@@ -1,107 +1,52 @@
 package tools.aqua.constraints.expressions;
 
-interface BooleanExpression : Expression<BoolSort>
+abstract class BooleanExpression(override val symbol: String = "") : AbstractExpression<BoolSort>(symbol, BoolSort)
 
 /**
- * Core And
+ * Core Boolean
  */
+
 data class And(override val children : Array<BooleanExpression>) :
-        BooleanExpression, NAryExpression<BoolSort, BooleanExpression>, NoEvaluation<BoolSort>() {
-    override val symbol = "and"
-    override val type = BoolSort
-}
+        NAryExpression<BoolSort, BooleanExpression>, BooleanExpression("and")
 
-/**
- * Core Or
- */
 data class Or(override val children : Array<BooleanExpression>) :
-    BooleanExpression, NAryExpression<BoolSort, BooleanExpression>, NoEvaluation<BoolSort>() {
-    override val symbol = "or"
-    override val type = BoolSort
-}
+        NAryExpression<BoolSort, BooleanExpression>, BooleanExpression("or")
 
-/**
- * Core Xor
- */
 data class Xor(override val left : BooleanExpression, override val right : BooleanExpression) :
-    BooleanExpression, BinaryExpression<BoolSort, BooleanExpression>, NoEvaluation<BoolSort>() {
-    override val symbol = "xor"
-    override val type = BoolSort
-}
+    BinaryExpression<BoolSort, BooleanExpression>, BooleanExpression("xor")
 
-/**
- * Core Implies
- */
 data class Implies(override val left : BooleanExpression, override val right : BooleanExpression) :
-    BooleanExpression, BinaryExpression<BoolSort, BooleanExpression>, NoEvaluation<BoolSort>() {
-    override val symbol = "=>"
-    override val type = BoolSort
-}
+        BinaryExpression<BoolSort, BooleanExpression>, BooleanExpression("=>")
 
-/**
- * Core Not
- */
 data class Not(override val inner : BooleanExpression) :
-        BooleanExpression, UnaryExpression<BoolSort, BooleanExpression>, NoEvaluation<BoolSort>() {
-    override val symbol = "not"
-    override val type = BoolSort
-}
+        UnaryExpression<BoolSort, BooleanExpression>, BooleanExpression("not")
 
 /**
- * Equality for all sorts
+ * Quantified: Exists
+ */
+data class Exists(override val vars : Array<Variable<*>>, override val inner : BooleanExpression) :
+        ExpressionWithBoundVariables<BoolSort>, BooleanExpression("exists")
+
+data class Forall(override val vars : Array<Variable<*>>, override val inner : BooleanExpression) :
+        ExpressionWithBoundVariables<BoolSort>, BooleanExpression("forall")
+
+/**
+ * Equality/Distinct for all sorts
  */
 data class Eq<I:Sort> (override val left : Expression<I>, override val right : Expression<I>) :
-        BooleanExpression, BinaryExpression<BoolSort, Expression<I>>, NoEvaluation<BoolSort>() {
-    override val symbol = "="
-    override val type = BoolSort
-}
+        BinaryExpression<BoolSort, Expression<I>>, BooleanExpression("=")
 
-/**
- * Distinct for all sorts
- */
 data class Distinct<I:Sort>(override val children : Array<Expression<I>>) :
-    BooleanExpression, NAryExpression<BoolSort, Expression<I>>, NoEvaluation<BoolSort>() {
-    override val symbol = "distinct"
-    override val type = BoolSort
-}
-
-/**
- * ITE for all sorts
- */
-data class Ite<T:Sort> (override val type:T, override val cnd : BooleanExpression,
-                        override val thn : Expression<T>, override val els : Expression<T>) :
-    Expression<T>, ITEExpression<T>, NoEvaluation<T>() {
-    override val symbol = "ite"
-}
+        NAryExpression<BoolSort, Expression<I>>, BooleanExpression("distinct")
 
 /**
  * Variable
  */
 data class BooleanVariable(override val symbol:String) :
-    Variable<BoolSort>(symbol, BoolSort), BooleanExpression
+    Variable<BoolSort>, BooleanExpression()
 
 /**
- * True named literal
+ * Constants
  */
-object True : BooleanExpression, Literal<BoolSort> {
-    override val symbol = "true"
-    override val type = BoolSort
-    override fun evaluate(vals: Valuation): EvaluationResult<BoolSort> =
-        EvaluationResult(this, "")
-    override fun toString(): String {
-        return this.symbol
-    }
-}
-
-/**
- * False named literal
- */
-object False : BooleanExpression, Literal<BoolSort> {
-    override val symbol = "false"
-    override val type = BoolSort
-    override fun evaluate(vals: Valuation): EvaluationResult<BoolSort> =
-        EvaluationResult(this, "")
-    override fun toString(): String {
-        return this.symbol
-    }
-}
+object True  : Literal<BoolSort>, BooleanExpression("true")
+object False : Literal<BoolSort>, BooleanExpression("false")

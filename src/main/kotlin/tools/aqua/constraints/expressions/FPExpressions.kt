@@ -1,86 +1,65 @@
 package tools.aqua.constraints.expressions;
 
-
 enum class RoundingMode {RNE, RNA, RTZ}
 
-interface FPExpression<T : FPSort> : Expression<T>
+abstract class FPExpression<T : FPSort>(override val symbol: String = "") : AbstractExpression<T>(symbol)
+abstract class FPBooleanExpression<I: FPSort>(override val symbol: String) : BooleanExpression(symbol)
 
-interface FPBooleanExpression<T : FPSort> : BooleanExpression
+/*
+ * Arithmetic
+ */
 
 data class FPAdd<T : FPSort>(override val type:T, val rnd: RoundingMode, override val left : Expression<T>, override val right : Expression<T>) :
-        FPExpression<T>, BinaryExpression<T, Expression<T>>, NoEvaluation<T>() {
-    override val symbol = "fp.add"
-}
+        BinaryExpression<T, Expression<T>>, FPExpression<T>("fp.add")
 
 data class FPSub<T : FPSort>(override val type:T, val rnd: RoundingMode, override val left : Expression<T>, override val right : Expression<T>) :
-        FPExpression<T>, BinaryExpression<T, Expression<T>>, NoEvaluation<T>() {
-    override val symbol = "fp.sub"
-}
+        BinaryExpression<T, Expression<T>>, FPExpression<T>("fp.sub")
 
 data class FPMul<T : FPSort>(override val type:T, val rnd : RoundingMode, override val left : Expression<T>, override val right : Expression<T>) :
-        FPExpression<T>, BinaryExpression<T, Expression<T>>, NoEvaluation<T>() {
-    override val symbol = "fp.mul"
-}
+        BinaryExpression<T, Expression<T>>, FPExpression<T>("fp.mul")
 
 data class FPDiv<T : FPSort>(override val type:T, val rnd: RoundingMode, override val left : Expression<T>, override val right : Expression<T>) :
-        FPExpression<T>, BinaryExpression<T, Expression<T>>, NoEvaluation<T>() {
-    override val symbol = "fp.div"
-}
+        BinaryExpression<T, Expression<T>>, FPExpression<T>("fp.div")
 
 data class FPRem<T : FPSort>(override val type:T, val rnd: RoundingMode, override val left : Expression<T>, override val right : Expression<T>) :
-        FPExpression<T>, BinaryExpression<T, Expression<T>>, NoEvaluation<T>() {
-    override val symbol = "fp.rem"
-}
+        BinaryExpression<T, Expression<T>>, FPExpression<T>("fp.rem")
+
 data class FPMin<T : FPSort>(override val type:T, override val left : Expression<T>, override val right : Expression<T>) :
-        FPExpression<T>,  BinaryExpression<T, Expression<T>>, NoEvaluation<T>() {
-    override val symbol = "fp.min"
-}
+        BinaryExpression<T, Expression<T>>, FPExpression<T>("fp.min")
 
 data class FPMax<T : FPSort>(override val type:T, override val left : Expression<T>, override val right : Expression<T>) :
-        FPExpression<T>, BinaryExpression<T, Expression<T>>, NoEvaluation<T>() {
-    override val symbol = "fp.max"
-}
+        BinaryExpression<T, Expression<T>>, FPExpression<T>("fp.max")
 
-data class FPEq<T : FPSort>(override val left : Expression<T>, override val right : Expression<T>) :
-        FPBooleanExpression<T>, BinaryExpression<BoolSort, Expression<T>>, NoEvaluation<BoolSort>() {
-    override val symbol = "fp.eq"
-    override val type = BoolSort
-}
+/*
+ * Comparisons
+ */
+
+data class FPEq<I : FPSort>(override val left : Expression<I>, override val right : Expression<I>) :
+        BinaryExpression<BoolSort, Expression<I>>, FPBooleanExpression<I>("fp.eq")
+
+/*
+ * Conversions
+ */
 
 data class FPtoFPfromBV<T : FPSort, I : BVSort>(override val type:T, override val inner : BVExpression<I>) :
-        FPExpression<T>, UnaryExpression<T, BVExpression<I>>, NoEvaluation<T>() {
-    override val symbol = "(_ to_fp ${type.eBits} ${type.mBits})"
-}
+        UnaryExpression<T, BVExpression<I>>, FPExpression<T>("(_ to_fp ${type.eBits} ${type.mBits})")
 
-/**
- * fp.to_sbv
- */
 data class FPtoSBV<T : BVSort, I : FPSort>(override val type:T, val rnd:RoundingMode, override val inner : FPExpression<I>) :
-    BVExpression<T>, UnaryExpression<T, FPExpression<I>>, NoEvaluation<T>() {
-    override val symbol = "(_ fp.to_sbv ${type.bits})"
-}
+    UnaryExpression<T, FPExpression<I>>, BVExpression<T>( "(_ fp.to_sbv ${type.bits})")
 
-/**
- * variable
+/*
+ * Variables / Literals
  */
+
 data class FPVariable<T : FPSort>(override val symbol:String, override val type:T) :
-    Variable<T>(symbol, type), FPExpression<T>
+    Variable<T>, FPExpression<T>()
 
-/**
- * constant
- */
 data class FPLiteral<T : FPSort>(override val type:T, val sBit:String, val eBits: String, val mBits: String) :
-        FPExpression<T>, Literal<T> {
-    override val symbol = "fp"
-    override fun evaluate(vals: Valuation): EvaluationResult<T> = EvaluationResult(this, "")
-}
+        Literal<T>, FPExpression<T>("fp")
 
-/**
- * NaN
+/*
+ * Constants
  */
-data class FPNaN<T : FPSort>(override val type:T) :
-        FPExpression<T>, Literal<T> {
-    override val symbol = "_ NaN"
-    override fun evaluate(vals: Valuation): EvaluationResult<T> = EvaluationResult(this, "")
-}
+
+data class FPNaN<T : FPSort>(override val type:T) : Literal<T>,  FPExpression<T>("_ NaN")
 

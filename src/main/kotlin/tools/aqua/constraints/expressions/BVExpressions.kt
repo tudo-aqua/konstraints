@@ -1,26 +1,26 @@
 package tools.aqua.constraints.expressions
 
 
-interface BVExpression<T : BVSort> : Expression<T>
+abstract class BVExpression<T : BVSort>(override val symbol: String = "") : AbstractExpression<T>(symbol)
+abstract class BVBooleanExpression<I : BVSort>(override val symbol: String) : BooleanExpression(symbol)
 
-interface BVBooleanExpression<T : BVSort> : BooleanExpression
-
-/**
- * bv add
+/*
+ * Arithmetic
  */
+
 data class BVAdd<T : BVSort>(override val type:T, override val left : Expression<T>, override val right : Expression<T>) :
-        BVExpression<T>, BinaryExpression<T, Expression<T>>, NoEvaluation<T>() {
-    override val symbol = "bvadd"
-}
+        BinaryExpression<T, Expression<T>>, BVExpression<T>("bvadd")
 
-/**
- * bv signed less
+/*
+ * Comparisons
  */
-data class BVSLeq<T : BVSort>(override val left : Expression<T>, override val right : Expression<T>) :
-        BVBooleanExpression<T>, BinaryExpression<BoolSort, Expression<T>>, NoEvaluation<BoolSort>() {
-    override val symbol = "bvsle"
-    override val type = BoolSort
-}
+
+data class BVSLeq<I : BVSort>(override val left : Expression<I>, override val right : Expression<I>) :
+        BinaryExpression<BoolSort, Expression<I>>, BVBooleanExpression<I>("bvsle")
+
+/*
+ * Variables
+ */
 
 data class BPVariable<T : BVSort>(override val symbol:String, override val type:T) :
-    Variable<T>(symbol, type), BVExpression<T>
+    Variable<T>, BVExpression<T>()

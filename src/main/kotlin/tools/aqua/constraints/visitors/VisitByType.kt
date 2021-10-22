@@ -58,8 +58,8 @@ abstract class VisitByType<in H, out R> {
 
     abstract fun <T:FPSort> visit(expr : FPLiteral<T>, ctx : H) : R
 
-    private fun <T : FPSort> visit(expr : FPBooleanExpression<T>, ctx : H) : R = when (expr) {
-        is FPEq<*> -> visit(expr, ctx)
+    private fun <I:FPSort> visit(expr : FPBooleanExpression<I>, ctx : H) : R = when (expr) {
+        is FPEq<I> -> visit(expr, ctx)
         else -> missingCase(expr)
     }
 
@@ -75,9 +75,9 @@ abstract class VisitByType<in H, out R> {
 
     fun <T:Sort> visit(expr : Expression<T>, ctx : H) : R = when (expr) {
         // variables can be handled uniformly
-        is Variable<*> -> visit(expr, ctx)
+        is Variable<T> -> visit(expr, ctx)
         // more specific types first
-        is Ite<*> -> visit(expr, ctx)
+        is Ite -> visit(expr, ctx)
         is FPBooleanExpression<*> -> visit(expr, ctx)
         is BooleanExpression -> visit(expr, ctx)
         is FPExpression<*> -> visit(expr, ctx)

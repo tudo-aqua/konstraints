@@ -27,7 +27,7 @@ object SMTLibExport : VisitByType<Appendable, Unit>() {
 
     // Float
 
-    override fun <T : FPSort> visit(expr: FPEq<T>, ctx: Appendable) =
+    override fun <I : FPSort> visit(expr: FPEq<I>, ctx: Appendable) =
             paren(ctx, expr, expr.left, expr.right)
 
     override fun <T : FPSort> visit(expr: FPNaN<T>, ctx: Appendable) =
@@ -66,7 +66,7 @@ object SMTLibExport : VisitByType<Appendable, Unit>() {
         ctx.append(")")
     }
 
-    private fun paren(ctx: Appendable, expr:Expression<*>, param:String, vararg children:Expression<*>) {
+    private fun <I:Sort> paren(ctx: Appendable, expr:Expression<*>, param:String, vararg children:Expression<I>) {
         ctx.append("(")
         ctx.append(expr.symbol).append(" ").append(param)
         for (child in children) {

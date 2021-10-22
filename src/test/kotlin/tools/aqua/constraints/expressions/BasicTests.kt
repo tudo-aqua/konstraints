@@ -12,10 +12,15 @@ class BasicTests {
 
     @Test
     fun testVisitor() {
+
+        val lit = FPLiteral(Float32,"1", "00000000", "00000000000000000000000")
+
         val eq = FPEq(
-                FPLiteral(Float32,"1", "00000000", "00000000000000000000000"),
+                lit,
                 FPNaN(Float32)
         )
+
+        println("LIT TYPE: ${lit.type}")
 
         println( SMTLibExport.export(eq) )
 
@@ -31,16 +36,6 @@ class BasicTests {
 
         val vars = FreeVariables.of(min)
         println(SMTLibExport.declare(vars[0]))
-
-        assertEquals("x", "x")
-    }
-
-    @Test
-    fun testEvaluation() {
-        val and = And( arrayOf(True, True))
-
-        val e = and.evaluate( Valuation())
-        println(e.value)
 
         assertEquals("x", "x")
     }

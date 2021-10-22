@@ -1,6 +1,5 @@
 package tools.aqua.constraints.expressions
 
-
 interface Expression<T : Sort> {
 
     /**
@@ -12,10 +11,5 @@ interface Expression<T : Sort> {
      * type of the expression
      */
     val type:Sort
-
-    /**
-     * evaluate expression
-     */
-    fun evaluate(vals:Valuation) : EvaluationResult<T>
 
 }
