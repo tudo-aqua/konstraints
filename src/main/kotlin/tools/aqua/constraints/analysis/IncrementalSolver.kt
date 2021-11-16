@@ -2,8 +2,12 @@ package tools.aqua.constraints.analysis
 
 import tools.aqua.constraints.expressions.BooleanExpression
 
-interface Interpolator {
+interface IncrementalSolver {
 
-    fun interpolate(a:BooleanExpression, b:BooleanExpression) : Interpolant
+    fun add(vararg expr: BooleanExpression)
+
+    fun push()
+
+    fun pop()
 
 }

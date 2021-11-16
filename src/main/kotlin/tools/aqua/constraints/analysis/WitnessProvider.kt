@@ -2,8 +2,7 @@ package tools.aqua.constraints.analysis
 
 import tools.aqua.constraints.expressions.BooleanExpression
 
-interface Interpolator {
+interface WitnessProvider {
 
-    fun interpolate(a:BooleanExpression, b:BooleanExpression) : Interpolant
-
+    fun solveWithWitness(vararg expr: BooleanExpression)
 }
