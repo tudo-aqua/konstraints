@@ -1,41 +1,113 @@
 package tools.aqua.constraints.expressions
 
-// Basic Sort
-
+/**
+ * Basic marker interface for sorts
+ */
 interface Sort
 
-// Unit
+/**
+ * Shared marker for ints and reals
+ */
+interface NumericSort : Sort
 
-object NoSort : Sort
+/**
+ * SMTLib Bool
+ */
+object BoolSort : Sort {
+    override fun toString() = "Bool"
+}
 
-// Special Sorts
+/**
+ * SMTLib Int
+ */
+object IntSort  : NumericSort {
+    override fun toString() = "Int"
+}
 
-object BoolSort : Sort
-object IntSort  : Sort
-object RealSort : Sort
+/**
+ * SMTLib Real
+ */
+object RealSort : NumericSort {
+    override fun toString() = "Real"
+}
 
-// Floating Point
-
+/**
+ * SMTLib floating point sort
+ */
 open class FPSort(val eBits: Int, val mBits: Int) : Sort {
     override fun toString(): String = "(_ FloatingPoint $eBits $mBits)"
 }
 
-object Float16  : FPSort( 5,  11) { override fun toString(): String =  "Float16" }
-object Float32  : FPSort( 8,  24) { override fun toString(): String =  "Float32" }
-object Float64  : FPSort(11,  53) { override fun toString(): String =  "Float64" }
-object Float128 : FPSort(15, 113) { override fun toString(): String = "Float128" }
+/**
+ * SMTLib Float16
+ */
+object Float16  : FPSort( 5,  11)
 
-// Bitvector
+/**
+ * SMTLib Float32
+ */
+object Float32  : FPSort( 8,  24)
 
+/**
+ * SMTLib Float64
+ */
+object Float64  : FPSort(11,  53)
+
+/**
+ * SMTLib Float128
+ */
+object Float128 : FPSort(15, 113)
+
+/**
+ * SMTLib BitVec
+ */
 open class BVSort(val bits: Int) : Sort {
     override fun toString(): String = "(_ BitVec $bits)"
 }
 
-object BitVec8  : BVSort( 8) // not in SMTLib
-object BitVec16 : BVSort(16) // not in SMTLib
-object BitVec32 : BVSort(32) // not in SMTLib
-object BitVec64 : BVSort(64) // not in SMTLib
+/**
+ * 8 bit. Not in SMTLib
+ */
+object BitVec8   : BVSort( 8)
 
-// Custom Sorts
+/**
+ * 16 bit. Not in SMTLib
+ */
+object BitVec16  : BVSort( 16)
 
-data class NamedSort(val name:String)
+/**
+ * 32 bit. Not in SMTLib
+ */
+object BitVec32  : BVSort( 32)
+
+/**
+ * 64 bit. Not in SMTLib
+ */
+object BitVec64  : BVSort( 64)
+
+/**
+ * 128 bit. Not in SMTLib
+ */
+object BitVec128 : BVSort( 128)
+
+
+/**
+ * SMTLib String
+ */
+object StringSort : Sort {
+    override fun toString() = "String"
+}
+
+/**
+ * Function sort
+ */
+data class FunctionSort(val argTypes:List<Sort>, val returnType:Sort) : Sort {
+    override fun toString() = "(${argTypes.joinToString(" ")}) $returnType"
+}
+
+/**
+ * SMTLib named sort
+ */
+data class NamedSort(val name:String) : Sort {
+        override fun toString() = name
+}

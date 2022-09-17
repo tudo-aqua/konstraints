@@ -3,9 +3,11 @@ package tools.aqua.constraints.visitors
 import tools.aqua.constraints.expressions.*
 
 /**
- * Basis for Type-Based Case Analysis
+ * Basis for type-based visitors.
  */
 abstract class VisitByType<in H, out R> {
+
+    // TODO: add missing cases
 
     // Boolean
 
@@ -19,6 +21,7 @@ abstract class VisitByType<in H, out R> {
         is False -> visit(expr, ctx)
         is Eq<*> -> visit(expr, ctx)
         is Distinct<*> -> visit(expr, ctx)
+        is BooleanVariable -> visit(expr, ctx)
         else -> missingCase(expr)
     }
 
@@ -29,8 +32,8 @@ abstract class VisitByType<in H, out R> {
     abstract fun visit(expr:Not, ctx : H) : R
     abstract fun visit(expr:True, ctx : H) : R
     abstract fun visit(expr:False, ctx : H) : R
-
-    abstract fun <I:Sort> visit(expr:Eq<I>, ctx : H) : R
+    abstract fun visit(expr:BooleanVariable, ctx : H) : R
+    abstract fun visit(expr:Eq<*>, ctx : H) : R
     abstract fun <I:Sort> visit(expr:Distinct<I>, ctx : H) : R
 
     // Int
@@ -67,21 +70,50 @@ abstract class VisitByType<in H, out R> {
 
     // String
 
-    // Equality and Uninterpreted Functions
-
     // Array Theory
+
+    // Numeric
+
+    private fun <T:NumericSort> visit(expr : NumericExpression<T>, ctx : H) : R = when (expr) {
+        is Add<T> -> visit(expr, ctx)
+        is Sub<T> -> visit(expr, ctx)
+        is Mul<T> -> visit(expr, ctx)
+        is Neg<T> -> visit(expr, ctx)
+        is NumericVariable<T> -> visit(expr, ctx)
+        is IntLiteral -> visit(expr, ctx)
+        else -> missingCase(expr)
+    }
+
+    abstract fun <T:NumericSort> visit(expr:Add<T>, ctx : H) : R
+    abstract fun <T:NumericSort> visit(expr:Sub<T>, ctx : H) : R
+    abstract fun <T:NumericSort> visit(expr:Mul<T>, ctx : H) : R
+    abstract fun <T:NumericSort> visit(expr:Neg<T>, ctx : H) : R
+    abstract fun <T:NumericSort> visit(expr:NumericVariable<T>, ctx : H) : R
+    abstract fun visit(expr:IntLiteral, ctx : H) : R
+
+    // Uninterpreted Functions
+
+    fun <T:Sort> visit(expr : FunctionExpression<T>, ctx : H) : R = when (expr) {
+        is Application -> visit(expr, ctx)
+        else -> missingCase(expr)
+    }
+
+    abstract fun <T:Sort> visit(expr:Application<T>, ctx : H) : R
+
 
     // Top Level
 
     fun <T:Sort> visit(expr : Expression<T>, ctx : H) : R = when (expr) {
         // variables can be handled uniformly
-        is Variable<T> -> visit(expr, ctx)
+        // is Variable<T> -> visit(expr, ctx)
         // more specific types first
         is Ite -> visit(expr, ctx)
         is FPBooleanExpression<*> -> visit(expr, ctx)
         is BooleanExpression -> visit(expr, ctx)
         is FPExpression<*> -> visit(expr, ctx)
         is BVExpression<*> -> visit(expr, ctx)
+        is NumericExpression<*> -> visit(expr, ctx)
+        is FunctionExpression<*> -> visit(expr, ctx)
         else -> missingCase(expr)
     }
 
