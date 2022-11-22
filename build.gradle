@@ -29,4 +29,11 @@ shadowJar{
     archiveClassifier.set("jar-with-dependencies")
     mergeServiceFiles()
 }
+jar {
+    manifest {
+        attributes 'Main-Class': 'tools.aqua.constraints.runner.KonstraintsRunner'
+    }
+}
+
+
 assemble.dependsOn shadowJar
