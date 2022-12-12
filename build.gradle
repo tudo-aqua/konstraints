@@ -15,7 +15,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "tools.aqua:z3-turnkey:4.11.2"
     implementation("com.github.h0tk3y.betterParse:better-parse:0.4.2")
-    implementation "org.mod4j.org.apache.commons:cli:1.0.0"
+
+    implementation("commons-cli:commons-cli:1.5.0")
     testCompile group: 'junit', name: 'junit', version: '4.12'
 }
 
