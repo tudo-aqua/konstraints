@@ -1,0 +1,13 @@
+stages:
+  - build
+
+build-konstraints:
+  image: ubuntu:20.04
+  stage: build
+  script:
+    - apt update
+    - apt install -y openjdk-11-jdk
+    - ./gradlew assemble
+  artifacts:
+    path:
+      - build/libs/*
