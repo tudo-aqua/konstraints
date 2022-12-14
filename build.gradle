@@ -32,4 +32,10 @@ shadowJar{
     mergeServiceFiles()
 }
 
+jar {
+    manifest {
+        attributes 'Main-Class': 'tools.aqua.constraints.runner.KonstraintsRunnerKt'
+    }
+}
+
 assemble.dependsOn shadowJar

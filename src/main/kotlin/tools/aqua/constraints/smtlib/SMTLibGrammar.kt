@@ -163,7 +163,7 @@ abstract class SMTLibGrammar<T> : Grammar<T>() {
 
     internal val option by regexToken(":[a-zA-Z\\-]+")
 
-    internal val symbol by regexToken("[a-zA-Z\\-_0-9!]+")
+    internal val symbol by regexToken("[a-zA-Z\\-_0-9!\$]+")
     
     // ignore white space and comments
     internal val ws by regexToken("\\s+", ignore = true)
