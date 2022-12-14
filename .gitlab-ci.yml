@@ -9,5 +9,5 @@ build-konstraints:
     - apt install -y openjdk-11-jdk
     - ./gradlew assemble
   artifacts:
-    path:
+    paths:
       - build/libs/*
