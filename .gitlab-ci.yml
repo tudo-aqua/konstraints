@@ -8,6 +8,9 @@ build-konstraints:
     - apt update
     - apt install -y openjdk-11-jdk
     - ./gradlew assemble
+    - git rev-parse --short HEAD > konstraints-commit.txt
+    - cat konstraints-commit.txt
   artifacts:
     paths:
       - build/libs/*
+      - konstraints-commit.txt
