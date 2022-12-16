@@ -6,7 +6,7 @@ build-konstraints:
   stage: build
   script:
     - apt update
-    - apt install -y openjdk-11-jdk
+    - apt install -y openjdk-11-jdk git
     - ./gradlew assemble
     - git rev-parse --short HEAD > konstraints-commit.txt
     - cat konstraints-commit.txt
