@@ -60,15 +60,19 @@ open class Sort(val identifier : SMTIdentifier, val varargs : List<Sort>) {
 /**
  * SMTLib Bool
  */
-object BoolSort : Sort(SMTIdentifier(SMTSymbol("Bool"))) {
-}
+object BoolSort : Sort(SMTIdentifier(SMTSymbol("Bool"))) {}
+
+/**
+ * SMTLib fixed size bitvector
+ */
+open class BVSort(val bits : Int) : Sort(SMTIdentifier(SMTSymbol("BitVec"), listOf("$bits"))) {}
+
+object BVSort32 : BVSort(32)
 
 /**
  * SMTLib String
  */
 object StringSort : Sort(SMTIdentifier(SMTSymbol("String")))
-
-object BVSort32 : Sort(SMTIdentifier(SMTSymbol("BitVec"), listOf("32")))
 
 object IntSort : Sort(SMTIdentifier(SMTSymbol("Int")))
 
