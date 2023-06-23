@@ -1,5 +1,7 @@
+package tools.aqua.konstraints
+
 /**
- * Data class representing an SMTSymbol
+ * Data class representing an tools.aqua.konstraints.SMTSymbol
  * constructor checks if [symbol] is a valid simple symbol or quoted symbol
  * quotes symbol if needed, allows for explicit and implicit creation of quoted symbols
  * @throws [IllegalArgumentException] if [symbol] is not valid
@@ -12,7 +14,7 @@ data class SMTSymbol(val symbol : String) {
      */
     companion object Regex {
         val simple = Regex("""[a-zA-Z~!@$%^&*_\-+=<>.?/][0-9a-zA-Z~!@$%^&*_\-+=<>.?/]*""")
-        val quoted = Regex("""\|(.|\n)*\|""")
+        val quoted = Regex("""\|([^\|]|\n)*\|""")
     }
 
     /**
@@ -29,7 +31,7 @@ data class SMTSymbol(val symbol : String) {
     }
 
     /**
-     * Serialization of SMTSymbol, quotes symbol if needed
+     * Serialization of tools.aqua.konstraints.SMTSymbol, quotes symbol if needed
      * @return a valid quoted or simple SMT Symbol
      */
     override fun toString() = if(symbol.matches(simple)) symbol else "|$symbol|"
@@ -78,7 +80,8 @@ object IntSort : Sort(SMTIdentifier(SMTSymbol("Int")))
 
 object RealSort : Sort(SMTIdentifier(SMTSymbol("Real")))
 
-object ExampleListSort : Sort(SMTIdentifier(SMTSymbol("List")),
+object ExampleListSort : Sort(
+    SMTIdentifier(SMTSymbol("List")),
     listOf(Sort(SMTIdentifier(SMTSymbol("Array")), listOf(IntSort, RealSort))))
 
 object ExampleFixedSizeList : Sort(SMTIdentifier(SMTSymbol("FixedSizeList"), listOf("4")), listOf(RealSort))
@@ -90,13 +93,13 @@ object ExampleSet : Sort(SMTIdentifier(SMTSymbol("Set")), listOf(BVSort32))
  */
 
 /*
-data class FunctionSort(val argTypes:List<Sort>, val returnType:Sort) : Sort {
+data class FunctionSort(val argTypes:List<tools.aqua.konstraints.Sort>, val returnType:tools.aqua.konstraints.Sort) : tools.aqua.konstraints.Sort {
     override fun toString() = "(${argTypes.joinToString(" ")}) $returnType"
 }
 */
 
 /**
-open class ParameterizedSort(val name: String, val arity: Int) : Sort {
+open class ParameterizedSort(val name: String, val arity: Int) : tools.aqua.konstraints.Sort {
     override fun equals(other: Any?): Boolean = when {
         this === other -> true
         other !is ParameterizedSort -> false
