@@ -17,6 +17,8 @@
  */
 
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
+import com.github.gradle.node.variant.computeNodeDir
+import com.github.gradle.node.variant.computeNodeExec
 import org.gradle.api.plugins.JavaBasePlugin.DOCUMENTATION_GROUP
 import org.gradle.api.publish.plugins.PublishingPlugin.PUBLISH_TASK_GROUP
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
@@ -110,7 +112,7 @@ spotless {
     licenseHeaderFile(project.file("config/license/CC-BY-4.0-xmlstyle"), "#+")
     prettier()
         .npmInstallCache()
-        .nodeExecutable("${tasks.nodeSetup.flatMap { it.nodeDir }.get()}/bin/node")
+        .nodeExecutable(computeNodeExec(node, computeNodeDir(node)).get())
         .config(mapOf("parser" to "markdown", "printWidth" to 100, "proseWrap" to "always"))
   }
   yaml {
@@ -118,7 +120,7 @@ spotless {
     licenseHeaderFile(project.file("config/license/Apache-2.0-hashmark"), "[A-Za-z-]+:")
     prettier()
         .npmInstallCache()
-        .nodeExecutable("${tasks.nodeSetup.flatMap { it.nodeDir }.get()}/bin/node")
+        .nodeExecutable(computeNodeExec(node, computeNodeDir(node)).get())
         .config(mapOf("parser" to "yaml", "printWidth" to 100))
   }
   format("toml") {
@@ -126,7 +128,7 @@ spotless {
     licenseHeaderFile(project.file("config/license/Apache-2.0-hashmark"), """\[[A-Za-z-]+]""")
     prettier(mapOf("prettier-plugin-toml" to libs.versions.prettier.toml.get()))
         .npmInstallCache()
-        .nodeExecutable("${tasks.nodeSetup.flatMap { it.nodeDir }.get()}/bin/node")
+        .nodeExecutable(computeNodeExec(node, computeNodeDir(node)).get())
         .config(mapOf("parser" to "toml", "printWidth" to 100))
   }
 }
