@@ -21,6 +21,12 @@ on:
   pull_request:
   workflow_dispatch:
 
+permissions:
+  checks: write
+  contents: read
+  packages: read
+  pull-requests: write
+
 jobs:
   validate-gradle:
     name: "Gradle Wrapper Validation"
