@@ -1,0 +1,102 @@
+#  SPDX-License-Identifier: Apache-2.0
+#
+#  Copyright 2023-2023 The Konstraints Authors
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
+name: CI/CD
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  validate-gradle:
+    name: "Gradle Wrapper Validation"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: gradle/wrapper-validation-action@v1
+
+  detekt:
+    name: "Detekt Analysis"
+    needs: validate-gradle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Required for version number generation
+      - uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: "Run Detekt"
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: detekt
+      - name: "Attach Detekt Report"
+        shell: sh
+        run: cat build/reports/detekt/detekt.md >> ${GITHUB_STEP_SUMMARY}
+
+  spotless:
+    name: "Spotless Style Check"
+    needs: validate-gradle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Required for version number generation
+      - uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: "Run Spotless"
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: spotlessCheck
+      - name: "Apply Spotless Fixes"
+        if: failure()
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: spotlessApply
+      - name: "Attach Spotless Diff"
+        if: failure()
+        shell: sh
+        run: >
+          echo "# Spotless Changes\n\n```diff" >> ${GITHUB_STEP_SUMMARY}       
+          git diff >> ${GITHUB_STEP_SUMMARY}
+          echo "```" >> ${GITHUB_STEP_SUMMARY}
+
+  junit-test:
+    name: "JUnit Tests"
+    needs: validate-gradle
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Required for version number generation
+      - uses: actions/setup-java@v3
+        with:
+          distribution: temurin
+          java-version: 17
+      - name: "Run JUnit Tests"
+        uses: gradle/gradle-build-action@v2
+        with:
+          arguments: test
+      - name: "Publish Test Results"
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always() # Must execute after failed tests
+        with:
+          files: "build/test-results/test/TEST-*.xml"
+          comment_mode: off
