@@ -131,6 +131,10 @@ spotless {
   }
 }
 
+tasks.named("spotlessMarkdown") { dependsOn(tasks.npmSetup) }
+
+tasks.named("spotlessToml") { dependsOn(tasks.npmSetup) }
+
 tasks.named("spotlessYaml") { dependsOn(tasks.npmSetup) }
 
 detekt { ignoreFailures = true }
