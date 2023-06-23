@@ -109,6 +109,7 @@ spotless {
     target(".github/**/*.md", "*.md")
     licenseHeaderFile(project.file("config/license/CC-BY-4.0-xmlstyle"), "#+")
     prettier()
+        .npmInstallCache()
         .nodeExecutable("${tasks.nodeSetup.flatMap { it.nodeDir }.get()}/bin/node")
         .config(mapOf("parser" to "markdown", "printWidth" to 100, "proseWrap" to "always"))
   }
@@ -116,6 +117,7 @@ spotless {
     target("config/**/*.yml", ".github/**/*.yml", "CITATION.cff")
     licenseHeaderFile(project.file("config/license/Apache-2.0-hashmark"), "[A-Za-z-]+:")
     prettier()
+        .npmInstallCache()
         .nodeExecutable("${tasks.nodeSetup.flatMap { it.nodeDir }.get()}/bin/node")
         .config(mapOf("parser" to "yaml", "printWidth" to 100))
   }
@@ -123,6 +125,7 @@ spotless {
     target("gradle/libs.versions.toml")
     licenseHeaderFile(project.file("config/license/Apache-2.0-hashmark"), """\[[A-Za-z-]+]""")
     prettier(mapOf("prettier-plugin-toml" to libs.versions.prettier.toml.get()))
+        .npmInstallCache()
         .nodeExecutable("${tasks.nodeSetup.flatMap { it.nodeDir }.get()}/bin/node")
         .config(mapOf("parser" to "toml", "printWidth" to 100))
   }
