@@ -87,4 +87,10 @@ class SortTests {
         arguments("((_ FixedSizeList 4) Real)", ExampleFixedSizeList),
         arguments("(Set (_ BitVec 32))", ExampleSet))
   }
+
+  @ParameterizedTest
+  @ValueSource(ints = [-1])
+  fun testBitvectorConstraints(bits: Int) {
+    assertThrows<IllegalArgumentException> { BVSort(bits) }
+  }
 }

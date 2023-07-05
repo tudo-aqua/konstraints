@@ -67,7 +67,21 @@ object BoolSort : Sort(SMTIdentifier(SMTSymbol("Bool"))) {}
 /**
  * SMTLib fixed size bitvector
  */
-open class BVSort(val bits : Int) : Sort(SMTIdentifier(SMTSymbol("BitVec"), listOf("$bits"))) {}
+open class BVSort(val bits : Int) : Sort(SMTIdentifier(SMTSymbol("BitVec"), listOf("$bits"))) {
+    init {
+        require(bits > 0)
+    }
+
+    override fun equals(other: Any?): Boolean = when {
+        this === other -> true
+        other !is BVSort -> false
+        else -> bits == other.bits
+    }
+
+    override fun hashCode(): Int = bits
+
+
+}
 
 object BVSort32 : BVSort(32)
 
