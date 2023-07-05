@@ -81,9 +81,9 @@ dependencies {
 }
 
 node {
-  download.set(true)
-  version.set(libs.versions.nodejs.get())
-  workDir.set(file("${buildDir}/nodejs"))
+  download = true
+  version = libs.versions.nodejs.get()
+  workDir = file("${buildDir}/nodejs")
 }
 
 fun isNonStable(version: String): Boolean {
@@ -144,7 +144,7 @@ detekt { ignoreFailures = true }
 val kdocJar: TaskProvider<Jar> by
     tasks.registering(Jar::class) {
       group = DOCUMENTATION_GROUP
-      archiveClassifier.set("kdoc")
+      archiveClassifier = "kdoc"
       from(tasks.dokkaHtml.flatMap { it.outputDirectory })
     }
 
@@ -159,7 +159,7 @@ artifacts { add(kdoc.name, kdocJar) }
 val javadocJar: TaskProvider<Jar> by
     tasks.registering(Jar::class) {
       group = DOCUMENTATION_GROUP
-      archiveClassifier.set("javadoc")
+      archiveClassifier = "javadoc"
       from(tasks.dokkaJavadoc.flatMap { it.outputDirectory })
     }
 
@@ -181,43 +181,43 @@ publishing {
       from(components["java"])
 
       pom {
-        name.set("Konstraints")
-        description.set("A library for working with SMT Expressions in the JVM")
-        url.set("https://github.com/tudo-aqua/konstraints")
+        name = "Konstraints"
+        description = "A library for working with SMT Expressions in the JVM"
+        url = "https://github.com/tudo-aqua/konstraints"
 
         licenses {
           license {
-            name.set("Apache-2.0")
-            url.set("https://www.apache.org/licenses/LICENSE-2.0")
+            name = "Apache-2.0"
+            url = "https://www.apache.org/licenses/LICENSE-2.0"
           }
           license {
-            name.set("CC-BY-4.0")
-            url.set("https://creativecommons.org/licenses/by/4.0/")
+            name = "CC-BY-4.0"
+            url = "https://creativecommons.org/licenses/by/4.0/"
           }
         }
 
         developers {
           developer {
-            name.set("Simon Dierl")
-            email.set("simon.dierl@tu-dortmund.de")
-            organization.set("TU Dortmund University")
+            name = "Simon Dierl"
+            email = "simon.dierl@tu-dortmund.de"
+            organization = "TU Dortmund University"
           }
           developer {
-            name.set("Falk Howar")
-            email.set("falk.howar@tu-dortmund.de")
-            organization.set("TU Dortmund University")
+            name = "Falk Howar"
+            email = "falk.howar@tu-dortmund.de"
+            organization = "TU Dortmund University"
           }
           developer {
-            name.set("Laurenz Levi Spielmann")
-            email.set("laurenz-levi.spielmann@tu-dortmund.de")
-            organization.set("TU Dortmund University")
+            name = "Laurenz Levi Spielmann"
+            email = "laurenz-levi.spielmann@tu-dortmund.de"
+            organization = "TU Dortmund University"
           }
         }
 
         scm {
-          url.set("https://github.com/tudo-aqua/konstraints/tree/main")
-          connection.set("scm:git:git://github.com:tudo-aqua/konstraints.git")
-          developerConnection.set("scm:git:ssh://git@github.com:tudo-aqua/konstraints.git")
+          url = "https://github.com/tudo-aqua/konstraints/tree/main"
+          connection = "scm:git:git://github.com:tudo-aqua/konstraints.git"
+          developerConnection = "scm:git:ssh://git@github.com:tudo-aqua/konstraints.git"
         }
       }
     }
