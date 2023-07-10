@@ -19,7 +19,7 @@
 package tools.aqua.konstraints
 
 import java.util.stream.Stream
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -97,5 +97,49 @@ class SortTests {
   @ValueSource(ints = [-1, 0])
   fun `test that bitvectors can only be constructed with more than 0 bits`(bits: Int) {
     assertThrows<IllegalArgumentException> { BVSort(bits) }
+  }
+
+  @ParameterizedTest
+  @MethodSource("getEqualBVSortObjects")
+  fun `test that BVSort equals works for equal bitvectors`(lhs: BVSort, rhs: BVSort) {
+    assertEquals(lhs, rhs)
+  }
+
+  private fun getEqualBVSortObjects(): Stream<Arguments> {
+    return Stream.of(
+        arguments(BVSort(8), BVSort(8)),
+        arguments(BVSort32, BVSort32),
+        arguments(BVSort32, BVSort(32)))
+  }
+
+  @ParameterizedTest
+  @MethodSource("getUnequalBVSortObjects")
+  fun `test that BVSort equals works for unequal bitvectors`(lhs: BVSort, rhs: BVSort) {
+    assertNotEquals(lhs, rhs)
+  }
+
+  private fun getUnequalBVSortObjects(): Stream<Arguments> {
+    return Stream.of(
+        arguments(BVSort(8), BVSort(16)),
+        arguments(BVSort32, BVSort(16)),
+        arguments(BVSort32, BVSort16))
+  }
+
+  @ParameterizedTest
+  @MethodSource("getBVSortObjects")
+  fun `test that BVSort hash code returns the same value on multiple invocations`(
+      bitvector: BVSort
+  ) {
+    assertEquals(bitvector.hashCode(), bitvector.hashCode())
+  }
+
+  private fun getBVSortObjects(): Stream<Arguments> {
+    return Stream.of(arguments(BVSort32), arguments(BVSort16), arguments(BVSort(8)))
+  }
+
+  @ParameterizedTest
+  @MethodSource("getEqualBVSortObjects")
+  fun `test that equal BVSorts return the same hash code`(lhs: BVSort, rhs: BVSort) {
+    assertEquals(lhs.hashCode(), rhs.hashCode())
   }
 }

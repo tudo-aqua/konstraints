@@ -84,6 +84,7 @@ open class BVSort(val bits : Int) : Sort(SMTIdentifier(SMTSymbol("BitVec"), list
 }
 
 object BVSort32 : BVSort(32)
+object BVSort16 : BVSort(16)
 
 /**
  * SMTLib String
