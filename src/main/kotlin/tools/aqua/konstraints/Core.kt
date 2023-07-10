@@ -18,7 +18,10 @@
 
 package tools.aqua.konstraints
 
-/** Definition of SMTLib Core theory according to http://smtlib.cs.uiowa.edu/theories-Core.shtml */
+/*
+ * This file implements the SMT core theory
+ * http://smtlib.cs.uiowa.edu/theories-Core.shtml
+ */
 
 /** Object for SMT true */
 object True : Expression<BoolSort>() {
