@@ -21,25 +21,33 @@ package tools.aqua.konstraints
 import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.*
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+/*
+ * Lifecycle.PER_CLASS is needed for MethodSource to avoid moving sources to a companion object
+ * This also avoids creating a new class for every test, as this is not needed, because no data is modified
+ */
+@TestInstance(Lifecycle.PER_CLASS)
 class CoreTests {
   private val A = BasicExpression("A", BoolSort)
   private val B = BasicExpression("B", BoolSort)
   private val C = BasicExpression("C", BoolSort)
 
   @ParameterizedTest
-  @MethodSource("testCoreSerializationParameterization")
-  fun testCoreSerialization(expected: String, expression: Expression<BoolSort>) {
+  @MethodSource("getCoreTheoryExpressionsAndTheirSerialization")
+  fun `test that serialization of boolean expressions is correct`(
+      expected: String,
+      expression: Expression<BoolSort>
+  ) {
     Assertions.assertEquals(expected, expression.toString())
   }
 
-  private fun testCoreSerializationParameterization(): Stream<Arguments> {
+  private fun getCoreTheoryExpressionsAndTheirSerialization(): Stream<Arguments> {
     return Stream.of(
         arguments("true", True),
         arguments("false", False),

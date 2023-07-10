@@ -21,6 +21,7 @@ package tools.aqua.konstraints
 import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
@@ -30,7 +31,11 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import tools.aqua.konstraints.*
 
-@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+/*
+ * Lifecycle.PER_CLASS is needed for MethodSource to avoid moving sources to a companion object
+ * This also avoids creating a new class for every test, as this is not needed, because no data is modified
+ */
+@TestInstance(Lifecycle.PER_CLASS)
 class SortTests {
   @ParameterizedTest
   @ValueSource(
@@ -57,29 +62,29 @@ class SortTests {
               "||",
               """| " can occur too |""",
               """| af klj ^*0 asfe2 (&*)&(#^ $ > > >?" ']]984|"""])
-  fun testSymbolPositive(symbol: String) {
+  fun `test that valid SMTSymbols get accepted by the constructor`(symbol: String) {
     assertDoesNotThrow { SMTSymbol(symbol) }
   }
 
   @ParameterizedTest
   @ValueSource(strings = ["32", "3bitvec"])
-  fun testImplicitQuoting(symbol: String) {
+  fun `test that symbols that need to be quoted get automatically quoted`(symbol: String) {
     assertEquals("|$symbol|", SMTSymbol(symbol).toString())
   }
 
   @ParameterizedTest
   @ValueSource(strings = ["bit|vec"])
-  fun testSymbolNegative(symbol: String) {
+  fun `test that invalid SMTSymbols get rejected by the constructor`(symbol: String) {
     assertThrows<IllegalArgumentException> { SMTSymbol(symbol) }
   }
 
   @ParameterizedTest
-  @MethodSource("testSortSerializationParameterization")
-  fun testSortSerialization(symbol: String, sort: Sort) {
+  @MethodSource("getSortsAndTheirSerialization")
+  fun `test that serialization of sorts is correct`(symbol: String, sort: Sort) {
     assertEquals(symbol, sort.toString())
   }
 
-  private fun testSortSerializationParameterization(): Stream<Arguments> {
+  private fun getSortsAndTheirSerialization(): Stream<Arguments> {
     return Stream.of(
         arguments("Bool", BoolSort),
         arguments("(_ BitVec 32)", BVSort32),
@@ -89,8 +94,8 @@ class SortTests {
   }
 
   @ParameterizedTest
-  @ValueSource(ints = [-1])
-  fun testBitvectorConstraints(bits: Int) {
+  @ValueSource(ints = [-1, 0])
+  fun `test that bitvectors can only be constructed with more than 0 bits`(bits: Int) {
     assertThrows<IllegalArgumentException> { BVSort(bits) }
   }
 }
