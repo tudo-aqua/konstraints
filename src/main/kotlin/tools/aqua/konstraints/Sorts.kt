@@ -66,8 +66,14 @@ object BoolSort : Sort(SMTIdentifier(SMTSymbol("Bool"))) {}
 
 /**
  * SMTLib fixed size bitvector
+ * constructor is internal to allow inheritance,
+ * but instantiation must be done via the companion objects invoke operator
  */
-open class BVSort(val bits : Int) : Sort(SMTIdentifier(SMTSymbol("BitVec"), listOf("$bits"))) {
+open class BVSort internal constructor(val bits : Int) : Sort(SMTIdentifier(SMTSymbol("BitVec"), listOf("$bits"))) {
+    companion object {
+        operator fun invoke(bits : Int) : BVSort = BVSort(bits)
+    }
+
     init {
         require(bits > 0)
     }
@@ -79,8 +85,6 @@ open class BVSort(val bits : Int) : Sort(SMTIdentifier(SMTSymbol("BitVec"), list
     }
 
     override fun hashCode(): Int = bits
-
-
 }
 
 object BVSort32 : BVSort(32)
