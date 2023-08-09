@@ -87,7 +87,7 @@ class SortTests {
   private fun getSortsAndTheirSerialization(): Stream<Arguments> {
     return Stream.of(
         arguments("Bool", BoolSort),
-        arguments("(_ BitVec 32)", BVSort32),
+        arguments("(_ BitVec 32)", BVSort.BV32),
         arguments("(List (Array Int Real))", ExampleListSort),
         arguments("((_ FixedSizeList 4) Real)", ExampleFixedSizeList),
         arguments("(Set (_ BitVec 32))", ExampleSet))
@@ -108,8 +108,8 @@ class SortTests {
   private fun getEqualBVSortObjects(): Stream<Arguments> {
     return Stream.of(
         arguments(BVSort(8), BVSort(8)),
-        arguments(BVSort32, BVSort32),
-        arguments(BVSort32, BVSort(32)))
+        arguments(BVSort.BV32, BVSort.BV32),
+        arguments(BVSort.BV32, BVSort(32)))
   }
 
   @ParameterizedTest
@@ -121,8 +121,8 @@ class SortTests {
   private fun getUnequalBVSortObjects(): Stream<Arguments> {
     return Stream.of(
         arguments(BVSort(8), BVSort(16)),
-        arguments(BVSort32, BVSort(16)),
-        arguments(BVSort32, BVSort16))
+        arguments(BVSort.BV32, BVSort(16)),
+        arguments(BVSort.BV32, BVSort.BV16))
   }
 
   @ParameterizedTest
@@ -134,7 +134,7 @@ class SortTests {
   }
 
   private fun getBVSortObjects(): Stream<Arguments> {
-    return Stream.of(arguments(BVSort32), arguments(BVSort16), arguments(BVSort(8)))
+    return Stream.of(arguments(BVSort.BV32), arguments(BVSort.BV16), arguments(BVSort(8)))
   }
 
   @ParameterizedTest

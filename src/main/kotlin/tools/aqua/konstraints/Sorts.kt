@@ -65,13 +65,19 @@ open class Sort(val identifier : SMTIdentifier, val varargs : List<Sort>) {
 object BoolSort : Sort(SMTIdentifier(SMTSymbol("Bool"))) {}
 
 /**
- * SMTLib fixed size bitvector
- * constructor is internal to allow inheritance,
- * but instantiation must be done via the companion objects invoke operator
+ * SMTLib fixed size bitvector of length [bits]
  */
-open class BVSort internal constructor(val bits : Int) : Sort(SMTIdentifier(SMTSymbol("BitVec"), listOf("$bits"))) {
+
+/*
+ * constructor is private to force instantiation via the companion objects invoke operator
+ * inheritance is also no longer possible, derived objects have been moved to the companion object as constants
+ */
+class BVSort private constructor(val bits : Int) : Sort(SMTIdentifier(SMTSymbol("BitVec"), listOf("$bits"))) {
     companion object {
         operator fun invoke(bits : Int) : BVSort = BVSort(bits)
+
+        val BV32 = BVSort(32)
+        val BV16 = BVSort(16)
     }
 
     init {
@@ -86,9 +92,6 @@ open class BVSort internal constructor(val bits : Int) : Sort(SMTIdentifier(SMTS
 
     override fun hashCode(): Int = bits
 }
-
-object BVSort32 : BVSort(32)
-object BVSort16 : BVSort(16)
 
 /**
  * SMTLib String
@@ -105,7 +108,7 @@ object ExampleListSort : Sort(
 
 object ExampleFixedSizeList : Sort(SMTIdentifier(SMTSymbol("FixedSizeList"), listOf("4")), listOf(RealSort))
 
-object ExampleSet : Sort(SMTIdentifier(SMTSymbol("Set")), listOf(BVSort32))
+object ExampleSet : Sort(SMTIdentifier(SMTSymbol("Set")), listOf(BVSort.BV32))
 
 /**
  * Function sort
