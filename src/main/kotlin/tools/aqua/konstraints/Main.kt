@@ -19,8 +19,5 @@
 package tools.aqua.konstraints
 
 fun main(args: Array<String>) {
-  /**
-   * println(tools.aqua.konstraints.DeclareConst(A)) println(tools.aqua.konstraints.DeclareConst(B))
-   * println(tools.aqua.konstraints.CheckSat)
-   */
+
 }

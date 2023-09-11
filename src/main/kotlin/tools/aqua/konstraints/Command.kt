@@ -40,4 +40,9 @@ data class DeclareConst(var expression: Expression<*>) :
   override fun toString(): String = "($command)"
 }
 
+data class DeclareFun(val name : SMTSymbol, val parameters : List<Sort>, val sort : Sort) :
+    SimpleCommand("declare-fun $name (${parameters.joinToString(" ")}) $sort") {
+        override fun toString() : String = "($command)"
+    }
+
 // tools.aqua.konstraints.DeclareConst(expr, expr.sort)

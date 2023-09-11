@@ -78,6 +78,7 @@ dependencies {
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
   implementation(libs.z3.turnkey)
+  implementation(libs.petitparser.core)
 }
 
 node {
