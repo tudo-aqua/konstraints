@@ -95,7 +95,7 @@ object PetitParser {
   val lparen = of('(') trim whitespaceCat
   val rparen = of(')') trim whitespaceCat
 
-  val numeralBase = (of('0') + (range('1', '9') * digitCat.plus()))
+  val numeralBase = (of('0') + (range('1', '9') * digitCat.plus())).flatten()
   val numeral = numeralBase.map(String::toInt)
   val decimal =
       (numeralBase * of('.') * of('0').star() * numeralBase)
@@ -126,7 +126,7 @@ object PetitParser {
           range('\u0080', '\u00FF')
   val quotedSymbol = of('|') * anythingButPipeOrBackslash.star() * of('|')
 
-  val symbol = (simpleSymbol + quotedSymbol)
+  val symbol = (simpleSymbol + quotedSymbol).flatten()
   val keyword = of(':') * simpleSymbol
 
   // S-Expressions
@@ -137,8 +137,13 @@ object PetitParser {
 
   init {
     sExpression.set(
-        ((specConstant + reserved + symbol + keyword) trim whitespaceCat).flatten() +
-            ((lparen * sExpression.star() * rparen) trim whitespaceCat)) // TODO reserved
+      ((specConstant + reserved + symbol + keyword) trim whitespaceCat).token() +
+              ((lparen * sExpression.star() * rparen).pick(1) trim whitespaceCat)
+    )
+    /*
+      pick(1) only returns the second result (here the result of sExpression.star()) to filter out
+      the lparen/rparen matches that are no longer needed for further parsing
+    */
   }
 
   // Identifiers
