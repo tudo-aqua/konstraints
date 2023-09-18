@@ -19,6 +19,7 @@
 package tools.aqua.konstraints.parser
 
 import java.math.BigDecimal
+import org.petitparser.context.Token
 import org.petitparser.parser.Parser
 import org.petitparser.parser.combinators.ChoiceParser
 import org.petitparser.parser.combinators.SequenceParser
@@ -33,6 +34,14 @@ operator fun Parser.plus(other: Parser): ChoiceParser = or(other)
 operator fun Parser.times(other: Parser): SequenceParser = seq(other)
 
 infix fun Parser.trim(both: Parser): Parser = trim(both)
+
+data class Node(val token: Token?, var parent: Node?) : Visitable {
+  val childs = mutableListOf<Node>()
+
+  override fun accept(visitor: Visitor) {
+    visitor.visit(this)
+  }
+}
 
 object PetitParser {
   // Auxiliary Lexical Categories
@@ -57,6 +66,21 @@ object PetitParser {
   val numeralKW = of("NUMERAL") trim whitespaceCat
   val parKW = of("par") trim whitespaceCat
   val stringKW = of("STRING") trim whitespaceCat
+
+  val reservedGeneral =
+      exclamationKW +
+          underscoreKW +
+          asKW +
+          binaryKW +
+          decimalKW +
+          existsKW +
+          hexadecimalKW +
+          forallKW +
+          letKW +
+          matchKW +
+          numeralKW +
+          parKW +
+          stringKW
 
   // Tokens: Reserved Words: Command names
 
@@ -90,6 +114,37 @@ object PetitParser {
   val setLogicKW = of("set-logic") trim whitespaceCat
   val setOptionKW = of("set-option") trim whitespaceCat
 
+  val reservedCommands =
+      assertKW +
+          checkSatKW +
+          checkSatAssumingKW +
+          declareConstKW +
+          declareDatatypeKW +
+          declareDatatypesKW +
+          declareFunKW +
+          declareSortKW +
+          defineFunKW +
+          defineFunRecKW +
+          defineSortKW +
+          echoKW +
+          exitKW +
+          getAssertionsKW +
+          getAssignmentKW +
+          getInfoKW +
+          getModelKW +
+          getOptionKW +
+          getProofKW +
+          getUnsatAssumptionsKW +
+          getUnsatCoreKW +
+          getValueKW +
+          popKW +
+          pushKW +
+          resetKW +
+          resetAssertionsKW +
+          setInfoKW +
+          setLogicKW +
+          setOptionKW
+
   // Tokens: Other tokens
 
   val lparen = of('(') trim whitespaceCat
@@ -102,7 +157,7 @@ object PetitParser {
           .flatten()
           .map<String, BigDecimal>(::BigDecimal)
   val hexadecimal = of("#x") * (digitCat + range('A', 'F') + range('a', 'f')).plus()
-  val binary = of("#b") * range('0', '1').plus()
+  val binary = (of("#b") * range('0', '1').plus()).flatten()
   val anythingButQuotes =
       whitespaceCat +
           range('\u0020', '"' - 1) +
@@ -137,9 +192,8 @@ object PetitParser {
 
   init {
     sExpression.set(
-      ((specConstant + reserved + symbol + keyword) trim whitespaceCat).token() +
-              ((lparen * sExpression.star() * rparen).pick(1) trim whitespaceCat)
-    )
+        ((specConstant + reserved + symbol + keyword) trim whitespaceCat).token() +
+            ((lparen * sExpression.star() * rparen).pick(1) trim whitespaceCat))
     /*
       pick(1) only returns the second result (here the result of sExpression.star()) to filter out
       the lparen/rparen matches that are no longer needed for further parsing

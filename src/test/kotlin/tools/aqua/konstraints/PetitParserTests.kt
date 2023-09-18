@@ -22,64 +22,64 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.petitparser.context.ParseError
 import org.petitparser.context.Token
+import tools.aqua.konstraints.parser.ASTVisitor
+import tools.aqua.konstraints.parser.Node
 import tools.aqua.konstraints.parser.PetitParser
 
-data class Node(val token : Token?, var parent : Node?) {
-    val childs = mutableListOf<Node>()
-}
-
 class PetitParserTests {
-    @ParameterizedTest
-    @ValueSource(
-        strings =
-        [
-            "(declare-fun A () Bool)",
-            "(declare-fun B () Bool)",
-            "(declare-fun C () Bool)",
-            "(assert (and (or (not A) (not B)) (xor A B (not C)) (and B (or A C))))",
-            "(check-sat)",
-            "(declare-fun A (Bool (_ BitVec 32)) (_ BitVec 16))",
-            /* QF_BV 20190311-bv-small-term-rw-Noetzli / bv-term-small-rw_1.smt */
-            "(declare-fun s () (_ BitVec 32))",
-            "(declare-fun t () (_ BitVec 32))",
-            "(assert (not (= (bvand s s) s)))",
-            /* QF_BV 20190311-bv-small-term-rw-Noetzli / bv-term-small-rw_100.smt */
-            "(assert (not (= (bvlshr s (bvshl t #b00000000000000000000000000000000)) (bvlshr s t))))",
-        ]
-    )
-    fun testParse(statement: String) {
-        val result = PetitParser.sExpression.parse(statement)
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(declare-fun A () Bool)",
+              "(declare-fun B () Bool)",
+              "(declare-fun C () Bool)",
+              "(assert (and (or (not A) (not B)) (xor A B (not C)) (and B (or A C))))",
+              "(check-sat)",
+              "(declare-fun A (Bool (_ BitVec 32)) (_ BitVec 16))",
+              /* QF_BV 20190311-bv-small-term-rw-Noetzli / bv-term-small-rw_1.smt */
+              "(declare-fun s () (_ BitVec 32))",
+              "(declare-fun t () (_ BitVec 32))",
+              "(assert (not (= (bvand s s) s)))",
+              /* QF_BV 20190311-bv-small-term-rw-Noetzli / bv-term-small-rw_100.smt */
+              "(assert (not (= (bvlshr s (bvshl t #b00000000000000000000000000000000)) (bvlshr s t))))",
+          ])
+  fun testParse(statement: String) {
+    val result = PetitParser.sExpression.parse(statement)
 
-        if (result.isSuccess) {
-            println(result.get<String>())
-        } else {
-            throw ParseError(result.failure(result.message))
-        }
-
-        val root = Node(null, null)
-        buildAST(result.get(), root)
-
-        printTree(root, "")
+    if (result.isSuccess) {
+      println(result.get<String>())
+    } else {
+      throw ParseError(result.failure(result.message))
     }
 
-    private fun buildAST(result : ArrayList<*>, current : Node) {
-        result.forEach {
-            if (it is Token) {
-                current.childs.add(Node(it, current))
-            } else if(it !is Char) {
-                current.childs.add(Node(null, current))
+    val root = Node(null, null)
+    buildAST(result.get(), root)
 
-                buildAST(it as ArrayList<*>, current.childs.last())
-            }
-        }
-    }
+    printTree(root, "")
 
-    private fun printTree(node: Node, prefix: String) {
-        if(node.token == null){
-            println("$prefix[ ]")
-        } else {
-            println(prefix + node.token)
-        }
-        node.childs.forEach { printTree(it, "$prefix\t") }
+    val visitor = ASTVisitor()
+    visitor.visit(root)
+  }
+
+  private fun buildAST(result: ArrayList<*>, current: Node) {
+    result.forEach {
+      if (it is Token) {
+        current.childs.add(Node(it, current))
+      } else if (it !is Char) {
+        current.childs.add(Node(null, current))
+
+        buildAST(it as ArrayList<*>, current.childs.last())
+      }
     }
+  }
+
+  private fun printTree(node: Node, prefix: String) {
+    if (node.token == null) {
+      println("$prefix[ ]")
+    } else {
+      println(prefix + node.token)
+    }
+    node.childs.forEach { printTree(it, "$prefix\t") }
+  }
 }
