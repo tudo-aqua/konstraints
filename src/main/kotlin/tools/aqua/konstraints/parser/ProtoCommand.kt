@@ -18,6 +18,14 @@
 
 package tools.aqua.konstraints.parser
 
-interface Visitable {
-  fun accept(visitor: Visitor)
-}
+import tools.aqua.konstraints.*
+
+sealed interface ProtoCommand {}
+
+data object ProtoAssert : ProtoCommand {}
+
+data object ProtoCheckSat : ProtoCommand {}
+
+data object ProtoDeclareConst : ProtoCommand {}
+
+data object ProtoDeclareFun : ProtoCommand {}
