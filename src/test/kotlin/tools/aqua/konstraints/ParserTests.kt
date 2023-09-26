@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints
 
+import java.lang.Exception
 import java.util.stream.Stream
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -34,6 +35,8 @@ class ParserTests {
   @ValueSource(
       strings =
           [
+              "(declare-const A Bool)",
+              "(declare-const B (_ BitVec 32))",
               "(declare-fun A () Bool)",
               "(declare-fun B () Bool)",
               "(declare-fun C () Bool)",
@@ -103,6 +106,22 @@ class ParserTests {
                     Parser.rparen) *
                 Parser.rparen,
             "(assert (and A B))"),
-        arguments(Parser.sort, "(_ BitVec 32)"))
+        arguments(Parser.sort, "(_ BitVec 32)"),
+        arguments(
+            Parser.lparen * Parser.declareConstKW * Parser.symbol * Parser.rparen,
+            "(declare-const A)"),
+        arguments(
+            Parser.lparen * Parser.declareConstKW * Parser.symbol * Parser.sort * Parser.rparen,
+            "(declare-const A B)"),
+    )
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings = ["Bool", "(_ BitVec 32)", "(List (Array Int Real))", "(Set (_ BitVec 32))"])
+  fun testSortParsing(input: String) {
+    val result = Parser.sort.parse(input)
+
+    if (result.isSuccess) println(result.get<Any>()) else throw Exception()
   }
 }

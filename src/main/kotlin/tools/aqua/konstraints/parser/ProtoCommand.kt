@@ -18,14 +18,18 @@
 
 package tools.aqua.konstraints.parser
 
+import org.petitparser.context.Token
 import tools.aqua.konstraints.*
 
 sealed interface ProtoCommand {}
 
 data object ProtoAssert : ProtoCommand {}
 
-data object ProtoCheckSat : ProtoCommand {}
+data class ProtoDeclareConst(val name: Symbol, val sort: ProtoSort) : ProtoCommand {}
 
-data object ProtoDeclareConst : ProtoCommand {}
+data class ProtoDeclareFun(val name: Symbol, val parameters: List<ProtoSort>, val sort: ProtoSort) :
+    ProtoCommand {}
 
-data object ProtoDeclareFun : ProtoCommand {}
+data class Symbol(val token: Token) {}
+
+data class ProtoSort(val token: Token, val sorts: List<Any>) {}

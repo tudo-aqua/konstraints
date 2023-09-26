@@ -19,6 +19,7 @@
 package tools.aqua.konstraints.parser
 
 import java.math.BigDecimal
+import org.petitparser.context.Token
 import org.petitparser.parser.Parser
 import org.petitparser.parser.combinators.ChoiceParser
 import org.petitparser.parser.combinators.SequenceParser
@@ -27,6 +28,7 @@ import org.petitparser.parser.primitive.CharacterParser.anyOf
 import org.petitparser.parser.primitive.CharacterParser.of
 import org.petitparser.parser.primitive.CharacterParser.range
 import org.petitparser.parser.primitive.StringParser.of
+import tools.aqua.konstraints.CheckSat
 
 operator fun Parser.plus(other: Parser): ChoiceParser = or(other)
 
@@ -174,7 +176,10 @@ object Parser {
           range('\u0080', '\u00FF')
   val quotedSymbol = of('|') * anythingButPipeOrBackslash.star() * of('|')
 
-  val symbol = (simpleSymbol + quotedSymbol).flatten().token()
+  val symbol =
+      (simpleSymbol + quotedSymbol).trim(whitespaceCat).flatten().token().map { token: Token ->
+        Symbol(token)
+      }
   val keyword = (of(':') * simpleSymbol).flatten().token()
 
   // S-Expressions
@@ -195,15 +200,26 @@ object Parser {
 
   // Identifiers
 
-  val index = numeralBase + symbol.trim(whitespaceCat)
-  val identifier = symbol + (lparen * symbol.trim(whitespaceCat) * index.plus() * rparen)
+  val index = numeralBase + symbol
+  val identifier =
+      symbol +
+          (lparen * symbol * index.plus() * rparen).map { results: List<Any> ->
+            val temp = mutableListOf<Any>()
+            temp.add(results[1])
+            temp.addAll(results[2] as List<Any>)
+            temp.toList()
+          }
 
   // Sorts
 
   val sort = undefined()
 
   init {
-    sort.set(identifier + (lparen * identifier * sort.plus() * rparen))
+    sort.set(
+        identifier.token().map { token: Token -> ProtoSort(token, listOf()) } +
+            (lparen * identifier.token() * sort.plus() * rparen).map { results: List<Any> ->
+              ProtoSort(results[1] as Token, results[2] as List<Any>)
+            })
   }
 
   // Attributes
@@ -266,9 +282,20 @@ object Parser {
   val propLiteral = undefined() /*symbol + (lparen * notKW * symbol * rparen)*/
 
   val assertCMD = lparen * assertKW * term * rparen
-  val checkSatCMD = lparen * checkSatKW * rparen
-  val declareConstCMD = lparen * declareConstKW * symbol * sort * rparen
-  val declareFunCMD = lparen * declareFunKW * symbol * lparen * sort.star() * rparen * sort * rparen
+
+  val checkSatCMD = (lparen * checkSatKW * rparen).map { _: Any -> CheckSat }
+
+  val declareConstCMD =
+      (lparen * declareConstKW * symbol * sort * rparen).map { results: ArrayList<Any> ->
+        ProtoDeclareConst(results[2] as Symbol, results[3] as ProtoSort)
+      }
+
+  val declareFunCMD =
+      (lparen * declareFunKW * symbol * lparen * sort.star() * rparen * sort * rparen).map {
+          results: ArrayList<Any> ->
+        ProtoDeclareFun(
+            results[2] as Symbol, results[4] as List<ProtoSort>, results[6] as ProtoSort)
+      }
 
   val command = assertCMD + checkSatCMD + declareConstCMD + declareFunCMD
   val script = command.star()
