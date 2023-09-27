@@ -118,7 +118,13 @@ class ParserTests {
 
   @ParameterizedTest
   @ValueSource(
-      strings = ["Bool", "(_ BitVec 32)", "(List (Array Int Real))", "(Set (_ BitVec 32))"])
+      strings =
+          [
+              "Bool",
+              "(_ BitVec 32)",
+              "(List (Array Int Real))",
+              "((_ FixedSizeList 4) Real)",
+              "(Set (_ BitVec 32))"])
   fun testSortParsing(input: String) {
     val result = Parser.sort.parse(input)
 

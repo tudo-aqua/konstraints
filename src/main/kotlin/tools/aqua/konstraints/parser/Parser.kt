@@ -145,7 +145,7 @@ object Parser {
   val lparen = of('(') trim whitespaceCat
   val rparen = of(')') trim whitespaceCat
 
-  val numeralBase = (of('0') + (range('1', '9') * digitCat.plus())).flatten()
+  val numeralBase = (of('0') + (range('1', '9') * digitCat.star())).flatten()
   val numeral = numeralBase.map(String::toInt)
   val decimal =
       (numeralBase * of('.') * of('0').star() * numeralBase)
