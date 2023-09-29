@@ -19,12 +19,8 @@
 package tools.aqua.konstraints
 
 import java.lang.Exception
-import java.util.stream.Stream
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.Arguments.arguments
-import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.petitparser.context.ParseError
 import tools.aqua.konstraints.parser.*
@@ -50,7 +46,7 @@ class ParserTests {
               /* QF_BV 20190311-bv-small-term-rw-Noetzli / bv-term-small-rw_100.smt */
               "(assert (not (= (bvlshr s (bvshl t #b00000000000000000000000000000000)) (bvlshr s t))))",
           ])
-  fun testParse(statement: String) {
+  fun testCommandParsing(statement: String) {
     val result = Parser.command.parse(statement)
 
     if (result.isSuccess) {
@@ -58,62 +54,6 @@ class ParserTests {
     } else {
       throw ParseError(result.failure(result.message))
     }
-  }
-
-  @ParameterizedTest
-  @MethodSource("getParserAndString")
-  fun test(parser: org.petitparser.parser.Parser, input: String) {
-    val result = parser.parse(input)
-    println(result.get<Any>())
-  }
-
-  private fun getParserAndString(): Stream<Arguments> {
-    return Stream.of(
-        arguments(Parser.assertCMD, "(assert (and A B))"),
-        arguments((Parser.lparen * Parser.qualIdentifier * Parser.rparen), "(and )"),
-        arguments(
-            (Parser.lparen * Parser.qualIdentifier.trim() * Parser.qualIdentifier * Parser.rparen),
-            "(and A)"),
-        arguments(
-            (Parser.lparen *
-                Parser.qualIdentifier.trim() *
-                Parser.qualIdentifier.trim().plus() *
-                Parser.rparen),
-            "(and A B)"),
-        arguments(
-            (Parser.lparen *
-                Parser.qualIdentifier.trim() *
-                Parser.qualIdentifier.trim().plus() *
-                Parser.rparen),
-            "(and A B)"),
-        arguments(Parser.term, "(and A B)"),
-        arguments(Parser.lparen * Parser.assertKW * Parser.rparen, "(assert)"),
-        arguments(
-            Parser.lparen *
-                Parser.assertKW *
-                (Parser.lparen *
-                    Parser.qualIdentifier.trim() *
-                    Parser.qualIdentifier.trim().plus() *
-                    Parser.rparen) *
-                Parser.rparen,
-            "(assert (and A B))"),
-        arguments(
-            Parser.lparen *
-                Parser.assertKW *
-                (Parser.lparen *
-                    Parser.qualIdentifier.trim(Parser.whitespaceCat) *
-                    Parser.qualIdentifier.trim(Parser.whitespaceCat).plus() *
-                    Parser.rparen) *
-                Parser.rparen,
-            "(assert (and A B))"),
-        arguments(Parser.sort, "(_ BitVec 32)"),
-        arguments(
-            Parser.lparen * Parser.declareConstKW * Parser.symbol * Parser.rparen,
-            "(declare-const A)"),
-        arguments(
-            Parser.lparen * Parser.declareConstKW * Parser.symbol * Parser.sort * Parser.rparen,
-            "(declare-const A B)"),
-    )
   }
 
   @ParameterizedTest
@@ -129,5 +69,20 @@ class ParserTests {
     val result = Parser.sort.parse(input)
 
     if (result.isSuccess) println(result.get<Any>()) else throw Exception()
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(declare-fun s () (_ BitVec 32))(declare-fun t () (_ BitVec 32))(assert (not (= (bvand s s) s)))(check-sat)"])
+  fun testScriptParsing(script: String) {
+    val result = Parser.script.parse(script)
+
+    if (result.isSuccess) {
+      println(result.get<String>())
+    } else {
+      throw ParseError(result.failure(result.message))
+    }
   }
 }

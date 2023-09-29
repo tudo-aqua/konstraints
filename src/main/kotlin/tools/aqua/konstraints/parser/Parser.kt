@@ -177,7 +177,7 @@ object Parser {
   val quotedSymbol = of('|') * anythingButPipeOrBackslash.star() * of('|')
 
   val symbol =
-      (simpleSymbol + quotedSymbol).trim(whitespaceCat).flatten().token().map { token: Token ->
+      (simpleSymbol + quotedSymbol).flatten().trim(whitespaceCat).token().map { token: Token ->
         Symbol(token)
       }
   val keyword = (of(':') * simpleSymbol).flatten().token()
@@ -204,8 +204,7 @@ object Parser {
   val identifier =
       symbol +
           (lparen * symbol * index.plus() * rparen).map { results: List<Any> ->
-            (results[1] as Symbol).childs.addAll(results[2] as List<Symbol>)
-            (results[1] as Symbol)
+            (results[1] as Symbol).also { it.childs.addAll(results[2] as List<Symbol>) }
           } /* maps to Symbol tree returns the root symbol */
 
   // Sorts
@@ -214,9 +213,9 @@ object Parser {
 
   init {
     sort.set(
-        identifier.token().map { token: Token -> ProtoSort(token, listOf()) } +
-            (lparen * identifier.token() * sort.plus() * rparen).map { results: List<Any> ->
-              ProtoSort(results[1] as Token, results[2] as List<Any>)
+        identifier.map { symbol: Symbol -> ProtoSort(symbol, listOf()) } +
+            (lparen * identifier * sort.plus() * rparen).map { results: List<Any> ->
+              ProtoSort(results[1] as Symbol, results[2] as List<ProtoSort>)
             })
   }
 
@@ -243,8 +242,7 @@ object Parser {
             qualIdentifier /* Results is either SymbolTree or ProtoAs */ +
             (lparen * qualIdentifier * term.plus() * rparen).map { results: List<Any>
               -> /* Results contains GenericProtoTerm/ProtoAs follow by list of ProtoTerm*/
-              (results[1] as ProtoTerm).childs.addAll(results[2] as List<ProtoTerm>)
-              results[1]
+              (results[1] as ProtoTerm).also { it.childs.addAll(results[2] as List<ProtoTerm>) }
             } + /* maps to GenericProtoTerm */
             (lparen *
                 letKW *
@@ -310,7 +308,7 @@ object Parser {
               rparen)
   val functionDec = lparen * symbol * lparen * sortedVar.star() * rparen * sort * rparen
   val functionDef = symbol * lparen * sortedVar.star() * rparen * sort * term
-  val propLiteral = undefined() /*symbol + (lparen * notKW * symbol * rparen)*/
+  val propLiteral = symbol /*+ (lparen * notKW * symbol * rparen)*/
 
   val assertCMD =
       (lparen * assertKW * term * rparen).map { results: List<Any> ->

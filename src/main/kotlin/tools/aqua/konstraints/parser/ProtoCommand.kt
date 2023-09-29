@@ -32,11 +32,13 @@ data class ProtoDeclareFun(val name: Symbol, val parameters: List<ProtoSort>, va
 data class Symbol(val token: Token) {
   val childs = mutableListOf<Symbol>()
 
+  override fun toString(): String = "Symbol(token=($token) childs=$childs)"
+
   fun toProtoTerm(): ProtoTerm =
       GenericProtoTerm(token, childs.map { it.toProtoTerm() }.toMutableList())
 }
 
-data class ProtoSort(val token: Token, val sorts: List<Any>) {}
+data class ProtoSort(val symbol: Symbol, val sorts: List<Any>) {}
 
 sealed class ProtoTerm() {
   abstract val childs: MutableList<ProtoTerm>
