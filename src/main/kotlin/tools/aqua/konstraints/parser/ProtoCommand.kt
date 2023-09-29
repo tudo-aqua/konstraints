@@ -19,17 +19,42 @@
 package tools.aqua.konstraints.parser
 
 import org.petitparser.context.Token
-import tools.aqua.konstraints.*
 
 sealed interface ProtoCommand {}
 
-data object ProtoAssert : ProtoCommand {}
+data class ProtoAssert(val term: ProtoTerm) : ProtoCommand {}
 
 data class ProtoDeclareConst(val name: Symbol, val sort: ProtoSort) : ProtoCommand {}
 
 data class ProtoDeclareFun(val name: Symbol, val parameters: List<ProtoSort>, val sort: ProtoSort) :
     ProtoCommand {}
 
-data class Symbol(val token: Token) {}
+data class Symbol(val token: Token) {
+  val childs = mutableListOf<Symbol>()
+
+  fun toProtoTerm(): ProtoTerm =
+      GenericProtoTerm(token, childs.map { it.toProtoTerm() }.toMutableList())
+}
 
 data class ProtoSort(val token: Token, val sorts: List<Any>) {}
+
+sealed class ProtoTerm() {
+  abstract val childs: MutableList<ProtoTerm>
+}
+
+data class ProtoAs(
+    val symbol: Symbol,
+    val sort: ProtoSort,
+    override val childs: MutableList<ProtoTerm>
+) : ProtoTerm() {}
+
+data class GenericProtoTerm(val token: Token, override val childs: MutableList<ProtoTerm>) :
+    ProtoTerm() {}
+
+data class ProtoLet(
+    val binding: VarBinding,
+    val term: ProtoTerm,
+    override val childs: MutableList<ProtoTerm>
+) : ProtoTerm() {}
+
+data class VarBinding(val symbol: Symbol, val term: ProtoTerm) {}

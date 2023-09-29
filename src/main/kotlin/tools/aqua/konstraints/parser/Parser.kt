@@ -204,11 +204,9 @@ object Parser {
   val identifier =
       symbol +
           (lparen * symbol * index.plus() * rparen).map { results: List<Any> ->
-            val temp = mutableListOf<Any>()
-            temp.add(results[1])
-            temp.addAll(results[2] as List<Any>)
-            temp.toList()
-          }
+            (results[1] as Symbol).childs.addAll(results[2] as List<Symbol>)
+            (results[1] as Symbol)
+          } /* maps to Symbol tree returns the root symbol */
 
   // Sorts
 
@@ -229,25 +227,58 @@ object Parser {
   // Terms
 
   val term = undefined()
-  val qualIdentifier = identifier + (lparen * asKW * identifier * sort * rparen)
-  val varBinding = lparen * symbol * term * rparen
-  val sortedVar = lparen * symbol * sort * rparen
+  val qualIdentifier =
+      identifier.map { result: Symbol -> result.toProtoTerm() } + /* maps to GenericProtoTerm */
+          (lparen * asKW * identifier * sort * rparen).map { results: List<Any> ->
+            ProtoAs(results[2] as Symbol, results[3] as ProtoSort, mutableListOf())
+          } /* maps to ProtoAs */
+  val varBinding = lparen * symbol * term * rparen /* maps to VarBinding */
+  val sortedVar = lparen * symbol * sort * rparen /* maps to SortedVar */
   val pattern = symbol + (lparen * symbol * symbol.plus() * rparen)
   val matchCase = lparen * pattern * term * rparen
 
   init {
     term.set(
-        specConstant +
-            qualIdentifier.trim(whitespaceCat) +
+        specConstant + /* maps to ?? */
+            qualIdentifier /* Results is either SymbolTree or ProtoAs */ +
+            (lparen * qualIdentifier * term.plus() * rparen).map { results: List<Any>
+              -> /* Results contains GenericProtoTerm/ProtoAs follow by list of ProtoTerm*/
+              (results[1] as ProtoTerm).childs.addAll(results[2] as List<ProtoTerm>)
+              results[1]
+            } + /* maps to GenericProtoTerm */
             (lparen *
-                qualIdentifier.trim(whitespaceCat) *
-                term.plus() *
-                rparen) /*+
-                        (lparen * letKW * lparen * varBinding.plus() * rparen * term * rparen) +
-                        (lparen * forallKW * lparen * sortedVar.plus() * rparen * term * rparen) +
-                        (lparen * existsKW * lparen * sortedVar.plus() * rparen * term * rparen) +
-                        (lparen * matchKW * term * lparen * matchCase.plus() * rparen * rparen) +
-                        (lparen * exclamationKW * term * attribute.plus() * rparen)*/) // map to prototerm (token?)
+                letKW *
+                lparen *
+                varBinding.plus() *
+                rparen *
+                term *
+                rparen) + /* maps to ProtoLet */
+            (lparen *
+                forallKW *
+                lparen *
+                sortedVar.plus() *
+                rparen *
+                term *
+                rparen) + /* maps to ProtoForAll */
+            (lparen *
+                existsKW *
+                lparen *
+                sortedVar.plus() *
+                rparen *
+                term *
+                rparen) + /* maps to ProtoExists */
+            (lparen *
+                matchKW *
+                term *
+                lparen *
+                matchCase.plus() *
+                rparen *
+                rparen) + /* maps to ProtoMatch */
+            (lparen *
+                exclamationKW *
+                term *
+                attribute.plus() *
+                rparen)) /* maps to ProtoExclamation */
   }
 
   // Theories
@@ -281,7 +312,10 @@ object Parser {
   val functionDef = symbol * lparen * sortedVar.star() * rparen * sort * term
   val propLiteral = undefined() /*symbol + (lparen * notKW * symbol * rparen)*/
 
-  val assertCMD = lparen * assertKW * term * rparen
+  val assertCMD =
+      (lparen * assertKW * term * rparen).map { results: List<Any> ->
+        ProtoAssert(results[2] as ProtoTerm)
+      }
 
   val checkSatCMD = (lparen * checkSatKW * rparen).map { _: Any -> CheckSat }
 
