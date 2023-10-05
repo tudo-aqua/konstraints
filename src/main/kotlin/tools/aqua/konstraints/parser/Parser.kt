@@ -209,7 +209,7 @@ object Parser {
 
   /* maps to an implementation of Index */
   val index =
-      numeralBase.map { numeral: Int -> NumeralIndex(numeral) } +
+      numeral.map { numeral: Int -> NumeralIndex(numeral) } +
           symbol.map { symbol: Symbol -> SymbolIndex(symbol) }
 
   /* maps to an implementation of Identifier */
