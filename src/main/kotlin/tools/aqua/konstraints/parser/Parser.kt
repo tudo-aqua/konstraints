@@ -231,9 +231,11 @@ object Parser {
 
   val term = undefined()
   val qualIdentifier =
-      identifier.map { result: Symbol -> result } + /* maps to GenericProtoTerm */
+      identifier.map { identifier: Identifier ->
+        SimpleQualIdentifier(identifier)
+      } + /* maps to GenericProtoTerm */
           (lparen * asKW * identifier * sort * rparen).map { results: List<Any> ->
-            ProtoAs(results[2] as Symbol, results[3] as ProtoSort, mutableListOf())
+            AsQualIdentifier(results[2] as Identifier, results[3] as ProtoSort)
           } /* maps to ProtoAs */
   val varBinding = lparen * symbol * term * rparen /* maps to VarBinding */
   val sortedVar = lparen * symbol * sort * rparen /* maps to SortedVar */
@@ -245,8 +247,8 @@ object Parser {
         specConstant + /* maps to ?? */
             qualIdentifier /* Results is either SymbolTree or ProtoAs */ +
             (lparen * qualIdentifier * term.plus() * rparen).map { results: List<Any>
-              -> /* Results contains GenericProtoTerm/ProtoAs follow by list of ProtoTerm*/
-              (results[1] as ProtoTerm).also { it.childs.addAll(results[2] as List<ProtoTerm>) }
+              -> /* Results contains QualIdentifier follow by list of ProtoTerm */
+              BracketedProtoTerm(results[1] as QualIdentifier, results[2] as List<ProtoTerm>)
             } + /* maps to GenericProtoTerm */
             (lparen *
                 letKW *
@@ -331,6 +333,7 @@ object Parser {
           results: ArrayList<Any> ->
         ProtoDeclareFun(
             results[2] as Symbol, results[4] as List<ProtoSort>, results[6] as ProtoSort)
+        // results[4] is guaranteed to be a List of ProtoSort
       }
 
   val command = assertCMD + checkSatCMD + declareConstCMD + declareFunCMD

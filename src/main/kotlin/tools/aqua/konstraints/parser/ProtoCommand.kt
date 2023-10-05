@@ -33,24 +33,23 @@ data class Symbol(val token: Token)
 
 data class ProtoSort(val identifier: Identifier, val sorts: List<Any>) {}
 
-sealed class ProtoTerm() {
-  abstract val childs: MutableList<ProtoTerm>
+// QualIdentifier is also a ProtoTerm because BracketedProtoTerm.terms can be more QualIdentifiers
+sealed interface QualIdentifier : ProtoTerm {
+  val identifier: Identifier
 }
 
-data class ProtoAs(
-    val symbol: Symbol,
-    val sort: ProtoSort,
-    override val childs: MutableList<ProtoTerm>
-) : ProtoTerm() {}
+data class SimpleQualIdentifier(override val identifier: Identifier) : QualIdentifier
 
-data class GenericProtoTerm(val token: Token, override val childs: MutableList<ProtoTerm>) :
-    ProtoTerm() {}
+data class AsQualIdentifier(override val identifier: Identifier, val sort: ProtoSort) :
+    QualIdentifier
 
-data class ProtoLet(
-    val binding: VarBinding,
-    val term: ProtoTerm,
-    override val childs: MutableList<ProtoTerm>
-) : ProtoTerm() {}
+sealed interface ProtoTerm
+
+data class BracketedProtoTerm(val qualIdentifier: QualIdentifier, val terms: List<ProtoTerm>) :
+    ProtoTerm
+
+data class ProtoLet(val binding: VarBinding, val term: ProtoTerm, val terms: List<ProtoTerm>) :
+    ProtoTerm {}
 
 data class VarBinding(val symbol: Symbol, val term: ProtoTerm) {}
 
