@@ -36,6 +36,7 @@ operator fun Parser.times(other: Parser): SequenceParser = seq(other)
 
 infix fun Parser.trim(both: Parser): Parser = trim(both)
 
+@SuppressWarnings("UNCHECKED_CAST")
 object Parser {
   // Auxiliary Lexical Categories
 
@@ -201,10 +202,12 @@ object Parser {
   // Identifiers
 
   val index = numeralBase + symbol
+
+  // results[3] is guaranteed to be a List of Index implementations
   val identifier =
-      symbol +
-          (lparen * symbol * index.plus() * rparen).map { results: List<Any> ->
-            (results[1] as Symbol).also { it.childs.addAll(results[2] as List<Symbol>) }
+      symbol.map { symbol: Symbol -> SymbolIdentifier(symbol) } +
+          (lparen * of("_") * symbol * index.plus() * rparen).map { results: List<Any> ->
+            IndexedIdentifier(results[2] as Symbol, results[3] as List<Index>)
           } /* maps to Symbol tree returns the root symbol */
 
   // Sorts
@@ -213,9 +216,10 @@ object Parser {
 
   init {
     sort.set(
-        identifier.map { symbol: Symbol -> ProtoSort(symbol, listOf()) } +
+        identifier.map { identifier: Identifier -> ProtoSort(identifier, listOf()) } +
             (lparen * identifier * sort.plus() * rparen).map { results: List<Any> ->
-              ProtoSort(results[1] as Symbol, results[2] as List<ProtoSort>)
+              ProtoSort(results[1] as Identifier, results[2] as List<ProtoSort>)
+              // results[2] is guaranteed to be a none empty List of ProtoSort
             })
   }
 
@@ -227,7 +231,7 @@ object Parser {
 
   val term = undefined()
   val qualIdentifier =
-      identifier.map { result: Symbol -> result.toProtoTerm() } + /* maps to GenericProtoTerm */
+      identifier.map { result: Symbol -> result } + /* maps to GenericProtoTerm */
           (lparen * asKW * identifier * sort * rparen).map { results: List<Any> ->
             ProtoAs(results[2] as Symbol, results[3] as ProtoSort, mutableListOf())
           } /* maps to ProtoAs */

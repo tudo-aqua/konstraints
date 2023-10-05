@@ -29,16 +29,9 @@ data class ProtoDeclareConst(val name: Symbol, val sort: ProtoSort) : ProtoComma
 data class ProtoDeclareFun(val name: Symbol, val parameters: List<ProtoSort>, val sort: ProtoSort) :
     ProtoCommand {}
 
-data class Symbol(val token: Token) {
-  val childs = mutableListOf<Symbol>()
+data class Symbol(val token: Token)
 
-  override fun toString(): String = "Symbol(token=($token) childs=$childs)"
-
-  fun toProtoTerm(): ProtoTerm =
-      GenericProtoTerm(token, childs.map { it.toProtoTerm() }.toMutableList())
-}
-
-data class ProtoSort(val symbol: Symbol, val sorts: List<Any>) {}
+data class ProtoSort(val identifier: Identifier, val sorts: List<Any>) {}
 
 sealed class ProtoTerm() {
   abstract val childs: MutableList<ProtoTerm>
@@ -60,3 +53,17 @@ data class ProtoLet(
 ) : ProtoTerm() {}
 
 data class VarBinding(val symbol: Symbol, val term: ProtoTerm) {}
+
+sealed interface Identifier {
+  val symbol: Symbol
+}
+
+data class SymbolIdentifier(override val symbol: Symbol) : Identifier
+
+data class IndexedIdentifier(override val symbol: Symbol, val indices: List<Index>) : Identifier
+
+sealed interface Index
+
+data class SymbolIndex(val symbol: Symbol) : Index
+
+data class NumeralIndex(val numeral: Int) : Index
