@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.parser
 
+import java.math.BigDecimal
 import org.petitparser.context.Token
 
 sealed interface ProtoCommand {}
@@ -31,27 +32,23 @@ data class ProtoDeclareFun(val name: Symbol, val parameters: List<ProtoSort>, va
 
 data class Symbol(val token: Token)
 
-data class ProtoSort(val identifier: Identifier, val sorts: List<Any>) {}
+sealed interface SpecConstant // Token?
 
-// QualIdentifier is also a ProtoTerm because BracketedProtoTerm.terms can be more QualIdentifiers
-sealed interface QualIdentifier : ProtoTerm {
-  val identifier: Identifier
-}
+data class StringConstant(val string: String) : SpecConstant
 
-data class SimpleQualIdentifier(override val identifier: Identifier) : QualIdentifier
+data class NumeralConstant(val numeral: Int) : SpecConstant
 
-data class AsQualIdentifier(override val identifier: Identifier, val sort: ProtoSort) :
-    QualIdentifier
+data class BinaryConstant(val binary: String) : SpecConstant
 
-sealed interface ProtoTerm
+data class HexConstant(val hexadecimal: String) : SpecConstant
 
-data class BracketedProtoTerm(val qualIdentifier: QualIdentifier, val terms: List<ProtoTerm>) :
-    ProtoTerm
+data class DecimalConstant(val decimal: BigDecimal) : SpecConstant
 
-data class ProtoLet(val binding: VarBinding, val term: ProtoTerm, val terms: List<ProtoTerm>) :
-    ProtoTerm {}
+// S-Expressions
 
-data class VarBinding(val symbol: Symbol, val term: ProtoTerm) {}
+// TODO
+
+// Identifiers
 
 sealed interface Identifier {
   val symbol: Symbol
@@ -66,3 +63,48 @@ sealed interface Index
 data class SymbolIndex(val symbol: Symbol) : Index
 
 data class NumeralIndex(val numeral: Int) : Index
+
+// Sorts
+
+data class ProtoSort(val identifier: Identifier, val sorts: List<Any>) {}
+
+// Attributes
+
+// TODO
+
+// Terms
+
+// QualIdentifier is also a ProtoTerm because BracketedProtoTerm.terms can be more QualIdentifiers
+sealed interface QualIdentifier : ProtoTerm {
+  val identifier: Identifier
+}
+
+data class SimpleQualIdentifier(override val identifier: Identifier) : QualIdentifier
+
+data class AsQualIdentifier(override val identifier: Identifier, val sort: ProtoSort) :
+    QualIdentifier
+
+data class VarBinding(val symbol: Symbol, val term: ProtoTerm)
+
+data class SortedVar(val symbol: Symbol, val sort: ProtoSort)
+
+data class Pattern(val symbols: List<Symbol>)
+
+data class MatchCase(val pattern: Pattern, val term: ProtoTerm)
+
+sealed interface ProtoTerm
+
+data class SpecConstantTerm(val specConstant: SpecConstant) : ProtoTerm
+
+data class BracketedProtoTerm(val qualIdentifier: QualIdentifier, val terms: List<ProtoTerm>) :
+    ProtoTerm
+
+data class ProtoLet(val bindings: List<VarBinding>, val term: ProtoTerm) : ProtoTerm
+
+data class ProtoForAll(val sortedVars: List<SortedVar>, val term: ProtoTerm) : ProtoTerm
+
+data class ProtoExists(val sortedVars: List<SortedVar>, val term: ProtoTerm) : ProtoTerm
+
+data class ProtoMatch(val term: ProtoTerm, val matchCase: List<MatchCase>) : ProtoTerm
+
+// TODO data class ProtoExclamation(val term : ProtoTerm, val attributes : List<Attribute>)

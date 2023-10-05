@@ -185,7 +185,12 @@ object Parser {
 
   // S-Expressions
 
-  val specConstant = (numeralBase + decimal + hexadecimal + binary + string).token()
+  val specConstant =
+      numeral.map { numeral: Int -> NumeralConstant(numeral) } +
+          decimal.map { decimal: BigDecimal -> DecimalConstant(decimal) } +
+          hexadecimal.map { hexadecimal: String -> HexConstant(hexadecimal) } +
+          binary.map { binary: String -> BinaryConstant(binary) } +
+          string.map { string: String -> StringConstant(string) }
   val sExpression = undefined()
   val reserved = reservedCommands + reservedGeneral
 
@@ -237,47 +242,50 @@ object Parser {
           (lparen * asKW * identifier * sort * rparen).map { results: List<Any> ->
             AsQualIdentifier(results[2] as Identifier, results[3] as ProtoSort)
           } /* maps to ProtoAs */
-  val varBinding = lparen * symbol * term * rparen /* maps to VarBinding */
-  val sortedVar = lparen * symbol * sort * rparen /* maps to SortedVar */
-  val pattern = symbol + (lparen * symbol * symbol.plus() * rparen)
-  val matchCase = lparen * pattern * term * rparen
+  val varBinding =
+      (lparen * symbol * term * rparen).map { results: List<Any> ->
+        VarBinding(results[1] as Symbol, results[2] as ProtoTerm)
+      } /* maps to VarBinding */
+  val sortedVar =
+      (lparen * symbol * sort * rparen).map { results: List<Any> ->
+        SortedVar(results[1] as Symbol, results[2] as ProtoSort)
+      } /* maps to SortedVar */
+  val pattern =
+      symbol.map { symbol: Symbol -> Pattern(listOf(symbol)) } +
+          (lparen * symbol * symbol.plus() * rparen).map { results: List<Any> ->
+            Pattern(listOf(listOf(results[1] as Symbol), results[2] as List<Symbol>).flatten())
+          }
+  val matchCase =
+      (lparen * pattern * term * rparen).map { results: List<Any> ->
+        MatchCase(results[1] as Pattern, results[2] as ProtoTerm)
+      }
 
   init {
     term.set(
-        specConstant + /* maps to ?? */
+        specConstant.map { constant: SpecConstant ->
+          SpecConstantTerm(constant)
+        } + /* maps to SpecConstantTerm */
             qualIdentifier /* Results is either SymbolTree or ProtoAs */ +
-            (lparen * qualIdentifier * term.plus() * rparen).map { results: List<Any>
-              -> /* Results contains QualIdentifier follow by list of ProtoTerm */
+            (lparen * qualIdentifier * term.plus() * rparen).map { results: List<Any> ->
+              /* Results contains QualIdentifier follow by list of ProtoTerm */
               BracketedProtoTerm(results[1] as QualIdentifier, results[2] as List<ProtoTerm>)
             } + /* maps to GenericProtoTerm */
-            (lparen *
-                letKW *
-                lparen *
-                varBinding.plus() *
-                rparen *
-                term *
-                rparen) + /* maps to ProtoLet */
-            (lparen *
-                forallKW *
-                lparen *
-                sortedVar.plus() *
-                rparen *
-                term *
-                rparen) + /* maps to ProtoForAll */
-            (lparen *
-                existsKW *
-                lparen *
-                sortedVar.plus() *
-                rparen *
-                term *
-                rparen) + /* maps to ProtoExists */
-            (lparen *
-                matchKW *
-                term *
-                lparen *
-                matchCase.plus() *
-                rparen *
-                rparen) + /* maps to ProtoMatch */
+            (lparen * letKW * lparen * varBinding.plus() * rparen * term * rparen).map {
+                results: List<Any> ->
+              ProtoLet(results[3] as List<VarBinding>, results[5] as ProtoTerm)
+            } + /* maps to ProtoLet */
+            (lparen * forallKW * lparen * sortedVar.plus() * rparen * term * rparen).map {
+                results: List<Any> ->
+              ProtoForAll(results[3] as List<SortedVar>, results[5] as ProtoTerm)
+            } + /* maps to ProtoForAll */
+            (lparen * existsKW * lparen * sortedVar.plus() * rparen * term * rparen).map {
+                results: List<Any> ->
+              ProtoExists(results[3] as List<SortedVar>, results[5] as ProtoTerm)
+            } + /* maps to ProtoExists */
+            (lparen * matchKW * term * lparen * matchCase.plus() * rparen * rparen).map {
+                results: List<Any> ->
+              ProtoMatch(results[2] as ProtoTerm, results[3] as List<MatchCase>)
+            } + /* maps to ProtoMatch */
             (lparen *
                 exclamationKW *
                 term *

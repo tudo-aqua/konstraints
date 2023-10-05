@@ -45,7 +45,7 @@ class ParserTests {
               "(assert (not (= (bvand s s) s)))",
               /* QF_BV 20190311-bv-small-term-rw-Noetzli / bv-term-small-rw_100.smt */
               "(assert (not (= (bvlshr s (bvshl t #b00000000000000000000000000000000)) (bvlshr s t))))",
-          ])
+              "(assert(forall (( x ( List Int )) ( y ( List Int ))) (= ( append x y ) ( ite (= x ( as nil ( List Int ))) y ( let (( h ( head x )) ( t ( tail x ))) ( insert h ( append t y )))))))"])
   fun testCommandParsing(statement: String) {
     val result = Parser.command.parse(statement)
 
