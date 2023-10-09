@@ -143,6 +143,6 @@ data class ProtoForAll(val sortedVars: List<SortedVar>, val term: ProtoTerm) : P
 
 data class ProtoExists(val sortedVars: List<SortedVar>, val term: ProtoTerm) : ProtoTerm
 
-data class ProtoMatch(val term: ProtoTerm, val matchCase: List<MatchCase>) : ProtoTerm
+data class ProtoMatch(val term: ProtoTerm, val matchCases: List<MatchCase>) : ProtoTerm
 
 data class ProtoExclamation(val term: ProtoTerm, val attributes: List<Attribute>) : ProtoTerm
