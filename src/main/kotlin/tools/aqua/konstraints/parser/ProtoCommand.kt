@@ -21,18 +21,26 @@ package tools.aqua.konstraints.parser
 import java.math.BigDecimal
 import org.petitparser.context.Token
 
-sealed interface ProtoCommand {}
+sealed interface ProtoCommand : Visitable {
+  override fun accept(visitor: Visitor) {
+    visitor.visit(this)
+  }
+}
 
-data class ProtoAssert(val term: ProtoTerm) : ProtoCommand {}
+data class ProtoAssert(val term: ProtoTerm) : ProtoCommand
 
-data class ProtoDeclareConst(val name: Symbol, val sort: ProtoSort) : ProtoCommand {}
+data class ProtoDeclareConst(val name: Symbol, val sort: ProtoSort) : ProtoCommand
 
 data class ProtoDeclareFun(val name: Symbol, val parameters: List<ProtoSort>, val sort: ProtoSort) :
-    ProtoCommand {}
+    ProtoCommand
 
 data class Symbol(val token: Token)
 
-sealed interface SpecConstant // Token?
+sealed interface SpecConstant : Visitable {
+  override fun accept(visitor: Visitor) {
+    visitor.visit(this)
+  }
+} // Token?
 
 data class StringConstant(val string: String) : SpecConstant
 
@@ -62,11 +70,19 @@ data class NumeralIndex(val numeral: Int) : Index
 
 // Sorts
 
-data class ProtoSort(val identifier: Identifier, val sorts: List<Any>) {}
+data class ProtoSort(val identifier: Identifier, val sorts: List<ProtoSort>) : Visitable {
+  override fun accept(visitor: Visitor) {
+    visitor.visit(this)
+  }
+}
 
 // S-Expression
 
-sealed interface SExpression
+sealed interface SExpression : Visitable {
+  override fun accept(visitor: Visitor) {
+    visitor.visit(this)
+  }
+}
 
 data class SubSExpression(val subExpressions: List<SExpression>) : SExpression
 
@@ -110,7 +126,11 @@ data class Pattern(val symbols: List<Symbol>)
 
 data class MatchCase(val pattern: Pattern, val term: ProtoTerm)
 
-sealed interface ProtoTerm
+sealed interface ProtoTerm : Visitable {
+  override fun accept(visitor: Visitor) {
+    visitor.visit(this)
+  }
+}
 
 data class SpecConstantTerm(val specConstant: SpecConstant) : ProtoTerm
 
@@ -125,4 +145,4 @@ data class ProtoExists(val sortedVars: List<SortedVar>, val term: ProtoTerm) : P
 
 data class ProtoMatch(val term: ProtoTerm, val matchCase: List<MatchCase>) : ProtoTerm
 
-data class ProtoExclamation(val term: ProtoTerm, val attributes: List<Attribute>)
+data class ProtoExclamation(val term: ProtoTerm, val attributes: List<Attribute>) : ProtoTerm
