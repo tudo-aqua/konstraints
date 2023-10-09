@@ -44,10 +44,6 @@ data class HexConstant(val hexadecimal: String) : SpecConstant
 
 data class DecimalConstant(val decimal: BigDecimal) : SpecConstant
 
-// S-Expressions
-
-// TODO
-
 // Identifiers
 
 sealed interface Identifier {
@@ -68,9 +64,31 @@ data class NumeralIndex(val numeral: Int) : Index
 
 data class ProtoSort(val identifier: Identifier, val sorts: List<Any>) {}
 
+// S-Expression
+
+sealed interface SExpression
+
+data class SubSExpression(val subExpressions: List<SExpression>) : SExpression
+
+data class SExpressionConstant(val constant: SpecConstant) : SExpression
+
+data class SExpressionSymbol(val symbol: Symbol) : SExpression
+
+data class SExpressionReserved(val reserved: Token) : SExpression
+
+data class SExpressionKeyword(val keyword: Token) : SExpression
+
 // Attributes
 
-// TODO
+data class Attribute(val keyword: Token, val value: AttributeValue?)
+
+sealed interface AttributeValue
+
+data class ConstantAttributeValue(val constant: SpecConstant) : AttributeValue
+
+data class SymbolAttributeValue(val symbol: Symbol) : AttributeValue
+
+data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : AttributeValue
 
 // Terms
 
@@ -107,4 +125,4 @@ data class ProtoExists(val sortedVars: List<SortedVar>, val term: ProtoTerm) : P
 
 data class ProtoMatch(val term: ProtoTerm, val matchCase: List<MatchCase>) : ProtoTerm
 
-// TODO data class ProtoExclamation(val term : ProtoTerm, val attributes : List<Attribute>)
+data class ProtoExclamation(val term: ProtoTerm, val attributes: List<Attribute>)

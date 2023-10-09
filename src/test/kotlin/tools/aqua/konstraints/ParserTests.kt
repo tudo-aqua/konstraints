@@ -85,4 +85,27 @@ class ParserTests {
       throw ParseError(result.failure(result.message))
     }
   }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              ":produce-models true",
+              ":smt-lib-version 2.6",
+              ":funs ( (par (X) (emptySet (Set X)))\n" +
+                  "(par (X) (univSet (Set X)))\n" +
+                  "(par (X) (singleton X (Set X)))\n" +
+                  "(par (X) (union (Set X) (Set X) (Set X) :left-assoc))\n" +
+                  "(par (X) (inters (Set X) (Set X) (Set X) :left-assoc))\n" +
+                  "(par (X) (in X (Set X) Bool))\n" +
+                  "(par (X) (subset (Set X) (Set X) Bool :chainable)) )\n"])
+  fun testAttributeParsing(attribute: String) {
+    val result = Parser.attribute.parse(attribute)
+
+    if (result.isSuccess) {
+      println(result.get<String>())
+    } else {
+      throw ParseError(result.failure(result.message))
+    }
+  }
 }

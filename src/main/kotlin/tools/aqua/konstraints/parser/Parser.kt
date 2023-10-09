@@ -181,14 +181,14 @@ object Parser {
       (simpleSymbol + quotedSymbol).flatten().trim(whitespaceCat).token().map { token: Token ->
         Symbol(token)
       }
-  val keyword = (of(':') * simpleSymbol).flatten().token()
+  val keyword = (of(':') * simpleSymbol).trim(whitespaceCat).flatten().token()
 
   // S-Expressions
 
   /* maps to an implementation of SpecConstant */
   val specConstant =
-      numeral.map { numeral: Int -> NumeralConstant(numeral) } +
-          decimal.map { decimal: BigDecimal -> DecimalConstant(decimal) } +
+      decimal.map { decimal: BigDecimal -> DecimalConstant(decimal) } +
+          numeral.map { numeral: Int -> NumeralConstant(numeral) } +
           hexadecimal.map { hexadecimal: String -> HexConstant(hexadecimal) } +
           binary.map { binary: String -> BinaryConstant(binary) } +
           string.map { string: String -> StringConstant(string) }
@@ -196,13 +196,16 @@ object Parser {
   val reserved = reservedCommands + reservedGeneral
 
   init {
+    /* maps to an implementation of SExpression */
     sExpression.set(
-        ((specConstant + reserved + symbol + keyword) trim whitespaceCat) +
-            ((lparen * sExpression.star() * rparen).pick(1) trim whitespaceCat))
-    /*
-      pick(1) only returns the second result (here the result of sExpression.star()) to filter out
-      the lparen/rparen matches that are no longer needed for further parsing
-    */
+        ((specConstant.map { constant: SpecConstant -> SExpressionConstant(constant) } +
+            reserved.map { reserved: Token -> SExpressionReserved(reserved) } +
+            symbol.map { symbol: Symbol -> SExpressionSymbol(symbol) } +
+            keyword.map { keyword: Token -> SExpressionKeyword(keyword) }) trim whitespaceCat) +
+            ((lparen * sExpression.star() * rparen).map { results: List<Any> ->
+              SubSExpression(results.slice(1..results.size - 2) as List<SExpression>)
+              // results is guaranteed to be a list of SExpression except the first and last entry
+            } trim whitespaceCat))
   }
 
   // Identifiers
@@ -235,37 +238,61 @@ object Parser {
   }
 
   // Attributes
-  val attributeValue = specConstant + symbol + (lparen * sExpression.star() * rparen)
-  val attribute = keyword + (keyword * attributeValue)
+
+  /* maps to an implementation of AttributeValue */
+  val attributeValue =
+      specConstant.map { constant: SpecConstant -> ConstantAttributeValue(constant) } +
+          symbol.map { symbol: Symbol -> SymbolAttributeValue(symbol) } +
+          (lparen * sExpression.star() * rparen).map { results: List<Any> ->
+            SExpressionAttributeValue(results.slice(1..results.size - 2) as List<SExpression>)
+          }
+
+  /*
+   * maps to Attribute
+   * ChoiceParser matches greedy, so it's important to first match (keyword * attributeValue)
+   * Maybe replace with (keyword * attributeValue.optional())
+   */
+  val attribute =
+      (keyword * attributeValue).map { results: List<Any> ->
+        Attribute(results[0] as Token, results[1] as AttributeValue)
+      } + keyword.map { keyword: Token -> Attribute(keyword, null) }
 
   // Terms
 
   val term = undefined()
+
+  /* maps to an implementation of QualIdentifier */
   val qualIdentifier =
-      identifier.map { identifier: Identifier ->
-        SimpleQualIdentifier(identifier)
-      } + /* maps to GenericProtoTerm */
+      identifier.map { identifier: Identifier -> SimpleQualIdentifier(identifier) } +
           (lparen * asKW * identifier * sort * rparen).map { results: List<Any> ->
             AsQualIdentifier(results[2] as Identifier, results[3] as ProtoSort)
-          } /* maps to ProtoAs */
+          }
+
+  /* maps to VarBinding */
   val varBinding =
       (lparen * symbol * term * rparen).map { results: List<Any> ->
         VarBinding(results[1] as Symbol, results[2] as ProtoTerm)
-      } /* maps to VarBinding */
+      }
+
+  /* maps to SortedVar */
   val sortedVar =
       (lparen * symbol * sort * rparen).map { results: List<Any> ->
         SortedVar(results[1] as Symbol, results[2] as ProtoSort)
-      } /* maps to SortedVar */
+      }
+
+  /* maps to pattern */
   val pattern =
       symbol.map { symbol: Symbol -> Pattern(listOf(symbol)) } +
           (lparen * symbol * symbol.plus() * rparen).map { results: List<Any> ->
             Pattern(listOf(listOf(results[1] as Symbol), results[2] as List<Symbol>).flatten())
             // results[2] is guaranteed to be a list of Symbol
-          } /* maps to pattern */
+          }
+
+  /* maps to match case */
   val matchCase =
       (lparen * pattern * term * rparen).map { results: List<Any> ->
         MatchCase(results[1] as Pattern, results[2] as ProtoTerm)
-      } /* maps to match case */
+      }
 
   init {
     term.set(
@@ -297,11 +324,10 @@ object Parser {
               ProtoMatch(results[2] as ProtoTerm, results[3] as List<MatchCase>)
               // results[3] is guaranteed to be a list of MatchCase
             } + /* maps to ProtoMatch */
-            (lparen *
-                exclamationKW *
-                term *
-                attribute.plus() *
-                rparen)) /* maps to ProtoExclamation */
+            (lparen * exclamationKW * term * attribute.plus() * rparen).map { results: List<Any> ->
+              ProtoExclamation(results[2] as ProtoTerm, results[3] as List<Attribute>)
+              // results[3] is guaranteed to be a list of Attributes
+            } /* maps to ProtoExclamation */)
   }
 
   // Theories
