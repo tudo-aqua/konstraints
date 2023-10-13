@@ -35,8 +35,8 @@ data class Assert(val expression: Expression<BoolSort>) : SimpleCommand("assert 
   override fun toString(): String = super.toString()
 }
 
-data class DeclareConst(var expression: Expression<*>) :
-    SimpleCommand("declare-const $expression ${expression.sort}") {
+data class DeclareConst(val name: SMTSymbol, val sort: Sort) :
+    SimpleCommand("declare-const $name $sort") {
   override fun toString(): String = "($command)"
 }
 

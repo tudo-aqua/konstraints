@@ -21,11 +21,7 @@ package tools.aqua.konstraints.parser
 import java.math.BigDecimal
 import org.petitparser.context.Token
 
-sealed interface ProtoCommand : Visitable {
-  override fun accept(visitor: Visitor) {
-    visitor.visit(this)
-  }
-}
+sealed interface ProtoCommand
 
 data class ProtoAssert(val term: ProtoTerm) : ProtoCommand
 
@@ -36,11 +32,7 @@ data class ProtoDeclareFun(val name: Symbol, val parameters: List<ProtoSort>, va
 
 data class Symbol(val token: Token)
 
-sealed interface SpecConstant : Visitable {
-  override fun accept(visitor: Visitor) {
-    visitor.visit(this)
-  }
-} // Token?
+sealed interface SpecConstant // Token?
 
 data class StringConstant(val string: String) : SpecConstant
 
@@ -70,19 +62,11 @@ data class NumeralIndex(val numeral: Int) : Index
 
 // Sorts
 
-data class ProtoSort(val identifier: Identifier, val sorts: List<ProtoSort>) : Visitable {
-  override fun accept(visitor: Visitor) {
-    visitor.visit(this)
-  }
-}
+data class ProtoSort(val identifier: Identifier, val sorts: List<ProtoSort>)
 
 // S-Expression
 
-sealed interface SExpression : Visitable {
-  override fun accept(visitor: Visitor) {
-    visitor.visit(this)
-  }
-}
+sealed interface SExpression
 
 data class SubSExpression(val subExpressions: List<SExpression>) : SExpression
 
@@ -126,11 +110,7 @@ data class Pattern(val symbols: List<Symbol>)
 
 data class MatchCase(val pattern: Pattern, val term: ProtoTerm)
 
-sealed interface ProtoTerm : Visitable {
-  override fun accept(visitor: Visitor) {
-    visitor.visit(this)
-  }
-}
+sealed interface ProtoTerm
 
 data class SpecConstantTerm(val specConstant: SpecConstant) : ProtoTerm
 

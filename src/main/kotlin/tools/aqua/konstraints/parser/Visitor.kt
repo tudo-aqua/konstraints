@@ -18,22 +18,25 @@
 
 package tools.aqua.konstraints.parser
 
-interface Visitor {
+import tools.aqua.konstraints.*
+
+interface CommandVisitor {
   // Visit functions for all ProtoCommands
-  fun visit(command: ProtoCommand) {
-    when (command) {
-      is ProtoAssert -> visit(command)
-      is ProtoDeclareConst -> visit(command)
-      is ProtoDeclareFun -> visit(command)
-    }
-  }
+  fun visit(command: ProtoCommand): Command =
+      when (command) {
+        is ProtoAssert -> visit(command)
+        is ProtoDeclareConst -> visit(command)
+        is ProtoDeclareFun -> visit(command)
+      }
 
-  fun visit(protoAssert: ProtoAssert)
+  fun visit(protoAssert: ProtoAssert): Assert
 
-  fun visit(protoDeclareConst: ProtoDeclareConst)
+  fun visit(protoDeclareConst: ProtoDeclareConst): DeclareConst
 
-  fun visit(protoDeclareFun: ProtoDeclareFun)
+  fun visit(protoDeclareFun: ProtoDeclareFun): DeclareFun
+}
 
+interface SpecConstantVisitor {
   // Visit functions for all SpecConstant implementations
   fun visit(specConstant: SpecConstant) {
     when (specConstant) {
@@ -54,13 +57,13 @@ interface Visitor {
   fun visit(hexConstant: HexConstant)
 
   fun visit(decimalConstant: DecimalConstant)
+}
 
-  // TODO Visit identifier/index?
+interface SortVisitor {
+  fun visit(protoSort: ProtoSort): Sort
+}
 
-  // Visit function for ProtoSort
-  fun visit(protoSort: ProtoSort)
-
-  // Visit functions for SExpression
+interface SExpressionVisitor {
   fun visit(sExpression: SExpression) {
     when (sExpression) {
       is SubSExpression -> visit(sExpression)
@@ -80,40 +83,37 @@ interface Visitor {
   fun visit(sExpressionReserved: SExpressionReserved)
 
   fun visit(sExpressionKeyword: SExpressionKeyword)
+}
 
-  // TODO Visit attributes?
+interface TermVisitor {
+  fun visit(protoTerm: ProtoTerm): Expression<*> =
+      when (protoTerm) {
+        is SimpleQualIdentifier -> visit(protoTerm)
+        is AsQualIdentifier -> visit(protoTerm)
+        is SpecConstantTerm -> visit(protoTerm)
+        is BracketedProtoTerm -> visit(protoTerm)
+        is ProtoLet -> visit(protoTerm)
+        is ProtoForAll -> visit(protoTerm)
+        is ProtoExists -> visit(protoTerm)
+        is ProtoMatch -> visit(protoTerm)
+        is ProtoExclamation -> visit(protoTerm)
+      }
 
-  // Visit functions for ProtoTerms
+  fun visit(simpleQualIdentifier: SimpleQualIdentifier): Expression<*>
 
-  fun visit(protoTerm: ProtoTerm) {
-    when (protoTerm) {
-      is SimpleQualIdentifier -> visit(protoTerm)
-      is AsQualIdentifier -> visit(protoTerm)
-      is SpecConstantTerm -> visit(protoTerm)
-      is BracketedProtoTerm -> visit(protoTerm)
-      is ProtoLet -> visit(protoTerm)
-      is ProtoForAll -> visit(protoTerm)
-      is ProtoExists -> visit(protoTerm)
-      is ProtoMatch -> visit(protoTerm)
-      is ProtoExclamation -> visit(protoTerm)
-    }
-  }
+  fun visit(asQualIdentifier: AsQualIdentifier): Expression<*>
 
-  fun visit(simpleQualIdentifier: SimpleQualIdentifier)
+  fun visit(specConstantTerm: SpecConstantTerm): Expression<*>
 
-  fun visit(asQualIdentifier: AsQualIdentifier)
+  fun visit(bracketedProtoTerm: BracketedProtoTerm): Expression<*>
 
-  fun visit(specConstantTerm: SpecConstantTerm)
+  fun visit(protoLet: ProtoLet): Expression<*>
 
-  fun visit(bracketedProtoTerm: BracketedProtoTerm)
+  fun visit(protoForAll: ProtoForAll): Expression<*>
 
-  fun visit(protoLet: ProtoLet)
+  fun visit(protoExists: ProtoExists): Expression<*>
 
-  fun visit(protoForAll: ProtoForAll)
+  fun visit(protoMatch: ProtoMatch): Expression<*>
 
-  fun visit(protoExists: ProtoExists)
-
-  fun visit(protoMatch: ProtoMatch)
-
-  fun visit(protoExclamation: ProtoExclamation)
+  fun visit(protoExclamation: ProtoExclamation): Expression<*>
 }
