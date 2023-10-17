@@ -96,7 +96,7 @@ interface TermVisitor {
         is ProtoForAll -> visit(protoTerm)
         is ProtoExists -> visit(protoTerm)
         is ProtoMatch -> visit(protoTerm)
-        is ProtoExclamation -> visit(protoTerm)
+        is ProtoAnnotation -> visit(protoTerm)
       }
 
   fun visit(simpleQualIdentifier: SimpleQualIdentifier): Expression<*>
@@ -115,5 +115,5 @@ interface TermVisitor {
 
   fun visit(protoMatch: ProtoMatch): Expression<*>
 
-  fun visit(protoExclamation: ProtoExclamation): Expression<*>
+  fun visit(protoAnnotation: ProtoAnnotation): Expression<*>
 }

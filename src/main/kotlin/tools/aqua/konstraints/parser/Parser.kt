@@ -325,7 +325,7 @@ object Parser {
               // results[3] is guaranteed to be a list of MatchCase
             } + /* maps to ProtoMatch */
             (lparen * exclamationKW * term * attribute.plus() * rparen).map { results: List<Any> ->
-              ProtoExclamation(results[2] as ProtoTerm, results[3] as List<Attribute>)
+              ProtoAnnotation(results[2] as ProtoTerm, results[3] as List<Attribute>)
               // results[3] is guaranteed to be a list of Attributes
             } /* maps to ProtoExclamation */)
   }

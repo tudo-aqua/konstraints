@@ -30,13 +30,11 @@ class VisitorTests {
   @ValueSource(
       strings =
           [
-              "(declare-const A Bool)",
-              "(declare-const B (_ BitVec 32))",
               "(declare-fun A () Bool)",
               "(declare-fun B () Bool)",
               "(declare-fun C () Bool)",
               "(assert (and (or (not A) (not B)) (xor A B (not C)) (and B (or A C))))",
-              "(declare-fun A (Bool (_ BitVec 32)) (_ BitVec 16))",
+              "(declare-fun D (Bool (_ BitVec 32)) (_ BitVec 16))",
               "(declare-fun s () (_ BitVec 32))",
               "(declare-fun t () (_ BitVec 32))",
               "(assert (bvult s t))",

@@ -18,10 +18,73 @@
 
 package tools.aqua.konstraints
 
+import tools.aqua.konstraints.parser.Identifier
+import tools.aqua.konstraints.parser.IndexedIdentifier
+import tools.aqua.konstraints.parser.SymbolIdentifier
+
 /*
  * This file implements the SMT core theory
  * http://smtlib.cs.uiowa.edu/theories-Core.shtml
  */
+
+@Suppress("UNCHECKED_CAST")
+inline fun <reified T : Any> List<*>.checkedCast(): List<T> =
+  if(all { it is T })
+    this as List<T>
+  else throw IllegalArgumentException("")
+
+
+object CoreContext {
+  fun isFun(identifier: Identifier) : Boolean {
+    return when(identifier) {
+      is SymbolIdentifier -> {
+        when(identifier.symbol.token.getValue<String>()) {
+          "and" -> true
+          "or" -> true
+          "xor" -> true
+          "not" -> true
+          "=>" -> true
+          "=" -> true
+          "distinct" -> true
+          "ite" -> true
+          else -> false
+        }
+      }
+      is IndexedIdentifier -> false
+    }
+  }
+
+  fun getFun(identifier: Identifier, args : List<Expression<*>>) : Expression<BoolSort>? {
+    return when(identifier) {
+      is SymbolIdentifier -> {
+        when(identifier.symbol.token.getValue<String>()) {
+          "and" -> And(args.checkedCast())
+          "or" -> Or(args.checkedCast())
+          "xor" -> XOr(args.checkedCast())
+          "not" -> Not(args[0] as Expression<BoolSort>)
+          "=>" -> Implies(args.checkedCast())
+          "=" -> Equals(args.checkedCast())
+          "distinct" -> Distinct(args.checkedCast())
+          "ite" -> Ite(args[0] as Expression<BoolSort>, args[1] as Expression<BoolSort>, args[2] as Expression<BoolSort>)
+          else -> null
+        }
+      }
+      is IndexedIdentifier -> null
+    }
+  }
+
+  fun getSort(identifier: Identifier) : Sort? {
+    return when(identifier) {
+      is SymbolIdentifier -> {
+        when(identifier.symbol.token.getValue<String>()) {
+          "Bool" -> BoolSort
+          else -> null
+        }
+      }
+      is IndexedIdentifier -> null
+    }
+  }
+}
 
 /** Object for SMT true */
 object True : Expression<BoolSort>() {
