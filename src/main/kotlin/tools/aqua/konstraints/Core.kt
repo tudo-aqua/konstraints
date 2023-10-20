@@ -18,71 +18,27 @@
 
 package tools.aqua.konstraints
 
-import tools.aqua.konstraints.parser.Identifier
-import tools.aqua.konstraints.parser.IndexedIdentifier
-import tools.aqua.konstraints.parser.SymbolIdentifier
+import tools.aqua.konstraints.parser.*
 
 /*
  * This file implements the SMT core theory
  * http://smtlib.cs.uiowa.edu/theories-Core.shtml
  */
 
+// TODO implement casting for none homogeneous lists
 @Suppress("UNCHECKED_CAST")
 inline fun <reified T : Any> List<*>.checkedCast(): List<T> =
-  if(all { it is T })
-    this as List<T>
-  else throw IllegalArgumentException("")
-
+    if (all { it is T }) this as List<T> else throw TypeCastException("")
 
 object CoreContext {
-  fun isFun(identifier: Identifier) : Boolean {
-    return when(identifier) {
-      is SymbolIdentifier -> {
-        when(identifier.symbol.token.getValue<String>()) {
-          "and" -> true
-          "or" -> true
-          "xor" -> true
-          "not" -> true
-          "=>" -> true
-          "=" -> true
-          "distinct" -> true
-          "ite" -> true
-          else -> false
-        }
-      }
-      is IndexedIdentifier -> false
-    }
-  }
+  val funs =
+      mapOf(Pair("not", NotDecl), Pair("and", AndDecl), Pair("or", OrDecl), Pair("xor", XOrDecl))
+  val sorts = mapOf(Pair("Bool", BoolSortDecl))
+}
 
-  fun getFun(identifier: Identifier, args : List<Expression<*>>) : Expression<BoolSort>? {
-    return when(identifier) {
-      is SymbolIdentifier -> {
-        when(identifier.symbol.token.getValue<String>()) {
-          "and" -> And(args.checkedCast())
-          "or" -> Or(args.checkedCast())
-          "xor" -> XOr(args.checkedCast())
-          "not" -> Not(args[0] as Expression<BoolSort>)
-          "=>" -> Implies(args.checkedCast())
-          "=" -> Equals(args.checkedCast())
-          "distinct" -> Distinct(args.checkedCast())
-          "ite" -> Ite(args[0] as Expression<BoolSort>, args[1] as Expression<BoolSort>, args[2] as Expression<BoolSort>)
-          else -> null
-        }
-      }
-      is IndexedIdentifier -> null
-    }
-  }
-
-  fun getSort(identifier: Identifier) : Sort? {
-    return when(identifier) {
-      is SymbolIdentifier -> {
-        when(identifier.symbol.token.getValue<String>()) {
-          "Bool" -> BoolSort
-          else -> null
-        }
-      }
-      is IndexedIdentifier -> null
-    }
+object BoolSortDecl : SortDecl<BoolSort>("BoolSort") {
+  override fun getSort(sort: ProtoSort): BoolSort {
+    return BoolSort
   }
 }
 
@@ -108,6 +64,21 @@ class Not(val inner: Expression<BoolSort>) : Expression<BoolSort>() {
   override val symbol = "(not $inner)"
 
   override fun toString(): String = symbol
+}
+
+/** FunctionDecl Object for Not */
+object NotDecl : FunctionDecl<BoolSort>("not", listOf(BoolSort), BoolSort) {
+  override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
+    // TODO implement sorting exception
+    require(args.size == 1) { "Not only accepts 1 argument but ${args.size} were provided" }
+    require(args[0].sort == BoolSort) {
+      "Not only accepts arguments of Sort BoolSort but ${args[0].sort} was provided"
+    }
+
+    @Suppress("UNCHECKED_CAST") val inner = args[0] as Expression<BoolSort>
+
+    return Not(inner)
+  }
 }
 
 /**
@@ -138,6 +109,17 @@ class And(val conjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   override fun toString() = symbol
 }
 
+object AndDecl : FunctionDecl<BoolSort>("and", listOf(), BoolSort) {
+  override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
+    require(args.size >= 2) {
+      "And accepts at least 2 arguments but ${args.size} have been provided"
+    }
+    require(args.all { it.sort == BoolSort }) { "And only accepts arguments of Sort BoolSort" }
+
+    @Suppress("UNCHECKED_CAST") return And(args as List<Expression<BoolSort>>)
+  }
+}
+
 /**
  * Implements or according to Core theory (or Bool Bool Bool :left-assoc)
  *
@@ -152,6 +134,17 @@ class Or(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   override fun toString(): String = symbol
 }
 
+object OrDecl : FunctionDecl<BoolSort>("or", listOf(), BoolSort) {
+  override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
+    require(args.size >= 2) {
+      "Or accepts at least 2 arguments but ${args.size} have been provided"
+    }
+    require(args.all { it.sort == BoolSort }) { "Or only accepts arguments of Sort BoolSort" }
+
+    @Suppress("UNCHECKED_CAST") return Or(args as List<Expression<BoolSort>>)
+  }
+}
+
 /**
  * Implements xor according to Core theory (xor Bool Bool Bool :left-assoc)
  *
@@ -164,6 +157,17 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   override val symbol = "(xor ${disjuncts.joinToString(" ")})"
 
   override fun toString(): String = symbol
+}
+
+object XOrDecl : FunctionDecl<BoolSort>("xor", listOf(), BoolSort) {
+  override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
+    require(args.size >= 2) {
+      "Xor accepts at least 2 arguments but ${args.size} have been provided"
+    }
+    require(args.all { it.sort == BoolSort }) { "Xor only accepts arguments of Sort BoolSort" }
+
+    @Suppress("UNCHECKED_CAST") return XOr(args as List<Expression<BoolSort>>)
+  }
 }
 
 /**

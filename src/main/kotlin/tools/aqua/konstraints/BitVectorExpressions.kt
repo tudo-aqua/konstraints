@@ -18,6 +18,23 @@
 
 package tools.aqua.konstraints
 
+import tools.aqua.konstraints.parser.*
+
+object BitVectorExpressionContext {
+  val funs = mapOf(Pair("bvult", BVUltDecl))
+  val sorts = mapOf(Pair("BitVec", BVSortDecl))
+}
+
+object BVSortDecl : SortDecl<BVSort>("BitVec") {
+  override fun getSort(sort: ProtoSort): BVSort {
+    require(sort.identifier is IndexedIdentifier)
+    require(sort.identifier.indices.size == 1)
+    require(sort.identifier.indices[0] is NumeralIndex)
+
+    return BVSort((sort.identifier.indices[0] as NumeralIndex).numeral)
+  }
+}
+
 /*
  * This file implements the SMT theory of fixed size bitvectors
  * http://smtlib.cs.uiowa.edu/theories-FixedSizeBitVectors.shtml
@@ -292,4 +309,15 @@ class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expressi
   }
 
   override fun toString(): String = symbol
+}
+
+object BVUltDecl : FunctionDecl<BoolSort>("bvult", listOf(BVSort(32), BVSort(32)), BoolSort) {
+  override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
+    require(args.size == 2) { "bvult accepts only 2 arguments but ${args.size} were provided" }
+    require(args[0].sort is BVSort)
+    require(args[1].sort is BVSort)
+
+    @Suppress("UNCHECKED_CAST")
+    return BVUlt(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+  }
 }

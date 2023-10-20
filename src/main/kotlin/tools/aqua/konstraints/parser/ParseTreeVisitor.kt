@@ -22,18 +22,14 @@ import tools.aqua.konstraints.*
 
 object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor {
 
-    private val lambdaContext = LambdaContext
+  private val context = Context()
 
-    init {
-        lambdaContext.funs["and"] = { expressions: List<Expression<*>> -> And(expressions as List<Expression<BoolSort>>) }
-        lambdaContext.funs["or"] = { expressions: List<Expression<*>> -> Or(expressions as List<Expression<BoolSort>>) }
-        lambdaContext.funs["xor"] = { expressions: List<Expression<*>> -> XOr(expressions as List<Expression<BoolSort>>) }
-        lambdaContext.funs["not"] = { expressions: List<Expression<*>> -> Not(expressions[0] as Expression<BoolSort>) }
-        lambdaContext.funs["bvult"] = { expressions: List<Expression<*>> -> BVUlt(expressions[0] as Expression<BVSort>, expressions[1] as Expression<BVSort>) }
-
-        lambdaContext.sorts["Bool"] = BoolSort
-        lambdaContext.sorts["BitVec"] = BVSort(32) //TODO Implement support for parameterized sorts
-    }
+  init {
+    context.funs.putAll(CoreContext.funs)
+    context.sorts.putAll(CoreContext.sorts)
+    context.funs.putAll(BitVectorExpressionContext.funs)
+    context.sorts.putAll(BitVectorExpressionContext.sorts)
+  }
 
   override fun visit(protoAssert: ProtoAssert): Assert {
     val term = visit(protoAssert.term)
@@ -46,8 +42,10 @@ object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor {
   override fun visit(protoDeclareConst: ProtoDeclareConst): DeclareConst {
     val sort = visit(protoDeclareConst.sort)
 
-      //TODO check that fun is not already declared
-      lambdaContext.funs[protoDeclareConst.name.token.getValue()] = { _ -> BasicExpression(protoDeclareConst.name.token.getValue(), sort)}
+    // TODO check that fun is not already declared
+    // TODO move this functionality to context
+    context.funs[protoDeclareConst.name.token.getValue()] =
+        ConstDecl(protoDeclareConst.name.token.getValue(), sort)
 
     return DeclareConst(SMTSymbol(protoDeclareConst.name.token.getValue()), sort)
   }
@@ -56,20 +54,29 @@ object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor {
     val sort = visit(protoDeclareFun.sort)
     val parameters = protoDeclareFun.parameters.map { visit(it) }
 
-      //TODO check that fun is not already declared, handle parameters of fun
-      lambdaContext.funs[protoDeclareFun.name.token.getValue()] = { _ -> BasicExpression(protoDeclareFun.name.token.getValue(), sort)}
+    // TODO check that fun is not already declared, handle parameters of fun
+    // TODO function overloading (- Int Int) (- Real Real)
+    // TODO ambiguous function overloading only in as and match
+    if (parameters.isEmpty()) {
+      context.funs[protoDeclareFun.name.token.getValue()] =
+          ConstDecl(protoDeclareFun.name.token.getValue(), sort)
+    } else {
+      TODO("Implement functions with parameters")
+    }
 
     return DeclareFun(SMTSymbol(protoDeclareFun.name.token.getValue()), parameters, sort)
   }
 
   override fun visit(simpleQualIdentifier: SimpleQualIdentifier): Expression<*> {
-      val op = lambdaContext.funs[simpleQualIdentifier.identifier.symbol.token.getValue()]
+    val op = context.funs[simpleQualIdentifier.identifier.symbol.token.getValue()]
 
-      if(op != null) {
-          return op.invoke(listOf())
-      } else {
-          throw IllegalStateException("Unknown fun ${simpleQualIdentifier.identifier.symbol.token.getValue<String>()}") // TODO UnknownFunctionException
-      }
+    if (op != null) {
+      return op.getExpression(listOf())
+    } else {
+      throw IllegalStateException(
+          "Unknown fun ${simpleQualIdentifier.identifier.symbol.token.getValue<String>()}") // TODO
+      // UnknownFunctionException
+    }
   }
 
   override fun visit(asQualIdentifier: AsQualIdentifier): Expression<*> {
@@ -83,13 +90,14 @@ object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor {
   override fun visit(bracketedProtoTerm: BracketedProtoTerm): Expression<*> {
     val terms = bracketedProtoTerm.terms.map { visit(it) }
 
-      val op = lambdaContext.funs[bracketedProtoTerm.qualIdentifier.identifier.symbol.token.getValue()]
+    val op = context.funs[bracketedProtoTerm.qualIdentifier.identifier.symbol.token.getValue()]
 
-      if(op != null) {
-          return op.invoke(terms)
-      } else {
-          throw IllegalStateException("Unknown fun ${bracketedProtoTerm.qualIdentifier.identifier.symbol.token.getValue<String>()}") // TODO UnknownFunctionException
-      }
+    if (op != null) {
+      return op.getExpression(terms)
+    } else {
+      throw IllegalStateException(
+          "Unknown fun ${bracketedProtoTerm.qualIdentifier.identifier.symbol.token.getValue<String>()}") // TODO UnknownFunctionException
+    }
   }
 
   override fun visit(protoLet: ProtoLet): Expression<*> {
@@ -113,7 +121,8 @@ object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor {
   }
 
   override fun visit(protoSort: ProtoSort): Sort {
-      return lambdaContext.sorts[protoSort.identifier.symbol.token.getValue()]?:
-      throw IllegalStateException("Unknown sort ${protoSort.identifier.symbol.token.getValue<String>()}")
+    return context.sorts[protoSort.identifier.symbol.token.getValue()]?.getSort(protoSort)
+        ?: throw IllegalStateException(
+            "Unknown sort ${protoSort.identifier.symbol.token.getValue<String>()}")
   }
 }
