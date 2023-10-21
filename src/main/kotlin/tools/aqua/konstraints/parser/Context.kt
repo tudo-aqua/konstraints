@@ -44,6 +44,57 @@ abstract class SortDecl<T : Sort>(val name: String) {
 }
 
 class Context {
-  val funs: MutableMap<String, FunctionDecl<*>> = mutableMapOf()
+  fun registerTheory(other: TheoryContext) {
+    // TODO added safely via registerFun/Sort
+    functions.putAll(other.functions)
+    sorts.putAll(other.sorts)
+  }
+
+  fun registerFunction(const: ProtoDeclareConst, sort: Sort) {
+    // TODO check that fun is not already declared
+
+    functions[const.name.token.getValue()] = ConstDecl(const.name.token.getValue(), sort)
+  }
+
+  fun registerFunction(function: ProtoDeclareFun, parameters: List<Sort>, sort: Sort) {
+
+    // TODO check that fun is not already declared, handle parameters of fun
+    if (parameters.isEmpty()) {
+      functions[function.name.token.getValue()] = ConstDecl(function.name.token.getValue(), sort)
+    } else {
+      TODO("Implement functions with parameters")
+    }
+  }
+
+  fun registerFunction(function: FunctionDecl<*>) {
+    functions[function.name] = function
+  }
+
+  fun registerSort(sort: SortDecl<*>) {
+    // TODO check for sort already in context
+    sorts[sort.name] = sort
+  }
+
+  fun getFunction(name: Identifier, args: List<Expression<*>>): FunctionDecl<*>? {
+    return getFunction(name.symbol.token.getValue<String>(), args)
+  }
+
+  fun getFunction(name: String, args: List<Expression<*>>): FunctionDecl<*>? {
+    // TODO check function for correct args
+    return functions[name]
+  }
+
+  fun getFunction(name: String, args: List<Expression<*>>, type: Sort) {
+    TODO("Implement ambiguous functions in context")
+  }
+
+  // TODO make read-only outside of class
+  val functions: MutableMap<String, FunctionDecl<*>> = mutableMapOf()
   val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf()
+}
+
+interface TheoryContext {
+  // TODO make protected
+  val functions: Map<String, FunctionDecl<*>>
+  val sorts: Map<String, SortDecl<*>>
 }

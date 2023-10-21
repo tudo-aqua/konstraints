@@ -30,10 +30,10 @@ import tools.aqua.konstraints.parser.*
 inline fun <reified T : Any> List<*>.checkedCast(): List<T> =
     if (all { it is T }) this as List<T> else throw TypeCastException("")
 
-object CoreContext {
-  val funs =
+object CoreContext : TheoryContext {
+  override val functions =
       mapOf(Pair("not", NotDecl), Pair("and", AndDecl), Pair("or", OrDecl), Pair("xor", XOrDecl))
-  val sorts = mapOf(Pair("Bool", BoolSortDecl))
+  override val sorts = mapOf(Pair("Bool", BoolSortDecl))
 }
 
 object BoolSortDecl : SortDecl<BoolSort>("BoolSort") {

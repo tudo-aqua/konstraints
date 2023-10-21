@@ -20,9 +20,9 @@ package tools.aqua.konstraints
 
 import tools.aqua.konstraints.parser.*
 
-object BitVectorExpressionContext {
-  val funs = mapOf(Pair("bvult", BVUltDecl))
-  val sorts = mapOf(Pair("BitVec", BVSortDecl))
+object BitVectorExpressionContext : TheoryContext {
+  override val functions = mapOf(Pair("bvult", BVUltDecl))
+  override val sorts = mapOf(Pair("BitVec", BVSortDecl))
 }
 
 object BVSortDecl : SortDecl<BVSort>("BitVec") {
