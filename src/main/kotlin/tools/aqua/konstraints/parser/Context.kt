@@ -123,9 +123,12 @@ class Context {
     return functions.find { (it.name == name) && (it.accepts(args)) && it.sort == sort }
   }
 
-  // TODO make read-only outside of class
-  val functions: HashSet<FunctionDecl<*>> = hashSetOf()
-  val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf()
+  fun getSort(protoSort: ProtoSort): Sort? {
+    return sorts[protoSort.identifier.symbol.token.getValue()]?.getSort(protoSort)
+  }
+
+  private val functions: HashSet<FunctionDecl<*>> = hashSetOf()
+  private val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf()
 }
 
 interface TheoryContext {

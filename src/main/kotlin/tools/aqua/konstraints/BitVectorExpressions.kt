@@ -311,13 +311,24 @@ class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expressi
   override fun toString(): String = symbol
 }
 
+// TODO implement BVSort marker interface?
 object BVUltDecl : FunctionDecl<BoolSort>("bvult", listOf(BVSort(32), BVSort(32)), BoolSort) {
   override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
     require(args.size == 2) { "bvult accepts only 2 arguments but ${args.size} were provided" }
     require(args[0].sort is BVSort)
     require(args[1].sort is BVSort)
+    require((args[0].sort as BVSort).bits == (args[1].sort as BVSort).bits)
 
     @Suppress("UNCHECKED_CAST")
     return BVUlt(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+  }
+
+  override fun accepts(args: List<Expression<*>>): Boolean {
+    if (args.size != 2) return false
+    if (args[0].sort !is BVSort) return false
+    if (args[1].sort !is BVSort) return false
+    if ((args[0].sort as BVSort).bits != (args[1].sort as BVSort).bits) return false
+
+    return true
   }
 }
