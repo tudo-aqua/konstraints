@@ -34,6 +34,8 @@ data class SMTSymbol(val symbol : String) {
      * Serialization of tools.aqua.konstraints.SMTSymbol, quotes symbol if needed
      * @return a valid quoted or simple SMT Symbol
      */
+
+    //TODO use parser to check for valid symbol?
     override fun toString() = if(symbol.matches(simple)) symbol else "|$symbol|"
 }
 

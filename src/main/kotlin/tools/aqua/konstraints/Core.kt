@@ -36,7 +36,7 @@ object CoreContext : TheoryContext {
   override val sorts = mapOf(Pair("Bool", BoolSortDecl))
 }
 
-object BoolSortDecl : SortDecl<BoolSort>("BoolSort") {
+object BoolSortDecl : SortDecl<BoolSort>("Bool") {
   override fun getSort(sort: ProtoSort): BoolSort {
     return BoolSort
   }
@@ -109,7 +109,8 @@ class And(val conjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   override fun toString() = symbol
 }
 
-object AndDecl : FunctionDecl<BoolSort>("and", listOf(), BoolSort) {
+// TODO handle vararg parameters
+object AndDecl : FunctionDecl<BoolSort>("and", listOf(BoolSort, BoolSort), BoolSort) {
   override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
     require(args.size >= 2) {
       "And accepts at least 2 arguments but ${args.size} have been provided"
@@ -117,6 +118,12 @@ object AndDecl : FunctionDecl<BoolSort>("and", listOf(), BoolSort) {
     require(args.all { it.sort == BoolSort }) { "And only accepts arguments of Sort BoolSort" }
 
     @Suppress("UNCHECKED_CAST") return And(args as List<Expression<BoolSort>>)
+  }
+
+  override fun accepts(args: List<Expression<*>>): Boolean {
+    require(args.size >= 2)
+
+    return args.all { it.sort == BoolSort }
   }
 }
 
@@ -134,7 +141,7 @@ class Or(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   override fun toString(): String = symbol
 }
 
-object OrDecl : FunctionDecl<BoolSort>("or", listOf(), BoolSort) {
+object OrDecl : FunctionDecl<BoolSort>("or", listOf(BoolSort, BoolSort), BoolSort) {
   override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
     require(args.size >= 2) {
       "Or accepts at least 2 arguments but ${args.size} have been provided"
@@ -142,6 +149,12 @@ object OrDecl : FunctionDecl<BoolSort>("or", listOf(), BoolSort) {
     require(args.all { it.sort == BoolSort }) { "Or only accepts arguments of Sort BoolSort" }
 
     @Suppress("UNCHECKED_CAST") return Or(args as List<Expression<BoolSort>>)
+  }
+
+  override fun accepts(args: List<Expression<*>>): Boolean {
+    require(args.size >= 2)
+
+    return args.all { it.sort == BoolSort }
   }
 }
 
@@ -159,7 +172,7 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   override fun toString(): String = symbol
 }
 
-object XOrDecl : FunctionDecl<BoolSort>("xor", listOf(), BoolSort) {
+object XOrDecl : FunctionDecl<BoolSort>("xor", listOf(BoolSort, BoolSort), BoolSort) {
   override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
     require(args.size >= 2) {
       "Xor accepts at least 2 arguments but ${args.size} have been provided"
@@ -167,6 +180,12 @@ object XOrDecl : FunctionDecl<BoolSort>("xor", listOf(), BoolSort) {
     require(args.all { it.sort == BoolSort }) { "Xor only accepts arguments of Sort BoolSort" }
 
     @Suppress("UNCHECKED_CAST") return XOr(args as List<Expression<BoolSort>>)
+  }
+
+  override fun accepts(args: List<Expression<*>>): Boolean {
+    require(args.size >= 2)
+
+    return args.all { it.sort == BoolSort }
   }
 }
 

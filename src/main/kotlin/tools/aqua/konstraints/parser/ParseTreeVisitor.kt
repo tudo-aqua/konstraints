@@ -79,7 +79,9 @@ object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor {
   override fun visit(bracketedProtoTerm: BracketedProtoTerm): Expression<*> {
     val terms = bracketedProtoTerm.terms.map { visit(it) }
 
-    val op = context.functions[bracketedProtoTerm.qualIdentifier.identifier.symbol.token.getValue()]
+    val op =
+        context.getFunction(
+            bracketedProtoTerm.qualIdentifier.identifier.symbol.token.getValue<String>(), terms)
 
     if (op != null) {
       return op.getExpression(terms)
