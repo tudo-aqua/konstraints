@@ -21,7 +21,7 @@ package tools.aqua.konstraints
 import tools.aqua.konstraints.parser.*
 
 object BitVectorExpressionContext : TheoryContext {
-  override val functions = mapOf(Pair("bvult", BVUltDecl))
+  override val functions: HashSet<FunctionDecl<*>> = hashSetOf(BVUltDecl)
   override val sorts = mapOf(Pair("BitVec", BVSortDecl))
 }
 
@@ -323,12 +323,10 @@ object BVUltDecl : FunctionDecl<BoolSort>("bvult", listOf(BVSort(32), BVSort(32)
     return BVUlt(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
   }
 
-  override fun accepts(args: List<Expression<*>>): Boolean {
-    if (args.size != 2) return false
-    if (args[0].sort !is BVSort) return false
-    if (args[1].sort !is BVSort) return false
-    if ((args[0].sort as BVSort).bits != (args[1].sort as BVSort).bits) return false
-
-    return true
+  override fun checkRequirements(args: List<Expression<*>>) {
+    require (args.size == 2)
+    require (args[0].sort is BVSort)
+    require (args[1].sort is BVSort)
+    require ((args[0].sort as BVSort).bits == (args[1].sort as BVSort).bits)
   }
 }

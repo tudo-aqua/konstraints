@@ -20,6 +20,7 @@ package tools.aqua.konstraints
 
 import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -38,6 +39,8 @@ class ContextTests {
   init {
     context.registerTheory(CoreContext)
     context.registerTheory(BitVectorExpressionContext)
+      context.registerFunction("O", listOf(BoolSort, BoolSort), BoolSort)
+      context.registerFunction("O", listOf(BVSort(32), BVSort(32)), BVSort(32))
   }
 
   @ParameterizedTest
@@ -98,7 +101,11 @@ class ContextTests {
         arguments("xor", listOf(boolExpression, boolExpression), BoolSort),
         arguments("xor", listOf(boolExpression, boolExpression, boolExpression), BoolSort),
         arguments("bvult", listOf(bv16Expression, bv16Expression), BoolSort),
-        arguments("bvult", listOf(bv32Expression, bv32Expression), BoolSort))
+        arguments("bvult", listOf(bv32Expression, bv32Expression), BoolSort),
+        arguments("O", listOf(boolExpression, boolExpression), BoolSort),
+        arguments("O", listOf(bv32Expression, bv32Expression), BVSort(32)),
+        arguments("O", listOf(bv16Expression, bv16Expression), BVSort(32))
+    )
   }
 
   @ParameterizedTest
@@ -109,6 +116,15 @@ class ContextTests {
   ) {
     assertFalse(function.accepts(args))
   }
+
+    @ParameterizedTest
+    @MethodSource("getFunctionNameAndIncorrectArgs")
+    fun `Check that Expression generation fails for incorrect parameters`(
+        function: FunctionDecl<*>,
+        args: List<Expression<*>>
+    ) {
+        assertThrows<Exception> { function.getExpression(args) }
+    }
 
   private fun getFunctionNameAndIncorrectArgs(): Stream<Arguments> {
     return Stream.of(

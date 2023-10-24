@@ -31,14 +31,27 @@ open class FunctionDecl<T : Sort>(
     val isAmbiguous: Boolean = false
 ) {
   open fun getExpression(args: List<Expression<*>>): Expression<T> {
+    checkRequirements(args)
+
     return BasicExpression(name, sort)
   }
 
   /** Returns true if the function accepts the arguments provided */
-  open fun accepts(args: List<Expression<*>>): Boolean {
-    if (args.size != params.size) return false
+  fun accepts(args: List<Expression<*>>): Boolean {
+    try {
+        checkRequirements(args)
+    } catch (e : Exception) {
+      return false
+    }
 
-    return args.zip(params).all { it.first.sort == it.second }
+    return true
+  }
+
+  protected open fun checkRequirements(args: List<Expression<*>>) {
+    require(args.size == params.size) { "${params.size} arguments expected, but ${args.size} were provided" }
+
+    require(args.zip(params).all { it.first.sort::class == it.second::class }) { "Type mismatch expected ${params.joinToString(" ")}, but ${args.joinToString(" ")} were provided" }
+    //require(args.zip(params).all { it.first.sort == it.second }) { "Type mismatch" }
   }
 
   override fun equals(other: Any?): Boolean =
@@ -57,7 +70,7 @@ abstract class SortDecl<T : Sort>(val name: String) {
 
 class Context {
   fun registerTheory(other: TheoryContext) {
-    functions.addAll(other.functions.values)
+    functions.addAll(other.functions)
     other.sorts.forEach { registerSort(it.value) }
   }
 
@@ -123,8 +136,9 @@ class Context {
     return functions.find { (it.name == name) && (it.accepts(args)) && it.sort == sort }
   }
 
-  fun getSort(protoSort: ProtoSort): Sort? {
-    return sorts[protoSort.identifier.symbol.token.getValue()]?.getSort(protoSort)
+  fun getSort(protoSort: ProtoSort): Sort {
+    return sorts[protoSort.identifier.symbol.token.getValue()]?.getSort(protoSort) ?:
+    throw Exception("Unknown sort ${protoSort.identifier.symbol.token.getValue<String>()}")
   }
 
   private val functions: HashSet<FunctionDecl<*>> = hashSetOf()
@@ -132,6 +146,6 @@ class Context {
 }
 
 interface TheoryContext {
-  val functions: Map<String, FunctionDecl<*>>
+  val functions: HashSet<FunctionDecl<*>>
   val sorts: Map<String, SortDecl<*>>
 }

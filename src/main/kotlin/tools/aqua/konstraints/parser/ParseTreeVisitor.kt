@@ -114,7 +114,5 @@ object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor {
   override fun visit(protoSort: ProtoSort): Sort {
     // TODO move to context
     return context.getSort(protoSort)
-        ?: throw IllegalStateException(
-            "Unknown sort ${protoSort.identifier.symbol.token.getValue<String>()}")
   }
 }
