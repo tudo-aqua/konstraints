@@ -193,7 +193,7 @@ object Parser {
           binary.map { binary: String -> BinaryConstant(binary) } +
           string.map { string: String -> StringConstant(string) }
   private val sExpression = undefined()
-  private val reserved = reservedCommands + reservedGeneral
+  internal val reserved = reservedCommands + reservedGeneral
 
   init {
     /* maps to an implementation of SExpression */
