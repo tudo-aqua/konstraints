@@ -18,6 +18,23 @@
 
 package tools.aqua.konstraints
 
+import tools.aqua.konstraints.parser.*
+
+internal object BitVectorExpressionContext : TheoryContext {
+  override val functions: HashSet<FunctionDecl<*>> = hashSetOf(BVUltDecl)
+  override val sorts = mapOf(Pair("BitVec", BVSortDecl))
+}
+
+internal object BVSortDecl : SortDecl<BVSort>("BitVec") {
+  override fun getSort(sort: ProtoSort): BVSort {
+    require(sort.identifier is IndexedIdentifier)
+    require(sort.identifier.indices.size == 1)
+    require(sort.identifier.indices[0] is NumeralIndex)
+
+    return BVSort((sort.identifier.indices[0] as NumeralIndex).numeral)
+  }
+}
+
 /*
  * This file implements the SMT theory of fixed size bitvectors
  * http://smtlib.cs.uiowa.edu/theories-FixedSizeBitVectors.shtml
@@ -292,4 +309,24 @@ class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expressi
   }
 
   override fun toString(): String = symbol
+}
+
+// TODO implement BVSort marker interface?
+object BVUltDecl : FunctionDecl<BoolSort>("bvult", listOf(BVSort(32), BVSort(32)), BoolSort) {
+  override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
+    require(args.size == 2) { "bvult accepts only 2 arguments but ${args.size} were provided" }
+    require(args[0].sort is BVSort)
+    require(args[1].sort is BVSort)
+    require((args[0].sort as BVSort).bits == (args[1].sort as BVSort).bits)
+
+    @Suppress("UNCHECKED_CAST")
+    return BVUlt(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+  }
+
+  override fun checkRequirements(args: List<Expression<*>>) {
+    require(args.size == 2)
+    require(args[0].sort is BVSort)
+    require(args[1].sort is BVSort)
+    require((args[0].sort as BVSort).bits == (args[1].sort as BVSort).bits)
+  }
 }

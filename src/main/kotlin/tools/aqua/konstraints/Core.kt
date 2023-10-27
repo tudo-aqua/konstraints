@@ -18,10 +18,28 @@
 
 package tools.aqua.konstraints
 
+import tools.aqua.konstraints.parser.*
+
 /*
  * This file implements the SMT core theory
  * http://smtlib.cs.uiowa.edu/theories-Core.shtml
  */
+
+// TODO implement casting for none homogeneous lists
+@Suppress("UNCHECKED_CAST")
+inline fun <reified T : Any> List<*>.checkedCast(): List<T> =
+    if (all { it is T }) this as List<T> else throw TypeCastException("")
+
+internal object CoreContext : TheoryContext {
+  override val functions: HashSet<FunctionDecl<*>> = hashSetOf(NotDecl, AndDecl, OrDecl, XOrDecl)
+  override val sorts = mapOf(Pair("Bool", BoolSortDecl))
+}
+
+internal object BoolSortDecl : SortDecl<BoolSort>("Bool") {
+  override fun getSort(sort: ProtoSort): BoolSort {
+    return BoolSort
+  }
+}
 
 /** Object for SMT true */
 object True : Expression<BoolSort>() {
@@ -45,6 +63,21 @@ class Not(val inner: Expression<BoolSort>) : Expression<BoolSort>() {
   override val symbol = "(not $inner)"
 
   override fun toString(): String = symbol
+}
+
+/** FunctionDecl Object for Not */
+object NotDecl : FunctionDecl<BoolSort>("not", listOf(BoolSort), BoolSort) {
+  override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
+    // TODO implement sorting exception
+    require(args.size == 1) { "Not only accepts 1 argument but ${args.size} were provided" }
+    require(args[0].sort == BoolSort) {
+      "Not only accepts arguments of Sort BoolSort but ${args[0].sort} was provided"
+    }
+
+    @Suppress("UNCHECKED_CAST") val inner = args[0] as Expression<BoolSort>
+
+    return Not(inner)
+  }
 }
 
 /**
@@ -75,6 +108,24 @@ class And(val conjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   override fun toString() = symbol
 }
 
+// TODO handle vararg parameters
+object AndDecl : FunctionDecl<BoolSort>("and", listOf(BoolSort, BoolSort), BoolSort) {
+  override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
+    require(args.size >= 2) {
+      "And accepts at least 2 arguments but ${args.size} have been provided"
+    }
+    require(args.all { it.sort == BoolSort }) { "And only accepts arguments of Sort BoolSort" }
+
+    @Suppress("UNCHECKED_CAST") return And(args as List<Expression<BoolSort>>)
+  }
+
+  override fun checkRequirements(args: List<Expression<*>>) {
+    require(args.size >= 2)
+
+    require(args.all { it.sort == BoolSort })
+  }
+}
+
 /**
  * Implements or according to Core theory (or Bool Bool Bool :left-assoc)
  *
@@ -89,6 +140,23 @@ class Or(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   override fun toString(): String = symbol
 }
 
+object OrDecl : FunctionDecl<BoolSort>("or", listOf(BoolSort, BoolSort), BoolSort) {
+  override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
+    require(args.size >= 2) {
+      "Or accepts at least 2 arguments but ${args.size} have been provided"
+    }
+    require(args.all { it.sort == BoolSort }) { "Or only accepts arguments of Sort BoolSort" }
+
+    @Suppress("UNCHECKED_CAST") return Or(args as List<Expression<BoolSort>>)
+  }
+
+  override fun checkRequirements(args: List<Expression<*>>) {
+    require(args.size >= 2)
+
+    require(args.all { it.sort == BoolSort })
+  }
+}
+
 /**
  * Implements xor according to Core theory (xor Bool Bool Bool :left-assoc)
  *
@@ -101,6 +169,23 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   override val symbol = "(xor ${disjuncts.joinToString(" ")})"
 
   override fun toString(): String = symbol
+}
+
+object XOrDecl : FunctionDecl<BoolSort>("xor", listOf(BoolSort, BoolSort), BoolSort) {
+  override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
+    require(args.size >= 2) {
+      "Xor accepts at least 2 arguments but ${args.size} have been provided"
+    }
+    require(args.all { it.sort == BoolSort }) { "Xor only accepts arguments of Sort BoolSort" }
+
+    @Suppress("UNCHECKED_CAST") return XOr(args as List<Expression<BoolSort>>)
+  }
+
+  override fun checkRequirements(args: List<Expression<*>>) {
+    require(args.size >= 2)
+
+    require(args.all { it.sort == BoolSort })
+  }
 }
 
 /**
