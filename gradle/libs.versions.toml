@@ -34,7 +34,7 @@ versions = { id = "com.github.ben-manes.versions", version = "0.50.0" }
 [libraries]
 junit-bom = { group = "org.junit", name = "junit-bom", version = "5.10.0" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter" } # version from BOM
-z3-turnkey = { group = "tools.aqua", name = "z3-turnkey", version = "4.12.2" }
+z3-turnkey = { group = "tools.aqua", name = "z3-turnkey", version = "4.12.2.1" }
 petitparser-core = { group = "com.github.petitparser", name = "petitparser-core", version = "2.3.1" }
 
 [bundles]
