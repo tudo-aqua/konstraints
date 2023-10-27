@@ -359,7 +359,7 @@ object Parser {
               rparen)
   val functionDec = lparen * symbol * lparen * sortedVar.star() * rparen * sort * rparen
   val functionDef = symbol * lparen * sortedVar.star() * rparen * sort * term
-  val propLiteral = symbol /*+ (lparen * notKW * symbol * rparen)*/
+  val propLiteral = symbol /*+ (lparen * of("not") * symbol * rparen)*/
 
   val assertCMD =
       (lparen * assertKW * term * rparen).map { results: List<Any> ->

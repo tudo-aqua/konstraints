@@ -21,6 +21,8 @@ package tools.aqua.konstraints.parser
 import java.math.BigDecimal
 import org.petitparser.context.Token
 
+// TODO(make parser classes internal)
+
 sealed interface ProtoCommand
 
 data class ProtoAssert(val term: ProtoTerm) : ProtoCommand
@@ -32,7 +34,7 @@ data class ProtoDeclareFun(val name: Symbol, val parameters: List<ProtoSort>, va
 
 data class Symbol(val token: Token)
 
-sealed interface SpecConstant // Token?
+sealed interface SpecConstant
 
 data class StringConstant(val string: String) : SpecConstant
 

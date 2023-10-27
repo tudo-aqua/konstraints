@@ -324,9 +324,9 @@ object BVUltDecl : FunctionDecl<BoolSort>("bvult", listOf(BVSort(32), BVSort(32)
   }
 
   override fun checkRequirements(args: List<Expression<*>>) {
-    require (args.size == 2)
-    require (args[0].sort is BVSort)
-    require (args[1].sort is BVSort)
-    require ((args[0].sort as BVSort).bits == (args[1].sort as BVSort).bits)
+    require(args.size == 2)
+    require(args[0].sort is BVSort)
+    require(args[1].sort is BVSort)
+    require((args[0].sort as BVSort).bits == (args[1].sort as BVSort).bits)
   }
 }

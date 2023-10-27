@@ -18,11 +18,40 @@
 
 package tools.aqua.konstraints.parser
 
-import tools.aqua.konstraints.BasicExpression
-import tools.aqua.konstraints.Expression
-import tools.aqua.konstraints.Sort
+import tools.aqua.konstraints.*
 
 // TODO ambiguous lookup with params and return type
+
+data class Signature(
+    val parametricSorts: Set<Sort>,
+    val indices: Set<Index>,
+    val parameters: List<Sort>,
+    val sort: Sort
+) {
+  fun bindToOrNull(
+      parameter: List<Sort>,
+      sort: Sort
+  ): Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>? {
+    val parametricBindings = mutableMapOf<Sort, Sort>()
+    val indexBindings = mutableMapOf<Index, NumeralIndex>()
+
+    return null
+  }
+
+  private fun bindToOrNullInternal(
+      parameter: List<Sort>,
+      parametricBindings: MutableMap<Sort, Sort>,
+      indexBindings: MutableMap<Index, NumeralIndex>
+  ): Boolean {
+    parameters.forEach {
+      when (it) {
+        is BoolSort -> TODO()
+        is BVSort -> TODO()
+      }
+    }
+    return false
+  }
+}
 
 open class FunctionDecl<T : Sort>(
     val name: String,
@@ -39,8 +68,8 @@ open class FunctionDecl<T : Sort>(
   /** Returns true if the function accepts the arguments provided */
   fun accepts(args: List<Expression<*>>): Boolean {
     try {
-        checkRequirements(args)
-    } catch (e : Exception) {
+      checkRequirements(args)
+    } catch (e: Exception) {
       return false
     }
 
@@ -48,10 +77,14 @@ open class FunctionDecl<T : Sort>(
   }
 
   protected open fun checkRequirements(args: List<Expression<*>>) {
-    require(args.size == params.size) { "${params.size} arguments expected, but ${args.size} were provided" }
+    require(args.size == params.size) {
+      "${params.size} arguments expected, but ${args.size} were provided"
+    }
 
-    require(args.zip(params).all { it.first.sort::class == it.second::class }) { "Type mismatch expected ${params.joinToString(" ")}, but ${args.joinToString(" ")} were provided" }
-    //require(args.zip(params).all { it.first.sort == it.second }) { "Type mismatch" }
+    require(args.zip(params).all { it.first.sort::class == it.second::class }) {
+      "Type mismatch expected ${params.joinToString(" ")}, but ${args.joinToString(" ")} were provided"
+    }
+    // require(args.zip(params).all { it.first.sort == it.second }) { "Type mismatch" }
   }
 
   override fun equals(other: Any?): Boolean =
@@ -137,8 +170,8 @@ class Context {
   }
 
   fun getSort(protoSort: ProtoSort): Sort {
-    return sorts[protoSort.identifier.symbol.token.getValue()]?.getSort(protoSort) ?:
-    throw Exception("Unknown sort ${protoSort.identifier.symbol.token.getValue<String>()}")
+    return sorts[protoSort.identifier.symbol.token.getValue()]?.getSort(protoSort)
+        ?: throw Exception("Unknown sort ${protoSort.identifier.symbol.token.getValue<String>()}")
   }
 
   private val functions: HashSet<FunctionDecl<*>> = hashSetOf()

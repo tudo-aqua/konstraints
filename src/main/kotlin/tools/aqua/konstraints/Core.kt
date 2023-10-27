@@ -31,8 +31,7 @@ inline fun <reified T : Any> List<*>.checkedCast(): List<T> =
     if (all { it is T }) this as List<T> else throw TypeCastException("")
 
 object CoreContext : TheoryContext {
-  override val functions: HashSet<FunctionDecl<*>> =
-      hashSetOf(NotDecl, AndDecl, OrDecl, XOrDecl)
+  override val functions: HashSet<FunctionDecl<*>> = hashSetOf(NotDecl, AndDecl, OrDecl, XOrDecl)
   override val sorts = mapOf(Pair("Bool", BoolSortDecl))
 }
 
@@ -120,7 +119,7 @@ object AndDecl : FunctionDecl<BoolSort>("and", listOf(BoolSort, BoolSort), BoolS
     @Suppress("UNCHECKED_CAST") return And(args as List<Expression<BoolSort>>)
   }
 
-  override fun  checkRequirements(args: List<Expression<*>>) {
+  override fun checkRequirements(args: List<Expression<*>>) {
     require(args.size >= 2)
 
     require(args.all { it.sort == BoolSort })
@@ -151,7 +150,7 @@ object OrDecl : FunctionDecl<BoolSort>("or", listOf(BoolSort, BoolSort), BoolSor
     @Suppress("UNCHECKED_CAST") return Or(args as List<Expression<BoolSort>>)
   }
 
-  override fun  checkRequirements(args: List<Expression<*>>) {
+  override fun checkRequirements(args: List<Expression<*>>) {
     require(args.size >= 2)
 
     require(args.all { it.sort == BoolSort })
@@ -182,7 +181,7 @@ object XOrDecl : FunctionDecl<BoolSort>("xor", listOf(BoolSort, BoolSort), BoolS
     @Suppress("UNCHECKED_CAST") return XOr(args as List<Expression<BoolSort>>)
   }
 
-  override fun  checkRequirements(args: List<Expression<*>>) {
+  override fun checkRequirements(args: List<Expression<*>>) {
     require(args.size >= 2)
 
     require(args.all { it.sort == BoolSort })
