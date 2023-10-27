@@ -40,28 +40,28 @@ infix fun Parser.trim(both: Parser): Parser = trim(both)
 object Parser {
   // Auxiliary Lexical Categories
 
-  val whitespaceCat = anyOf(" \t\r\n", "space, tab, or newline expected")
-  val printableCat = range('\u0020', '\u007E') + range('\u0080', '\u00FF')
-  val digitCat = range('0', '9')
-  val letterCat = range('A', 'Z') + range('a', 'z')
+  private val whitespaceCat = anyOf(" \t\r\n", "space, tab, or newline expected")
+  private val printableCat = range('\u0020', '\u007E') + range('\u0080', '\u00FF')
+  private val digitCat = range('0', '9')
+  private val letterCat = range('A', 'Z') + range('a', 'z')
 
   // Tokens: Reserved Words: General
 
-  val exclamationKW = of('!') trim whitespaceCat
-  val underscoreKW = of('_') trim whitespaceCat
-  val asKW = of("as") trim whitespaceCat
-  val binaryKW = of("BINARY") trim whitespaceCat
-  val decimalKW = of("DECIMAL") trim whitespaceCat
-  val existsKW = of("exists") trim whitespaceCat
-  val hexadecimalKW = of("HEXADECIMAL") trim whitespaceCat
-  val forallKW = of("forall") trim whitespaceCat
-  val letKW = of("let") trim whitespaceCat
-  val matchKW = of("match") trim whitespaceCat
-  val numeralKW = of("NUMERAL") trim whitespaceCat
-  val parKW = of("par") trim whitespaceCat
-  val stringKW = of("STRING") trim whitespaceCat
+  private val exclamationKW = of('!') trim whitespaceCat
+  private val underscoreKW = of('_') trim whitespaceCat
+  private val asKW = of("as") trim whitespaceCat
+  private val binaryKW = of("BINARY") trim whitespaceCat
+  private val decimalKW = of("DECIMAL") trim whitespaceCat
+  private val existsKW = of("exists") trim whitespaceCat
+  private val hexadecimalKW = of("HEXADECIMAL") trim whitespaceCat
+  private val forallKW = of("forall") trim whitespaceCat
+  private val letKW = of("let") trim whitespaceCat
+  private val matchKW = of("match") trim whitespaceCat
+  private val numeralKW = of("NUMERAL") trim whitespaceCat
+  private val parKW = of("par") trim whitespaceCat
+  private val stringKW = of("STRING") trim whitespaceCat
 
-  val reservedGeneral =
+  internal val reservedGeneral =
       (exclamationKW +
               underscoreKW +
               asKW +
@@ -79,37 +79,37 @@ object Parser {
 
   // Tokens: Reserved Words: Command names
 
-  val assertKW = of("assert") trim whitespaceCat
-  val checkSatKW = of("check-sat") trim whitespaceCat
-  val checkSatAssumingKW = of("check-sat-assuming") trim whitespaceCat
-  val declareConstKW = of("declare-const") trim whitespaceCat
-  val declareDatatypeKW = of("declare-datatype") trim whitespaceCat
-  val declareDatatypesKW = of("declare-datatypes") trim whitespaceCat
-  val declareFunKW = of("declare-fun") trim whitespaceCat
-  val declareSortKW = of("declare-sort") trim whitespaceCat
-  val defineFunKW = of("define-fun") trim whitespaceCat
-  val defineFunRecKW = of("define-fun-rec") trim whitespaceCat
-  val defineSortKW = of("define-sort") trim whitespaceCat
-  val echoKW = of("echo") trim whitespaceCat
-  val exitKW = of("exit") trim whitespaceCat
-  val getAssertionsKW = of("get-assertions") trim whitespaceCat
-  val getAssignmentKW = of("get-assignment") trim whitespaceCat
-  val getInfoKW = of("get-info") trim whitespaceCat
-  val getModelKW = of("get-model") trim whitespaceCat
-  val getOptionKW = of("get-option") trim whitespaceCat
-  val getProofKW = of("get-proof") trim whitespaceCat
-  val getUnsatAssumptionsKW = of("get-unsat-assumptions") trim whitespaceCat
-  val getUnsatCoreKW = of("get-unsat-core") trim whitespaceCat
-  val getValueKW = of("get-value") trim whitespaceCat
-  val popKW = of("pop") trim whitespaceCat
-  val pushKW = of("push") trim whitespaceCat
-  val resetKW = of("reset") trim whitespaceCat
-  val resetAssertionsKW = of("reset-assertions") trim whitespaceCat
-  val setInfoKW = of("set-info") trim whitespaceCat
-  val setLogicKW = of("set-logic") trim whitespaceCat
-  val setOptionKW = of("set-option") trim whitespaceCat
+  private val assertKW = of("assert") trim whitespaceCat
+  private val checkSatKW = of("check-sat") trim whitespaceCat
+  private val checkSatAssumingKW = of("check-sat-assuming") trim whitespaceCat
+  private val declareConstKW = of("declare-const") trim whitespaceCat
+  private val declareDatatypeKW = of("declare-datatype") trim whitespaceCat
+  private val declareDatatypesKW = of("declare-datatypes") trim whitespaceCat
+  private val declareFunKW = of("declare-fun") trim whitespaceCat
+  private val declareSortKW = of("declare-sort") trim whitespaceCat
+  private val defineFunKW = of("define-fun") trim whitespaceCat
+  private val defineFunRecKW = of("define-fun-rec") trim whitespaceCat
+  private val defineSortKW = of("define-sort") trim whitespaceCat
+  private val echoKW = of("echo") trim whitespaceCat
+  private val exitKW = of("exit") trim whitespaceCat
+  private val getAssertionsKW = of("get-assertions") trim whitespaceCat
+  private val getAssignmentKW = of("get-assignment") trim whitespaceCat
+  private val getInfoKW = of("get-info") trim whitespaceCat
+  private val getModelKW = of("get-model") trim whitespaceCat
+  private val getOptionKW = of("get-option") trim whitespaceCat
+  private val getProofKW = of("get-proof") trim whitespaceCat
+  private val getUnsatAssumptionsKW = of("get-unsat-assumptions") trim whitespaceCat
+  private val getUnsatCoreKW = of("get-unsat-core") trim whitespaceCat
+  private val getValueKW = of("get-value") trim whitespaceCat
+  private val popKW = of("pop") trim whitespaceCat
+  private val pushKW = of("push") trim whitespaceCat
+  private val resetKW = of("reset") trim whitespaceCat
+  private val resetAssertionsKW = of("reset-assertions") trim whitespaceCat
+  private val setInfoKW = of("set-info") trim whitespaceCat
+  private val setLogicKW = of("set-logic") trim whitespaceCat
+  private val setOptionKW = of("set-option") trim whitespaceCat
 
-  val reservedCommands =
+  internal val reservedCommands =
       (assertKW +
               checkSatKW +
               checkSatAssumingKW +
@@ -143,57 +143,57 @@ object Parser {
 
   // Tokens: Other tokens
 
-  val lparen = of('(') trim whitespaceCat
-  val rparen = of(')') trim whitespaceCat
+  private val lparen = of('(') trim whitespaceCat
+  private val rparen = of(')') trim whitespaceCat
 
-  val numeralBase = (of('0') + (range('1', '9') * digitCat.star())).flatten()
-  val numeral = numeralBase.map(String::toInt)
-  val decimal =
+  private val numeralBase = (of('0') + (range('1', '9') * digitCat.star())).flatten()
+  private val numeral = numeralBase.map(String::toInt)
+  private val decimal =
       (numeralBase * of('.') * of('0').star() * numeralBase)
           .flatten()
           .map<String, BigDecimal>(::BigDecimal)
-  val hexadecimal = of("#x") * (digitCat + range('A', 'F') + range('a', 'f')).plus()
-  val binary = (of("#b") * range('0', '1').plus()).flatten()
-  val anythingButQuotes =
+  private val hexadecimal = of("#x") * (digitCat + range('A', 'F') + range('a', 'f')).plus()
+  private val binary = (of("#b") * range('0', '1').plus()).flatten()
+  private val anythingButQuotes =
       whitespaceCat +
           range('\u0020', '"' - 1) +
           range('"' + 1, '\u007E') +
           range('\u0080', '\u00FF')
-  val string =
+  private val string =
       of("\"") *
           (anythingButQuotes.star() +
               ((anythingButQuotes.star() * of("\"\"") * anythingButQuotes.star()).star())) *
           of("\"")
 
-  val symbolSymbols = anyOf("+-/*=%?!.\$_~&^<>@")
-  val simpleSymbol =
+  private val symbolSymbols = anyOf("+-/*=%?!.\$_~&^<>@")
+  internal val simpleSymbol =
       (letterCat + symbolSymbols) * (letterCat + digitCat + anyOf("+-/*=%?!.\$_~&^<>@")).star()
 
-  val anythingButPipeOrBackslash =
+  private val anythingButPipeOrBackslash =
       whitespaceCat +
           range('\u0020', '\\' - 1) +
           range('\\' + 1, '|' - 1) +
           range('|' + 1, '\u007E') +
           range('\u0080', '\u00FF')
-  val quotedSymbol = of('|') * anythingButPipeOrBackslash.star() * of('|')
+  internal val quotedSymbol = of('|') * anythingButPipeOrBackslash.star() * of('|')
 
-  val symbol =
+  private val symbol =
       (simpleSymbol + quotedSymbol).flatten().trim(whitespaceCat).token().map { token: Token ->
         Symbol(token)
       }
-  val keyword = (of(':') * simpleSymbol).trim(whitespaceCat).flatten().token()
+  private val keyword = (of(':') * simpleSymbol).trim(whitespaceCat).flatten().token()
 
   // S-Expressions
 
   /* maps to an implementation of SpecConstant */
-  val specConstant =
+  private val specConstant =
       decimal.map { decimal: BigDecimal -> DecimalConstant(decimal) } +
           numeral.map { numeral: Int -> NumeralConstant(numeral) } +
           hexadecimal.map { hexadecimal: String -> HexConstant(hexadecimal) } +
           binary.map { binary: String -> BinaryConstant(binary) } +
           string.map { string: String -> StringConstant(string) }
-  val sExpression = undefined()
-  val reserved = reservedCommands + reservedGeneral
+  private val sExpression = undefined()
+  private val reserved = reservedCommands + reservedGeneral
 
   init {
     /* maps to an implementation of SExpression */
@@ -211,12 +211,12 @@ object Parser {
   // Identifiers
 
   /* maps to an implementation of Index */
-  val index =
+  private val index =
       numeral.map { numeral: Int -> NumeralIndex(numeral) } +
           symbol.map { symbol: Symbol -> SymbolIndex(symbol) }
 
   /* maps to an implementation of Identifier */
-  val identifier =
+  private val identifier =
       symbol.map { symbol: Symbol -> SymbolIdentifier(symbol) } +
           (lparen * of("_") * symbol * index.plus() * rparen).map { results: List<Any> ->
             IndexedIdentifier(results[2] as Symbol, results[3] as List<Index>)
@@ -225,7 +225,7 @@ object Parser {
 
   // Sorts
 
-  val sort = undefined()
+  internal val sort = undefined()
 
   init {
     /* maps to ProtoSort */
@@ -240,7 +240,7 @@ object Parser {
   // Attributes
 
   /* maps to an implementation of AttributeValue */
-  val attributeValue =
+  private val attributeValue =
       specConstant.map { constant: SpecConstant -> ConstantAttributeValue(constant) } +
           symbol.map { symbol: Symbol -> SymbolAttributeValue(symbol) } +
           (lparen * sExpression.star() * rparen).map { results: List<Any> ->
@@ -252,36 +252,36 @@ object Parser {
    * ChoiceParser matches greedy, so it's important to first match (keyword * attributeValue)
    * Maybe replace with (keyword * attributeValue.optional())
    */
-  val attribute =
+  internal val attribute =
       (keyword * attributeValue).map { results: List<Any> ->
         Attribute(results[0] as Token, results[1] as AttributeValue)
       } + keyword.map { keyword: Token -> Attribute(keyword, null) }
 
   // Terms
 
-  val term = undefined()
+  private val term = undefined()
 
   /* maps to an implementation of QualIdentifier */
-  val qualIdentifier =
+  private val qualIdentifier =
       identifier.map { identifier: Identifier -> SimpleQualIdentifier(identifier) } +
           (lparen * asKW * identifier * sort * rparen).map { results: List<Any> ->
             AsQualIdentifier(results[2] as Identifier, results[3] as ProtoSort)
           }
 
   /* maps to VarBinding */
-  val varBinding =
+  private val varBinding =
       (lparen * symbol * term * rparen).map { results: List<Any> ->
         VarBinding(results[1] as Symbol, results[2] as ProtoTerm)
       }
 
   /* maps to SortedVar */
-  val sortedVar =
+  private val sortedVar =
       (lparen * symbol * sort * rparen).map { results: List<Any> ->
         SortedVar(results[1] as Symbol, results[2] as ProtoSort)
       }
 
   /* maps to pattern */
-  val pattern =
+  private val pattern =
       symbol.map { symbol: Symbol -> Pattern(listOf(symbol)) } +
           (lparen * symbol * symbol.plus() * rparen).map { results: List<Any> ->
             Pattern(listOf(listOf(results[1] as Symbol), results[2] as List<Symbol>).flatten())
@@ -289,7 +289,7 @@ object Parser {
           }
 
   /* maps to match case */
-  val matchCase =
+  private val matchCase =
       (lparen * pattern * term * rparen).map { results: List<Any> ->
         MatchCase(results[1] as Pattern, results[2] as ProtoTerm)
       }
@@ -343,10 +343,10 @@ object Parser {
   // TODO
 
   // Commands
-  val sortDec = lparen * symbol * numeralBase * rparen
-  val selectorDec = lparen * symbol * sort * rparen
-  val constructorDec = lparen * symbol * selectorDec.star() * rparen
-  val datatypeDec =
+  private val sortDec = lparen * symbol * numeralBase * rparen
+  private val selectorDec = lparen * symbol * sort * rparen
+  private val constructorDec = lparen * symbol * selectorDec.star() * rparen
+  private val datatypeDec =
       (lparen * constructorDec.plus() * rparen) +
           (lparen *
               parKW *
@@ -357,23 +357,27 @@ object Parser {
               constructorDec.plus() *
               rparen *
               rparen)
-  val functionDec = lparen * symbol * lparen * sortedVar.star() * rparen * sort * rparen
-  val functionDef = symbol * lparen * sortedVar.star() * rparen * sort * term
-  val propLiteral = symbol /*+ (lparen * of("not") * symbol * rparen)*/
+  private val functionDec = lparen * symbol * lparen * sortedVar.star() * rparen * sort * rparen
+  private val functionDef = symbol * lparen * sortedVar.star() * rparen * sort * term
 
-  val assertCMD =
+  /*
+   * The spec lists "not" as reserved here, but it is not reserved in any other context
+   */
+  private val propLiteral = symbol + (lparen * of("not") * symbol * rparen)
+
+  private val assertCMD =
       (lparen * assertKW * term * rparen).map { results: List<Any> ->
         ProtoAssert(results[2] as ProtoTerm)
       }
 
-  val checkSatCMD = (lparen * checkSatKW * rparen).map { _: Any -> CheckSat }
+  private val checkSatCMD = (lparen * checkSatKW * rparen).map { _: Any -> CheckSat }
 
-  val declareConstCMD =
+  private val declareConstCMD =
       (lparen * declareConstKW * symbol * sort * rparen).map { results: ArrayList<Any> ->
         ProtoDeclareConst(results[2] as Symbol, results[3] as ProtoSort)
       }
 
-  val declareFunCMD =
+  private val declareFunCMD =
       (lparen * declareFunKW * symbol * lparen * sort.star() * rparen * sort * rparen).map {
           results: ArrayList<Any> ->
         ProtoDeclareFun(

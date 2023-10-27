@@ -22,7 +22,9 @@ import tools.aqua.konstraints.*
 
 // TODO ambiguous lookup with params and return type
 
-data class Signature(
+// TODO this uses the wrong index class right now so it must be internal, will be made public again
+// once the right index data class is implemented
+internal data class Signature(
     val parametricSorts: Set<Sort>,
     val indices: Set<Index>,
     val parameters: List<Sort>,
@@ -97,11 +99,11 @@ open class FunctionDecl<T : Sort>(
   override fun hashCode(): Int = name.hashCode() * 961 + params.hashCode() * 31 + sort.hashCode()
 }
 
-abstract class SortDecl<T : Sort>(val name: String) {
+internal abstract class SortDecl<T : Sort>(val name: String) {
   abstract fun getSort(sort: ProtoSort): T
 }
 
-class Context {
+internal class Context {
   fun registerTheory(other: TheoryContext) {
     functions.addAll(other.functions)
     other.sorts.forEach { registerSort(it.value) }
@@ -178,7 +180,7 @@ class Context {
   private val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf()
 }
 
-interface TheoryContext {
+internal interface TheoryContext {
   val functions: HashSet<FunctionDecl<*>>
   val sorts: Map<String, SortDecl<*>>
 }

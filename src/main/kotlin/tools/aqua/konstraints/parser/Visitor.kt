@@ -20,7 +20,7 @@ package tools.aqua.konstraints.parser
 
 import tools.aqua.konstraints.*
 
-interface CommandVisitor {
+internal interface CommandVisitor {
   // Visit functions for all ProtoCommands
   fun visit(command: ProtoCommand): Command =
       when (command) {
@@ -36,7 +36,7 @@ interface CommandVisitor {
   fun visit(protoDeclareFun: ProtoDeclareFun): DeclareFun
 }
 
-interface SpecConstantVisitor {
+internal interface SpecConstantVisitor {
   // Visit functions for all SpecConstant implementations
   fun visit(specConstant: SpecConstant) {
     when (specConstant) {
@@ -59,11 +59,11 @@ interface SpecConstantVisitor {
   fun visit(decimalConstant: DecimalConstant)
 }
 
-interface SortVisitor {
+internal interface SortVisitor {
   fun visit(protoSort: ProtoSort): Sort
 }
 
-interface SExpressionVisitor {
+internal interface SExpressionVisitor {
   fun visit(sExpression: SExpression) {
     when (sExpression) {
       is SubSExpression -> visit(sExpression)
@@ -85,7 +85,7 @@ interface SExpressionVisitor {
   fun visit(sExpressionKeyword: SExpressionKeyword)
 }
 
-interface TermVisitor {
+internal interface TermVisitor {
   fun visit(protoTerm: ProtoTerm): Expression<*> =
       when (protoTerm) {
         is SimpleQualIdentifier -> visit(protoTerm)

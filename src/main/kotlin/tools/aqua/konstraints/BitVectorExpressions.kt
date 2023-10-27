@@ -20,12 +20,12 @@ package tools.aqua.konstraints
 
 import tools.aqua.konstraints.parser.*
 
-object BitVectorExpressionContext : TheoryContext {
+internal object BitVectorExpressionContext : TheoryContext {
   override val functions: HashSet<FunctionDecl<*>> = hashSetOf(BVUltDecl)
   override val sorts = mapOf(Pair("BitVec", BVSortDecl))
 }
 
-object BVSortDecl : SortDecl<BVSort>("BitVec") {
+internal object BVSortDecl : SortDecl<BVSort>("BitVec") {
   override fun getSort(sort: ProtoSort): BVSort {
     require(sort.identifier is IndexedIdentifier)
     require(sort.identifier.indices.size == 1)
