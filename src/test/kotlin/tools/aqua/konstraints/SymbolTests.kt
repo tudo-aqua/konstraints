@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints
 
+import java.util.stream.Stream
 import kotlin.IllegalArgumentException
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.TestInstance
@@ -27,7 +28,6 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
-import java.util.stream.Stream
 
 /*
  * Lifecycle.PER_CLASS is needed for MethodSource to avoid moving sources to a companion object
@@ -99,7 +99,7 @@ class SymbolTests {
               "-32",
           ])
   fun `test that smart quote accepts simple symbols`(symbol: String) {
-    val test = Symbol(symbol, QUOTING_RULE.SMART)
+    val test = Symbol(symbol, QuotingRule.SMART)
     assertEquals(symbol, test.value)
   }
 
@@ -115,14 +115,14 @@ class SymbolTests {
               """ " can occur too """,
               """ af klj ^*0 asfe2 (&*)&(#^ $ > > >?" ']]984"""])
   fun `test that smart quote dequotes quoted symbols`(symbol: String) {
-    val test = Symbol("|$symbol|", QUOTING_RULE.SMART)
+    val test = Symbol("|$symbol|", QuotingRule.SMART)
     assertEquals(symbol, test.value)
   }
 
   @ParameterizedTest
   @ValueSource(strings = ["bit|vec"])
   fun `test that smart quoting rejects illegal symbols`(symbol: String) {
-    assertThrows<IllegalArgumentException> { Symbol(symbol, QUOTING_RULE.SMART) }
+    assertThrows<IllegalArgumentException> { Symbol(symbol, QuotingRule.SMART) }
   }
 
   @ParameterizedTest
@@ -144,7 +144,7 @@ class SymbolTests {
               "+34",
               "-32"])
   fun `test that forced quoting quotes simple symbols`(symbol: String) {
-    val test = Symbol(symbol, QUOTING_RULE.FORCED)
+    val test = Symbol(symbol, QuotingRule.FORCED)
     assertEquals("|$symbol|", test.value)
   }
 
@@ -160,36 +160,33 @@ class SymbolTests {
               """| " can occur too |""",
               """| af klj ^*0 asfe2 (&*)&(#^ $ > > >?" ']]984|"""])
   fun `test that forced quoting handles quoted strings correctly`(symbol: String) {
-    val test = Symbol(symbol, QUOTING_RULE.FORCED)
+    val test = Symbol(symbol, QuotingRule.FORCED)
     assertEquals(symbol, test.value)
   }
 
   @ParameterizedTest
   @ValueSource(strings = ["bit|vec"])
   fun `test that forced quoting does not accept illegal symbols`(symbol: String) {
-    assertThrows<IllegalArgumentException> { Symbol(symbol, QUOTING_RULE.FORCED) }
+    assertThrows<IllegalArgumentException> { Symbol(symbol, QuotingRule.FORCED) }
   }
 
-    @ParameterizedTest
-    @MethodSource("getEqualSymbols")
-    fun `test that equals works correct for equal symbols`(lhs: Symbol, rhs: Symbol) {
-        assertEquals(lhs, rhs)
-    }
+  @ParameterizedTest
+  @MethodSource("getEqualSymbols")
+  fun `test that equals works correct for equal symbols`(lhs: Symbol, rhs: Symbol) {
+    assertEquals(lhs, rhs)
+  }
 
-    private fun getEqualSymbols() : Stream<Arguments> {
-        return Stream.of(
-            arguments(Symbol("A"), Symbol("A")),
-            arguments(Symbol("A"), Symbol("|A|"))
-        )
-    }
+  private fun getEqualSymbols(): Stream<Arguments> {
+    return Stream.of(arguments(Symbol("A"), Symbol("A")), arguments(Symbol("A"), Symbol("|A|")))
+  }
 
-    @ParameterizedTest
-    @MethodSource("getUnequalSymbols")
-    fun `test that equals works correct for unequal symbols`(lhs: Symbol, rhs: Symbol) {
-        assertNotEquals(lhs, rhs)
-    }
+  @ParameterizedTest
+  @MethodSource("getUnequalSymbols")
+  fun `test that equals works correct for unequal symbols`(lhs: Symbol, rhs: Symbol) {
+    assertNotEquals(lhs, rhs)
+  }
 
-    private fun getUnequalSymbols() : Stream<Arguments> {
-        return Stream.of(arguments(Symbol("A"), Symbol("B")))
-    }
+  private fun getUnequalSymbols(): Stream<Arguments> {
+    return Stream.of(arguments(Symbol("A"), Symbol("B")))
+  }
 }

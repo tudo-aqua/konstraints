@@ -283,7 +283,9 @@ object Parser {
   private val pattern =
       symbol.map { symbol: ParseSymbol -> Pattern(listOf(symbol)) } +
           (lparen * symbol * symbol.plus() * rparen).map { results: List<Any> ->
-            Pattern(listOf(listOf(results[1] as ParseSymbol), results[2] as List<ParseSymbol>).flatten())
+            Pattern(
+                listOf(listOf(results[1] as ParseSymbol), results[2] as List<ParseSymbol>)
+                    .flatten())
             // results[2] is guaranteed to be a list of Symbol
           }
 

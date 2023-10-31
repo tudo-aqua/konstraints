@@ -19,24 +19,23 @@
 package tools.aqua.konstraints
 
 import tools.aqua.konstraints.parser.Parser
-import tools.aqua.konstraints.parser.ParseSymbol
 
-enum class QUOTING_RULE {
+enum class QuotingRule {
   NONE,
   SMART,
   FORCED
 }
 
-class Symbol(symbol: String, rule: QUOTING_RULE) {
-  var isQuoted = false
-  var mustQuote = false
-  var value = ""
+class Symbol(symbol: String, rule: QuotingRule) {
+  val isQuoted: Boolean
+  val mustQuote: Boolean
+  val value: String // TODO save smtstring without quotes, construct if needed
 
-  constructor(symbol: String) : this(symbol, QUOTING_RULE.NONE)
+  constructor(symbol: String) : this(symbol, QuotingRule.NONE)
 
   init {
     when (rule) {
-      QUOTING_RULE.NONE -> {
+      QuotingRule.NONE -> {
         // Parser must consume the entire string so .end() is needed
         if (Parser.simpleSymbol.end().accept(symbol) && !Parser.reserved.end().accept(symbol)) {
           isQuoted = false
@@ -51,7 +50,7 @@ class Symbol(symbol: String, rule: QUOTING_RULE) {
 
         value = symbol
       }
-      QUOTING_RULE.SMART -> {
+      QuotingRule.SMART -> {
         if (Parser.simpleSymbol.end().accept(symbol)) {
           isQuoted = false
           mustQuote = false
@@ -67,7 +66,7 @@ class Symbol(symbol: String, rule: QUOTING_RULE) {
           throw IllegalArgumentException("$symbol is not a valid smt symbol")
         }
       }
-      QUOTING_RULE.FORCED -> {
+      QuotingRule.FORCED -> {
         if (Parser.quotedSymbol.end().accept(symbol)) {
           isQuoted = true
           mustQuote = true
@@ -86,17 +85,18 @@ class Symbol(symbol: String, rule: QUOTING_RULE) {
     }
   }
 
-  //TODO fun createSimilar replaces all illegal chars and marks with uuid to prevent name conflicts
+  // TODO fun createSimilar replaces all illegal chars and marks with uuid to prevent name conflicts
 
   override fun hashCode(): Int = value.hashCode()
 
-  override fun equals(other: Any?): Boolean = when {
-    this === other -> true
-    other !is Symbol -> false
-    else -> symbolEquality(other)
-  }
+  override fun equals(other: Any?): Boolean =
+      when {
+        this === other -> true
+        other !is Symbol -> false
+        else -> symbolEquality(other)
+      }
 
-  private fun symbolEquality(other : Symbol) : Boolean {
+  private fun symbolEquality(other: Symbol): Boolean {
     return value.trim('|') == other.value.trim('|')
   }
 }

@@ -55,8 +55,10 @@ internal sealed interface Identifier {
 
 internal data class SymbolIdentifier(override val symbol: ParseSymbol) : Identifier
 
-internal data class IndexedIdentifier(override val symbol: ParseSymbol, val indices: List<ParseIndex>) :
-    Identifier
+internal data class IndexedIdentifier(
+    override val symbol: ParseSymbol,
+    val indices: List<ParseIndex>
+) : Identifier
 
 internal sealed interface ParseIndex
 

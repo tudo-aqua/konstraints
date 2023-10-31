@@ -16,24 +16,8 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints
+package tools.aqua.konstraints.util
 
-open class Sort(
-    val name: Symbol,
-    val indices: List<Index> = emptyList(),
-    val parameters: List<Sort> = emptyList()
-) {
-  constructor(
-      name: String,
-      indices: List<Index> = emptyList(),
-      parameters: List<Sort> = emptyList()
-  ) : this(Symbol(name), indices, parameters)
-
-  constructor(name: String, vararg indices: Index) : this(name, indices.toList())
-
-  // TODO equality, hashCode, toString, toSMTString
-}
-
-object BoolSort : Sort("Bool")
-
-class BVSort(val bits: Int) : Sort("BitVec", listOf(NumeralIndex(bits)))
+/* parametricBindings.putIfAbsent(symbolic, actual)?.let {
+    require(it == actual) //TODO nice exception
+} */

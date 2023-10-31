@@ -25,33 +25,73 @@ import tools.aqua.konstraints.*
 // TODO this uses the wrong index class right now so it must be internal, will be made public again
 // once the right index data class is implemented
 internal data class Signature(
-  val parametricSorts: Set<Sort>,
-  val indices: Set<ParseIndex>,
-  val parameters: List<Sort>,
-  val sort: Sort
+    val parametricSorts: Set<Sort>,
+    val indices: Set<Index>,
+    val parameters: List<Sort>,
+    val sort: Sort
 ) {
-  fun bindToOrNull(
-      parameter: List<Sort>,
-      sort: Sort
-  ): Pair<Map<Sort, Sort>, Map<ParseIndex, NumeralParseIndex>>? {
-    val parametricBindings = mutableMapOf<Sort, Sort>()
-    val indexBindings = mutableMapOf<ParseIndex, NumeralParseIndex>()
+  // TODO refactor bindToOrNull into bindTo
+  // TODO create bindTOOrNull, catching exception and returning null on error
 
-    return null
+  fun bindToOrNull(
+      actualParameters: List<Sort>,
+      actualReturn: Sort
+  ): Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>? {
+    val parametricBindings = mutableMapOf<Sort, Sort>()
+    val indexBindings = mutableMapOf<Index, NumeralIndex>()
+
+    bindToOrNullInternal(parameters, actualParameters, parametricBindings, indexBindings)
+    bindToOrNullInternal(sort, actualReturn, parametricBindings, indexBindings)
+
+    return parametricBindings to indexBindings
   }
 
   private fun bindToOrNullInternal(
-      parameter: List<Sort>,
+      symbolicParameters: List<Sort>,
+      actualParameters: List<Sort>,
       parametricBindings: MutableMap<Sort, Sort>,
-      indexBindings: MutableMap<ParseIndex, NumeralParseIndex>
-  ): Boolean {
-    parameters.forEach {
-      when (it) {
-        is BoolSort -> TODO()
-        is BVSort -> TODO()
-      }
+      indexBindings: MutableMap<Index, NumeralIndex>
+  ) {
+    // TODO enforce equal length of symbolicParameters and actualParameters
+
+    (symbolicParameters zip actualParameters).forEach { (symbolic, actual) ->
+      bindToOrNullInternal(symbolic, actual, parametricBindings, indexBindings)
     }
-    return false
+  }
+
+  private fun bindToOrNullInternal(
+      symbolic: Sort,
+      actual: Sort,
+      parametricBindings: MutableMap<Sort, Sort>,
+      indexBindings: MutableMap<Index, NumeralIndex>
+  ) {
+    if (symbolic in parametricSorts) {
+      // bind if not already bound
+      parametricBindings.bind(symbolic, actual)
+    } else {
+      require(symbolic.name == actual.name)
+
+      // TODO enforce same length symbolic.indices and actual.indices
+      (symbolic.indices zip actual.indices).forEach { (symbolicIndex, actualIndex) ->
+        bindToOrNullInternal(symbolicIndex, actualIndex, indexBindings)
+      }
+      bindToOrNullInternal(
+          symbolic.parameters, actual.parameters, parametricBindings, indexBindings)
+    }
+  }
+
+  private fun bindToOrNullInternal(
+      symbolic: Index,
+      actual: Index,
+      indexBindings: MutableMap<Index, NumeralIndex>
+  ) {
+    require(actual is NumeralIndex)
+    if (symbolic in indices) {
+      indexBindings.bind(symbolic, actual)
+    } else {
+      require(symbolic is NumeralIndex)
+      require(symbolic.numeral == actual.numeral)
+    }
   }
 }
 
@@ -69,6 +109,8 @@ open class FunctionDecl<T : Sort>(
 
   /** Returns true if the function accepts the arguments provided */
   fun accepts(args: List<Expression<*>>): Boolean {
+    // TODO use sign
+
     try {
       checkRequirements(args)
     } catch (e: Exception) {
@@ -183,4 +225,11 @@ internal class Context {
 internal interface TheoryContext {
   val functions: HashSet<FunctionDecl<*>>
   val sorts: Map<String, SortDecl<*>>
+}
+
+class BindException(val key: Any, val existing: Any, val new: Any) :
+    RuntimeException("$new could not be bound to $key; already bound to $existing")
+
+fun <K : Any, V : Any> MutableMap<K, V>.bind(key: K, value: V) {
+  putIfAbsent(key, value)?.let { if (it != value) throw BindException(key, it, value) }
 }
