@@ -21,21 +21,19 @@ package tools.aqua.konstraints.parser
 import java.math.BigDecimal
 import org.petitparser.context.Token
 
-// TODO(make parser classes internal)
-
 internal sealed interface ProtoCommand
 
 internal data class ProtoAssert(val term: ProtoTerm) : ProtoCommand
 
-internal data class ProtoDeclareConst(val name: Symbol, val sort: ProtoSort) : ProtoCommand
+internal data class ProtoDeclareConst(val name: ParseSymbol, val sort: ProtoSort) : ProtoCommand
 
 internal data class ProtoDeclareFun(
-    val name: Symbol,
+    val name: ParseSymbol,
     val parameters: List<ProtoSort>,
     val sort: ProtoSort
 ) : ProtoCommand
 
-internal data class Symbol(val token: Token)
+internal data class ParseSymbol(val token: Token)
 
 internal sealed interface SpecConstant
 
@@ -52,19 +50,19 @@ internal data class DecimalConstant(val decimal: BigDecimal) : SpecConstant
 // Identifiers
 
 internal sealed interface Identifier {
-  val symbol: Symbol
+  val symbol: ParseSymbol
 }
 
-internal data class SymbolIdentifier(override val symbol: Symbol) : Identifier
+internal data class SymbolIdentifier(override val symbol: ParseSymbol) : Identifier
 
-internal data class IndexedIdentifier(override val symbol: Symbol, val indices: List<Index>) :
+internal data class IndexedIdentifier(override val symbol: ParseSymbol, val indices: List<ParseIndex>) :
     Identifier
 
-internal sealed interface Index
+internal sealed interface ParseIndex
 
-internal data class SymbolIndex(val symbol: Symbol) : Index
+internal data class SymbolParseIndex(val symbol: ParseSymbol) : ParseIndex
 
-internal data class NumeralIndex(val numeral: Int) : Index
+internal data class NumeralParseIndex(val numeral: Int) : ParseIndex
 
 // Sorts
 
@@ -78,7 +76,7 @@ internal data class SubSExpression(val subExpressions: List<SExpression>) : SExp
 
 internal data class SExpressionConstant(val constant: SpecConstant) : SExpression
 
-internal data class SExpressionSymbol(val symbol: Symbol) : SExpression
+internal data class SExpressionSymbol(val symbol: ParseSymbol) : SExpression
 
 internal data class SExpressionReserved(val reserved: Token) : SExpression
 
@@ -92,7 +90,7 @@ sealed interface AttributeValue
 
 internal data class ConstantAttributeValue(val constant: SpecConstant) : AttributeValue
 
-internal data class SymbolAttributeValue(val symbol: Symbol) : AttributeValue
+internal data class SymbolAttributeValue(val symbol: ParseSymbol) : AttributeValue
 
 internal data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : AttributeValue
 
@@ -108,11 +106,11 @@ internal data class SimpleQualIdentifier(override val identifier: Identifier) : 
 internal data class AsQualIdentifier(override val identifier: Identifier, val sort: ProtoSort) :
     QualIdentifier
 
-internal data class VarBinding(val symbol: Symbol, val term: ProtoTerm)
+internal data class VarBinding(val symbol: ParseSymbol, val term: ProtoTerm)
 
-internal data class SortedVar(val symbol: Symbol, val sort: ProtoSort)
+internal data class SortedVar(val symbol: ParseSymbol, val sort: ProtoSort)
 
-internal data class Pattern(val symbols: List<Symbol>)
+internal data class Pattern(val symbols: List<ParseSymbol>)
 
 internal data class MatchCase(val pattern: Pattern, val term: ProtoTerm)
 

@@ -36,7 +36,6 @@ operator fun Parser.times(other: Parser): SequenceParser = seq(other)
 
 infix fun Parser.trim(both: Parser): Parser = trim(both)
 
-@SuppressWarnings("UNCHECKED_CAST")
 object Parser {
   // Auxiliary Lexical Categories
 
@@ -179,7 +178,7 @@ object Parser {
 
   private val symbol =
       (simpleSymbol + quotedSymbol).flatten().trim(whitespaceCat).token().map { token: Token ->
-        Symbol(token)
+        ParseSymbol(token)
       }
   private val keyword = (of(':') * simpleSymbol).trim(whitespaceCat).flatten().token()
 
@@ -200,7 +199,7 @@ object Parser {
     sExpression.set(
         ((specConstant.map { constant: SpecConstant -> SExpressionConstant(constant) } +
             reserved.map { reserved: Token -> SExpressionReserved(reserved) } +
-            symbol.map { symbol: Symbol -> SExpressionSymbol(symbol) } +
+            symbol.map { symbol: ParseSymbol -> SExpressionSymbol(symbol) } +
             keyword.map { keyword: Token -> SExpressionKeyword(keyword) }) trim whitespaceCat) +
             ((lparen * sExpression.star() * rparen).map { results: List<Any> ->
               SubSExpression(results.slice(1..results.size - 2) as List<SExpression>)
@@ -212,14 +211,14 @@ object Parser {
 
   /* maps to an implementation of Index */
   private val index =
-      numeral.map { numeral: Int -> NumeralIndex(numeral) } +
-          symbol.map { symbol: Symbol -> SymbolIndex(symbol) }
+      numeral.map { numeral: Int -> NumeralParseIndex(numeral) } +
+          symbol.map { symbol: ParseSymbol -> SymbolParseIndex(symbol) }
 
   /* maps to an implementation of Identifier */
   private val identifier =
-      symbol.map { symbol: Symbol -> SymbolIdentifier(symbol) } +
+      symbol.map { symbol: ParseSymbol -> SymbolIdentifier(symbol) } +
           (lparen * of("_") * symbol * index.plus() * rparen).map { results: List<Any> ->
-            IndexedIdentifier(results[2] as Symbol, results[3] as List<Index>)
+            IndexedIdentifier(results[2] as ParseSymbol, results[3] as List<ParseIndex>)
             // results[3] is guaranteed to be a list of Index
           }
 
@@ -242,7 +241,7 @@ object Parser {
   /* maps to an implementation of AttributeValue */
   private val attributeValue =
       specConstant.map { constant: SpecConstant -> ConstantAttributeValue(constant) } +
-          symbol.map { symbol: Symbol -> SymbolAttributeValue(symbol) } +
+          symbol.map { symbol: ParseSymbol -> SymbolAttributeValue(symbol) } +
           (lparen * sExpression.star() * rparen).map { results: List<Any> ->
             SExpressionAttributeValue(results.slice(1..results.size - 2) as List<SExpression>)
           }
@@ -271,20 +270,20 @@ object Parser {
   /* maps to VarBinding */
   private val varBinding =
       (lparen * symbol * term * rparen).map { results: List<Any> ->
-        VarBinding(results[1] as Symbol, results[2] as ProtoTerm)
+        VarBinding(results[1] as ParseSymbol, results[2] as ProtoTerm)
       }
 
   /* maps to SortedVar */
   private val sortedVar =
       (lparen * symbol * sort * rparen).map { results: List<Any> ->
-        SortedVar(results[1] as Symbol, results[2] as ProtoSort)
+        SortedVar(results[1] as ParseSymbol, results[2] as ProtoSort)
       }
 
   /* maps to pattern */
   private val pattern =
-      symbol.map { symbol: Symbol -> Pattern(listOf(symbol)) } +
+      symbol.map { symbol: ParseSymbol -> Pattern(listOf(symbol)) } +
           (lparen * symbol * symbol.plus() * rparen).map { results: List<Any> ->
-            Pattern(listOf(listOf(results[1] as Symbol), results[2] as List<Symbol>).flatten())
+            Pattern(listOf(listOf(results[1] as ParseSymbol), results[2] as List<ParseSymbol>).flatten())
             // results[2] is guaranteed to be a list of Symbol
           }
 
@@ -374,14 +373,14 @@ object Parser {
 
   private val declareConstCMD =
       (lparen * declareConstKW * symbol * sort * rparen).map { results: ArrayList<Any> ->
-        ProtoDeclareConst(results[2] as Symbol, results[3] as ProtoSort)
+        ProtoDeclareConst(results[2] as ParseSymbol, results[3] as ProtoSort)
       }
 
   private val declareFunCMD =
       (lparen * declareFunKW * symbol * lparen * sort.star() * rparen * sort * rparen).map {
           results: ArrayList<Any> ->
         ProtoDeclareFun(
-            results[2] as Symbol, results[4] as List<ProtoSort>, results[6] as ProtoSort)
+            results[2] as ParseSymbol, results[4] as List<ProtoSort>, results[6] as ProtoSort)
         // results[4] is guaranteed to be a List of ProtoSort
       }
 

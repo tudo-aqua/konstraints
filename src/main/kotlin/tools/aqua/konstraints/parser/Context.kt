@@ -25,17 +25,17 @@ import tools.aqua.konstraints.*
 // TODO this uses the wrong index class right now so it must be internal, will be made public again
 // once the right index data class is implemented
 internal data class Signature(
-    val parametricSorts: Set<Sort>,
-    val indices: Set<Index>,
-    val parameters: List<Sort>,
-    val sort: Sort
+  val parametricSorts: Set<Sort>,
+  val indices: Set<ParseIndex>,
+  val parameters: List<Sort>,
+  val sort: Sort
 ) {
   fun bindToOrNull(
       parameter: List<Sort>,
       sort: Sort
-  ): Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>? {
+  ): Pair<Map<Sort, Sort>, Map<ParseIndex, NumeralParseIndex>>? {
     val parametricBindings = mutableMapOf<Sort, Sort>()
-    val indexBindings = mutableMapOf<Index, NumeralIndex>()
+    val indexBindings = mutableMapOf<ParseIndex, NumeralParseIndex>()
 
     return null
   }
@@ -43,7 +43,7 @@ internal data class Signature(
   private fun bindToOrNullInternal(
       parameter: List<Sort>,
       parametricBindings: MutableMap<Sort, Sort>,
-      indexBindings: MutableMap<Index, NumeralIndex>
+      indexBindings: MutableMap<ParseIndex, NumeralParseIndex>
   ): Boolean {
     parameters.forEach {
       when (it) {

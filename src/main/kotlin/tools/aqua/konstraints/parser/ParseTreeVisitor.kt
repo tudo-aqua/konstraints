@@ -42,7 +42,7 @@ internal object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor {
 
     context.registerFunction(protoDeclareConst, sort)
 
-    return DeclareConst(SMTSymbol(protoDeclareConst.name.token.getValue()), sort)
+    return DeclareConst(Symbol(protoDeclareConst.name.token.getValue()), sort)
   }
 
   override fun visit(protoDeclareFun: ProtoDeclareFun): DeclareFun {
@@ -53,7 +53,7 @@ internal object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor {
     // TODO ambiguous function overloading only in as and match
     context.registerFunction(protoDeclareFun, parameters, sort)
 
-    return DeclareFun(SMTSymbol(protoDeclareFun.name.token.getValue()), parameters, sort)
+    return DeclareFun(Symbol(protoDeclareFun.name.token.getValue()), parameters, sort)
   }
 
   override fun visit(simpleQualIdentifier: SimpleQualIdentifier): Expression<*> {

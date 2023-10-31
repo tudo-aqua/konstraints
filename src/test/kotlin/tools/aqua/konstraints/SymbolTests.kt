@@ -20,10 +20,20 @@ package tools.aqua.konstraints
 
 import kotlin.IllegalArgumentException
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.Arguments.arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
+import java.util.stream.Stream
 
+/*
+ * Lifecycle.PER_CLASS is needed for MethodSource to avoid moving sources to a companion object
+ * This also avoids creating a new class for every test, as this is not needed, because no data is modified
+ */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SymbolTests {
   @ParameterizedTest
   @ValueSource(
@@ -159,4 +169,27 @@ class SymbolTests {
   fun `test that forced quoting does not accept illegal symbols`(symbol: String) {
     assertThrows<IllegalArgumentException> { Symbol(symbol, QUOTING_RULE.FORCED) }
   }
+
+    @ParameterizedTest
+    @MethodSource("getEqualSymbols")
+    fun `test that equals works correct for equal symbols`(lhs: Symbol, rhs: Symbol) {
+        assertEquals(lhs, rhs)
+    }
+
+    private fun getEqualSymbols() : Stream<Arguments> {
+        return Stream.of(
+            arguments(Symbol("A"), Symbol("A")),
+            arguments(Symbol("A"), Symbol("|A|"))
+        )
+    }
+
+    @ParameterizedTest
+    @MethodSource("getUnequalSymbols")
+    fun `test that equals works correct for unequal symbols`(lhs: Symbol, rhs: Symbol) {
+        assertNotEquals(lhs, rhs)
+    }
+
+    private fun getUnequalSymbols() : Stream<Arguments> {
+        return Stream.of(arguments(Symbol("A"), Symbol("B")))
+    }
 }

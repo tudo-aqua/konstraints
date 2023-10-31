@@ -19,6 +19,7 @@
 package tools.aqua.konstraints
 
 import tools.aqua.konstraints.parser.Parser
+import tools.aqua.konstraints.parser.ParseSymbol
 
 enum class QUOTING_RULE {
   NONE,
@@ -83,5 +84,19 @@ class Symbol(symbol: String, rule: QUOTING_RULE) {
         }
       }
     }
+  }
+
+  //TODO fun createSimilar replaces all illegal chars and marks with uuid to prevent name conflicts
+
+  override fun hashCode(): Int = value.hashCode()
+
+  override fun equals(other: Any?): Boolean = when {
+    this === other -> true
+    other !is Symbol -> false
+    else -> symbolEquality(other)
+  }
+
+  private fun symbolEquality(other : Symbol) : Boolean {
+    return value.trim('|') == other.value.trim('|')
   }
 }

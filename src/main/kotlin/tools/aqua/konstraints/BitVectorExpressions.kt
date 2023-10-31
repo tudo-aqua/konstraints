@@ -29,7 +29,6 @@ internal object BVSortDecl : SortDecl<BVSort>("BitVec") {
   override fun getSort(sort: ProtoSort): BVSort {
     require(sort.identifier is IndexedIdentifier)
     require(sort.identifier.indices.size == 1)
-    require(sort.identifier.indices[0] is NumeralIndex)
 
     return BVSort((sort.identifier.indices[0] as NumeralIndex).numeral)
   }

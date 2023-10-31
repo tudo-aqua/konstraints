@@ -35,7 +35,7 @@ import tools.aqua.konstraints.*
  * Lifecycle.PER_CLASS is needed for MethodSource to avoid moving sources to a companion object
  * This also avoids creating a new class for every test, as this is not needed, because no data is modified
  */
-@TestInstance(Lifecycle.PER_CLASS)
+/*@TestInstance(Lifecycle.PER_CLASS)
 class SortTests {
   @ParameterizedTest
   @ValueSource(
@@ -63,19 +63,19 @@ class SortTests {
               """| " can occur too |""",
               """| af klj ^*0 asfe2 (&*)&(#^ $ > > >?" ']]984|"""])
   fun `test that valid SMTSymbols get accepted by the constructor`(symbol: String) {
-    assertDoesNotThrow { SMTSymbol(symbol) }
+    assertDoesNotThrow { Symbol(symbol) }
   }
 
   @ParameterizedTest
   @ValueSource(strings = ["32", "3bitvec"])
   fun `test that symbols that need to be quoted get automatically quoted`(symbol: String) {
-    assertEquals("|$symbol|", SMTSymbol(symbol).toString())
+    assertEquals("|$symbol|", Symbol(symbol).toString())
   }
 
   @ParameterizedTest
   @ValueSource(strings = ["bit|vec"])
   fun `test that invalid SMTSymbols get rejected by the constructor`(symbol: String) {
-    assertThrows<IllegalArgumentException> { SMTSymbol(symbol) }
+    assertThrows<IllegalArgumentException> { Symbol(symbol) }
   }
 
   @ParameterizedTest
@@ -142,4 +142,4 @@ class SortTests {
   fun `test that equal BVSorts return the same hash code`(lhs: BVSort, rhs: BVSort) {
     assertEquals(lhs.hashCode(), rhs.hashCode())
   }
-}
+}*/

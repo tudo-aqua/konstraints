@@ -35,12 +35,12 @@ data class Assert(val expression: Expression<BoolSort>) : SimpleCommand("assert 
   override fun toString(): String = super.toString()
 }
 
-data class DeclareConst(val name: SMTSymbol, val sort: Sort) :
+data class DeclareConst(val name: Symbol, val sort: Sort) :
     SimpleCommand("declare-const $name $sort") {
   override fun toString(): String = "($command)"
 }
 
-data class DeclareFun(val name: SMTSymbol, val parameters: List<Sort>, val sort: Sort) :
+data class DeclareFun(val name: Symbol, val parameters: List<Sort>, val sort: Sort) :
     SimpleCommand("declare-fun $name (${parameters.joinToString(" ")}) $sort") {
   override fun toString(): String = "($command)"
 }
