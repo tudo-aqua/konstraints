@@ -60,7 +60,7 @@ internal object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor {
     val op = context.getFunction(simpleQualIdentifier.identifier, listOf())
 
     if (op != null) {
-      return op.getExpression(listOf())
+      return op.buildExpression(listOf())
     } else {
       throw IllegalStateException(
           "Unknown fun ${simpleQualIdentifier.identifier.symbol.token.getValue<String>()}")
@@ -84,7 +84,7 @@ internal object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor {
             bracketedProtoTerm.qualIdentifier.identifier.symbol.token.getValue<String>(), terms)
 
     if (op != null) {
-      return op.getExpression(terms)
+      return op.buildExpression(terms)
     } else {
       throw IllegalStateException(
           "Unknown fun ${bracketedProtoTerm.qualIdentifier.identifier.symbol.token.getValue<String>()}") // TODO UnknownFunctionException

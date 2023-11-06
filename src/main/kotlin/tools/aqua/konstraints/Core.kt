@@ -66,17 +66,11 @@ class Not(val inner: Expression<BoolSort>) : Expression<BoolSort>() {
 }
 
 /** FunctionDecl Object for Not */
-object NotDecl : FunctionDecl<BoolSort>("not", listOf(BoolSort), BoolSort) {
-  override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
-    // TODO implement sorting exception
-    require(args.size == 1) { "Not only accepts 1 argument but ${args.size} were provided" }
-    require(args[0].sort == BoolSort) {
-      "Not only accepts arguments of Sort BoolSort but ${args[0].sort} was provided"
-    }
+object NotDecl : FunctionDecl<BoolSort>("not", listOf(BoolSort), emptySet(), BoolSort) {
+  override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
+    bindTo(args)
 
-    @Suppress("UNCHECKED_CAST") val inner = args[0] as Expression<BoolSort>
-
-    return Not(inner)
+    return Not(args.single() as Expression<BoolSort>)
   }
 }
 
@@ -109,20 +103,11 @@ class And(val conjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
 }
 
 // TODO handle vararg parameters
-object AndDecl : FunctionDecl<BoolSort>("and", listOf(BoolSort, BoolSort), BoolSort) {
-  override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
-    require(args.size >= 2) {
-      "And accepts at least 2 arguments but ${args.size} have been provided"
-    }
-    require(args.all { it.sort == BoolSort }) { "And only accepts arguments of Sort BoolSort" }
+object AndDecl : FunctionDecl<BoolSort>("and", listOf(BoolSort, BoolSort), emptySet(), BoolSort, Associativity.LEFT_ASSOC) {
+  override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
+    OrDecl.bindTo(args)
 
-    @Suppress("UNCHECKED_CAST") return And(args as List<Expression<BoolSort>>)
-  }
-
-  override fun checkRequirements(args: List<Expression<*>>) {
-    require(args.size >= 2)
-
-    require(args.all { it.sort == BoolSort })
+    return And(args as List<Expression<BoolSort>>)
   }
 }
 
@@ -140,20 +125,11 @@ class Or(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   override fun toString(): String = symbol
 }
 
-object OrDecl : FunctionDecl<BoolSort>("or", listOf(BoolSort, BoolSort), BoolSort) {
-  override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
-    require(args.size >= 2) {
-      "Or accepts at least 2 arguments but ${args.size} have been provided"
-    }
-    require(args.all { it.sort == BoolSort }) { "Or only accepts arguments of Sort BoolSort" }
+object OrDecl : FunctionDecl<BoolSort>("or", listOf(BoolSort, BoolSort), emptySet(), BoolSort, Associativity.LEFT_ASSOC) {
+  override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
+    bindTo(args)
 
-    @Suppress("UNCHECKED_CAST") return Or(args as List<Expression<BoolSort>>)
-  }
-
-  override fun checkRequirements(args: List<Expression<*>>) {
-    require(args.size >= 2)
-
-    require(args.all { it.sort == BoolSort })
+    return Or(args as List<Expression<BoolSort>>)
   }
 }
 
@@ -171,20 +147,11 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   override fun toString(): String = symbol
 }
 
-object XOrDecl : FunctionDecl<BoolSort>("xor", listOf(BoolSort, BoolSort), BoolSort) {
-  override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
-    require(args.size >= 2) {
-      "Xor accepts at least 2 arguments but ${args.size} have been provided"
-    }
-    require(args.all { it.sort == BoolSort }) { "Xor only accepts arguments of Sort BoolSort" }
+object XOrDecl : FunctionDecl<BoolSort>("xor", listOf(BoolSort, BoolSort), emptySet(), BoolSort, Associativity.LEFT_ASSOC) {
+  override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
+    bindTo(args)
 
-    @Suppress("UNCHECKED_CAST") return XOr(args as List<Expression<BoolSort>>)
-  }
-
-  override fun checkRequirements(args: List<Expression<*>>) {
-    require(args.size >= 2)
-
-    require(args.all { it.sort == BoolSort })
+    return XOr(args as List<Expression<BoolSort>>)
   }
 }
 

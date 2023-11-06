@@ -31,9 +31,31 @@ open class Sort(
 
   constructor(name: String, vararg indices: Index) : this(name, indices.toList())
 
-  // TODO equality, hashCode, toString, toSMTString
+    fun isIndexed() : Boolean = indices.isNotEmpty()
+
+    // TODO equality, hashCode, toString, toSMTString
+    override fun equals(other: Any?): Boolean = when {
+        this === other -> true
+        other !is Sort -> false
+        else -> sortEquality(other)
+    }
+
+    private fun sortEquality(other : Sort) : Boolean {
+        return if(name != other.name) false
+        else if(!(indices zip other.indices).all { (lhs, rhs) -> lhs == rhs }) false
+        else if(!(parameters zip other.parameters).all { (lhs, rhs) -> lhs == rhs }) false
+        else true
+    }
+
+    override fun hashCode(): Int = name.hashCode() * 961 + indices.hashCode() * 31 + parameters.hashCode()
+
+    override fun toString() = if (this.isIndexed()) {
+        "(_ $name ${indices.joinToString(" ")})"
+    } else {
+        name.toString()
+    }
 }
 
 object BoolSort : Sort("Bool")
 
-class BVSort(val bits: Int) : Sort("BitVec", listOf(NumeralIndex(bits)))
+class BVSort(val bits: Int) : Sort("BitVec", listOf(NumeralIndex(bits))) // TODO implement BVSort factory again

@@ -19,217 +19,235 @@
 package tools.aqua.konstraints.parser
 
 import tools.aqua.konstraints.*
+import tools.aqua.konstraints.util.zipWithSameLength
 
 // TODO ambiguous lookup with params and return type
-
-// TODO this uses the wrong index class right now so it must be internal, will be made public again
-// once the right index data class is implemented
-internal data class Signature(
+// TODO left-assoc, right-assoc, chainable, pairwise
+data class Signature(
     val parametricSorts: Set<Sort>,
     val indices: Set<Index>,
     val parameters: List<Sort>,
     val sort: Sort
 ) {
-  // TODO refactor bindToOrNull into bindTo
-  // TODO create bindTOOrNull, catching exception and returning null on error
+    fun bindToOrNull(
+        actualParameters: List<Sort>,
+        actualReturn: Sort
+    ): Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>? =
+        try {
+            bindTo(actualParameters, actualReturn)
+        }  catch (exception : Exception) {
+            null
+        }
 
-  fun bindToOrNull(
-      actualParameters: List<Sort>,
-      actualReturn: Sort
-  ): Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>? {
-    val parametricBindings = mutableMapOf<Sort, Sort>()
-    val indexBindings = mutableMapOf<Index, NumeralIndex>()
+    fun bindTo(
+        actualParameters: List<Sort>,
+        actualReturn: Sort
+    ): Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>> {
+        val parametricBindings = mutableMapOf<Sort, Sort>()
+        val indexBindings = mutableMapOf<Index, NumeralIndex>()
 
-    bindToOrNullInternal(parameters, actualParameters, parametricBindings, indexBindings)
-    bindToOrNullInternal(sort, actualReturn, parametricBindings, indexBindings)
+        bindToInternal(parameters, actualParameters, parametricBindings, indexBindings)
+        bindToInternal(sort, actualReturn, parametricBindings, indexBindings)
 
-    return parametricBindings to indexBindings
-  }
-
-  private fun bindToOrNullInternal(
-      symbolicParameters: List<Sort>,
-      actualParameters: List<Sort>,
-      parametricBindings: MutableMap<Sort, Sort>,
-      indexBindings: MutableMap<Index, NumeralIndex>
-  ) {
-    // TODO enforce equal length of symbolicParameters and actualParameters
-
-    (symbolicParameters zip actualParameters).forEach { (symbolic, actual) ->
-      bindToOrNullInternal(symbolic, actual, parametricBindings, indexBindings)
+        return parametricBindings to indexBindings
     }
-  }
 
-  private fun bindToOrNullInternal(
-      symbolic: Sort,
-      actual: Sort,
-      parametricBindings: MutableMap<Sort, Sort>,
-      indexBindings: MutableMap<Index, NumeralIndex>
-  ) {
-    if (symbolic in parametricSorts) {
-      // bind if not already bound
-      parametricBindings.bind(symbolic, actual)
-    } else {
-      require(symbolic.name == actual.name)
-
-      // TODO enforce same length symbolic.indices and actual.indices
-      (symbolic.indices zip actual.indices).forEach { (symbolicIndex, actualIndex) ->
-        bindToOrNullInternal(symbolicIndex, actualIndex, indexBindings)
-      }
-      bindToOrNullInternal(
-          symbolic.parameters, actual.parameters, parametricBindings, indexBindings)
+    private fun bindToInternal(
+        symbolicParameters: List<Sort>,
+        actualParameters: List<Sort>,
+        parametricBindings: MutableMap<Sort, Sort>,
+        indexBindings: MutableMap<Index, NumeralIndex>
+    ) {
+        (symbolicParameters zipWithSameLength actualParameters).forEach { (symbolic, actual) ->
+            bindToInternal(symbolic, actual, parametricBindings, indexBindings)
+        }
     }
-  }
 
-  private fun bindToOrNullInternal(
-      symbolic: Index,
-      actual: Index,
-      indexBindings: MutableMap<Index, NumeralIndex>
-  ) {
-    require(actual is NumeralIndex)
-    if (symbolic in indices) {
-      indexBindings.bind(symbolic, actual)
-    } else {
-      require(symbolic is NumeralIndex)
-      require(symbolic.numeral == actual.numeral)
+    private fun bindToInternal(
+        symbolic: Sort,
+        actual: Sort,
+        parametricBindings: MutableMap<Sort, Sort>,
+        indexBindings: MutableMap<Index, NumeralIndex>
+    ) {
+        if (symbolic in parametricSorts) {
+            // bind if not already bound
+            parametricBindings.bindTo(symbolic, actual)
+        } else {
+            require(symbolic.name == actual.name)
+
+            (symbolic.indices zipWithSameLength actual.indices).forEach { (symbolicIndex, actualIndex) ->
+                bindToInternal(symbolicIndex, actualIndex, indexBindings)
+            }
+            bindToInternal(
+                symbolic.parameters, actual.parameters, parametricBindings, indexBindings
+            )
+        }
     }
-  }
+
+    private fun bindToInternal(
+        symbolic: Index,
+        actual: Index,
+        indexBindings: MutableMap<Index, NumeralIndex>
+    ) {
+        require(actual is NumeralIndex)
+        if (symbolic in indices) {
+            indexBindings.bindTo(symbolic, actual)
+        } else {
+            require(symbolic is NumeralIndex)
+            require(symbolic.numeral == actual.numeral)
+        }
+    }
 }
 
-open class FunctionDecl<T : Sort>(
+enum class Associativity {
+    LEFT_ASSOC,
+    RIGHT_ASSOC,
+    PAIRWISE,
+    CHAINABLE,
+    NONE
+}
+
+open class FunctionDecl<S : Sort>(
     val name: String,
     val params: List<Sort>,
-    val sort: T,
+    val indices: Set<Index>,
+    val sort: S,
+    val associativity: Associativity = Associativity.NONE,
     val isAmbiguous: Boolean = false
 ) {
-  open fun getExpression(args: List<Expression<*>>): Expression<T> {
-    checkRequirements(args)
+    val signature = Signature(emptySet(), indices, params, sort)
+    open fun buildExpression(args: List<Expression<*>>): Expression<S> {
+        bindTo(args)
 
-    return BasicExpression(name, sort)
-  }
-
-  /** Returns true if the function accepts the arguments provided */
-  fun accepts(args: List<Expression<*>>): Boolean {
-    // TODO use sign
-
-    try {
-      checkRequirements(args)
-    } catch (e: Exception) {
-      return false
+        // TODO generate expression with args (data model flaw?)
+        return BasicExpression(name, sort)
     }
 
-    return true
-  }
-
-  protected open fun checkRequirements(args: List<Expression<*>>) {
-    require(args.size == params.size) {
-      "${params.size} arguments expected, but ${args.size} were provided"
+    fun bindTo(args : List<Expression<*>>) = when(associativity) {
+        Associativity.LEFT_ASSOC -> {
+            args.slice(2..<args.size).forEach { require(args[0].sort == it.sort) }
+            signature.bindTo(args.slice(0..1).map { it.sort }, sort)
+        }
+        Associativity.RIGHT_ASSOC -> {
+            args.slice(2..<args.size).forEach { require(args[1].sort == it.sort) }
+            signature.bindTo(args.slice(0..1).map { it.sort }, sort)
+        }
+        Associativity.PAIRWISE -> TODO("Implement pairwise binding")
+        Associativity.CHAINABLE -> TODO("Implement chainable binding")
+        Associativity.NONE -> signature.bindTo(args.map { it.sort }, sort)
     }
 
-    require(args.zip(params).all { it.first.sort::class == it.second::class }) {
-      "Type mismatch expected ${params.joinToString(" ")}, but ${args.joinToString(" ")} were provided"
+    /** Returns true if the function accepts the arguments provided */
+    fun accepts(args: List<Expression<*>>): Boolean {
+        try {
+            bindTo(args)
+        } catch (e: Exception) {
+            return false
+        }
+
+        return true
     }
-    // require(args.zip(params).all { it.first.sort == it.second }) { "Type mismatch" }
-  }
 
-  override fun equals(other: Any?): Boolean =
-      when {
-        this === other -> true
-        other !is FunctionDecl<*> -> false
-        else -> (name == other.name) && (params == other.params) && (sort == other.sort)
-      }
+    override fun equals(other: Any?): Boolean =
+        when {
+            this === other -> true
+            other !is FunctionDecl<*> -> false
+            else -> (name == other.name) && (params == other.params) && (sort == other.sort)
+        }
 
-  override fun hashCode(): Int = name.hashCode() * 961 + params.hashCode() * 31 + sort.hashCode()
+    override fun hashCode(): Int = name.hashCode() * 961 + params.hashCode() * 31 + sort.hashCode()
 }
 
 internal abstract class SortDecl<T : Sort>(val name: String) {
-  abstract fun getSort(sort: ProtoSort): T
+    abstract fun getSort(sort: ProtoSort): T
 }
 
 internal class Context {
-  fun registerTheory(other: TheoryContext) {
-    functions.addAll(other.functions)
-    other.sorts.forEach { registerSort(it.value) }
-  }
-
-  /* Function is private to not allow illegal FunctionDecl to be registered */
-  private fun registerFunction(function: FunctionDecl<*>) {
-    val other = functions.find { it.name == function.name && it.params == function.params }
-    if (other != null) {
-      if (other.sort == function.sort) {
-        throw Exception(
-            "Function (${function.name} (${function.params.joinToString(" ")}) ${function.sort}) is already in context")
-      } else {
-        TODO("Implement ambiguous function overloading")
-      }
-    } else {
-      functions.add(function)
+    fun registerTheory(other: TheoryContext) {
+        functions.addAll(other.functions)
+        other.sorts.forEach { registerSort(it.value) }
     }
-  }
 
-  fun registerFunction(const: ProtoDeclareConst, sort: Sort) {
-    functions.add(FunctionDecl(const.name.token.getValue(), listOf(), sort))
-  }
-
-  fun registerFunction(function: ProtoDeclareFun, parameters: List<Sort>, sort: Sort) {
-    if (parameters.isEmpty()) {
-      registerFunction(function.name.token.getValue<String>(), listOf(), sort)
-    } else {
-      registerFunction(function.name.token.getValue<String>(), parameters, sort)
+    /* Function is private to not allow illegal FunctionDecl to be registered */
+    fun registerFunction(function: FunctionDecl<*>) {
+        val other = functions.find { it.name == function.name && it.params == function.params }
+        if (other != null) {
+            if (other.sort == function.sort) {
+                throw Exception(
+                    "Function (${function.name} (${function.params.joinToString(" ")}) ${function.sort}) is already in context"
+                )
+            } else {
+                TODO("Implement ambiguous function overloading")
+            }
+        } else {
+            functions.add(function)
+        }
     }
-  }
 
-  fun registerFunction(name: String, params: List<Sort>, sort: Sort) {
-    registerFunction(FunctionDecl(name, params, sort))
-  }
+    fun registerFunction(const: ProtoDeclareConst, sort: Sort) {
+        functions.add(FunctionDecl(const.name.token.getValue(), listOf(), emptySet(), sort))
+    }
 
-  fun registerSort(sort: SortDecl<*>) {
-    if (sorts.containsKey(sort.name))
-        throw Exception("Sort ${sort.name} is already defined in context")
+    fun registerFunction(function: ProtoDeclareFun, parameters: List<Sort>, sort: Sort) {
+        if (parameters.isEmpty()) {
+            registerFunction(function.name.token.getValue<String>(), listOf(), sort)
+        } else {
+            registerFunction(function.name.token.getValue<String>(), parameters, sort)
+        }
+    }
 
-    sorts[sort.name] = sort
-  }
+    fun registerFunction(name: String, params: List<Sort>, sort: Sort) {
+        registerFunction(FunctionDecl(name, params, emptySet(), sort))
+    }
 
-  /**
-   * Returns a function matching the identifier, which accepts the provided arguments Function must
-   * not be ambiguous
-   */
-  fun getFunction(name: Identifier, args: List<Expression<*>>): FunctionDecl<*>? {
-    return getFunction(name.symbol.token.getValue<String>(), args)
-  }
+    fun registerSort(sort: SortDecl<*>) {
+        if (sorts.containsKey(sort.name))
+            throw Exception("Sort ${sort.name} is already defined in context")
 
-  /**
-   * Returns a function matching the name, which accepts the provided arguments Function must not be
-   * ambiguous
-   */
-  fun getFunction(name: String, args: List<Expression<*>>): FunctionDecl<*>? {
-    return functions.find { (it.name == name) && (it.accepts(args)) && !it.isAmbiguous }
-  }
+        sorts[sort.name] = sort
+    }
 
-  /**
-   * Returns a function matching the name and sort, which accepts the provided arguments Function
-   * can be ambiguous
-   */
-  fun getFunction(name: String, args: List<Expression<*>>, sort: Sort): FunctionDecl<*>? {
-    return functions.find { (it.name == name) && (it.accepts(args)) && it.sort == sort }
-  }
+    /**
+     * Returns a function matching the identifier, which accepts the provided arguments Function must
+     * not be ambiguous
+     */
+    fun getFunction(name: Identifier, args: List<Expression<*>>): FunctionDecl<*>? {
+        return getFunction(name.symbol.token.getValue<String>(), args)
+    }
 
-  fun getSort(protoSort: ProtoSort): Sort {
-    return sorts[protoSort.identifier.symbol.token.getValue()]?.getSort(protoSort)
-        ?: throw Exception("Unknown sort ${protoSort.identifier.symbol.token.getValue<String>()}")
-  }
+    /**
+     * Returns a function matching the name, which accepts the provided arguments Function must not be
+     * ambiguous
+     */
+    fun getFunction(name: String, args: List<Expression<*>>): FunctionDecl<*>? {
+        return functions.find { (it.name == name) && (it.accepts(args)) && !it.isAmbiguous }
+    }
 
-  private val functions: HashSet<FunctionDecl<*>> = hashSetOf()
-  private val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf()
+    /**
+     * Returns a function matching the name and sort, which accepts the provided arguments Function
+     * can be ambiguous
+     */
+    fun getFunction(name: String, args: List<Expression<*>>, sort: Sort): FunctionDecl<*>? {
+        return functions.find { (it.name == name) && (it.accepts(args)) && it.sort == sort }
+    }
+
+    fun getSort(protoSort: ProtoSort): Sort {
+        return sorts[protoSort.identifier.symbol.token.getValue()]?.getSort(protoSort)
+            ?: throw Exception("Unknown sort ${protoSort.identifier.symbol.token.getValue<String>()}")
+    }
+
+    private val functions: HashSet<FunctionDecl<*>> = hashSetOf()
+    private val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf()
 }
 
 internal interface TheoryContext {
-  val functions: HashSet<FunctionDecl<*>>
-  val sorts: Map<String, SortDecl<*>>
+    val functions: HashSet<FunctionDecl<*>>
+    val sorts: Map<String, SortDecl<*>>
 }
 
 class BindException(val key: Any, val existing: Any, val new: Any) :
     RuntimeException("$new could not be bound to $key; already bound to $existing")
 
-fun <K : Any, V : Any> MutableMap<K, V>.bind(key: K, value: V) {
-  putIfAbsent(key, value)?.let { if (it != value) throw BindException(key, it, value) }
+fun <K : Any, V : Any> MutableMap<K, V>.bindTo(key: K, value: V) {
+    putIfAbsent(key, value)?.let { if (it != value) throw BindException(key, it, value) }
 }

@@ -30,7 +30,7 @@ internal object BVSortDecl : SortDecl<BVSort>("BitVec") {
     require(sort.identifier is IndexedIdentifier)
     require(sort.identifier.indices.size == 1)
 
-    return BVSort((sort.identifier.indices[0] as NumeralIndex).numeral)
+    return BVSort((sort.identifier.indices[0] as NumeralParseIndex).numeral)
   }
 }
 
@@ -311,8 +311,8 @@ class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expressi
 }
 
 // TODO implement BVSort marker interface?
-object BVUltDecl : FunctionDecl<BoolSort>("bvult", listOf(BVSort(32), BVSort(32)), BoolSort) {
-  override fun getExpression(args: List<Expression<*>>): Expression<BoolSort> {
+object BVUltDecl : FunctionDecl<BoolSort>("bvult", listOf(BVSort(0), BVSort(0)), setOf(NumeralIndex(0)), BoolSort) {
+  override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
     require(args.size == 2) { "bvult accepts only 2 arguments but ${args.size} were provided" }
     require(args[0].sort is BVSort)
     require(args[1].sort is BVSort)
@@ -320,12 +320,5 @@ object BVUltDecl : FunctionDecl<BoolSort>("bvult", listOf(BVSort(32), BVSort(32)
 
     @Suppress("UNCHECKED_CAST")
     return BVUlt(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
-  }
-
-  override fun checkRequirements(args: List<Expression<*>>) {
-    require(args.size == 2)
-    require(args[0].sort is BVSort)
-    require(args[1].sort is BVSort)
-    require((args[0].sort as BVSort).bits == (args[1].sort as BVSort).bits)
   }
 }

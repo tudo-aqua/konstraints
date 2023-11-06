@@ -22,6 +22,10 @@ fun Int.idx(): NumeralIndex = NumeralIndex(this)
 
 sealed interface Index
 
-data class NumeralIndex(val numeral: Int) : Index
+data class NumeralIndex(val numeral: Int) : Index{
+    override fun toString() = numeral.toString()
+}
 
-data class SymbolIndex(val symbol: Symbol) : Index
+data class SymbolIndex(val symbol: Symbol) : Index {
+    override fun toString() = symbol.toString()
+}

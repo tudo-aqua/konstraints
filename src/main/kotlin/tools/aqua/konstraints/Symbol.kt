@@ -99,4 +99,6 @@ class Symbol(symbol: String, rule: QuotingRule) {
   private fun symbolEquality(other: Symbol): Boolean {
     return value.trim('|') == other.value.trim('|')
   }
+
+  override fun toString() = value
 }
