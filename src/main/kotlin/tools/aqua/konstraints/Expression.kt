@@ -51,9 +51,10 @@ class BinaryExpression<T : Sort>(
 class NAryExpression<T : Sort>(
     symbol: String,
     override val sort: T,
-    val tokens: List<Expression<T>>
+    val tokens: List<Expression<*>>
 ) : Expression<T>() {
   override val symbol = symbol
 
-  override fun toString() = "($symbol ${tokens.joinToString(" ")})"
+  override fun toString() =
+      if (tokens.isNotEmpty()) "($symbol ${tokens.joinToString(" ")})" else symbol
 }

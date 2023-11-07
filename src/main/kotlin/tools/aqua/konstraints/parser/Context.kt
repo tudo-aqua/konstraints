@@ -22,7 +22,6 @@ import tools.aqua.konstraints.*
 import tools.aqua.konstraints.util.zipWithSameLength
 
 // TODO ambiguous lookup with params and return type
-// TODO left-assoc, right-assoc, chainable, pairwise
 data class Signature(
     val parametricSorts: Set<Sort>,
     val indices: Set<Index>,
@@ -119,7 +118,7 @@ open class FunctionDecl<S : Sort>(
     bindTo(args)
 
     // TODO generate expression with args (data model flaw?)
-    return BasicExpression(name, sort)
+    return NAryExpression(name, sort, args)
   }
 
   fun bindTo(args: List<Expression<*>>) =
