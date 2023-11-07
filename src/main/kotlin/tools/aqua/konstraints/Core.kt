@@ -66,12 +66,11 @@ class Not(val inner: Expression<BoolSort>) : Expression<BoolSort>() {
 }
 
 /** FunctionDecl Object for Not */
-object NotDecl : FunctionDecl<BoolSort>("not", listOf(BoolSort), emptySet(), BoolSort) {
-  override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
-    bindTo(args)
-
-    return Not(args.single() as Expression<BoolSort>)
-  }
+object NotDecl : FunctionDecl1<BoolSort, BoolSort>("not", BoolSort, BoolSort, Associativity.NONE) {
+  override fun buildExpression(
+      param: Expression<BoolSort>,
+      bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
+  ): Expression<BoolSort> = Not(param)
 }
 
 /**

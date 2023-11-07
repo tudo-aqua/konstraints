@@ -30,5 +30,5 @@ infix fun <T, R> Iterable<T>.zipWithSameLength(other: Iterable<R>): List<Pair<T,
   require(this.count() == other.count()) {
     "zipWithSameLength called with Iterable of different length"
   }
-  return zip(other) { t1, t2 -> t1 to t2 }
+  return zip(other)
 }
