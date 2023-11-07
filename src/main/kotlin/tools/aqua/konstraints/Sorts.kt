@@ -60,5 +60,12 @@ open class Sort(
 
 object BoolSort : Sort("Bool")
 
-class BVSort(val bits: Int) :
-    Sort("BitVec", listOf(NumeralIndex(bits))) // TODO implement BVSort factory again
+class BVSort private constructor(val bits: Int) : Sort("BitVec", listOf(NumeralIndex(bits))) {
+  companion object {
+    operator fun invoke(bits: Int): BVSort = BVSort(bits)
+  }
+
+  init {
+    require(bits > 0)
+  }
+}

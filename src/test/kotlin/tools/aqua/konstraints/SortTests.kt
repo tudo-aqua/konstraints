@@ -22,7 +22,6 @@ import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle
-import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -35,49 +34,8 @@ import tools.aqua.konstraints.*
  * Lifecycle.PER_CLASS is needed for MethodSource to avoid moving sources to a companion object
  * This also avoids creating a new class for every test, as this is not needed, because no data is modified
  */
-/*@TestInstance(Lifecycle.PER_CLASS)
+@TestInstance(Lifecycle.PER_CLASS)
 class SortTests {
-  @ParameterizedTest
-  @ValueSource(
-      strings =
-          [
-              "+",
-              "<=",
-              "x",
-              "plus",
-              "**",
-              "$",
-              "<sas",
-              "<adf>",
-              "abc77",
-              "*\$s&6",
-              ".kkk",
-              ".8",
-              "+34",
-              "-32",
-              "32",
-              "3bitvec", // these testcases are allowed as they will be quoted
-              "| this is a quoted symbol |",
-              "| so is\n" + "this one |",
-              "||",
-              """| " can occur too |""",
-              """| af klj ^*0 asfe2 (&*)&(#^ $ > > >?" ']]984|"""])
-  fun `test that valid SMTSymbols get accepted by the constructor`(symbol: String) {
-    assertDoesNotThrow { Symbol(symbol) }
-  }
-
-  @ParameterizedTest
-  @ValueSource(strings = ["32", "3bitvec"])
-  fun `test that symbols that need to be quoted get automatically quoted`(symbol: String) {
-    assertEquals("|$symbol|", Symbol(symbol).toString())
-  }
-
-  @ParameterizedTest
-  @ValueSource(strings = ["bit|vec"])
-  fun `test that invalid SMTSymbols get rejected by the constructor`(symbol: String) {
-    assertThrows<IllegalArgumentException> { Symbol(symbol) }
-  }
-
   @ParameterizedTest
   @MethodSource("getSortsAndTheirSerialization")
   fun `test that serialization of sorts is correct`(symbol: String, sort: Sort) {
@@ -85,12 +43,7 @@ class SortTests {
   }
 
   private fun getSortsAndTheirSerialization(): Stream<Arguments> {
-    return Stream.of(
-        arguments("Bool", BoolSort),
-        arguments("(_ BitVec 32)", BVSort.BV32),
-        arguments("(List (Array Int Real))", ExampleListSort),
-        arguments("((_ FixedSizeList 4) Real)", ExampleFixedSizeList),
-        arguments("(Set (_ BitVec 32))", ExampleSet))
+    return Stream.of(arguments("Bool", BoolSort), arguments("(_ BitVec 32)", BVSort(32)))
   }
 
   @ParameterizedTest
@@ -105,11 +58,23 @@ class SortTests {
     assertEquals(lhs, rhs)
   }
 
+  // TODO implement BVSort factory so that there is only one instance of BVSort per bit length
+  /*
+  @ParameterizedTest
+  @MethodSource("getEqualBVSortObjects")
+  fun `test that BVSort objects with same bit length are the same objects`(
+      lhs: BVSort,
+      rhs: BVSort
+  ) {
+    assertSame(lhs, rhs)
+  }
+    */
+
   private fun getEqualBVSortObjects(): Stream<Arguments> {
     return Stream.of(
         arguments(BVSort(8), BVSort(8)),
-        arguments(BVSort.BV32, BVSort.BV32),
-        arguments(BVSort.BV32, BVSort(32)))
+        arguments(BVSort(16), BVSort(16)),
+        arguments(BVSort(32), BVSort(32)))
   }
 
   @ParameterizedTest
@@ -118,11 +83,20 @@ class SortTests {
     assertNotEquals(lhs, rhs)
   }
 
+  @ParameterizedTest
+  @MethodSource("getUnequalBVSortObjects")
+  fun `test that BVSort objects with different bit length are different objects`(
+      lhs: BVSort,
+      rhs: BVSort
+  ) {
+    assertNotSame(lhs, rhs)
+  }
+
   private fun getUnequalBVSortObjects(): Stream<Arguments> {
     return Stream.of(
         arguments(BVSort(8), BVSort(16)),
-        arguments(BVSort.BV32, BVSort(16)),
-        arguments(BVSort.BV32, BVSort.BV16))
+        arguments(BVSort(32), BVSort(16)),
+        arguments(BVSort(16), BVSort(32)))
   }
 
   @ParameterizedTest
@@ -134,7 +108,7 @@ class SortTests {
   }
 
   private fun getBVSortObjects(): Stream<Arguments> {
-    return Stream.of(arguments(BVSort.BV32), arguments(BVSort.BV16), arguments(BVSort(8)))
+    return Stream.of(arguments(BVSort(32)), arguments(BVSort(16)), arguments(BVSort(8)))
   }
 
   @ParameterizedTest
@@ -142,4 +116,4 @@ class SortTests {
   fun `test that equal BVSorts return the same hash code`(lhs: BVSort, rhs: BVSort) {
     assertEquals(lhs.hashCode(), rhs.hashCode())
   }
-}*/
+}
