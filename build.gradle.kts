@@ -102,11 +102,11 @@ tasks.withType<DependencyUpdatesTask> {
 spotless {
   kotlin {
     licenseHeaderFile(project.file("config/license/Apache-2.0-cstyle"))
-    ktfmt()
+    ktfmt("0.46")
   }
   kotlinGradle {
     licenseHeaderFile(project.file("config/license/Apache-2.0-cstyle"), "(plugins|import )")
-    ktfmt()
+    ktfmt("0.46")
   }
   format("markdown") {
     target(".github/**/*.md", "*.md")

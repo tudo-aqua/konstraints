@@ -36,8 +36,10 @@ class ContextTests {
   private val bv32Expression = BasicExpression("B", BVSort(32))
   private val bv16Expression = BasicExpression("B", BVSort(16))
 
-    // this function has no indices as it is not infinitary, BVSort(32) here means actually only bitvectors of length 32
-    private val overloadedBV = FunctionDecl("O", listOf(BVSort(32), BVSort(32)), emptySet(), BVSort(32))
+  // this function has no indices as it is not infinitary, BVSort(32) here means actually only
+  // bitvectors of length 32
+  private val overloadedBV =
+      FunctionDecl("O", listOf(BVSort(32), BVSort(32)), emptySet(), BVSort(32))
 
   init {
     context.registerTheory(CoreContext)
@@ -106,8 +108,7 @@ class ContextTests {
         arguments("bvult", listOf(bv16Expression, bv16Expression), BoolSort),
         arguments("bvult", listOf(bv32Expression, bv32Expression), BoolSort),
         arguments("O", listOf(boolExpression, boolExpression), BoolSort),
-        arguments("O", listOf(bv32Expression, bv32Expression), BVSort(32))
-    )
+        arguments("O", listOf(bv32Expression, bv32Expression), BVSort(32)))
   }
 
   @ParameterizedTest
@@ -138,7 +139,6 @@ class ContextTests {
         arguments(BVUltDecl, listOf(bv16Expression, boolExpression)),
         arguments(BVUltDecl, listOf(bv16Expression, bv32Expression)),
         arguments(BVUltDecl, listOf(bv32Expression, bv16Expression)),
-        arguments(overloadedBV, listOf(bv16Expression, bv16Expression))
-    )
+        arguments(overloadedBV, listOf(bv16Expression, bv16Expression)))
   }
 }

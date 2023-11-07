@@ -311,7 +311,9 @@ class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expressi
 }
 
 // TODO implement BVSort marker interface?
-object BVUltDecl : FunctionDecl<BoolSort>("bvult", listOf(BVSort(0), BVSort(0)), setOf(NumeralIndex(0)), BoolSort) {
+object BVUltDecl :
+    FunctionDecl<BoolSort>(
+        "bvult", listOf(BVSort(0), BVSort(0)), setOf(NumeralIndex(0)), BoolSort) {
   override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
     require(args.size == 2) { "bvult accepts only 2 arguments but ${args.size} were provided" }
     require(args[0].sort is BVSort)

@@ -23,10 +23,12 @@ package tools.aqua.konstraints.util
 } */
 
 /**
- * Returns a list of pairs built from the elements of this collection and other collection with the same index.
- * Enforces that both lists have the same length.
+ * Returns a list of pairs built from the elements of this collection and other collection with the
+ * same index. Enforces that both lists have the same length.
  */
 infix fun <T, R> Iterable<T>.zipWithSameLength(other: Iterable<R>): List<Pair<T, R>> {
-    require(this.count() == other.count()) { "zipWithSameLength called with Iterable of different length" }
-    return zip(other) { t1, t2 -> t1 to t2 }
+  require(this.count() == other.count()) {
+    "zipWithSameLength called with Iterable of different length"
+  }
+  return zip(other) { t1, t2 -> t1 to t2 }
 }

@@ -103,7 +103,9 @@ class And(val conjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
 }
 
 // TODO handle vararg parameters
-object AndDecl : FunctionDecl<BoolSort>("and", listOf(BoolSort, BoolSort), emptySet(), BoolSort, Associativity.LEFT_ASSOC) {
+object AndDecl :
+    FunctionDecl<BoolSort>(
+        "and", listOf(BoolSort, BoolSort), emptySet(), BoolSort, Associativity.LEFT_ASSOC) {
   override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
     OrDecl.bindTo(args)
 
@@ -125,7 +127,9 @@ class Or(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   override fun toString(): String = symbol
 }
 
-object OrDecl : FunctionDecl<BoolSort>("or", listOf(BoolSort, BoolSort), emptySet(), BoolSort, Associativity.LEFT_ASSOC) {
+object OrDecl :
+    FunctionDecl<BoolSort>(
+        "or", listOf(BoolSort, BoolSort), emptySet(), BoolSort, Associativity.LEFT_ASSOC) {
   override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
     bindTo(args)
 
@@ -147,7 +151,9 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   override fun toString(): String = symbol
 }
 
-object XOrDecl : FunctionDecl<BoolSort>("xor", listOf(BoolSort, BoolSort), emptySet(), BoolSort, Associativity.LEFT_ASSOC) {
+object XOrDecl :
+    FunctionDecl<BoolSort>(
+        "xor", listOf(BoolSort, BoolSort), emptySet(), BoolSort, Associativity.LEFT_ASSOC) {
   override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
     bindTo(args)
 
