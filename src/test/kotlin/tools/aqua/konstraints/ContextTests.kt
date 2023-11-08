@@ -26,6 +26,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
+import tools.aqua.konstraints.parser.Associativity
 import tools.aqua.konstraints.parser.Context
 import tools.aqua.konstraints.parser.FunctionDecl
 
@@ -39,7 +40,7 @@ class ContextTests {
   // this function has no indices as it is not infinitary, BVSort(32) here means actually only
   // bitvectors of length 32
   private val overloadedBV =
-      FunctionDecl("O", listOf(BVSort(32), BVSort(32)), emptySet(), BVSort(32))
+      FunctionDecl("O", listOf(BVSort(32), BVSort(32)), emptySet(), BVSort(32), Associativity.NONE)
 
   init {
     context.registerTheory(CoreContext)

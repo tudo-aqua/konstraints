@@ -47,10 +47,18 @@ object True : Expression<BoolSort>() {
   override val sort = BoolSort
 }
 
+object TrueDecl : FunctionDecl0<BoolSort>("true", emptySet(), BoolSort) {
+  override fun buildExpression(): Expression<BoolSort> = True
+}
+
 /** Object for SMT false */
 object False : Expression<BoolSort>() {
   override val symbol = "false"
   override val sort = BoolSort
+}
+
+object FalseDecl : FunctionDecl0<BoolSort>("false", emptySet(), BoolSort) {
+  override fun buildExpression(): Expression<BoolSort> = False
 }
 
 /**
@@ -66,7 +74,7 @@ class Not(val inner: Expression<BoolSort>) : Expression<BoolSort>() {
 }
 
 /** FunctionDecl Object for Not */
-object NotDecl : FunctionDecl1<BoolSort, BoolSort>("not", BoolSort, BoolSort, Associativity.NONE) {
+object NotDecl : FunctionDecl1<BoolSort, BoolSort>("not", BoolSort, emptySet(), BoolSort) {
   override fun buildExpression(
       param: Expression<BoolSort>,
       bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
@@ -103,13 +111,14 @@ class And(val conjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
 
 // TODO handle vararg parameters
 object AndDecl :
-    FunctionDecl<BoolSort>(
-        "and", listOf(BoolSort, BoolSort), emptySet(), BoolSort, Associativity.LEFT_ASSOC) {
-  override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
-    OrDecl.bindTo(args)
-
-    return And(args as List<Expression<BoolSort>>)
-  }
+    FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
+        "and", BoolSort, BoolSort, emptySet(), BoolSort) {
+  override fun buildExpression(
+      param1: Expression<BoolSort>,
+      param2: Expression<BoolSort>,
+      varargs: List<Expression<BoolSort>>,
+      bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
+  ) = And(listOf(param1, param2).plus(varargs))
 }
 
 /**
@@ -127,13 +136,14 @@ class Or(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
 }
 
 object OrDecl :
-    FunctionDecl<BoolSort>(
-        "or", listOf(BoolSort, BoolSort), emptySet(), BoolSort, Associativity.LEFT_ASSOC) {
-  override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
-    bindTo(args)
-
-    return Or(args as List<Expression<BoolSort>>)
-  }
+    FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
+        "or", BoolSort, BoolSort, emptySet(), BoolSort) {
+  override fun buildExpression(
+      param1: Expression<BoolSort>,
+      param2: Expression<BoolSort>,
+      varargs: List<Expression<BoolSort>>,
+      bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
+  ) = Or(listOf(param1, param2).plus(varargs))
 }
 
 /**
@@ -151,13 +161,14 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
 }
 
 object XOrDecl :
-    FunctionDecl<BoolSort>(
-        "xor", listOf(BoolSort, BoolSort), emptySet(), BoolSort, Associativity.LEFT_ASSOC) {
-  override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
-    bindTo(args)
-
-    return XOr(args as List<Expression<BoolSort>>)
-  }
+    FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
+        "xor", BoolSort, BoolSort, emptySet(), BoolSort) {
+  override fun buildExpression(
+      param1: Expression<BoolSort>,
+      param2: Expression<BoolSort>,
+      varargs: List<Expression<BoolSort>>,
+      bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
+  ) = XOr(listOf(param1, param2).plus(varargs))
 }
 
 /**
