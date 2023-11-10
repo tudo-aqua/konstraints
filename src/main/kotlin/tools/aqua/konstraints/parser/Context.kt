@@ -107,10 +107,3 @@ internal interface TheoryContext {
   val functions: HashSet<FunctionDecl<*>>
   val sorts: Map<String, SortDecl<*>>
 }
-
-class BindException(val key: Any, val existing: Any, val new: Any) :
-    RuntimeException("$new could not be bound to $key; already bound to $existing")
-
-fun <K : Any, V : Any> MutableMap<K, V>.bindTo(key: K, value: V) {
-  putIfAbsent(key, value)?.let { if (it != value) throw BindException(key, it, value) }
-}

@@ -21,18 +21,19 @@ package tools.aqua.konstraints.parser
 import tools.aqua.konstraints.Index
 import tools.aqua.konstraints.NumeralIndex
 import tools.aqua.konstraints.Sort
+import tools.aqua.konstraints.SymbolIndex
 import tools.aqua.konstraints.util.zipWithSameLength
 
 data class Signature(
     val parametricSorts: Set<Sort>,
-    val indices: Set<Index>,
+    val indices: Set<SymbolIndex>,
     val parameters: List<Sort>,
     val sort: Sort
 ) {
   fun bindToOrNull(
       actualParameters: List<Sort>,
       actualReturn: Sort
-  ): Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>? =
+  ): Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>? =
       try {
         bindTo(actualParameters, actualReturn)
       } catch (exception: Exception) {
@@ -42,9 +43,9 @@ data class Signature(
   fun bindTo(
       actualParameters: List<Sort>,
       actualReturn: Sort
-  ): Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>> {
+  ): Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>> {
     val parametricBindings = mutableMapOf<Sort, Sort>()
-    val indexBindings = mutableMapOf<Index, NumeralIndex>()
+    val indexBindings = mutableMapOf<SymbolIndex, NumeralIndex>()
 
     bindToInternal(parameters, actualParameters, parametricBindings, indexBindings)
     bindToInternal(sort, actualReturn, parametricBindings, indexBindings)
@@ -56,7 +57,7 @@ data class Signature(
       symbolicParameters: List<Sort>,
       actualParameters: List<Sort>,
       parametricBindings: MutableMap<Sort, Sort>,
-      indexBindings: MutableMap<Index, NumeralIndex>
+      indexBindings: MutableMap<SymbolIndex, NumeralIndex>
   ) {
     (symbolicParameters zipWithSameLength actualParameters).forEach { (symbolic, actual) ->
       bindToInternal(symbolic, actual, parametricBindings, indexBindings)
@@ -67,7 +68,7 @@ data class Signature(
       symbolic: Sort,
       actual: Sort,
       parametricBindings: MutableMap<Sort, Sort>,
-      indexBindings: MutableMap<Index, NumeralIndex>
+      indexBindings: MutableMap<SymbolIndex, NumeralIndex>
   ) {
     if (symbolic in parametricSorts) {
       // bind if not already bound
@@ -76,23 +77,37 @@ data class Signature(
       require(symbolic.name == actual.name)
 
       (symbolic.indices zipWithSameLength actual.indices).forEach { (symbolicIndex, actualIndex) ->
-        bindToInternal(symbolicIndex, actualIndex, indexBindings)
+        if (symbolicIndex is SymbolIndex) {
+          // try to bind or match if already bound
+          bindToInternal(symbolicIndex, actualIndex, indexBindings)
+        } else {
+          // just try to match
+          // TODO require that we are matching NumeralIndices here
+          // TODO actual should never be a SymbolIndex
+          require((symbolicIndex as NumeralIndex).numeral == (actualIndex as NumeralIndex).numeral)
+        }
       }
       bindToInternal(symbolic.parameters, actual.parameters, parametricBindings, indexBindings)
     }
   }
 
   private fun bindToInternal(
-      symbolic: Index,
+      symbolic: SymbolIndex,
       actual: Index,
-      indexBindings: MutableMap<Index, NumeralIndex>
+      indexBindings: MutableMap<SymbolIndex, NumeralIndex>
   ) {
     require(actual is NumeralIndex)
     if (symbolic in indices) {
       indexBindings.bindTo(symbolic, actual)
     } else {
-      require(symbolic is NumeralIndex)
-      require(symbolic.numeral == actual.numeral)
+      require(indexBindings[symbolic]?.numeral == actual.numeral)
     }
   }
+}
+
+class BindException(val key: Any, val existing: Any, val new: Any) :
+    RuntimeException("$new could not be bound to $key; already bound to $existing")
+
+fun <K : Any, V : Any> MutableMap<K, V>.bindTo(key: K, value: V) {
+  putIfAbsent(key, value)?.let { if (it != value) throw BindException(key, it, value) }
 }

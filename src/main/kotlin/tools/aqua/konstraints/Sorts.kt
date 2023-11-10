@@ -60,7 +60,10 @@ open class Sort(
 
 object BoolSort : Sort("Bool")
 
-class BVSort private constructor(val bits: Int) : Sort("BitVec", listOf(NumeralIndex(bits))) {
+/** BVSort marker interface */
+abstract class IBVSort(index: Index) : Sort("BitVec", listOf(index))
+
+open class BVSort(val bits: Int) : IBVSort(NumeralIndex(bits)) {
   companion object {
     operator fun invoke(bits: Int): BVSort = BVSort(bits)
   }

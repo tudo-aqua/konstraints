@@ -32,7 +32,7 @@ enum class Associativity {
 open class FunctionDecl<S : Sort>(
     val name: String,
     val params: List<Sort>,
-    val indices: Set<Index>,
+    val indices: Set<SymbolIndex>,
     val sort: S,
     val associativity: Associativity,
     val isAmbiguous: Boolean = false
@@ -83,7 +83,7 @@ open class FunctionDecl<S : Sort>(
 }
 
 // TODO are indices necessary here (dont think so)
-abstract class FunctionDecl0<S : Sort>(name: String, indices: Set<Index>, sort: S) :
+abstract class FunctionDecl0<S : Sort>(name: String, indices: Set<SymbolIndex>, sort: S) :
     FunctionDecl<S>(name, emptyList(), indices, sort, Associativity.NONE) {
 
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
@@ -100,7 +100,7 @@ abstract class FunctionDecl0<S : Sort>(name: String, indices: Set<Index>, sort: 
 abstract class FunctionDecl1<P : Sort, S : Sort>(
     name: String,
     param: P,
-    indices: Set<Index>,
+    indices: Set<SymbolIndex>,
     sort: S
 ) : FunctionDecl<S>(name, listOf(param), indices, sort, Associativity.NONE) {
 
@@ -113,7 +113,7 @@ abstract class FunctionDecl1<P : Sort, S : Sort>(
 
   abstract fun buildExpression(
       param: Expression<P>,
-      bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
+      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
   ): Expression<S>
 }
 
@@ -121,7 +121,7 @@ abstract class FunctionDecl2<P1 : Sort, P2 : Sort, S : Sort>(
     name: String,
     param1: P1,
     param2: P2,
-    indices: Set<Index>,
+    indices: Set<SymbolIndex>,
     sort: S
 ) : FunctionDecl<S>(name, listOf(param1, param2), indices, sort, Associativity.NONE) {
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
@@ -135,7 +135,7 @@ abstract class FunctionDecl2<P1 : Sort, P2 : Sort, S : Sort>(
   abstract fun buildExpression(
       param1: Expression<P1>,
       param2: Expression<P2>,
-      bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
+      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
   ): Expression<S>
 }
 
@@ -144,7 +144,7 @@ abstract class FunctionDecl3<P1 : Sort, P2 : Sort, P3 : Sort, S : Sort>(
     param1: P1,
     param2: P2,
     param3: P3,
-    indices: Set<Index>,
+    indices: Set<SymbolIndex>,
     sort: S
 ) : FunctionDecl<S>(name, listOf(param1, param2, param3), indices, sort, Associativity.NONE) {
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
@@ -160,7 +160,7 @@ abstract class FunctionDecl3<P1 : Sort, P2 : Sort, P3 : Sort, S : Sort>(
       param1: Expression<P1>,
       param2: Expression<P2>,
       param3: Expression<P3>,
-      bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
+      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
   ): Expression<S>
 }
 
@@ -170,7 +170,7 @@ abstract class FunctionDecl4<P1 : Sort, P2 : Sort, P3 : Sort, P4 : Sort, S : Sor
     param2: P2,
     param3: P3,
     param4: P4,
-    indices: Set<Index>,
+    indices: Set<SymbolIndex>,
     sort: S
 ) :
     FunctionDecl<S>(
@@ -193,7 +193,7 @@ abstract class FunctionDecl4<P1 : Sort, P2 : Sort, P3 : Sort, P4 : Sort, S : Sor
       param2: Expression<P2>,
       param3: Expression<P3>,
       param4: Expression<P4>,
-      bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
+      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
   ): Expression<S>
 }
 
@@ -201,7 +201,7 @@ abstract class FunctionDeclLeftAssociative<P1 : Sort, P2 : Sort, S : Sort>(
     name: String,
     param1: Sort,
     param2: Sort,
-    indices: Set<Index>,
+    indices: Set<SymbolIndex>,
     sort: S
 ) : FunctionDecl<S>(name, listOf(param1, param2), indices, sort, Associativity.LEFT_ASSOC) {
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
@@ -218,7 +218,7 @@ abstract class FunctionDeclLeftAssociative<P1 : Sort, P2 : Sort, S : Sort>(
       param1: Expression<P1>,
       param2: Expression<P2>,
       varargs: List<Expression<P1>>,
-      bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
+      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
   ): Expression<S>
 }
 
@@ -226,7 +226,7 @@ abstract class FunctionDeclRightAssociative<P1 : Sort, P2 : Sort, S : Sort>(
     name: String,
     param1: P1,
     param2: P2,
-    indices: Set<Index>,
+    indices: Set<SymbolIndex>,
     sort: S
 ) : FunctionDecl<S>(name, listOf(param1, param2), indices, sort, Associativity.RIGHT_ASSOC) {
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
@@ -243,7 +243,7 @@ abstract class FunctionDeclRightAssociative<P1 : Sort, P2 : Sort, S : Sort>(
       param1: Expression<P1>,
       param2: Expression<P2>,
       varargs: List<Expression<P2>>,
-      bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
+      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
   ): Expression<S>
 }
 
@@ -251,7 +251,7 @@ abstract class FunctionDeclChainable<P : Sort>(
     name: String,
     param1: P,
     param2: P,
-    indices: Set<Index>,
+    indices: Set<SymbolIndex>,
 ) :
     FunctionDecl<BoolSort>(
         name, listOf(param1, param2), indices, BoolSort, Associativity.CHAINABLE) {
@@ -263,7 +263,7 @@ abstract class FunctionDeclChainable<P : Sort>(
 
   abstract fun buildExpression(
       varargs: List<Expression<P>>,
-      bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
+      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
   ): Expression<BoolSort>
 }
 
@@ -271,7 +271,7 @@ abstract class FunctionDeclPairwise<P : Sort>(
     name: String,
     param1: P,
     param2: P,
-    indices: Set<Index>,
+    indices: Set<SymbolIndex>,
 ) :
     FunctionDecl<BoolSort>(
         name, listOf(param1, param2), indices, BoolSort, Associativity.PAIRWISE) {
@@ -283,6 +283,6 @@ abstract class FunctionDeclPairwise<P : Sort>(
 
   abstract fun buildExpression(
       varargs: List<Expression<P>>,
-      bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
+      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
   ): Expression<BoolSort>
 }

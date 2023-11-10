@@ -312,11 +312,11 @@ class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expressi
 
 // TODO implement BVSort marker interface?
 object BVUltDecl :
-    FunctionDecl2<BVSort, BVSort, BoolSort>(
-        "bvult", BVSort(1), BVSort(1), setOf(NumeralIndex(1)), BoolSort) {
+    FunctionDecl2<IBVSort, IBVSort, BoolSort>(
+        "bvult", SymbolicBVSort("a"), SymbolicBVSort("a"), setOf(SymbolIndex("a")), BoolSort) {
   override fun buildExpression(
-      param1: Expression<BVSort>,
-      param2: Expression<BVSort>,
-      bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
-  ): Expression<BoolSort> = BVUlt(param1, param2)
+      param1: Expression<IBVSort>,
+      param2: Expression<IBVSort>,
+      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
+  ): Expression<BoolSort> = BVUlt(param1 as Expression<BVSort>, param2 as Expression<BVSort>)
 }

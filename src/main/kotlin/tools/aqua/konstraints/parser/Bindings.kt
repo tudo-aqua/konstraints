@@ -16,18 +16,22 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints
+package tools.aqua.konstraints.parser
 
-fun Int.idx(): NumeralIndex = NumeralIndex(this)
+import tools.aqua.konstraints.BVSort
+import tools.aqua.konstraints.NumeralIndex
+import tools.aqua.konstraints.SymbolIndex
+import tools.aqua.konstraints.SymbolicBVSort
 
-sealed interface Index
+data class IndexBindings(val indices: Map<SymbolIndex, NumeralIndex>) {
+  fun get(symbolic: SymbolicBVSort): BVSort {
+    if (symbolic.symbolicBits in indices) {
+      return BVSort(indices[symbolic.symbolicBits]!!.numeral)
+    }
 
-data class NumeralIndex(val numeral: Int) : Index {
-  override fun toString() = numeral.toString()
+    throw NotBoundException(symbolic.symbolicBits)
+  }
 }
 
-data class SymbolIndex(val symbol: Symbol) : Index {
-  constructor(symbol: String) : this(Symbol(symbol))
-
-  override fun toString() = symbol.toString()
-}
+class NotBoundException(val symbolIndex: SymbolIndex) :
+    RuntimeException("$symbolIndex is not bound")

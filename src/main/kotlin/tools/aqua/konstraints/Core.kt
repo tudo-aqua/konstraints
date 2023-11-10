@@ -77,7 +77,7 @@ class Not(val inner: Expression<BoolSort>) : Expression<BoolSort>() {
 object NotDecl : FunctionDecl1<BoolSort, BoolSort>("not", BoolSort, emptySet(), BoolSort) {
   override fun buildExpression(
       param: Expression<BoolSort>,
-      bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
+      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
   ): Expression<BoolSort> = Not(param)
 }
 
@@ -117,7 +117,7 @@ object AndDecl :
       param1: Expression<BoolSort>,
       param2: Expression<BoolSort>,
       varargs: List<Expression<BoolSort>>,
-      bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
+      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
   ) = And(listOf(param1, param2).plus(varargs))
 }
 
@@ -142,7 +142,7 @@ object OrDecl :
       param1: Expression<BoolSort>,
       param2: Expression<BoolSort>,
       varargs: List<Expression<BoolSort>>,
-      bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
+      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
   ) = Or(listOf(param1, param2).plus(varargs))
 }
 
@@ -167,7 +167,7 @@ object XOrDecl :
       param1: Expression<BoolSort>,
       param2: Expression<BoolSort>,
       varargs: List<Expression<BoolSort>>,
-      bindings: Pair<Map<Sort, Sort>, Map<Index, NumeralIndex>>
+      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
   ) = XOr(listOf(param1, param2).plus(varargs))
 }
 

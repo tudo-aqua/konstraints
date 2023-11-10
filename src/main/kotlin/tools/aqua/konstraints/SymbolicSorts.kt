@@ -18,16 +18,11 @@
 
 package tools.aqua.konstraints
 
-fun Int.idx(): NumeralIndex = NumeralIndex(this)
-
-sealed interface Index
-
-data class NumeralIndex(val numeral: Int) : Index {
-  override fun toString() = numeral.toString()
-}
-
-data class SymbolIndex(val symbol: Symbol) : Index {
-  constructor(symbol: String) : this(Symbol(symbol))
-
-  override fun toString() = symbol.toString()
+/**
+ * BVSort with a symbolic number of bits, only used for binding actual instances of BVSort name must
+ * be BitVec so the class can act like a BVSort in the context of binding
+ */
+// TODO prevent accidental usage of this class in normal sort context
+class SymbolicBVSort(val symbolicBits: SymbolIndex) : IBVSort(symbolicBits) {
+  constructor(symbol: String) : this(SymbolIndex(symbol))
 }
