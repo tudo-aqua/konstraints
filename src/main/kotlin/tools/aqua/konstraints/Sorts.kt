@@ -63,12 +63,21 @@ object BoolSort : Sort("Bool")
 /** BVSort marker interface */
 abstract class IBVSort(index: Index) : Sort("BitVec", listOf(index))
 
-open class BVSort(val bits: Int) : IBVSort(NumeralIndex(bits)) {
+open class BVSort(index: Index) : Sort("BitVec", listOf(index)) {
   companion object {
-    operator fun invoke(bits: Int): BVSort = BVSort(bits)
+    operator fun invoke(bits: Int): BVSort = BVSort(NumeralIndex(bits))
+
+    internal operator fun invoke(symbol: String) = BVSort(SymbolIndex(symbol))
   }
 
+  val bits: Int
+
   init {
-    require(bits > 0)
+    if (indices.single() is NumeralIndex) {
+      bits = (indices.single() as NumeralIndex).numeral
+      require(bits > 0)
+    } else {
+      bits = 0
+    }
   }
 }

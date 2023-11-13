@@ -18,20 +18,10 @@
 
 package tools.aqua.konstraints.parser
 
-import tools.aqua.konstraints.BVSort
 import tools.aqua.konstraints.NumeralIndex
 import tools.aqua.konstraints.SymbolIndex
-import tools.aqua.konstraints.SymbolicBVSort
 
-data class IndexBindings(val indices: Map<SymbolIndex, NumeralIndex>) {
-  fun get(symbolic: SymbolicBVSort): BVSort {
-    if (symbolic.symbolicBits in indices) {
-      return BVSort(indices[symbolic.symbolicBits]!!.numeral)
-    }
-
-    throw NotBoundException(symbolic.symbolicBits)
-  }
-}
+data class IndexBindings(val indices: Map<SymbolIndex, NumeralIndex>) {}
 
 class NotBoundException(val symbolIndex: SymbolIndex) :
     RuntimeException("$symbolIndex is not bound")
