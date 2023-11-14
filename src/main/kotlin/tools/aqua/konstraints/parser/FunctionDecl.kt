@@ -46,7 +46,7 @@ open class FunctionDecl<S : Sort>(
     return NAryExpression(name, sort, args)
   }
 
-  fun bindTo(args: List<Expression<*>>) =
+  open fun bindTo(args: List<Expression<*>>) =
       when (associativity) {
         Associativity.LEFT_ASSOC -> {
           args.slice(2 ..< args.size).forEach { require(args[0].sort == it.sort) }
@@ -111,10 +111,7 @@ abstract class FunctionDecl1<P : Sort, S : Sort>(
     return buildExpression(args.single() as Expression<P>, bindings)
   }
 
-  abstract fun buildExpression(
-      param: Expression<P>,
-      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
-  ): Expression<S>
+  abstract fun buildExpression(param: Expression<P>, bindings: Bindings): Expression<S>
 }
 
 abstract class FunctionDecl2<P1 : Sort, P2 : Sort, S : Sort>(
@@ -135,7 +132,7 @@ abstract class FunctionDecl2<P1 : Sort, P2 : Sort, S : Sort>(
   abstract fun buildExpression(
       param1: Expression<P1>,
       param2: Expression<P2>,
-      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
+      bindings: Bindings
   ): Expression<S>
 }
 
@@ -160,7 +157,7 @@ abstract class FunctionDecl3<P1 : Sort, P2 : Sort, P3 : Sort, S : Sort>(
       param1: Expression<P1>,
       param2: Expression<P2>,
       param3: Expression<P3>,
-      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
+      bindings: Bindings
   ): Expression<S>
 }
 
@@ -193,7 +190,7 @@ abstract class FunctionDecl4<P1 : Sort, P2 : Sort, P3 : Sort, P4 : Sort, S : Sor
       param2: Expression<P2>,
       param3: Expression<P3>,
       param4: Expression<P4>,
-      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
+      bindings: Bindings
   ): Expression<S>
 }
 
@@ -218,7 +215,7 @@ abstract class FunctionDeclLeftAssociative<P1 : Sort, P2 : Sort, S : Sort>(
       param1: Expression<P1>,
       param2: Expression<P2>,
       varargs: List<Expression<P1>>,
-      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
+      bindings: Bindings
   ): Expression<S>
 }
 
@@ -243,7 +240,7 @@ abstract class FunctionDeclRightAssociative<P1 : Sort, P2 : Sort, S : Sort>(
       param1: Expression<P1>,
       param2: Expression<P2>,
       varargs: List<Expression<P2>>,
-      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
+      bindings: Bindings
   ): Expression<S>
 }
 
@@ -263,7 +260,7 @@ abstract class FunctionDeclChainable<P : Sort>(
 
   abstract fun buildExpression(
       varargs: List<Expression<P>>,
-      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
+      bindings: Bindings
   ): Expression<BoolSort>
 }
 
@@ -283,6 +280,6 @@ abstract class FunctionDeclPairwise<P : Sort>(
 
   abstract fun buildExpression(
       varargs: List<Expression<P>>,
-      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
+      bindings: Bindings
   ): Expression<BoolSort>
 }

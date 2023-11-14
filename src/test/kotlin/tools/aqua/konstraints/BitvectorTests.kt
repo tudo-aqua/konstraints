@@ -39,6 +39,8 @@ class BitvectorTests {
   private val B = BasicExpression<BVSort>("B", BVSort(8))
   private val C = BasicExpression<BVSort>("C", BVSort(8))
   private val D = BasicExpression<BVSort>("D", BVSort(16))
+  private val symbolicE = BasicExpression<SymbolicBVSort>("E", SymbolicBVSort("a"))
+  private val symbolicF = BasicExpression<SymbolicBVSort>("F", SymbolicBVSort("b"))
 
   @ParameterizedTest
   @MethodSource("getBVExpressionsAndSerialization")
@@ -166,4 +168,25 @@ class BitvectorTests {
         arguments(bvadd, listOf(A, B)),
         arguments(bvmul, listOf(A, B)))
   }
+
+  /* @ParameterizedTest
+  @MethodSource("getBVExpressionConstructors")
+  fun `test that SymbolicBVSort can not be used as BVSort in expressions`(
+      constructor: (List<Expression<BVSort>>) -> Expression<BVSort>,
+      args: List<Expression<BVSort>>
+  ) {
+      assertThrows<Exception> { constructor(args) }
+  }
+
+  private fun getBVExpressionConstructors() : Stream<Arguments> {
+      val bvand: (List<Expression<BVSort>>) -> Expression<BVSort> = ::BVAnd
+      val bvor: (List<Expression<BVSort>>) -> Expression<BVSort> = ::BVOr
+      val bvadd: (List<Expression<BVSort>>) -> Expression<BVSort> = ::BVAdd
+      val bvmul: (List<Expression<BVSort>>) -> Expression<BVSort> = ::BVMul
+      return Stream.of(
+          arguments(bvand, listOf(symbolicE, symbolicF)),
+          arguments(bvor, listOf(symbolicE, symbolicF)),
+          arguments(bvadd, listOf(symbolicE, symbolicF)),
+          arguments(bvmul, listOf(symbolicE, symbolicF)))
+  } */
 }

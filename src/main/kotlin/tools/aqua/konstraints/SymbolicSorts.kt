@@ -23,3 +23,6 @@ package tools.aqua.konstraints
  * be BitVec so the class can act like a BVSort in the context of binding
  */
 // TODO prevent accidental usage of this class in normal sort context
+internal class SymbolicBVSort(symbol: SymbolIndex) : BVSort(symbol) {
+  constructor(symbol: String) : this(SymbolIndex(symbol))
+}

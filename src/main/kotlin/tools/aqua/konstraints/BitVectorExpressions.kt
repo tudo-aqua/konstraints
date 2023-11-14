@@ -21,7 +21,7 @@ package tools.aqua.konstraints
 import tools.aqua.konstraints.parser.*
 
 internal object BitVectorExpressionContext : TheoryContext {
-  override val functions: HashSet<FunctionDecl<*>> = hashSetOf(BVUltDecl)
+  override val functions: HashSet<FunctionDecl<*>> = hashSetOf(BVUltDecl, BVConcatDecl)
   override val sorts = mapOf(Pair("BitVec", BVSortDecl))
 }
 
@@ -48,6 +48,26 @@ internal object BVSortDecl : SortDecl<BVSort>("BitVec") {
 class BVConcat(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expression<BVSort>() {
   override val sort: BVSort = BVSort(lhs.sort.bits + rhs.sort.bits)
   override val symbol: String by lazy { "(concat $lhs $rhs)" }
+}
+
+object BVConcatDecl :
+    FunctionDecl2<BVSort, BVSort, BVSort>(
+        "concat",
+        SymbolicBVSort("a"),
+        SymbolicBVSort("b"),
+        setOf(SymbolIndex("a"), SymbolIndex("b")),
+        SymbolicBVSort("c")) {
+  override fun bindTo(args: List<Expression<*>>): Bindings {
+    return signature.bindParameters(args.map { it.sort })
+  }
+
+  override fun buildExpression(
+      param1: Expression<BVSort>,
+      param2: Expression<BVSort>,
+      bindings: Bindings
+  ): Expression<BVSort> {
+    return BVConcat(param1, param2)
+  }
 }
 
 /**
@@ -313,10 +333,10 @@ class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expressi
 // TODO implement BVSort marker interface?
 object BVUltDecl :
     FunctionDecl2<BVSort, BVSort, BoolSort>(
-        "bvult", BVSort("a"), BVSort("a"), setOf(SymbolIndex("a")), BoolSort) {
+        "bvult", SymbolicBVSort("a"), SymbolicBVSort("a"), setOf(SymbolIndex("a")), BoolSort) {
   override fun buildExpression(
       param1: Expression<BVSort>,
       param2: Expression<BVSort>,
-      bindings: Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>
+      bindings: Bindings
   ): Expression<BoolSort> = BVUlt(param1, param2)
 }

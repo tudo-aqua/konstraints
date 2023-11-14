@@ -30,27 +30,39 @@ data class Signature(
     val parameters: List<Sort>,
     val sort: Sort
 ) {
-  fun bindToOrNull(
-      actualParameters: List<Sort>,
-      actualReturn: Sort
-  ): Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>>? =
+  fun bindToOrNull(actualParameters: List<Sort>, actualReturn: Sort): Bindings? =
       try {
         bindTo(actualParameters, actualReturn)
       } catch (exception: Exception) {
         null
       }
 
-  fun bindTo(
-      actualParameters: List<Sort>,
-      actualReturn: Sort
-  ): Pair<Map<Sort, Sort>, Map<SymbolIndex, NumeralIndex>> {
+  fun bindTo(actualParameters: List<Sort>, actualReturn: Sort): Bindings {
     val parametricBindings = mutableMapOf<Sort, Sort>()
     val indexBindings = mutableMapOf<SymbolIndex, NumeralIndex>()
 
     bindToInternal(parameters, actualParameters, parametricBindings, indexBindings)
     bindToInternal(sort, actualReturn, parametricBindings, indexBindings)
 
-    return parametricBindings to indexBindings
+    return Bindings(parametricBindings, indexBindings)
+  }
+
+  fun bindParameters(actualParameters: List<Sort>): Bindings {
+    val parametricBindings = mutableMapOf<Sort, Sort>()
+    val indexBindings = mutableMapOf<SymbolIndex, NumeralIndex>()
+
+    bindToInternal(parameters, actualParameters, parametricBindings, indexBindings)
+
+    return Bindings(parametricBindings, indexBindings)
+  }
+
+  fun bindReturn(actualReturn: Sort): Bindings {
+    val parametricBindings = mutableMapOf<Sort, Sort>()
+    val indexBindings = mutableMapOf<SymbolIndex, NumeralIndex>()
+
+    bindToInternal(sort, actualReturn, parametricBindings, indexBindings)
+
+    return Bindings(parametricBindings, indexBindings)
   }
 
   private fun bindToInternal(
