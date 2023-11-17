@@ -18,18 +18,49 @@
 
 package tools.aqua.konstraints.parser
 
+import tools.aqua.konstraints.IllegalSymbolException
 import tools.aqua.konstraints.NumeralIndex
 import tools.aqua.konstraints.Sort
 import tools.aqua.konstraints.SymbolIndex
 
-// TODO add parametric bindings
 data class Bindings(val parametric: Map<Sort, Sort>, val indices: Map<SymbolIndex, NumeralIndex>) {
-  fun getBinding(symbol: String): NumeralIndex = getBinding(SymbolIndex(symbol))
+  /**
+   * Returns the NumeralIndex that the Symbol is bound to
+   *
+   * @param symbol String specifying the SymbolIndex to get the binding for
+   * @throws IndexNotBoundException if the SymbolIndex is not bound
+   * @throws IllegalSymbolException if [symbol] is not a valid SMTSymbol
+   */
+  operator fun get(symbol: String): NumeralIndex = get(SymbolIndex(symbol))
 
-  fun getBinding(symbol: SymbolIndex): NumeralIndex {
-    return indices[symbol] ?: throw NotBoundException(symbol)
+  operator fun get(symbol: SymbolIndex): NumeralIndex {
+    return indices[symbol] ?: throw IndexNotBoundException(symbol)
+  }
+
+  fun getOrNull(symbol: String): NumeralIndex? = getOrNull(SymbolIndex(symbol))
+
+  fun getOrNull(symbol: SymbolIndex): NumeralIndex? {
+    return try {
+      this[symbol]
+    } catch (_: Exception) {
+      null
+    }
+  }
+
+  operator fun get(sort: Sort): Sort {
+    return parametric[sort] ?: throw SortNotBoundException(sort)
+  }
+
+  fun getOrNull(sort: Sort): Sort? {
+    return try {
+      this[sort]
+    } catch (_: Exception) {
+      null
+    }
   }
 }
 
-class NotBoundException(val symbolIndex: SymbolIndex) :
+class IndexNotBoundException(symbolIndex: SymbolIndex) :
     RuntimeException("$symbolIndex is not bound")
+
+class SortNotBoundException(sort: Sort) : RuntimeException("$sort is not bound")

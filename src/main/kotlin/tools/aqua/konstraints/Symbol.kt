@@ -102,3 +102,5 @@ class Symbol(symbol: String, rule: QuotingRule) {
 
   override fun toString() = value
 }
+
+class IllegalSymbolException() : RuntimeException("")

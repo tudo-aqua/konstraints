@@ -42,7 +42,6 @@ open class FunctionDecl<S : Sort>(
   open fun buildExpression(args: List<Expression<*>>): Expression<S> {
     bindTo(args)
 
-    // TODO generate expression with args (data model flaw?)
     return NAryExpression(name, sort, args)
   }
 

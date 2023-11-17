@@ -18,17 +18,14 @@
 
 package tools.aqua.konstraints.parser
 
-import tools.aqua.konstraints.Index
-import tools.aqua.konstraints.NumeralIndex
-import tools.aqua.konstraints.Sort
-import tools.aqua.konstraints.SymbolIndex
+import tools.aqua.konstraints.*
 import tools.aqua.konstraints.util.zipWithSameLength
 
 data class Signature(
     val parametricSorts: Set<Sort>,
     val indices: Set<SymbolIndex>,
     val parameters: List<Sort>,
-    val sort: Sort
+    val returnSort: Sort
 ) {
   fun bindToOrNull(actualParameters: List<Sort>, actualReturn: Sort): Bindings? =
       try {
@@ -42,7 +39,7 @@ data class Signature(
     val indexBindings = mutableMapOf<SymbolIndex, NumeralIndex>()
 
     bindToInternal(parameters, actualParameters, parametricBindings, indexBindings)
-    bindToInternal(sort, actualReturn, parametricBindings, indexBindings)
+    bindToInternal(returnSort, actualReturn, parametricBindings, indexBindings)
 
     return Bindings(parametricBindings, indexBindings)
   }
@@ -60,7 +57,7 @@ data class Signature(
     val parametricBindings = mutableMapOf<Sort, Sort>()
     val indexBindings = mutableMapOf<SymbolIndex, NumeralIndex>()
 
-    bindToInternal(sort, actualReturn, parametricBindings, indexBindings)
+    bindToInternal(returnSort, actualReturn, parametricBindings, indexBindings)
 
     return Bindings(parametricBindings, indexBindings)
   }
@@ -89,14 +86,16 @@ data class Signature(
       require(symbolic.name == actual.name)
 
       (symbolic.indices zipWithSameLength actual.indices).forEach { (symbolicIndex, actualIndex) ->
-        if (symbolicIndex is SymbolIndex) {
-          // try to bind or match if already bound
-          bindToInternal(symbolicIndex, actualIndex, indexBindings)
-        } else {
-          // just try to match
-          // TODO require that we are matching NumeralIndices here
-          // TODO actual should never be a SymbolIndex
-          require((symbolicIndex as NumeralIndex).numeral == (actualIndex as NumeralIndex).numeral)
+        when (symbolicIndex) {
+          is SymbolIndex -> {
+            // bind the symbolicIndex if it has not been already bound
+            bindToInternal(symbolicIndex, actualIndex, indexBindings)
+          }
+          is NumeralIndex -> {
+            // just try to match
+            require(actualIndex is NumeralIndex)
+            require(symbolicIndex.numeral == actualIndex.numeral)
+          }
         }
       }
       bindToInternal(symbolic.parameters, actual.parameters, parametricBindings, indexBindings)
@@ -111,8 +110,6 @@ data class Signature(
     require(actual is NumeralIndex)
     if (symbolic in indices) {
       indexBindings.bindTo(symbolic, actual)
-    } else {
-      require(indexBindings[symbolic]?.numeral == actual.numeral)
     }
   }
 }

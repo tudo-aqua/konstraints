@@ -23,6 +23,18 @@ abstract class Expression<T : Sort> {
   abstract val sort: T
 
   override fun toString() = symbol
+
+  /**
+   * Safely cast this expression to an Expression of Sort S, if this.sort is S Avoids unchecked cast
+   * warnings when casting Expression<*> after binding
+   */
+  inline fun <reified S : Sort> cast(): Expression<S> {
+    if (sort::class == S::class) {
+      throw ExpressionCastException(sort, S::class.toString())
+    }
+
+    @Suppress("UNCHECKED_CAST") return this as Expression<S>
+  }
 }
 
 class BasicExpression<T : Sort>(override val symbol: String, override val sort: T) :
@@ -58,3 +70,6 @@ class NAryExpression<T : Sort>(
   override fun toString() =
       if (tokens.isNotEmpty()) "($symbol ${tokens.joinToString(" ")})" else symbol
 }
+
+class ExpressionCastException(from: Sort, to: String) :
+    ClassCastException("Can not cast expression from $from to $to")
