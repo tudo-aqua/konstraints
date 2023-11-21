@@ -44,6 +44,13 @@ data class Signature(
     return Bindings(parametricBindings, indexBindings)
   }
 
+  fun bindParametersOrNull(actualParameters: List<Sort>): Bindings? =
+      try {
+        bindParameters(actualParameters)
+      } catch (_: Exception) {
+        null
+      }
+
   fun bindParameters(actualParameters: List<Sort>): Bindings {
     val parametricBindings = mutableMapOf<Sort, Sort>()
     val indexBindings = mutableMapOf<SymbolIndex, NumeralIndex>()
@@ -52,6 +59,13 @@ data class Signature(
 
     return Bindings(parametricBindings, indexBindings)
   }
+
+  fun bindReturnOrNull(actualReturn: Sort): Bindings? =
+      try {
+        bindReturn(actualReturn)
+      } catch (_: Exception) {
+        null
+      }
 
   fun bindReturn(actualReturn: Sort): Bindings {
     val parametricBindings = mutableMapOf<Sort, Sort>()
@@ -81,7 +95,7 @@ data class Signature(
   ) {
     if (symbolic in parametricSorts) {
       // bind if not already bound
-      parametricBindings.bindTo(symbolic, actual)
+      parametricBindings.bindParametersTo(symbolic, actual)
     } else {
       require(symbolic.name == actual.name)
 
@@ -109,7 +123,7 @@ data class Signature(
   ) {
     require(actual is NumeralIndex)
     if (symbolic in indices) {
-      indexBindings.bindTo(symbolic, actual)
+      indexBindings.bindParametersTo(symbolic, actual)
     }
   }
 }
@@ -117,6 +131,6 @@ data class Signature(
 class BindException(val key: Any, val existing: Any, val new: Any) :
     RuntimeException("$new could not be bound to $key; already bound to $existing")
 
-fun <K : Any, V : Any> MutableMap<K, V>.bindTo(key: K, value: V) {
+fun <K : Any, V : Any> MutableMap<K, V>.bindParametersTo(key: K, value: V) {
   putIfAbsent(key, value)?.let { if (it != value) throw BindException(key, it, value) }
 }

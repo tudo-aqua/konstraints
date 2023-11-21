@@ -60,6 +60,8 @@ open class Sort(
 
 object BoolSort : Sort("Bool")
 
+// can not be sealed and open
+// TODO reevaluate operator fun invoke(symbol : String) approach
 open class BVSort(index: Index) : Sort("BitVec", listOf(index)) {
   companion object {
     operator fun invoke(bits: Int): BVSort = BVSort(NumeralIndex(bits))

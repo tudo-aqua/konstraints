@@ -29,7 +29,12 @@ enum class QuotingRule {
 class Symbol(symbol: String, rule: QuotingRule) {
   val isQuoted: Boolean
   val mustQuote: Boolean
-  val value: String // TODO save smtstring without quotes, construct if needed
+
+  /**
+   * internal representation of the symbol without quotes, quoting will be reconstructed by
+   * [toSMTString] before giving the symbol to a solver
+   */
+  val value: String
 
   constructor(symbol: String) : this(symbol, QuotingRule.NONE)
 
@@ -44,45 +49,34 @@ class Symbol(symbol: String, rule: QuotingRule) {
           isQuoted = true
           mustQuote = true
         } else {
-          // TODO Implement IllegalSymbolException
-          throw IllegalArgumentException("$symbol is not a valid smt symbol")
+          throw IllegalSymbolException(symbol)
         }
-
-        value = symbol
       }
       QuotingRule.SMART -> {
         if (Parser.simpleSymbol.end().accept(symbol)) {
           isQuoted = false
           mustQuote = false
-
-          value = symbol
         } else if (Parser.quotedSymbol.end().accept(symbol)) {
           isQuoted = false
           mustQuote = true
-
-          value = symbol.trim('|')
         } else {
-          // TODO Implement IllegalSymbolException
-          throw IllegalArgumentException("$symbol is not a valid smt symbol")
+          throw IllegalSymbolException(symbol)
         }
       }
       QuotingRule.FORCED -> {
         if (Parser.quotedSymbol.end().accept(symbol)) {
           isQuoted = true
           mustQuote = true
-
-          value = symbol
         } else if (Parser.simpleSymbol.end().accept(symbol)) {
           isQuoted = true
           mustQuote = true
-
-          value = "|$symbol|"
         } else {
-          // TODO Implement IllegalSymbolException
-          throw IllegalArgumentException("$symbol is not a valid smt symbol")
+          throw IllegalSymbolException(symbol)
         }
       }
     }
+
+    value = symbol.trim('|')
   }
 
   // TODO fun createSimilar replaces all illegal chars and marks with uuid to prevent name conflicts
@@ -97,10 +91,13 @@ class Symbol(symbol: String, rule: QuotingRule) {
       }
 
   private fun symbolEquality(other: Symbol): Boolean {
-    return value.trim('|') == other.value.trim('|')
+    return value == other.value
   }
 
   override fun toString() = value
+
+  fun toSMTString() = if (mustQuote) "|$value|" else value
 }
 
-class IllegalSymbolException() : RuntimeException("")
+class IllegalSymbolException(val symbol: String) :
+    RuntimeException("$symbol is not a legal SMT symbol")

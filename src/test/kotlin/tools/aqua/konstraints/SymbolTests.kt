@@ -19,7 +19,6 @@
 package tools.aqua.konstraints
 
 import java.util.stream.Stream
-import kotlin.IllegalArgumentException
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertThrows
@@ -62,7 +61,37 @@ class SymbolTests {
               """| af klj ^*0 asfe2 (&*)&(#^ $ > > >?" ']]984|"""])
   fun `test that symbols without quoting rules work`(symbol: String) {
     val test = Symbol(symbol)
-    assertEquals(symbol, test.value)
+    assertEquals(symbol, test.toSMTString())
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "+",
+              "<=",
+              "x",
+              "plus",
+              "**",
+              "$",
+              "<sas",
+              "<adf>",
+              "abc77",
+              "*\$s&6",
+              ".kkk",
+              ".8",
+              "+34",
+              "-32",
+              "|32|",
+              "|3bitvec|",
+              "| this is a quoted symbol |",
+              "| so is\nthis one |",
+              "||",
+              """| " can occur too |""",
+              """| af klj ^*0 asfe2 (&*)&(#^ $ > > >?" ']]984|"""])
+  fun `test that symbols without quoting rules internal representation is correct`(symbol: String) {
+    val test = Symbol(symbol)
+    assertEquals(symbol.trim('|'), test.value)
   }
 
   @ParameterizedTest
@@ -70,13 +99,13 @@ class SymbolTests {
   fun `test that symbols without quoting rules throws for strings that must be quoted`(
       symbol: String
   ) {
-    assertThrows<IllegalArgumentException> { Symbol(symbol) }
+    assertThrows<IllegalSymbolException> { Symbol(symbol) }
   }
 
   @ParameterizedTest
   @ValueSource(strings = ["bit|vec"])
   fun `test that symbol throws for illegal symbols`(symbol: String) {
-    assertThrows<IllegalArgumentException> { Symbol(symbol) }
+    assertThrows<IllegalSymbolException> { Symbol(symbol) }
   }
 
   @ParameterizedTest
@@ -122,7 +151,7 @@ class SymbolTests {
   @ParameterizedTest
   @ValueSource(strings = ["bit|vec"])
   fun `test that smart quoting rejects illegal symbols`(symbol: String) {
-    assertThrows<IllegalArgumentException> { Symbol(symbol, QuotingRule.SMART) }
+    assertThrows<IllegalSymbolException> { Symbol(symbol, QuotingRule.SMART) }
   }
 
   @ParameterizedTest
@@ -145,7 +174,7 @@ class SymbolTests {
               "-32"])
   fun `test that forced quoting quotes simple symbols`(symbol: String) {
     val test = Symbol(symbol, QuotingRule.FORCED)
-    assertEquals("|$symbol|", test.value)
+    assertEquals("|$symbol|", test.toSMTString())
   }
 
   @ParameterizedTest
@@ -161,13 +190,29 @@ class SymbolTests {
               """| af klj ^*0 asfe2 (&*)&(#^ $ > > >?" ']]984|"""])
   fun `test that forced quoting handles quoted strings correctly`(symbol: String) {
     val test = Symbol(symbol, QuotingRule.FORCED)
-    assertEquals(symbol, test.value)
+    assertEquals(symbol, test.toSMTString())
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "|32|",
+              "|3bitvec|",
+              "| this is a quoted symbol |",
+              "| so is\nthis one |",
+              "||",
+              """| " can occur too |""",
+              """| af klj ^*0 asfe2 (&*)&(#^ $ > > >?" ']]984|"""])
+  fun `test that forced quoting removes quotes for internal representation`(symbol: String) {
+    val test = Symbol(symbol, QuotingRule.FORCED)
+    assertEquals(symbol.trim('|'), test.value)
   }
 
   @ParameterizedTest
   @ValueSource(strings = ["bit|vec"])
   fun `test that forced quoting does not accept illegal symbols`(symbol: String) {
-    assertThrows<IllegalArgumentException> { Symbol(symbol, QuotingRule.FORCED) }
+    assertThrows<IllegalSymbolException> { Symbol(symbol, QuotingRule.FORCED) }
   }
 
   @ParameterizedTest

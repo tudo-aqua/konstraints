@@ -24,6 +24,10 @@ abstract class Expression<T : Sort> {
 
   override fun toString() = symbol
 
+  init {
+    require(sort !is SymbolicSort)
+  }
+
   /**
    * Safely cast this expression to an Expression of Sort S, if this.sort is S Avoids unchecked cast
    * warnings when casting Expression<*> after binding

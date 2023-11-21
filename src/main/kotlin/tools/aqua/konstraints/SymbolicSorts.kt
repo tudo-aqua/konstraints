@@ -18,11 +18,13 @@
 
 package tools.aqua.konstraints
 
+internal interface SymbolicSort
+
 /**
  * BVSort with a symbolic number of bits, only used for binding actual instances of BVSort name must
  * be BitVec so the class can act like a BVSort in the context of binding
  */
 // TODO prevent accidental usage of this class in normal sort context
-internal class SymbolicBVSort(symbol: SymbolIndex) : BVSort(symbol) {
+internal class SymbolicBVSort(symbol: SymbolIndex) : BVSort(symbol), SymbolicSort {
   constructor(symbol: String) : this(SymbolIndex(symbol))
 }

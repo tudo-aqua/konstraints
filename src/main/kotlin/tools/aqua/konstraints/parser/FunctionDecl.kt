@@ -40,12 +40,12 @@ open class FunctionDecl<S : Sort>(
   val signature = Signature(emptySet(), indices, params, sort)
 
   open fun buildExpression(args: List<Expression<*>>): Expression<S> {
-    bindTo(args)
+    bindParametersToWithExpressions(args)
 
     return NAryExpression(name, sort, args)
   }
 
-  open fun bindTo(args: List<Expression<*>>) =
+  open fun bindParametersToWithExpressions(args: List<Expression<*>>) =
       when (associativity) {
         Associativity.LEFT_ASSOC -> {
           args.slice(2 ..< args.size).forEach { require(args[0].sort == it.sort) }
@@ -55,15 +55,52 @@ open class FunctionDecl<S : Sort>(
           args.slice(2 ..< args.size).forEach { require(args[1].sort == it.sort) }
           signature.bindTo(args.slice(0..1).map { it.sort }, sort)
         }
-        Associativity.PAIRWISE -> TODO("Implement pairwise binding")
-        Associativity.CHAINABLE -> TODO("Implement chainable binding")
+        Associativity.PAIRWISE -> {
+          args.forEach { require(args[0].sort == it.sort) }
+          signature.bindTo(args.slice(0..1).map { it.sort }, sort)
+        }
+        Associativity.CHAINABLE -> {
+          args.forEach { require(args[0].sort == it.sort) }
+          signature.bindTo(args.slice(0..1).map { it.sort }, sort)
+        }
         Associativity.NONE -> signature.bindTo(args.map { it.sort }, sort)
       }
 
   /** Returns true if the function accepts the arguments provided */
-  fun accepts(args: List<Expression<*>>): Boolean {
+  fun acceptsExpressions(args: List<Expression<*>>): Boolean {
     try {
-      bindTo(args)
+      bindParametersToWithExpressions(args)
+    } catch (e: Exception) {
+      return false
+    }
+
+    return true
+  }
+
+  fun bindParametersTo(args: List<Sort>) =
+      when (associativity) {
+        Associativity.LEFT_ASSOC -> {
+          args.slice(2 ..< args.size).forEach { require(args[0] == it) }
+          signature.bindParameters(args.slice(0..1))
+        }
+        Associativity.RIGHT_ASSOC -> {
+          args.slice(2 ..< args.size).forEach { require(args[1] == it) }
+          signature.bindParameters(args.slice(0..1))
+        }
+        Associativity.PAIRWISE -> {
+          args.forEach { require(args[0] == it) }
+          signature.bindTo(args.slice(0..1), sort)
+        }
+        Associativity.CHAINABLE -> {
+          args.forEach { require(args[0] == it) }
+          signature.bindTo(args.slice(0..1), sort)
+        }
+        Associativity.NONE -> signature.bindParameters(args)
+      }
+
+  fun accepts(args: List<Sort>): Boolean {
+    try {
+      bindParametersTo(args)
     } catch (e: Exception) {
       return false
     }
@@ -79,6 +116,8 @@ open class FunctionDecl<S : Sort>(
       }
 
   override fun hashCode(): Int = name.hashCode() * 961 + params.hashCode() * 31 + sort.hashCode()
+
+  override fun toString() = "($name (${params.joinToString(" ")}) $sort)"
 }
 
 // TODO are indices necessary here (dont think so)
@@ -95,7 +134,7 @@ abstract class FunctionDecl0<S : Sort>(name: String, indices: Set<SymbolIndex>, 
 }
 
 // TODO refactor sort into more meaningful name i.e. return
-// TODO implement for indexed sorts
+// TODO implement for parametric sorts
 abstract class FunctionDecl1<P : Sort, S : Sort>(
     name: String,
     param: P,
@@ -105,7 +144,7 @@ abstract class FunctionDecl1<P : Sort, S : Sort>(
 
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
     require(args.size == 1)
-    val bindings = bindTo(args)
+    val bindings = bindParametersToWithExpressions(args)
 
     return buildExpression(args.single() as Expression<P>, bindings)
   }
@@ -122,7 +161,7 @@ abstract class FunctionDecl2<P1 : Sort, P2 : Sort, S : Sort>(
 ) : FunctionDecl<S>(name, listOf(param1, param2), indices, sort, Associativity.NONE) {
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
     require(args.size == 2)
-    val bindings = bindTo(args)
+    val bindings = bindParametersToWithExpressions(args)
 
     // TODO suppress unchecked cast warning
     return buildExpression(args[0] as Expression<P1>, args[1] as Expression<P2>, bindings)
@@ -145,7 +184,7 @@ abstract class FunctionDecl3<P1 : Sort, P2 : Sort, P3 : Sort, S : Sort>(
 ) : FunctionDecl<S>(name, listOf(param1, param2, param3), indices, sort, Associativity.NONE) {
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
     require(args.size == 3)
-    val bindings = bindTo(args)
+    val bindings = bindParametersToWithExpressions(args)
 
     // TODO suppress unchecked cast warning
     return buildExpression(
@@ -173,7 +212,7 @@ abstract class FunctionDecl4<P1 : Sort, P2 : Sort, P3 : Sort, P4 : Sort, S : Sor
         name, listOf(param1, param2, param3, param4), indices, sort, Associativity.NONE) {
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
     require(args.size == 4)
-    val bindings = bindTo(args)
+    val bindings = bindParametersToWithExpressions(args)
 
     // TODO suppress unchecked cast warning
     return buildExpression(
@@ -201,7 +240,7 @@ abstract class FunctionDeclLeftAssociative<P1 : Sort, P2 : Sort, S : Sort>(
     sort: S
 ) : FunctionDecl<S>(name, listOf(param1, param2), indices, sort, Associativity.LEFT_ASSOC) {
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
-    val bindings = bindTo(args)
+    val bindings = bindParametersToWithExpressions(args)
 
     return buildExpression(
         args[0] as Expression<P1>,
@@ -226,7 +265,7 @@ abstract class FunctionDeclRightAssociative<P1 : Sort, P2 : Sort, S : Sort>(
     sort: S
 ) : FunctionDecl<S>(name, listOf(param1, param2), indices, sort, Associativity.RIGHT_ASSOC) {
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
-    val bindings = bindTo(args)
+    val bindings = bindParametersToWithExpressions(args)
 
     return buildExpression(
         args[0] as Expression<P1>,
@@ -252,7 +291,7 @@ abstract class FunctionDeclChainable<P : Sort>(
     FunctionDecl<BoolSort>(
         name, listOf(param1, param2), indices, BoolSort, Associativity.CHAINABLE) {
   override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
-    val bindings = bindTo(args)
+    val bindings = bindParametersToWithExpressions(args)
 
     return buildExpression(args as List<Expression<P>>, bindings)
   }
@@ -272,7 +311,7 @@ abstract class FunctionDeclPairwise<P : Sort>(
     FunctionDecl<BoolSort>(
         name, listOf(param1, param2), indices, BoolSort, Associativity.PAIRWISE) {
   override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
-    val bindings = bindTo(args)
+    val bindings = bindParametersToWithExpressions(args)
 
     return buildExpression(args as List<Expression<P>>, bindings)
   }

@@ -32,18 +32,96 @@ internal class Context {
   }
 
   /* Function is private to not allow illegal FunctionDecl to be registered */
-  fun registerFunction(function: FunctionDecl<*>) {
-    val other = functions.find { it.name == function.name && it.params == function.params }
-    if (other != null) {
-      if (other.sort == function.sort) {
-        throw Exception(
-            "Function (${function.name} (${function.params.joinToString(" ")}) ${function.sort}) is already in context")
+  fun isFunctionLegal(function: FunctionDecl<*>) {
+    /*val unambiguous = unambiguousFunctions[function.name]
+
+    if (unambiguous != null) {
+      // there already is a function with the same name
+      if (unambiguous.accepts(function.params)) {
+        // there already is a function with the same name that accepts the same arguments
+        if(unambiguous.signature.bindReturnOrNull(function.sort) != null) {
+          //there already is a function with this signature
+          throw FunctionAlreadyDeclaredException(function)
+        } else {
+          println("New ambiguous function $function")
+          return
+        }
       } else {
-        TODO("Implement ambiguous function overloading")
+        println("New overloaded function $function")
+        return
+      }
+    }
+
+    val overloaded = overloadedFunctions[function.name]
+
+    if(overloaded != null) {
+      // there already is a family of overloaded functions with the same name
+
+      val conflicts = overloaded.filter { it.accepts(function.params) }
+
+      if(conflicts.isEmpty()) {
+        println("New overloaded function $function")
+        return
+      } else {
+        if(conflicts.any { it.signature.bindReturnOrNull(function.sort) != null }) {
+          throw FunctionAlreadyDeclaredException(function)
+        } else {
+          println("New ambiguous function $function")
+          return
+        }
+      }
+    }
+
+    val ambiguous = ambiguousFunctions[function.name]
+
+    if (ambiguous != null) {
+      // there already is a family of ambiguous functions with the same name
+
+      val conflicts = ambiguous.filter { it.accepts(function.params) }
+
+      if(conflicts.isEmpty()) {
+        println("New overloaded ambiguous function $function")
+        return
+      } else {
+        if(conflicts.any { it.signature.bindReturnOrNull(function.sort) != null }) {
+          throw FunctionAlreadyDeclaredException(function)
+        } else {
+          println("New ambiguous function $function")
+          return
+        }
+      }
+    }
+
+    println("New unambiguous function $function")*/
+
+    val conflicts = functionLookup[function.name]
+
+    if (conflicts != null) {
+      println("Conflicts found $conflicts")
+
+      val conflictParams = conflicts.filter { it.accepts(function.params) }
+
+      if (conflictParams.isNotEmpty()) {
+        println("Param conflicts with $conflictParams")
+
+        val conflictReturns =
+            conflictParams.filter { it.signature.bindReturnOrNull(function.sort) != null }
+
+        if (conflictReturns.isNotEmpty()) {
+          throw FunctionAlreadyDeclaredException(function)
+        } else {
+          println("New ambiguous $function")
+        }
+      } else {
+        println("New overloaded $function")
       }
     } else {
-      functions.add(function)
+      println("Register new function $function")
     }
+  }
+
+  fun registerFunction(function: FunctionDecl<*>) {
+    functions.add(function)
   }
 
   fun registerFunction(const: ProtoDeclareConst, sort: Sort) {
@@ -83,7 +161,7 @@ internal class Context {
    * ambiguous
    */
   fun getFunction(name: String, args: List<Expression<*>>): FunctionDecl<*>? {
-    return functions.find { (it.name == name) && (it.accepts(args)) && !it.isAmbiguous }
+    return functions.find { (it.name == name) && (it.acceptsExpressions(args)) && !it.isAmbiguous }
   }
 
   /**
@@ -91,7 +169,7 @@ internal class Context {
    * can be ambiguous
    */
   fun getFunction(name: String, args: List<Expression<*>>, sort: Sort): FunctionDecl<*>? {
-    return functions.find { (it.name == name) && (it.accepts(args)) && it.sort == sort }
+    return functions.find { (it.name == name) && (it.acceptsExpressions(args)) && it.sort == sort }
   }
 
   fun getSort(protoSort: ProtoSort): Sort {
@@ -101,9 +179,38 @@ internal class Context {
 
   private val functions: HashSet<FunctionDecl<*>> = hashSetOf()
   private val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf()
+
+  /*
+   * Lookup for all simple functions
+   * excludes indexed functions of the form e.g. ((_ extract i j) (_ BitVec m) (_ BitVec n))
+   */
+  val functionLookup: MutableMap<String, List<FunctionDecl<*>>> = mutableMapOf()
+
+  /*val unambiguousFunctions = UnambiguousLookup()
+  val overloadedFunctions: MutableMap<String, List<FunctionDecl<*>>> = mutableMapOf()
+  val ambiguousFunctions: MutableMap<String, List<FunctionDecl<*>>> = mutableMapOf()*/
 }
 
 internal interface TheoryContext {
   val functions: HashSet<FunctionDecl<*>>
   val sorts: Map<String, SortDecl<*>>
 }
+
+internal class UnambiguousLookup {
+  val functions: MutableMap<String, FunctionDecl<*>> = mutableMapOf()
+
+  operator fun get(name: String): FunctionDecl<*>? {
+    return functions[name]
+  }
+}
+
+internal class OverloadedLookup {
+  val functions: MutableMap<String, List<FunctionDecl<*>>> = mutableMapOf()
+
+  operator fun get(name: String): List<FunctionDecl<*>>? {
+    return functions[name]
+  }
+}
+
+class FunctionAlreadyDeclaredException(func: FunctionDecl<*>) :
+    RuntimeException("Function $func has already been declared")

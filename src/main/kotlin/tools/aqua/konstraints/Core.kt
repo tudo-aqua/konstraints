@@ -95,6 +95,17 @@ class Implies(val statements: List<Expression<BoolSort>>) : Expression<BoolSort>
   override fun toString(): String = symbol
 }
 
+object ImpliesDecl :
+    FunctionDeclRightAssociative<BoolSort, BoolSort, BoolSort>(
+        "=>", BoolSort, BoolSort, emptySet(), BoolSort) {
+  override fun buildExpression(
+      param1: Expression<BoolSort>,
+      param2: Expression<BoolSort>,
+      varargs: List<Expression<BoolSort>>,
+      bindings: Bindings
+  ) = Implies(listOf(param1, param2).plus(varargs))
+}
+
 /**
  * Implements and according to Core theory (and Bool Bool Bool :left-assoc)
  *

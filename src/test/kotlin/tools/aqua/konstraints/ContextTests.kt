@@ -47,6 +47,12 @@ class ContextTests {
     context.registerTheory(BitVectorExpressionContext)
     context.registerFunction("O", listOf(BoolSort, BoolSort), BoolSort)
     context.registerFunction(overloadedBV)
+
+    context.functionLookup["and"] = listOf(AndDecl)
+    context.functionLookup["or"] = listOf(OrDecl)
+    context.functionLookup["xor"] = listOf(XOrDecl)
+    context.functionLookup["not"] = listOf(NotDecl)
+    context.functionLookup["bvult"] = listOf(BVUltDecl)
   }
 
   @ParameterizedTest
@@ -95,7 +101,7 @@ class ContextTests {
     val function = context.getFunction(name, args)
 
     requireNotNull(function)
-    assert(function.accepts(args))
+    assert(function.acceptsExpressions(args))
   }
 
   private fun getFunctionNameAndArgs(): Stream<Arguments> {
@@ -119,7 +125,7 @@ class ContextTests {
       function: FunctionDecl<*>,
       args: List<Expression<*>>
   ) {
-    assertFalse(function.accepts(args))
+    assertFalse(function.acceptsExpressions(args))
   }
 
   @ParameterizedTest
@@ -142,5 +148,55 @@ class ContextTests {
         arguments(BVUltDecl, listOf(bv16Expression, bv32Expression)),
         arguments(BVUltDecl, listOf(bv32Expression, bv16Expression)),
         arguments(overloadedBV, listOf(bv16Expression, bv16Expression)))
+  }
+
+  @ParameterizedTest
+  @MethodSource("getFunctionDeclarations")
+  fun testIsFunctionLegal(func: FunctionDecl<*>) {
+    context.isFunctionLegal(func)
+  }
+
+  private fun getFunctionDeclarations(): Stream<Arguments> {
+    return Stream.of(
+        /* No conflict */
+        arguments(
+            FunctionDecl(
+                "foo", listOf(BoolSort, BoolSort), emptySet(), BoolSort, Associativity.NONE)),
+        /* New overloaded */
+        arguments(
+            FunctionDecl(
+                "and", listOf(BVSort(16), BVSort(16)), emptySet(), BoolSort, Associativity.NONE)),
+        /* Illegal */
+        arguments(
+            FunctionDecl(
+                "and",
+                listOf(BoolSort, BoolSort, BoolSort),
+                emptySet(),
+                BoolSort,
+                Associativity.NONE)),
+        /* New ambiguous */
+        arguments(
+            FunctionDecl(
+                "and",
+                listOf(BoolSort, BoolSort, BoolSort),
+                emptySet(),
+                BVSort(16),
+                Associativity.NONE)),
+        /* Illegal */
+        arguments(
+            FunctionDecl(
+                "bvult", listOf(BVSort(16), BVSort(16)), emptySet(), BoolSort, Associativity.NONE)),
+        /* New ambiguous */
+        arguments(
+            FunctionDecl(
+                "bvult",
+                listOf(BVSort(16), BVSort(16)),
+                emptySet(),
+                BVSort(16),
+                Associativity.NONE)),
+        /* ??? */
+        arguments(
+            FunctionDecl(
+                "bvult", listOf(BVSort(16), BVSort(32)), emptySet(), BoolSort, Associativity.NONE)))
   }
 }

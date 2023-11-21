@@ -57,7 +57,7 @@ object BVConcatDecl :
         SymbolicBVSort("b"),
         setOf(SymbolIndex("a"), SymbolIndex("b")),
         SymbolicBVSort("c")) {
-  override fun bindTo(args: List<Expression<*>>): Bindings {
+  override fun bindParametersToWithExpressions(args: List<Expression<*>>): Bindings {
     return signature.bindParameters(args.map { it.sort })
   }
 
