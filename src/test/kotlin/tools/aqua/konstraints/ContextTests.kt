@@ -28,6 +28,7 @@ import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.parser.Associativity
 import tools.aqua.konstraints.parser.Context
+import tools.aqua.konstraints.parser.FunctionAlreadyDeclaredException
 import tools.aqua.konstraints.parser.FunctionDecl
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -166,14 +167,6 @@ class ContextTests {
         arguments(
             FunctionDecl(
                 "and", listOf(BVSort(16), BVSort(16)), emptySet(), BoolSort, Associativity.NONE)),
-        /* Illegal */
-        arguments(
-            FunctionDecl(
-                "and",
-                listOf(BoolSort, BoolSort, BoolSort),
-                emptySet(),
-                BoolSort,
-                Associativity.NONE)),
         /* New ambiguous */
         arguments(
             FunctionDecl(
@@ -182,10 +175,6 @@ class ContextTests {
                 emptySet(),
                 BVSort(16),
                 Associativity.NONE)),
-        /* Illegal */
-        arguments(
-            FunctionDecl(
-                "bvult", listOf(BVSort(16), BVSort(16)), emptySet(), BoolSort, Associativity.NONE)),
         /* New ambiguous */
         arguments(
             FunctionDecl(
@@ -198,5 +187,27 @@ class ContextTests {
         arguments(
             FunctionDecl(
                 "bvult", listOf(BVSort(16), BVSort(32)), emptySet(), BoolSort, Associativity.NONE)))
+  }
+
+  @ParameterizedTest
+  @MethodSource("getIllegalFunctionDeclarations")
+  fun testFunctionAlreadyDeclaredException(func: FunctionDecl<*>) {
+    assertThrows<FunctionAlreadyDeclaredException> { context.isFunctionLegal(func) }
+  }
+
+  private fun getIllegalFunctionDeclarations(): Stream<Arguments> {
+    return Stream.of(
+        /* Illegal */
+        arguments(
+            FunctionDecl(
+                "and",
+                listOf(BoolSort, BoolSort, BoolSort),
+                emptySet(),
+                BoolSort,
+                Associativity.NONE)),
+        /* Illegal */
+        arguments(
+            FunctionDecl(
+                "bvult", listOf(BVSort(16), BVSort(16)), emptySet(), BoolSort, Associativity.NONE)))
   }
 }
