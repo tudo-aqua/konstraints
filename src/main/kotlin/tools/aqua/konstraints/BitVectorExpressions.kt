@@ -53,10 +53,10 @@ class BVConcat(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expre
 object BVConcatDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
         "concat",
-        SymbolicBVSort("a"),
-        SymbolicBVSort("b"),
+        BVSort.fromSymbol("a"),
+        BVSort.fromSymbol("b"),
         setOf(SymbolIndex("a"), SymbolIndex("b")),
-        SymbolicBVSort("c")) {
+        BVSort.fromSymbol("c")) {
   override fun bindParametersToWithExpressions(args: List<Expression<*>>): Bindings {
     return signature.bindParameters(args.map { it.sort })
   }
@@ -333,7 +333,11 @@ class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expressi
 // TODO implement BVSort marker interface?
 object BVUltDecl :
     FunctionDecl2<BVSort, BVSort, BoolSort>(
-        "bvult", SymbolicBVSort("a"), SymbolicBVSort("a"), setOf(SymbolIndex("a")), BoolSort) {
+        "bvult",
+        BVSort.fromSymbol("a"),
+        BVSort.fromSymbol("a"),
+        setOf(SymbolIndex("a")),
+        BoolSort) {
   override fun buildExpression(
       param1: Expression<BVSort>,
       param2: Expression<BVSort>,

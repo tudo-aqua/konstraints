@@ -120,7 +120,6 @@ class And(val conjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   override fun toString() = symbol
 }
 
-// TODO handle vararg parameters
 object AndDecl :
     FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
         "and", BoolSort, BoolSort, emptySet(), BoolSort) {
