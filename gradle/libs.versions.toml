@@ -20,7 +20,7 @@ nodejs = "20.4.0"
 prettier-toml = "0.3.1"
 
 [plugins]
-detekt = { id = "io.gitlab.arturbosch.detekt", version = "1.23.1" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version = "1.23.4" }
 gitVersioning = { id = "me.qoomon.git-versioning", version = "6.4.2" }
 kotlin-dokka = { id = "org.jetbrains.dokka", version = "1.9.10" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
