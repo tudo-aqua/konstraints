@@ -18,10 +18,28 @@
 
 package tools.aqua.konstraints
 
+import tools.aqua.konstraints.parser.*
+
 /*
  * This file implements the SMT core theory
  * http://smtlib.cs.uiowa.edu/theories-Core.shtml
  */
+
+// TODO implement casting for none homogeneous lists
+@Suppress("UNCHECKED_CAST")
+inline fun <reified T : Any> List<*>.checkedCast(): List<T> =
+    if (all { it is T }) this as List<T> else throw TypeCastException("")
+
+internal object CoreContext : TheoryContext {
+  override val functions: HashSet<FunctionDecl<*>> = hashSetOf(NotDecl, AndDecl, OrDecl, XOrDecl)
+  override val sorts = mapOf(Pair("Bool", BoolSortDecl))
+}
+
+internal object BoolSortDecl : SortDecl<BoolSort>("Bool") {
+  override fun getSort(sort: ProtoSort): BoolSort {
+    return BoolSort
+  }
+}
 
 /** Object for SMT true */
 object True : Expression<BoolSort>() {
@@ -29,10 +47,18 @@ object True : Expression<BoolSort>() {
   override val sort = BoolSort
 }
 
+object TrueDecl : FunctionDecl0<BoolSort>("true", emptySet(), BoolSort) {
+  override fun buildExpression(): Expression<BoolSort> = True
+}
+
 /** Object for SMT false */
 object False : Expression<BoolSort>() {
   override val symbol = "false"
   override val sort = BoolSort
+}
+
+object FalseDecl : FunctionDecl0<BoolSort>("false", emptySet(), BoolSort) {
+  override fun buildExpression(): Expression<BoolSort> = False
 }
 
 /**
@@ -45,6 +71,14 @@ class Not(val inner: Expression<BoolSort>) : Expression<BoolSort>() {
   override val symbol = "(not $inner)"
 
   override fun toString(): String = symbol
+}
+
+/** FunctionDecl Object for Not */
+object NotDecl : FunctionDecl1<BoolSort, BoolSort>("not", BoolSort, emptySet(), BoolSort) {
+  override fun buildExpression(
+      param: Expression<BoolSort>,
+      bindings: Bindings
+  ): Expression<BoolSort> = Not(param)
 }
 
 /**
@@ -61,6 +95,17 @@ class Implies(val statements: List<Expression<BoolSort>>) : Expression<BoolSort>
   override fun toString(): String = symbol
 }
 
+object ImpliesDecl :
+    FunctionDeclRightAssociative<BoolSort, BoolSort, BoolSort>(
+        "=>", BoolSort, BoolSort, emptySet(), BoolSort) {
+  override fun buildExpression(
+      param1: Expression<BoolSort>,
+      param2: Expression<BoolSort>,
+      varargs: List<Expression<BoolSort>>,
+      bindings: Bindings
+  ) = Implies(listOf(param1, param2).plus(varargs))
+}
+
 /**
  * Implements and according to Core theory (and Bool Bool Bool :left-assoc)
  *
@@ -73,6 +118,17 @@ class And(val conjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   override val symbol = "(and ${conjuncts.joinToString(" ")})"
 
   override fun toString() = symbol
+}
+
+object AndDecl :
+    FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
+        "and", BoolSort, BoolSort, emptySet(), BoolSort) {
+  override fun buildExpression(
+      param1: Expression<BoolSort>,
+      param2: Expression<BoolSort>,
+      varargs: List<Expression<BoolSort>>,
+      bindings: Bindings
+  ) = And(listOf(param1, param2).plus(varargs))
 }
 
 /**
@@ -89,6 +145,17 @@ class Or(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   override fun toString(): String = symbol
 }
 
+object OrDecl :
+    FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
+        "or", BoolSort, BoolSort, emptySet(), BoolSort) {
+  override fun buildExpression(
+      param1: Expression<BoolSort>,
+      param2: Expression<BoolSort>,
+      varargs: List<Expression<BoolSort>>,
+      bindings: Bindings
+  ) = Or(listOf(param1, param2).plus(varargs))
+}
+
 /**
  * Implements xor according to Core theory (xor Bool Bool Bool :left-assoc)
  *
@@ -101,6 +168,17 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   override val symbol = "(xor ${disjuncts.joinToString(" ")})"
 
   override fun toString(): String = symbol
+}
+
+object XOrDecl :
+    FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
+        "xor", BoolSort, BoolSort, emptySet(), BoolSort) {
+  override fun buildExpression(
+      param1: Expression<BoolSort>,
+      param2: Expression<BoolSort>,
+      varargs: List<Expression<BoolSort>>,
+      bindings: Bindings
+  ) = XOr(listOf(param1, param2).plus(varargs))
 }
 
 /**

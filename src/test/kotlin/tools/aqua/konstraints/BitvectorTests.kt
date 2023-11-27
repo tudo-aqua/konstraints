@@ -39,6 +39,8 @@ class BitvectorTests {
   private val B = BasicExpression<BVSort>("B", BVSort(8))
   private val C = BasicExpression<BVSort>("C", BVSort(8))
   private val D = BasicExpression<BVSort>("D", BVSort(16))
+  private val symbolicE = BasicExpression("E", BVSort.fromSymbol("a"))
+  private val symbolicF = BasicExpression("F", BVSort.fromSymbol("b"))
 
   @ParameterizedTest
   @MethodSource("getBVExpressionsAndSerialization")

@@ -78,6 +78,7 @@ dependencies {
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
   implementation(libs.z3.turnkey)
+  implementation(libs.petitparser.core)
 }
 
 node {
@@ -101,11 +102,11 @@ tasks.withType<DependencyUpdatesTask> {
 spotless {
   kotlin {
     licenseHeaderFile(project.file("config/license/Apache-2.0-cstyle"))
-    ktfmt()
+    ktfmt("0.46")
   }
   kotlinGradle {
     licenseHeaderFile(project.file("config/license/Apache-2.0-cstyle"), "(plugins|import )")
-    ktfmt()
+    ktfmt("0.46")
   }
   format("markdown") {
     target(".github/**/*.md", "*.md")

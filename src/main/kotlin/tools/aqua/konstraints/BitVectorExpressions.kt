@@ -18,6 +18,22 @@
 
 package tools.aqua.konstraints
 
+import tools.aqua.konstraints.parser.*
+
+internal object BitVectorExpressionContext : TheoryContext {
+  override val functions: HashSet<FunctionDecl<*>> = hashSetOf(BVUltDecl, BVConcatDecl)
+  override val sorts = mapOf(Pair("BitVec", BVSortDecl))
+}
+
+internal object BVSortDecl : SortDecl<BVSort>("BitVec") {
+  override fun getSort(sort: ProtoSort): BVSort {
+    require(sort.identifier is IndexedIdentifier)
+    require(sort.identifier.indices.size == 1)
+
+    return BVSort((sort.identifier.indices[0] as NumeralParseIndex).numeral)
+  }
+}
+
 /*
  * This file implements the SMT theory of fixed size bitvectors
  * http://smtlib.cs.uiowa.edu/theories-FixedSizeBitVectors.shtml
@@ -32,6 +48,26 @@ package tools.aqua.konstraints
 class BVConcat(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expression<BVSort>() {
   override val sort: BVSort = BVSort(lhs.sort.bits + rhs.sort.bits)
   override val symbol: String by lazy { "(concat $lhs $rhs)" }
+}
+
+object BVConcatDecl :
+    FunctionDecl2<BVSort, BVSort, BVSort>(
+        "concat",
+        BVSort.fromSymbol("a"),
+        BVSort.fromSymbol("b"),
+        setOf(SymbolIndex("a"), SymbolIndex("b")),
+        BVSort.fromSymbol("c")) {
+  override fun bindParametersToWithExpressions(args: List<Expression<*>>): Bindings {
+    return signature.bindParameters(args.map { it.sort })
+  }
+
+  override fun buildExpression(
+      param1: Expression<BVSort>,
+      param2: Expression<BVSort>,
+      bindings: Bindings
+  ): Expression<BVSort> {
+    return BVConcat(param1, param2)
+  }
 }
 
 /**
@@ -292,4 +328,19 @@ class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expressi
   }
 
   override fun toString(): String = symbol
+}
+
+// TODO implement BVSort marker interface?
+object BVUltDecl :
+    FunctionDecl2<BVSort, BVSort, BoolSort>(
+        "bvult",
+        BVSort.fromSymbol("a"),
+        BVSort.fromSymbol("a"),
+        setOf(SymbolIndex("a")),
+        BoolSort) {
+  override fun buildExpression(
+      param1: Expression<BVSort>,
+      param2: Expression<BVSort>,
+      bindings: Bindings
+  ): Expression<BoolSort> = BVUlt(param1, param2)
 }

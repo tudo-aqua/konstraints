@@ -16,9 +16,18 @@
  * limitations under the License.
  */
 
-plugins {
-  id("com.gradle.enterprise") version "3.15"
-  id("org.gradle.toolchains.foojay-resolver-convention") version "0.7.0"
+package tools.aqua.konstraints
+
+fun Int.idx(): NumeralIndex = NumeralIndex(this)
+
+sealed interface Index
+
+data class NumeralIndex(val numeral: Int) : Index {
+  override fun toString() = numeral.toString()
 }
 
-rootProject.name = "konstraints"
+data class SymbolIndex(val symbol: Symbol) : Index {
+  constructor(symbol: String) : this(Symbol(symbol))
+
+  override fun toString() = symbol.toString()
+}
