@@ -16,7 +16,7 @@
 [versions]
 java-jdk = "9"
 kotlin = "1.9.21"
-nodejs = "20.4.0"
+nodejs = "20.5.1"
 prettier-toml = "0.3.1"
 
 [plugins]
