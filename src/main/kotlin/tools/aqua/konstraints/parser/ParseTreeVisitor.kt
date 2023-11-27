@@ -42,18 +42,16 @@ internal object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor {
 
     context.registerFunction(protoDeclareConst, sort)
 
-    return DeclareConst(Symbol(protoDeclareConst.name.token.getValue()), sort)
+    return DeclareConst(Symbol(protoDeclareConst.name), sort)
   }
 
   override fun visit(protoDeclareFun: ProtoDeclareFun): DeclareFun {
     val sort = visit(protoDeclareFun.sort)
     val parameters = protoDeclareFun.parameters.map { visit(it) }
 
-    // TODO function overloading (- Int Int) (- Real Real)
-    // TODO ambiguous function overloading only in as and match
     context.registerFunction(protoDeclareFun, parameters, sort)
 
-    return DeclareFun(Symbol(protoDeclareFun.name.token.getValue()), parameters, sort)
+    return DeclareFun(Symbol(protoDeclareFun.name), parameters, sort)
   }
 
   override fun visit(simpleQualIdentifier: SimpleQualIdentifier): Expression<*> {

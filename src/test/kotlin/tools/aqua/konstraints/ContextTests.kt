@@ -19,9 +19,8 @@
 package tools.aqua.konstraints
 
 import java.util.stream.Stream
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
@@ -31,7 +30,17 @@ import tools.aqua.konstraints.parser.Context
 import tools.aqua.konstraints.parser.FunctionAlreadyDeclaredException
 import tools.aqua.konstraints.parser.FunctionDecl
 
+/*
+ * TestInstance per class is needed for parameterized tests
+ * It is important to note that the class will not be reinitialized for each test,
+ * so we need to make sure the test does not modify the context in an unpredictable way
+ */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+
+/*
+ * Test order will be fixed here to modify context in later tests without breaking other tests
+ */
+@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class ContextTests {
   private val context = Context()
   private val boolExpression = BasicExpression("A", BoolSort)
@@ -49,15 +58,16 @@ class ContextTests {
     context.registerFunction("O", listOf(BoolSort, BoolSort), BoolSort)
     context.registerFunction(overloadedBV)
 
-    context.functionLookup["and"] = listOf(AndDecl)
-    context.functionLookup["or"] = listOf(OrDecl)
-    context.functionLookup["xor"] = listOf(XOrDecl)
-    context.functionLookup["not"] = listOf(NotDecl)
-    context.functionLookup["bvult"] = listOf(BVUltDecl)
+    context.functionLookup["and"] = mutableListOf(AndDecl)
+    context.functionLookup["or"] = mutableListOf(OrDecl)
+    context.functionLookup["xor"] = mutableListOf(XOrDecl)
+    context.functionLookup["not"] = mutableListOf(NotDecl)
+    context.functionLookup["bvult"] = mutableListOf(BVUltDecl)
   }
 
   @ParameterizedTest
   @MethodSource("getFunctionNameAndArgs")
+  @Order(1)
   fun `Check that Context returns none null function`(
       name: String,
       args: List<Expression<*>>,
@@ -70,6 +80,7 @@ class ContextTests {
 
   @ParameterizedTest
   @MethodSource("getFunctionNameAndArgs")
+  @Order(2)
   fun `Check that Context returns function with correct name`(
       name: String,
       args: List<Expression<*>>,
@@ -82,6 +93,7 @@ class ContextTests {
 
   @ParameterizedTest
   @MethodSource("getFunctionNameAndArgs")
+  @Order(3)
   fun `Check that Context returns function with correct sort`(
       name: String,
       args: List<Expression<*>>,
@@ -94,6 +106,7 @@ class ContextTests {
 
   @ParameterizedTest
   @MethodSource("getFunctionNameAndArgs")
+  @Order(4)
   fun `Check that Function accepts parameters`(
       name: String,
       args: List<Expression<*>>,
@@ -122,6 +135,7 @@ class ContextTests {
 
   @ParameterizedTest
   @MethodSource("getFunctionNameAndIncorrectArgs")
+  @Order(5)
   fun `Check that Function rejects incorrect parameters`(
       function: FunctionDecl<*>,
       args: List<Expression<*>>
@@ -131,6 +145,7 @@ class ContextTests {
 
   @ParameterizedTest
   @MethodSource("getFunctionNameAndIncorrectArgs")
+  @Order(6)
   fun `Check that Expression generation fails for incorrect parameters`(
       function: FunctionDecl<*>,
       args: List<Expression<*>>
@@ -151,10 +166,15 @@ class ContextTests {
         arguments(overloadedBV, listOf(bv16Expression, bv16Expression)))
   }
 
+  /*
+   * This test must be executed after all of the above tests, as the function symbol "and" will become ambiguous
+   * making it illegal to use outside "match" and "as"
+   */
   @ParameterizedTest
   @MethodSource("getFunctionDeclarations")
+  @Order(7)
   fun testIsFunctionLegal(func: FunctionDecl<*>) {
-    context.isFunctionLegal(func)
+    context.registerFunction(func)
   }
 
   private fun getFunctionDeclarations(): Stream<Arguments> {
@@ -191,8 +211,9 @@ class ContextTests {
 
   @ParameterizedTest
   @MethodSource("getIllegalFunctionDeclarations")
+  @Order(8)
   fun testFunctionAlreadyDeclaredException(func: FunctionDecl<*>) {
-    assertThrows<FunctionAlreadyDeclaredException> { context.isFunctionLegal(func) }
+    assertThrows<FunctionAlreadyDeclaredException> { context.registerFunction(func) }
   }
 
   private fun getIllegalFunctionDeclarations(): Stream<Arguments> {

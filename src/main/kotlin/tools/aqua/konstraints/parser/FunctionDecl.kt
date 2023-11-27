@@ -34,8 +34,7 @@ open class FunctionDecl<S : Sort>(
     val params: List<Sort>,
     val indices: Set<SymbolIndex>,
     val sort: S,
-    val associativity: Associativity,
-    val isAmbiguous: Boolean = false
+    val associativity: Associativity
 ) {
   val signature = Signature(emptySet(), indices, params, sort)
 

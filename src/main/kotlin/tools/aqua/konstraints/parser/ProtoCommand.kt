@@ -25,13 +25,18 @@ internal sealed interface ProtoCommand
 
 internal data class ProtoAssert(val term: ProtoTerm) : ProtoCommand
 
-internal data class ProtoDeclareConst(val name: ParseSymbol, val sort: ProtoSort) : ProtoCommand
+// TODO what is symbol necessary for here
+internal data class ProtoDeclareConst(val symbol: ParseSymbol, val sort: ProtoSort) : ProtoCommand {
+  val name = symbol.token.getValue<String>()
+}
 
 internal data class ProtoDeclareFun(
-    val name: ParseSymbol,
+    val symbol: ParseSymbol,
     val parameters: List<ProtoSort>,
     val sort: ProtoSort
-) : ProtoCommand
+) : ProtoCommand {
+  val name = symbol.token.getValue<String>()
+}
 
 internal data class ParseSymbol(val token: Token)
 
