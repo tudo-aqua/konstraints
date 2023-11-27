@@ -50,7 +50,13 @@ class ContextTests {
   // this function has no indices as it is not infinitary, BVSort(32) here means actually only
   // bitvectors of length 32
   private val overloadedBV =
-      FunctionDecl("O", listOf(BVSort(32), BVSort(32)), emptySet(), BVSort(32), Associativity.NONE)
+      FunctionDecl(
+          "O",
+          emptySet(),
+          listOf(BVSort(32), BVSort(32)),
+          emptySet(),
+          BVSort(32),
+          Associativity.NONE)
 
   init {
     context.registerTheory(CoreContext)
@@ -130,7 +136,10 @@ class ContextTests {
         arguments("bvult", listOf(bv32Expression, bv32Expression), BoolSort),
         arguments("O", listOf(boolExpression, boolExpression), BoolSort),
         arguments("O", listOf(bv32Expression, bv32Expression), BVSort(32)),
-        arguments("concat", listOf(bv32Expression, bv32Expression), BVSort.fromSymbol("c")))
+        arguments("concat", listOf(bv32Expression, bv32Expression), BVSort.fromSymbol("c")),
+        arguments("=", listOf(boolExpression, boolExpression), BoolSort),
+        arguments("=", listOf(boolExpression, boolExpression, boolExpression), BoolSort),
+        arguments("=", listOf(bv32Expression, bv32Expression), BoolSort))
   }
 
   @ParameterizedTest
@@ -163,7 +172,10 @@ class ContextTests {
         arguments(BVUltDecl, listOf(bv16Expression, boolExpression)),
         arguments(BVUltDecl, listOf(bv16Expression, bv32Expression)),
         arguments(BVUltDecl, listOf(bv32Expression, bv16Expression)),
-        arguments(overloadedBV, listOf(bv16Expression, bv16Expression)))
+        arguments(overloadedBV, listOf(bv16Expression, bv16Expression)),
+        arguments(EqualsDecl, listOf(boolExpression, bv16Expression)),
+        arguments(EqualsDecl, listOf(boolExpression, boolExpression, bv16Expression)),
+        arguments(EqualsDecl, listOf(boolExpression, bv16Expression, boolExpression)))
   }
 
   /*
@@ -173,7 +185,7 @@ class ContextTests {
   @ParameterizedTest
   @MethodSource("getFunctionDeclarations")
   @Order(7)
-  fun testIsFunctionLegal(func: FunctionDecl<*>) {
+  fun `test that legal functions can be registered`(func: FunctionDecl<*>) {
     context.registerFunction(func)
   }
 
@@ -182,15 +194,26 @@ class ContextTests {
         /* No conflict */
         arguments(
             FunctionDecl(
-                "foo", listOf(BoolSort, BoolSort), emptySet(), BoolSort, Associativity.NONE)),
+                "foo",
+                emptySet(),
+                listOf(BoolSort, BoolSort),
+                emptySet(),
+                BoolSort,
+                Associativity.NONE)),
         /* New overloaded */
         arguments(
             FunctionDecl(
-                "and", listOf(BVSort(16), BVSort(16)), emptySet(), BoolSort, Associativity.NONE)),
+                "and",
+                emptySet(),
+                listOf(BVSort(16), BVSort(16)),
+                emptySet(),
+                BoolSort,
+                Associativity.NONE)),
         /* New ambiguous */
         arguments(
             FunctionDecl(
                 "and",
+                emptySet(),
                 listOf(BoolSort, BoolSort, BoolSort),
                 emptySet(),
                 BVSort(16),
@@ -199,6 +222,7 @@ class ContextTests {
         arguments(
             FunctionDecl(
                 "bvult",
+                emptySet(),
                 listOf(BVSort(16), BVSort(16)),
                 emptySet(),
                 BVSort(16),
@@ -206,13 +230,21 @@ class ContextTests {
         /* ??? */
         arguments(
             FunctionDecl(
-                "bvult", listOf(BVSort(16), BVSort(32)), emptySet(), BoolSort, Associativity.NONE)))
+                "bvult",
+                emptySet(),
+                listOf(BVSort(16), BVSort(32)),
+                emptySet(),
+                BoolSort,
+                Associativity.NONE)),
+    )
   }
 
   @ParameterizedTest
   @MethodSource("getIllegalFunctionDeclarations")
   @Order(8)
-  fun testFunctionAlreadyDeclaredException(func: FunctionDecl<*>) {
+  fun `test that redeclaration of functions throws FunctionAlreadyDeclaredException`(
+      func: FunctionDecl<*>
+  ) {
     assertThrows<FunctionAlreadyDeclaredException> { context.registerFunction(func) }
   }
 
@@ -222,6 +254,7 @@ class ContextTests {
         arguments(
             FunctionDecl(
                 "and",
+                emptySet(),
                 listOf(BoolSort, BoolSort, BoolSort),
                 emptySet(),
                 BoolSort,
@@ -229,6 +262,11 @@ class ContextTests {
         /* Illegal */
         arguments(
             FunctionDecl(
-                "bvult", listOf(BVSort(16), BVSort(16)), emptySet(), BoolSort, Associativity.NONE)))
+                "bvult",
+                emptySet(),
+                listOf(BVSort(16), BVSort(16)),
+                emptySet(),
+                BoolSort,
+                Associativity.NONE)))
   }
 }

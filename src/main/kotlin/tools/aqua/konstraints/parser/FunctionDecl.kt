@@ -28,15 +28,15 @@ enum class Associativity {
   NONE
 }
 
-// TODO implement parametric´s
 open class FunctionDecl<S : Sort>(
     val name: String,
+    val parametricSorts: Set<Sort>,
     val params: List<Sort>,
     val indices: Set<SymbolIndex>,
     val sort: S,
     val associativity: Associativity
 ) {
-  val signature = Signature(emptySet(), indices, params, sort)
+  val signature = Signature(parametricSorts, indices, params, sort)
 
   open fun buildExpression(args: List<Expression<*>>): Expression<S> {
     bindParametersToWithExpressions(args)
@@ -120,8 +120,12 @@ open class FunctionDecl<S : Sort>(
 }
 
 // TODO are indices necessary here (dont think so)
-abstract class FunctionDecl0<S : Sort>(name: String, indices: Set<SymbolIndex>, sort: S) :
-    FunctionDecl<S>(name, emptyList(), indices, sort, Associativity.NONE) {
+abstract class FunctionDecl0<S : Sort>(
+    name: String,
+    parametricSorts: Set<Sort>,
+    indices: Set<SymbolIndex>,
+    sort: S
+) : FunctionDecl<S>(name, parametricSorts, emptyList(), indices, sort, Associativity.NONE) {
 
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
     require(args.isEmpty())
@@ -136,10 +140,11 @@ abstract class FunctionDecl0<S : Sort>(name: String, indices: Set<SymbolIndex>, 
 // TODO implement for parametric sorts
 abstract class FunctionDecl1<P : Sort, S : Sort>(
     name: String,
+    parametricSorts: Set<Sort>,
     param: P,
     indices: Set<SymbolIndex>,
     sort: S
-) : FunctionDecl<S>(name, listOf(param), indices, sort, Associativity.NONE) {
+) : FunctionDecl<S>(name, parametricSorts, listOf(param), indices, sort, Associativity.NONE) {
 
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
     require(args.size == 1)
@@ -153,11 +158,14 @@ abstract class FunctionDecl1<P : Sort, S : Sort>(
 
 abstract class FunctionDecl2<P1 : Sort, P2 : Sort, S : Sort>(
     name: String,
+    parametricSorts: Set<Sort>,
     param1: P1,
     param2: P2,
     indices: Set<SymbolIndex>,
     sort: S
-) : FunctionDecl<S>(name, listOf(param1, param2), indices, sort, Associativity.NONE) {
+) :
+    FunctionDecl<S>(
+        name, parametricSorts, listOf(param1, param2), indices, sort, Associativity.NONE) {
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
     require(args.size == 2)
     val bindings = bindParametersToWithExpressions(args)
@@ -175,12 +183,15 @@ abstract class FunctionDecl2<P1 : Sort, P2 : Sort, S : Sort>(
 
 abstract class FunctionDecl3<P1 : Sort, P2 : Sort, P3 : Sort, S : Sort>(
     name: String,
+    parametricSorts: Set<Sort>,
     param1: P1,
     param2: P2,
     param3: P3,
     indices: Set<SymbolIndex>,
     sort: S
-) : FunctionDecl<S>(name, listOf(param1, param2, param3), indices, sort, Associativity.NONE) {
+) :
+    FunctionDecl<S>(
+        name, parametricSorts, listOf(param1, param2, param3), indices, sort, Associativity.NONE) {
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
     require(args.size == 3)
     val bindings = bindParametersToWithExpressions(args)
@@ -200,6 +211,7 @@ abstract class FunctionDecl3<P1 : Sort, P2 : Sort, P3 : Sort, S : Sort>(
 
 abstract class FunctionDecl4<P1 : Sort, P2 : Sort, P3 : Sort, P4 : Sort, S : Sort>(
     name: String,
+    parametricSorts: Set<Sort>,
     param1: P1,
     param2: P2,
     param3: P3,
@@ -208,7 +220,12 @@ abstract class FunctionDecl4<P1 : Sort, P2 : Sort, P3 : Sort, P4 : Sort, S : Sor
     sort: S
 ) :
     FunctionDecl<S>(
-        name, listOf(param1, param2, param3, param4), indices, sort, Associativity.NONE) {
+        name,
+        parametricSorts,
+        listOf(param1, param2, param3, param4),
+        indices,
+        sort,
+        Associativity.NONE) {
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
     require(args.size == 4)
     val bindings = bindParametersToWithExpressions(args)
@@ -233,11 +250,14 @@ abstract class FunctionDecl4<P1 : Sort, P2 : Sort, P3 : Sort, P4 : Sort, S : Sor
 
 abstract class FunctionDeclLeftAssociative<P1 : Sort, P2 : Sort, S : Sort>(
     name: String,
+    parametricSorts: Set<Sort>,
     param1: Sort,
     param2: Sort,
     indices: Set<SymbolIndex>,
     sort: S
-) : FunctionDecl<S>(name, listOf(param1, param2), indices, sort, Associativity.LEFT_ASSOC) {
+) :
+    FunctionDecl<S>(
+        name, parametricSorts, listOf(param1, param2), indices, sort, Associativity.LEFT_ASSOC) {
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
     val bindings = bindParametersToWithExpressions(args)
 
@@ -258,11 +278,14 @@ abstract class FunctionDeclLeftAssociative<P1 : Sort, P2 : Sort, S : Sort>(
 
 abstract class FunctionDeclRightAssociative<P1 : Sort, P2 : Sort, S : Sort>(
     name: String,
+    parametricSorts: Set<Sort>,
     param1: P1,
     param2: P2,
     indices: Set<SymbolIndex>,
     sort: S
-) : FunctionDecl<S>(name, listOf(param1, param2), indices, sort, Associativity.RIGHT_ASSOC) {
+) :
+    FunctionDecl<S>(
+        name, parametricSorts, listOf(param1, param2), indices, sort, Associativity.RIGHT_ASSOC) {
   override fun buildExpression(args: List<Expression<*>>): Expression<S> {
     val bindings = bindParametersToWithExpressions(args)
 
@@ -283,12 +306,13 @@ abstract class FunctionDeclRightAssociative<P1 : Sort, P2 : Sort, S : Sort>(
 
 abstract class FunctionDeclChainable<P : Sort>(
     name: String,
+    parametricSorts: Set<Sort>,
     param1: P,
     param2: P,
     indices: Set<SymbolIndex>,
 ) :
     FunctionDecl<BoolSort>(
-        name, listOf(param1, param2), indices, BoolSort, Associativity.CHAINABLE) {
+        name, parametricSorts, listOf(param1, param2), indices, BoolSort, Associativity.CHAINABLE) {
   override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
     val bindings = bindParametersToWithExpressions(args)
 
@@ -303,12 +327,13 @@ abstract class FunctionDeclChainable<P : Sort>(
 
 abstract class FunctionDeclPairwise<P : Sort>(
     name: String,
+    parametricSorts: Set<Sort>,
     param1: P,
     param2: P,
     indices: Set<SymbolIndex>,
 ) :
     FunctionDecl<BoolSort>(
-        name, listOf(param1, param2), indices, BoolSort, Associativity.PAIRWISE) {
+        name, parametricSorts, listOf(param1, param2), indices, BoolSort, Associativity.PAIRWISE) {
   override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
     val bindings = bindParametersToWithExpressions(args)
 

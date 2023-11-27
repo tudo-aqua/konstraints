@@ -31,7 +31,8 @@ inline fun <reified T : Any> List<*>.checkedCast(): List<T> =
     if (all { it is T }) this as List<T> else throw TypeCastException("")
 
 internal object CoreContext : TheoryContext {
-  override val functions: HashSet<FunctionDecl<*>> = hashSetOf(NotDecl, AndDecl, OrDecl, XOrDecl)
+  override val functions: HashSet<FunctionDecl<*>> =
+      hashSetOf(NotDecl, AndDecl, OrDecl, XOrDecl, EqualsDecl)
   override val sorts = mapOf(Pair("Bool", BoolSortDecl))
 }
 
@@ -47,7 +48,7 @@ object True : Expression<BoolSort>() {
   override val sort = BoolSort
 }
 
-object TrueDecl : FunctionDecl0<BoolSort>("true", emptySet(), BoolSort) {
+object TrueDecl : FunctionDecl0<BoolSort>("true", emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(): Expression<BoolSort> = True
 }
 
@@ -57,7 +58,7 @@ object False : Expression<BoolSort>() {
   override val sort = BoolSort
 }
 
-object FalseDecl : FunctionDecl0<BoolSort>("false", emptySet(), BoolSort) {
+object FalseDecl : FunctionDecl0<BoolSort>("false", emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(): Expression<BoolSort> = False
 }
 
@@ -74,7 +75,8 @@ class Not(val inner: Expression<BoolSort>) : Expression<BoolSort>() {
 }
 
 /** FunctionDecl Object for Not */
-object NotDecl : FunctionDecl1<BoolSort, BoolSort>("not", BoolSort, emptySet(), BoolSort) {
+object NotDecl :
+    FunctionDecl1<BoolSort, BoolSort>("not", emptySet(), BoolSort, emptySet(), BoolSort) {
   override fun buildExpression(
       param: Expression<BoolSort>,
       bindings: Bindings
@@ -97,7 +99,7 @@ class Implies(val statements: List<Expression<BoolSort>>) : Expression<BoolSort>
 
 object ImpliesDecl :
     FunctionDeclRightAssociative<BoolSort, BoolSort, BoolSort>(
-        "=>", BoolSort, BoolSort, emptySet(), BoolSort) {
+        "=>", emptySet(), BoolSort, BoolSort, emptySet(), BoolSort) {
   override fun buildExpression(
       param1: Expression<BoolSort>,
       param2: Expression<BoolSort>,
@@ -122,7 +124,7 @@ class And(val conjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
 
 object AndDecl :
     FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
-        "and", BoolSort, BoolSort, emptySet(), BoolSort) {
+        "and", emptySet(), BoolSort, BoolSort, emptySet(), BoolSort) {
   override fun buildExpression(
       param1: Expression<BoolSort>,
       param2: Expression<BoolSort>,
@@ -147,7 +149,7 @@ class Or(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
 
 object OrDecl :
     FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
-        "or", BoolSort, BoolSort, emptySet(), BoolSort) {
+        "or", emptySet(), BoolSort, BoolSort, emptySet(), BoolSort) {
   override fun buildExpression(
       param1: Expression<BoolSort>,
       param2: Expression<BoolSort>,
@@ -172,7 +174,7 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
 
 object XOrDecl :
     FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
-        "xor", BoolSort, BoolSort, emptySet(), BoolSort) {
+        "xor", emptySet(), BoolSort, BoolSort, emptySet(), BoolSort) {
   override fun buildExpression(
       param1: Expression<BoolSort>,
       param2: Expression<BoolSort>,
@@ -186,8 +188,8 @@ object XOrDecl :
  *
  * @param statements multiple [Expression] of [BoolSort] to be checked in equals statement
  */
-class Equals(val statements: List<Expression<BoolSort>>) : Expression<BoolSort>() {
-  constructor(vararg statements: Expression<BoolSort>) : this(statements.toList())
+class Equals(val statements: List<Expression<*>>) : Expression<BoolSort>() {
+  constructor(vararg statements: Expression<*>) : this(statements.toList())
 
   override val sort: BoolSort = BoolSort
 
@@ -195,6 +197,22 @@ class Equals(val statements: List<Expression<BoolSort>>) : Expression<BoolSort>(
   override val symbol = "(= ${statements.joinToString(" ")})"
 
   override fun toString(): String = symbol
+}
+
+object EqualsDecl :
+    FunctionDeclChainable<Sort>(
+        "=", setOf(PlaceholderSort("A")), PlaceholderSort("A"), PlaceholderSort("A"), emptySet()) {
+
+  override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
+    val bindings = signature.bindParameters(args.map { it.sort })
+
+    return buildExpression(args as List<Expression<Sort>>, bindings)
+  }
+
+  override fun buildExpression(
+      varargs: List<Expression<Sort>>,
+      bindings: Bindings
+  ): Expression<BoolSort> = Equals(varargs)
 }
 
 /**

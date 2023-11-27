@@ -58,6 +58,8 @@ open class Sort(
       }
 }
 
+internal class PlaceholderSort(name: String) : Sort(name, emptyList(), emptyList())
+
 object BoolSort : Sort("Bool")
 
 class BVSort private constructor(index: Index) : Sort("BitVec", listOf(index)) {

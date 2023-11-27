@@ -53,6 +53,7 @@ class BVConcat(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expre
 object BVConcatDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
         "concat",
+        emptySet(),
         BVSort.fromSymbol("a"),
         BVSort.fromSymbol("b"),
         setOf(SymbolIndex("a"), SymbolIndex("b")),
@@ -334,6 +335,7 @@ class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expressi
 object BVUltDecl :
     FunctionDecl2<BVSort, BVSort, BoolSort>(
         "bvult",
+        emptySet(),
         BVSort.fromSymbol("a"),
         BVSort.fromSymbol("a"),
         setOf(SymbolIndex("a")),
