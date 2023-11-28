@@ -38,25 +38,24 @@ internal interface CommandVisitor {
 
 internal interface SpecConstantVisitor {
   // Visit functions for all SpecConstant implementations
-  fun visit(specConstant: SpecConstant) {
-    when (specConstant) {
-      is StringConstant -> visit(specConstant)
-      is NumeralConstant -> visit(specConstant)
-      is BinaryConstant -> visit(specConstant)
-      is HexConstant -> visit(specConstant)
-      is DecimalConstant -> visit(specConstant)
-    }
-  }
+  fun visit(specConstant: SpecConstant): Expression<*> =
+      when (specConstant) {
+        is StringConstant -> visit(specConstant)
+        is NumeralConstant -> visit(specConstant)
+        is BinaryConstant -> visit(specConstant)
+        is HexConstant -> visit(specConstant)
+        is DecimalConstant -> visit(specConstant)
+      }
 
-  fun visit(stringConstant: StringConstant)
+  fun visit(stringConstant: StringConstant): Expression<*>
 
-  fun visit(numeralConstant: NumeralConstant)
+  fun visit(numeralConstant: NumeralConstant): Expression<*>
 
-  fun visit(binaryConstant: BinaryConstant)
+  fun visit(binaryConstant: BinaryConstant): Expression<*>
 
-  fun visit(hexConstant: HexConstant)
+  fun visit(hexConstant: HexConstant): Expression<*>
 
-  fun visit(decimalConstant: DecimalConstant)
+  fun visit(decimalConstant: DecimalConstant): Expression<*>
 }
 
 internal interface SortVisitor {

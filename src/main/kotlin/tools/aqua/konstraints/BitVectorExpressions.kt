@@ -21,7 +21,20 @@ package tools.aqua.konstraints
 import tools.aqua.konstraints.parser.*
 
 internal object BitVectorExpressionContext : TheoryContext {
-  override val functions: HashSet<FunctionDecl<*>> = hashSetOf(BVUltDecl, BVConcatDecl)
+  override val functions: HashSet<FunctionDecl<*>> =
+      hashSetOf(
+          BVUltDecl,
+          BVConcatDecl,
+          BVAndDecl,
+          BVNegDecl,
+          BVNotDecl,
+          BVOrDecl,
+          BVAddDecl,
+          BVMulDecl,
+          BVUDivDecl,
+          BVURemDecl,
+          BVShlDecl,
+          BVLShrDecl)
   override val sorts = mapOf(Pair("BitVec", BVSortDecl))
 }
 
@@ -58,10 +71,6 @@ object BVConcatDecl :
         BVSort.fromSymbol("b"),
         setOf(SymbolIndex("a"), SymbolIndex("b")),
         BVSort.fromSymbol("c")) {
-  override fun bindParametersToWithExpressions(args: List<Expression<*>>): Bindings {
-    return signature.bindParameters(args.map { it.sort })
-  }
-
   override fun buildExpression(
       param1: Expression<BVSort>,
       param2: Expression<BVSort>,
@@ -105,6 +114,17 @@ class BVNot(val inner: Expression<BVSort>) : Expression<BVSort>() {
   override fun toString(): String = symbol
 }
 
+object BVNotDecl :
+    FunctionDecl1<BVSort, BVSort>(
+        "bvnot",
+        emptySet(),
+        BVSort.fromSymbol("A"),
+        setOf(SymbolIndex("A")),
+        BVSort.fromSymbol("A")) {
+  override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
+      BVNot(param)
+}
+
 /**
  * Negation operation on bitvectors
  *
@@ -115,6 +135,17 @@ class BVNeg(val inner: Expression<BVSort>) : Expression<BVSort>() {
   override val symbol: String by lazy { "(bvneg $inner)" }
 
   override fun toString(): String = symbol
+}
+
+object BVNegDecl :
+    FunctionDecl1<BVSort, BVSort>(
+        "bvneg",
+        emptySet(),
+        BVSort.fromSymbol("A"),
+        setOf(SymbolIndex("A")),
+        BVSort.fromSymbol("A")) {
+  override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
+      BVNeg(param)
 }
 
 /**
@@ -142,6 +173,22 @@ class BVAnd(val conjuncts: List<Expression<BVSort>>) : Expression<BVSort>() {
   }
 
   override fun toString(): String = symbol
+}
+
+object BVAndDecl :
+    FunctionDeclLeftAssociative<BVSort, BVSort, BVSort>(
+        "bvand",
+        emptySet(),
+        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("A"),
+        setOf(SymbolIndex("A")),
+        BVSort.fromSymbol("A")) {
+  override fun buildExpression(
+      param1: Expression<BVSort>,
+      param2: Expression<BVSort>,
+      varargs: List<Expression<BVSort>>,
+      bindings: Bindings
+  ): Expression<BVSort> = BVAnd(listOf(param1, param2))
 }
 
 /**
@@ -172,6 +219,22 @@ class BVOr(val disjuncts: List<Expression<BVSort>>) : Expression<BVSort>() {
   override fun toString(): String = symbol
 }
 
+object BVOrDecl :
+    FunctionDeclLeftAssociative<BVSort, BVSort, BVSort>(
+        "bvor",
+        emptySet(),
+        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("A"),
+        setOf(SymbolIndex("A")),
+        BVSort.fromSymbol("A")) {
+  override fun buildExpression(
+      param1: Expression<BVSort>,
+      param2: Expression<BVSort>,
+      varargs: List<Expression<BVSort>>,
+      bindings: Bindings
+  ): Expression<BVSort> = BVOr(listOf(param1, param2))
+}
+
 /**
  * Addition operation on bitvectors
  *
@@ -197,6 +260,22 @@ class BVAdd(val summands: List<Expression<BVSort>>) : Expression<BVSort>() {
   }
 
   override fun toString(): String = symbol
+}
+
+object BVAddDecl :
+    FunctionDeclLeftAssociative<BVSort, BVSort, BVSort>(
+        "bvadd",
+        emptySet(),
+        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("A"),
+        setOf(SymbolIndex("A")),
+        BVSort.fromSymbol("A")) {
+  override fun buildExpression(
+      param1: Expression<BVSort>,
+      param2: Expression<BVSort>,
+      varargs: List<Expression<BVSort>>,
+      bindings: Bindings
+  ): Expression<BVSort> = BVAdd(listOf(param1, param2))
 }
 
 /**
@@ -226,6 +305,22 @@ class BVMul(val factors: List<Expression<BVSort>>) : Expression<BVSort>() {
   override fun toString(): String = symbol
 }
 
+object BVMulDecl :
+    FunctionDeclLeftAssociative<BVSort, BVSort, BVSort>(
+        "bvmul",
+        emptySet(),
+        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("A"),
+        setOf(SymbolIndex("A")),
+        BVSort.fromSymbol("A")) {
+  override fun buildExpression(
+      param1: Expression<BVSort>,
+      param2: Expression<BVSort>,
+      varargs: List<Expression<BVSort>>,
+      bindings: Bindings
+  ): Expression<BVSort> = BVMul(listOf(param1, param2))
+}
+
 /**
  * Unsigned division operation on bitvectors
  *
@@ -249,6 +344,21 @@ class BVUDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
   override fun toString(): String = symbol
 }
 
+object BVUDivDecl :
+    FunctionDecl2<BVSort, BVSort, BVSort>(
+        "bvudiv",
+        emptySet(),
+        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("A"),
+        setOf(SymbolIndex("A")),
+        BVSort.fromSymbol("A")) {
+  override fun buildExpression(
+      param1: Expression<BVSort>,
+      param2: Expression<BVSort>,
+      bindings: Bindings
+  ) = BVUDiv(param1, param2)
+}
+
 /**
  * Unsigned remainder operation on bitvectors
  *
@@ -266,6 +376,21 @@ class BVURem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
   }
 
   override fun toString(): String = symbol
+}
+
+object BVURemDecl :
+    FunctionDecl2<BVSort, BVSort, BVSort>(
+        "bvurem",
+        emptySet(),
+        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("A"),
+        setOf(SymbolIndex("A")),
+        BVSort.fromSymbol("A")) {
+  override fun buildExpression(
+      param1: Expression<BVSort>,
+      param2: Expression<BVSort>,
+      bindings: Bindings
+  ) = BVURem(param1, param2)
 }
 
 /**
@@ -289,6 +414,21 @@ class BVShl(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
   override fun toString(): String = symbol
 }
 
+object BVShlDecl :
+    FunctionDecl2<BVSort, BVSort, BVSort>(
+        "bvshl",
+        emptySet(),
+        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("A"),
+        setOf(SymbolIndex("A")),
+        BVSort.fromSymbol("A")) {
+  override fun buildExpression(
+      param1: Expression<BVSort>,
+      param2: Expression<BVSort>,
+      bindings: Bindings
+  ) = BVShl(param1, param2)
+}
+
 /**
  * Logical right shift operation on bitvectors
  *
@@ -308,6 +448,21 @@ class BVLShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
   }
 
   override fun toString(): String = symbol
+}
+
+object BVLShrDecl :
+    FunctionDecl2<BVSort, BVSort, BVSort>(
+        "bvlshr",
+        emptySet(),
+        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("A"),
+        setOf(SymbolIndex("A")),
+        BVSort.fromSymbol("A")) {
+  override fun buildExpression(
+      param1: Expression<BVSort>,
+      param2: Expression<BVSort>,
+      bindings: Bindings
+  ) = BVLShr(param1, param2)
 }
 
 /**
@@ -331,7 +486,6 @@ class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expressi
   override fun toString(): String = symbol
 }
 
-// TODO implement BVSort marker interface?
 object BVUltDecl :
     FunctionDecl2<BVSort, BVSort, BoolSort>(
         "bvult",

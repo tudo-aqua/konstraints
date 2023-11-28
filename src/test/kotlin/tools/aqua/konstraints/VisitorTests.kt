@@ -38,11 +38,11 @@ class VisitorTests {
               "(declare-fun E () (_ BitVec 16))",
               "(assert (and (or (not A) (not B)) (xor A B (not C)) (and B (or A C))))",
               "(declare-fun F (Bool (_ BitVec 32)) (_ BitVec 16))",
-              "(declare-fun s () (_ BitVec 32))",
-              "(declare-fun t () (_ BitVec 32))",
-              "(assert (bvult s t))",
-              "(assert (not (bvult s t)))",
-              "(assert (and (bvult s t) (bvult t s)))"])
+              "(declare-fun a () (_ BitVec 32))",
+              "(declare-fun b () (_ BitVec 32))",
+              "(assert (bvult a b))",
+              "(assert (not (bvult a b)))",
+              "(assert (and (bvult a b) (bvult b a)))"])
   fun testCommandVisiting(statement: String) {
     val result = Parser.command.parse(statement)
 

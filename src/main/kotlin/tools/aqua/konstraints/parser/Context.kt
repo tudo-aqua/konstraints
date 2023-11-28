@@ -41,31 +41,21 @@ internal class Context {
     val conflicts = functionLookup[function.name]
 
     if (conflicts != null) {
-      println("Conflicts found $conflicts")
-
       val conflictParams = conflicts.filter { it.accepts(function.params) }
 
       if (conflictParams.isNotEmpty()) {
-        println("Param conflicts with $conflictParams")
-
         val conflictReturns =
             conflictParams.filter { it.signature.bindReturnOrNull(function.sort) != null }
 
         if (conflictReturns.isNotEmpty()) {
           throw FunctionAlreadyDeclaredException(function)
         } else {
-          println("New ambiguous $function")
-
           conflicts.add(function)
         }
       } else {
-        println("New overloaded $function")
-
         conflicts.add(function)
       }
     } else {
-      println("Register new function $function")
-
       functionLookup[function.name] = mutableListOf(function)
     }
   }

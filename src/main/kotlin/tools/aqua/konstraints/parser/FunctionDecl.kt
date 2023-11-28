@@ -48,21 +48,21 @@ open class FunctionDecl<S : Sort>(
       when (associativity) {
         Associativity.LEFT_ASSOC -> {
           args.slice(2 ..< args.size).forEach { require(args[0].sort == it.sort) }
-          signature.bindTo(args.slice(0..1).map { it.sort }, sort)
+          signature.bindParameters(args.slice(0..1).map { it.sort })
         }
         Associativity.RIGHT_ASSOC -> {
           args.slice(2 ..< args.size).forEach { require(args[1].sort == it.sort) }
-          signature.bindTo(args.slice(0..1).map { it.sort }, sort)
+          signature.bindParameters(args.slice(0..1).map { it.sort })
         }
         Associativity.PAIRWISE -> {
           args.forEach { require(args[0].sort == it.sort) }
-          signature.bindTo(args.slice(0..1).map { it.sort }, sort)
+          signature.bindParameters(args.slice(0..1).map { it.sort })
         }
         Associativity.CHAINABLE -> {
           args.forEach { require(args[0].sort == it.sort) }
-          signature.bindTo(args.slice(0..1).map { it.sort }, sort)
+          signature.bindParameters(args.slice(0..1).map { it.sort })
         }
-        Associativity.NONE -> signature.bindTo(args.map { it.sort }, sort)
+        Associativity.NONE -> signature.bindParameters(args.map { it.sort })
       }
 
   /** Returns true if the function accepts the arguments provided */
@@ -137,7 +137,6 @@ abstract class FunctionDecl0<S : Sort>(
 }
 
 // TODO refactor sort into more meaningful name i.e. return
-// TODO implement for parametric sorts
 abstract class FunctionDecl1<P : Sort, S : Sort>(
     name: String,
     parametricSorts: Set<Sort>,

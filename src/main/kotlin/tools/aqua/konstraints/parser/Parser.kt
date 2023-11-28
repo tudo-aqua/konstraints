@@ -386,8 +386,23 @@ object Parser {
         // results[4] is guaranteed to be a List of ProtoSort
       }
 
-  val command = assertCMD + checkSatCMD + declareConstCMD + declareFunCMD
-  val script = command.star()
+  private val exitCMD = (lparen * exitKW * rparen).map { results: ArrayList<Any> -> "(exit)" }
+  private val setInfoCMD =
+      (lparen *
+              setInfoKW *
+              (letterCat + digitCat + whitespaceCat + anyOf(":+|,._-/\"")).star() *
+              rparen)
+          .map { results: ArrayList<Any> -> "(set-info)" }
+  private val setLogicCMD =
+      (lparen *
+              setLogicKW *
+              (letterCat + digitCat + whitespaceCat + anyOf(":+|,._-/\"")).star() *
+              rparen)
+          .map { results: ArrayList<Any> -> "(set-logic)" }
+
+  val command =
+      assertCMD + checkSatCMD + declareConstCMD + declareFunCMD + exitCMD + setInfoCMD + setLogicCMD
+  val script = command.star().end()
 
   // TODO missing commands
 

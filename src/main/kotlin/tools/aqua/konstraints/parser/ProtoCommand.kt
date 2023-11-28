@@ -46,6 +46,7 @@ internal data class StringConstant(val string: String) : SpecConstant
 
 internal data class NumeralConstant(val numeral: Int) : SpecConstant
 
+// TODO implement function for accessing number of digits
 internal data class BinaryConstant(val binary: String) : SpecConstant
 
 internal data class HexConstant(val hexadecimal: String) : SpecConstant

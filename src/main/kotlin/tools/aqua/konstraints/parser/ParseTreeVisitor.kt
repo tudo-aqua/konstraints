@@ -20,9 +20,9 @@ package tools.aqua.konstraints.parser
 
 import tools.aqua.konstraints.*
 
-internal object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor {
+internal object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor, SpecConstantVisitor {
 
-  private val context = Context()
+  internal var context = Context()
 
   init {
     context.registerTheory(CoreContext)
@@ -71,7 +71,7 @@ internal object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor {
   }
 
   override fun visit(specConstantTerm: SpecConstantTerm): Expression<*> {
-    TODO("Implement visit SpecConstantTerm")
+    return visit(specConstantTerm.specConstant)
   }
 
   override fun visit(bracketedProtoTerm: BracketedProtoTerm): Expression<*> {
@@ -111,5 +111,26 @@ internal object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor {
 
   override fun visit(protoSort: ProtoSort): Sort {
     return context.getSort(protoSort)
+  }
+
+  override fun visit(stringConstant: StringConstant): Expression<*> {
+    TODO("Not yet implemented")
+  }
+
+  override fun visit(numeralConstant: NumeralConstant): Expression<*> {
+    TODO("Not yet implemented")
+  }
+
+  override fun visit(binaryConstant: BinaryConstant): Expression<*> {
+    return BasicExpression(binaryConstant.binary, BVSort(binaryConstant.binary.length - 2))
+  }
+
+  override fun visit(hexConstant: HexConstant): Expression<*> {
+    return BasicExpression(
+        hexConstant.hexadecimal, BVSort((hexConstant.hexadecimal.length - 2) * 4))
+  }
+
+  override fun visit(decimalConstant: DecimalConstant): Expression<*> {
+    TODO("Not yet implemented")
   }
 }
