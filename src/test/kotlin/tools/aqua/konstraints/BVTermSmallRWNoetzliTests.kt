@@ -30,6 +30,7 @@ import tools.aqua.konstraints.parser.Context
 import tools.aqua.konstraints.parser.ParseTreeVisitor
 import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.parser.ProtoCommand
+import kotlin.streams.toList
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BVTermSmallRWNoetzliTests {
@@ -46,8 +47,9 @@ class BVTermSmallRWNoetzliTests {
     ParseTreeVisitor.context.registerTheory(BitVectorExpressionContext)
 
     val temp =
-        File("src/main/resources/QF_BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_$id.smt2")
-            .readLines()
+      javaClass.getResourceAsStream("/QF_BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_$id.smt2")!!
+        .bufferedReader()
+        .readLines()
     val program = temp.map { it.trim('\r', '\n') }
     println(program.joinToString("\n"))
     println("\n==========================")
