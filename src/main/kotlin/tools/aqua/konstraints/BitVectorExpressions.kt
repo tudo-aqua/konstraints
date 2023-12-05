@@ -52,6 +52,27 @@ internal object BVSortDecl : SortDecl<BVSort>("BitVec") {
  * http://smtlib.cs.uiowa.edu/theories-FixedSizeBitVectors.shtml
  */
 
+data class BVLiteral(override val symbol: String) : Expression<BVSort>() {
+  val bits: Int
+  val isBinary: Boolean
+
+  init {
+    if (symbol[1] == 'b') {
+      bits = symbol.length - 2
+      isBinary = true
+    } else if (symbol[1] == 'x') {
+      bits = (symbol.length - 2) * 4
+      isBinary = false
+    } else {
+      throw IllegalArgumentException("$symbol is not a valid bitvector literal.")
+    }
+  }
+
+  override val sort = BVSort(bits)
+
+  override fun toString() = symbol
+}
+
 /**
  * Concatenation of two [Expression]s of [BVSort]
  *

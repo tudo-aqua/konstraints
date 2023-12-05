@@ -20,22 +20,49 @@ package tools.aqua.konstraints
 
 import tools.aqua.konstraints.parser.Parser
 
+/**
+ * Quoting rules for SMT String
+ *
+ * @property NONE no modification will be done
+ * @property SMART automatically determines whether the string needs quoting or not
+ * @property FORCED quotes the string if it is not already quoted
+ */
 enum class QuotingRule {
+  /** No modification will be done */
   NONE,
+
+  /** Automatically determines whether the string needs quoting or not */
   SMART,
+
+  /** Quotes the string if it is not already quoted */
   FORCED
 }
 
+/**
+ * Representation of an SMT Symbol
+ *
+ * @param symbol String containing the SMT Symbol
+ * @param rule [QuotingRule] applied to the Symbol
+ * @throws IllegalSymbolException if [symbol] is not a valid SMT Symbol
+ */
 class Symbol(symbol: String, rule: QuotingRule) {
+  /** If true the Symbol was explicitly quoted when constructed */
   val isQuoted: Boolean
+
+  /** If true the Symbol is only a valid SMT Symbol if it is quoted */
   val mustQuote: Boolean
 
   /**
-   * internal representation of the symbol without quotes, quoting will be reconstructed by
+   * Internal representation of the symbol without quotes, quoting will be reconstructed by
    * [toSMTString] before giving the symbol to a solver
    */
   val value: String
 
+  /**
+   * Construct a Symbol from String with [QuotingRule.NONE]
+   *
+   * @throws IllegalSymbolException if [symbol] is not a valid SMT Symbol
+   */
   constructor(symbol: String) : this(symbol, QuotingRule.NONE)
 
   init {
@@ -94,8 +121,10 @@ class Symbol(symbol: String, rule: QuotingRule) {
     return value == other.value
   }
 
+  /** Returns the internal representation of the symbol without any quotes */
   override fun toString() = value
 
+  /** Returns a valid SMT String with reconstructed quoting */
   fun toSMTString() = if (mustQuote) "|$value|" else value
 }
 

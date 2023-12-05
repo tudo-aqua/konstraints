@@ -33,7 +33,6 @@ open class Sort(
 
   fun isIndexed(): Boolean = indices.isNotEmpty()
 
-  // TODO equality, hashCode, toString, toSMTString
   override fun equals(other: Any?): Boolean =
       when {
         this === other -> true
@@ -56,9 +55,11 @@ open class Sort(
       } else {
         name.toString()
       }
+
+  fun toSMTString() = name.toSMTString()
 }
 
-internal class PlaceholderSort(name: String) : Sort(name, emptyList(), emptyList())
+internal class SortParameter(name: String) : Sort(name, emptyList(), emptyList())
 
 object BoolSort : Sort("Bool")
 

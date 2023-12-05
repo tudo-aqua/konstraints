@@ -20,9 +20,9 @@ package tools.aqua.konstraints.parser
 
 import tools.aqua.konstraints.*
 
-internal object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor, SpecConstantVisitor {
+internal class ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor, SpecConstantVisitor {
 
-  internal var context = Context()
+  val context = Context()
 
   init {
     context.registerTheory(CoreContext)
@@ -60,8 +60,7 @@ internal object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor, Spe
     if (op != null) {
       return op.buildExpression(listOf())
     } else {
-      throw IllegalStateException(
-          "Unknown fun ${simpleQualIdentifier.identifier.symbol.token.getValue<String>()}")
+      throw IllegalStateException("Unknown fun ${simpleQualIdentifier.identifier.symbol.symbol}")
       // TODO UnknownFunctionException
     }
   }
@@ -77,15 +76,14 @@ internal object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor, Spe
   override fun visit(bracketedProtoTerm: BracketedProtoTerm): Expression<*> {
     val terms = bracketedProtoTerm.terms.map { visit(it) }
 
-    val op =
-        context.getFunction(
-            bracketedProtoTerm.qualIdentifier.identifier.symbol.token.getValue<String>(), terms)
+    val op = context.getFunction(bracketedProtoTerm.qualIdentifier.identifier.symbol.symbol, terms)
 
     if (op != null) {
       return op.buildExpression(terms)
     } else {
       throw IllegalStateException(
-          "Unknown fun ${bracketedProtoTerm.qualIdentifier.identifier.symbol.token.getValue<String>()}") // TODO UnknownFunctionException
+          "Unknown fun ${bracketedProtoTerm.qualIdentifier.identifier.symbol.symbol}") // TODO
+      // UnknownFunctionException
     }
   }
 
@@ -122,12 +120,11 @@ internal object ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor, Spe
   }
 
   override fun visit(binaryConstant: BinaryConstant): Expression<*> {
-    return BasicExpression(binaryConstant.binary, BVSort(binaryConstant.binary.length - 2))
+    return BVLiteral(binaryConstant.binary)
   }
 
   override fun visit(hexConstant: HexConstant): Expression<*> {
-    return BasicExpression(
-        hexConstant.hexadecimal, BVSort((hexConstant.hexadecimal.length - 2) * 4))
+    return BVLiteral(hexConstant.hexadecimal)
   }
 
   override fun visit(decimalConstant: DecimalConstant): Expression<*> {

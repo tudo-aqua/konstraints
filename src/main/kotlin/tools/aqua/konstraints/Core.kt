@@ -25,11 +25,6 @@ import tools.aqua.konstraints.parser.*
  * http://smtlib.cs.uiowa.edu/theories-Core.shtml
  */
 
-// TODO implement casting for none homogeneous lists
-@Suppress("UNCHECKED_CAST")
-inline fun <reified T : Any> List<*>.checkedCast(): List<T> =
-    if (all { it is T }) this as List<T> else throw TypeCastException("")
-
 internal object CoreContext : TheoryContext {
   override val functions: HashSet<FunctionDecl<*>> =
       hashSetOf(NotDecl, AndDecl, OrDecl, XOrDecl, EqualsDecl)
@@ -201,7 +196,7 @@ class Equals(val statements: List<Expression<*>>) : Expression<BoolSort>() {
 
 object EqualsDecl :
     FunctionDeclChainable<Sort>(
-        "=", setOf(PlaceholderSort("A")), PlaceholderSort("A"), PlaceholderSort("A"), emptySet()) {
+        "=", setOf(SortParameter("A")), SortParameter("A"), SortParameter("A"), emptySet()) {
 
   override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
     val bindings = signature.bindParameters(args.map { it.sort })

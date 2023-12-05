@@ -35,10 +35,12 @@ internal data class ProtoDeclareFun(
     val parameters: List<ProtoSort>,
     val sort: ProtoSort
 ) : ProtoCommand {
-  val name = symbol.token.getValue<String>()
+  val name = symbol.symbol
 }
 
-internal data class ParseSymbol(val token: Token)
+internal data class ParseSymbol(val token: Token) {
+  val symbol: String = token.getValue()
+}
 
 internal sealed interface SpecConstant
 
@@ -46,10 +48,19 @@ internal data class StringConstant(val string: String) : SpecConstant
 
 internal data class NumeralConstant(val numeral: Int) : SpecConstant
 
-// TODO implement function for accessing number of digits
-internal data class BinaryConstant(val binary: String) : SpecConstant
+/* BinaryConstant of the form #b followed by a non-empty sequence of 0 and 1 characters */
+internal data class BinaryConstant(val binary: String) : SpecConstant {
+  /* Number of bits for this binary */
+  val bits = binary.length - 2
+}
 
-internal data class HexConstant(val hexadecimal: String) : SpecConstant
+/* Hexadecimal constant of the form
+ * #x followed by a non-empty sequence of digits and letters from A to F , capitalized or not
+ */
+internal data class HexConstant(val hexadecimal: String) : SpecConstant {
+  /* Number of bits for this hexadecimal */
+  val bits = (hexadecimal.length - 2) * 4
+}
 
 internal data class DecimalConstant(val decimal: BigDecimal) : SpecConstant
 

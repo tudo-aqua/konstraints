@@ -28,9 +28,9 @@ abstract class Expression<T : Sort> {
    * Safely cast this expression to an Expression of Sort S, if this.sort is S Avoids unchecked cast
    * warnings when casting Expression<*> after binding
    */
-  inline fun <reified S : Sort> cast(): Expression<S> {
-    if (sort::class == S::class) {
-      throw ExpressionCastException(sort, S::class.toString())
+  infix fun <S : Sort> castTo(to: S): Expression<S> {
+    if (sort == to) {
+      throw ExpressionCastException(sort, to.toString())
     }
 
     @Suppress("UNCHECKED_CAST") return this as Expression<S>

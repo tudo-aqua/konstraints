@@ -19,6 +19,7 @@
 package tools.aqua.konstraints
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.petitparser.context.ParseError
@@ -26,7 +27,13 @@ import tools.aqua.konstraints.parser.ParseTreeVisitor
 import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.parser.ProtoCommand
 
+/*
+ * Make Lifecycle per class because context needs to be the same for each test input
+ */
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VisitorTests {
+  private val parseTreeVisitor = ParseTreeVisitor()
+
   @ParameterizedTest
   @ValueSource(
       strings =
@@ -47,7 +54,7 @@ class VisitorTests {
     val result = Parser.command.parse(statement)
 
     if (result.isSuccess) {
-      val command = ParseTreeVisitor.visit(result.get<ProtoCommand>())
+      val command = parseTreeVisitor.visit(result.get<ProtoCommand>())
       println(command)
       assertEquals(statement, command.toString())
     } else {
