@@ -20,6 +20,7 @@ package tools.aqua.konstraints
 
 import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -28,12 +29,13 @@ import tools.aqua.konstraints.parser.ParseTreeVisitor
 import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.parser.ProtoCommand
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BVTermSmallRWNoetzliTests {
-  private val parseTreeVisitor = ParseTreeVisitor()
-
   @ParameterizedTest
   @MethodSource("getInts")
   fun testQF_BV(id: Int) {
+    val parseTreeVisitor = ParseTreeVisitor()
+
     val temp =
         javaClass
             .getResourceAsStream(
@@ -62,10 +64,7 @@ class BVTermSmallRWNoetzliTests {
     }
   }
 
-  companion object {
-    @JvmStatic
-    private fun getInts(): Stream<Arguments> {
-      return IntArray(1575) { it }.map { Arguments.arguments(it + 1) }.stream()
-    }
+  private fun getInts(): Stream<Arguments> {
+    return IntArray(1575) { it }.map { Arguments.arguments(it + 1) }.stream()
   }
 }
