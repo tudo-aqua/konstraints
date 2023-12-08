@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints
+package tools.aqua.konstraints.visitors
 
 import com.microsoft.z3.BoolSort
 import com.microsoft.z3.Context as ctx
 import com.microsoft.z3.Expr
+import tools.aqua.konstraints.*
 
 class Z3Visitor : CoreVisitor<Expr<*>> {
   val context = ctx()

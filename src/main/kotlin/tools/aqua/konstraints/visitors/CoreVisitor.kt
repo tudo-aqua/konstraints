@@ -16,7 +16,9 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints
+package tools.aqua.konstraints.visitors
+
+import tools.aqua.konstraints.*
 
 interface CoreVisitor<T> {
   fun visit(expression: Expression<*>): T =
