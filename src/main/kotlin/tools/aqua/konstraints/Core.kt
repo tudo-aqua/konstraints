@@ -27,7 +27,8 @@ import tools.aqua.konstraints.parser.*
 
 internal object CoreContext : TheoryContext {
   override val functions: HashSet<FunctionDecl<*>> =
-      hashSetOf(NotDecl, AndDecl, OrDecl, XOrDecl, EqualsDecl)
+      hashSetOf(
+          FalseDecl, TrueDecl, NotDecl, AndDecl, OrDecl, XOrDecl, EqualsDecl, DistinctDecl, IteDecl)
   override val sorts = mapOf(Pair("Bool", BoolSortDecl))
 }
 
@@ -198,12 +199,6 @@ object EqualsDecl :
     FunctionDeclChainable<Sort>(
         "=", setOf(SortParameter("A")), SortParameter("A"), SortParameter("A"), emptySet()) {
 
-  override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
-    val bindings = signature.bindParameters(args.map { it.sort })
-
-    return buildExpression(args as List<Expression<Sort>>, bindings)
-  }
-
   override fun buildExpression(
       varargs: List<Expression<Sort>>,
       bindings: Bindings
@@ -215,7 +210,7 @@ object EqualsDecl :
  *
  * @param statements multiple [Expression] of [BoolSort] to be checked in distinct statement
  */
-class Distinct(val statements: List<Expression<BoolSort>>) : Expression<BoolSort>() {
+class Distinct(val statements: List<Expression<*>>) : Expression<BoolSort>() {
   constructor(vararg statements: Expression<BoolSort>) : this(statements.toList())
 
   override val sort: BoolSort = BoolSort
@@ -229,6 +224,22 @@ class Distinct(val statements: List<Expression<BoolSort>>) : Expression<BoolSort
   override fun toString(): String = symbol
 }
 
+object DistinctDecl :
+    FunctionDeclPairwise<Sort>(
+        "distinct", setOf(SortParameter("A")), SortParameter("A"), SortParameter("A"), emptySet()) {
+
+  override fun buildExpression(args: List<Expression<*>>): Expression<BoolSort> {
+    val bindings = signature.bindParameters(args.map { it.sort })
+
+    return buildExpression(args as List<Expression<Sort>>, bindings)
+  }
+
+  override fun buildExpression(
+      varargs: List<Expression<Sort>>,
+      bindings: Bindings
+  ): Expression<BoolSort> = Distinct(varargs)
+}
+
 /**
  * Implements ite according to Core theory (par (A) (ite Bool A A A))
  *
@@ -236,13 +247,27 @@ class Distinct(val statements: List<Expression<BoolSort>>) : Expression<BoolSort
  * @param then value to be returned if [statement] is true
  * @param els value to be returned if [statement] is false
  */
-class Ite(
-    val statement: Expression<BoolSort>,
-    val then: Expression<BoolSort>,
-    val els: Expression<BoolSort>
-) : Expression<BoolSort>() {
+class Ite(val statement: Expression<BoolSort>, val then: Expression<*>, val els: Expression<*>) :
+    Expression<Sort>() {
   override val sort: BoolSort = BoolSort
   override val symbol = "(ite $statement $then $els)"
 
   override fun toString(): String = symbol
+}
+
+object IteDecl :
+    FunctionDecl3<BoolSort, Sort, Sort, Sort>(
+        "ite",
+        setOf(SortParameter("A")),
+        BoolSort,
+        SortParameter("A"),
+        SortParameter("A"),
+        emptySet(),
+        SortParameter("A")) {
+  override fun buildExpression(
+      param1: Expression<BoolSort>,
+      param2: Expression<Sort>,
+      param3: Expression<Sort>,
+      bindings: Bindings
+  ): Expression<Sort> = Ite(param1, param2, param3)
 }
