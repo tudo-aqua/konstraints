@@ -20,7 +20,8 @@ package tools.aqua.konstraints.parser
 
 import tools.aqua.konstraints.*
 
-internal class ParseTreeVisitor : CommandVisitor, TermVisitor, SortVisitor, SpecConstantVisitor {
+internal class ParseTreeVisitor :
+    ProtoCommandVisitor, ProtoTermVisitor, ProtoSortVisitor, SpecConstantVisitor {
 
   val context = Context()
 
