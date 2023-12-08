@@ -18,11 +18,9 @@
 
 package tools.aqua.konstraints
 
-import kotlin.math.exp
-
 interface CoreVisitor<T> {
-  fun visit(expression: Expression<*>) : T =
-    when (expression) {
+  fun visit(expression: Expression<*>): T =
+      when (expression) {
         is True -> visit(expression)
         is False -> visit(expression)
         is Not -> visit(expression)
@@ -34,25 +32,25 @@ interface CoreVisitor<T> {
         is Distinct -> visit(expression)
         is Ite -> visit(expression)
         else -> throw IllegalArgumentException("Core visitor can not visit expression $expression!")
-    }
+      }
 
-  fun visit(trueExpr: True) : T
+  fun visit(trueExpr: True): T
 
-  fun visit(falseExpr: False) : T
+  fun visit(falseExpr: False): T
 
-  fun visit(notExpr: Not) : T
+  fun visit(notExpr: Not): T
 
-  fun visit(impliesExpr: Implies) : T
+  fun visit(impliesExpr: Implies): T
 
-  fun visit(andExpr: And) : T
+  fun visit(andExpr: And): T
 
-  fun visit(orExpr: Or) : T
+  fun visit(orExpr: Or): T
 
-  fun visit(xorExpr: XOr) : T
+  fun visit(xorExpr: XOr): T
 
-  fun visit(equalsExpr: Equals) : T
+  fun visit(equalsExpr: Equals): T
 
-  fun visit(distinctExpr: Distinct) : T
+  fun visit(distinctExpr: Distinct): T
 
-  fun visit(iteExpr: Ite) : T
+  fun visit(iteExpr: Ite): T
 }
