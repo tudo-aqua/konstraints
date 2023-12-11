@@ -19,7 +19,7 @@
 package tools.aqua.konstraints
 
 import java.util.stream.Stream
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -28,6 +28,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 
 /*
  * Lifecycle.PER_CLASS is needed for MethodSource to avoid moving sources to a companion object
@@ -167,5 +168,55 @@ class BitvectorTests {
         arguments(bvor, listOf(A, B)),
         arguments(bvadd, listOf(A, B)),
         arguments(bvmul, listOf(A, B)))
+  }
+
+  @ParameterizedTest
+  @MethodSource("getLiteralsAndLength")
+  fun `test that BVLiterals have the right bit length`(literal: String, expected: Int) {
+    assertEquals(expected, BVLiteral(literal).bits)
+  }
+
+  private fun getLiteralsAndLength(): Stream<Arguments> {
+    return Stream.of(
+        arguments("#b0000", 4),
+        arguments("#b00001111", 8),
+        arguments("#b0000111100", 10),
+        arguments("#b0000000", 7),
+        arguments("#x0", 4),
+        arguments("#x012", 12),
+        arguments("#xEEEE", 16),
+        arguments("#xAEF00", 20),
+    )
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = ["#b0000", "#b00001111", "#b0000111100", "#b0000000"])
+  fun `test that binary BVLiterals get classified correctly`(literal: String) {
+    assertTrue(BVLiteral(literal).isBinary)
+  }
+
+  @ParameterizedTest
+  @ValueSource(strings = ["#x0", "#x012", "#xEEEE", "#xAEF00"])
+  fun `test that hexadecimal BVLiterals get classified correctly`(literal: String) {
+    assertFalse(BVLiteral(literal).isBinary)
+  }
+
+  @ParameterizedTest
+  @MethodSource("getLiteralsAndValue")
+  fun `test that BVLiterals have the right decimal value`(literal: String, expected: Int) {
+    assertEquals(expected, BVLiteral(literal).value)
+  }
+
+  private fun getLiteralsAndValue(): Stream<Arguments> {
+    return Stream.of(
+        arguments("#b0000", 0),
+        arguments("#b00001111", 15),
+        arguments("#b0000111100", 60),
+        arguments("#b0101001", 41),
+        arguments("#x0", 0),
+        arguments("#x012", 18),
+        arguments("#xEEEE", 61166),
+        arguments("#xAEF00", 716544),
+    )
   }
 }

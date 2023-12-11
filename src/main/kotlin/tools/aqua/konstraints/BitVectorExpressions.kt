@@ -53,6 +53,7 @@ internal object BVSortDecl : SortDecl<BVSort>("BitVec") {
  */
 
 data class BVLiteral(override val symbol: String) : Expression<BVSort>() {
+  val value: Int
   val bits: Int
   val isBinary: Boolean
 
@@ -60,9 +61,11 @@ data class BVLiteral(override val symbol: String) : Expression<BVSort>() {
     if (symbol[1] == 'b') {
       bits = symbol.length - 2
       isBinary = true
+      value = Integer.parseInt(symbol.substring(2), 2)
     } else if (symbol[1] == 'x') {
       bits = (symbol.length - 2) * 4
       isBinary = false
+      value = Integer.parseInt(symbol.substring(2), 16)
     } else {
       throw IllegalArgumentException("$symbol is not a valid bitvector literal.")
     }

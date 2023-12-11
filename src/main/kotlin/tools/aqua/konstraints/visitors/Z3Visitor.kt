@@ -18,13 +18,44 @@
 
 package tools.aqua.konstraints.visitors
 
+import com.microsoft.z3.BitVecSort
 import com.microsoft.z3.BoolSort
 import com.microsoft.z3.Context as ctx
 import com.microsoft.z3.Expr
+import com.microsoft.z3.Sort
 import tools.aqua.konstraints.*
 
-class Z3Visitor : CoreVisitor<Expr<*>> {
+class Z3Visitor : CoreVisitor<Expr<*>>, FSBVVisitor<Expr<*>> {
   val context = ctx()
+
+  override fun visit(expression: Expression<*>): Expr<*> =
+      when (expression) {
+        is True -> visit(expression)
+        is False -> visit(expression)
+        is Not -> visit(expression)
+        is Implies -> visit(expression)
+        is And -> visit(expression)
+        is Or -> visit(expression)
+        is XOr -> visit(expression)
+        is Equals -> visit(expression)
+        is Distinct -> visit(expression)
+        is Ite -> visit(expression)
+        is BVLiteral -> visit(expression)
+        is BVConcat -> visit(expression)
+        is BVExtract -> visit(expression)
+        is BVNot -> visit(expression)
+        is BVNeg -> visit(expression)
+        is BVAnd -> visit(expression)
+        is BVOr -> visit(expression)
+        is BVAdd -> visit(expression)
+        is BVMul -> visit(expression)
+        is BVUDiv -> visit(expression)
+        is BVURem -> visit(expression)
+        is BVShl -> visit(expression)
+        is BVLShr -> visit(expression)
+        is BVUlt -> visit(expression)
+        else -> throw IllegalArgumentException("Z3 visitor can not visit expression $expression!")
+      }
 
   override fun visit(trueExpr: True): Expr<*> {
     return context.mkTrue()
@@ -105,5 +136,82 @@ class Z3Visitor : CoreVisitor<Expr<*>> {
   override fun visit(iteExpr: Ite): Expr<*> {
     return context.mkITE(
         visit(iteExpr.statement) as Expr<BoolSort>, visit(iteExpr.then), visit(iteExpr.els))
+  }
+
+  override fun visit(bvLiteral: BVLiteral): Expr<*> {
+    return context.mkBV(bvLiteral.value, bvLiteral.bits)
+  }
+
+  override fun visit(bvConcat: BVConcat): Expr<*> {
+    return context.mkConcat(
+        visit(bvConcat.lhs) as Expr<BitVecSort>, visit(bvConcat.rhs) as Expr<BitVecSort>)
+  }
+
+  override fun visit(bvExtract: BVExtract): Expr<*> {
+    return context.mkExtract(bvExtract.i, bvExtract.j, visit(bvExtract.inner) as Expr<BitVecSort>)
+  }
+
+  override fun visit(bvNot: BVNot): Expr<*> {
+    return context.mkBVNot(visit(bvNot.inner) as Expr<BitVecSort>)
+  }
+
+  override fun visit(bvNeg: BVNeg): Expr<*> {
+    return context.mkBVNot(visit(bvNeg.inner) as Expr<BitVecSort>)
+  }
+
+  override fun visit(bvAnd: BVAnd): Expr<*> {
+    return makeLeftAssoc(bvAnd.conjuncts) { lhs, rhs -> context.mkBVAND(lhs, rhs) }
+  }
+
+  override fun visit(bvOr: BVOr): Expr<*> {
+    return makeLeftAssoc(bvOr.disjuncts) { lhs, rhs -> context.mkBVOR(lhs, rhs) }
+  }
+
+  override fun visit(bvAdd: BVAdd): Expr<*> {
+    return makeLeftAssoc(bvAdd.summands) { lhs, rhs -> context.mkBVAdd(lhs, rhs) }
+  }
+
+  override fun visit(bvMul: BVMul): Expr<*> {
+    return makeLeftAssoc(bvMul.factors) { lhs, rhs -> context.mkBVMul(lhs, rhs) }
+  }
+
+  override fun visit(bvuDiv: BVUDiv): Expr<*> {
+    return context.mkBVUDiv(
+        visit(bvuDiv.numerator) as Expr<BitVecSort>, visit(bvuDiv.denominator) as Expr<BitVecSort>)
+  }
+
+  override fun visit(bvuRem: BVURem): Expr<*> {
+    return context.mkBVURem(
+        visit(bvuRem.numerator) as Expr<BitVecSort>, visit(bvuRem.denominator) as Expr<BitVecSort>)
+  }
+
+  override fun visit(bvShl: BVShl): Expr<*> {
+    return context.mkBVSHL(
+        visit(bvShl.value) as Expr<BitVecSort>, visit(bvShl.distance) as Expr<BitVecSort>)
+  }
+
+  override fun visit(bvlShr: BVLShr): Expr<*> {
+    return context.mkBVLSHR(
+        visit(bvlShr.value) as Expr<BitVecSort>, visit(bvlShr.distance) as Expr<BitVecSort>)
+  }
+
+  override fun visit(bvUlt: BVUlt): Expr<*> {
+    return context.mkBVULT(visit(bvUlt.lhs) as Expr<BitVecSort>, visit(bvUlt) as Expr<BitVecSort>)
+  }
+
+  /**
+   * Build a left associative expression using [operation] (e.g. BVADD) S1 and S2 are Z3 target
+   * sorts, R is a konstraints sort of the original expression
+   */
+  private fun <R : tools.aqua.konstraints.Sort, S1 : Sort, S2 : Sort> makeLeftAssoc(
+      expressions: List<Expression<R>>,
+      operation: (Expr<S1>, Expr<S2>) -> Expr<S1>
+  ): Expr<S1> {
+    return if (expressions.size == 2) {
+      operation(visit(expressions[0]) as Expr<S1>, visit(expressions[1]) as Expr<S2>)
+    } else {
+      operation(
+          makeLeftAssoc(expressions.dropLast(1), operation), visit(expressions.last()) as Expr<S2>)
+    }
   }
 }
