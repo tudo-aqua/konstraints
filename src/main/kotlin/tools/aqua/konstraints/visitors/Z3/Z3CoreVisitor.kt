@@ -25,15 +25,16 @@ import tools.aqua.konstraints.*
 import tools.aqua.konstraints.visitors.AssociativeVisitor
 import tools.aqua.konstraints.visitors.CoreVisitor
 
-class Z3CoreVisitor(val context: Context, val generator: Z3ExpressionGenerator) : CoreVisitor<Expr<*>>, AssociativeVisitor {
-    override fun visitUnknownExpression(expression: Expression<*>): Expr<*> {
-        /*
-         * If we find an expression from another theory e.g. BVUlt can appear inside a Not expression
-         * we delegate handling this expression back to the Z3ExpressionGenerator to switch into the
-         * appropriate visitor, here it would be the Z3BitVecVisitor
-         */
-        return generator.visit(expression)
-    }
+class Z3CoreVisitor(val context: Context, val generator: Z3ExpressionGenerator) :
+    CoreVisitor<Expr<*>>, AssociativeVisitor {
+  override fun visitUnknownExpression(expression: Expression<*>): Expr<*> {
+    /*
+     * If we find an expression from another theory e.g. BVUlt can appear inside a Not expression
+     * we delegate handling this expression back to the Z3ExpressionGenerator to switch into the
+     * appropriate visitor, here it would be the Z3BitVecVisitor
+     */
+    return generator.visit(expression)
+  }
 
   override fun visit(trueExpr: True): Expr<*> {
     return context.mkTrue()
@@ -67,7 +68,9 @@ class Z3CoreVisitor(val context: Context, val generator: Z3ExpressionGenerator) 
 
   override fun visit(equalsExpr: Equals): Expr<*> {
     return context.mkAnd(
-        *makeChainable<com.microsoft.z3.Sort>(equalsExpr.statements, { expr -> visit(expr) }) { lhs, rhs ->
+        *makeChainable<com.microsoft.z3.Sort>(equalsExpr.statements, { expr -> visit(expr) }) {
+                lhs,
+                rhs ->
               context.mkEq(lhs, rhs)
             }
             .toTypedArray())

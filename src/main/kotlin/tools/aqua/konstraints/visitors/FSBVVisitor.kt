@@ -40,8 +40,9 @@ interface FSBVVisitor<T> {
         else -> visitUnknownExpression(expression)
       }
 
-  fun visitUnknownExpression(expression: Expression<*>) : T {
-    throw IllegalArgumentException("FixedSizeBitvector visitor can not visit expression $expression!")
+  fun visitUnknownExpression(expression: Expression<*>): T {
+    throw IllegalArgumentException(
+        "FixedSizeBitvector visitor can not visit expression $expression!")
   }
 
   fun visit(bvLiteral: BVLiteral): T

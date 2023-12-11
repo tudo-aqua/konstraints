@@ -18,51 +18,49 @@
 
 package tools.aqua.konstraints.visitors.Z3
 
-import com.microsoft.z3.Context
 import com.microsoft.z3.Expr
 import tools.aqua.konstraints.*
-import kotlin.math.exp
 
 class Z3ExpressionGenerator(val solver: Z3Solver) {
   private val coreVisitor = Z3CoreVisitor(solver.context, this)
   private val bitVecVisitor = Z3BitVecVisitor(solver.context, this)
 
-  fun visit(expression: Expression<*>) : Expr<*> =
-    // TODO maybe create a helper function in each theory to check if an expression is from that
-    // theory
-    when (expression) {
-      is True -> coreVisitor.visit(expression)
-      is False -> coreVisitor.visit(expression)
-      is Not -> coreVisitor.visit(expression)
-      is Implies -> coreVisitor.visit(expression)
-      is And -> coreVisitor.visit(expression)
-      is Or -> coreVisitor.visit(expression)
-      is XOr -> coreVisitor.visit(expression)
-      is Equals -> coreVisitor.visit(expression)
-      is Distinct -> coreVisitor.visit(expression)
-      is Ite -> coreVisitor.visit(expression)
-      is BVLiteral -> bitVecVisitor.visit(expression)
-      is BVConcat -> bitVecVisitor.visit(expression)
-      is BVExtract -> bitVecVisitor.visit(expression)
-      is BVNot -> bitVecVisitor.visit(expression)
-      is BVNeg -> bitVecVisitor.visit(expression)
-      is BVAnd -> bitVecVisitor.visit(expression)
-      is BVOr -> bitVecVisitor.visit(expression)
-      is BVAdd -> bitVecVisitor.visit(expression)
-      is BVMul -> bitVecVisitor.visit(expression)
-      is BVUDiv -> bitVecVisitor.visit(expression)
-      is BVURem -> bitVecVisitor.visit(expression)
-      is BVShl -> bitVecVisitor.visit(expression)
-      is BVLShr -> bitVecVisitor.visit(expression)
-      is BVUlt -> bitVecVisitor.visit(expression)
-      else -> {
-        if (solver.constants[expression.symbol] != null) {
-          solver.constants[expression.symbol]!!
-        } else if (solver.functions[expression.symbol] != null) {
-          TODO("Implement free function symbols")
-        } else {
-          throw IllegalArgumentException("Z3 can not visit expression $expression!")
+  fun visit(expression: Expression<*>): Expr<*> =
+      // TODO maybe create a helper function in each theory to check if an expression is from that
+      // theory
+      when (expression) {
+        is True -> coreVisitor.visit(expression)
+        is False -> coreVisitor.visit(expression)
+        is Not -> coreVisitor.visit(expression)
+        is Implies -> coreVisitor.visit(expression)
+        is And -> coreVisitor.visit(expression)
+        is Or -> coreVisitor.visit(expression)
+        is XOr -> coreVisitor.visit(expression)
+        is Equals -> coreVisitor.visit(expression)
+        is Distinct -> coreVisitor.visit(expression)
+        is Ite -> coreVisitor.visit(expression)
+        is BVLiteral -> bitVecVisitor.visit(expression)
+        is BVConcat -> bitVecVisitor.visit(expression)
+        is BVExtract -> bitVecVisitor.visit(expression)
+        is BVNot -> bitVecVisitor.visit(expression)
+        is BVNeg -> bitVecVisitor.visit(expression)
+        is BVAnd -> bitVecVisitor.visit(expression)
+        is BVOr -> bitVecVisitor.visit(expression)
+        is BVAdd -> bitVecVisitor.visit(expression)
+        is BVMul -> bitVecVisitor.visit(expression)
+        is BVUDiv -> bitVecVisitor.visit(expression)
+        is BVURem -> bitVecVisitor.visit(expression)
+        is BVShl -> bitVecVisitor.visit(expression)
+        is BVLShr -> bitVecVisitor.visit(expression)
+        is BVUlt -> bitVecVisitor.visit(expression)
+        else -> {
+          if (solver.constants[expression.symbol] != null) {
+            solver.constants[expression.symbol]!!
+          } else if (solver.functions[expression.symbol] != null) {
+            TODO("Implement free function symbols")
+          } else {
+            throw IllegalArgumentException("Z3 can not visit expression $expression!")
+          }
         }
       }
-    }
-  }
+}

@@ -36,7 +36,7 @@ interface CoreVisitor<T> {
         else -> visitUnknownExpression(expression)
       }
 
-  fun visitUnknownExpression(expression: Expression<*>) : T {
+  fun visitUnknownExpression(expression: Expression<*>): T {
     throw IllegalArgumentException("Core visitor can not visit expression $expression!")
   }
 
