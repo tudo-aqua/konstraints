@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints
 
+import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -32,24 +33,11 @@ import tools.aqua.konstraints.visitors.Z3.Z3Solver
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Z3Tests {
+
   @ParameterizedTest
   @MethodSource("getInts")
+  @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun test(id: Int) {
-    /* Manually disable all tests that should timeout until a solution for timeout is found */
-    if (id == 453 ||
-        id == 524 ||
-        id == 690 ||
-        id == 928 ||
-        id == 1248 ||
-        id == 1254 ||
-        id == 1299 ||
-        id == 1323 ||
-        id == 1395 ||
-        id == 1474 ||
-        id == 1492) {
-      TODO("Implement timeout")
-    }
-
     val parseTreeVisitor = ParseTreeVisitor()
     val solver = Z3Solver()
     val temp =
@@ -68,6 +56,8 @@ class Z3Tests {
         } else {
           "sat"
         }
+
+    println("Expected result is $satStatus")
 
     val result = Parser.script.parse(program.joinToString(""))
 

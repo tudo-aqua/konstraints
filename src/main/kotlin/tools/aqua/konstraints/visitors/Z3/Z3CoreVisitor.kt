@@ -67,13 +67,22 @@ class Z3CoreVisitor(val context: Context, val generator: Z3ExpressionGenerator) 
   }
 
   override fun visit(equalsExpr: Equals): Expr<*> {
-    return context.mkAnd(
-        *makeChainable<com.microsoft.z3.Sort>(equalsExpr.statements, { expr -> visit(expr) }) {
-                lhs,
-                rhs ->
-              context.mkEq(lhs, rhs)
-            }
-            .toTypedArray())
+    val unrolled =
+        makeChainable<com.microsoft.z3.Sort>(equalsExpr.statements, { expr -> visit(expr) }) {
+            lhs,
+            rhs ->
+          context.mkEq(lhs, rhs)
+        }
+
+    /*
+     * if we use the syntactic sugar variant we need to wrap the unrolled terms in an and-expression,
+     * otherwise we can not wrap it as this would lead to a wrong SMT program
+     */
+    return if (unrolled.size == 1) {
+      unrolled[0]
+    } else {
+      context.mkAnd(*unrolled.toTypedArray())
+    }
   }
 
   override fun visit(distinctExpr: Distinct): Expr<*> {

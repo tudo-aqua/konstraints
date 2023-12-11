@@ -54,7 +54,7 @@ class Z3BitVecVisitor(val context: Context, val generator: Z3ExpressionGenerator
   }
 
   override fun visit(bvNeg: BVNeg): Expr<*> {
-    return context.mkBVNot(visit(bvNeg.inner) as Expr<BitVecSort>)
+    return context.mkBVNeg(visit(bvNeg.inner) as Expr<BitVecSort>)
   }
 
   override fun visit(bvAnd: BVAnd): Expr<*> {
