@@ -21,7 +21,7 @@ class SMTProgram(commands: List<Command>) {
   // checkWellSorted, etc...
 }
 
-interface Command {
+sealed interface Command {
   val command: String
 }
 

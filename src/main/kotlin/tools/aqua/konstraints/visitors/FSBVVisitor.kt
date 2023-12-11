@@ -37,10 +37,12 @@ interface FSBVVisitor<T> {
         is BVShl -> visit(expression)
         is BVLShr -> visit(expression)
         is BVUlt -> visit(expression)
-        else ->
-            throw IllegalArgumentException(
-                "FixedSizeBitvector visitor can not visit expression $expression!")
+        else -> visitUnknownExpression(expression)
       }
+
+  fun visitUnknownExpression(expression: Expression<*>) : T {
+    throw IllegalArgumentException("FixedSizeBitvector visitor can not visit expression $expression!")
+  }
 
   fun visit(bvLiteral: BVLiteral): T
 

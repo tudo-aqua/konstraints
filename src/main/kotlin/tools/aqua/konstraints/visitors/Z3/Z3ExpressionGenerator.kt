@@ -19,15 +19,15 @@
 package tools.aqua.konstraints.visitors.Z3
 
 import com.microsoft.z3.Context
+import com.microsoft.z3.Expr
 import tools.aqua.konstraints.*
+import kotlin.math.exp
 
-class Z3Visitor() {
-  val context = Context()
+class Z3ExpressionGenerator(val solver: Z3Solver) {
+  private val coreVisitor = Z3CoreVisitor(solver.context, this)
+  private val bitVecVisitor = Z3BitVecVisitor(solver.context, this)
 
-  private val coreVisitor = Z3CoreVisitor(context)
-  private val bitVecVisitor = Z3BitVecVisitor(context)
-
-  fun visit(expression: Expression<*>) {
+  fun visit(expression: Expression<*>) : Expr<*> =
     // TODO maybe create a helper function in each theory to check if an expression is from that
     // theory
     when (expression) {
@@ -55,7 +55,14 @@ class Z3Visitor() {
       is BVShl -> bitVecVisitor.visit(expression)
       is BVLShr -> bitVecVisitor.visit(expression)
       is BVUlt -> bitVecVisitor.visit(expression)
-      else -> throw IllegalArgumentException("Z3 can not visit expression $expression!")
+      else -> {
+        if (solver.constants[expression.symbol] != null) {
+          solver.constants[expression.symbol]!!
+        } else if (solver.functions[expression.symbol] != null) {
+          TODO("Implement free function symbols")
+        } else {
+          throw IllegalArgumentException("Z3 can not visit expression $expression!")
+        }
+      }
     }
   }
-}

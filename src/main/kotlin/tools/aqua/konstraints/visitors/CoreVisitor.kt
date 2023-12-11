@@ -33,8 +33,12 @@ interface CoreVisitor<T> {
         is Equals -> visit(expression)
         is Distinct -> visit(expression)
         is Ite -> visit(expression)
-        else -> throw IllegalArgumentException("Core visitor can not visit expression $expression!")
+        else -> visitUnknownExpression(expression)
       }
+
+  fun visitUnknownExpression(expression: Expression<*>) : T {
+    throw IllegalArgumentException("Core visitor can not visit expression $expression!")
+  }
 
   fun visit(trueExpr: True): T
 

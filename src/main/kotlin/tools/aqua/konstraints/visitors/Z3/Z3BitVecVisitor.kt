@@ -25,7 +25,16 @@ import tools.aqua.konstraints.*
 import tools.aqua.konstraints.visitors.AssociativeVisitor
 import tools.aqua.konstraints.visitors.FSBVVisitor
 
-class Z3BitVecVisitor(val context: Context) : FSBVVisitor<Expr<*>>, AssociativeVisitor {
+class Z3BitVecVisitor(val context: Context,  val generator: Z3ExpressionGenerator) : FSBVVisitor<Expr<*>>, AssociativeVisitor {
+    override fun visitUnknownExpression(expression: Expression<*>): Expr<*> {
+        /*
+         * If we find an expression from another theory
+         * we delegate handling this expression back to the Z3ExpressionGenerator to switch into the
+         * appropriate visitor
+         */
+        return generator.visit(expression)
+    }
+
   override fun visit(bvLiteral: BVLiteral): Expr<*> {
     return context.mkBV(bvLiteral.value, bvLiteral.bits)
   }
