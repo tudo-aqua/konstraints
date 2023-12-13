@@ -18,26 +18,21 @@
 
 package tools.aqua.konstraints.visitors.Z3
 
-import com.microsoft.z3.*
 import com.microsoft.z3.BoolSort
+import com.microsoft.z3.IntSort
 import com.microsoft.z3.Sort
+import com.microsoft.z3.Status
 import tools.aqua.konstraints.*
 import tools.aqua.konstraints.visitors.CommandVisitor
 
 class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
-  val context = Context()
-  val solver = context.mkSolver()
-  val expressionGenerator = Z3ExpressionGenerator(this)
+  val context = Z3Context()
 
   internal var status = ""
 
-  internal val constants = HashMap<String, Expr<*>>()
-  internal val functions = HashMap<String, FuncDecl<*>>()
-  internal val sorts = HashMap<tools.aqua.konstraints.Sort, com.microsoft.z3.Sort>()
-
   override fun visit(assert: Assert) {
-    solver.add(expressionGenerator.visit(assert.expression) as Expr<BoolSort>)
-    println(solver.assertions.last())
+    context.solver.add(assert.expression.z3ify(context))
+    println(context.solver.assertions.last())
   }
 
   override fun visit(declareConst: DeclareConst) {
@@ -46,38 +41,40 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
 
   override fun visit(declareFun: DeclareFun) {
     if (declareFun.parameters.isNotEmpty()) {
-      functions[declareFun.name.toString()]?.let { error("function already declared.") }
-      functions[declareFun.name.toString()] =
-          context.mkFuncDecl(
+      context.functions[declareFun.name.toString()]?.let { error("function already declared.") }
+      context.functions[declareFun.name.toString()] =
+          context.context.mkFuncDecl(
               declareFun.name.toSMTString(),
               declareFun.parameters.map { getOrCreateSort(it) }.toTypedArray(),
               getOrCreateSort(declareFun.sort))
     } else {
-      constants[declareFun.name.toString()]?.let { error("constant already declared.") }
-      constants[declareFun.name.toString()] =
+      context.constants[declareFun.name.toString()]?.let { error("constant already declared.") }
+      context.constants[declareFun.name.toString()] =
           when (declareFun.sort) {
-            is tools.aqua.konstraints.BoolSort -> context.mkBoolConst(declareFun.name.toSMTString())
-            is BVSort -> context.mkBVConst(declareFun.name.toSMTString(), declareFun.sort.bits)
+            is tools.aqua.konstraints.BoolSort ->
+                context.context.mkBoolConst(declareFun.name.toSMTString())
+            is BVSort ->
+                context.context.mkBVConst(declareFun.name.toSMTString(), declareFun.sort.bits)
             else -> error("Sort ${declareFun.sort} not supported.")
           }
     }
   }
 
   private fun getOrCreateSort(sort: tools.aqua.konstraints.Sort): Sort {
-    sorts[sort]?.let {
-      return sorts[sort]!!
+    context.sorts[sort]?.let {
+      return context.sorts[sort]!!
     }
-    sorts[sort] =
+    context.sorts[sort] =
         when (sort) {
-          is BoolSort -> context.mkBoolSort()
-          is IntSort -> context.mkIntSort()
+          is BoolSort -> context.context.mkBoolSort()
+          is IntSort -> context.context.mkIntSort()
           else -> error("unsupported sort $sort")
         }
-    return sorts[sort]!!
+    return context.sorts[sort]!!
   }
 
   override fun visit(checkSat: CheckSat) {
-    return when (solver.check()) {
+    return when (context.solver.check()) {
       Status.UNSATISFIABLE -> status = "unsat"
       Status.UNKNOWN -> status = "DontKnow"
       Status.SATISFIABLE -> status = "sat"
@@ -85,7 +82,7 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
   }
 
   override fun close() {
-    solver.reset()
-    context.close()
+    context.solver.reset()
+    context.context.close()
   }
 }

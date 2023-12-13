@@ -18,49 +18,126 @@
 
 package tools.aqua.konstraints.visitors.Z3
 
+import com.microsoft.z3.BitVecSort
 import com.microsoft.z3.Expr
 import tools.aqua.konstraints.*
+import com.microsoft.z3.BoolSort as Z3BoolSort
 
-class Z3ExpressionGenerator(val solver: Z3Solver) {
-  private val coreVisitor = Z3CoreVisitor(solver.context, this)
-  private val bitVecVisitor = Z3BitVecVisitor(solver.context, this)
+@JvmName("z3ifyAny")
+fun Expression<*>.z3ify(context: Z3Context): Expr<*> =
+    when {
+      this.sort is BoolSort -> (this as Expression<BoolSort>).z3ify(context)
+      this.sort is BVSort -> (this as Expression<BVSort>).z3ify(context)
+      else -> throw RuntimeException("Unknown sort ${this.sort}")
+    }
 
-  fun visit(expression: Expression<*>): Expr<*> =
-      // TODO maybe create a helper function in each theory to check if an expression is from that
-      // theory
-      when (expression) {
-        is True -> coreVisitor.visit(expression)
-        is False -> coreVisitor.visit(expression)
-        is Not -> coreVisitor.visit(expression)
-        is Implies -> coreVisitor.visit(expression)
-        is And -> coreVisitor.visit(expression)
-        is Or -> coreVisitor.visit(expression)
-        is XOr -> coreVisitor.visit(expression)
-        is Equals -> coreVisitor.visit(expression)
-        is Distinct -> coreVisitor.visit(expression)
-        is Ite -> coreVisitor.visit(expression)
-        is BVLiteral -> bitVecVisitor.visit(expression)
-        is BVConcat -> bitVecVisitor.visit(expression)
-        is BVExtract -> bitVecVisitor.visit(expression)
-        is BVNot -> bitVecVisitor.visit(expression)
-        is BVNeg -> bitVecVisitor.visit(expression)
-        is BVAnd -> bitVecVisitor.visit(expression)
-        is BVOr -> bitVecVisitor.visit(expression)
-        is BVAdd -> bitVecVisitor.visit(expression)
-        is BVMul -> bitVecVisitor.visit(expression)
-        is BVUDiv -> bitVecVisitor.visit(expression)
-        is BVURem -> bitVecVisitor.visit(expression)
-        is BVShl -> bitVecVisitor.visit(expression)
-        is BVLShr -> bitVecVisitor.visit(expression)
-        is BVUlt -> bitVecVisitor.visit(expression)
-        else -> {
-          if (solver.constants[expression.symbol] != null) {
-            solver.constants[expression.symbol]!!
-          } else if (solver.functions[expression.symbol] != null) {
+@JvmName("z3ifyBool")
+fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    when {
+      this is True -> this.z3ify(context)
+      this is False -> this.z3ify(context)
+      this is Not -> this.z3ify(context)
+      this is Implies -> this.z3ify(context)
+      this is And -> this.z3ify(context)
+      this is Or -> this.z3ify(context)
+      this is XOr -> this.z3ify(context)
+      this is Equals -> this.z3ify(context)
+      this is Distinct -> this.z3ify(context)
+      this is BVUlt -> this.z3ify(context)
+      /* TODO this also has to handle declared functions */
+      else ->
+          if (context.constants[this.symbol] != null) {
+            context.constants[this.symbol]!! as Expr<com.microsoft.z3.BoolSort>
+          } else if (context.functions[this.symbol] != null) {
             TODO("Implement free function symbols")
           } else {
-            throw IllegalArgumentException("Z3 can not visit expression $expression!")
+            throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
           }
-        }
-      }
-}
+    }
+
+fun True.z3ify(context: Z3Context): Expr<Z3BoolSort> = context.context.mkTrue()
+
+fun False.z3ify(context: Z3Context): Expr<Z3BoolSort> = context.context.mkFalse()
+
+fun Not.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkNot(this.inner.z3ify(context))
+
+fun Implies.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO("Implement Z3 extension for Implies")
+
+fun And.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkAnd(*this.conjuncts.map { it.z3ify(context) }.toTypedArray())
+
+fun Or.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkOr(*this.disjuncts.map { it.z3ify(context) }.toTypedArray())
+
+fun XOr.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO("Implement Z3 extension for Xor")
+
+fun Equals.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkAnd(
+        *this.statements
+            .zipWithNext { a, b -> context.context.mkEq(a.z3ify(context), b.z3ify(context)) }
+            .toTypedArray())
+
+fun Distinct.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkDistinct(*this.statements.map { it.z3ify(context) }.toTypedArray())
+
+@JvmName("z3ifyBitVec")
+fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
+    when {
+      this is BVLiteral -> this.z3ify(context)
+      this is BVConcat -> this.z3ify(context)
+      this is BVExtract -> this.z3ify(context)
+      this is BVNot -> this.z3ify(context)
+      this is BVNeg -> this.z3ify(context)
+      this is BVAnd -> this.z3ify(context)
+      this is BVOr -> this.z3ify(context)
+      this is BVAdd -> this.z3ify(context)
+      this is BVMul -> this.z3ify(context)
+      this is BVUDiv -> this.z3ify(context)
+      this is BVURem -> this.z3ify(context)
+      this is BVShl -> this.z3ify(context)
+      this is BVLShr -> this.z3ify(context)
+      else ->
+          if (context.constants[this.symbol] != null) {
+            context.constants[this.symbol]!! as Expr<BitVecSort>
+          } else if (context.functions[this.symbol] != null) {
+            TODO("Implement free function symbols")
+          } else {
+            throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
+          }
+    }
+
+fun BVLiteral.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkBV(this.value, this.bits)
+
+fun BVConcat.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkConcat(this.lhs.z3ify(context), this.rhs.z3ify(context))
+
+fun BVExtract.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkExtract(this.i, this.j, this.inner.z3ify(context))
+
+fun BVNot.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkBVNot(this.inner.z3ify(context))
+
+fun BVNeg.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkBVNeg(this.inner.z3ify(context))
+
+fun BVAnd.z3ify(context: Z3Context): Expr<BitVecSort> = TODO()
+
+fun BVOr.z3ify(context: Z3Context): Expr<BitVecSort> = TODO()
+
+fun BVAdd.z3ify(context: Z3Context): Expr<BitVecSort> = TODO()
+
+fun BVMul.z3ify(context: Z3Context): Expr<BitVecSort> = TODO()
+
+fun BVUDiv.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkBVUDiv(this.numerator.z3ify(context), this.denominator.z3ify(context))
+
+fun BVURem.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkBVURem(this.numerator.z3ify(context), this.denominator.z3ify(context))
+
+fun BVShl.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkBVSHL(this.value.z3ify(context), this.distance.z3ify(context))
+
+fun BVLShr.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkBVLSHR(this.value.z3ify(context), this.distance.z3ify(context))

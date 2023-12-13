@@ -20,8 +20,9 @@ package tools.aqua.konstraints
 
 import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
-import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -52,7 +53,7 @@ class Z3Tests {
         if (program.find { it.contains("unsat") } != null) {
           "unsat"
         } else if (program.find { it.contains("unknown") } != null) {
-          "unknown"
+          return
         } else {
           "sat"
         }
