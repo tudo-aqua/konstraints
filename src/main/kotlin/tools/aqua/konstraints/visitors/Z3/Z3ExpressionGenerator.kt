@@ -19,9 +19,40 @@
 package tools.aqua.konstraints.visitors.Z3
 
 import com.microsoft.z3.BitVecSort
+import com.microsoft.z3.BoolSort as Z3BoolSort
 import com.microsoft.z3.Expr
 import tools.aqua.konstraints.*
-import com.microsoft.z3.BoolSort as Z3BoolSort
+
+fun makeLeftAssoc(
+    expressions: List<Expression<*>>,
+    context: Z3Context,
+    operation: (Expr<*>, Expr<*>) -> Expr<*>
+): Expr<*> {
+  return if (expressions.size == 2) {
+    operation(expressions[0].z3ify(context), expressions[1].z3ify(context))
+  } else {
+    operation(
+        makeLeftAssoc(expressions.dropLast(1), context, operation),
+        expressions.last().z3ify(context))
+  }
+}
+
+/**
+ * Build a right associative expression using [operation] (e.g. =>) S1 and S2 are Z3 target sorts, R
+ * is a konstraints sort of the original expression
+ */
+fun makeRightAssoc(
+    expressions: List<Expression<*>>,
+    context: Z3Context,
+    operation: (Expr<*>, Expr<*>) -> Expr<*>
+): Expr<*> {
+  return if (expressions.size == 2) {
+    operation(expressions[0].z3ify(context), expressions[1].z3ify(context))
+  } else {
+    operation(
+        expressions.first().z3ify(context), makeRightAssoc(expressions.drop(1), context, operation))
+  }
+}
 
 @JvmName("z3ifyAny")
 fun Expression<*>.z3ify(context: Z3Context): Expr<*> =
@@ -44,7 +75,7 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
       this is Equals -> this.z3ify(context)
       this is Distinct -> this.z3ify(context)
       this is BVUlt -> this.z3ify(context)
-      /* TODO this also has to handle declared functions */
+      /* this also has to handle declared functions */
       else ->
           if (context.constants[this.symbol] != null) {
             context.constants[this.symbol]!! as Expr<com.microsoft.z3.BoolSort>
@@ -62,7 +93,11 @@ fun False.z3ify(context: Z3Context): Expr<Z3BoolSort> = context.context.mkFalse(
 fun Not.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkNot(this.inner.z3ify(context))
 
-fun Implies.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO("Implement Z3 extension for Implies")
+fun Implies.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    makeRightAssoc(this.statements, context) { lhs, rhs ->
+      context.context.mkImplies(lhs as Expr<Z3BoolSort>, rhs as Expr<Z3BoolSort>)
+    }
+        as Expr<Z3BoolSort>
 
 fun And.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkAnd(*this.conjuncts.map { it.z3ify(context) }.toTypedArray())
@@ -70,7 +105,11 @@ fun And.z3ify(context: Z3Context): Expr<Z3BoolSort> =
 fun Or.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkOr(*this.disjuncts.map { it.z3ify(context) }.toTypedArray())
 
-fun XOr.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO("Implement Z3 extension for Xor")
+fun XOr.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    makeLeftAssoc(this.disjuncts, context) { lhs, rhs ->
+      context.context.mkXor(lhs as Expr<Z3BoolSort>, rhs as Expr<Z3BoolSort>)
+    }
+        as Expr<Z3BoolSort>
 
 fun Equals.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkAnd(
@@ -122,13 +161,29 @@ fun BVNot.z3ify(context: Z3Context): Expr<BitVecSort> =
 fun BVNeg.z3ify(context: Z3Context): Expr<BitVecSort> =
     context.context.mkBVNeg(this.inner.z3ify(context))
 
-fun BVAnd.z3ify(context: Z3Context): Expr<BitVecSort> = TODO()
+fun BVAnd.z3ify(context: Z3Context): Expr<BitVecSort> =
+    makeLeftAssoc(this.conjuncts, context) { lhs, rhs ->
+      context.context.mkBVAND(lhs as Expr<BitVecSort>, rhs as Expr<BitVecSort>)
+    }
+        as Expr<BitVecSort>
 
-fun BVOr.z3ify(context: Z3Context): Expr<BitVecSort> = TODO()
+fun BVOr.z3ify(context: Z3Context): Expr<BitVecSort> =
+    makeLeftAssoc(this.disjuncts, context) { lhs, rhs ->
+      context.context.mkBVOR(lhs as Expr<BitVecSort>, rhs as Expr<BitVecSort>)
+    }
+        as Expr<BitVecSort>
 
-fun BVAdd.z3ify(context: Z3Context): Expr<BitVecSort> = TODO()
+fun BVAdd.z3ify(context: Z3Context): Expr<BitVecSort> =
+    makeLeftAssoc(this.summands, context) { lhs, rhs ->
+      context.context.mkBVAdd(lhs as Expr<BitVecSort>, rhs as Expr<BitVecSort>)
+    }
+        as Expr<BitVecSort>
 
-fun BVMul.z3ify(context: Z3Context): Expr<BitVecSort> = TODO()
+fun BVMul.z3ify(context: Z3Context): Expr<BitVecSort> =
+    makeLeftAssoc(this.factors, context) { lhs, rhs ->
+      context.context.mkBVMul(lhs as Expr<BitVecSort>, rhs as Expr<BitVecSort>)
+    }
+        as Expr<BitVecSort>
 
 fun BVUDiv.z3ify(context: Z3Context): Expr<BitVecSort> =
     context.context.mkBVUDiv(this.numerator.z3ify(context), this.denominator.z3ify(context))
