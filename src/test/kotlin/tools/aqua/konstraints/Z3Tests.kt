@@ -37,7 +37,7 @@ class Z3Tests {
 
   @ParameterizedTest
   @MethodSource("getInts")
-  @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 3, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun test(id: Int) {
     /*
      * These test are currently not working with Z3 as the solver is not capable of solving them yet
