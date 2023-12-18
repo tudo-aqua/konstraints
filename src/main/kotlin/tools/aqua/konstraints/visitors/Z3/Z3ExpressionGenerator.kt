@@ -111,11 +111,13 @@ fun XOr.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     }
         as Expr<Z3BoolSort>
 
-fun Equals.z3ify(context: Z3Context): Expr<Z3BoolSort> =
-    context.context.mkAnd(
-        *this.statements
-            .zipWithNext { a, b -> context.context.mkEq(a.z3ify(context), b.z3ify(context)) }
-            .toTypedArray())
+fun Equals.z3ify(context: Z3Context): Expr<Z3BoolSort> {
+  val inner =
+      this.statements.zipWithNext { a, b ->
+        context.context.mkEq(a.z3ify(context), b.z3ify(context))
+      }
+  return if (inner.size == 1) inner.single() else context.context.mkAnd(*inner.toTypedArray())
+}
 
 fun Distinct.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkDistinct(*this.statements.map { it.z3ify(context) }.toTypedArray())

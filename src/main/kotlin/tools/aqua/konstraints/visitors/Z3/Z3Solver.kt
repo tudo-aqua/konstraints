@@ -31,8 +31,9 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
   internal var status = ""
 
   override fun visit(assert: Assert) {
-    context.solver.add(assert.expression.z3ify(context))
-    println(context.solver.assertions.last())
+    val assertion = assert.expression.z3ify(context)
+    println(assertion)
+    context.solver.add(assertion)
   }
 
   override fun visit(declareConst: DeclareConst) {
