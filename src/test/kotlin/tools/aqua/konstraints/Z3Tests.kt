@@ -18,6 +18,8 @@
 
 package tools.aqua.konstraints
 
+import java.util.concurrent.TimeUnit
+import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.Timeout
@@ -29,8 +31,6 @@ import tools.aqua.konstraints.parser.ParseTreeVisitor
 import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.parser.ProtoCommand
 import tools.aqua.konstraints.visitors.Z3.Z3Solver
-import java.util.concurrent.TimeUnit
-import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Z3Tests {
