@@ -21,28 +21,24 @@ class SMTProgram(commands: List<Command>) {
   // checkWellSorted, etc...
 }
 
-sealed interface Command {
-  val command: String
-}
-
-abstract class SimpleCommand(override val command: String) : Command {
+sealed class Command(val command: String) {
   override fun toString(): String = "($command)"
 }
 
-object CheckSat : SimpleCommand("check-sat")
+object CheckSat : Command("check-sat")
 
-data class Assert(val expression: Expression<BoolSort>) : SimpleCommand("assert $expression") {
+data class Assert(val expression: Expression<BoolSort>) : Command("assert $expression") {
   override fun toString(): String = super.toString()
 }
 
 data class DeclareConst(val name: Symbol, val sort: Sort) :
-    SimpleCommand("declare-const $name $sort") {
-  override fun toString(): String = "($command)"
+    Command("declare-const $name $sort") {
+  override fun toString(): String = super.toString()
 }
 
 data class DeclareFun(val name: Symbol, val parameters: List<Sort>, val sort: Sort) :
-    SimpleCommand("declare-fun $name (${parameters.joinToString(" ")}) $sort") {
-  override fun toString(): String = "($command)"
+    Command("declare-fun $name (${parameters.joinToString(" ")}) $sort") {
+  override fun toString(): String = super.toString()
 }
 
 // tools.aqua.konstraints.DeclareConst(expr, expr.sort)
