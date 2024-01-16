@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.parser
 
+import org.petitparser.context.Result
 import java.math.BigDecimal
 import org.petitparser.context.Token
 import org.petitparser.parser.Parser
@@ -28,6 +29,7 @@ import org.petitparser.parser.primitive.CharacterParser.anyOf
 import org.petitparser.parser.primitive.CharacterParser.of
 import org.petitparser.parser.primitive.CharacterParser.range
 import org.petitparser.parser.primitive.StringParser.of
+import org.petitparser.utils.FailureJoiner
 import tools.aqua.konstraints.CheckSat
 
 operator fun Parser.plus(other: Parser): ChoiceParser = or(other)
@@ -400,8 +402,8 @@ object Parser {
               rparen)
           .map { results: ArrayList<Any> -> "(set-logic)" }
 
-  val command =
-      assertCMD + checkSatCMD + declareConstCMD + declareFunCMD + exitCMD + setInfoCMD + setLogicCMD
+  val command = ChoiceParser(FailureJoiner.SelectFarthest(), assertCMD, checkSatCMD, declareConstCMD, declareFunCMD, exitCMD, setInfoCMD, setLogicCMD)
+
   val script = command.star().end()
 
   // TODO missing commands

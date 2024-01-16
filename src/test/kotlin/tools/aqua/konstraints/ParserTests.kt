@@ -22,6 +22,7 @@ import java.lang.Exception
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.petitparser.context.Failure
 import org.petitparser.context.ParseError
 import tools.aqua.konstraints.parser.*
 
@@ -57,6 +58,23 @@ class ParserTests {
       throw ParseError(result.failure(result.message))
     }
   }
+
+    @ParameterizedTest
+    @ValueSource(
+        strings =
+        [
+            "(declare-fun A Bool)",
+            "(assert (not (= (bvlshr s (bvshl t #b00000000000000000000000000000000)) (bvlshr s t)))"
+        ]
+    )
+    fun testIllegalCommands(command: String) {
+        val result = Parser.command.parse(command)
+        assert(result.isFailure)
+
+        println(result.message)
+        println(result.position)
+        println(result.buffer)
+    }
 
   @ParameterizedTest
   @ValueSource(

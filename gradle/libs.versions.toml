@@ -14,7 +14,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 [versions]
-java-jdk = "9"
+java-jdk = "11"
 kotlin = "1.9.21"
 nodejs = "20.5.1"
 prettier-toml = "0.3.1"
@@ -35,7 +35,7 @@ versions = { id = "com.github.ben-manes.versions", version = "0.50.0" }
 junit-bom = { group = "org.junit", name = "junit-bom", version = "5.10.1" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter" } # version from BOM
 z3-turnkey = { group = "tools.aqua", name = "z3-turnkey", version = "4.12.2.1" }
-petitparser-core = { group = "com.github.petitparser", name = "petitparser-core", version = "2.3.1" }
+petitparser-core = { group = "com.github.petitparser", name = "petitparser-core", version = "2.4.0" }
 kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.8.0-RC" }
 
 [bundles]
