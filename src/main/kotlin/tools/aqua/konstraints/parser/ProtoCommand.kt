@@ -20,6 +20,7 @@ package tools.aqua.konstraints.parser
 
 import java.math.BigDecimal
 import org.petitparser.context.Token
+import tools.aqua.konstraints.Symbol
 
 internal sealed interface ProtoCommand
 
@@ -40,16 +41,20 @@ internal data class ProtoDeclareFun(
 
 internal data class ParseSymbol(val token: Token) {
   val symbol: String = token.getValue()
+
+  fun toSymbol(): Symbol {
+    return Symbol(symbol)
+  }
 }
 
-internal sealed interface SpecConstant
+sealed interface SpecConstant
 
-internal data class StringConstant(val string: String) : SpecConstant
+data class StringConstant(val string: String) : SpecConstant
 
-internal data class NumeralConstant(val numeral: Int) : SpecConstant
+data class NumeralConstant(val numeral: Int) : SpecConstant
 
 /* BinaryConstant of the form #b followed by a non-empty sequence of 0 and 1 characters */
-internal data class BinaryConstant(val binary: String) : SpecConstant {
+data class BinaryConstant(val binary: String) : SpecConstant {
   /* Number of bits for this binary */
   val bits = binary.length - 2
 }
@@ -57,12 +62,12 @@ internal data class BinaryConstant(val binary: String) : SpecConstant {
 /* Hexadecimal constant of the form
  * #x followed by a non-empty sequence of digits and letters from A to F , capitalized or not
  */
-internal data class HexConstant(val hexadecimal: String) : SpecConstant {
+data class HexConstant(val hexadecimal: String) : SpecConstant {
   /* Number of bits for this hexadecimal */
   val bits = (hexadecimal.length - 2) * 4
 }
 
-internal data class DecimalConstant(val decimal: BigDecimal) : SpecConstant
+data class DecimalConstant(val decimal: BigDecimal) : SpecConstant
 
 // Identifiers
 
@@ -89,29 +94,41 @@ internal data class ProtoSort(val identifier: Identifier, val sorts: List<ProtoS
 
 // S-Expression
 
-internal sealed interface SExpression
+sealed interface SExpression
 
-internal data class SubSExpression(val subExpressions: List<SExpression>) : SExpression
+data class SubSExpression(val subExpressions: List<SExpression>) : SExpression
 
-internal data class SExpressionConstant(val constant: SpecConstant) : SExpression
+data class SExpressionConstant(val constant: SpecConstant) : SExpression
 
-internal data class SExpressionSymbol(val symbol: ParseSymbol) : SExpression
+data class SExpressionSymbol(val symbol: Symbol) : SExpression
 
-internal data class SExpressionReserved(val reserved: Token) : SExpression
+data class SExpressionReserved(val reserved: Token) : SExpression
 
-internal data class SExpressionKeyword(val keyword: Token) : SExpression
+data class SExpressionKeyword(val keyword: Token) : SExpression
 
 // Attributes
 
-internal data class Attribute(val keyword: Token, val value: AttributeValue?)
+// keyword is a token, so when we pass an Attribute to a solver via set-info, we can generate a
+// better failure message
+data class Attribute(val keyword: Token, val value: AttributeValue?)
 
 sealed interface AttributeValue
 
-internal data class ConstantAttributeValue(val constant: SpecConstant) : AttributeValue
+data class ConstantAttributeValue(val constant: SpecConstant) : AttributeValue
 
-internal data class SymbolAttributeValue(val symbol: ParseSymbol) : AttributeValue
+data class SymbolAttributeValue(val symbol: Symbol) : AttributeValue
 
-internal data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : AttributeValue
+data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : AttributeValue
+
+sealed interface OptionValue
+
+data class BooleanOptionValue(val bool: Boolean) : OptionValue
+
+data class StringOptionValue(val sting: String) : OptionValue
+
+data class NumeralOptionValue(val numeral: Int) : OptionValue
+
+data class AttributeOptionValue(val attribute: Attribute) : OptionValue
 
 // Terms
 

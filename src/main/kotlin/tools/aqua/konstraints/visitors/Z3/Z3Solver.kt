@@ -82,6 +82,14 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
     }
   }
 
+  override fun visit(exit: Exit) {}
+
+  override fun visit(setInfo: SetInfo) {}
+
+  override fun visit(setOption: SetOption) {}
+
+  override fun visit(setLogic: SetLogic) {}
+
   override fun close() {
     context.solver.reset()
     context.context.close()

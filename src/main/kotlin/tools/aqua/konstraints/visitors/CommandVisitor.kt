@@ -27,8 +27,10 @@ interface CommandVisitor<T> {
         is DeclareConst -> visit(command)
         is DeclareFun -> visit(command)
         is CheckSat -> visit(command)
-        /* this is only needed because SimpleCommand exists, but I think it is not really necessary */
-        else -> throw Exception()
+        is Exit -> visit(command)
+        is SetInfo -> visit(command)
+        is SetOption -> visit(command)
+        is SetLogic -> visit(command)
       }
 
   fun visit(assert: Assert): T
@@ -38,4 +40,12 @@ interface CommandVisitor<T> {
   fun visit(declareFun: DeclareFun): T
 
   fun visit(checkSat: CheckSat): T
+
+  fun visit(exit: Exit): T
+
+  fun visit(setInfo: SetInfo): T
+
+  fun visit(setOption: SetOption): T
+
+  fun visit(setLogic: SetLogic): T
 }

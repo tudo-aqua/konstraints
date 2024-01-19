@@ -17,6 +17,10 @@
  */
 
 package tools.aqua.konstraints
+
+import tools.aqua.konstraints.parser.Attribute
+import tools.aqua.konstraints.parser.OptionValue
+
 class SMTProgram(commands: List<Command>) {
   // checkWellSorted, etc...
 }
@@ -27,12 +31,13 @@ sealed class Command(val command: String) {
 
 object CheckSat : Command("check-sat")
 
+object Exit : Command("exit")
+
 data class Assert(val expression: Expression<BoolSort>) : Command("assert $expression") {
   override fun toString(): String = super.toString()
 }
 
-data class DeclareConst(val name: Symbol, val sort: Sort) :
-    Command("declare-const $name $sort") {
+data class DeclareConst(val name: Symbol, val sort: Sort) : Command("declare-const $name $sort") {
   override fun toString(): String = super.toString()
 }
 
@@ -41,4 +46,10 @@ data class DeclareFun(val name: Symbol, val parameters: List<Sort>, val sort: So
   override fun toString(): String = super.toString()
 }
 
-// tools.aqua.konstraints.DeclareConst(expr, expr.sort)
+data class SetInfo(val attribute: Attribute) :
+    Command("set-info ${attribute.keyword} ${attribute.value})")
+
+// TODO string serialization of OptionValue
+data class SetOption(val name: String, val value: OptionValue) : Command("set-option $name $value")
+
+data class SetLogic(val logic: Logic) : Command("set-logic $logic")

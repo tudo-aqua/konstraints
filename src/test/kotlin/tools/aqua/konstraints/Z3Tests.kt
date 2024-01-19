@@ -76,7 +76,7 @@ class Z3Tests {
               .filter { it is ProtoCommand || it is Command }
               .map { if (it is ProtoCommand) parseTreeVisitor.visit(it) else it } as List<Command>
 
-      println(commands)
+      println(commands.joinToString("\n"))
 
       solver.use {
         commands.map { solver.visit(it) }

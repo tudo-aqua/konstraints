@@ -18,7 +18,6 @@
 
 package tools.aqua.konstraints.parser
 
-import org.petitparser.context.Result
 import java.math.BigDecimal
 import org.petitparser.context.Token
 import org.petitparser.parser.Parser
@@ -30,7 +29,7 @@ import org.petitparser.parser.primitive.CharacterParser.of
 import org.petitparser.parser.primitive.CharacterParser.range
 import org.petitparser.parser.primitive.StringParser.of
 import org.petitparser.utils.FailureJoiner
-import tools.aqua.konstraints.CheckSat
+import tools.aqua.konstraints.*
 
 operator fun Parser.plus(other: Parser): ChoiceParser = or(other)
 
@@ -155,16 +154,18 @@ object Parser {
           .map<String, BigDecimal>(::BigDecimal)
   private val hexadecimal = of("#x") * (digitCat + range('A', 'F') + range('a', 'f')).plus()
   private val binary = (of("#b") * range('0', '1').plus()).flatten()
+  // all printable characters that are not double quotes
   private val anythingButQuotes =
       whitespaceCat +
           range('\u0020', '"' - 1) +
           range('"' + 1, '\u007E') +
           range('\u0080', '\u00FF')
-  private val string =
-      of("\"") *
-          (anythingButQuotes.star() +
-              ((anythingButQuotes.star() * of("\"\"") * anythingButQuotes.star()).star())) *
-          of("\"")
+  internal val string =
+      (of("\"") *
+              (anythingButQuotes.star() +
+                  ((anythingButQuotes.star() * of("\"\"") * anythingButQuotes.star()).star())) *
+              of("\""))
+          .flatten()
 
   private val symbolSymbols = anyOf("+-/*=%?!.\$_~&^<>@")
   internal val simpleSymbol =
@@ -184,6 +185,59 @@ object Parser {
       }
   private val keyword = (of(':') * simpleSymbol).trim(whitespaceCat).flatten().token()
 
+  // Logics
+
+  private val auflia = of("AUFLIA").map { _: Any -> Logic.AUFLIA }
+  private val auflira = of("AUFLIRA").map { _: Any -> Logic.AUFLIRA }
+  private val aufnira = of("AUFNIRA").map { _: Any -> Logic.AUFNIRA }
+  private val lia = of("LIA").map { _: Any -> Logic.LIA }
+  private val lra = of("LRA").map { _: Any -> Logic.LRA }
+  private val qf_abv = of("QF_ABV").map { _: Any -> Logic.QF_ABV }
+  private val qf_aufbv = of("QF_AUFBV").map { _: Any -> Logic.QF_AUFBV }
+  private val qf_auflia = of("QF_AUFLIA").map { _: Any -> Logic.QF_AUFLIA }
+  private val qf_ax = of("QF_AX").map { _: Any -> Logic.QF_AX }
+  private val qf_bv = of("QF_BV").map { _: Any -> Logic.QF_BV }
+  private val qf_idl = of("QF_IDL").map { _: Any -> Logic.QF_IDL }
+  private val qf_lia = of("QF_LIA").map { _: Any -> Logic.QF_LIA }
+  private val qf_lra = of("QF_LRA").map { _: Any -> Logic.QF_LRA }
+  private val qf_nia = of("QF_NIA").map { _: Any -> Logic.QF_NIA }
+  private val qf_nra = of("QF_NRA").map { _: Any -> Logic.QF_NRA }
+  private val qf_rdl = of("QF_RDL").map { _: Any -> Logic.QF_RDL }
+  private val qf_uf = of("QF_UF").map { _: Any -> Logic.QF_UF }
+  private val qf_ufbv = of("QF_UFBV").map { _: Any -> Logic.QF_UFBV }
+  private val qf_ufidl = of("QF_UFIDL").map { _: Any -> Logic.QF_UFIDL }
+  private val qf_uflia = of("QF_UFLIA").map { _: Any -> Logic.QF_UFLIA }
+  private val qf_uflra = of("QF_UFLRA").map { _: Any -> Logic.QF_UFLRA }
+  private val qf_ufnra = of("QF_UFNRA").map { _: Any -> Logic.QF_UFNRA }
+  private val uflra = of("UFLRA").map { _: Any -> Logic.UFLRA }
+  private val ufnia = of("UFNIA").map { _: Any -> Logic.UFNIA }
+
+  internal val logic =
+      auflia +
+          auflira +
+          aufnira +
+          lia +
+          lra +
+          qf_abv +
+          qf_aufbv +
+          qf_auflia +
+          qf_ax +
+          qf_bv +
+          qf_idl +
+          qf_lia +
+          qf_lra +
+          qf_nia +
+          qf_nra +
+          qf_rdl +
+          qf_ufbv +
+          qf_ufidl +
+          qf_uflia +
+          qf_uflra +
+          qf_ufnra +
+          uflra +
+          ufnia +
+          qf_uf
+
   // S-Expressions
 
   /* maps to an implementation of SpecConstant */
@@ -201,7 +255,7 @@ object Parser {
     sExpression.set(
         ((specConstant.map { constant: SpecConstant -> SExpressionConstant(constant) } +
             reserved.map { reserved: Token -> SExpressionReserved(reserved) } +
-            symbol.map { symbol: ParseSymbol -> SExpressionSymbol(symbol) } +
+            symbol.map { symbol: ParseSymbol -> SExpressionSymbol(symbol.toSymbol()) } +
             keyword.map { keyword: Token -> SExpressionKeyword(keyword) }) trim whitespaceCat) +
             ((lparen * sExpression.star() * rparen).map { results: List<Any> ->
               SubSExpression(results.slice(1..results.size - 2) as List<SExpression>)
@@ -243,7 +297,7 @@ object Parser {
   /* maps to an implementation of AttributeValue */
   private val attributeValue =
       specConstant.map { constant: SpecConstant -> ConstantAttributeValue(constant) } +
-          symbol.map { symbol: ParseSymbol -> SymbolAttributeValue(symbol) } +
+          symbol.map { symbol: ParseSymbol -> SymbolAttributeValue(symbol.toSymbol()) } +
           (lparen * sExpression.star() * rparen).map { results: List<Any> ->
             SExpressionAttributeValue(results.slice(1..results.size - 2) as List<SExpression>)
           }
@@ -343,7 +397,54 @@ object Parser {
   // TODO
 
   // Command options
-  // TODO
+  private val b_value = of("true").flatten() + of("false").flatten()
+
+  private val diagnosticOutputChannelOption =
+      (of(":diagnostic-output-channel") trim whitespaceCat).token()
+  private val globalDeclarationsOption = (of(":global-declarations") trim whitespaceCat).token()
+  private val interactiveModelOption = (of(":interactive-model") trim whitespaceCat).token()
+  private val printSuccessOption = (of(":print-success") trim whitespaceCat).token()
+  private val produceAssertionsOption = (of(":produce-assertions") trim whitespaceCat).token()
+  private val produceAssignmentsOption = (of(":produce-assignments") trim whitespaceCat).token()
+  private val produceModelsOption = (of(":produce-models") trim whitespaceCat).token()
+  private val produceProofsOption = (of(":produce-proofs") trim whitespaceCat).token()
+  private val produceUnsatAssumptionsOption =
+      (of(":produce-unsat-assumptions") trim whitespaceCat).token()
+  private val produceUnsatCoresOption = (of(":produce-unsat-cores") trim whitespaceCat).token()
+  private val randomSeedOption = (of(":random-seed") trim whitespaceCat).token()
+  private val regularOutputChannelOption =
+      (of(":regular-output-channel") trim whitespaceCat).token()
+  private val reproducibleResourceLimitOption =
+      (of(":reproducible-resource-limit") trim whitespaceCat).token()
+  private val verbosityOption = (of(":verbosity") trim whitespaceCat).token()
+  private val option =
+      ((globalDeclarationsOption * b_value) +
+              (interactiveModelOption * b_value) +
+              (printSuccessOption * b_value) +
+              (produceAssertionsOption * b_value) +
+              (produceAssignmentsOption * b_value) +
+              (produceModelsOption * b_value) +
+              (produceProofsOption * b_value) +
+              (produceUnsatAssumptionsOption * b_value) +
+              (produceUnsatCoresOption * b_value))
+          .map { results: List<Any> ->
+            listOf(results[0] as Token, BooleanOptionValue((results[1] as String).toBoolean()))
+          } +
+          ((diagnosticOutputChannelOption * string) + (regularOutputChannelOption * string)).map {
+              results: List<Any> ->
+            listOf(results[0] as Token, StringOptionValue(results[1] as String))
+          } +
+          /* use numeralBase here to have the number as string makes parsing later easier */
+          ((randomSeedOption * numeral) +
+                  (reproducibleResourceLimitOption * numeral) +
+                  (verbosityOption * numeral))
+              .map { results: List<Any> ->
+                listOf(results[0] as Token, NumeralOptionValue(results[1] as Int))
+              } +
+          attribute.map { result: Attribute ->
+            // set-option requires
+            listOf(result.keyword, AttributeOptionValue(result))
+          }
 
   // Commands
   private val sortDec = lparen * symbol * numeralBase * rparen
@@ -390,19 +491,29 @@ object Parser {
 
   private val exitCMD = (lparen * exitKW * rparen).map { results: ArrayList<Any> -> "(exit)" }
   private val setInfoCMD =
-      (lparen *
-              setInfoKW *
-              (letterCat + digitCat + whitespaceCat + anyOf(":+|,._-/\"")).star() *
-              rparen)
-          .map { results: ArrayList<Any> -> "(set-info)" }
+      (lparen * setInfoKW * attribute * rparen).map { results: ArrayList<Any> ->
+        SetInfo(results[2] as Attribute)
+      }
   private val setLogicCMD =
-      (lparen *
-              setLogicKW *
-              (letterCat + digitCat + whitespaceCat + anyOf(":+|,._-/\"")).star() *
-              rparen)
-          .map { results: ArrayList<Any> -> "(set-logic)" }
+      (lparen * setLogicKW * logic * rparen).map { results: ArrayList<Any> ->
+        SetLogic(results[2] as Logic)
+      }
+  private val setOptionCMD =
+      (lparen * setOptionKW * option * rparen).map { results: ArrayList<Any> ->
+        SetOption(
+            (results[2] as List<Any>)[0] as String, (results[2] as List<Any>)[0] as OptionValue)
+      }
 
-  val command = ChoiceParser(FailureJoiner.SelectFarthest(), assertCMD, checkSatCMD, declareConstCMD, declareFunCMD, exitCMD, setInfoCMD, setLogicCMD)
+  val command =
+      ChoiceParser(
+          FailureJoiner.SelectFarthest(),
+          assertCMD,
+          checkSatCMD,
+          declareConstCMD,
+          declareFunCMD,
+          exitCMD,
+          setInfoCMD,
+          setLogicCMD)
 
   val script = command.star().end()
 
