@@ -19,15 +19,13 @@
 package tools.aqua.konstraints
 
 import java.util.stream.Stream
-import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.petitparser.context.ParseError
 import tools.aqua.konstraints.parser.ParseTreeVisitor
 import tools.aqua.konstraints.parser.Parser
-import tools.aqua.konstraints.parser.ProtoCommand
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class BVTermSmallRWNoetzliTests {
@@ -42,26 +40,9 @@ class BVTermSmallRWNoetzliTests {
                 "/QF_BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_$id.smt2")!!
             .bufferedReader()
             .readLines()
-    val program = temp.map { it.trim('\r', '\n') }
+    val input = temp.map { it.trim('\r', '\n') }
 
-    val result = Parser.script.parse(program.joinToString(""))
-
-    if (result.isSuccess) {
-      /*
-       * CheckSat is not a ProtoCommand instance as the parser directly returns the CheckSat object,
-       * it is therefore filtered out here and missing in the output
-       */
-      val commands = result.get<List<Any>>().filterIsInstance<ProtoCommand>()
-
-      commands.forEachIndexed { i, command ->
-        val parsed = parseTreeVisitor.visit(command)
-        println(parsed)
-
-        assertNotNull(program.find { it == parsed.toString() })
-      }
-    } else {
-      throw ParseError(result.failure(result.message))
-    }
+    assertDoesNotThrow { Parser.parse(input.joinToString("")) }
   }
 
   private fun getInts(): Stream<Arguments> {

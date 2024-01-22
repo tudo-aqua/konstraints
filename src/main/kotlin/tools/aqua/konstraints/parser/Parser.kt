@@ -489,7 +489,7 @@ object Parser {
         // results[4] is guaranteed to be a List of ProtoSort
       }
 
-  private val exitCMD = (lparen * exitKW * rparen).map { results: ArrayList<Any> -> "(exit)" }
+  private val exitCMD = (lparen * exitKW * rparen).map { results: ArrayList<Any> -> Exit }
   private val setInfoCMD =
       (lparen * setInfoKW * attribute * rparen).map { results: ArrayList<Any> ->
         SetInfo(results[2] as Attribute)
@@ -521,4 +521,32 @@ object Parser {
 
   // Command responses
   // TODO
+
+  fun parse(program: String): SMTProgram {
+    val parseTreeVisitor = ParseTreeVisitor()
+
+    // TODO parse each command individually, fail on the first command that can not be parsed
+    // this will lead to better error messages but requires some preprocessing to split the input
+    // input individual commands (this may be done in linear time by searching the input from
+    // left to right counting the number of opening an closing brackets)
+    val protoCommands = script.parse(program)
+
+    if (protoCommands.isSuccess) {
+      val commands =
+          (protoCommands.get<List<Any>>()).map { command ->
+            when (command) {
+              is ProtoCommand -> parseTreeVisitor.visit(command)
+              is Command -> command
+              else -> throw IllegalStateException("Illegal type in parse tree $command!")
+            }
+          }
+
+      return SMTProgram(commands)
+    } else {
+      throw ParseException(protoCommands.message, protoCommands.position)
+    }
+  }
 }
+
+class ParseException(message: String, position: Int) :
+    RuntimeException("Parser failed with message $message at position $position!")

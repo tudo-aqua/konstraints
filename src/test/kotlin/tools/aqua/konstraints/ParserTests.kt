@@ -21,7 +21,6 @@ package tools.aqua.konstraints
 import java.lang.Exception
 import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments

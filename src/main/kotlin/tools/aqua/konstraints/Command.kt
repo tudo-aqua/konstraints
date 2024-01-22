@@ -21,10 +21,6 @@ package tools.aqua.konstraints
 import tools.aqua.konstraints.parser.Attribute
 import tools.aqua.konstraints.parser.OptionValue
 
-class SMTProgram(commands: List<Command>) {
-  // checkWellSorted, etc...
-}
-
 sealed class Command(val command: String) {
   override fun toString(): String = "($command)"
 }
