@@ -34,7 +34,8 @@ internal object BitVectorExpressionContext : TheoryContext {
           BVUDivDecl,
           BVURemDecl,
           BVShlDecl,
-          BVLShrDecl)
+          BVLShrDecl,
+          ExtractDecl)
   override val sorts = mapOf(Pair("BitVec", BVSortDecl))
 }
 
@@ -123,6 +124,26 @@ class BVExtract(val i: Int, val j: Int, val inner: Expression<BVSort>) : Express
     require(inner.sort.bits > i) {
       "i can not be greater than the number of bits in inner, but was $i"
     }
+  }
+}
+
+object ExtractDecl :
+    FunctionDecl1<BVSort, BVSort>(
+        "extract",
+        emptySet(),
+        BVSort.fromSymbol("m"),
+        setOf(SymbolIndex("i"), SymbolIndex("j"), SymbolIndex("m")),
+        BVSort.fromSymbol("n")) {
+
+  override fun buildExpression(args: List<Expression<*>>): Expression<BVSort> {
+    require(args.size == 1)
+    val bindings = bindParametersToWithExpressions(args, setOf(15.idx(), 0.idx()))
+
+    return buildExpression(args.single() as Expression<BVSort>, bindings)
+  }
+
+  override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> {
+    return BVExtract(bindings["i"].numeral, bindings["j"].numeral, param)
   }
 }
 

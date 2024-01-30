@@ -51,13 +51,26 @@ data class Signature(
         null
       }
 
-  fun bindParameters(actualParameters: List<Sort>): Bindings {
+  fun bindParameters(
+      actualParameters: List<Sort>,
+      funcIndices: Set<NumeralIndex> = emptySet()
+  ): Bindings {
     val parametricBindings = mutableMapOf<Sort, Sort>()
     val indexBindings = mutableMapOf<SymbolIndex, NumeralIndex>()
 
+    bindIndices(funcIndices, indexBindings)
     bindToInternal(parameters, actualParameters, parametricBindings, indexBindings)
 
     return Bindings(parametricBindings, indexBindings)
+  }
+
+  private fun bindIndices(
+      funcIndices: Set<NumeralIndex>,
+      indexBindings: MutableMap<SymbolIndex, NumeralIndex>
+  ) {
+    (funcIndices zip indices).forEach { (funcIndex, index) ->
+      bindToInternal(index, funcIndex, indexBindings)
+    }
   }
 
   fun bindReturnOrNull(actualReturn: Sort): Bindings? =

@@ -44,7 +44,10 @@ open class FunctionDecl<S : Sort>(
     return NAryExpression(name, sort, args)
   }
 
-  open fun bindParametersToWithExpressions(args: List<Expression<*>>) =
+  open fun bindParametersToWithExpressions(
+      args: List<Expression<*>>,
+      indices: Set<NumeralIndex> = emptySet()
+  ) =
       when (associativity) {
         Associativity.LEFT_ASSOC -> {
           args.slice(2 ..< args.size).forEach { require(args[0].sort == it.sort) }
@@ -62,7 +65,7 @@ open class FunctionDecl<S : Sort>(
           args.forEach { require(args[0].sort == it.sort) }
           signature.bindParameters(args.slice(0..1).map { it.sort })
         }
-        Associativity.NONE -> signature.bindParameters(args.map { it.sort })
+        Associativity.NONE -> signature.bindParameters(args.map { it.sort }, indices)
       }
 
   /** Returns true if the function accepts the arguments provided */
@@ -76,7 +79,7 @@ open class FunctionDecl<S : Sort>(
     return true
   }
 
-  fun bindParametersTo(args: List<Sort>) =
+  fun bindParametersTo(args: List<Sort>, indices: Set<NumeralIndex> = emptySet()) =
       when (associativity) {
         Associativity.LEFT_ASSOC -> {
           args.slice(2 ..< args.size).forEach { require(args[0] == it) }
@@ -97,7 +100,7 @@ open class FunctionDecl<S : Sort>(
         Associativity.NONE -> signature.bindParameters(args)
       }
 
-  fun accepts(args: List<Sort>): Boolean {
+  fun accepts(args: List<Sort>, indices: Set<NumeralIndex> = emptySet()): Boolean {
     try {
       bindParametersTo(args)
     } catch (e: Exception) {

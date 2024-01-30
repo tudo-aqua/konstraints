@@ -49,7 +49,8 @@ class VisitorTests {
               "(declare-fun b () (_ BitVec 32))",
               "(assert (bvult a b))",
               "(assert (not (bvult a b)))",
-              "(assert (and (bvult a b) (bvult b a)))"])
+              "(assert (and (bvult a b) (bvult b a)))",
+              "(assert (bvult ((_ extract 15 0) D) E))"])
   fun testCommandVisiting(statement: String) {
     val result = Parser.command.parse(statement)
 
