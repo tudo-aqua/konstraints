@@ -122,6 +122,9 @@ fun Equals.z3ify(context: Z3Context): Expr<Z3BoolSort> {
 fun Distinct.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkDistinct(*this.statements.map { it.z3ify(context) }.toTypedArray())
 
+fun BVUlt.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkBVULT(lhs.z3ify(context), rhs.z3ify(context))
+
 @JvmName("z3ifyBitVec")
 fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
     when {

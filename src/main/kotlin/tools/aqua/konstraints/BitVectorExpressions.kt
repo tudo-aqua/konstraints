@@ -44,7 +44,7 @@ internal object BVSortDecl : SortDecl<BVSort>("BitVec") {
     require(sort.identifier is IndexedIdentifier)
     require(sort.identifier.indices.size == 1)
 
-    return BVSort((sort.identifier.indices[0] as NumeralParseIndex).numeral)
+    return BVSort((sort.identifier.indices[0] as NumeralIndex).numeral)
   }
 }
 
@@ -94,6 +94,7 @@ object BVConcatDecl :
         emptySet(),
         BVSort.fromSymbol("a"),
         BVSort.fromSymbol("b"),
+        emptySet(),
         setOf(SymbolIndex("a"), SymbolIndex("b")),
         BVSort.fromSymbol("c")) {
   override fun buildExpression(
@@ -132,12 +133,16 @@ object ExtractDecl :
         "extract",
         emptySet(),
         BVSort.fromSymbol("m"),
-        setOf(SymbolIndex("i"), SymbolIndex("j"), SymbolIndex("m")),
+        setOf(SymbolIndex("i"), SymbolIndex("j")),
+        setOf(SymbolIndex("m")),
         BVSort.fromSymbol("n")) {
 
-  override fun buildExpression(args: List<Expression<*>>): Expression<BVSort> {
+  override fun buildExpression(
+      args: List<Expression<*>>,
+      functionIndices: Set<NumeralIndex>
+  ): Expression<BVSort> {
     require(args.size == 1)
-    val bindings = bindParametersToWithExpressions(args, setOf(15.idx(), 0.idx()))
+    val bindings = bindParametersToWithExpressions(args, functionIndices)
 
     return buildExpression(args.single() as Expression<BVSort>, bindings)
   }
@@ -164,6 +169,7 @@ object BVNotDecl :
         "bvnot",
         emptySet(),
         BVSort.fromSymbol("A"),
+        emptySet(),
         setOf(SymbolIndex("A")),
         BVSort.fromSymbol("A")) {
   override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
@@ -187,6 +193,7 @@ object BVNegDecl :
         "bvneg",
         emptySet(),
         BVSort.fromSymbol("A"),
+        emptySet(),
         setOf(SymbolIndex("A")),
         BVSort.fromSymbol("A")) {
   override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
@@ -226,6 +233,7 @@ object BVAndDecl :
         emptySet(),
         BVSort.fromSymbol("A"),
         BVSort.fromSymbol("A"),
+        emptySet(),
         setOf(SymbolIndex("A")),
         BVSort.fromSymbol("A")) {
   override fun buildExpression(
@@ -270,6 +278,7 @@ object BVOrDecl :
         emptySet(),
         BVSort.fromSymbol("A"),
         BVSort.fromSymbol("A"),
+        emptySet(),
         setOf(SymbolIndex("A")),
         BVSort.fromSymbol("A")) {
   override fun buildExpression(
@@ -313,6 +322,7 @@ object BVAddDecl :
         emptySet(),
         BVSort.fromSymbol("A"),
         BVSort.fromSymbol("A"),
+        emptySet(),
         setOf(SymbolIndex("A")),
         BVSort.fromSymbol("A")) {
   override fun buildExpression(
@@ -356,6 +366,7 @@ object BVMulDecl :
         emptySet(),
         BVSort.fromSymbol("A"),
         BVSort.fromSymbol("A"),
+        emptySet(),
         setOf(SymbolIndex("A")),
         BVSort.fromSymbol("A")) {
   override fun buildExpression(
@@ -395,6 +406,7 @@ object BVUDivDecl :
         emptySet(),
         BVSort.fromSymbol("A"),
         BVSort.fromSymbol("A"),
+        emptySet(),
         setOf(SymbolIndex("A")),
         BVSort.fromSymbol("A")) {
   override fun buildExpression(
@@ -429,6 +441,7 @@ object BVURemDecl :
         emptySet(),
         BVSort.fromSymbol("A"),
         BVSort.fromSymbol("A"),
+        emptySet(),
         setOf(SymbolIndex("A")),
         BVSort.fromSymbol("A")) {
   override fun buildExpression(
@@ -465,6 +478,7 @@ object BVShlDecl :
         emptySet(),
         BVSort.fromSymbol("A"),
         BVSort.fromSymbol("A"),
+        emptySet(),
         setOf(SymbolIndex("A")),
         BVSort.fromSymbol("A")) {
   override fun buildExpression(
@@ -501,6 +515,7 @@ object BVLShrDecl :
         emptySet(),
         BVSort.fromSymbol("A"),
         BVSort.fromSymbol("A"),
+        emptySet(),
         setOf(SymbolIndex("A")),
         BVSort.fromSymbol("A")) {
   override fun buildExpression(
@@ -537,6 +552,7 @@ object BVUltDecl :
         emptySet(),
         BVSort.fromSymbol("a"),
         BVSort.fromSymbol("a"),
+        emptySet(),
         setOf(SymbolIndex("a")),
         BoolSort) {
   override fun buildExpression(

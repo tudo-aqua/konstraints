@@ -26,6 +26,7 @@ import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import org.petitparser.context.ParseError
 import tools.aqua.konstraints.parser.ParseTreeVisitor
 import tools.aqua.konstraints.parser.Parser
@@ -97,5 +98,36 @@ class Z3Tests {
 
   private fun getInts(): Stream<Arguments> {
     return IntArray(1575) { it }.map { Arguments.arguments(it + 1) }.stream()
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(declare-fun A () (_ BitVec 32))(declare-fun B () (_ BitVec 16))(assert (bvult ((_ extract 15 0) A) B))(check-sat)"])
+  fun testExtract(program: String) {
+    val parseTreeVisitor = ParseTreeVisitor()
+    val solver = Z3Solver()
+
+    val result = Parser.script.parse(program)
+
+    if (result.isSuccess) {
+      val commands =
+          result
+              .get<List<Any>>()
+              .filter { it is ProtoCommand || it is Command }
+              .map { if (it is ProtoCommand) parseTreeVisitor.visit(it) else it } as List<Command>
+
+      println(commands.joinToString("\n"))
+
+      solver.use {
+        commands.map { solver.visit(it) }
+
+        // verify we get the correct status for the test
+        assertEquals("sat", solver.status)
+      }
+    } else {
+      throw ParseError(result.failure(result.message))
+    }
   }
 }

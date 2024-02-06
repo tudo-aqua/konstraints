@@ -55,6 +55,7 @@ class ContextTests {
           emptySet(),
           listOf(BVSort(32), BVSort(32)),
           emptySet(),
+          emptySet(),
           BVSort(32),
           Associativity.NONE)
 
@@ -121,7 +122,7 @@ class ContextTests {
     val function = context.getFunction(name, args)
 
     requireNotNull(function)
-    assert(function.acceptsExpressions(args))
+    assert(function.acceptsExpressions(args, emptySet()))
   }
 
   private fun getFunctionNameAndArgs(): Stream<Arguments> {
@@ -149,7 +150,7 @@ class ContextTests {
       function: FunctionDecl<*>,
       args: List<Expression<*>>
   ) {
-    assertFalse(function.acceptsExpressions(args))
+    assertFalse(function.acceptsExpressions(args, emptySet()))
   }
 
   @ParameterizedTest
@@ -159,7 +160,7 @@ class ContextTests {
       function: FunctionDecl<*>,
       args: List<Expression<*>>
   ) {
-    assertThrows<Exception> { function.buildExpression(args) }
+    assertThrows<Exception> { function.buildExpression(args, emptySet()) }
   }
 
   private fun getFunctionNameAndIncorrectArgs(): Stream<Arguments> {
@@ -198,6 +199,7 @@ class ContextTests {
                 emptySet(),
                 listOf(BoolSort, BoolSort),
                 emptySet(),
+                emptySet(),
                 BoolSort,
                 Associativity.NONE)),
         /* New overloaded */
@@ -206,6 +208,7 @@ class ContextTests {
                 "and",
                 emptySet(),
                 listOf(BVSort(16), BVSort(16)),
+                emptySet(),
                 emptySet(),
                 BoolSort,
                 Associativity.NONE)),
@@ -216,6 +219,7 @@ class ContextTests {
                 emptySet(),
                 listOf(BoolSort, BoolSort, BoolSort),
                 emptySet(),
+                emptySet(),
                 BVSort(16),
                 Associativity.NONE)),
         /* New ambiguous */
@@ -225,6 +229,7 @@ class ContextTests {
                 emptySet(),
                 listOf(BVSort(16), BVSort(16)),
                 emptySet(),
+                emptySet(),
                 BVSort(16),
                 Associativity.NONE)),
         /* ??? */
@@ -233,6 +238,7 @@ class ContextTests {
                 "bvult",
                 emptySet(),
                 listOf(BVSort(16), BVSort(32)),
+                emptySet(),
                 emptySet(),
                 BoolSort,
                 Associativity.NONE)),
@@ -257,6 +263,7 @@ class ContextTests {
                 emptySet(),
                 listOf(BoolSort, BoolSort, BoolSort),
                 emptySet(),
+                emptySet(),
                 BoolSort,
                 Associativity.NONE)),
         /* Illegal */
@@ -265,6 +272,7 @@ class ContextTests {
                 "bvult",
                 emptySet(),
                 listOf(BVSort(16), BVSort(16)),
+                emptySet(),
                 emptySet(),
                 BoolSort,
                 Associativity.NONE)))

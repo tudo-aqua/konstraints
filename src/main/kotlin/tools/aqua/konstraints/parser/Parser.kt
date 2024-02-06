@@ -267,14 +267,14 @@ object Parser {
 
   /* maps to an implementation of Index */
   private val index =
-      (numeral.map { numeral: Int -> NumeralParseIndex(numeral) } +
-          symbol.map { symbol: ParseSymbol -> SymbolParseIndex(symbol) }) trim whitespaceCat
+      (numeral.map { numeral: Int -> NumeralIndex(numeral) } +
+          symbol.map { symbol: ParseSymbol -> SymbolIndex(symbol.toSymbol()) }) trim whitespaceCat
 
   /* maps to an implementation of Identifier */
   private val identifier =
       symbol.map { symbol: ParseSymbol -> SymbolIdentifier(symbol) } +
           (lparen * of("_") * symbol * index.plus() * rparen).map { results: List<Any> ->
-            IndexedIdentifier(results[2] as ParseSymbol, results[3] as List<ParseIndex>)
+            IndexedIdentifier(results[2] as ParseSymbol, results[3] as List<Index>)
             // results[3] is guaranteed to be a list of Index
           }
 

@@ -59,7 +59,7 @@ internal class ParseTreeVisitor :
     val op = context.getFunction(simpleQualIdentifier.identifier, listOf())
 
     if (op != null) {
-      return op.buildExpression(listOf())
+      return op.buildExpression(listOf(), emptySet())
     } else {
       throw IllegalStateException("Unknown fun ${simpleQualIdentifier.identifier.symbol.symbol}")
       // TODO UnknownFunctionException
@@ -79,8 +79,18 @@ internal class ParseTreeVisitor :
 
     val op = context.getFunction(bracketedProtoTerm.qualIdentifier.identifier.symbol.symbol, terms)
 
+    val functionIndices =
+        if (bracketedProtoTerm.qualIdentifier.identifier is IndexedIdentifier) {
+          (bracketedProtoTerm.qualIdentifier.identifier as IndexedIdentifier)
+              .indices
+              .map { it as NumeralIndex }
+              .toSet()
+        } else {
+          emptySet()
+        }
+
     if (op != null) {
-      return op.buildExpression(terms)
+      return op.buildExpression(terms, functionIndices)
     } else {
       throw IllegalStateException(
           "Unknown fun ${bracketedProtoTerm.qualIdentifier.identifier.symbol.symbol}") // TODO

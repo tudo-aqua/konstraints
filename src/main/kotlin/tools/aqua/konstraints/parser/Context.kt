@@ -41,7 +41,7 @@ internal class Context {
     val conflicts = functionLookup[function.name]
 
     if (conflicts != null) {
-      val conflictParams = conflicts.filter { it.accepts(function.params) }
+      val conflictParams = conflicts.filter { it.accepts(function.params, emptySet()) }
 
       if (conflictParams.isNotEmpty()) {
         val conflictReturns =
@@ -62,7 +62,8 @@ internal class Context {
 
   fun registerFunction(const: ProtoDeclareConst, sort: Sort) {
     registerFunction(
-        FunctionDecl(const.name, emptySet(), listOf(), emptySet(), sort, Associativity.NONE))
+        FunctionDecl(
+            const.name, emptySet(), listOf(), emptySet(), emptySet(), sort, Associativity.NONE))
   }
 
   fun registerFunction(function: ProtoDeclareFun, parameters: List<Sort>, sort: Sort) {
@@ -75,7 +76,7 @@ internal class Context {
 
   fun registerFunction(name: String, params: List<Sort>, sort: Sort) {
     this.registerFunction(
-        FunctionDecl(name, emptySet(), params, emptySet(), sort, Associativity.NONE))
+        FunctionDecl(name, emptySet(), params, emptySet(), emptySet(), sort, Associativity.NONE))
   }
 
   fun registerSort(sort: SortDecl<*>) {
@@ -100,7 +101,7 @@ internal class Context {
    * @throws IllegalArgumentException if the function specified by name and args is ambiguous
    */
   fun getFunction(name: String, args: List<Expression<*>>): FunctionDecl<*>? {
-    return functionLookup[name]?.single { func -> func.accepts(args.map { it.sort }) }
+    return functionLookup[name]?.single { func -> func.accepts(args.map { it.sort }, emptySet()) }
   }
 
   fun getSort(protoSort: ProtoSort): Sort {

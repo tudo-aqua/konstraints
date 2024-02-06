@@ -20,6 +20,7 @@ package tools.aqua.konstraints.parser
 
 import java.math.BigDecimal
 import org.petitparser.context.Token
+import tools.aqua.konstraints.Index
 import tools.aqua.konstraints.Symbol
 
 internal sealed interface ProtoCommand
@@ -77,16 +78,8 @@ internal sealed interface Identifier {
 
 internal data class SymbolIdentifier(override val symbol: ParseSymbol) : Identifier
 
-internal data class IndexedIdentifier(
-    override val symbol: ParseSymbol,
-    val indices: List<ParseIndex>
-) : Identifier
-
-internal sealed interface ParseIndex
-
-internal data class SymbolParseIndex(val symbol: ParseSymbol) : ParseIndex
-
-internal data class NumeralParseIndex(val numeral: Int) : ParseIndex
+internal data class IndexedIdentifier(override val symbol: ParseSymbol, val indices: List<Index>) :
+    Identifier
 
 // Sorts
 
