@@ -50,8 +50,7 @@ fun makeRightAssoc(
     operation(expressions[0].z3ify(context), expressions[1].z3ify(context))
   } else {
     operation(
-        expressions.first().z3ify(context), makeRightAssoc(expressions.drop(1), context, operation)
-    )
+        expressions.first().z3ify(context), makeRightAssoc(expressions.drop(1), context, operation))
   }
 }
 
