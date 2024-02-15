@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.visitors.Z3
+package tools.aqua.konstraints.solvers.Z3
 
 import com.microsoft.z3.Context
 import com.microsoft.z3.Expr

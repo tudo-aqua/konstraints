@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.visitors.Z3
+package tools.aqua.konstraints.solvers.Z3
 
 import com.microsoft.z3.BitVecSort
 import com.microsoft.z3.BoolSort as Z3BoolSort
@@ -50,7 +50,8 @@ fun makeRightAssoc(
     operation(expressions[0].z3ify(context), expressions[1].z3ify(context))
   } else {
     operation(
-        expressions.first().z3ify(context), makeRightAssoc(expressions.drop(1), context, operation))
+        expressions.first().z3ify(context), makeRightAssoc(expressions.drop(1), context, operation)
+    )
   }
 }
 

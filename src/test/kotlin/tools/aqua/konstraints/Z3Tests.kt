@@ -31,7 +31,7 @@ import org.petitparser.context.ParseError
 import tools.aqua.konstraints.parser.ParseTreeVisitor
 import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.parser.ProtoCommand
-import tools.aqua.konstraints.visitors.Z3.Z3Solver
+import tools.aqua.konstraints.solvers.Z3.Z3Solver
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Z3Tests {
