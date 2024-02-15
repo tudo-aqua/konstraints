@@ -137,7 +137,7 @@ class ContextTests {
         arguments("bvult", listOf(bv32Expression, bv32Expression), BoolSort),
         arguments("O", listOf(boolExpression, boolExpression), BoolSort),
         arguments("O", listOf(bv32Expression, bv32Expression), BVSort(32)),
-        arguments("concat", listOf(bv32Expression, bv32Expression), BVSort.fromSymbol("c")),
+        arguments("concat", listOf(bv32Expression, bv32Expression), BVSort.fromSymbol("m")),
         arguments("=", listOf(boolExpression, boolExpression), BoolSort),
         arguments("=", listOf(boolExpression, boolExpression, boolExpression), BoolSort),
         arguments("=", listOf(bv32Expression, bv32Expression), BoolSort))

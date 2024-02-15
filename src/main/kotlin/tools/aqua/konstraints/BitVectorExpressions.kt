@@ -92,11 +92,11 @@ object BVConcatDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
         "concat",
         emptySet(),
-        BVSort.fromSymbol("a"),
-        BVSort.fromSymbol("b"),
+        BVSort.fromSymbol("i"),
+        BVSort.fromSymbol("j"),
         emptySet(),
-        setOf(SymbolIndex("a"), SymbolIndex("b")),
-        BVSort.fromSymbol("c")) {
+        setOf(SymbolIndex("i"), SymbolIndex("j")),
+        BVSort.fromSymbol("m")) {
   override fun buildExpression(
       param1: Expression<BVSort>,
       param2: Expression<BVSort>,
@@ -142,7 +142,7 @@ object ExtractDecl :
       functionIndices: Set<NumeralIndex>
   ): Expression<BVSort> {
     require(args.size == 1)
-    val bindings = bindParametersToWithExpressions(args, functionIndices)
+    val bindings = bindParametersToExpressions(args, functionIndices)
 
     return buildExpression(args.single() as Expression<BVSort>, bindings)
   }
@@ -168,10 +168,10 @@ object BVNotDecl :
     FunctionDecl1<BVSort, BVSort>(
         "bvnot",
         emptySet(),
-        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("m"),
         emptySet(),
-        setOf(SymbolIndex("A")),
-        BVSort.fromSymbol("A")) {
+        setOf(SymbolIndex("m")),
+        BVSort.fromSymbol("m")) {
   override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
       BVNot(param)
 }
@@ -192,10 +192,10 @@ object BVNegDecl :
     FunctionDecl1<BVSort, BVSort>(
         "bvneg",
         emptySet(),
-        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("m"),
         emptySet(),
-        setOf(SymbolIndex("A")),
-        BVSort.fromSymbol("A")) {
+        setOf(SymbolIndex("m")),
+        BVSort.fromSymbol("m")) {
   override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
       BVNeg(param)
 }
@@ -231,11 +231,11 @@ object BVAndDecl :
     FunctionDeclLeftAssociative<BVSort, BVSort, BVSort>(
         "bvand",
         emptySet(),
-        BVSort.fromSymbol("A"),
-        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("m"),
+        BVSort.fromSymbol("m"),
         emptySet(),
-        setOf(SymbolIndex("A")),
-        BVSort.fromSymbol("A")) {
+        setOf(SymbolIndex("m")),
+        BVSort.fromSymbol("m")) {
   override fun buildExpression(
       param1: Expression<BVSort>,
       param2: Expression<BVSort>,
@@ -276,11 +276,11 @@ object BVOrDecl :
     FunctionDeclLeftAssociative<BVSort, BVSort, BVSort>(
         "bvor",
         emptySet(),
-        BVSort.fromSymbol("A"),
-        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("m"),
+        BVSort.fromSymbol("m"),
         emptySet(),
-        setOf(SymbolIndex("A")),
-        BVSort.fromSymbol("A")) {
+        setOf(SymbolIndex("m")),
+        BVSort.fromSymbol("m")) {
   override fun buildExpression(
       param1: Expression<BVSort>,
       param2: Expression<BVSort>,
@@ -320,11 +320,11 @@ object BVAddDecl :
     FunctionDeclLeftAssociative<BVSort, BVSort, BVSort>(
         "bvadd",
         emptySet(),
-        BVSort.fromSymbol("A"),
-        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("m"),
+        BVSort.fromSymbol("m"),
         emptySet(),
-        setOf(SymbolIndex("A")),
-        BVSort.fromSymbol("A")) {
+        setOf(SymbolIndex("m")),
+        BVSort.fromSymbol("m")) {
   override fun buildExpression(
       param1: Expression<BVSort>,
       param2: Expression<BVSort>,
@@ -364,11 +364,11 @@ object BVMulDecl :
     FunctionDeclLeftAssociative<BVSort, BVSort, BVSort>(
         "bvmul",
         emptySet(),
-        BVSort.fromSymbol("A"),
-        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("m"),
+        BVSort.fromSymbol("m"),
         emptySet(),
-        setOf(SymbolIndex("A")),
-        BVSort.fromSymbol("A")) {
+        setOf(SymbolIndex("m")),
+        BVSort.fromSymbol("m")) {
   override fun buildExpression(
       param1: Expression<BVSort>,
       param2: Expression<BVSort>,
@@ -404,11 +404,11 @@ object BVUDivDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
         "bvudiv",
         emptySet(),
-        BVSort.fromSymbol("A"),
-        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("m"),
+        BVSort.fromSymbol("m"),
         emptySet(),
-        setOf(SymbolIndex("A")),
-        BVSort.fromSymbol("A")) {
+        setOf(SymbolIndex("m")),
+        BVSort.fromSymbol("m")) {
   override fun buildExpression(
       param1: Expression<BVSort>,
       param2: Expression<BVSort>,
@@ -439,11 +439,11 @@ object BVURemDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
         "bvurem",
         emptySet(),
-        BVSort.fromSymbol("A"),
-        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("m"),
+        BVSort.fromSymbol("m"),
         emptySet(),
-        setOf(SymbolIndex("A")),
-        BVSort.fromSymbol("A")) {
+        setOf(SymbolIndex("m")),
+        BVSort.fromSymbol("m")) {
   override fun buildExpression(
       param1: Expression<BVSort>,
       param2: Expression<BVSort>,
@@ -476,11 +476,11 @@ object BVShlDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
         "bvshl",
         emptySet(),
-        BVSort.fromSymbol("A"),
-        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("m"),
+        BVSort.fromSymbol("m"),
         emptySet(),
-        setOf(SymbolIndex("A")),
-        BVSort.fromSymbol("A")) {
+        setOf(SymbolIndex("m")),
+        BVSort.fromSymbol("m")) {
   override fun buildExpression(
       param1: Expression<BVSort>,
       param2: Expression<BVSort>,
@@ -513,11 +513,11 @@ object BVLShrDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
         "bvlshr",
         emptySet(),
-        BVSort.fromSymbol("A"),
-        BVSort.fromSymbol("A"),
+        BVSort.fromSymbol("m"),
+        BVSort.fromSymbol("m"),
         emptySet(),
-        setOf(SymbolIndex("A")),
-        BVSort.fromSymbol("A")) {
+        setOf(SymbolIndex("m")),
+        BVSort.fromSymbol("m")) {
   override fun buildExpression(
       param1: Expression<BVSort>,
       param2: Expression<BVSort>,
@@ -550,10 +550,10 @@ object BVUltDecl :
     FunctionDecl2<BVSort, BVSort, BoolSort>(
         "bvult",
         emptySet(),
-        BVSort.fromSymbol("a"),
-        BVSort.fromSymbol("a"),
+        BVSort.fromSymbol("m"),
+        BVSort.fromSymbol("m"),
         emptySet(),
-        setOf(SymbolIndex("a")),
+        setOf(SymbolIndex("m")),
         BoolSort) {
   override fun buildExpression(
       param1: Expression<BVSort>,
