@@ -21,14 +21,30 @@ package tools.aqua.konstraints.parser
 import tools.aqua.konstraints.*
 import tools.aqua.konstraints.util.zipWithSameLength
 
+/**
+ * data class holding the signature of a [FunctionDecl]
+ * @param parametricSorts set of parametric sorts
+ * @param functionIndices set of the function name indices (i.e. (_ extract i j))
+ * @param parameterIndices set of function parameter indices (i.e. (_ BitVec m))
+ * @param parameters list of function parameters
+ * @param returnSort sort of the function
+ */
 data class Signature(
     val parametricSorts: Set<Sort>,
     val functionIndices: Set<SymbolIndex>,
-    val paramIndices: Set<SymbolIndex>,
+    val parameterIndices: Set<SymbolIndex>,
     val parameters: List<Sort>,
     val returnSort: Sort
 ) {
-  fun bindToOrNull(
+
+    /**
+     * Bind the function indices, parametric sorts and return sort
+     * @param actualParameters list of parameters passed to the SMT function
+     * @param actualFunctionIndices set of the numeral indices
+     * @param actualReturn return sort of the function
+     * @return the binding object if binding was successful, null otherwise
+     */
+    fun bindToOrNull(
       actualParameters: List<Sort>,
       actualFunctionIndices: Set<NumeralIndex>,
       actualReturn: Sort
@@ -39,6 +55,15 @@ data class Signature(
         null
       }
 
+    /**
+     * Bind the function indices, parametric sorts and return sort
+     * @param actualParameters list of parameters passed to the SMT function
+     * @param actualFunctionIndices set of the numeral indices
+     * @param actualReturn return sort of the function
+     * @return the binding object if binding was successful
+     * @throws BindException if an index is already bound
+     * @throws IllegalArgumentException if length of actualParameters does not match length of function parameters
+     */
   fun bindTo(
       actualParameters: List<Sort>,
       actualFunctionIndices: Set<NumeralIndex>,
@@ -48,12 +73,18 @@ data class Signature(
     val indexBindings = mutableMapOf<SymbolIndex, NumeralIndex>()
 
     bindToInternal(parameters, actualParameters, parametricBindings, indexBindings)
-    bindToInternal(actualFunctionIndices, indexBindings)
-    bindToInternal(returnSort, actualReturn, parametricBindings, indexBindings)
+    bindFunctionIndices(actualFunctionIndices, indexBindings)
+    bindParameter(returnSort, actualReturn, parametricBindings, indexBindings)
 
     return Bindings(parametricBindings, indexBindings)
   }
 
+    /**
+     * Bind only the function indices and parametric sorts
+     * @param actualParameters list of parameters passed to the SMT function
+     * @param actualFunctionIndices set of the numeral indices
+     * @return the binding object if binding was successful, null otherwise
+     */
   fun bindParametersOrNull(
       actualParameters: List<Sort>,
       actualFunctionIndices: Set<NumeralIndex>
@@ -64,6 +95,14 @@ data class Signature(
         null
       }
 
+    /**
+     * Bind only the function indices and parametric sorts
+     * @param actualParameters list of parameters passed to the SMT function
+     * @param actualFunctionIndices set of the numeral indices
+     * @return the binding object if binding was successful
+     * @throws BindException if an index is already bound
+     * @throws IllegalArgumentException if length of actualParameters does not match length of function parameters
+     */
   fun bindParameters(
       actualParameters: List<Sort>,
       actualFunctionIndices: Set<NumeralIndex>
@@ -71,22 +110,17 @@ data class Signature(
     val parametricBindings = mutableMapOf<Sort, Sort>()
     val indexBindings = mutableMapOf<SymbolIndex, NumeralIndex>()
 
-    bindToInternal(actualFunctionIndices, indexBindings)
     bindToInternal(parameters, actualParameters, parametricBindings, indexBindings)
+      bindFunctionIndices(actualFunctionIndices, indexBindings)
 
     return Bindings(parametricBindings, indexBindings)
   }
 
-  private fun bindToInternal(
-      funcIndices: Set<NumeralIndex>,
-      indexBindings: MutableMap<SymbolIndex, NumeralIndex>
-  ) {
-    // TODO handle case of already bound index (exception?)
-    (funcIndices zip functionIndices).forEach { (funcIndex, index) ->
-      bindToInternal(index, funcIndex, functionIndices, indexBindings)
-    }
-  }
-
+    /**
+     * Bind only the return sort of the function
+     * @param actualReturn return sort of the function
+     * @return the binding object if binding was successful, null otherwise
+     */
   fun bindReturnOrNull(actualReturn: Sort): Bindings? =
       try {
         bindReturn(actualReturn)
@@ -94,15 +128,25 @@ data class Signature(
         null
       }
 
+    /**
+     * Bind only the return sort of the function
+     * @param actualReturn return sort of the function
+     * @return the binding object if binding was successful
+     * @throws BindException if an index is already bound
+     * @throws IllegalArgumentException if length of actualParameters does not match length of function parameters
+     */
   fun bindReturn(actualReturn: Sort): Bindings {
     val parametricBindings = mutableMapOf<Sort, Sort>()
     val indexBindings = mutableMapOf<SymbolIndex, NumeralIndex>()
 
-    bindToInternal(returnSort, actualReturn, parametricBindings, indexBindings)
+    bindParameter(returnSort, actualReturn, parametricBindings, indexBindings)
 
     return Bindings(parametricBindings, indexBindings)
   }
 
+    /**
+     * zip the symbolicParameters with the actualParameters then try to bind each pair
+     */
   private fun bindToInternal(
       symbolicParameters: List<Sort>,
       actualParameters: List<Sort>,
@@ -110,11 +154,29 @@ data class Signature(
       indexBindings: MutableMap<SymbolIndex, NumeralIndex>
   ) {
     (symbolicParameters zipWithSameLength actualParameters).forEach { (symbolic, actual) ->
-      bindToInternal(symbolic, actual, parametricBindings, indexBindings)
+      bindParameter(symbolic, actual, parametricBindings, indexBindings)
     }
   }
 
-  private fun bindToInternal(
+    /**
+     * bind each function index to [functionIndices]
+     */
+    private fun bindFunctionIndices(
+        funcIndices: Set<NumeralIndex>,
+        indexBindings: MutableMap<SymbolIndex, NumeralIndex>
+    ) {
+        // TODO handle case of already bound index (exception?)
+        (funcIndices zip functionIndices).forEach { (funcIndex, index) ->
+            bindIndex(index, funcIndex, functionIndices, indexBindings)
+        }
+    }
+
+    /**
+     * bind a single parameter
+     * if its a parametric sort bind it to an actual sort
+     * then if present bind all indices or match already bound indices
+     */
+  private fun bindParameter(
       symbolic: Sort,
       actual: Sort,
       parametricBindings: MutableMap<Sort, Sort>,
@@ -130,10 +192,10 @@ data class Signature(
         when (symbolicIndex) {
           is SymbolIndex -> {
             // bind the symbolicIndex if it has not been already bound
-            bindToInternal(symbolicIndex, actualIndex, paramIndices, indexBindings)
+            bindIndex(symbolicIndex, actualIndex, parameterIndices, indexBindings)
           }
           is NumeralIndex -> {
-            // just try to match
+            // else just try to match
             require(actualIndex is NumeralIndex)
             require(symbolicIndex.numeral == actualIndex.numeral)
           }
@@ -143,14 +205,17 @@ data class Signature(
     }
   }
 
-  private fun bindToInternal(
+    /**
+     * bind the provided index to the symbolic index of set [targetIndices]
+     */
+  private fun bindIndex(
       symbolic: SymbolIndex,
       actual: Index,
-      target: Set<SymbolIndex>,
+      targetIndices: Set<SymbolIndex>,
       indexBindings: MutableMap<SymbolIndex, NumeralIndex>
   ) {
     require(actual is NumeralIndex)
-    if (symbolic in target) {
+    if (symbolic in targetIndices) {
       indexBindings.bindParametersTo(symbolic, actual)
     }
   }
