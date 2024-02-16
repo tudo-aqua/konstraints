@@ -529,24 +529,53 @@ object Parser {
     // this will lead to better error messages but requires some preprocessing to split the input
     // input individual commands (this may be done in linear time by searching the input from
     // left to right counting the number of opening an closing brackets)
-    val protoCommands = script.parse(program)
+    val commands = splitInput(program.trim())
+    val protoCommands = commands.map {
+        val temp = command.parse(it)
 
-    if (protoCommands.isSuccess) {
-      val commands =
-          (protoCommands.get<List<Any>>()).map { command ->
-            when (command) {
+        if (temp.isSuccess) {
+            temp
+        } else {
+            throw ParseException(temp.message, temp.position, temp.buffer)
+        }
+    }
+
+      return SMTProgram(protoCommands.map { result ->
+          result.get<Any>()
+      }.map { command ->
+          when (command) {
               is ProtoCommand -> parseTreeVisitor.visit(command)
               is Command -> command
               else -> throw IllegalStateException("Illegal type in parse tree $command!")
-            }
           }
-
-      return SMTProgram(commands)
-    } else {
-      throw ParseException(protoCommands.message, protoCommands.position)
-    }
+      }
+      )
   }
+
+    private fun splitInput(program: String) : List<String> {
+        val commands = mutableListOf<String>()
+        var count = 0
+        var position = 0
+
+        program.forEachIndexed { index, c ->
+            if(c == '(') {
+                if (count == 0) {
+                    position = index
+                }
+
+                count++
+            } else if (c == ')') {
+                count--
+
+                if (count == 0) {
+                    commands.add(program.substring(position, index + 1))
+                }
+            }
+        }
+
+        return commands
+    }
 }
 
-class ParseException(message: String, position: Int) :
-    RuntimeException("Parser failed with message $message at position $position!")
+class ParseException(message: String, position: Int, buffer: String) :
+    RuntimeException("Parser failed with message $message at position $position: ${buffer.substring(position)}")

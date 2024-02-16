@@ -130,4 +130,35 @@ class Z3Tests {
       throw ParseError(result.failure(result.message))
     }
   }
+
+    @ParameterizedTest
+    @ValueSource(
+        strings = [
+            """
+        (set-logic QF_BV) 
+        (declare-fun x_0 () (_ BitVec 32))
+        (declare-fun x_1 () (_ BitVec 32))
+        (declare-fun x_2 () (_ BitVec 32))   
+        (declare-fun y_0 () (_ BitVec 32))
+        (declare-fun y_1 () (_ BitVec 32))   
+        (assert (= x_1 (bvadd x_0 y_0))) 
+        (assert (= y_1 (bvadd x_1 y_0)))
+        (assert (= x_2 (bvadd x_1 y_1)))
+        (assert (not (and (= x_2 y_0) (= y_1 x_0))))
+        (check-sat)
+        (exit)        
+    """
+        ]
+    )
+    fun testEquals(program: String) {
+        val solver = Z3Solver()
+
+        val result = Parser.parse(program)
+        solver.use {
+            result.commands.map { solver.visit(it) }
+
+            // verify we get the correct status for the test
+            assertEquals("sat", solver.status)
+        }
+    }
 }
