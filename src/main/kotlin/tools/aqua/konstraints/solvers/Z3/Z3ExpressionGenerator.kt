@@ -92,6 +92,7 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
       is RealLess -> this.z3ify(context)
       is RealGreaterEq -> this.z3ify(context)
       is RealGreater -> this.z3ify(context)
+      is IsInt -> this.z3ify(context)
       /* this also has to handle declared functions */
       else ->
           if (context.constants[this.symbol] != null) {
@@ -192,6 +193,9 @@ fun RealGreater.z3ify(context: Z3Context): Expr<Z3BoolSort> =
 
 fun Divisible.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
 
+fun IsInt.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkIsInteger(this.inner.z3ify(context))
+
 @JvmName("z3ifyBitVec")
 fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
     when (this) {
@@ -280,6 +284,7 @@ fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
       is IntDiv -> this.z3ify(context)
       is Mod -> this.z3ify(context)
       is Abs -> this.z3ify(context)
+      is ToInt -> this.z3ify(context)
       else ->
           if (context.constants[this.symbol] != null) {
             context.constants[this.symbol]!! as Expr<Z3IntSort>
@@ -315,6 +320,9 @@ fun Mod.z3ify(context: Z3Context): Expr<Z3IntSort> =
 
 fun Abs.z3ify(context: Z3Context): Expr<Z3IntSort> = TODO()
 
+fun ToInt.z3ify(context: Z3Context): Expr<Z3IntSort> =
+    context.context.mkReal2Int(this.inner.z3ify(context))
+
 @JvmName("z3ifyReals")
 fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
     when (this) {
@@ -324,6 +332,7 @@ fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
       is RealAdd -> this.z3ify(context)
       is RealMul -> this.z3ify(context)
       is RealDiv -> this.z3ify(context)
+      is ToReal -> this.z3ify(context)
       else ->
           if (context.constants[this.symbol] != null) {
             context.constants[this.symbol]!! as Expr<Z3RealSort>
@@ -354,3 +363,6 @@ fun RealDiv.z3ify(context: Z3Context): Expr<Z3RealSort> =
       context.context.mkDiv(lhs as Expr<ArithSort>, rhs as Expr<ArithSort>)
     }
         as Expr<Z3RealSort>
+
+fun ToReal.z3ify(context: Z3Context): Expr<Z3RealSort> =
+    context.context.mkInt2Real(this.inner.z3ify(context))
