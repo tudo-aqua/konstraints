@@ -18,9 +18,11 @@
 
 package tools.aqua.konstraints.solvers.Z3
 
+import com.microsoft.z3.ArithSort
 import com.microsoft.z3.BitVecSort
 import com.microsoft.z3.BoolSort as Z3BoolSort
 import com.microsoft.z3.Expr
+import com.microsoft.z3.IntSort as Z3IntSort
 import tools.aqua.konstraints.smt.BVSort
 import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Expression
@@ -59,25 +61,31 @@ fun makeRightAssoc(
 
 @JvmName("z3ifyAny")
 fun Expression<*>.z3ify(context: Z3Context): Expr<*> =
-    when {
-      this.sort is BoolSort -> (this as Expression<BoolSort>).z3ify(context)
-      this.sort is BVSort -> (this as Expression<BVSort>).z3ify(context)
+    when (this.sort) {
+      is BoolSort -> (this as Expression<BoolSort>).z3ify(context)
+      is BVSort -> (this as Expression<BVSort>).z3ify(context)
+      is IntSort -> (this as Expression<IntSort>).z3ify(context)
       else -> throw RuntimeException("Unknown sort ${this.sort}")
     }
 
 @JvmName("z3ifyBool")
 fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
-    when {
-      this is True -> this.z3ify(context)
-      this is False -> this.z3ify(context)
-      this is Not -> this.z3ify(context)
-      this is Implies -> this.z3ify(context)
-      this is And -> this.z3ify(context)
-      this is Or -> this.z3ify(context)
-      this is XOr -> this.z3ify(context)
-      this is Equals -> this.z3ify(context)
-      this is Distinct -> this.z3ify(context)
-      this is BVUlt -> this.z3ify(context)
+    when (this) {
+      is True -> this.z3ify(context)
+      is False -> this.z3ify(context)
+      is Not -> this.z3ify(context)
+      is Implies -> this.z3ify(context)
+      is And -> this.z3ify(context)
+      is Or -> this.z3ify(context)
+      is XOr -> this.z3ify(context)
+      is Equals -> this.z3ify(context)
+      is Distinct -> this.z3ify(context)
+      is BVUlt -> this.z3ify(context)
+      is IntLessEq -> this.z3ify(context)
+      is IntLess -> this.z3ify(context)
+      is IntGreaterEq -> this.z3ify(context)
+      is IntGreater -> this.z3ify(context)
+      is Divisible -> this.z3ify(context)
       /* this also has to handle declared functions */
       else ->
           if (context.constants[this.symbol] != null) {
@@ -128,22 +136,48 @@ fun Distinct.z3ify(context: Z3Context): Expr<Z3BoolSort> =
 fun BVUlt.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkBVULT(lhs.z3ify(context), rhs.z3ify(context))
 
+fun IntLessEq.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    makeLeftAssoc(this.terms, context) { lhs, rhs ->
+      context.context.mkLe(lhs as Expr<out ArithSort>, rhs as Expr<out ArithSort>)
+    }
+        as Expr<Z3BoolSort>
+
+fun IntLess.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    makeLeftAssoc(this.terms, context) { lhs, rhs ->
+      context.context.mkLt(lhs as Expr<out ArithSort>, rhs as Expr<out ArithSort>)
+    }
+        as Expr<Z3BoolSort>
+
+fun IntGreaterEq.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    makeLeftAssoc(this.terms, context) { lhs, rhs ->
+      context.context.mkGe(lhs as Expr<out ArithSort>, rhs as Expr<out ArithSort>)
+    }
+        as Expr<Z3BoolSort>
+
+fun IntGreater.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    makeLeftAssoc(this.terms, context) { lhs, rhs ->
+      context.context.mkGt(lhs as Expr<out ArithSort>, rhs as Expr<out ArithSort>)
+    }
+        as Expr<Z3BoolSort>
+
+fun Divisible.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
+
 @JvmName("z3ifyBitVec")
 fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
-    when {
-      this is BVLiteral -> this.z3ify(context)
-      this is BVConcat -> this.z3ify(context)
-      this is BVExtract -> this.z3ify(context)
-      this is BVNot -> this.z3ify(context)
-      this is BVNeg -> this.z3ify(context)
-      this is BVAnd -> this.z3ify(context)
-      this is BVOr -> this.z3ify(context)
-      this is BVAdd -> this.z3ify(context)
-      this is BVMul -> this.z3ify(context)
-      this is BVUDiv -> this.z3ify(context)
-      this is BVURem -> this.z3ify(context)
-      this is BVShl -> this.z3ify(context)
-      this is BVLShr -> this.z3ify(context)
+    when (this) {
+      is BVLiteral -> this.z3ify(context)
+      is BVConcat -> this.z3ify(context)
+      is BVExtract -> this.z3ify(context)
+      is BVNot -> this.z3ify(context)
+      is BVNeg -> this.z3ify(context)
+      is BVAnd -> this.z3ify(context)
+      is BVOr -> this.z3ify(context)
+      is BVAdd -> this.z3ify(context)
+      is BVMul -> this.z3ify(context)
+      is BVUDiv -> this.z3ify(context)
+      is BVURem -> this.z3ify(context)
+      is BVShl -> this.z3ify(context)
+      is BVLShr -> this.z3ify(context)
       else ->
           if (context.constants[this.symbol] != null) {
             context.constants[this.symbol]!! as Expr<BitVecSort>
@@ -204,3 +238,49 @@ fun BVShl.z3ify(context: Z3Context): Expr<BitVecSort> =
 
 fun BVLShr.z3ify(context: Z3Context): Expr<BitVecSort> =
     context.context.mkBVLSHR(this.value.z3ify(context), this.distance.z3ify(context))
+
+@JvmName("z3ifyInts")
+fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
+    when (this) {
+      is IntLiteral -> this.z3ify(context)
+      is IntNeg -> this.z3ify(context)
+      is IntSub -> this.z3ify(context)
+      is IntAdd -> this.z3ify(context)
+      is IntMul -> this.z3ify(context)
+      is IntDiv -> this.z3ify(context)
+      is Mod -> this.z3ify(context)
+      is Abs -> this.z3ify(context)
+      else ->
+          if (context.constants[this.symbol] != null) {
+            context.constants[this.symbol]!! as Expr<Z3IntSort>
+          } else if (context.functions[this.symbol] != null) {
+            TODO("Implement free function symbols")
+          } else {
+            throw IllegalArgumentException("Z3 can not visit expression $this!")
+          }
+    }
+
+fun IntLiteral.z3ify(context: Z3Context): Expr<Z3IntSort> = context.context.mkInt(this.value)
+
+fun IntNeg.z3ify(context: Z3Context): Expr<Z3IntSort> =
+    context.context.mkUnaryMinus(this.inner.z3ify(context))
+
+fun IntSub.z3ify(context: Z3Context): Expr<Z3IntSort> =
+    context.context.mkSub(*this.terms.map { it.z3ify(context) }.toTypedArray())
+
+fun IntAdd.z3ify(context: Z3Context): Expr<Z3IntSort> =
+    context.context.mkAdd(*this.terms.map { it.z3ify(context) }.toTypedArray())
+
+fun IntMul.z3ify(context: Z3Context): Expr<Z3IntSort> =
+    context.context.mkMul(*this.factors.map { it.z3ify(context) }.toTypedArray())
+
+fun IntDiv.z3ify(context: Z3Context): Expr<Z3IntSort> =
+    makeLeftAssoc(this.terms, context) { lhs, rhs ->
+      context.context.mkDiv(lhs as Expr<ArithSort>, rhs as Expr<ArithSort>)
+    }
+        as Expr<Z3IntSort>
+
+fun Mod.z3ify(context: Z3Context): Expr<Z3IntSort> =
+    context.context.mkMod(this.dividend.z3ify(context), this.divisor.z3ify(context))
+
+fun Abs.z3ify(context: Z3Context): Expr<Z3IntSort> = TODO()

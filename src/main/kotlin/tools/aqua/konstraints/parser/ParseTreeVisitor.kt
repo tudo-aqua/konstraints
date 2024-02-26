@@ -19,9 +19,10 @@
 package tools.aqua.konstraints.parser
 
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.theories.BVLiteral
+import tools.aqua.konstraints.theories.*
 import tools.aqua.konstraints.theories.BitVectorExpressionContext
 import tools.aqua.konstraints.theories.CoreContext
+import tools.aqua.konstraints.theories.IntsContext
 
 internal class ParseTreeVisitor :
     ProtoCommandVisitor, ProtoTermVisitor, ProtoSortVisitor, SpecConstantVisitor {
@@ -31,6 +32,7 @@ internal class ParseTreeVisitor :
   init {
     context.registerTheory(CoreContext)
     context.registerTheory(BitVectorExpressionContext)
+    context.registerTheory(IntsContext)
   }
 
   override fun visit(protoAssert: ProtoAssert): Assert {
@@ -130,7 +132,7 @@ internal class ParseTreeVisitor :
   }
 
   override fun visit(numeralConstant: NumeralConstant): Expression<*> {
-    TODO("Not yet implemented")
+    return IntLiteral(numeralConstant.numeral)
   }
 
   override fun visit(binaryConstant: BinaryConstant): Expression<*> {

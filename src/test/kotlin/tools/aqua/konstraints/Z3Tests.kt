@@ -18,8 +18,10 @@
 
 package tools.aqua.konstraints
 
+import java.io.File
 import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
+import kotlin.streams.asStream
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.Timeout
@@ -40,7 +42,7 @@ class Z3Tests {
   @ParameterizedTest
   @MethodSource("getInts")
   @Timeout(value = 3, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-  fun test(id: Int) {
+  fun QF_BV(id: Int) {
     /*
      * These test are currently not working with Z3 as the solver is not capable of solving them yet
      */
@@ -99,6 +101,63 @@ class Z3Tests {
 
   private fun getInts(): Stream<Arguments> {
     return IntArray(1575) { it }.map { Arguments.arguments(it + 1) }.stream()
+  }
+
+  @ParameterizedTest
+  @MethodSource("getQFIDLFile")
+  @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  fun QF_IDL(file: File) {
+    val parseTreeVisitor = ParseTreeVisitor()
+    val solver = Z3Solver()
+    val temp = file.bufferedReader().readLines()
+    val program = temp.map { it.trim('\r', '\n') }
+
+    val satStatus =
+        if (program.find { it.contains("unsat") } != null) {
+          "unsat"
+        } else if (program.find { it.contains("unknown") } != null) {
+          return
+        } else {
+          "sat"
+        }
+
+    println("Expected result is $satStatus")
+
+    val result = Parser.script.parse(program.joinToString(""))
+
+    if (result.isSuccess) {
+      val commands =
+          result
+              .get<List<Any>>()
+              .filter { it is ProtoCommand || it is Command }
+              .map { if (it is ProtoCommand) parseTreeVisitor.visit(it) else it } as List<Command>
+
+      println(commands.joinToString("\n"))
+
+      solver.use {
+        commands.map { solver.visit(it) }
+
+        // verify we get the correct status for the test
+        assertEquals(satStatus, solver.status)
+
+        // verify we parsed the correct program
+        /*
+        assertEquals(commands.filterIsInstance<Assert>().single().expression.toString(),
+            solver.context.solver.assertions.last().toString())
+        */
+      }
+    } else {
+      throw ParseError(result.failure(result.message))
+    }
+  }
+
+  fun getQFIDLFile(): Stream<Arguments> {
+    val dir = File(javaClass.getResource("/QF_IDL/20210312-Bouvier/").file)
+
+    return dir.walk()
+        .filter { file: File -> file.isFile }
+        .map { file: File -> Arguments.arguments(file) }
+        .asStream()
   }
 
   @ParameterizedTest
