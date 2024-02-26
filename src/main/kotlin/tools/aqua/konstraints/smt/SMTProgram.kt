@@ -16,6 +16,6 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints
+package tools.aqua.konstraints.smt
 
 class SMTProgram(val commands: List<Command>) {}

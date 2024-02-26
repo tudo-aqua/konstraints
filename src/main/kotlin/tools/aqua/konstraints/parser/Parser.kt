@@ -24,12 +24,10 @@ import org.petitparser.parser.Parser
 import org.petitparser.parser.combinators.ChoiceParser
 import org.petitparser.parser.combinators.SequenceParser
 import org.petitparser.parser.combinators.SettableParser.undefined
-import org.petitparser.parser.primitive.CharacterParser.anyOf
-import org.petitparser.parser.primitive.CharacterParser.of
-import org.petitparser.parser.primitive.CharacterParser.range
+import org.petitparser.parser.primitive.CharacterParser.*
 import org.petitparser.parser.primitive.StringParser.of
 import org.petitparser.utils.FailureJoiner
-import tools.aqua.konstraints.*
+import tools.aqua.konstraints.smt.*
 
 operator fun Parser.plus(other: Parser): ChoiceParser = or(other)
 
@@ -529,53 +527,79 @@ object Parser {
     // this will lead to better error messages but requires some preprocessing to split the input
     // input individual commands (this may be done in linear time by searching the input from
     // left to right counting the number of opening an closing brackets)
-    val commands = splitInput(program.trim())
-    val protoCommands = commands.map {
-        val temp = command.parse(it)
+    val commands = splitInput(program)
+    val protoCommands =
+        commands.map {
+          val temp = command.parse(it)
 
-        if (temp.isSuccess) {
+          if (temp.isSuccess) {
             temp
-        } else {
+          } else {
             throw ParseException(temp.message, temp.position, temp.buffer)
-        }
-    }
-
-      return SMTProgram(protoCommands.map { result ->
-          result.get<Any>()
-      }.map { command ->
-          when (command) {
-              is ProtoCommand -> parseTreeVisitor.visit(command)
-              is Command -> command
-              else -> throw IllegalStateException("Illegal type in parse tree $command!")
           }
-      }
-      )
+        }
+
+    return SMTProgram(
+        protoCommands
+            .map { result -> result.get<Any>() }
+            .map { command ->
+              when (command) {
+                is ProtoCommand -> parseTreeVisitor.visit(command)
+                is Command -> command
+                else -> throw IllegalStateException("Illegal type in parse tree $command!")
+              }
+            })
   }
 
-    private fun splitInput(program: String) : List<String> {
-        val commands = mutableListOf<String>()
-        var count = 0
-        var position = 0
+  private fun splitInput(program: String): List<String> {
+    val commands = mutableListOf<String>()
+    var count = 0
+    var position = 0
 
-        program.forEachIndexed { index, c ->
-            if(c == '(') {
-                if (count == 0) {
-                    position = index
-                }
-
-                count++
-            } else if (c == ')') {
-                count--
-
-                if (count == 0) {
-                    commands.add(program.substring(position, index + 1))
-                }
-            }
+    program.forEachIndexed { index, c ->
+      if (c == '(') {
+        if (count == 0) {
+          position = index
         }
 
-        return commands
+        count++
+      } else if (c == ')') {
+        count--
+
+        if (count == 0) {
+          commands.add(program.substring(position, index + 1))
+        }
+      }
     }
+
+    return commands
+  }
+
+  private fun preprocess(program: String): List<String> {
+    val temp = preprocessingParser.parse(program)
+
+    if (temp.isSuccess) {
+      return temp.get()
+    } else {
+      throw ParseException(temp.message, temp.position, temp.buffer)
+    }
+  }
+
+  val commandSplitter = undefined()
+  val preprocessingParser = commandSplitter.star()
+
+  init {
+    commandSplitter.set(
+        ((specConstant.map { constant: SpecConstant -> constant.toString() } +
+            reserved.map { reserved: Token -> reserved.getValue<Any>() } +
+            symbol.map { symbol: ParseSymbol -> symbol.toString() } +
+            keyword.map { keyword: Token -> keyword }) trim whitespaceCat) +
+            ((lparen * commandSplitter.star() * rparen).map { results: List<Any> ->
+              print(results)
+            } trim whitespaceCat))
+  }
 }
 
 class ParseException(message: String, position: Int, buffer: String) :
-    RuntimeException("Parser failed with message $message at position $position: ${buffer.substring(position)}")
+    RuntimeException(
+        "Parser failed with message $message at position $position: ${buffer.substring(position)}")

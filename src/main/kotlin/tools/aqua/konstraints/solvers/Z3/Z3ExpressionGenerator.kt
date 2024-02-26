@@ -21,7 +21,10 @@ package tools.aqua.konstraints.solvers.Z3
 import com.microsoft.z3.BitVecSort
 import com.microsoft.z3.BoolSort as Z3BoolSort
 import com.microsoft.z3.Expr
-import tools.aqua.konstraints.*
+import tools.aqua.konstraints.smt.BVSort
+import tools.aqua.konstraints.smt.BoolSort
+import tools.aqua.konstraints.smt.Expression
+import tools.aqua.konstraints.theories.*
 
 fun makeLeftAssoc(
     expressions: List<Expression<*>>,

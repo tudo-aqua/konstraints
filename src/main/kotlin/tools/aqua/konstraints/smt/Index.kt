@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints
+package tools.aqua.konstraints.smt
 
 /** Extension method to conveniently create a [NumeralIndex] from an Integer */
 fun Int.idx(): NumeralIndex = NumeralIndex(this)

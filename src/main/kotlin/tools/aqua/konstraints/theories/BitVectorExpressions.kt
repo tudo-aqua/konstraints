@@ -16,9 +16,10 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints
+package tools.aqua.konstraints.theories
 
 import tools.aqua.konstraints.parser.*
+import tools.aqua.konstraints.smt.*
 
 internal object BitVectorExpressionContext : TheoryContext {
   override val functions: HashSet<FunctionDecl<*>> =

@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints
+package tools.aqua.konstraints.smt
 
 abstract class Expression<T : Sort> {
   abstract val symbol: String
@@ -25,8 +25,8 @@ abstract class Expression<T : Sort> {
   override fun toString() = symbol
 
   /**
-   * Safely cast this expression to an Expression of Sort S, if this.sort is S
-   * Avoids unchecked cast warnings when casting Expression<*> after binding
+   * Safely cast this expression to an Expression of Sort S, if this.sort is S Avoids unchecked cast
+   * warnings when casting Expression<*> after binding
    */
   infix fun <S : Sort> castTo(to: S): Expression<S> {
     if (sort == to) {

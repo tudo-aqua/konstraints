@@ -18,10 +18,10 @@
 
 package tools.aqua.konstraints.parser
 
-import tools.aqua.konstraints.IllegalSymbolException
-import tools.aqua.konstraints.NumeralIndex
-import tools.aqua.konstraints.Sort
-import tools.aqua.konstraints.SymbolIndex
+import tools.aqua.konstraints.smt.IllegalSymbolException
+import tools.aqua.konstraints.smt.NumeralIndex
+import tools.aqua.konstraints.smt.Sort
+import tools.aqua.konstraints.smt.SymbolIndex
 
 data class Bindings(val parametric: Map<Sort, Sort>, val indices: Map<SymbolIndex, NumeralIndex>) {
   /**

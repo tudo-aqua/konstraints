@@ -18,7 +18,8 @@
 
 package tools.aqua.konstraints.parser
 
-import tools.aqua.konstraints.*
+import tools.aqua.konstraints.smt.Expression
+import tools.aqua.konstraints.smt.Sort
 
 internal abstract class SortDecl<T : Sort>(val name: String) {
   abstract fun getSort(sort: ProtoSort): T

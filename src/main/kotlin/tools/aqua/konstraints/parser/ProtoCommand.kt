@@ -20,8 +20,8 @@ package tools.aqua.konstraints.parser
 
 import java.math.BigDecimal
 import org.petitparser.context.Token
-import tools.aqua.konstraints.Index
-import tools.aqua.konstraints.Symbol
+import tools.aqua.konstraints.smt.Index
+import tools.aqua.konstraints.smt.Symbol
 
 internal sealed interface ProtoCommand
 

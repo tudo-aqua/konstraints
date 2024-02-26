@@ -18,7 +18,7 @@
 
 package tools.aqua.konstraints.parser
 
-import tools.aqua.konstraints.*
+import tools.aqua.konstraints.smt.*
 
 internal interface ProtoCommandVisitor {
   // Visit functions for all ProtoCommands

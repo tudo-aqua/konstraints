@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints
+package tools.aqua.konstraints.smt
 
 enum class Logic {
   AUFLIA, // Closed formulas over the theory of linear integer arithmetic and arrays extended with

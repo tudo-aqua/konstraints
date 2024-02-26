@@ -18,7 +18,10 @@
 
 package tools.aqua.konstraints.parser
 
-import tools.aqua.konstraints.*
+import tools.aqua.konstraints.smt.Index
+import tools.aqua.konstraints.smt.NumeralIndex
+import tools.aqua.konstraints.smt.Sort
+import tools.aqua.konstraints.smt.SymbolIndex
 import tools.aqua.konstraints.util.zipWithSameLength
 
 /**
@@ -39,7 +42,8 @@ data class Signature(
 ) {
 
   /**
-   * Bind the function indices, parametric sorts and return sort
+   * Bind the symbolic function indices, parametric sorts and return sort to actual indices and
+   * sorts
    *
    * @param actualParameters list of parameters passed to the SMT function
    * @param actualFunctionIndices set of the numeral indices
@@ -58,7 +62,8 @@ data class Signature(
       }
 
   /**
-   * Bind the function indices, parametric sorts and return sort
+   * Bind the symbolic function indices, parametric sorts and return sort to actual indices and
+   * sorts
    *
    * @param actualParameters list of parameters passed to the SMT function
    * @param actualFunctionIndices set of the numeral indices

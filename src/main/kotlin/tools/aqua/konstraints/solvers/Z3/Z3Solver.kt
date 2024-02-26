@@ -22,7 +22,7 @@ import com.microsoft.z3.BoolSort
 import com.microsoft.z3.IntSort
 import com.microsoft.z3.Sort
 import com.microsoft.z3.Status
-import tools.aqua.konstraints.*
+import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.visitors.CommandVisitor
 
 class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
@@ -52,7 +52,7 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
       context.constants[declareFun.name.toString()]?.let { error("constant already declared.") }
       context.constants[declareFun.name.toString()] =
           when (declareFun.sort) {
-            is tools.aqua.konstraints.BoolSort ->
+            is tools.aqua.konstraints.smt.BoolSort ->
                 context.context.mkBoolConst(declareFun.name.toSMTString())
             is BVSort ->
                 context.context.mkBVConst(declareFun.name.toSMTString(), declareFun.sort.bits)
@@ -61,7 +61,7 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
     }
   }
 
-  private fun getOrCreateSort(sort: tools.aqua.konstraints.Sort): Sort {
+  private fun getOrCreateSort(sort: tools.aqua.konstraints.smt.Sort): Sort {
     context.sorts[sort]?.let {
       return context.sorts[sort]!!
     }

@@ -18,7 +18,10 @@
 
 package tools.aqua.konstraints.parser
 
-import tools.aqua.konstraints.*
+import tools.aqua.konstraints.smt.*
+import tools.aqua.konstraints.theories.BVLiteral
+import tools.aqua.konstraints.theories.BitVectorExpressionContext
+import tools.aqua.konstraints.theories.CoreContext
 
 internal class ParseTreeVisitor :
     ProtoCommandVisitor, ProtoTermVisitor, ProtoSortVisitor, SpecConstantVisitor {

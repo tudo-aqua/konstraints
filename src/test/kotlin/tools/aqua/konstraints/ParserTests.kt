@@ -29,6 +29,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.petitparser.context.ParseError
 import tools.aqua.konstraints.parser.*
+import tools.aqua.konstraints.smt.Logic
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserTests {

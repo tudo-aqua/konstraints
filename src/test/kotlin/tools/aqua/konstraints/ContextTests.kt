@@ -29,6 +29,9 @@ import tools.aqua.konstraints.parser.Associativity
 import tools.aqua.konstraints.parser.Context
 import tools.aqua.konstraints.parser.FunctionAlreadyDeclaredException
 import tools.aqua.konstraints.parser.FunctionDecl
+import tools.aqua.konstraints.smt.*
+import tools.aqua.konstraints.theories.*
+import tools.aqua.konstraints.theories.CoreContext
 
 /*
  * TestInstance per class is needed for parameterized tests

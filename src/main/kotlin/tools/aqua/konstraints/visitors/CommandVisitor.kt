@@ -18,7 +18,7 @@
 
 package tools.aqua.konstraints.visitors
 
-import tools.aqua.konstraints.*
+import tools.aqua.konstraints.smt.*
 
 interface CommandVisitor<T> {
   fun visit(command: Command): T =

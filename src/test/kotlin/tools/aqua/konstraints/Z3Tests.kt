@@ -31,6 +31,7 @@ import org.petitparser.context.ParseError
 import tools.aqua.konstraints.parser.ParseTreeVisitor
 import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.parser.ProtoCommand
+import tools.aqua.konstraints.smt.Command
 import tools.aqua.konstraints.solvers.Z3.Z3Solver
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -131,10 +132,11 @@ class Z3Tests {
     }
   }
 
-    @ParameterizedTest
-    @ValueSource(
-        strings = [
-            """
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              """
         (set-logic QF_BV) 
         (declare-fun x_0 () (_ BitVec 32))
         (declare-fun x_1 () (_ BitVec 32))
@@ -147,18 +149,16 @@ class Z3Tests {
         (assert (not (and (= x_2 y_0) (= y_1 x_0))))
         (check-sat)
         (exit)        
-    """
-        ]
-    )
-    fun testEquals(program: String) {
-        val solver = Z3Solver()
+    """])
+  fun testEquals(program: String) {
+    val solver = Z3Solver()
 
-        val result = Parser.parse(program)
-        solver.use {
-            result.commands.map { solver.visit(it) }
+    val result = Parser.parse(program)
+    solver.use {
+      result.commands.map { solver.visit(it) }
 
-            // verify we get the correct status for the test
-            assertEquals("sat", solver.status)
-        }
+      // verify we get the correct status for the test
+      assertEquals("sat", solver.status)
     }
+  }
 }

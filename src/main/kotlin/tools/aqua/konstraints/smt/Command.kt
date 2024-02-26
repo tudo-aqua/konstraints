@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints
+package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.Attribute
 import tools.aqua.konstraints.parser.OptionValue
