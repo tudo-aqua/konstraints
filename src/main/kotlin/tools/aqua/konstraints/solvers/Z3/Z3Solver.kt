@@ -58,6 +58,8 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
                 context.context.mkBVConst(declareFun.name.toSMTString(), declareFun.sort.bits)
             is tools.aqua.konstraints.theories.IntSort ->
                 context.context.mkIntConst(declareFun.name.toSMTString())
+            is tools.aqua.konstraints.theories.RealSort ->
+                context.context.mkRealConst(declareFun.name.toSMTString())
             else -> error("Sort ${declareFun.sort} not supported.")
           }
     }

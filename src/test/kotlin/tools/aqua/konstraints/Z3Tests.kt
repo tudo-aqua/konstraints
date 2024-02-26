@@ -23,6 +23,7 @@ import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
 import kotlin.streams.asStream
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
@@ -35,6 +36,8 @@ import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.parser.ProtoCommand
 import tools.aqua.konstraints.smt.Command
 import tools.aqua.konstraints.solvers.Z3.Z3Solver
+import tools.aqua.konstraints.theories.IntSort
+import tools.aqua.konstraints.theories.RealSort
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Z3Tests {
@@ -112,6 +115,8 @@ class Z3Tests {
     val temp = file.bufferedReader().readLines()
     val program = temp.map { it.trim('\r', '\n') }
 
+    parseTreeVisitor.context.numeralSort = IntSort
+
     val satStatus =
         if (program.find { it.contains("unsat") } != null) {
           "unsat"
@@ -153,6 +158,68 @@ class Z3Tests {
 
   fun getQFIDLFile(): Stream<Arguments> {
     val dir = File(javaClass.getResource("/QF_IDL/20210312-Bouvier/").file)
+
+    return dir.walk()
+        .filter { file: File -> file.isFile }
+        .map { file: File -> Arguments.arguments(file) }
+        .asStream()
+  }
+
+  @ParameterizedTest
+  @MethodSource("getQFRDLFile")
+  @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  fun QF_RDL(file: File) {
+    val parseTreeVisitor = ParseTreeVisitor()
+    val solver = Z3Solver()
+    val temp = file.bufferedReader().readLines()
+    val program = temp.map { it.trim('\r', '\n') }
+
+    parseTreeVisitor.context.numeralSort = RealSort
+
+    val satStatus =
+        if (program.find { it.contains("unsat") } != null) {
+          "unsat"
+        } else if (program.find { it.contains("unknown") } != null) {
+          "unknown"
+        } else {
+          "sat"
+        }
+
+    /* ignore the test if assumption fails, ignores all unknown tests */
+    assumeTrue(satStatus != "unknown")
+
+    println("Expected result is $satStatus")
+
+    val result = Parser.script.parse(program.joinToString(""))
+
+    if (result.isSuccess) {
+      val commands =
+          result
+              .get<List<Any>>()
+              .filter { it is ProtoCommand || it is Command }
+              .map { if (it is ProtoCommand) parseTreeVisitor.visit(it) else it } as List<Command>
+
+      println(commands.joinToString("\n"))
+
+      solver.use {
+        commands.map { solver.visit(it) }
+
+        // verify we get the correct status for the test
+        assertEquals(satStatus, solver.status)
+
+        // verify we parsed the correct program
+        /*
+        assertEquals(commands.filterIsInstance<Assert>().single().expression.toString(),
+            solver.context.solver.assertions.last().toString())
+        */
+      }
+    } else {
+      throw ParseError(result.failure(result.message))
+    }
+  }
+
+  fun getQFRDLFile(): Stream<Arguments> {
+    val dir = File(javaClass.getResource("/QF_RDL/scheduling/").file)
 
     return dir.walk()
         .filter { file: File -> file.isFile }

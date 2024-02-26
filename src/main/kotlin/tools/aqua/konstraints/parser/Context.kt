@@ -26,6 +26,10 @@ internal abstract class SortDecl<T : Sort>(val name: String) {
 }
 
 internal class Context {
+  // store the sort of numeral expressions either (NUMERAL Int) or (NUMERAL Real) depending on the
+  // loaded logic
+  var numeralSort: Sort? = null
+
   fun registerTheory(other: TheoryContext) {
     other.functions.forEach { func ->
       if (func.name in functionLookup) {

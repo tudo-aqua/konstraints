@@ -23,6 +23,7 @@ import com.microsoft.z3.BitVecSort
 import com.microsoft.z3.BoolSort as Z3BoolSort
 import com.microsoft.z3.Expr
 import com.microsoft.z3.IntSort as Z3IntSort
+import com.microsoft.z3.RealSort as Z3RealSort
 import tools.aqua.konstraints.smt.BVSort
 import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Expression
@@ -65,6 +66,7 @@ fun Expression<*>.z3ify(context: Z3Context): Expr<*> =
       is BoolSort -> (this as Expression<BoolSort>).z3ify(context)
       is BVSort -> (this as Expression<BVSort>).z3ify(context)
       is IntSort -> (this as Expression<IntSort>).z3ify(context)
+      is RealSort -> (this as Expression<RealSort>).z3ify(context)
       else -> throw RuntimeException("Unknown sort ${this.sort}")
     }
 
@@ -86,6 +88,10 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
       is IntGreaterEq -> this.z3ify(context)
       is IntGreater -> this.z3ify(context)
       is Divisible -> this.z3ify(context)
+      is RealLessEq -> this.z3ify(context)
+      is RealLess -> this.z3ify(context)
+      is RealGreaterEq -> this.z3ify(context)
+      is RealGreater -> this.z3ify(context)
       /* this also has to handle declared functions */
       else ->
           if (context.constants[this.symbol] != null) {
@@ -155,6 +161,30 @@ fun IntGreaterEq.z3ify(context: Z3Context): Expr<Z3BoolSort> =
         as Expr<Z3BoolSort>
 
 fun IntGreater.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    makeLeftAssoc(this.terms, context) { lhs, rhs ->
+      context.context.mkGt(lhs as Expr<out ArithSort>, rhs as Expr<out ArithSort>)
+    }
+        as Expr<Z3BoolSort>
+
+fun RealLessEq.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    makeLeftAssoc(this.terms, context) { lhs, rhs ->
+      context.context.mkLe(lhs as Expr<out ArithSort>, rhs as Expr<out ArithSort>)
+    }
+        as Expr<Z3BoolSort>
+
+fun RealLess.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    makeLeftAssoc(this.terms, context) { lhs, rhs ->
+      context.context.mkLt(lhs as Expr<out ArithSort>, rhs as Expr<out ArithSort>)
+    }
+        as Expr<Z3BoolSort>
+
+fun RealGreaterEq.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    makeLeftAssoc(this.terms, context) { lhs, rhs ->
+      context.context.mkGe(lhs as Expr<out ArithSort>, rhs as Expr<out ArithSort>)
+    }
+        as Expr<Z3BoolSort>
+
+fun RealGreater.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     makeLeftAssoc(this.terms, context) { lhs, rhs ->
       context.context.mkGt(lhs as Expr<out ArithSort>, rhs as Expr<out ArithSort>)
     }
@@ -284,3 +314,43 @@ fun Mod.z3ify(context: Z3Context): Expr<Z3IntSort> =
     context.context.mkMod(this.dividend.z3ify(context), this.divisor.z3ify(context))
 
 fun Abs.z3ify(context: Z3Context): Expr<Z3IntSort> = TODO()
+
+@JvmName("z3ifyReals")
+fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
+    when (this) {
+      is RealLiteral -> this.z3ify(context)
+      is RealNeg -> this.z3ify(context)
+      is RealSub -> this.z3ify(context)
+      is RealAdd -> this.z3ify(context)
+      is RealMul -> this.z3ify(context)
+      is RealDiv -> this.z3ify(context)
+      else ->
+          if (context.constants[this.symbol] != null) {
+            context.constants[this.symbol]!! as Expr<Z3RealSort>
+          } else if (context.functions[this.symbol] != null) {
+            TODO("Implement free function symbols")
+          } else {
+            throw IllegalArgumentException("Z3 can not visit expression $this!")
+          }
+    }
+
+fun RealLiteral.z3ify(context: Z3Context): Expr<Z3RealSort> =
+    context.context.mkReal(this.value.toString())
+
+fun RealNeg.z3ify(context: Z3Context): Expr<Z3RealSort> =
+    context.context.mkUnaryMinus(this.inner.z3ify(context))
+
+fun RealSub.z3ify(context: Z3Context): Expr<Z3RealSort> =
+    context.context.mkSub(*this.terms.map { it.z3ify(context) }.toTypedArray())
+
+fun RealAdd.z3ify(context: Z3Context): Expr<Z3RealSort> =
+    context.context.mkAdd(*this.terms.map { it.z3ify(context) }.toTypedArray())
+
+fun RealMul.z3ify(context: Z3Context): Expr<Z3RealSort> =
+    context.context.mkMul(*this.factors.map { it.z3ify(context) }.toTypedArray())
+
+fun RealDiv.z3ify(context: Z3Context): Expr<Z3RealSort> =
+    makeLeftAssoc(this.terms, context) { lhs, rhs ->
+      context.context.mkDiv(lhs as Expr<ArithSort>, rhs as Expr<ArithSort>)
+    }
+        as Expr<Z3RealSort>

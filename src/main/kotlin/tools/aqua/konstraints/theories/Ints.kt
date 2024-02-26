@@ -232,7 +232,7 @@ class IntLess(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
 }
 
 object IntLessDecl :
-    FunctionDeclChainable<IntSort>("<=", emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
+    FunctionDeclChainable<IntSort>("<", emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
@@ -253,7 +253,7 @@ class IntGreaterEq(val terms: List<Expression<IntSort>>) : Expression<BoolSort>(
 }
 
 object IntGreaterEqDecl :
-    FunctionDeclChainable<IntSort>("<=", emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
+    FunctionDeclChainable<IntSort>(">=", emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
@@ -274,7 +274,7 @@ class IntGreater(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() 
 }
 
 object IntGreaterDecl :
-    FunctionDeclChainable<IntSort>("<=", emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
+    FunctionDeclChainable<IntSort>(">", emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<IntSort>>,
       bindings: Bindings

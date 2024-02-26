@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.parser
 
+import java.math.BigDecimal
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 import tools.aqua.konstraints.theories.BitVectorExpressionContext
@@ -33,6 +34,7 @@ internal class ParseTreeVisitor :
     context.registerTheory(CoreContext)
     context.registerTheory(BitVectorExpressionContext)
     context.registerTheory(IntsContext)
+    context.registerTheory(RealsContext)
   }
 
   override fun visit(protoAssert: ProtoAssert): Assert {
@@ -132,7 +134,10 @@ internal class ParseTreeVisitor :
   }
 
   override fun visit(numeralConstant: NumeralConstant): Expression<*> {
-    return IntLiteral(numeralConstant.numeral)
+    if (context.numeralSort == IntSort) return IntLiteral(numeralConstant.numeral)
+    else if (context.numeralSort == RealSort)
+        return RealLiteral(BigDecimal(numeralConstant.numeral))
+    else throw RuntimeException("Unsupported numeral literal sort ${context.numeralSort}")
   }
 
   override fun visit(binaryConstant: BinaryConstant): Expression<*> {
@@ -144,6 +149,6 @@ internal class ParseTreeVisitor :
   }
 
   override fun visit(decimalConstant: DecimalConstant): Expression<*> {
-    TODO("Not yet implemented")
+    return RealLiteral(decimalConstant.decimal)
   }
 }
