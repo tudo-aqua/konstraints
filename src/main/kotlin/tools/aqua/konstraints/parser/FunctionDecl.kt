@@ -113,11 +113,12 @@ abstract class FunctionDecl0<S : Sort>(
       functionIndices: Set<NumeralIndex>
   ): Expression<S> {
     require(args.isEmpty())
+    val bindings = bindParametersToExpressions(args, functionIndices)
 
-    return buildExpression()
+    return buildExpression(bindings)
   }
 
-  abstract fun buildExpression(): Expression<S>
+  abstract fun buildExpression(bindings: Bindings): Expression<S>
 }
 
 // TODO refactor sort into more meaningful name i.e. return

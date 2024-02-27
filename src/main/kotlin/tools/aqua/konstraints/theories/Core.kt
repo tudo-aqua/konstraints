@@ -47,7 +47,7 @@ object True : Expression<BoolSort>() {
 }
 
 object TrueDecl : FunctionDecl0<BoolSort>("true", emptySet(), emptySet(), BoolSort) {
-  override fun buildExpression(): Expression<BoolSort> = True
+  override fun buildExpression(bindings: Bindings): Expression<BoolSort> = True
 }
 
 /** Object for SMT false */
@@ -57,7 +57,7 @@ object False : Expression<BoolSort>() {
 }
 
 object FalseDecl : FunctionDecl0<BoolSort>("false", emptySet(), emptySet(), BoolSort) {
-  override fun buildExpression(): Expression<BoolSort> = False
+  override fun buildExpression(bindings: Bindings): Expression<BoolSort> = False
 }
 
 /**
