@@ -58,7 +58,7 @@ internal class ParseTreeVisitor :
 
     context.registerFunction(protoDeclareFun, parameters, sort)
 
-    return DeclareFun(Symbol(protoDeclareFun.name), parameters, sort)
+    return DeclareFun(protoDeclareFun.name.symbol(), parameters, sort)
   }
 
   override fun visit(protoSetLogic: ProtoSetLogic): SetLogic {
@@ -101,7 +101,9 @@ internal class ParseTreeVisitor :
   override fun visit(bracketedProtoTerm: BracketedProtoTerm): Expression<*> {
     val terms = bracketedProtoTerm.terms.map { visit(it) }
 
-    val op = context.getFunction(bracketedProtoTerm.qualIdentifier.identifier.symbol.symbol, terms)
+    val op =
+        context.getFunction(
+            bracketedProtoTerm.qualIdentifier.identifier.symbol.symbol.toString(), terms)
 
     val functionIndices =
         if (bracketedProtoTerm.qualIdentifier.identifier is IndexedIdentifier) {

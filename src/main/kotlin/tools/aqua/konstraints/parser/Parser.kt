@@ -268,7 +268,7 @@ object Parser {
   /* maps to an implementation of Index */
   private val index =
       (numeral.map { numeral: Int -> NumeralIndex(numeral) } +
-          symbol.map { symbol: ParseSymbol -> SymbolIndex(symbol.toSymbol()) }) trim whitespaceCat
+          symbol.map { symbol: ParseSymbol -> SymbolIndex(symbol.symbol) }) trim whitespaceCat
 
   /* maps to an implementation of Identifier */
   private val identifier =

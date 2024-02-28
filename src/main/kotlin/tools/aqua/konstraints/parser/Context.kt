@@ -80,9 +80,9 @@ internal class Context {
 
   fun registerFunction(function: ProtoDeclareFun, parameters: List<Sort>, sort: Sort) {
     if (parameters.isEmpty()) {
-      registerFunction(function.name, listOf(), sort)
+      registerFunction(function.name.toString(), listOf(), sort)
     } else {
-      registerFunction(function.name, parameters, sort)
+      registerFunction(function.name.toString(), parameters, sort)
     }
   }
 
