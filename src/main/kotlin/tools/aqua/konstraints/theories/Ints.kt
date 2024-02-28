@@ -47,21 +47,21 @@ internal object IntSortDecl : SortDecl<IntSort>("Int") {
 }
 
 class IntLiteral(val value: Int) : Expression<IntSort>() {
-  override val symbol: String = value.toString()
+  override val symbol: Symbol = value.toString().symbol()
   override val sort: IntSort = IntSort
 
-  override fun toString(): String = symbol
+  override fun toString(): String = value.toString()
 }
 
 class IntNeg(val inner: Expression<IntSort>) : Expression<IntSort>() {
-  override val symbol: String = "(- $inner)"
+  override val symbol: Symbol = "-".symbol()
   override val sort: IntSort = IntSort
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(- $inner)"
 }
 
 object IntNegDecl :
-    FunctionDecl1<IntSort, IntSort>("-", emptySet(), IntSort, emptySet(), emptySet(), IntSort) {
+    FunctionDecl1<IntSort, IntSort>("-".symbol(), emptySet(), IntSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param: Expression<IntSort>,
       bindings: Bindings
@@ -69,7 +69,7 @@ object IntNegDecl :
 }
 
 class IntSub(val terms: List<Expression<IntSort>>) : Expression<IntSort>() {
-  override val symbol: String = "(- ${terms.joinToString(separator = " ")})"
+  override val symbol: Symbol = "-".symbol()
   override val sort: IntSort = IntSort
 
   init {
@@ -78,12 +78,12 @@ class IntSub(val terms: List<Expression<IntSort>>) : Expression<IntSort>() {
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(- ${terms.joinToString(separator = " ")})"
 }
 
 object IntSubDecl :
     FunctionDeclLeftAssociative<IntSort, IntSort, IntSort>(
-        "-", emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
+        "-".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param1: Expression<IntSort>,
       param2: Expression<IntSort>,
@@ -93,7 +93,7 @@ object IntSubDecl :
 }
 
 class IntAdd(val terms: List<Expression<IntSort>>) : Expression<IntSort>() {
-  override val symbol: String = "(+ ${terms.joinToString(separator = " ")})"
+  override val symbol: Symbol = "+".symbol()
   override val sort: IntSort = IntSort
 
   init {
@@ -102,12 +102,12 @@ class IntAdd(val terms: List<Expression<IntSort>>) : Expression<IntSort>() {
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(+ ${terms.joinToString(separator = " ")})"
 }
 
 object IntAddDecl :
     FunctionDeclLeftAssociative<IntSort, IntSort, IntSort>(
-        "-", emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
+        "+".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param1: Expression<IntSort>,
       param2: Expression<IntSort>,
@@ -117,7 +117,7 @@ object IntAddDecl :
 }
 
 class IntMul(val factors: List<Expression<IntSort>>) : Expression<IntSort>() {
-  override val symbol: String = "(* ${factors.joinToString(separator = " ")})"
+  override val symbol: Symbol = "*".symbol()
   override val sort: IntSort = IntSort
 
   init {
@@ -126,12 +126,12 @@ class IntMul(val factors: List<Expression<IntSort>>) : Expression<IntSort>() {
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(* ${factors.joinToString(separator = " ")})"
 }
 
 object IntMulDecl :
     FunctionDeclLeftAssociative<IntSort, IntSort, IntSort>(
-        "-", emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
+        "*".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param1: Expression<IntSort>,
       param2: Expression<IntSort>,
@@ -141,7 +141,7 @@ object IntMulDecl :
 }
 
 class IntDiv(val terms: List<Expression<IntSort>>) : Expression<IntSort>() {
-  override val symbol: String = "(/ ${terms.joinToString(separator = " ")})"
+  override val symbol: Symbol = "/".symbol()
   override val sort: IntSort = IntSort
 
   init {
@@ -150,12 +150,12 @@ class IntDiv(val terms: List<Expression<IntSort>>) : Expression<IntSort>() {
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(/ ${terms.joinToString(separator = " ")})"
 }
 
 object IntDivDecl :
     FunctionDeclLeftAssociative<IntSort, IntSort, IntSort>(
-        "-", emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
+        "/".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param1: Expression<IntSort>,
       param2: Expression<IntSort>,
@@ -166,15 +166,15 @@ object IntDivDecl :
 
 class Mod(val dividend: Expression<IntSort>, val divisor: Expression<IntSort>) :
     Expression<IntSort>() {
-  override val symbol: String = "(mod $dividend $divisor)"
+  override val symbol: Symbol = "mod".symbol()
   override val sort: IntSort = IntSort
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(mod $dividend $divisor)"
 }
 
 object ModDecl :
     FunctionDecl2<IntSort, IntSort, IntSort>(
-        "mod", emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
+        "mod".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param1: Expression<IntSort>,
       param2: Expression<IntSort>,
@@ -183,14 +183,14 @@ object ModDecl :
 }
 
 class Abs(val inner: Expression<IntSort>) : Expression<IntSort>() {
-  override val symbol: String = "(abs $inner)"
+  override val symbol: Symbol = "abs".symbol()
   override val sort: IntSort = IntSort
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(abs $inner)"
 }
 
 object AbsDecl :
-    FunctionDecl1<IntSort, IntSort>("abs", emptySet(), IntSort, emptySet(), emptySet(), IntSort) {
+    FunctionDecl1<IntSort, IntSort>("abs".symbol(), emptySet(), IntSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param: Expression<IntSort>,
       bindings: Bindings
@@ -198,7 +198,7 @@ object AbsDecl :
 }
 
 class IntLessEq(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
-  override val symbol: String = "(<= ${terms.joinToString(separator = " ")})"
+  override val symbol: Symbol = "<=".symbol()
   override val sort: BoolSort = BoolSort
 
   init {
@@ -207,11 +207,11 @@ class IntLessEq(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(<= ${terms.joinToString(separator = " ")})"
 }
 
 object IntLessEqDecl :
-    FunctionDeclChainable<IntSort>("<=", emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
+    FunctionDeclChainable<IntSort>("<=".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
@@ -219,7 +219,7 @@ object IntLessEqDecl :
 }
 
 class IntLess(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
-  override val symbol: String = "(< ${terms.joinToString(separator = " ")})"
+  override val symbol: Symbol = "(< ${terms.joinToString(separator = " ")})".symbol()
   override val sort: BoolSort = BoolSort
 
   init {
@@ -228,11 +228,11 @@ class IntLess(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "<)"
 }
 
 object IntLessDecl :
-    FunctionDeclChainable<IntSort>("<", emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
+    FunctionDeclChainable<IntSort>("<".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
@@ -240,7 +240,7 @@ object IntLessDecl :
 }
 
 class IntGreaterEq(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
-  override val symbol: String = "(>= ${terms.joinToString(separator = " ")})"
+  override val symbol: Symbol = ">=".symbol()
   override val sort: BoolSort = BoolSort
 
   init {
@@ -249,11 +249,11 @@ class IntGreaterEq(val terms: List<Expression<IntSort>>) : Expression<BoolSort>(
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(>= ${terms.joinToString(separator = " ")})"
 }
 
 object IntGreaterEqDecl :
-    FunctionDeclChainable<IntSort>(">=", emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
+    FunctionDeclChainable<IntSort>(">=".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
@@ -261,7 +261,7 @@ object IntGreaterEqDecl :
 }
 
 class IntGreater(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
-  override val symbol: String = "(> ${terms.joinToString(separator = " ")})"
+  override val symbol: Symbol = "(> ${terms.joinToString(separator = " ")})".symbol()
   override val sort: BoolSort = BoolSort
 
   init {
@@ -270,11 +270,11 @@ class IntGreater(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() 
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = ">"
 }
 
 object IntGreaterDecl :
-    FunctionDeclChainable<IntSort>(">", emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
+    FunctionDeclChainable<IntSort>(">".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
@@ -282,13 +282,15 @@ object IntGreaterDecl :
 }
 
 class Divisible(val n: Int, val inner: Expression<IntSort>) : Expression<BoolSort>() {
-  override val symbol: String = "((_ divisible $n) $inner)"
+  override val symbol: Symbol = "divisible".symbol()
   override val sort: BoolSort = BoolSort
+
+    override fun toString(): String = "((_ divisible $n) $inner)"
 }
 
 object DivisibleDecl :
     FunctionDecl1<IntSort, BoolSort>(
-        "divisible", emptySet(), IntSort, setOf(SymbolIndex("n")), emptySet(), BoolSort) {
+        "divisible".symbol(), emptySet(), IntSort, setOf(SymbolIndex("n")), emptySet(), BoolSort) {
   override fun buildExpression(
       param: Expression<IntSort>,
       bindings: Bindings

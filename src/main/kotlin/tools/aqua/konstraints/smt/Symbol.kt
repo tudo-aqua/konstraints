@@ -130,3 +130,5 @@ class Symbol(symbol: String, rule: QuotingRule) {
 
 class IllegalSymbolException(val symbol: String) :
     RuntimeException("$symbol is not a legal SMT symbol")
+
+fun String.symbol() = Symbol(this)

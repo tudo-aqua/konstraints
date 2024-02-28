@@ -29,7 +29,7 @@ enum class Associativity {
 }
 
 open class FunctionDecl<S : Sort>(
-    val name: String,
+    val name: Symbol,
     val parametricSorts: Set<Sort>,
     val params: List<Sort>,
     val functionIndices: Set<SymbolIndex>,
@@ -100,7 +100,7 @@ open class FunctionDecl<S : Sort>(
 
 // TODO are indices necessary here (dont think so)
 abstract class FunctionDecl0<S : Sort>(
-    name: String,
+    name: Symbol,
     parametricSorts: Set<Sort>,
     indices: Set<SymbolIndex>,
     sort: S
@@ -123,7 +123,7 @@ abstract class FunctionDecl0<S : Sort>(
 
 // TODO refactor sort into more meaningful name i.e. return
 abstract class FunctionDecl1<P : Sort, S : Sort>(
-    name: String,
+    name: Symbol,
     parametricSorts: Set<Sort>,
     param: P,
     functionIndices: Set<SymbolIndex>,
@@ -147,7 +147,7 @@ abstract class FunctionDecl1<P : Sort, S : Sort>(
 }
 
 abstract class FunctionDecl2<P1 : Sort, P2 : Sort, S : Sort>(
-    name: String,
+    name: Symbol,
     parametricSorts: Set<Sort>,
     param1: P1,
     param2: P2,
@@ -182,7 +182,7 @@ abstract class FunctionDecl2<P1 : Sort, P2 : Sort, S : Sort>(
 }
 
 abstract class FunctionDecl3<P1 : Sort, P2 : Sort, P3 : Sort, S : Sort>(
-    name: String,
+    name: Symbol,
     parametricSorts: Set<Sort>,
     param1: P1,
     param2: P2,
@@ -220,7 +220,7 @@ abstract class FunctionDecl3<P1 : Sort, P2 : Sort, P3 : Sort, S : Sort>(
 }
 
 abstract class FunctionDecl4<P1 : Sort, P2 : Sort, P3 : Sort, P4 : Sort, S : Sort>(
-    name: String,
+    name: Symbol,
     parametricSorts: Set<Sort>,
     param1: P1,
     param2: P2,
@@ -264,7 +264,7 @@ abstract class FunctionDecl4<P1 : Sort, P2 : Sort, P3 : Sort, P4 : Sort, S : Sor
 }
 
 abstract class FunctionDeclLeftAssociative<P1 : Sort, P2 : Sort, S : Sort>(
-    name: String,
+    name: Symbol,
     parametricSorts: Set<Sort>,
     param1: Sort,
     param2: Sort,
@@ -302,7 +302,7 @@ abstract class FunctionDeclLeftAssociative<P1 : Sort, P2 : Sort, S : Sort>(
 }
 
 abstract class FunctionDeclRightAssociative<P1 : Sort, P2 : Sort, S : Sort>(
-    name: String,
+    name: Symbol,
     parametricSorts: Set<Sort>,
     param1: P1,
     param2: P2,
@@ -340,7 +340,7 @@ abstract class FunctionDeclRightAssociative<P1 : Sort, P2 : Sort, S : Sort>(
 }
 
 abstract class FunctionDeclChainable<P : Sort>(
-    name: String,
+    name: Symbol,
     parametricSorts: Set<Sort>,
     param1: P,
     param2: P,
@@ -371,7 +371,7 @@ abstract class FunctionDeclChainable<P : Sort>(
 }
 
 abstract class FunctionDeclPairwise<P : Sort>(
-    name: String,
+    name: Symbol,
     parametricSorts: Set<Sort>,
     param1: P,
     param2: P,

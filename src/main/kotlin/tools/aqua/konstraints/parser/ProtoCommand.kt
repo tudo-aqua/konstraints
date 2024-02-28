@@ -21,6 +21,7 @@ package tools.aqua.konstraints.parser
 import java.math.BigDecimal
 import org.petitparser.context.Token
 import tools.aqua.konstraints.smt.Index
+import tools.aqua.konstraints.smt.Logic
 import tools.aqua.konstraints.smt.Symbol
 
 internal sealed interface ProtoCommand
@@ -39,6 +40,10 @@ internal data class ProtoDeclareFun(
 ) : ProtoCommand {
   val name = symbol.symbol
 }
+
+internal data class ProtoSetLogic(
+    val logic: Logic
+) : ProtoCommand
 
 internal data class ParseSymbol(val token: Token) {
   val symbol: String = token.getValue()

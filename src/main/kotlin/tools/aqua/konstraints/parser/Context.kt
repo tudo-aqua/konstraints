@@ -20,6 +20,7 @@ package tools.aqua.konstraints.parser
 
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.Sort
+import tools.aqua.konstraints.smt.symbol
 
 internal abstract class SortDecl<T : Sort>(val name: String) {
   abstract fun getSort(sort: ProtoSort): T
@@ -32,10 +33,10 @@ internal class Context {
 
   fun registerTheory(other: TheoryContext) {
     other.functions.forEach { func ->
-      if (func.name in functionLookup) {
-        functionLookup[func.name]?.add(func)
+      if (func.name.toString() in functionLookup) {
+        functionLookup[func.name.toString()]?.add(func)
       } else {
-        functionLookup[func.name] = mutableListOf(func)
+        functionLookup[func.name.toString()] = mutableListOf(func)
       }
     }
 
@@ -43,7 +44,7 @@ internal class Context {
   }
 
   fun registerFunction(function: FunctionDecl<*>) {
-    val conflicts = functionLookup[function.name]
+    val conflicts = functionLookup[function.name.toString()]
 
     if (conflicts != null) {
       val conflictParams = conflicts.filter { it.accepts(function.params, emptySet()) }
@@ -61,14 +62,14 @@ internal class Context {
         conflicts.add(function)
       }
     } else {
-      functionLookup[function.name] = mutableListOf(function)
+      functionLookup[function.name.toString()] = mutableListOf(function)
     }
   }
 
   fun registerFunction(const: ProtoDeclareConst, sort: Sort) {
     registerFunction(
         FunctionDecl(
-            const.name, emptySet(), listOf(), emptySet(), emptySet(), sort, Associativity.NONE))
+            const.name.symbol(), emptySet(), listOf(), emptySet(), emptySet(), sort, Associativity.NONE))
   }
 
   fun registerFunction(function: ProtoDeclareFun, parameters: List<Sort>, sort: Sort) {
@@ -81,7 +82,7 @@ internal class Context {
 
   fun registerFunction(name: String, params: List<Sort>, sort: Sort) {
     this.registerFunction(
-        FunctionDecl(name, emptySet(), params, emptySet(), emptySet(), sort, Associativity.NONE))
+        FunctionDecl(name.symbol(), emptySet(), params, emptySet(), emptySet(), sort, Associativity.NONE))
   }
 
   fun registerSort(sort: SortDecl<*>) {

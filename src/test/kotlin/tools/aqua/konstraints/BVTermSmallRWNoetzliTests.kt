@@ -32,8 +32,6 @@ class BVTermSmallRWNoetzliTests {
   @ParameterizedTest
   @MethodSource("getInts")
   fun testQF_BV(id: Int) {
-    val parseTreeVisitor = ParseTreeVisitor()
-
     val temp =
         javaClass
             .getResourceAsStream(

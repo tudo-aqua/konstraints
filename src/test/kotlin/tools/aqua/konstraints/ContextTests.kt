@@ -46,15 +46,15 @@ import tools.aqua.konstraints.theories.CoreContext
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class ContextTests {
   private val context = Context()
-  private val boolExpression = BasicExpression("A", BoolSort)
-  private val bv32Expression = BasicExpression("B", BVSort(32))
-  private val bv16Expression = BasicExpression("B", BVSort(16))
+  private val boolExpression = BasicExpression("A".symbol(), BoolSort)
+  private val bv32Expression = BasicExpression("B".symbol(), BVSort(32))
+  private val bv16Expression = BasicExpression("B".symbol(), BVSort(16))
 
   // this function has no indices as it is not infinitary, BVSort(32) here means actually only
   // bitvectors of length 32
   private val overloadedBV =
       FunctionDecl(
-          "O",
+          "O".symbol(),
           emptySet(),
           listOf(BVSort(32), BVSort(32)),
           emptySet(),
@@ -98,7 +98,7 @@ class ContextTests {
   ) {
     val function = context.getFunction(name, args)
 
-    assertEquals(name, function?.name)
+    assertEquals(name.symbol(), function?.name)
   }
 
   @ParameterizedTest
@@ -198,7 +198,7 @@ class ContextTests {
         /* No conflict */
         arguments(
             FunctionDecl(
-                "foo",
+                "foo".symbol(),
                 emptySet(),
                 listOf(BoolSort, BoolSort),
                 emptySet(),
@@ -208,7 +208,7 @@ class ContextTests {
         /* New overloaded */
         arguments(
             FunctionDecl(
-                "and",
+                "and".symbol(),
                 emptySet(),
                 listOf(BVSort(16), BVSort(16)),
                 emptySet(),
@@ -218,7 +218,7 @@ class ContextTests {
         /* New ambiguous */
         arguments(
             FunctionDecl(
-                "and",
+                "and".symbol(),
                 emptySet(),
                 listOf(BoolSort, BoolSort, BoolSort),
                 emptySet(),
@@ -228,7 +228,7 @@ class ContextTests {
         /* New ambiguous */
         arguments(
             FunctionDecl(
-                "bvult",
+                "bvult".symbol(),
                 emptySet(),
                 listOf(BVSort(16), BVSort(16)),
                 emptySet(),
@@ -238,7 +238,7 @@ class ContextTests {
         /* ??? */
         arguments(
             FunctionDecl(
-                "bvult",
+                "bvult".symbol(),
                 emptySet(),
                 listOf(BVSort(16), BVSort(32)),
                 emptySet(),
@@ -262,7 +262,7 @@ class ContextTests {
         /* Illegal */
         arguments(
             FunctionDecl(
-                "and",
+                "and".symbol(),
                 emptySet(),
                 listOf(BoolSort, BoolSort, BoolSort),
                 emptySet(),
@@ -272,7 +272,7 @@ class ContextTests {
         /* Illegal */
         arguments(
             FunctionDecl(
-                "bvult",
+                "bvult".symbol(),
                 emptySet(),
                 listOf(BVSort(16), BVSort(16)),
                 emptySet(),

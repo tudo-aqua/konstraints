@@ -27,6 +27,7 @@ internal interface ProtoCommandVisitor {
         is ProtoAssert -> visit(command)
         is ProtoDeclareConst -> visit(command)
         is ProtoDeclareFun -> visit(command)
+        is ProtoSetLogic -> visit(command)
       }
 
   fun visit(protoAssert: ProtoAssert): Assert
@@ -34,6 +35,8 @@ internal interface ProtoCommandVisitor {
   fun visit(protoDeclareConst: ProtoDeclareConst): DeclareConst
 
   fun visit(protoDeclareFun: ProtoDeclareFun): DeclareFun
+
+  fun visit(protoSetLogic: ProtoSetLogic): SetLogic
 }
 
 internal interface SpecConstantVisitor {

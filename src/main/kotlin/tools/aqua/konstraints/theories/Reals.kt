@@ -22,9 +22,7 @@ import java.math.BigDecimal
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.parser.ProtoSort
 import tools.aqua.konstraints.parser.SortDecl
-import tools.aqua.konstraints.smt.BoolSort
-import tools.aqua.konstraints.smt.Expression
-import tools.aqua.konstraints.smt.Sort
+import tools.aqua.konstraints.smt.*
 
 internal object RealsContext : TheoryContext {
   override val functions: HashSet<FunctionDecl<*>> =
@@ -49,21 +47,21 @@ internal object RealSortDecl : SortDecl<RealSort>("Real") {
 }
 
 class RealLiteral(val value: BigDecimal) : Expression<RealSort>() {
-  override val symbol: String = value.toString()
+  override val symbol: Symbol = "|$value|".symbol()
   override val sort: RealSort = RealSort
 
-  override fun toString(): String = symbol
+  override fun toString(): String = symbol.toSMTString()
 }
 
 class RealNeg(val inner: Expression<RealSort>) : Expression<RealSort>() {
-  override val symbol: String = "(- $inner)"
+  override val symbol: Symbol = "-".symbol()
   override val sort: RealSort = RealSort
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(- $inner)"
 }
 
 object RealNegDecl :
-    FunctionDecl1<RealSort, RealSort>("-", emptySet(), RealSort, emptySet(), emptySet(), RealSort) {
+    FunctionDecl1<RealSort, RealSort>("-".symbol(), emptySet(), RealSort, emptySet(), emptySet(), RealSort) {
   override fun buildExpression(
       param: Expression<RealSort>,
       bindings: Bindings
@@ -71,7 +69,7 @@ object RealNegDecl :
 }
 
 class RealSub(val terms: List<Expression<RealSort>>) : Expression<RealSort>() {
-  override val symbol: String = "(- ${terms.joinToString(separator = " ")})"
+  override val symbol: Symbol = "-".symbol()
   override val sort: RealSort = RealSort
 
   init {
@@ -80,12 +78,12 @@ class RealSub(val terms: List<Expression<RealSort>>) : Expression<RealSort>() {
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(- ${terms.joinToString(separator = " ")})"
 }
 
 object RealSubDecl :
     FunctionDeclLeftAssociative<RealSort, RealSort, RealSort>(
-        "-", emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
+        "-".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
   override fun buildExpression(
       param1: Expression<RealSort>,
       param2: Expression<RealSort>,
@@ -95,7 +93,7 @@ object RealSubDecl :
 }
 
 class RealAdd(val terms: List<Expression<RealSort>>) : Expression<RealSort>() {
-  override val symbol: String = "(+ ${terms.joinToString(separator = " ")})"
+  override val symbol: Symbol = "+".symbol()
   override val sort: RealSort = RealSort
 
   init {
@@ -104,12 +102,12 @@ class RealAdd(val terms: List<Expression<RealSort>>) : Expression<RealSort>() {
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(+ ${terms.joinToString(separator = " ")})"
 }
 
 object RealAddDecl :
     FunctionDeclLeftAssociative<RealSort, RealSort, RealSort>(
-        "-", emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
+        "-".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
   override fun buildExpression(
       param1: Expression<RealSort>,
       param2: Expression<RealSort>,
@@ -119,7 +117,7 @@ object RealAddDecl :
 }
 
 class RealMul(val factors: List<Expression<RealSort>>) : Expression<RealSort>() {
-  override val symbol: String = "(* ${factors.joinToString(separator = " ")})"
+  override val symbol: Symbol = "*".symbol()
   override val sort: RealSort = RealSort
 
   init {
@@ -128,12 +126,12 @@ class RealMul(val factors: List<Expression<RealSort>>) : Expression<RealSort>() 
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(* ${factors.joinToString(separator = " ")})"
 }
 
 object RealMulDecl :
     FunctionDeclLeftAssociative<RealSort, RealSort, RealSort>(
-        "-", emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
+        "-".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
   override fun buildExpression(
       param1: Expression<RealSort>,
       param2: Expression<RealSort>,
@@ -143,7 +141,7 @@ object RealMulDecl :
 }
 
 class RealDiv(val terms: List<Expression<RealSort>>) : Expression<RealSort>() {
-  override val symbol: String = "(/ ${terms.joinToString(separator = " ")})"
+  override val symbol: Symbol = "/".symbol()
   override val sort: RealSort = RealSort
 
   init {
@@ -152,12 +150,12 @@ class RealDiv(val terms: List<Expression<RealSort>>) : Expression<RealSort>() {
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(/ ${terms.joinToString(separator = " ")})"
 }
 
 object RealDivDecl :
     FunctionDeclLeftAssociative<RealSort, RealSort, RealSort>(
-        "-", emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
+        "/".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
   override fun buildExpression(
       param1: Expression<RealSort>,
       param2: Expression<RealSort>,
@@ -167,7 +165,7 @@ object RealDivDecl :
 }
 
 class RealLessEq(val terms: List<Expression<RealSort>>) : Expression<BoolSort>() {
-  override val symbol: String = "(<= ${terms.joinToString(separator = " ")})"
+  override val symbol: Symbol = "<=".symbol()
   override val sort: BoolSort = BoolSort
 
   init {
@@ -176,11 +174,11 @@ class RealLessEq(val terms: List<Expression<RealSort>>) : Expression<BoolSort>()
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(<= ${terms.joinToString(separator = " ")})"
 }
 
 object RealLessEqDecl :
-    FunctionDeclChainable<RealSort>("<=", emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
+    FunctionDeclChainable<RealSort>("<=".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
@@ -188,7 +186,7 @@ object RealLessEqDecl :
 }
 
 class RealLess(val terms: List<Expression<RealSort>>) : Expression<BoolSort>() {
-  override val symbol: String = "(< ${terms.joinToString(separator = " ")})"
+  override val symbol: Symbol = "<".symbol()
   override val sort: BoolSort = BoolSort
 
   init {
@@ -197,11 +195,11 @@ class RealLess(val terms: List<Expression<RealSort>>) : Expression<BoolSort>() {
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(< ${terms.joinToString(separator = " ")})"
 }
 
 object RealLessDecl :
-    FunctionDeclChainable<RealSort>("<", emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
+    FunctionDeclChainable<RealSort>("<".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
@@ -209,7 +207,7 @@ object RealLessDecl :
 }
 
 class RealGreaterEq(val terms: List<Expression<RealSort>>) : Expression<BoolSort>() {
-  override val symbol: String = "(>= ${terms.joinToString(separator = " ")})"
+  override val symbol: Symbol = ">=".symbol()
   override val sort: BoolSort = BoolSort
 
   init {
@@ -218,11 +216,11 @@ class RealGreaterEq(val terms: List<Expression<RealSort>>) : Expression<BoolSort
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(>= ${terms.joinToString(separator = " ")})"
 }
 
 object RealGreaterEqDecl :
-    FunctionDeclChainable<RealSort>(">=", emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
+    FunctionDeclChainable<RealSort>(">=".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
@@ -230,7 +228,7 @@ object RealGreaterEqDecl :
 }
 
 class RealGreater(val terms: List<Expression<RealSort>>) : Expression<BoolSort>() {
-  override val symbol: String = "(> ${terms.joinToString(separator = " ")})"
+  override val symbol: Symbol = ">".symbol()
   override val sort: BoolSort = BoolSort
 
   init {
@@ -239,11 +237,11 @@ class RealGreater(val terms: List<Expression<RealSort>>) : Expression<BoolSort>(
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(> ${terms.joinToString(separator = " ")})"
 }
 
 object RealGreaterDecl :
-    FunctionDeclChainable<RealSort>(">", emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
+    FunctionDeclChainable<RealSort>(">".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<RealSort>>,
       bindings: Bindings

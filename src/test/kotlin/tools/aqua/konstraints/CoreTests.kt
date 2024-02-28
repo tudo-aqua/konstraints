@@ -29,6 +29,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.smt.BasicExpression
 import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Expression
+import tools.aqua.konstraints.smt.symbol
 import tools.aqua.konstraints.theories.*
 
 /*
@@ -37,9 +38,9 @@ import tools.aqua.konstraints.theories.*
  */
 @TestInstance(Lifecycle.PER_CLASS)
 class CoreTests {
-  private val A = BasicExpression("A", BoolSort)
-  private val B = BasicExpression("B", BoolSort)
-  private val C = BasicExpression("C", BoolSort)
+  private val A = BasicExpression("A".symbol(), BoolSort)
+  private val B = BasicExpression("B".symbol(), BoolSort)
+  private val C = BasicExpression("C".symbol(), BoolSort)
 
   @ParameterizedTest
   @MethodSource("getCoreTheoryExpressionsAndTheirSerialization")

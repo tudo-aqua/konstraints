@@ -23,6 +23,8 @@ import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.parser.TheoryContext
 import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Expression
+import tools.aqua.konstraints.smt.Symbol
+import tools.aqua.konstraints.smt.symbol
 
 internal object RealsIntsContext : TheoryContext {
   override val functions: HashSet<FunctionDecl<*>> =
@@ -57,15 +59,15 @@ internal object RealsIntsContext : TheoryContext {
 }
 
 class ToReal(val inner: Expression<IntSort>) : Expression<RealSort>() {
-  override val symbol: String = "(to_real $inner)"
+  override val symbol: Symbol = "to_real".symbol()
   override val sort: RealSort = RealSort
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(to_real $inner)"
 }
 
 object ToRealDecl :
     FunctionDecl1<IntSort, RealSort>(
-        "to_real", emptySet(), IntSort, emptySet(), emptySet(), RealSort) {
+        "to_real".symbol(), emptySet(), IntSort, emptySet(), emptySet(), RealSort) {
   override fun buildExpression(
       param: Expression<IntSort>,
       bindings: Bindings
@@ -73,15 +75,15 @@ object ToRealDecl :
 }
 
 class ToInt(val inner: Expression<RealSort>) : Expression<IntSort>() {
-  override val symbol: String = "(to_int $inner)"
+  override val symbol: Symbol = "to_int".symbol()
   override val sort: IntSort = IntSort
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(to_int $inner)"
 }
 
 object ToIntDecl :
     FunctionDecl1<RealSort, IntSort>(
-        "to_real", emptySet(), RealSort, emptySet(), emptySet(), IntSort) {
+        "to_real".symbol(), emptySet(), RealSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param: Expression<RealSort>,
       bindings: Bindings
@@ -89,15 +91,15 @@ object ToIntDecl :
 }
 
 class IsInt(val inner: Expression<RealSort>) : Expression<BoolSort>() {
-  override val symbol: String = "(is_int $inner)"
+  override val symbol: Symbol = "is_int".symbol()
   override val sort: BoolSort = BoolSort
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(is_int $inner)"
 }
 
 object IsIntDecl :
     FunctionDecl1<RealSort, BoolSort>(
-        "to_real", emptySet(), RealSort, emptySet(), emptySet(), BoolSort) {
+        "to_real".symbol(), emptySet(), RealSort, emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(
       param: Expression<RealSort>,
       bindings: Bindings

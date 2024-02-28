@@ -42,21 +42,21 @@ internal object BoolSortDecl : SortDecl<BoolSort>("Bool") {
 
 /** Object for SMT true */
 object True : Expression<BoolSort>() {
-  override val symbol = "true"
+  override val symbol: Symbol = "true".symbol()
   override val sort = BoolSort
 }
 
-object TrueDecl : FunctionDecl0<BoolSort>("true", emptySet(), emptySet(), BoolSort) {
+object TrueDecl : FunctionDecl0<BoolSort>("true".symbol(), emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(bindings: Bindings): Expression<BoolSort> = True
 }
 
 /** Object for SMT false */
 object False : Expression<BoolSort>() {
-  override val symbol = "false"
+  override val symbol: Symbol = "false".symbol()
   override val sort = BoolSort
 }
 
-object FalseDecl : FunctionDecl0<BoolSort>("false", emptySet(), emptySet(), BoolSort) {
+object FalseDecl : FunctionDecl0<BoolSort>("false".symbol(), emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(bindings: Bindings): Expression<BoolSort> = False
 }
 
@@ -67,15 +67,15 @@ object FalseDecl : FunctionDecl0<BoolSort>("false", emptySet(), emptySet(), Bool
  */
 class Not(val inner: Expression<BoolSort>) : Expression<BoolSort>() {
   override val sort: BoolSort = BoolSort
-  override val symbol = "(not $inner)"
+  override val symbol: Symbol = "not".symbol()
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(not $inner)"
 }
 
 /** FunctionDecl Object for Not */
 object NotDecl :
     FunctionDecl1<BoolSort, BoolSort>(
-        "not", emptySet(), BoolSort, emptySet(), emptySet(), BoolSort) {
+        "not".symbol(), emptySet(), BoolSort, emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(
       param: Expression<BoolSort>,
       bindings: Bindings
@@ -91,14 +91,14 @@ class Implies(val statements: List<Expression<BoolSort>>) : Expression<BoolSort>
   constructor(vararg statements: Expression<BoolSort>) : this(statements.toList())
 
   override val sort: BoolSort = BoolSort
-  override val symbol = "(=> ${statements.joinToString(" ")})"
+  override val symbol: Symbol = "=>".symbol()
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(=> ${statements.joinToString(" ")})"
 }
 
 object ImpliesDecl :
     FunctionDeclRightAssociative<BoolSort, BoolSort, BoolSort>(
-        "=>", emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
+        "=>".symbol(), emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(
       param1: Expression<BoolSort>,
       param2: Expression<BoolSort>,
@@ -116,14 +116,14 @@ class And(val conjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   constructor(vararg conjuncts: Expression<BoolSort>) : this(conjuncts.toList())
 
   override val sort: BoolSort = BoolSort
-  override val symbol = "(and ${conjuncts.joinToString(" ")})"
+  override val symbol: Symbol = "and".symbol()
 
-  override fun toString() = symbol
+  override fun toString() = "(and ${conjuncts.joinToString(" ")})"
 }
 
 object AndDecl :
     FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
-        "and", emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
+        "and".symbol(), emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(
       param1: Expression<BoolSort>,
       param2: Expression<BoolSort>,
@@ -141,14 +141,14 @@ class Or(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
 
   override val sort: BoolSort = BoolSort
-  override val symbol = "(or ${disjuncts.joinToString(" ")})"
+  override val symbol: Symbol = "or".symbol()
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(or ${disjuncts.joinToString(" ")})"
 }
 
 object OrDecl :
     FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
-        "or", emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
+        "or".symbol(), emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(
       param1: Expression<BoolSort>,
       param2: Expression<BoolSort>,
@@ -166,14 +166,14 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) : Expression<BoolSort>() {
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
 
   override val sort: BoolSort = BoolSort
-  override val symbol = "(xor ${disjuncts.joinToString(" ")})"
+  override val symbol: Symbol = "xor".symbol()
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(xor ${disjuncts.joinToString(" ")})"
 }
 
 object XOrDecl :
     FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
-        "xor", emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
+        "xor".symbol(), emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(
       param1: Expression<BoolSort>,
       param2: Expression<BoolSort>,
@@ -193,14 +193,14 @@ class Equals(val statements: List<Expression<*>>) : Expression<BoolSort>() {
   override val sort: BoolSort = BoolSort
 
   /** The symbol uses the :chainable short form (= A B C) is short for (and (= A B) (= B C)) */
-  override val symbol = "(= ${statements.joinToString(" ")})"
+  override val symbol: Symbol = "=".symbol()
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(= ${statements.joinToString(" ")})"
 }
 
 object EqualsDecl :
     FunctionDeclChainable<Sort>(
-        "=",
+        "=".symbol(),
         setOf(SortParameter("A")),
         SortParameter("A"),
         SortParameter("A"),
@@ -227,14 +227,14 @@ class Distinct(val statements: List<Expression<*>>) : Expression<BoolSort>() {
    * The symbol uses the :pairwise short form (distinct A B C) is short for (and (distinct A B)
    * (distinct A C) (distinct B C))
    */
-  override val symbol by lazy { "(distinct ${statements.joinToString(" ")})" }
+  override val symbol: Symbol = "distinct".symbol()
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(distinct ${statements.joinToString(" ")})"
 }
 
 object DistinctDecl :
     FunctionDeclPairwise<Sort>(
-        "distinct",
+        "distinct".symbol(),
         setOf(SortParameter("A")),
         SortParameter("A"),
         SortParameter("A"),
@@ -266,14 +266,14 @@ object DistinctDecl :
 class Ite(val statement: Expression<BoolSort>, val then: Expression<*>, val els: Expression<*>) :
     Expression<Sort>() {
   override val sort: BoolSort = BoolSort
-  override val symbol = "(ite $statement $then $els)"
+  override val symbol: Symbol = "ite".symbol()
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(ite $statement $then $els)"
 }
 
 object IteDecl :
     FunctionDecl3<BoolSort, Sort, Sort, Sort>(
-        "ite",
+        "ite".symbol(),
         setOf(SortParameter("A")),
         BoolSort,
         SortParameter("A"),

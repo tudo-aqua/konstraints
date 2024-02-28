@@ -54,7 +54,8 @@ enum class Logic {
   QF_UFLRA, // Unquantified linear real arithmetic with uninterpreted sort and function symbols.
   QF_UFNRA, // Unquantified non-linear real arithmetic with uninterpreted sort and function symbols.
   UFLRA, // Linear real arithmetic with uninterpreted sort and function symbols.
-  UFNIA; // Non-linear integer arithmetic with uninterpreted sort and function symbols.
+  UFNIA, // Non-linear integer arithmetic with uninterpreted sort and function symbols.
+  QF_FP; // Quantifier free floating point (missing on smt website)
 
   override fun toString(): String =
       when (this) {
@@ -82,5 +83,6 @@ enum class Logic {
         QF_UFNRA -> "QF_UFNRA"
         UFLRA -> "UFLRA"
         UFNIA -> "UFNIA"
+        QF_FP -> "QF_FP"
       }
 }

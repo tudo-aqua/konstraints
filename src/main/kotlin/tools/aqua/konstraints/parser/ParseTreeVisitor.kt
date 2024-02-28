@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.parser
 
+import jdk.jshell.spi.ExecutionControl.NotImplementedException
 import java.math.BigDecimal
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
@@ -31,10 +32,8 @@ internal class ParseTreeVisitor :
   val context = Context()
 
   init {
+    // always load core theory
     context.registerTheory(CoreContext)
-    context.registerTheory(BitVectorExpressionContext)
-    context.registerTheory(IntsContext)
-    context.registerTheory(RealsContext)
   }
 
   override fun visit(protoAssert: ProtoAssert): Assert {
@@ -60,6 +59,18 @@ internal class ParseTreeVisitor :
     context.registerFunction(protoDeclareFun, parameters, sort)
 
     return DeclareFun(Symbol(protoDeclareFun.name), parameters, sort)
+  }
+
+  override fun visit(protoSetLogic: ProtoSetLogic): SetLogic {
+    when(protoSetLogic.logic) {
+      Logic.QF_BV -> context.registerTheory(BitVectorExpressionContext)
+      Logic.QF_IDL -> { context.registerTheory(IntsContext); context.numeralSort = IntSort }
+      Logic.QF_RDL -> { context.registerTheory(RealsContext); context.numeralSort = RealSort }
+      Logic.QF_FP -> context.registerTheory(FloatingPointContext)
+      else -> throw NotImplementedException("${protoSetLogic.logic} not yet supported")
+    }
+
+    return SetLogic(protoSetLogic.logic)
   }
 
   override fun visit(simpleQualIdentifier: SimpleQualIdentifier): Expression<*> {

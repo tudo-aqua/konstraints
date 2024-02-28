@@ -54,28 +54,29 @@ internal object BVSortDecl : SortDecl<BVSort>("BitVec") {
  * http://smtlib.cs.uiowa.edu/theories-FixedSizeBitVectors.shtml
  */
 
-data class BVLiteral(override val symbol: String) : Expression<BVSort>() {
+class BVLiteral(vector: String) : Expression<BVSort>() {
   val value: Int
   val bits: Int
   val isBinary: Boolean
 
   init {
-    if (symbol[1] == 'b') {
-      bits = symbol.length - 2
+    if (vector[1] == 'b') {
+      bits = vector.length - 2
       isBinary = true
-      value = Integer.parseInt(symbol.substring(2), 2)
-    } else if (symbol[1] == 'x') {
-      bits = (symbol.length - 2) * 4
+      value = Integer.parseInt(vector.substring(2), 2)
+    } else if (vector[1] == 'x') {
+      bits = (vector.length - 2) * 4
       isBinary = false
-      value = Integer.parseInt(symbol.substring(2), 16)
+      value = Integer.parseInt(vector.substring(2), 16)
     } else {
-      throw IllegalArgumentException("$symbol is not a valid bitvector literal.")
+      throw IllegalArgumentException("$vector is not a valid bitvector literal.")
     }
   }
 
   override val sort = BVSort(bits)
+    override val symbol: Symbol = "|$vector|".symbol()
 
-  override fun toString() = symbol
+  override fun toString() = symbol.toSMTString()
 }
 
 /**
@@ -86,12 +87,14 @@ data class BVLiteral(override val symbol: String) : Expression<BVSort>() {
  */
 class BVConcat(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expression<BVSort>() {
   override val sort: BVSort = BVSort(lhs.sort.bits + rhs.sort.bits)
-  override val symbol: String by lazy { "(concat $lhs $rhs)" }
+  override val symbol: Symbol = "concat".symbol()
+
+    override fun toString(): String = "(concat $lhs $rhs)"
 }
 
 object BVConcatDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "concat",
+        "concat".symbol(),
         emptySet(),
         BVSort.fromSymbol("i"),
         BVSort.fromSymbol("j"),
@@ -118,7 +121,7 @@ object BVConcatDecl :
  */
 class BVExtract(val i: Int, val j: Int, val inner: Expression<BVSort>) : Expression<BVSort>() {
   override val sort: BVSort = BVSort(i - j + 1)
-  override val symbol: String by lazy { "((_ extract $i $j) $inner)" }
+  override val symbol: Symbol = "extract".symbol()
 
   init {
     require(j >= 0) { "j needs to be greater or equal to 0, but was $j" }
@@ -127,11 +130,13 @@ class BVExtract(val i: Int, val j: Int, val inner: Expression<BVSort>) : Express
       "i can not be greater than the number of bits in inner, but was $i"
     }
   }
+
+    override fun toString(): String = "((_ extract $i $j) $inner)"
 }
 
 object ExtractDecl :
     FunctionDecl1<BVSort, BVSort>(
-        "extract",
+        "extract".symbol(),
         emptySet(),
         BVSort.fromSymbol("m"),
         setOf(SymbolIndex("i"), SymbolIndex("j")),
@@ -160,14 +165,14 @@ object ExtractDecl :
  */
 class BVNot(val inner: Expression<BVSort>) : Expression<BVSort>() {
   override val sort: BVSort = inner.sort
-  override val symbol: String by lazy { "(bvnot $inner)" }
+  override val symbol: Symbol = "bvnot".symbol()
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(bvnot $inner)"
 }
 
 object BVNotDecl :
     FunctionDecl1<BVSort, BVSort>(
-        "bvnot",
+        "bvnot".symbol(),
         emptySet(),
         BVSort.fromSymbol("m"),
         emptySet(),
@@ -184,14 +189,14 @@ object BVNotDecl :
  */
 class BVNeg(val inner: Expression<BVSort>) : Expression<BVSort>() {
   override val sort: BVSort = inner.sort
-  override val symbol: String by lazy { "(bvneg $inner)" }
+  override val symbol: Symbol = "bvneg".symbol()
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(bvneg $inner)"
 }
 
 object BVNegDecl :
     FunctionDecl1<BVSort, BVSort>(
-        "bvneg",
+        "bvneg".symbol(),
         emptySet(),
         BVSort.fromSymbol("m"),
         emptySet(),
@@ -217,7 +222,7 @@ class BVAnd(val conjuncts: List<Expression<BVSort>>) : Expression<BVSort>() {
   constructor(vararg conjuncts: Expression<BVSort>) : this(conjuncts.toList())
 
   override val sort: BVSort = conjuncts.first().sort
-  override val symbol: String by lazy { "(bvand ${conjuncts.joinToString(" ")})" }
+  override val symbol: Symbol = "bvand".symbol()
 
   init {
     require(conjuncts.all { it.sort.bits == sort.bits }) {
@@ -225,12 +230,12 @@ class BVAnd(val conjuncts: List<Expression<BVSort>>) : Expression<BVSort>() {
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(bvand ${conjuncts.joinToString(" ")})"
 }
 
 object BVAndDecl :
     FunctionDeclLeftAssociative<BVSort, BVSort, BVSort>(
-        "bvand",
+        "bvand".symbol(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -262,7 +267,7 @@ class BVOr(val disjuncts: List<Expression<BVSort>>) : Expression<BVSort>() {
   constructor(vararg disjuncts: Expression<BVSort>) : this(disjuncts.toList())
 
   override val sort: BVSort = disjuncts.first().sort
-  override val symbol: String by lazy { "(bvor ${disjuncts.joinToString(" ")})" }
+  override val symbol: Symbol = "bvor".symbol()
 
   init {
     require(disjuncts.all { it.sort.bits == sort.bits }) {
@@ -270,12 +275,12 @@ class BVOr(val disjuncts: List<Expression<BVSort>>) : Expression<BVSort>() {
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(bvor ${disjuncts.joinToString(" ")})"
 }
 
 object BVOrDecl :
     FunctionDeclLeftAssociative<BVSort, BVSort, BVSort>(
-        "bvor",
+        "bvor".symbol(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -306,7 +311,7 @@ class BVAdd(val summands: List<Expression<BVSort>>) : Expression<BVSort>() {
   constructor(vararg summands: Expression<BVSort>) : this(summands.toList())
 
   override val sort: BVSort = summands.first().sort
-  override val symbol: String by lazy { "(bvadd ${summands.joinToString(" ")})" }
+  override val symbol: Symbol = "bvadd".symbol()
 
   init {
     require(summands.all { it.sort.bits == sort.bits }) {
@@ -314,12 +319,12 @@ class BVAdd(val summands: List<Expression<BVSort>>) : Expression<BVSort>() {
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(bvadd ${summands.joinToString(" ")})"
 }
 
 object BVAddDecl :
     FunctionDeclLeftAssociative<BVSort, BVSort, BVSort>(
-        "bvadd",
+        "bvadd".symbol(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -350,7 +355,7 @@ class BVMul(val factors: List<Expression<BVSort>>) : Expression<BVSort>() {
   constructor(vararg factors: Expression<BVSort>) : this(factors.toList())
 
   override val sort: BVSort = factors.first().sort
-  override val symbol: String by lazy { "(bvmul ${factors.joinToString(" ")})" }
+  override val symbol: Symbol = "bvmul".symbol()
 
   init {
     require(factors.all { it.sort.bits == sort.bits }) {
@@ -358,12 +363,12 @@ class BVMul(val factors: List<Expression<BVSort>>) : Expression<BVSort>() {
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(bvmul ${factors.joinToString(" ")})"
 }
 
 object BVMulDecl :
     FunctionDeclLeftAssociative<BVSort, BVSort, BVSort>(
-        "bvmul",
+        "bvmul".symbol(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -390,7 +395,7 @@ class BVUDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
     Expression<BVSort>() {
 
   override val sort: BVSort = numerator.sort
-  override val symbol: String by lazy { "(bvudiv $numerator $denominator)" }
+  override val symbol: Symbol = "bvudiv".symbol()
 
   init {
     require(numerator.sort.bits == denominator.sort.bits) {
@@ -398,12 +403,12 @@ class BVUDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(bvudiv $numerator $denominator)"
 }
 
 object BVUDivDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "bvudiv",
+        "bvudiv".symbol(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -427,18 +432,18 @@ class BVURem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
     Expression<BVSort>() {
 
   override val sort: BVSort = numerator.sort
-  override val symbol: String by lazy { "(bvurem $numerator $denominator)" }
+  override val symbol: Symbol = "bvurem".symbol()
 
   init {
     require(numerator.sort.bits == denominator.sort.bits)
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(bvurem $numerator $denominator)"
 }
 
 object BVURemDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "bvurem",
+        "bvurem".symbol(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -462,7 +467,7 @@ object BVURemDecl :
 class BVShl(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
     Expression<BVSort>() {
   override val sort: BVSort = value.sort
-  override val symbol: String by lazy { "(bvshl $value $distance)" }
+  override val symbol: Symbol = "bvshl".symbol()
 
   init {
     require(value.sort.bits == distance.sort.bits) {
@@ -470,12 +475,12 @@ class BVShl(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(bvshl $value $distance)"
 }
 
 object BVShlDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "bvshl",
+        "bvshl".symbol(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -499,7 +504,7 @@ object BVShlDecl :
 class BVLShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
     Expression<BVSort>() {
   override val sort: BVSort = value.sort
-  override val symbol: String by lazy { "(bvlshr $value $distance)" }
+  override val symbol: Symbol = "bvlshr".symbol()
 
   init {
     require(value.sort.bits == distance.sort.bits) {
@@ -507,12 +512,12 @@ class BVLShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(bvlshr $value $distance)"
 }
 
 object BVLShrDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "bvlshr",
+        "bvlshr".symbol(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -536,7 +541,7 @@ object BVLShrDecl :
 class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expression<BoolSort>() {
 
   override val sort: BoolSort = BoolSort
-  override val symbol: String by lazy { "(bvult $lhs $rhs)" }
+  override val symbol: Symbol = "bvult".symbol()
 
   init {
     require(lhs.sort.bits == rhs.sort.bits) {
@@ -544,12 +549,12 @@ class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expressi
     }
   }
 
-  override fun toString(): String = symbol
+  override fun toString(): String = "(bvult $lhs $rhs)"
 }
 
 object BVUltDecl :
     FunctionDecl2<BVSort, BVSort, BoolSort>(
-        "bvult",
+        "bvult".symbol(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),

@@ -209,6 +209,7 @@ object Parser {
   private val qf_ufnra = of("QF_UFNRA").map { _: Any -> Logic.QF_UFNRA }
   private val uflra = of("UFLRA").map { _: Any -> Logic.UFLRA }
   private val ufnia = of("UFNIA").map { _: Any -> Logic.UFNIA }
+  private val qf_fp = of("QF_FP").map { _: Any -> Logic.QF_FP }
 
   internal val logic =
       auflia +
@@ -234,7 +235,8 @@ object Parser {
           qf_ufnra +
           uflra +
           ufnia +
-          qf_uf
+          qf_uf +
+              qf_fp
 
   // S-Expressions
 
@@ -494,7 +496,7 @@ object Parser {
       }
   private val setLogicCMD =
       (lparen * setLogicKW * logic * rparen).map { results: ArrayList<Any> ->
-        SetLogic(results[2] as Logic)
+        ProtoSetLogic(results[2] as Logic)
       }
   private val setOptionCMD =
       (lparen * setOptionKW * option * rparen).map { results: ArrayList<Any> ->

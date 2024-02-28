@@ -36,8 +36,6 @@ import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.parser.ProtoCommand
 import tools.aqua.konstraints.smt.Command
 import tools.aqua.konstraints.solvers.Z3.Z3Solver
-import tools.aqua.konstraints.theories.IntSort
-import tools.aqua.konstraints.theories.RealSort
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Z3Tests {
@@ -59,6 +57,7 @@ class Z3Tests {
     }
 
     val parseTreeVisitor = ParseTreeVisitor()
+
     val solver = Z3Solver()
     val temp =
         javaClass
@@ -123,8 +122,6 @@ class Z3Tests {
     val temp = file.bufferedReader().readLines()
     val program = temp.map { it.trim('\r', '\n') }
 
-    parseTreeVisitor.context.numeralSort = IntSort
-
     val satStatus =
         if (program.find { it.contains("unsat") } != null) {
           "unsat"
@@ -182,8 +179,6 @@ class Z3Tests {
     val temp = file.bufferedReader().readLines()
     val program = temp.map { it.trim('\r', '\n') }
 
-    parseTreeVisitor.context.numeralSort = RealSort
-
     val satStatus =
         if (program.find { it.contains("unsat") } != null) {
           "unsat"
@@ -239,7 +234,7 @@ class Z3Tests {
   @ValueSource(
       strings =
           [
-              "(declare-fun A () (_ BitVec 32))(declare-fun B () (_ BitVec 16))(assert (bvult ((_ extract 15 0) A) B))(check-sat)"])
+              "(set-logic QF_BV)(declare-fun A () (_ BitVec 32))(declare-fun B () (_ BitVec 16))(assert (bvult ((_ extract 15 0) A) B))(check-sat)"])
   fun testExtract(program: String) {
     val parseTreeVisitor = ParseTreeVisitor()
     val solver = Z3Solver()

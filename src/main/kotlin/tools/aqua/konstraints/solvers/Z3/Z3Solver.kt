@@ -23,6 +23,7 @@ import com.microsoft.z3.IntSort
 import com.microsoft.z3.Sort
 import com.microsoft.z3.Status
 import tools.aqua.konstraints.smt.*
+import tools.aqua.konstraints.theories.*
 import tools.aqua.konstraints.visitors.CommandVisitor
 
 class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
@@ -44,24 +45,15 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
     if (declareFun.parameters.isNotEmpty()) {
       context.functions[declareFun.name.toString()]?.let { error("function already declared.") }
       context.functions[declareFun.name.toString()] =
-          context.context.mkFuncDecl(
-              declareFun.name.toSMTString(),
-              declareFun.parameters.map { getOrCreateSort(it) }.toTypedArray(),
-              getOrCreateSort(declareFun.sort))
+        context.context.mkFuncDecl(
+          declareFun.name.toSMTString(),
+          declareFun.parameters.map { getOrCreateSort(it) }.toTypedArray(),
+          getOrCreateSort(declareFun.sort)
+        )
     } else {
       context.constants[declareFun.name.toString()]?.let { error("constant already declared.") }
       context.constants[declareFun.name.toString()] =
-          when (declareFun.sort) {
-            is tools.aqua.konstraints.smt.BoolSort ->
-                context.context.mkBoolConst(declareFun.name.toSMTString())
-            is BVSort ->
-                context.context.mkBVConst(declareFun.name.toSMTString(), declareFun.sort.bits)
-            is tools.aqua.konstraints.theories.IntSort ->
-                context.context.mkIntConst(declareFun.name.toSMTString())
-            is tools.aqua.konstraints.theories.RealSort ->
-                context.context.mkRealConst(declareFun.name.toSMTString())
-            else -> error("Sort ${declareFun.sort} not supported.")
-          }
+        context.context.mkConstDecl(declareFun.name.toSMTString(), getOrCreateSort(declareFun.sort)).apply()
     }
   }
 
@@ -72,7 +64,15 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
     context.sorts[sort] =
         when (sort) {
           is BoolSort -> context.context.mkBoolSort()
+          is BVSort -> context.context.mkBitVecSort(sort.bits)
           is IntSort -> context.context.mkIntSort()
+          is RealSort -> context.context.mkRealSort()
+          is RoundingMode -> context.context.mkFPRoundingModeSort()
+          is FPSort -> context.context.mkFPSort(sort.exponentBits, sort.significantBits)
+          is FP16 -> context.context.mkFPSort16()
+          is FP32 -> context.context.mkFPSort32()
+          is FP64 -> context.context.mkFPSort64()
+          is FP128 -> context.context.mkFPSort128()
           else -> error("unsupported sort $sort")
         }
     return context.sorts[sort]!!
