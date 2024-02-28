@@ -61,7 +61,8 @@ class RealNeg(val inner: Expression<RealSort>) : Expression<RealSort>() {
 }
 
 object RealNegDecl :
-    FunctionDecl1<RealSort, RealSort>("-".symbol(), emptySet(), RealSort, emptySet(), emptySet(), RealSort) {
+    FunctionDecl1<RealSort, RealSort>(
+        "-".symbol(), emptySet(), RealSort, emptySet(), emptySet(), RealSort) {
   override fun buildExpression(
       param: Expression<RealSort>,
       bindings: Bindings
@@ -178,7 +179,8 @@ class RealLessEq(val terms: List<Expression<RealSort>>) : Expression<BoolSort>()
 }
 
 object RealLessEqDecl :
-    FunctionDeclChainable<RealSort>("<=".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
+    FunctionDeclChainable<RealSort>(
+        "<=".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
@@ -199,7 +201,8 @@ class RealLess(val terms: List<Expression<RealSort>>) : Expression<BoolSort>() {
 }
 
 object RealLessDecl :
-    FunctionDeclChainable<RealSort>("<".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
+    FunctionDeclChainable<RealSort>(
+        "<".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
@@ -220,7 +223,8 @@ class RealGreaterEq(val terms: List<Expression<RealSort>>) : Expression<BoolSort
 }
 
 object RealGreaterEqDecl :
-    FunctionDeclChainable<RealSort>(">=".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
+    FunctionDeclChainable<RealSort>(
+        ">=".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
@@ -241,7 +245,8 @@ class RealGreater(val terms: List<Expression<RealSort>>) : Expression<BoolSort>(
 }
 
 object RealGreaterDecl :
-    FunctionDeclChainable<RealSort>(">".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
+    FunctionDeclChainable<RealSort>(
+        ">".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<RealSort>>,
       bindings: Bindings

@@ -20,10 +20,10 @@ package tools.aqua.konstraints.solvers.Z3
 
 import com.microsoft.z3.*
 import com.microsoft.z3.BoolSort as Z3BoolSort
+import com.microsoft.z3.FPRMSort
 import com.microsoft.z3.FPSort as Z3FPSort
 import com.microsoft.z3.IntSort as Z3IntSort
 import com.microsoft.z3.RealSort as Z3RealSort
-import com.microsoft.z3.FPRMSort
 import tools.aqua.konstraints.smt.BVSort
 import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Expression
@@ -67,12 +67,12 @@ fun Expression<*>.z3ify(context: Z3Context): Expr<*> =
       is BVSort -> (this as Expression<BVSort>).z3ify(context)
       is IntSort -> (this as Expression<IntSort>).z3ify(context)
       is RealSort -> (this as Expression<RealSort>).z3ify(context)
-        is RoundingMode -> (this as Expression<RoundingMode>).z3ify(context)
-        is FPSort -> (this as Expression<FPSort>).z3ify(context)
-        is FP16 -> (this as Expression<FPSort>).z3ify(context)
-        is FP32 -> (this as Expression<FPSort>).z3ify(context)
-        is FP64 -> (this as Expression<FPSort>).z3ify(context)
-        is FP128 -> (this as Expression<FPSort>).z3ify(context)
+      is RoundingMode -> (this as Expression<RoundingMode>).z3ify(context)
+      is FPSort -> (this as Expression<FPSort>).z3ify(context)
+      is FP16 -> (this as Expression<FPSort>).z3ify(context)
+      is FP32 -> (this as Expression<FPSort>).z3ify(context)
+      is FP64 -> (this as Expression<FPSort>).z3ify(context)
+      is FP128 -> (this as Expression<FPSort>).z3ify(context)
       else -> throw RuntimeException("Unknown sort ${this.sort}")
     }
 
@@ -597,14 +597,14 @@ fun Expression<RoundingMode>.z3ify(context: Z3Context): Expr<FPRMSort> =
       is RTN -> this.z3ify(context)
       is RoundTowardZero -> this.z3ify(context)
       is RTZ -> this.z3ify(context)
-        else ->
-            if (context.constants[this.symbol.toString()] != null) {
-                context.constants[this.symbol.toString()]!! as Expr<FPRMSort>
-            } else if (context.functions[this.symbol.toString()] != null) {
-                TODO("Implement free function symbols")
-            } else {
-                throw IllegalArgumentException("Z3 can not visit expression $this!")
-            }
+      else ->
+          if (context.constants[this.symbol.toString()] != null) {
+            context.constants[this.symbol.toString()]!! as Expr<FPRMSort>
+          } else if (context.functions[this.symbol.toString()] != null) {
+            TODO("Implement free function symbols")
+          } else {
+            throw IllegalArgumentException("Z3 can not visit expression $this!")
+          }
     }
 
 fun RoundNearestTiesToEven.z3ify(context: Z3Context): Expr<FPRMSort> =

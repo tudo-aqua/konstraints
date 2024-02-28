@@ -74,7 +74,7 @@ class BVLiteral(vector: String) : Expression<BVSort>() {
   }
 
   override val sort = BVSort(bits)
-    override val symbol: Symbol = "|$vector|".symbol()
+  override val symbol: Symbol = "|$vector|".symbol()
 
   override fun toString() = symbol.toSMTString()
 }
@@ -89,7 +89,7 @@ class BVConcat(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expre
   override val sort: BVSort = BVSort(lhs.sort.bits + rhs.sort.bits)
   override val symbol: Symbol = "concat".symbol()
 
-    override fun toString(): String = "(concat $lhs $rhs)"
+  override fun toString(): String = "(concat $lhs $rhs)"
 }
 
 object BVConcatDecl :
@@ -131,7 +131,7 @@ class BVExtract(val i: Int, val j: Int, val inner: Expression<BVSort>) : Express
     }
   }
 
-    override fun toString(): String = "((_ extract $i $j) $inner)"
+  override fun toString(): String = "((_ extract $i $j) $inner)"
 }
 
 object ExtractDecl :

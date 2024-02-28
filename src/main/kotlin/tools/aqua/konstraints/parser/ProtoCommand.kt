@@ -41,9 +41,7 @@ internal data class ProtoDeclareFun(
   val name = symbol.symbol
 }
 
-internal data class ProtoSetLogic(
-    val logic: Logic
-) : ProtoCommand
+internal data class ProtoSetLogic(val logic: Logic) : ProtoCommand
 
 internal data class ParseSymbol(val token: Token) {
   val symbol: String = token.getValue()

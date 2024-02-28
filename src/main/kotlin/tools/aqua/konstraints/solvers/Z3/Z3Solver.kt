@@ -45,15 +45,16 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
     if (declareFun.parameters.isNotEmpty()) {
       context.functions[declareFun.name.toString()]?.let { error("function already declared.") }
       context.functions[declareFun.name.toString()] =
-        context.context.mkFuncDecl(
-          declareFun.name.toSMTString(),
-          declareFun.parameters.map { getOrCreateSort(it) }.toTypedArray(),
-          getOrCreateSort(declareFun.sort)
-        )
+          context.context.mkFuncDecl(
+              declareFun.name.toSMTString(),
+              declareFun.parameters.map { getOrCreateSort(it) }.toTypedArray(),
+              getOrCreateSort(declareFun.sort))
     } else {
       context.constants[declareFun.name.toString()]?.let { error("constant already declared.") }
       context.constants[declareFun.name.toString()] =
-        context.context.mkConstDecl(declareFun.name.toSMTString(), getOrCreateSort(declareFun.sort)).apply()
+          context.context
+              .mkConstDecl(declareFun.name.toSMTString(), getOrCreateSort(declareFun.sort))
+              .apply()
     }
   }
 

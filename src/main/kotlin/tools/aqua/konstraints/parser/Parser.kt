@@ -236,7 +236,7 @@ object Parser {
           uflra +
           ufnia +
           qf_uf +
-              qf_fp
+          qf_fp
 
   // S-Expressions
 

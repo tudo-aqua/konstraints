@@ -20,7 +20,7 @@ package tools.aqua.konstraints.smt
 
 abstract class Expression<T : Sort> {
   abstract val symbol: Symbol
-    abstract val sort: T
+  abstract val sort: T
 
   override fun toString() = symbol.toSMTString()
 

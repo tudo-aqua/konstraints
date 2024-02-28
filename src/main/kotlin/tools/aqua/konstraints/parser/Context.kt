@@ -69,7 +69,13 @@ internal class Context {
   fun registerFunction(const: ProtoDeclareConst, sort: Sort) {
     registerFunction(
         FunctionDecl(
-            const.name.symbol(), emptySet(), listOf(), emptySet(), emptySet(), sort, Associativity.NONE))
+            const.name.symbol(),
+            emptySet(),
+            listOf(),
+            emptySet(),
+            emptySet(),
+            sort,
+            Associativity.NONE))
   }
 
   fun registerFunction(function: ProtoDeclareFun, parameters: List<Sort>, sort: Sort) {
@@ -82,7 +88,8 @@ internal class Context {
 
   fun registerFunction(name: String, params: List<Sort>, sort: Sort) {
     this.registerFunction(
-        FunctionDecl(name.symbol(), emptySet(), params, emptySet(), emptySet(), sort, Associativity.NONE))
+        FunctionDecl(
+            name.symbol(), emptySet(), params, emptySet(), emptySet(), sort, Associativity.NONE))
   }
 
   fun registerSort(sort: SortDecl<*>) {

@@ -35,9 +35,9 @@ import tools.aqua.konstraints.theories.BitVectorExpressionContext
 class VisitorTests {
   private val parseTreeVisitor = ParseTreeVisitor()
 
-    init {
-        parseTreeVisitor.context.registerTheory(BitVectorExpressionContext)
-    }
+  init {
+    parseTreeVisitor.context.registerTheory(BitVectorExpressionContext)
+  }
 
   @ParameterizedTest
   @ValueSource(

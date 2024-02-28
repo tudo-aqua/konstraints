@@ -190,7 +190,8 @@ class RoundNearestTiesToEven : Expression<RoundingMode>() {
 }
 
 object RoundNearestTiesToEvenDecl :
-    FunctionDecl0<RoundingMode>("roundNearestTiesToEven".symbol(), emptySet(), emptySet(), RoundingMode) {
+    FunctionDecl0<RoundingMode>(
+        "roundNearestTiesToEven".symbol(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> =
       RoundNearestTiesToEven()
 }
@@ -210,7 +211,8 @@ class RoundNearestTiesToAway : Expression<RoundingMode>() {
 }
 
 object RoundNearestTiesToAwayDecl :
-    FunctionDecl0<RoundingMode>("roundNearestTiesToAway".symbol(), emptySet(), emptySet(), RoundingMode) {
+    FunctionDecl0<RoundingMode>(
+        "roundNearestTiesToAway".symbol(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> =
       RoundNearestTiesToAway()
 }
@@ -230,7 +232,8 @@ class RoundTowardPositive : Expression<RoundingMode>() {
 }
 
 object RoundTowardPositiveDecl :
-    FunctionDecl0<RoundingMode>("roundTowardPositive".symbol(), emptySet(), emptySet(), RoundingMode) {
+    FunctionDecl0<RoundingMode>(
+        "roundTowardPositive".symbol(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RoundTowardPositive()
 }
 
@@ -249,7 +252,8 @@ class RoundTowardNegative : Expression<RoundingMode>() {
 }
 
 object RoundTowardNegativeDecl :
-    FunctionDecl0<RoundingMode>("RoundTowardNegative".symbol(), emptySet(), emptySet(), RoundingMode) {
+    FunctionDecl0<RoundingMode>(
+        "RoundTowardNegative".symbol(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RoundTowardNegative()
 }
 
@@ -318,7 +322,7 @@ class FPInfinity(val eb: Int, val sb: Int) : Expression<FPSort>() {
   override val symbol: Symbol = "+oo".symbol()
   override val sort: FPSort = FPSort(eb, sb)
 
-    override fun toString(): String = "(_ +oo $eb $sb)"
+  override fun toString(): String = "(_ +oo $eb $sb)"
 }
 
 object FPInfinityDecl :
@@ -332,7 +336,7 @@ class FPMinusInfinity(val eb: Int, val sb: Int) : Expression<FPSort>() {
   override val symbol: Symbol = "-oo".symbol()
   override val sort: FPSort = FPSort(eb, sb)
 
-    override fun toString(): String = "(_ -oo $eb $sb)"
+  override fun toString(): String = "(_ -oo $eb $sb)"
 }
 
 object FPMinusInfinityDecl :
@@ -350,12 +354,15 @@ class FPZero(val eb: Int, val sb: Int) : Expression<FPSort>() {
   override val symbol: Symbol = "+zero".symbol()
   override val sort: FPSort = FPSort(eb, sb)
 
-    override fun toString(): String = "(_ +zero $eb $sb)"
+  override fun toString(): String = "(_ +zero $eb $sb)"
 }
 
 object FPZeroDecl :
     FunctionDecl0<FPSort>(
-        "+zero".symbol(), emptySet(), setOf("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())) {
+        "+zero".symbol(),
+        emptySet(),
+        setOf("eb".idx(), "sb".idx()),
+        FPSort("eb".idx(), "sb".idx())) {
   override fun buildExpression(bindings: Bindings): Expression<FPSort> =
       FPZero(bindings["eb"].numeral, bindings["sb"].numeral)
 }
@@ -364,12 +371,15 @@ class FPMinusZero(val eb: Int, val sb: Int) : Expression<FPSort>() {
   override val symbol: Symbol = "-zero".symbol()
   override val sort: FPSort = FPSort(eb, sb)
 
-    override fun toString(): String = "(_ -zero $eb $sb)"
+  override fun toString(): String = "(_ -zero $eb $sb)"
 }
 
 object FPMinusZeroDecl :
     FunctionDecl0<FPSort>(
-        "-zero".symbol(), emptySet(), setOf("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())) {
+        "-zero".symbol(),
+        emptySet(),
+        setOf("eb".idx(), "sb".idx()),
+        FPSort("eb".idx(), "sb".idx())) {
   override fun buildExpression(bindings: Bindings): Expression<FPSort> =
       FPMinusZero(bindings["eb"].numeral, bindings["sb"].numeral)
 }
@@ -382,7 +392,7 @@ class FPNaN(val eb: Int, val sb: Int) : Expression<FPSort>() {
   override val symbol: Symbol = "NaN".symbol()
   override val sort: FPSort = FPSort(eb, sb)
 
-    override fun toString(): String = "(_ NaN $eb $sb)"
+  override fun toString(): String = "(_ NaN $eb $sb)"
 }
 
 object FPNaNDecl :
@@ -400,7 +410,7 @@ class FPAbs(val inner: Expression<FPSort>) : Expression<FPSort>() {
   override val symbol: Symbol = "fp.abs".symbol()
   override val sort: FPSort = inner.sort
 
-    override fun toString(): String = "(fp.abs $inner)"
+  override fun toString(): String = "(fp.abs $inner)"
 }
 
 object FPAbsDecl :
@@ -419,7 +429,7 @@ class FPNeg(val inner: Expression<FPSort>) : Expression<FPSort>() {
   override val symbol: Symbol = "fp.neg".symbol()
   override val sort: FPSort = inner.sort
 
-    override fun toString(): String = "(fp.neg $inner)"
+  override fun toString(): String = "(fp.neg $inner)"
 }
 
 object FPNegDecl :
@@ -447,7 +457,7 @@ class FPAdd(
     require(lhs.sort == rhs.sort)
   }
 
-    override fun toString(): String = "(fp.add $lhs $rhs)"
+  override fun toString(): String = "(fp.add $lhs $rhs)"
 }
 
 object FPAddDecl :
@@ -481,7 +491,7 @@ class FPSub(
     require(minuend.sort == subtrahend.sort)
   }
 
-    override fun toString(): String = "(fp.sub $minuend $subtrahend)"
+  override fun toString(): String = "(fp.sub $minuend $subtrahend)"
 }
 
 object FPSubDecl :
@@ -515,7 +525,7 @@ class FPMul(
     require(multiplier.sort == multiplicand.sort)
   }
 
-    override fun toString(): String = "(fp.mul $multiplier $multiplicand)"
+  override fun toString(): String = "(fp.mul $multiplier $multiplicand)"
 }
 
 object FPMulDecl :
@@ -549,7 +559,7 @@ class FPDiv(
     require(dividend.sort == divisor.sort)
   }
 
-    override fun toString(): String = "(fp.div $dividend $divisor)"
+  override fun toString(): String = "(fp.div $dividend $divisor)"
 }
 
 object FPDivDecl :
@@ -584,7 +594,7 @@ class FPFma(
     require(multiplier.sort == summand.sort)
   }
 
-    override fun toString(): String = "(fp.fma $multiplier $multiplicand $summand)"
+  override fun toString(): String = "(fp.fma $multiplier $multiplicand $summand)"
 }
 
 object FPFmaDecl :
@@ -612,7 +622,7 @@ class FPSqrt(val roundingMode: Expression<RoundingMode>, val inner: Expression<F
   override val symbol: Symbol = "fp.sqrt".symbol()
   override val sort: FPSort = inner.sort
 
-    override fun toString(): String = "(fp.sqrt $inner)"
+  override fun toString(): String = "(fp.sqrt $inner)"
 }
 
 object FPSqrtDecl :
@@ -640,7 +650,7 @@ class FPRem(val dividend: Expression<FPSort>, val divisor: Expression<FPSort>) :
     require(dividend.sort == divisor.sort)
   }
 
-    override fun toString(): String = "(fp.rem $dividend $divisor)"
+  override fun toString(): String = "(fp.rem $dividend $divisor)"
 }
 
 object FPRemDecl :
@@ -664,7 +674,7 @@ class FPRoundToIntegral(val roundingMode: Expression<RoundingMode>, val inner: E
   override val symbol: Symbol = "fp.roundToIntegral".symbol()
   override val sort: FPSort = inner.sort
 
-    override fun toString(): String = "(fp.roundToIntegral $roundingMode $inner)"
+  override fun toString(): String = "(fp.roundToIntegral $roundingMode $inner)"
 }
 
 object FPRoundToIntegralDecl :
@@ -691,7 +701,7 @@ class FPMin(val lhs: Expression<FPSort>, val rhs: Expression<FPSort>) : Expressi
     require(lhs.sort == rhs.sort)
   }
 
-    override fun toString(): String = "(fp.min $lhs $rhs)"
+  override fun toString(): String = "(fp.min $lhs $rhs)"
 }
 
 object FPMinDecl :
@@ -718,7 +728,7 @@ class FPMax(val lhs: Expression<FPSort>, val rhs: Expression<FPSort>) : Expressi
     require(lhs.sort == rhs.sort)
   }
 
-    override fun toString(): String = "(fp.max $lhs $rhs)"
+  override fun toString(): String = "(fp.max $lhs $rhs)"
 }
 
 object FPMaxDecl :
@@ -748,7 +758,7 @@ class FPLeq(val terms: List<Expression<FPSort>>) : Expression<BoolSort>() {
     terms.zipWithNext { a, b -> require(a.sort == b.sort) }
   }
 
-    override fun toString(): String = "(fp.leq ${terms.joinToString(" ")})"
+  override fun toString(): String = "(fp.leq ${terms.joinToString(" ")})"
 }
 
 object FPLeqDecl :
@@ -776,7 +786,7 @@ class FPLt(val terms: List<Expression<FPSort>>) : Expression<BoolSort>() {
     terms.zipWithNext { a, b -> require(a.sort == b.sort) }
   }
 
-    override fun toString(): String = "(fp.lt ${terms.joinToString(" ")})"
+  override fun toString(): String = "(fp.lt ${terms.joinToString(" ")})"
 }
 
 object FPLtDecl :
@@ -804,7 +814,7 @@ class FPGeq(val terms: List<Expression<FPSort>>) : Expression<BoolSort>() {
     terms.zipWithNext { a, b -> require(a.sort == b.sort) }
   }
 
-    override fun toString(): String = "(fp.geq ${terms.joinToString(" ")})"
+  override fun toString(): String = "(fp.geq ${terms.joinToString(" ")})"
 }
 
 object FPGeqDecl :
@@ -832,7 +842,7 @@ class FPGt(val terms: List<Expression<FPSort>>) : Expression<BoolSort>() {
     terms.zipWithNext { a, b -> require(a.sort == b.sort) }
   }
 
-    override fun toString(): String = "(fp.gt ${terms.joinToString(" ")})"
+  override fun toString(): String = "(fp.gt ${terms.joinToString(" ")})"
 }
 
 object FPGtDecl :
@@ -860,7 +870,7 @@ class FPEq(val terms: List<Expression<FPSort>>) : Expression<BoolSort>() {
     terms.zipWithNext { a, b -> require(a.sort == b.sort) }
   }
 
-    override fun toString(): String = "(fp.eq ${terms.joinToString(" ")})"
+  override fun toString(): String = "(fp.eq ${terms.joinToString(" ")})"
 }
 
 object FPEqDecl :
@@ -881,7 +891,7 @@ class FPIsNormal(val inner: Expression<FPSort>) : Expression<BoolSort>() {
   override val symbol: Symbol = "fp.isNormal".symbol()
   override val sort: BoolSort = BoolSort
 
-    override fun toString(): String = "(fp.isNormal $inner)"
+  override fun toString(): String = "(fp.isNormal $inner)"
 }
 
 object FPIsNormalDecl :
@@ -902,7 +912,7 @@ class FPIsSubnormal(val inner: Expression<FPSort>) : Expression<BoolSort>() {
   override val symbol: Symbol = "fp.isSubnormal".symbol()
   override val sort: BoolSort = BoolSort
 
-    override fun toString(): String = "(fp.isSubnormal $inner)"
+  override fun toString(): String = "(fp.isSubnormal $inner)"
 }
 
 object FPIsSubormalDecl :
@@ -923,7 +933,7 @@ class FPIsZero(val inner: Expression<FPSort>) : Expression<BoolSort>() {
   override val symbol: Symbol = "fp.isZero".symbol()
   override val sort: BoolSort = BoolSort
 
-    override fun toString(): String = "(fp.isZero $inner)"
+  override fun toString(): String = "(fp.isZero $inner)"
 }
 
 object FPIsZeroDecl :
@@ -944,7 +954,7 @@ class FPIsInfinite(val inner: Expression<FPSort>) : Expression<BoolSort>() {
   override val symbol: Symbol = "fp.isInfinite".symbol()
   override val sort: BoolSort = BoolSort
 
-    override fun toString(): String = "(fp.isInfinite $inner)"
+  override fun toString(): String = "(fp.isInfinite $inner)"
 }
 
 object FPIsInfiniteDecl :
@@ -965,7 +975,7 @@ class FPIsNaN(val inner: Expression<FPSort>) : Expression<BoolSort>() {
   override val symbol: Symbol = "fp.isNaN".symbol()
   override val sort: BoolSort = BoolSort
 
-    override fun toString(): String = "(fp.isNaN $inner)"
+  override fun toString(): String = "(fp.isNaN $inner)"
 }
 
 object FPIsNaNDecl :
@@ -986,7 +996,7 @@ class FPIsNegative(val inner: Expression<FPSort>) : Expression<BoolSort>() {
   override val symbol: Symbol = "fp.isNegative".symbol()
   override val sort: BoolSort = BoolSort
 
-    override fun toString(): String = "(fp.isNegative $inner)"
+  override fun toString(): String = "(fp.isNegative $inner)"
 }
 
 object FPIsNegativeDecl :
@@ -1007,7 +1017,7 @@ class FPIsPositive(val inner: Expression<FPSort>) : Expression<BoolSort>() {
   override val symbol: Symbol = "fp.isPositive".symbol()
   override val sort: BoolSort = BoolSort
 
-    override fun toString(): String = "(fp.isPositive $inner)"
+  override fun toString(): String = "(fp.isPositive $inner)"
 }
 
 object FPIsPositiveDecl :
@@ -1032,7 +1042,7 @@ class BitVecToFP(val inner: Expression<BVSort>, val eb: Int, val sb: Int) : Expr
   override val symbol: Symbol = "to_fp".symbol()
   override val sort: FPSort = FPSort(eb, sb)
 
-    override fun toString(): String = "((_ to_fp $eb $sb) $inner)"
+  override fun toString(): String = "((_ to_fp $eb $sb) $inner)"
 }
 
 object BitVecToFPDecl :
@@ -1056,7 +1066,7 @@ class FPToFP(
   override val symbol: Symbol = "to_fp".symbol()
   override val sort: FPSort = FPSort(eb, sb)
 
-    override fun toString(): String = "((_ to_fp $eb $sb) $roundingMode $inner)"
+  override fun toString(): String = "((_ to_fp $eb $sb) $roundingMode $inner)"
 }
 
 object FPToFPDecl :
@@ -1084,7 +1094,7 @@ class RealToFP(
   override val symbol: Symbol = "to_fp".symbol()
   override val sort: FPSort = FPSort(eb, sb)
 
-    override fun toString(): String = "((_ to_fp $eb $sb) $roundingMode $inner)"
+  override fun toString(): String = "((_ to_fp $eb $sb) $roundingMode $inner)"
 }
 
 object RealToFPDecl :
@@ -1112,7 +1122,7 @@ class SBitVecToFP(
   override val symbol: Symbol = "to_fp".symbol()
   override val sort: FPSort = FPSort(eb, sb)
 
-    override fun toString(): String = "((_ to_fp $eb $sb) $roundingMode $inner)"
+  override fun toString(): String = "((_ to_fp $eb $sb) $roundingMode $inner)"
 }
 
 object SBitVecToFPDecl :
@@ -1141,7 +1151,7 @@ class UBitVecToFP(
   override val symbol: Symbol = "to_fp_unsigned".symbol()
   override val sort: FPSort = FPSort(eb, sb)
 
-    override fun toString(): String = "((_ to_fp_unsigned $eb $sb) $roundingMode $inner)"
+  override fun toString(): String = "((_ to_fp_unsigned $eb $sb) $roundingMode $inner)"
 }
 
 object UBitVecToFPDecl :
@@ -1173,7 +1183,7 @@ class FPToUBitVec(
   override val symbol: Symbol = "fp.to_ubv".symbol()
   override val sort: BVSort = BVSort(m)
 
-    override fun toString(): String = "((_ fp.to_ubv $m) $roundingMode $inner)"
+  override fun toString(): String = "((_ fp.to_ubv $m) $roundingMode $inner)"
 }
 
 object FPToUBitVecDecl :
@@ -1200,7 +1210,7 @@ class FPToSBitVec(
   override val symbol: Symbol = "fp.to_sbv".symbol()
   override val sort: BVSort = BVSort(m)
 
-    override fun toString(): String = "((_ fp.to_sbv $m) $roundingMode $inner)"
+  override fun toString(): String = "((_ fp.to_sbv $m) $roundingMode $inner)"
 }
 
 object FPToSBitVecDecl :
@@ -1223,7 +1233,7 @@ class FPToReal(val inner: Expression<FPSort>) : Expression<RealSort>() {
   override val symbol: Symbol = "fp.to_real".symbol()
   override val sort: RealSort = RealSort
 
-    override fun toString(): String = "(fp.to_real $inner)"
+  override fun toString(): String = "(fp.to_real $inner)"
 }
 
 object FPToRealDecl :
