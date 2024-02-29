@@ -76,7 +76,7 @@ class BVLiteral(vector: String) : Expression<BVSort>() {
   override val sort = BVSort(bits)
   override val symbol: Symbol = "|$vector|".symbol()
 
-  override fun toString() = symbol.toSMTString()
+  override fun toString() = symbol.toString()
 }
 
 /**
