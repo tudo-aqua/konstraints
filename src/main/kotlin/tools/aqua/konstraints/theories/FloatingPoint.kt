@@ -19,8 +19,6 @@
 package tools.aqua.konstraints.theories
 
 import tools.aqua.konstraints.parser.*
-import tools.aqua.konstraints.parser.IndexedIdentifier
-import tools.aqua.konstraints.parser.ProtoSort
 import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.smt.*
 
@@ -94,8 +92,9 @@ internal object FloatingPointContext : TheoryContext {
 
 object RoundingMode : Sort("RoundingMode")
 
-internal object RoundingModeDecl : SortDecl<RoundingMode>("RoundingMode") {
-  override fun getSort(sort: ProtoSort): RoundingMode = RoundingMode
+internal object RoundingModeDecl :
+    SortDecl<RoundingMode>("RoundingMode".symbol(), emptySet(), emptySet()) {
+  override fun getSort(bindings: Bindings): RoundingMode = RoundingMode
 }
 
 sealed class FPBase(eb: Index, sb: Index) : Sort("FloatingPoint", listOf(eb, sb)) {
@@ -143,41 +142,34 @@ class FPSort private constructor(eb: Index, sb: Index) : FPBase(eb, sb) {
   }
 }
 
-internal object FPSortDecl : SortDecl<FPSort>("FloatingPoint") {
-  override fun getSort(sort: ProtoSort): FPSort {
-    require(sort.identifier is IndexedIdentifier)
-    require(sort.identifier.indices.size == 2)
-    require(sort.identifier.indices[0] is NumeralIndex)
-    require(sort.identifier.indices[1] is NumeralIndex)
-
-    return FPSort(
-        (sort.identifier.indices[0] as NumeralIndex).numeral,
-        (sort.identifier.indices[1] as NumeralIndex).numeral)
-  }
+internal object FPSortDecl :
+    SortDecl<FPSort>("FloatingPoint".symbol(), emptySet(), setOf("eb".idx(), "sb".idx())) {
+  override fun getSort(bindings: Bindings): FPSort =
+      FPSort(bindings["eb"].numeral, bindings["sb"].numeral)
 }
 
 object FP16 : FPBase(5.idx(), 11.idx())
 
-internal object FP16Decl : SortDecl<FPSort>("Float16") {
-  override fun getSort(sort: ProtoSort): FPSort = FPSort(5, 11)
+internal object FP16Decl : SortDecl<FPSort>("Float16".symbol(), emptySet(), emptySet()) {
+  override fun getSort(bindings: Bindings): FPSort = FPSort(5, 11)
 }
 
 object FP32 : FPBase(8.idx(), 24.idx())
 
-internal object FP32Decl : SortDecl<FPSort>("Float32") {
-  override fun getSort(sort: ProtoSort): FPSort = FPSort(8, 24)
+internal object FP32Decl : SortDecl<FPSort>("Float32".symbol(), emptySet(), emptySet()) {
+  override fun getSort(bindings: Bindings): FPSort = FPSort(8, 24)
 }
 
 object FP64 : FPBase(11.idx(), 53.idx())
 
-internal object FP64Decl : SortDecl<FPSort>("Float64") {
-  override fun getSort(sort: ProtoSort): FPSort = FPSort(11, 53)
+internal object FP64Decl : SortDecl<FPSort>("Float64".symbol(), emptySet(), emptySet()) {
+  override fun getSort(bindings: Bindings): FPSort = FPSort(11, 53)
 }
 
 object FP128 : FPBase(15.idx(), 113.idx())
 
-internal object FP128Decl : SortDecl<FPSort>("Float128") {
-  override fun getSort(sort: ProtoSort): FPSort = FPSort(15, 113)
+internal object FP128Decl : SortDecl<FPSort>("Float128".symbol(), emptySet(), emptySet()) {
+  override fun getSort(bindings: Bindings): FPSort = FPSort(15, 113)
 }
 
 /*

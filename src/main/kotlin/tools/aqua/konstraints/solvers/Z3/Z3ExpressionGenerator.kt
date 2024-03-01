@@ -20,10 +20,13 @@ package tools.aqua.konstraints.solvers.Z3
 
 import com.microsoft.z3.*
 import com.microsoft.z3.BoolSort as Z3BoolSort
+import com.microsoft.z3.CharSort
 import com.microsoft.z3.FPRMSort
 import com.microsoft.z3.FPSort as Z3FPSort
 import com.microsoft.z3.IntSort as Z3IntSort
+import com.microsoft.z3.ReSort
 import com.microsoft.z3.RealSort as Z3RealSort
+import com.microsoft.z3.SeqSort
 import tools.aqua.konstraints.smt.BVSort
 import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Expression
@@ -73,6 +76,8 @@ fun Expression<*>.z3ify(context: Z3Context): Expr<*> =
       is FP32 -> (this as Expression<FPSort>).z3ify(context)
       is FP64 -> (this as Expression<FPSort>).z3ify(context)
       is FP128 -> (this as Expression<FPSort>).z3ify(context)
+      is StringSort -> (this as Expression<StringSort>).z3ify(context)
+      is RegLan -> (this as Expression<RegLan>).z3ify(context)
       else -> throw RuntimeException("Unknown sort ${this.sort}")
     }
 
@@ -111,6 +116,12 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
       is FPIsNaN -> this.z3ify(context)
       is FPIsNegative -> this.z3ify(context)
       is FPIsPositive -> this.z3ify(context)
+      is StrLexOrder -> this.z3ify(context)
+      is StrRefLexOrder -> this.z3ify(context)
+      is StrPrefixOf -> this.z3ify(context)
+      is StrSuffixOf -> this.z3ify(context)
+      is StrContains -> this.z3ify(context)
+      is StrIsDigit -> this.z3ify(context)
       /* this also has to handle declared functions */
       else ->
           if (context.constants[this.symbol.toString()] != null) {
@@ -209,7 +220,7 @@ fun RealGreater.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     }
         as Expr<Z3BoolSort>
 
-fun Divisible.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
+fun Divisible.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO() // C-API mk_divides missing
 
 fun IsInt.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkIsInteger(this.inner.z3ify(context))
@@ -269,6 +280,18 @@ fun FPIsNegative.z3ify(context: Z3Context): Expr<Z3BoolSort> =
 
 fun FPIsPositive.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkFPIsPositive(this.inner.z3ify(context))
+
+fun StrLexOrder.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
+
+fun StrRefLexOrder.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
+
+fun StrPrefixOf.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
+
+fun StrSuffixOf.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
+
+fun StrContains.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
+
+fun StrIsDigit.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
 
 @JvmName("z3ifyBitVec")
 fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
@@ -369,6 +392,9 @@ fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
       is Mod -> this.z3ify(context)
       is Abs -> this.z3ify(context)
       is ToInt -> this.z3ify(context)
+      is StrLength -> this.z3ify(context)
+      is StrIndexOf -> this.z3ify(context)
+      is StrToCode -> this.z3ify(context)
       else ->
           if (context.constants[this.symbol.toString()] != null) {
             context.constants[this.symbol.toString()]!! as Expr<Z3IntSort>
@@ -631,3 +657,63 @@ fun RoundTowardZero.z3ify(context: Z3Context): Expr<FPRMSort> =
     context.context.mkFPRoundTowardZero()
 
 fun RTZ.z3ify(context: Z3Context): Expr<FPRMSort> = context.context.mkFPRTZ()
+
+/*
+ * Z3´s StringSort is equivalent to a SeqSort<CharSort>>, mkStringSort returns a SeqSort<CharSort>>
+ */
+@JvmName("z3ifyString")
+fun Expression<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
+    when (this) {
+      is StrConcat -> this.z3ify(context)
+      is StrAt -> this.z3ify(context)
+      is StrSubstring -> this.z3ify(context)
+      is StrReplace -> this.z3ify(context)
+      is StrReplaceAll -> this.z3ify(context)
+      is StrReplaceRegex -> this.z3ify(context)
+      is StrReplaceAllRegex -> this.z3ify(context)
+      is StrFromCode -> this.z3ify(context)
+      is StrFromInt -> this.z3ify(context)
+      else -> TODO()
+    }
+
+fun StrConcat.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
+    context.context.mkConcat(*this.strings.map { it.z3ify(context) }.toTypedArray())
+
+fun StrAt.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
+    context.context.mkAt(this.inner.z3ify(context), this.position.z3ify(context))
+
+fun StrSubstring.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> = TODO()
+
+fun StrReplace.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
+    context.context.mkReplace(
+        this.inner.z3ify(context), this.old.z3ify(context), this.new.z3ify(context))
+
+fun StrReplaceAll.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> = TODO()
+
+fun StrReplaceRegex.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> = TODO()
+
+fun StrReplaceAllRegex.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> = TODO()
+
+fun StrFromCode.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> = TODO()
+
+fun StrFromInt.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> = TODO()
+
+@JvmName("z3ifyRegLan")
+fun Expression<RegLan>.z3ify(context: Z3Context): Expr<ReSort<CharSort>> =
+    when (this) {
+      is RegexNone -> this.z3ify(context)
+      is RegexAll -> this.z3ify(context)
+      is RegexAllChar -> this.z3ify(context)
+      is RegexConcat -> this.z3ify(context)
+      is RegexUnion -> this.z3ify(context)
+      is RegexIntersec -> this.z3ify(context)
+      is RegexStar -> this.z3ify(context)
+      is RegexComp -> this.z3ify(context)
+      is RegexDiff -> this.z3ify(context)
+      is RegexPlus -> this.z3ify(context)
+      is RegexOption -> this.z3ify(context)
+      is RegexRange -> this.z3ify(context)
+      is RegexPower -> this.z3ify(context)
+      is RegexLoop -> this.z3ify(context)
+      else -> TODO()
+    }

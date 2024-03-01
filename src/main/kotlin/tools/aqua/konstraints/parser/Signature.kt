@@ -229,6 +229,35 @@ data class Signature(
   }
 }
 
+class SortSignature(val sortParameter: Set<Sort>, val indices: Set<SymbolIndex>) {
+  fun bindTo(actualSorts: List<Sort>, actualIndices: List<NumeralIndex>): Bindings {
+    val parametricBindings = mutableMapOf<Sort, Sort>()
+    val indexBindings = mutableMapOf<SymbolIndex, NumeralIndex>()
+
+    bindSorts(actualSorts, parametricBindings)
+    bindIndices(actualIndices, indexBindings)
+
+    return Bindings(parametricBindings, indexBindings)
+  }
+
+  private fun bindSorts(actualSorts: List<Sort>, parametricBindings: MutableMap<Sort, Sort>) {
+    sortParameter.zipWithSameLength(actualSorts).forEach { (param, actual) ->
+      parametricBindings.bindParametersTo(param, actual)
+    }
+  }
+
+  private fun bindIndices(
+      actualIndices: List<NumeralIndex>,
+      indexBindings: MutableMap<SymbolIndex, NumeralIndex>
+  ) {
+    indices.zipWithSameLength(actualIndices).forEach { (index, actual) ->
+      require(actual is NumeralIndex)
+
+      indexBindings.bindParametersTo(index, actual)
+    }
+  }
+}
+
 class BindException(val key: Any, val existing: Any, val new: Any) :
     RuntimeException("$new could not be bound to $key; already bound to $existing")
 

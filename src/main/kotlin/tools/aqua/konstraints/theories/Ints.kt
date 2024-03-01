@@ -42,8 +42,8 @@ internal object IntsContext : TheoryContext {
 
 object IntSort : Sort("Int")
 
-internal object IntSortDecl : SortDecl<IntSort>("Int") {
-  override fun getSort(sort: ProtoSort): IntSort = IntSort
+internal object IntSortDecl : SortDecl<IntSort>("Int".symbol(), emptySet(), emptySet()) {
+  override fun getSort(bindings: Bindings): IntSort = IntSort
 }
 
 class IntLiteral(val value: Int) : Expression<IntSort>() {

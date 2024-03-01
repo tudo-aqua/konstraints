@@ -40,13 +40,8 @@ internal object BitVectorExpressionContext : TheoryContext {
   override val sorts = mapOf(Pair("BitVec", BVSortDecl))
 }
 
-internal object BVSortDecl : SortDecl<BVSort>("BitVec") {
-  override fun getSort(sort: ProtoSort): BVSort {
-    require(sort.identifier is IndexedIdentifier)
-    require(sort.identifier.indices.size == 1)
-
-    return BVSort((sort.identifier.indices[0] as NumeralIndex).numeral)
-  }
+internal object BVSortDecl : SortDecl<BVSort>("BitVec".symbol(), emptySet(), setOf("m".idx())) {
+  override fun getSort(bindings: Bindings): BVSort = BVSort(bindings["m"].numeral)
 }
 
 /*

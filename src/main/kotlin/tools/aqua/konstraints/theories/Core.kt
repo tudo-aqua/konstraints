@@ -34,10 +34,8 @@ internal object CoreContext : TheoryContext {
   override val sorts = mapOf(Pair("Bool", BoolSortDecl))
 }
 
-internal object BoolSortDecl : SortDecl<BoolSort>("Bool") {
-  override fun getSort(sort: ProtoSort): BoolSort {
-    return BoolSort
-  }
+internal object BoolSortDecl : SortDecl<BoolSort>("Bool".symbol(), emptySet(), emptySet()) {
+  override fun getSort(bindings: Bindings): BoolSort = BoolSort
 }
 
 /** Object for SMT true */

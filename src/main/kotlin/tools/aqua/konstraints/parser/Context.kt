@@ -18,12 +18,28 @@
 
 package tools.aqua.konstraints.parser
 
-import tools.aqua.konstraints.smt.Expression
-import tools.aqua.konstraints.smt.Sort
-import tools.aqua.konstraints.smt.symbol
+import tools.aqua.konstraints.smt.*
 
-internal abstract class SortDecl<T : Sort>(val name: String) {
-  abstract fun getSort(sort: ProtoSort): T
+internal abstract class SortDecl<T : Sort>(
+    val name: Symbol,
+    sortParameters: Set<SortParameter>,
+    indices: Set<SymbolIndex>,
+) {
+  val signature = SortSignature(sortParameters, indices)
+
+  open fun buildSort(sort: ProtoSort, parameters: List<Sort>): T {
+    val indices =
+        if (sort.identifier is IndexedIdentifier) {
+          require(sort.identifier.indices.all { it is NumeralIndex })
+          sort.identifier.indices as List<NumeralIndex>
+        } else {
+          emptyList()
+        }
+
+    return getSort(signature.bindTo(parameters, indices))
+  }
+
+  abstract fun getSort(bindings: Bindings): T
 }
 
 internal class Context {
@@ -93,10 +109,10 @@ internal class Context {
   }
 
   fun registerSort(sort: SortDecl<*>) {
-    if (sorts.containsKey(sort.name))
+    if (sorts.containsKey(sort.name.toString()))
         throw Exception("Sort ${sort.name} is already defined in context")
 
-    sorts[sort.name] = sort
+    sorts[sort.name.toString()] = sort
   }
 
   /**
@@ -118,7 +134,10 @@ internal class Context {
   }
 
   fun getSort(protoSort: ProtoSort): Sort {
-    return sorts[protoSort.identifier.symbol.token.getValue()]?.getSort(protoSort)
+    // build all sort parameters first
+    val parameters = protoSort.sorts.map { getSort(it) }
+
+    return sorts[protoSort.name]?.buildSort(protoSort, parameters)
         ?: throw Exception("Unknown sort ${protoSort.identifier.symbol.token.getValue<String>()}")
   }
 

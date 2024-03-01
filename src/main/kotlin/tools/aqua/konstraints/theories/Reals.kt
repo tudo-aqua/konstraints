@@ -20,7 +20,6 @@ package tools.aqua.konstraints.theories
 
 import java.math.BigDecimal
 import tools.aqua.konstraints.parser.*
-import tools.aqua.konstraints.parser.ProtoSort
 import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.smt.*
 
@@ -42,8 +41,8 @@ internal object RealsContext : TheoryContext {
 
 object RealSort : Sort("Real")
 
-internal object RealSortDecl : SortDecl<RealSort>("Real") {
-  override fun getSort(sort: ProtoSort) = RealSort
+internal object RealSortDecl : SortDecl<RealSort>("Real".symbol(), emptySet(), emptySet()) {
+  override fun getSort(bindings: Bindings): RealSort = RealSort
 }
 
 class RealLiteral(val value: BigDecimal) : Expression<RealSort>() {

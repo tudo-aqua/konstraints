@@ -86,7 +86,9 @@ internal data class IndexedIdentifier(override val symbol: ParseSymbol, val indi
 
 // Sorts
 
-internal data class ProtoSort(val identifier: Identifier, val sorts: List<ProtoSort>)
+internal data class ProtoSort(val identifier: Identifier, val sorts: List<ProtoSort>) {
+  val name = identifier.symbol.symbol
+}
 
 // S-Expression
 

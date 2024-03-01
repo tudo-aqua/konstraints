@@ -29,6 +29,7 @@ internal object StringContext : TheoryContext {
           StrLengthDecl,
           StrLexOrderDecl,
           StrRefLexOrderDecl,
+          StrAtDecl,
           StrSubstringDecl,
           StrPrefixOfDecl,
           StrSuffixOfDecl,
@@ -61,14 +62,14 @@ internal object StringContext : TheoryContext {
 
 object StringSort : Sort("String")
 
-internal object StringSortDecl : SortDecl<StringSort>("String") {
-  override fun getSort(sort: ProtoSort): StringSort = StringSort
+internal object StringSortDecl : SortDecl<StringSort>("String".symbol(), emptySet(), emptySet()) {
+  override fun getSort(bindings: Bindings): StringSort = StringSort
 }
 
 object RegLan : Sort("RegLan")
 
-internal object RegLanDecl : SortDecl<RegLan>("RegLan") {
-  override fun getSort(sort: ProtoSort): RegLan = RegLan
+internal object RegLanDecl : SortDecl<RegLan>("RegLan".symbol(), emptySet(), emptySet()) {
+  override fun getSort(bindings: Bindings): RegLan = RegLan
 }
 
 /**
