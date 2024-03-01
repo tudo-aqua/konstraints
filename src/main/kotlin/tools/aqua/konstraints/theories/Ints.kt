@@ -47,7 +47,7 @@ internal object IntSortDecl : SortDecl<IntSort>("Int".symbol(), emptySet(), empt
 }
 
 class IntLiteral(val value: Int) : Expression<IntSort>() {
-  override val symbol: Symbol = value.toString().symbol()
+  override val symbol: Symbol = "|$value|".symbol()
   override val sort: IntSort = IntSort
 
   override fun toString(): String = value.toString()

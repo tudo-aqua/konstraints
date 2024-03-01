@@ -73,6 +73,14 @@ internal class ParseTreeVisitor :
         context.numeralSort = RealSort
       }
       Logic.QF_FP -> context.registerTheory(FloatingPointContext)
+      // QF_AX uses only ArrayEx with free function and sort symbols, as free sorts are not yet
+      // supported
+      // load int theory as well for testing purposes
+      Logic.QF_AX -> {
+        context.registerTheory(ArrayExContext)
+        context.registerTheory(IntsContext)
+        context.numeralSort = IntSort
+      }
       else -> throw NotImplementedException("${protoSetLogic.logic} not yet supported")
     }
 

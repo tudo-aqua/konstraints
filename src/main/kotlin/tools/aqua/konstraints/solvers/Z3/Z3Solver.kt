@@ -18,8 +18,6 @@
 
 package tools.aqua.konstraints.solvers.Z3
 
-import com.microsoft.z3.BoolSort
-import com.microsoft.z3.IntSort
 import com.microsoft.z3.Sort
 import com.microsoft.z3.Status
 import tools.aqua.konstraints.smt.*
@@ -74,6 +72,8 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
           is FP32 -> context.context.mkFPSort32()
           is FP64 -> context.context.mkFPSort64()
           is FP128 -> context.context.mkFPSort128()
+          is ArraySort ->
+              context.context.mkArraySort(getOrCreateSort(sort.x), getOrCreateSort(sort.y))
           else -> error("unsupported sort $sort")
         }
     return context.sorts[sort]!!

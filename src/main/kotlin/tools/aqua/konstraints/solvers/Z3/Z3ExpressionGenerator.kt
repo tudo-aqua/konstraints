@@ -19,6 +19,7 @@
 package tools.aqua.konstraints.solvers.Z3
 
 import com.microsoft.z3.*
+import com.microsoft.z3.ArraySort as Z3ArraySort
 import com.microsoft.z3.BoolSort as Z3BoolSort
 import com.microsoft.z3.CharSort
 import com.microsoft.z3.FPRMSort
@@ -27,6 +28,7 @@ import com.microsoft.z3.IntSort as Z3IntSort
 import com.microsoft.z3.ReSort
 import com.microsoft.z3.RealSort as Z3RealSort
 import com.microsoft.z3.SeqSort
+import com.microsoft.z3.Sort as Z3Sort
 import tools.aqua.konstraints.smt.BVSort
 import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Expression
@@ -64,22 +66,31 @@ fun makeRightAssoc(
 }
 
 @JvmName("z3ifyAny")
-fun Expression<*>.z3ify(context: Z3Context): Expr<*> =
-    when (this.sort) {
-      is BoolSort -> (this as Expression<BoolSort>).z3ify(context)
-      is BVSort -> (this as Expression<BVSort>).z3ify(context)
-      is IntSort -> (this as Expression<IntSort>).z3ify(context)
-      is RealSort -> (this as Expression<RealSort>).z3ify(context)
-      is RoundingMode -> (this as Expression<RoundingMode>).z3ify(context)
-      is FPSort -> (this as Expression<FPSort>).z3ify(context)
-      is FP16 -> (this as Expression<FPSort>).z3ify(context)
-      is FP32 -> (this as Expression<FPSort>).z3ify(context)
-      is FP64 -> (this as Expression<FPSort>).z3ify(context)
-      is FP128 -> (this as Expression<FPSort>).z3ify(context)
-      is StringSort -> (this as Expression<StringSort>).z3ify(context)
-      is RegLan -> (this as Expression<RegLan>).z3ify(context)
-      else -> throw RuntimeException("Unknown sort ${this.sort}")
-    }
+fun Expression<*>.z3ify(context: Z3Context): Expr<*> {
+  // special case as return type of select can be any sort
+  if (this is ArraySelect) {
+    return this.z3ify(context)
+  }
+
+  return when (this.sort) {
+    is BoolSort -> (this as Expression<BoolSort>).z3ify(context)
+    is BVSort -> (this as Expression<BVSort>).z3ify(context)
+    is IntSort -> (this as Expression<IntSort>).z3ify(context)
+    is RealSort -> (this as Expression<RealSort>).z3ify(context)
+    is RoundingMode -> (this as Expression<RoundingMode>).z3ify(context)
+    is FPSort -> (this as Expression<FPSort>).z3ify(context)
+    is FP16 -> (this as Expression<FPSort>).z3ify(context)
+    is FP32 -> (this as Expression<FPSort>).z3ify(context)
+    is FP64 -> (this as Expression<FPSort>).z3ify(context)
+    is FP128 -> (this as Expression<FPSort>).z3ify(context)
+    is StringSort -> (this as Expression<StringSort>).z3ify(context)
+    is RegLan -> (this as Expression<RegLan>).z3ify(context)
+    else -> throw RuntimeException("Unknown sort ${this.sort}")
+  }
+}
+
+fun ArraySelect.z3ify(context: Z3Context): Expr<Z3Sort> =
+    context.context.mkSelect(this.array.z3ify(context), this.index.z3ify(context) as Expr<Z3Sort>)
 
 @JvmName("z3ifyBool")
 fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
@@ -717,3 +728,23 @@ fun Expression<RegLan>.z3ify(context: Z3Context): Expr<ReSort<CharSort>> =
       is RegexLoop -> this.z3ify(context)
       else -> TODO()
     }
+
+@JvmName("z3ifyArrayEx")
+fun Expression<ArraySort>.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>> =
+    when (this) {
+      is ArrayStore -> this.z3ify(context)
+      else ->
+          if (context.constants[this.symbol.toString()] != null) {
+            context.constants[this.symbol.toString()]!! as Expr<Z3ArraySort<Z3Sort, Z3Sort>>
+          } else if (context.functions[this.symbol.toString()] != null) {
+            TODO("Implement free function symbols")
+          } else {
+            throw IllegalArgumentException("Z3 can not visit expression $this!")
+          }
+    }
+
+fun ArrayStore.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>> =
+    context.context.mkStore(
+        this.array.z3ify(context),
+        this.value.z3ify(context) as Expr<Z3Sort>,
+        this.index.z3ify(context) as Expr<Z3Sort>)

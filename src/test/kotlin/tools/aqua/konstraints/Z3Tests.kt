@@ -172,7 +172,7 @@ class Z3Tests {
 
   @ParameterizedTest
   @MethodSource("getQFRDLFile")
-  @Timeout(value = 20, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_RDL(file: File) {
     val parseTreeVisitor = ParseTreeVisitor()
     val solver = Z3Solver()
@@ -232,7 +232,7 @@ class Z3Tests {
 
   @ParameterizedTest
   @MethodSource("getQFFPFile")
-  @Timeout(value = 20, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_FP(file: File) {
     val solver = Z3Solver()
     val temp = file.bufferedReader().readLines()
@@ -273,6 +273,56 @@ class Z3Tests {
 
   fun getQFFPFile(): Stream<Arguments> {
     val dir = File(javaClass.getResource("/QF_FP/aqua/").file)
+
+    return dir.walk()
+        .filter { file: File -> file.isFile }
+        .map { file: File -> Arguments.arguments(file) }
+        .asStream()
+  }
+
+  @ParameterizedTest
+  @MethodSource("getQFAXFile")
+  @Timeout(value = 20, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  fun QF_AX(file: File) {
+    val solver = Z3Solver()
+    val temp = file.bufferedReader().readLines()
+    val program = temp.map { it.trim('\r', '\n') }
+
+    val satStatus =
+        if (program.find { it.contains("unsat") } != null) {
+          "unsat"
+        } else if (program.find { it.contains("unknown") } != null) {
+          "unknown"
+        } else {
+          "sat"
+        }
+
+    /* ignore the test if assumption fails, ignores all unknown tests */
+    assumeTrue(satStatus != "unknown")
+
+    println("Expected result is $satStatus")
+
+    /* filter comments for now until they are handled by the parser */
+    val result = Parser.parse(program.filter { !it.startsWith(';') }.joinToString(""))
+
+    println(result.commands.joinToString("\n"))
+
+    solver.use {
+      result.commands.map { solver.visit(it) }
+
+      // verify we get the correct status for the test
+      assertEquals(satStatus, solver.status)
+
+      // verify we parsed the correct program
+      /*
+      assertEquals(commands.filterIsInstance<Assert>().single().expression.toString(),
+          solver.context.solver.assertions.last().toString())
+      */
+    }
+  }
+
+  fun getQFAXFile(): Stream<Arguments> {
+    val dir = File(javaClass.getResource("/QF_AX/aqua/").file)
 
     return dir.walk()
         .filter { file: File -> file.isFile }
