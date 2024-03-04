@@ -96,9 +96,9 @@ internal class Context {
 
   fun registerFunction(function: ProtoDeclareFun, parameters: List<Sort>, sort: Sort) {
     if (parameters.isEmpty()) {
-      registerFunction(function.name.toString(), listOf(), sort)
+      registerFunction(function.name, listOf(), sort)
     } else {
-      registerFunction(function.name.toString(), parameters, sort)
+      registerFunction(function.name, parameters, sort)
     }
   }
 
@@ -113,6 +113,13 @@ internal class Context {
         throw Exception("Sort ${sort.name} is already defined in context")
 
     sorts[sort.name.toString()] = sort
+  }
+
+  fun registerSort(name: Symbol, arity: Int) {
+    if (sorts.containsKey(name.toString()))
+        throw Exception("Sort $name is already defined in context")
+
+    sorts[name.toString()] = UserDefinedSortDecl(name, arity)
   }
 
   /**

@@ -18,6 +18,9 @@
 
 package tools.aqua.konstraints.smt
 
+import tools.aqua.konstraints.parser.Bindings
+import tools.aqua.konstraints.parser.SortDecl
+
 open class Sort(
     val name: Symbol,
     val indices: List<Index> = emptyList(),
@@ -86,4 +89,15 @@ class BVSort private constructor(index: Index) : Sort("BitVec", listOf(index)) {
   // TODO enforce this on the sort baseclass
   // test for any index to be symbolic
   internal fun isSymbolic() = (indices.single() is SymbolIndex)
+}
+
+class UserDefinedSort(name: Symbol, arity: Int) :
+    Sort(name, emptyList(), (0..arity).map { index -> SortParameter("sort$index") })
+
+internal class UserDefinedSortDecl(name: Symbol, val arity: Int) :
+        SortDecl<Sort>(name, (0..<arity).map { index -> SortParameter("sort$index") }.toSet(), emptySet()) {
+
+            // FIXME parameter order is assume to be right in the bindings map
+            override fun getSort(bindings: Bindings): Sort = UserDefinedSort(name, arity)
+
 }

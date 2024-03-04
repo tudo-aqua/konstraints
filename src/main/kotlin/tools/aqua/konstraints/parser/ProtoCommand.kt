@@ -43,6 +43,11 @@ internal data class ProtoDeclareFun(
 
 internal data class ProtoSetLogic(val logic: Logic) : ProtoCommand
 
+internal data class ProtoDeclareSort(val symbol: ParseSymbol, val arity: Int) : ProtoCommand {
+  val name = symbol.symbol
+}
+
+// TODO make this a subclass of the normal symbol with extra token info
 internal data class ParseSymbol(val token: Token) {
   val symbol: String = token.getValue()
 

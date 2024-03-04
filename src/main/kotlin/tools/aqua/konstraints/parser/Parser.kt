@@ -504,6 +504,11 @@ object Parser {
             (results[2] as List<Any>)[0] as String, (results[2] as List<Any>)[0] as OptionValue)
       }
 
+  private val declareSortCMD =
+      (lparen * declareSortKW * symbol * numeral * rparen).map { results: ArrayList<Any> ->
+        ProtoDeclareSort(results[2] as ParseSymbol, results[3] as Int)
+      }
+
   val command =
       ChoiceParser(
           FailureJoiner.SelectFarthest(),
@@ -513,7 +518,8 @@ object Parser {
           declareFunCMD,
           exitCMD,
           setInfoCMD,
-          setLogicCMD)
+          setLogicCMD,
+          declareSortCMD)
 
   val script = command.star().end()
 

@@ -45,6 +45,8 @@ data class DeclareFun(val name: Symbol, val parameters: List<Sort>, val sort: So
 data class SetInfo(val attribute: Attribute) :
     Command("set-info ${attribute.keyword} ${attribute.value})")
 
+data class DeclareSort(val name: Symbol, val arity: Int) : Command("declare-sort $name $arity")
+
 // TODO string serialization of OptionValue
 data class SetOption(val name: String, val value: OptionValue) : Command("set-option $name $value")
 

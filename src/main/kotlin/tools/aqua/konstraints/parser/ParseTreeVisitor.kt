@@ -87,6 +87,12 @@ internal class ParseTreeVisitor :
     return SetLogic(protoSetLogic.logic)
   }
 
+  override fun visit(protoDeclareSort: ProtoDeclareSort): DeclareSort {
+    context.registerSort(protoDeclareSort.symbol.toSymbol(), protoDeclareSort.arity)
+
+    return DeclareSort(protoDeclareSort.symbol.toSymbol(), protoDeclareSort.arity)
+  }
+
   override fun visit(simpleQualIdentifier: SimpleQualIdentifier): Expression<*> {
     val op = context.getFunction(simpleQualIdentifier.identifier, listOf())
 

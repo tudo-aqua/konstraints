@@ -74,7 +74,7 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
           is FP128 -> context.context.mkFPSort128()
           is ArraySort ->
               context.context.mkArraySort(getOrCreateSort(sort.x), getOrCreateSort(sort.y))
-          else -> error("unsupported sort $sort")
+          else -> context.context.mkUninterpretedSort(sort.toSMTString())
         }
     return context.sorts[sort]!!
   }
@@ -94,6 +94,9 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
   override fun visit(setOption: SetOption) {}
 
   override fun visit(setLogic: SetLogic) {}
+  override fun visit(declareSort: DeclareSort) {
+    context.context.mkUninterpretedSort(declareSort.name.toSMTString())
+  }
 
   override fun close() {
     context.solver.reset()

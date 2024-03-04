@@ -29,7 +29,9 @@ internal object ArrayExContext : TheoryContext {
   override val sorts: Map<String, SortDecl<*>> = mapOf(Pair("Array", ArraySortDecl))
 }
 
-class ArraySort(val x: Sort, val y: Sort) : Sort("Array".symbol(), emptyList(), listOf(x, y))
+class ArraySort(val x: Sort, val y: Sort) : Sort("Array".symbol(), emptyList(), listOf(x, y)) {
+    override fun toString(): String = "(Array $x $y)"
+}
 
 internal object ArraySortDecl :
     SortDecl<ArraySort>(

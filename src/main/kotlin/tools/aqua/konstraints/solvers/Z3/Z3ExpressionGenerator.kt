@@ -28,10 +28,12 @@ import com.microsoft.z3.IntSort as Z3IntSort
 import com.microsoft.z3.ReSort
 import com.microsoft.z3.RealSort as Z3RealSort
 import com.microsoft.z3.SeqSort
+import com.microsoft.z3.UninterpretedSort
 import com.microsoft.z3.Sort as Z3Sort
 import tools.aqua.konstraints.smt.BVSort
 import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Expression
+import tools.aqua.konstraints.smt.UserDefinedSort
 import tools.aqua.konstraints.theories.*
 
 fun makeLeftAssoc(
@@ -85,6 +87,8 @@ fun Expression<*>.z3ify(context: Z3Context): Expr<*> {
     is FP128 -> (this as Expression<FPSort>).z3ify(context)
     is StringSort -> (this as Expression<StringSort>).z3ify(context)
     is RegLan -> (this as Expression<RegLan>).z3ify(context)
+      is UserDefinedSort -> (this as Expression<UserDefinedSort>).z3ify(context)
+      is ArraySort -> (this as Expression<ArraySort>).z3ify(context)
     else -> throw RuntimeException("Unknown sort ${this.sort}")
   }
 }
@@ -748,3 +752,13 @@ fun ArrayStore.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>> =
         this.array.z3ify(context),
         this.value.z3ify(context) as Expr<Z3Sort>,
         this.index.z3ify(context) as Expr<Z3Sort>)
+
+fun Expression<UserDefinedSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
+    if (context.constants[this.symbol.toString()] != null) {
+        context.constants[this.symbol.toString()]!! as Expr<UninterpretedSort>
+    } else if (context.functions[this.symbol.toString()] != null) {
+        TODO("Implement free function symbols")
+    } else {
+        throw IllegalArgumentException("Z3 can not visit expression $this!")
+    }
+

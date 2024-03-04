@@ -31,6 +31,7 @@ interface CommandVisitor<T> {
         is SetInfo -> visit(command)
         is SetOption -> visit(command)
         is SetLogic -> visit(command)
+        is DeclareSort -> visit(command)
       }
 
   fun visit(assert: Assert): T
@@ -48,4 +49,6 @@ interface CommandVisitor<T> {
   fun visit(setOption: SetOption): T
 
   fun visit(setLogic: SetLogic): T
+
+  fun visit(declareSort: DeclareSort): T
 }
