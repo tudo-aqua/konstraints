@@ -30,7 +30,7 @@ internal object ArrayExContext : TheoryContext {
 }
 
 class ArraySort(val x: Sort, val y: Sort) : Sort("Array".symbol(), emptyList(), listOf(x, y)) {
-    override fun toString(): String = "(Array $x $y)"
+  override fun toString(): String = "(Array $x $y)"
 }
 
 internal object ArraySortDecl :

@@ -94,6 +94,7 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
   override fun visit(setOption: SetOption) {}
 
   override fun visit(setLogic: SetLogic) {}
+
   override fun visit(declareSort: DeclareSort) {
     context.context.mkUninterpretedSort(declareSort.name.toSMTString())
   }

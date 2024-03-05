@@ -39,6 +39,7 @@ internal object StringContext : TheoryContext {
           StrReplaceAllDecl,
           StrIsDigitDecl,
           StrToCodeDecl,
+          StrToIntDecl,
           StrFromCodeDecl,
           StrFromIntDecl,
           RegexNoneDecl,
@@ -717,6 +718,7 @@ object RegexLoopDecl :
  * Maps to and from integer
  */
 
+// TODO enforce inner is a single digit string
 class StrIsDigit(val inner: Expression<StringSort>) : Expression<BoolSort>() {
   override val symbol: Symbol = "str.is_digit".symbol()
   override val sort: BoolSort = BoolSort

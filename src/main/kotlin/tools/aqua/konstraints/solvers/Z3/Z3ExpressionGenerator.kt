@@ -28,8 +28,8 @@ import com.microsoft.z3.IntSort as Z3IntSort
 import com.microsoft.z3.ReSort
 import com.microsoft.z3.RealSort as Z3RealSort
 import com.microsoft.z3.SeqSort
-import com.microsoft.z3.UninterpretedSort
 import com.microsoft.z3.Sort as Z3Sort
+import com.microsoft.z3.UninterpretedSort
 import tools.aqua.konstraints.smt.BVSort
 import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Expression
@@ -87,8 +87,8 @@ fun Expression<*>.z3ify(context: Z3Context): Expr<*> {
     is FP128 -> (this as Expression<FPSort>).z3ify(context)
     is StringSort -> (this as Expression<StringSort>).z3ify(context)
     is RegLan -> (this as Expression<RegLan>).z3ify(context)
-      is UserDefinedSort -> (this as Expression<UserDefinedSort>).z3ify(context)
-      is ArraySort -> (this as Expression<ArraySort>).z3ify(context)
+    is UserDefinedSort -> (this as Expression<UserDefinedSort>).z3ify(context)
+    is ArraySort -> (this as Expression<ArraySort>).z3ify(context)
     else -> throw RuntimeException("Unknown sort ${this.sort}")
   }
 }
@@ -296,15 +296,32 @@ fun FPIsNegative.z3ify(context: Z3Context): Expr<Z3BoolSort> =
 fun FPIsPositive.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkFPIsPositive(this.inner.z3ify(context))
 
-fun StrLexOrder.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
+fun StrLexOrder.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkAnd(
+        *this.strings
+            .zipWithNext()
+            .map { (lhs, rhs) ->
+              context.context.MkStringLt(lhs.z3ify(context), rhs.z3ify(context))
+            }
+            .toTypedArray())
 
-fun StrRefLexOrder.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
+fun StrRefLexOrder.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkAnd(
+        *this.strings
+            .zipWithNext()
+            .map { (lhs, rhs) ->
+              context.context.MkStringLe(lhs.z3ify(context), rhs.z3ify(context))
+            }
+            .toTypedArray())
 
-fun StrPrefixOf.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
+fun StrPrefixOf.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkPrefixOf(inner.z3ify(context), prefix.z3ify(context))
 
-fun StrSuffixOf.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
+fun StrSuffixOf.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkSuffixOf(inner.z3ify(context), suffix.z3ify(context))
 
-fun StrContains.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
+fun StrContains.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkContains(string.z3ify(context), substring.z3ify(context))
 
 fun StrIsDigit.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
 
@@ -410,6 +427,7 @@ fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
       is StrLength -> this.z3ify(context)
       is StrIndexOf -> this.z3ify(context)
       is StrToCode -> this.z3ify(context)
+      is StrToInt -> this.z3ify(context)
       else ->
           if (context.constants[this.symbol.toString()] != null) {
             context.constants[this.symbol.toString()]!! as Expr<Z3IntSort>
@@ -447,6 +465,16 @@ fun Abs.z3ify(context: Z3Context): Expr<Z3IntSort> = TODO()
 
 fun ToInt.z3ify(context: Z3Context): Expr<Z3IntSort> =
     context.context.mkReal2Int(this.inner.z3ify(context))
+
+fun StrLength.z3ify(context: Z3Context): Expr<Z3IntSort> =
+    context.context.mkLength(this.inner.z3ify(context))
+
+fun StrIndexOf.z3ify(context: Z3Context): Expr<Z3IntSort> =
+    context.context.mkIndexOf(
+        this.string.z3ify(context), this.substring.z3ify(context), this.start.z3ify(context))
+
+fun StrToCode.z3ify(context: Z3Context): Expr<Z3IntSort> =
+    context.context.stringToInt(this.inner.z3ify(context))
 
 @JvmName("z3ifyReals")
 fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
@@ -688,7 +716,14 @@ fun Expression<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
       is StrReplaceAllRegex -> this.z3ify(context)
       is StrFromCode -> this.z3ify(context)
       is StrFromInt -> this.z3ify(context)
-      else -> TODO()
+      else ->
+          if (context.constants[this.symbol.toString()] != null) {
+            context.constants[this.symbol.toString()]!! as Expr<SeqSort<CharSort>>
+          } else if (context.functions[this.symbol.toString()] != null) {
+            TODO("Implement free function symbols")
+          } else {
+            throw IllegalArgumentException("Z3 can not visit expression $this!")
+          }
     }
 
 fun StrConcat.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
@@ -697,24 +732,29 @@ fun StrConcat.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
 fun StrAt.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
     context.context.mkAt(this.inner.z3ify(context), this.position.z3ify(context))
 
-fun StrSubstring.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> = TODO()
+fun StrSubstring.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
+    context.context.mkExtract(inner.z3ify(context), start.z3ify(context), length.z3ify(context))
 
 fun StrReplace.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
     context.context.mkReplace(
         this.inner.z3ify(context), this.old.z3ify(context), this.new.z3ify(context))
 
-fun StrReplaceAll.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> = TODO()
+// FIXME this probably only replaces the first occurrence, mkReplaceAll missing in C_API
+fun StrReplaceAll.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
+    context.context.mkReplace(inner.z3ify(context), old.z3ify(context), new.z3ify(context))
 
 fun StrReplaceRegex.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> = TODO()
 
 fun StrReplaceAllRegex.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> = TODO()
 
-fun StrFromCode.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> = TODO()
+fun StrFromCode.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
+    context.context.intToString(inner.z3ify(context))
 
-fun StrFromInt.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> = TODO()
+fun StrFromInt.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
+    context.context.intToString(inner.z3ify(context))
 
 @JvmName("z3ifyRegLan")
-fun Expression<RegLan>.z3ify(context: Z3Context): Expr<ReSort<CharSort>> =
+fun Expression<RegLan>.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
     when (this) {
       is RegexNone -> this.z3ify(context)
       is RegexAll -> this.z3ify(context)
@@ -730,8 +770,64 @@ fun Expression<RegLan>.z3ify(context: Z3Context): Expr<ReSort<CharSort>> =
       is RegexRange -> this.z3ify(context)
       is RegexPower -> this.z3ify(context)
       is RegexLoop -> this.z3ify(context)
-      else -> TODO()
+      else ->
+          if (context.constants[this.symbol.toString()] != null) {
+            context.constants[this.symbol.toString()]!! as Expr<ReSort<SeqSort<CharSort>>>
+          } else if (context.functions[this.symbol.toString()] != null) {
+            TODO("Implement free function symbols")
+          } else {
+            throw IllegalArgumentException("Z3 can not visit expression $this!")
+          }
     }
+
+fun RegexNone.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
+    context.context.mkEmptyRe(context.context.mkReSort(context.context.stringSort))
+
+fun RegexAll.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
+    context.context.mkFullRe(context.context.mkReSort(context.context.stringSort))
+
+fun RegexAllChar.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
+    context.context.mkAllcharRe(context.context.mkReSort(context.context.stringSort))
+
+fun RegexConcat.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
+    context.context.mkConcat(
+        *this.regex.map { it.z3ify(context) as ReExpr<SeqSort<CharSort>> }.toTypedArray())
+
+fun RegexUnion.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
+    context.context.mkUnion(
+        *this.regex.map { it.z3ify(context) as ReExpr<SeqSort<CharSort>> }.toTypedArray())
+
+fun RegexIntersec.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
+    context.context.mkIntersect(
+        *this.regex.map { it.z3ify(context) as ReExpr<SeqSort<CharSort>> }.toTypedArray())
+
+fun RegexStar.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
+    context.context.mkStar(this.inner.z3ify(context))
+
+fun RegexComp.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
+    context.context.mkComplement(this.inner.z3ify(context))
+
+fun RegexDiff.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
+    makeLeftAssoc(this.regex, context) { lhs, rhs ->
+      context.context.mkDiff(
+          lhs as Expr<ReSort<SeqSort<CharSort>>>, rhs as Expr<ReSort<SeqSort<CharSort>>>)
+    }
+        as Expr<ReSort<SeqSort<CharSort>>>
+
+fun RegexPlus.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
+    context.context.mkPlus(this.inner.z3ify(context))
+
+fun RegexOption.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
+    context.context.mkOption(this.inner.z3ify(context))
+
+fun RegexRange.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
+    context.context.mkRange(lhs.z3ify(context), rhs.z3ify(context))
+
+fun RegexPower.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
+    context.context.mkPower(this.inner.z3ify(context), this.n)
+
+fun RegexLoop.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
+    context.context.mkLoop(this.inner.z3ify(context), this.n, this.m)
 
 @JvmName("z3ifyArrayEx")
 fun Expression<ArraySort>.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>> =
@@ -750,15 +846,14 @@ fun Expression<ArraySort>.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3
 fun ArrayStore.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>> =
     context.context.mkStore(
         this.array.z3ify(context),
-        this.value.z3ify(context) as Expr<Z3Sort>,
-        this.index.z3ify(context) as Expr<Z3Sort>)
+        this.index.z3ify(context) as Expr<Z3Sort>,
+        this.value.z3ify(context) as Expr<Z3Sort>)
 
 fun Expression<UserDefinedSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
     if (context.constants[this.symbol.toString()] != null) {
-        context.constants[this.symbol.toString()]!! as Expr<UninterpretedSort>
+      context.constants[this.symbol.toString()]!! as Expr<UninterpretedSort>
     } else if (context.functions[this.symbol.toString()] != null) {
-        TODO("Implement free function symbols")
+      TODO("Implement free function symbols")
     } else {
-        throw IllegalArgumentException("Z3 can not visit expression $this!")
+      throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
-
