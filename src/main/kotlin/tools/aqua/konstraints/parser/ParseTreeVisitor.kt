@@ -93,6 +93,25 @@ internal class ParseTreeVisitor :
     return DeclareSort(protoDeclareSort.symbol.toSymbol(), protoDeclareSort.arity)
   }
 
+  override fun visit(protoDefineFun: ProtoDefineFun): DefineFun {
+    val def = visit(protoDefineFun.definition)
+
+    // TODO check if fun exists in current context
+    // Expected behaviour like declare fun
+
+    return DefineFun(def)
+  }
+
+  override fun visit(protoFunctionDef: ProtoFunctionDef): FunctionDef =
+      FunctionDef(
+          protoFunctionDef.symbol.toSymbol(),
+          protoFunctionDef.sortedVars.map { visit(it) },
+          visit(protoFunctionDef.sort),
+          visit(protoFunctionDef.term))
+
+  override fun visit(protoSortedVar: ProtoSortedVar): SortedVar =
+      SortedVar(protoSortedVar.symbol.toSymbol(), visit(protoSortedVar.sort))
+
   override fun visit(simpleQualIdentifier: SimpleQualIdentifier): Expression<*> {
     val op = context.getFunction(simpleQualIdentifier.identifier, listOf())
 

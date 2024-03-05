@@ -99,6 +99,14 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
     context.context.mkUninterpretedSort(declareSort.name.toSMTString())
   }
 
+  override fun visit(getModel: GetModel) {
+    val model = context.solver.model
+  }
+
+  override fun visit(defineFun: DefineFun) {
+    TODO("Not yet implemented")
+  }
+
   override fun close() {
     context.solver.reset()
     context.context.close()

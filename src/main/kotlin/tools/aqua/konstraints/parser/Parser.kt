@@ -332,7 +332,7 @@ object Parser {
   /* maps to SortedVar */
   private val sortedVar =
       (lparen * symbol * sort * rparen).map { results: List<Any> ->
-        SortedVar(results[1] as ParseSymbol, results[2] as ProtoSort)
+        ProtoSortedVar(results[1] as ParseSymbol, results[2] as ProtoSort)
       }
 
   /* maps to pattern */
@@ -368,12 +368,12 @@ object Parser {
             } + /* maps to ProtoLet */
             (lparen * forallKW * lparen * sortedVar.plus() * rparen * term * rparen).map {
                 results: List<Any> ->
-              ProtoForAll(results[3] as List<SortedVar>, results[5] as ProtoTerm)
+              ProtoForAll(results[3] as List<ProtoSortedVar>, results[5] as ProtoTerm)
               // results[3] is guaranteed to be a list of SortedVar
             } + /* maps to ProtoForAll */
             (lparen * existsKW * lparen * sortedVar.plus() * rparen * term * rparen).map {
                 results: List<Any> ->
-              ProtoExists(results[3] as List<SortedVar>, results[5] as ProtoTerm)
+              ProtoExists(results[3] as List<ProtoSortedVar>, results[5] as ProtoTerm)
               // results[3] is guaranteed to be a list of SortedVar
             } + /* maps to ProtoExists */
             (lparen * matchKW * term * lparen * matchCase.plus() * rparen * rparen).map {
@@ -462,7 +462,14 @@ object Parser {
               rparen *
               rparen)
   private val functionDec = lparen * symbol * lparen * sortedVar.star() * rparen * sort * rparen
-  private val functionDef = symbol * lparen * sortedVar.star() * rparen * sort * term
+  private val functionDef =
+      (symbol * lparen * sortedVar.star() * rparen * sort * term).map { result: ArrayList<Any> ->
+        ProtoFunctionDef(
+            result[0] as ParseSymbol,
+            result.filterIsInstance<ProtoSortedVar>(),
+            result[result.size - 2] as ProtoSort,
+            result[result.size - 1] as ProtoTerm)
+      }
 
   /*
    * The spec lists "not" as reserved here, but it is not reserved in any other context
@@ -490,14 +497,17 @@ object Parser {
       }
 
   private val exitCMD = (lparen * exitKW * rparen).map { results: ArrayList<Any> -> Exit }
+
   private val setInfoCMD =
       (lparen * setInfoKW * attribute * rparen).map { results: ArrayList<Any> ->
         SetInfo(results[2] as Attribute)
       }
+
   private val setLogicCMD =
       (lparen * setLogicKW * logic * rparen).map { results: ArrayList<Any> ->
         ProtoSetLogic(results[2] as Logic)
       }
+
   private val setOptionCMD =
       (lparen * setOptionKW * option * rparen).map { results: ArrayList<Any> ->
         SetOption(
@@ -507,6 +517,13 @@ object Parser {
   private val declareSortCMD =
       (lparen * declareSortKW * symbol * numeral * rparen).map { results: ArrayList<Any> ->
         ProtoDeclareSort(results[2] as ParseSymbol, results[3] as Int)
+      }
+
+  private val getModelCMD = (lparen * getModelKW * rparen).map { _: Any -> GetModel }
+
+  private val defineFunCMD =
+      (lparen * defineFunKW * functionDef * rparen).map { results: ArrayList<Any> ->
+        ProtoDefineFun(results[2] as ProtoFunctionDef)
       }
 
   val command =
@@ -519,7 +536,8 @@ object Parser {
           exitCMD,
           setInfoCMD,
           setLogicCMD,
-          declareSortCMD)
+          declareSortCMD,
+          getModelCMD)
 
   val script = command.star().end()
 

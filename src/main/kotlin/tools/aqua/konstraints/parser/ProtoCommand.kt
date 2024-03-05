@@ -47,6 +47,15 @@ internal data class ProtoDeclareSort(val symbol: ParseSymbol, val arity: Int) : 
   val name = symbol.symbol
 }
 
+internal data class ProtoDefineFun(val definition: ProtoFunctionDef) : ProtoCommand
+
+internal data class ProtoFunctionDef(
+    val symbol: ParseSymbol,
+    val sortedVars: List<ProtoSortedVar>,
+    val sort: ProtoSort,
+    val term: ProtoTerm
+)
+
 // TODO make this a subclass of the normal symbol with extra token info
 internal data class ParseSymbol(val token: Token) {
   val symbol: String = token.getValue()
@@ -147,7 +156,7 @@ internal data class AsQualIdentifier(override val identifier: Identifier, val so
 
 internal data class VarBinding(val symbol: ParseSymbol, val term: ProtoTerm)
 
-internal data class SortedVar(val symbol: ParseSymbol, val sort: ProtoSort)
+internal data class ProtoSortedVar(val symbol: ParseSymbol, val sort: ProtoSort)
 
 internal data class Pattern(val symbols: List<ParseSymbol>)
 
@@ -164,9 +173,11 @@ internal data class BracketedProtoTerm(
 
 internal data class ProtoLet(val bindings: List<VarBinding>, val term: ProtoTerm) : ProtoTerm
 
-internal data class ProtoForAll(val sortedVars: List<SortedVar>, val term: ProtoTerm) : ProtoTerm
+internal data class ProtoForAll(val sortedVars: List<ProtoSortedVar>, val term: ProtoTerm) :
+    ProtoTerm
 
-internal data class ProtoExists(val sortedVars: List<SortedVar>, val term: ProtoTerm) : ProtoTerm
+internal data class ProtoExists(val sortedVars: List<ProtoSortedVar>, val term: ProtoTerm) :
+    ProtoTerm
 
 internal data class ProtoMatch(val term: ProtoTerm, val matchCases: List<MatchCase>) : ProtoTerm
 

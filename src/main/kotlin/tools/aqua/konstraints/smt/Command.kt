@@ -29,6 +29,8 @@ object CheckSat : Command("check-sat")
 
 object Exit : Command("exit")
 
+object GetModel : Command("get-model")
+
 data class Assert(val expression: Expression<BoolSort>) : Command("assert $expression") {
   override fun toString(): String = super.toString()
 }
@@ -51,3 +53,25 @@ data class DeclareSort(val name: Symbol, val arity: Int) : Command("declare-sort
 data class SetOption(val name: String, val value: OptionValue) : Command("set-option $name $value")
 
 data class SetLogic(val logic: Logic) : Command("set-logic $logic")
+
+data class DefineFun(val definition: FunctionDef) : Command("define-fun $definition") {
+  constructor(
+      name: Symbol,
+      parameters: List<SortedVar>,
+      sort: Sort,
+      term: Expression<*>
+  ) : this(FunctionDef(name, parameters, sort, term))
+}
+
+data class FunctionDef(
+    val name: Symbol,
+    val parameters: List<SortedVar>,
+    val sort: Sort,
+    val term: Expression<*>
+) {
+  override fun toString(): String = "$name (${parameters.joinToString(" ")} $sort $term)"
+}
+
+data class SortedVar(val name: Symbol, val sort: Sort) {
+  override fun toString(): String = "($name $sort)"
+}
