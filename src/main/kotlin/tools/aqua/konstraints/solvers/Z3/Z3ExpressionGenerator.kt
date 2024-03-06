@@ -30,10 +30,7 @@ import com.microsoft.z3.RealSort as Z3RealSort
 import com.microsoft.z3.SeqSort
 import com.microsoft.z3.Sort as Z3Sort
 import com.microsoft.z3.UninterpretedSort
-import tools.aqua.konstraints.smt.BVSort
-import tools.aqua.konstraints.smt.BoolSort
-import tools.aqua.konstraints.smt.Expression
-import tools.aqua.konstraints.smt.UserDefinedSort
+import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 
 fun makeLeftAssoc(
@@ -432,7 +429,10 @@ fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
           if (context.constants[this.symbol.toString()] != null) {
             context.constants[this.symbol.toString()]!! as Expr<Z3IntSort>
           } else if (context.functions[this.symbol.toString()] != null) {
-            TODO("Implement free function symbols")
+            require(this is NAryExpression)
+            context.context.mkApp(
+                context.functions[this.symbol.toString()]!!,
+                *this.tokens.map { it.z3ify(context) }.toTypedArray()) as Expr<Z3IntSort>
           } else {
             throw IllegalArgumentException("Z3 can not visit expression $this!")
           }

@@ -69,7 +69,7 @@ data class FunctionDef(
     val sort: Sort,
     val term: Expression<*>
 ) {
-  override fun toString(): String = "$name (${parameters.joinToString(" ")} $sort $term)"
+  override fun toString(): String = "$name (${parameters.joinToString(" ")}) $sort $term)"
 }
 
 data class SortedVar(val name: Symbol, val sort: Sort) {

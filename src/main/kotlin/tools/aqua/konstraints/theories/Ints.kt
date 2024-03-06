@@ -222,7 +222,7 @@ object IntLessEqDecl :
 }
 
 class IntLess(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
-  override val symbol: Symbol = "(< ${terms.joinToString(separator = " ")})".symbol()
+  override val symbol: Symbol = "<".symbol()
   override val sort: BoolSort = BoolSort
 
   init {
@@ -231,7 +231,7 @@ class IntLess(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
     }
   }
 
-  override fun toString(): String = "<)"
+  override fun toString(): String = "(< ${terms.joinToString(separator = " ")})"
 }
 
 object IntLessDecl :
@@ -266,7 +266,7 @@ object IntGreaterEqDecl :
 }
 
 class IntGreater(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
-  override val symbol: Symbol = "(> ${terms.joinToString(separator = " ")})".symbol()
+  override val symbol: Symbol = ">".symbol()
   override val sort: BoolSort = BoolSort
 
   init {
@@ -275,7 +275,7 @@ class IntGreater(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() 
     }
   }
 
-  override fun toString(): String = ">"
+  override fun toString(): String = "(> ${terms.joinToString(separator = " ")})"
 }
 
 object IntGreaterDecl :

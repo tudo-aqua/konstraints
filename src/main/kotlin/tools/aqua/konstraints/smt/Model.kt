@@ -18,6 +18,6 @@
 
 package tools.aqua.konstraints.smt
 
-class SMTProgram(val commands: List<Command>) {
-  var model: Model? = null
+data class Model(val definitions: List<FunctionDef>) {
+  companion object
 }

@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.solvers.Z3
 
+import com.microsoft.z3.Model as Z3Model
 import com.microsoft.z3.Sort
 import com.microsoft.z3.Status
 import tools.aqua.konstraints.smt.*
@@ -100,7 +101,7 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
   }
 
   override fun visit(getModel: GetModel) {
-    val model = context.solver.model
+    println(Model(context.solver.model).definitions)
   }
 
   override fun visit(defineFun: DefineFun) {
@@ -111,4 +112,36 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
     context.solver.reset()
     context.context.close()
   }
+}
+
+/**
+ * Extension function creating a model from a z3 model obtained from solver.model this extends the
+ * invoke function of the companion object to emulate constructor syntax
+ */
+operator fun Model.Companion.invoke(model: Z3Model): Model {
+  // TODO implement handling of uninterpreted sorts from model.sorts
+
+  val temp = mutableListOf<FunctionDef>()
+
+  temp.addAll(
+      model.constDecls.map { decl ->
+        FunctionDef(
+            decl.name.toString().symbol(),
+            emptyList(),
+            decl.range.aquaify(),
+            model.getConstInterp(decl).aquaify())
+      })
+
+  temp.addAll(
+      model.funcDecls.map { decl ->
+        FunctionDef(
+            decl.name.toString().symbol(),
+            (decl.domain zip 0..<decl.domainSize).map { (sort, index) ->
+              SortedVar("x$index".symbol(), sort.aquaify())
+            },
+            decl.range.aquaify(),
+            model.getFuncInterp(decl).`else`.aquaify())
+      })
+
+  return Model(temp)
 }
