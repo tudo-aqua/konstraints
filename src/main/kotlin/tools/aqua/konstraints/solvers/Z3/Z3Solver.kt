@@ -28,7 +28,23 @@ import tools.aqua.konstraints.visitors.CommandVisitor
 class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
   val context = Z3Context()
 
-  internal var status = ""
+  internal var status: SatStatus = SatStatus.PENDING
+
+  private var model: Z3Model? = null
+
+  // this should later be part of solver interface
+  fun solve(program: SMTProgram): SatStatus {
+    program.commands.forEach { visit(it) }
+
+    return status
+  }
+
+  // this should later be part of solver interface
+  fun getModel(): Model {
+    requireNotNull(model)
+
+    return Model(model!!)
+  }
 
   override fun visit(assert: Assert) {
     val assertion = assert.expression.z3ify(context)
@@ -82,9 +98,9 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
 
   override fun visit(checkSat: CheckSat) {
     return when (context.solver.check()) {
-      Status.UNSATISFIABLE -> status = "unsat"
-      Status.UNKNOWN -> status = "DontKnow"
-      Status.SATISFIABLE -> status = "sat"
+      Status.UNSATISFIABLE -> status = SatStatus.UNSAT
+      Status.UNKNOWN -> status = SatStatus.UNKNOWN
+      Status.SATISFIABLE -> status = SatStatus.SAT
     }
   }
 
@@ -101,13 +117,14 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
   }
 
   override fun visit(getModel: GetModel) {
-    println(Model(context.solver.model).definitions)
+    model = context.solver.model
   }
 
   override fun visit(defineFun: DefineFun) {
     TODO("Not yet implemented")
   }
 
+  // this should later be part of solver interface
   override fun close() {
     context.solver.reset()
     context.context.close()
@@ -136,7 +153,7 @@ operator fun Model.Companion.invoke(model: Z3Model): Model {
       model.funcDecls.map { decl ->
         FunctionDef(
             decl.name.toString().symbol(),
-            (decl.domain zip 0..<decl.domainSize).map { (sort, index) ->
+            (decl.domain zip 0 ..< decl.domainSize).map { (sort, index) ->
               SortedVar("x$index".symbol(), sort.aquaify())
             },
             decl.range.aquaify(),

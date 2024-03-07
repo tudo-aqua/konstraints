@@ -181,7 +181,7 @@ object Parser {
       (simpleSymbol + quotedSymbol).flatten().trim(whitespaceCat).token().map { token: Token ->
         ParseSymbol(token)
       }
-  private val keyword = (of(':') * simpleSymbol).trim(whitespaceCat).flatten().token()
+  private val keyword = (of(':') * simpleSymbol).flatten().trim(whitespaceCat).token()
 
   // Logics
 
@@ -255,7 +255,7 @@ object Parser {
     sExpression.set(
         ((specConstant.map { constant: SpecConstant -> SExpressionConstant(constant) } +
             reserved.map { reserved: Token -> SExpressionReserved(reserved) } +
-            symbol.map { symbol: ParseSymbol -> SExpressionSymbol(symbol.toSymbol()) } +
+            symbol.map { symbol: ParseSymbol -> SExpressionSymbol(symbol) } +
             keyword.map { keyword: Token -> SExpressionKeyword(keyword) }) trim whitespaceCat) +
             ((lparen * sExpression.star() * rparen).map { results: List<Any> ->
               SubSExpression(results.slice(1..results.size - 2) as List<SExpression>)
@@ -297,7 +297,7 @@ object Parser {
   /* maps to an implementation of AttributeValue */
   private val attributeValue =
       specConstant.map { constant: SpecConstant -> ConstantAttributeValue(constant) } +
-          symbol.map { symbol: ParseSymbol -> SymbolAttributeValue(symbol.toSymbol()) } +
+          symbol.map { symbol: ParseSymbol -> SymbolAttributeValue(symbol) } +
           (lparen * sExpression.star() * rparen).map { results: List<Any> ->
             SExpressionAttributeValue(results.slice(1..results.size - 2) as List<SExpression>)
           }
@@ -309,8 +309,8 @@ object Parser {
    */
   internal val attribute =
       (keyword * attributeValue).map { results: List<Any> ->
-        Attribute(results[0] as Token, results[1] as AttributeValue)
-      } + keyword.map { keyword: Token -> Attribute(keyword, null) }
+        Attribute((results[0] as Token).getValue(), results[1] as AttributeValue)
+      } + keyword.map { keyword: Token -> Attribute(keyword.getValue(), null) }
 
   // Terms
 
@@ -574,7 +574,8 @@ object Parser {
                 is Command -> command
                 else -> throw IllegalStateException("Illegal type in parse tree $command!")
               }
-            })
+            },
+        parseTreeVisitor.context)
   }
 
   private fun splitInput(program: String): List<String> {

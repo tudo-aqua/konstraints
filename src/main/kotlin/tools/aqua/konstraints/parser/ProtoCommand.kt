@@ -22,6 +22,7 @@ import java.math.BigDecimal
 import org.petitparser.context.Token
 import tools.aqua.konstraints.smt.Index
 import tools.aqua.konstraints.smt.Logic
+import tools.aqua.konstraints.smt.QuotingRule
 import tools.aqua.konstraints.smt.Symbol
 
 internal sealed interface ProtoCommand
@@ -56,13 +57,8 @@ internal data class ProtoFunctionDef(
     val term: ProtoTerm
 )
 
-// TODO make this a subclass of the normal symbol with extra token info
-internal data class ParseSymbol(val token: Token) {
+internal class ParseSymbol(val token: Token) : Symbol(token.getValue(), QuotingRule.NONE) {
   val symbol: String = token.getValue()
-
-  fun toSymbol(): Symbol {
-    return Symbol(symbol)
-  }
 }
 
 sealed interface SpecConstant
@@ -89,8 +85,8 @@ data class DecimalConstant(val decimal: BigDecimal) : SpecConstant
 
 // Identifiers
 
-internal sealed interface Identifier {
-  val symbol: ParseSymbol
+sealed interface Identifier {
+  val symbol: Symbol
 }
 
 internal data class SymbolIdentifier(override val symbol: ParseSymbol) : Identifier
@@ -101,7 +97,7 @@ internal data class IndexedIdentifier(override val symbol: ParseSymbol, val indi
 // Sorts
 
 internal data class ProtoSort(val identifier: Identifier, val sorts: List<ProtoSort>) {
-  val name = identifier.symbol.symbol
+  val name = identifier.symbol.toString()
 }
 
 // S-Expression
@@ -122,7 +118,7 @@ data class SExpressionKeyword(val keyword: Token) : SExpression
 
 // keyword is a token, so when we pass an Attribute to a solver via set-info, we can generate a
 // better failure message
-data class Attribute(val keyword: Token, val value: AttributeValue?)
+data class Attribute(val keyword: String, val value: AttributeValue?)
 
 sealed interface AttributeValue
 

@@ -51,7 +51,7 @@ class ParserTests {
               "(assert (not (= (bvand s s) s)))",
               /* QF_BV 20190311-bv-small-term-rw-Noetzli / bv-term-small-rw_100.smt */
               "(assert (not (= (bvlshr s (bvshl t #b00000000000000000000000000000000)) (bvlshr s t))))",
-              "(assert(forall (( x ( List Int )) ( y ( List Int ))) (= ( append x y ) ( ite (= x ( as nil ( List Int ))) y ( let (( h ( head x )) ( t ( tail x ))) ( insert h ( append t y )))))))",
+              "(assert (forall (( x ( List Int )) ( y ( List Int ))) (= ( append x y ) ( ite (= x ( as nil ( List Int ))) y ( let (( h ( head x )) ( t ( tail x ))) ( insert h ( append t y )))))))",
               "(assert (bvult ((_ extract 15 0) foo) bar))",
               "(assert (= A B))",
               "(set-info :info 1)",

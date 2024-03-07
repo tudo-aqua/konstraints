@@ -18,6 +18,45 @@
 
 package tools.aqua.konstraints.smt
 
-class SMTProgram(val commands: List<Command>) {
+import tools.aqua.konstraints.parser.Attribute
+import tools.aqua.konstraints.parser.Context
+import tools.aqua.konstraints.solvers.Z3.Z3Solver
+
+enum class SatStatus {
+  SAT, // program is satisfiable
+  UNSAT, // program is unsatisfiable
+  UNKNOWN, // solver timed out
+  PENDING; // solve has not been called yet on program
+
+  override fun toString() =
+      when (this) {
+        SAT -> "sat"
+        UNSAT -> "unsat"
+        UNKNOWN -> "unknown"
+        PENDING -> "pending"
+      }
+}
+
+class SMTProgram(val commands: List<Command>, val context: Context) {
   var model: Model? = null
+  var status = SatStatus.PENDING
+  val info: List<Attribute>
+
+  init {
+    info = commands.filterIsInstance<SetInfo>().map { it.attribute }
+  }
+
+  /*
+   * currently uses Z3 to solve eventually use an abstract Solver interface
+   */
+  fun solve() {
+    // TODO maybe save solver as well
+    val solver = Z3Solver()
+
+    solver.use { status = solver.solve(this) }
+
+    if (status == SatStatus.SAT) {
+      model = solver.getModel()
+    }
+  }
 }

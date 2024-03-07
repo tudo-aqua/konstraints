@@ -45,7 +45,8 @@ enum class QuotingRule {
  * @param rule [QuotingRule] applied to the Symbol
  * @throws IllegalSymbolException if [symbol] is not a valid SMT Symbol
  */
-class Symbol(symbol: String, rule: QuotingRule) {
+// constructor is internal to prevent external subclassing of Symbol
+open class Symbol internal constructor(symbol: String, rule: QuotingRule) {
   /** If true the Symbol was explicitly quoted when constructed */
   val isQuoted: Boolean
 
@@ -57,6 +58,11 @@ class Symbol(symbol: String, rule: QuotingRule) {
    * [toSMTString] before giving the symbol to a solver
    */
   val value: String
+
+  companion object {
+    /** public substitute for constructor */
+    operator fun invoke(symbol: String, rule: QuotingRule): Symbol = this(symbol, rule)
+  }
 
   /**
    * Construct a Symbol from String with [QuotingRule.NONE]

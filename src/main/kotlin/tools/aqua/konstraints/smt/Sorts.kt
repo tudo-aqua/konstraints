@@ -62,7 +62,7 @@ open class Sort(
   fun toSMTString() = name.toSMTString()
 }
 
-internal class SortParameter(name: String) : Sort(name, emptyList(), emptyList())
+class SortParameter(name: String) : Sort(name, emptyList(), emptyList())
 
 object BoolSort : Sort("Bool")
 

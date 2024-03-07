@@ -88,9 +88,9 @@ internal class ParseTreeVisitor :
   }
 
   override fun visit(protoDeclareSort: ProtoDeclareSort): DeclareSort {
-    context.registerSort(protoDeclareSort.symbol.toSymbol(), protoDeclareSort.arity)
+    context.registerSort(protoDeclareSort.symbol, protoDeclareSort.arity)
 
-    return DeclareSort(protoDeclareSort.symbol.toSymbol(), protoDeclareSort.arity)
+    return DeclareSort(protoDeclareSort.symbol, protoDeclareSort.arity)
   }
 
   override fun visit(protoDefineFun: ProtoDefineFun): DefineFun {
@@ -104,13 +104,13 @@ internal class ParseTreeVisitor :
 
   override fun visit(protoFunctionDef: ProtoFunctionDef): FunctionDef =
       FunctionDef(
-          protoFunctionDef.symbol.toSymbol(),
+          protoFunctionDef.symbol,
           protoFunctionDef.sortedVars.map { visit(it) },
           visit(protoFunctionDef.sort),
           visit(protoFunctionDef.term))
 
   override fun visit(protoSortedVar: ProtoSortedVar): SortedVar =
-      SortedVar(protoSortedVar.symbol.toSymbol(), visit(protoSortedVar.sort))
+      SortedVar(protoSortedVar.symbol, visit(protoSortedVar.sort))
 
   override fun visit(simpleQualIdentifier: SimpleQualIdentifier): Expression<*> {
     val op = context.getFunction(simpleQualIdentifier.identifier, listOf())
@@ -118,7 +118,7 @@ internal class ParseTreeVisitor :
     if (op != null) {
       return op.buildExpression(listOf(), emptySet())
     } else {
-      throw IllegalStateException("Unknown fun ${simpleQualIdentifier.identifier.symbol.symbol}")
+      throw IllegalStateException("Unknown fun ${simpleQualIdentifier.identifier.symbol}")
       // TODO UnknownFunctionException
     }
   }
@@ -135,8 +135,7 @@ internal class ParseTreeVisitor :
     val terms = bracketedProtoTerm.terms.map { visit(it) }
 
     val op =
-        context.getFunction(
-            bracketedProtoTerm.qualIdentifier.identifier.symbol.symbol.toString(), terms)
+        context.getFunction(bracketedProtoTerm.qualIdentifier.identifier.symbol.toString(), terms)
 
     val functionIndices =
         if (bracketedProtoTerm.qualIdentifier.identifier is IndexedIdentifier) {
@@ -152,7 +151,7 @@ internal class ParseTreeVisitor :
       return op.buildExpression(terms, functionIndices)
     } else {
       throw IllegalStateException(
-          "Unknown fun ${bracketedProtoTerm.qualIdentifier.identifier.symbol.symbol}") // TODO
+          "Unknown fun ${bracketedProtoTerm.qualIdentifier.identifier.symbol}") // TODO
       // UnknownFunctionException
     }
   }

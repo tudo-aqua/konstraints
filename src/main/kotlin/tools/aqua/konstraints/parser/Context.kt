@@ -20,18 +20,18 @@ package tools.aqua.konstraints.parser
 
 import tools.aqua.konstraints.smt.*
 
-internal abstract class SortDecl<T : Sort>(
+abstract class SortDecl<T : Sort>(
     val name: Symbol,
     sortParameters: Set<SortParameter>,
     indices: Set<SymbolIndex>,
 ) {
   val signature = SortSignature(sortParameters, indices)
 
-  open fun buildSort(sort: ProtoSort, parameters: List<Sort>): T {
+  open fun buildSort(identifier: Identifier, parameters: List<Sort>): T {
     val indices =
-        if (sort.identifier is IndexedIdentifier) {
-          require(sort.identifier.indices.all { it is NumeralIndex })
-          sort.identifier.indices as List<NumeralIndex>
+        if (identifier is IndexedIdentifier) {
+          require(identifier.indices.all { it is NumeralIndex })
+          identifier.indices as List<NumeralIndex>
         } else {
           emptyList()
         }
@@ -42,7 +42,7 @@ internal abstract class SortDecl<T : Sort>(
   abstract fun getSort(bindings: Bindings): T
 }
 
-internal class Context {
+class Context {
   // store the sort of numeral expressions either (NUMERAL Int) or (NUMERAL Real) depending on the
   // loaded logic
   var numeralSort: Sort? = null
@@ -82,7 +82,7 @@ internal class Context {
     }
   }
 
-  fun registerFunction(const: ProtoDeclareConst, sort: Sort) {
+  internal fun registerFunction(const: ProtoDeclareConst, sort: Sort) {
     registerFunction(
         FunctionDecl(
             const.name.symbol(),
@@ -94,7 +94,7 @@ internal class Context {
             Associativity.NONE))
   }
 
-  fun registerFunction(function: ProtoDeclareFun, parameters: List<Sort>, sort: Sort) {
+  internal fun registerFunction(function: ProtoDeclareFun, parameters: List<Sort>, sort: Sort) {
     if (parameters.isEmpty()) {
       registerFunction(function.name, listOf(), sort)
     } else {
@@ -127,7 +127,7 @@ internal class Context {
    * not be ambiguous
    */
   fun getFunction(name: Identifier, args: List<Expression<*>>): FunctionDecl<*>? {
-    return getFunction(name.symbol.token.getValue<String>(), args)
+    return getFunction(name.symbol.toString(), args)
   }
 
   /**
@@ -140,12 +140,12 @@ internal class Context {
     return functionLookup[name]?.single { func -> func.accepts(args.map { it.sort }, emptySet()) }
   }
 
-  fun getSort(protoSort: ProtoSort): Sort {
+  internal fun getSort(protoSort: ProtoSort): Sort {
     // build all sort parameters first
     val parameters = protoSort.sorts.map { getSort(it) }
 
-    return sorts[protoSort.name]?.buildSort(protoSort, parameters)
-        ?: throw Exception("Unknown sort ${protoSort.identifier.symbol.token.getValue<String>()}")
+    return sorts[protoSort.name]?.buildSort(protoSort.identifier, parameters)
+        ?: throw Exception("Unknown sort ${protoSort.identifier.symbol}")
   }
 
   private val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf()
@@ -157,7 +157,7 @@ internal class Context {
   val functionLookup: MutableMap<String, MutableList<FunctionDecl<*>>> = mutableMapOf()
 }
 
-internal interface TheoryContext {
+interface TheoryContext {
   val functions: HashSet<FunctionDecl<*>>
   val sorts: Map<String, SortDecl<*>>
 }
