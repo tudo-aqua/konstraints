@@ -117,6 +117,7 @@ class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
   }
 
   override fun visit(getModel: GetModel) {
+    println("Generated model")
     model = context.solver.model
   }
 

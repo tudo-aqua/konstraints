@@ -209,7 +209,7 @@ class BitvectorTests {
   @ParameterizedTest
   @MethodSource("getLiteralsAndValue")
   fun `test that BVLiterals have the right decimal value`(literal: String, expected: Int) {
-    assertEquals(expected, BVLiteral(literal).value)
+    assertEquals(expected, BVLiteral(literal).value.toInt())
   }
 
   private fun getLiteralsAndValue(): Stream<Arguments> {

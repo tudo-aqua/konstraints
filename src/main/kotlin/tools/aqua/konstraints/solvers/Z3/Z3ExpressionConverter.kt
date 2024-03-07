@@ -18,11 +18,14 @@
 
 package tools.aqua.konstraints.solvers.Z3
 
+import com.microsoft.z3.BitVecNum
+import com.microsoft.z3.BitVecSort
 import com.microsoft.z3.BoolSort as Z3BoolSort
 import com.microsoft.z3.Expr
 import com.microsoft.z3.IntNum
 import com.microsoft.z3.IntSort as Z3IntSort
 import com.microsoft.z3.Sort as Z3Sort
+import tools.aqua.konstraints.smt.BVSort
 import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.Sort
@@ -32,6 +35,7 @@ fun Z3Sort.aquaify(): Sort =
     when (this) {
       is Z3BoolSort -> BoolSort
       is Z3IntSort -> IntSort
+      is BitVecSort -> BVSort(this.size)
       else -> throw RuntimeException("Unknown or unsupported Z3 sort $this")
     }
 
@@ -40,6 +44,7 @@ fun Expr<*>.aquaify(): Expression<*> =
     when (this.sort) {
       is Z3BoolSort -> (this as Expr<Z3BoolSort>).aquaify()
       is Z3IntSort -> (this as Expr<Z3IntSort>).aquaify()
+      is BitVecSort -> (this as Expr<BitVecSort>).aquaify()
       else -> throw RuntimeException("Unknown or unsupported Z3 sort ${this.sort}")
     }
 
@@ -62,5 +67,15 @@ fun Expr<Z3IntSort>.aquaify(): Expression<IntSort> =
     } else if (isIntNum) {
       IntLiteral((this as IntNum).int)
     } else {
-      throw RuntimeException("Unknown or unsupported bool expression $this")
+      throw RuntimeException("Unknown or unsupported int expression $this")
+    }
+
+@JvmName("aquaifyBitVec")
+fun Expr<BitVecSort>.aquaify(): Expression<BVSort> =
+    if (isBVNOT) {
+      BVNot(this.args[0].aquaify() as Expression<BVSort>)
+    } else if (this is BitVecNum) {
+      BVLiteral("#x${this.bigInteger.toString(16)}")
+    } else {
+      throw RuntimeException("Unknown or unsupported bitvec expression $this")
     }

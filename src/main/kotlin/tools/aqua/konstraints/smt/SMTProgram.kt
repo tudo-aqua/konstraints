@@ -53,10 +53,14 @@ class SMTProgram(val commands: List<Command>, val context: Context) {
     // TODO maybe save solver as well
     val solver = Z3Solver()
 
-    solver.use { status = solver.solve(this) }
+    solver.use {
+      status = solver.solve(this)
 
-    if (status == SatStatus.SAT) {
-      model = solver.getModel()
+      println(status)
+
+      if (status == SatStatus.SAT && commands.filterIsInstance<GetModel>().isNotEmpty()) {
+        model = solver.getModel()
+      }
     }
   }
 }

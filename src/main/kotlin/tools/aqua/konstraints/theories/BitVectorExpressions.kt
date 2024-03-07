@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.theories
 
+import java.math.BigInteger
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
@@ -50,7 +51,7 @@ internal object BVSortDecl : SortDecl<BVSort>("BitVec".symbol(), emptySet(), set
  */
 
 class BVLiteral(vector: String) : Expression<BVSort>() {
-  val value: Int
+  val value: BigInteger
   val bits: Int
   val isBinary: Boolean
 
@@ -58,11 +59,11 @@ class BVLiteral(vector: String) : Expression<BVSort>() {
     if (vector[1] == 'b') {
       bits = vector.length - 2
       isBinary = true
-      value = Integer.parseInt(vector.substring(2), 2)
+      value = vector.substring(2).toBigInteger(2)
     } else if (vector[1] == 'x') {
       bits = (vector.length - 2) * 4
       isBinary = false
-      value = Integer.parseInt(vector.substring(2), 16)
+      value = vector.substring(2).toBigInteger(16)
     } else {
       throw IllegalArgumentException("$vector is not a valid bitvector literal.")
     }
