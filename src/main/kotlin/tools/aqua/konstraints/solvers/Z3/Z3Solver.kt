@@ -22,28 +22,39 @@ import com.microsoft.z3.Model as Z3Model
 import com.microsoft.z3.Sort
 import com.microsoft.z3.Status
 import tools.aqua.konstraints.smt.*
+import tools.aqua.konstraints.solvers.Solver
 import tools.aqua.konstraints.theories.*
 import tools.aqua.konstraints.visitors.CommandVisitor
 
-class Z3Solver : CommandVisitor<Unit>, AutoCloseable {
+class Z3Solver : CommandVisitor<Unit>, Solver {
   val context = Z3Context()
 
   internal var status: SatStatus = SatStatus.PENDING
 
   private var model: Z3Model? = null
 
-  // this should later be part of solver interface
-  fun solve(program: SMTProgram): SatStatus {
+  override fun solve(program: SMTProgram): SatStatus {
     program.commands.forEach { visit(it) }
 
     return status
   }
 
-  // this should later be part of solver interface
-  fun getModel(): Model {
+  override fun getModelOrNull(): Model? {
+    return if (model != null) {
+      getModel()
+    } else {
+      return null
+    }
+  }
+
+  override fun getModel(): Model {
     requireNotNull(model)
 
     return Model(model!!)
+  }
+
+  override fun isModelAvailable(): Boolean {
+    return model != null
   }
 
   override fun visit(assert: Assert) {

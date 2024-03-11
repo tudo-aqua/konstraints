@@ -58,7 +58,7 @@ class SMTProgram(val commands: List<Command>, val context: Context) {
 
       println(status)
 
-      if (status == SatStatus.SAT && commands.filterIsInstance<GetModel>().isNotEmpty()) {
+      if (solver.isModelAvailable()) {
         model = solver.getModel()
       }
     }
