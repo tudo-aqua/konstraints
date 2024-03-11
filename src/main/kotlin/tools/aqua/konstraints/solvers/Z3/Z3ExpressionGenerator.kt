@@ -461,7 +461,14 @@ fun IntDiv.z3ify(context: Z3Context): Expr<Z3IntSort> =
 fun Mod.z3ify(context: Z3Context): Expr<Z3IntSort> =
     context.context.mkMod(this.dividend.z3ify(context), this.divisor.z3ify(context))
 
-fun Abs.z3ify(context: Z3Context): Expr<Z3IntSort> = TODO()
+/*
+ * Abs has no native function in z3 and is implemented using ite in the c++ api
+ */
+fun Abs.z3ify(context: Z3Context): Expr<Z3IntSort> = context.context.mkITE(
+    IntGreaterEq(this.inner, IntLiteral(0)).z3ify(context),
+    this.inner.z3ify(context),
+    IntNeg(this.inner).z3ify(context)
+)
 
 fun ToInt.z3ify(context: Z3Context): Expr<Z3IntSort> =
     context.context.mkReal2Int(this.inner.z3ify(context))

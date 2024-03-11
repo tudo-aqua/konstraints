@@ -28,6 +28,7 @@ import tools.aqua.konstraints.visitors.CommandVisitor
 
 class Z3Solver : CommandVisitor<Unit>, Solver {
   val context = Z3Context()
+    val solver : com.microsoft.z3.Solver = context.context.mkSolver()
 
   internal var status: SatStatus = SatStatus.PENDING
 
@@ -59,8 +60,8 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
 
   override fun visit(assert: Assert) {
     val assertion = assert.expression.z3ify(context)
-    println(assertion)
-    context.solver.add(assertion)
+
+    solver.add(assertion)
   }
 
   override fun visit(declareConst: DeclareConst) {
@@ -108,10 +109,11 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
   }
 
   override fun visit(checkSat: CheckSat) {
-    return when (context.solver.check()) {
+    return when (solver.check()) {
       Status.UNSATISFIABLE -> status = SatStatus.UNSAT
       Status.UNKNOWN -> status = SatStatus.UNKNOWN
       Status.SATISFIABLE -> status = SatStatus.SAT
+        null -> throw RuntimeException("z3 solver status was null")
     }
   }
 
@@ -128,8 +130,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
   }
 
   override fun visit(getModel: GetModel) {
-    println("Generated model")
-    model = context.solver.model
+    model = solver.model
   }
 
   override fun visit(defineFun: DefineFun) {
@@ -138,7 +139,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
 
   // this should later be part of solver interface
   override fun close() {
-    context.solver.reset()
+    solver.reset()
     context.context.close()
   }
 }

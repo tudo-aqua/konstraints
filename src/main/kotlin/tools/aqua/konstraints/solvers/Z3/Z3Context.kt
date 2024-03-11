@@ -25,7 +25,6 @@ import tools.aqua.konstraints.smt.Sort
 
 class Z3Context {
   val context = Context()
-  val solver = context.mkSolver()
 
   internal val constants = HashMap<String, Expr<*>>()
   internal val functions = HashMap<String, FuncDecl<*>>()
