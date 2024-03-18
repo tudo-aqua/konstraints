@@ -565,7 +565,7 @@ object Parser {
           }
         }
 
-    return SMTProgram(
+    return DefaultSMTProgram(
         protoCommands
             .map { result -> result.get<Any>() }
             .map { command ->

@@ -538,6 +538,7 @@ class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expressi
 
   override val sort: BoolSort = BoolSort
   override val symbol: Symbol = "bvult".symbol()
+  override val subexpressions = listOf(lhs, rhs)
 
   init {
     require(lhs.sort.bits == rhs.sort.bits) {

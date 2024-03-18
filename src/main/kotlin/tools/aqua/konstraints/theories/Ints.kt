@@ -18,7 +18,6 @@
 
 package tools.aqua.konstraints.theories
 
-import com.microsoft.z3.Expr
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
@@ -201,7 +200,7 @@ object AbsDecl :
 }
 
 class IntLessEq(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
-    constructor(vararg terms: Expression<IntSort>): this(terms.toList())
+  constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
 
   override val symbol: Symbol = "<=".symbol()
   override val sort: BoolSort = BoolSort
@@ -225,7 +224,7 @@ object IntLessEqDecl :
 }
 
 class IntLess(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
-    constructor(vararg terms: Expression<IntSort>): this(terms.toList())
+  constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
 
   override val symbol: Symbol = "<".symbol()
   override val sort: BoolSort = BoolSort
@@ -249,7 +248,7 @@ object IntLessDecl :
 }
 
 class IntGreaterEq(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
-    constructor(vararg terms: Expression<IntSort>): this(terms.toList())
+  constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
 
   override val symbol: Symbol = ">=".symbol()
   override val sort: BoolSort = BoolSort
@@ -273,7 +272,7 @@ object IntGreaterEqDecl :
 }
 
 class IntGreater(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
-    constructor(vararg terms: Expression<IntSort>): this(terms.toList())
+  constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
 
   override val symbol: Symbol = ">".symbol()
   override val sort: BoolSort = BoolSort

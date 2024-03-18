@@ -28,7 +28,7 @@ import tools.aqua.konstraints.visitors.CommandVisitor
 
 class Z3Solver : CommandVisitor<Unit>, Solver {
   val context = Z3Context()
-    val solver : com.microsoft.z3.Solver = context.context.mkSolver()
+  val solver: com.microsoft.z3.Solver = context.context.mkSolver()
 
   internal var status: SatStatus = SatStatus.PENDING
 
@@ -113,7 +113,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
       Status.UNSATISFIABLE -> status = SatStatus.UNSAT
       Status.UNKNOWN -> status = SatStatus.UNKNOWN
       Status.SATISFIABLE -> status = SatStatus.SAT
-        null -> throw RuntimeException("z3 solver status was null")
+      null -> throw RuntimeException("z3 solver status was null")
     }
   }
 

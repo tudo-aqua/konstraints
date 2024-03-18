@@ -47,6 +47,9 @@ class Context {
   // loaded logic
   var numeralSort: Sort? = null
 
+  fun contains(expression: Expression<*>): Boolean =
+      getFunction(expression.symbol.toString(), expression.subexpressions) != null
+
   fun registerTheory(other: TheoryContext) {
     other.functions.forEach { func ->
       if (func.name.toString() in functionLookup) {
@@ -57,6 +60,30 @@ class Context {
     }
 
     other.sorts.forEach { registerSort(it.value) }
+  }
+
+  fun registerFunction(function: DeclareConst) {
+    registerFunction(
+        FunctionDecl(
+            function.name,
+            emptySet(),
+            emptyList(),
+            emptySet(),
+            emptySet(),
+            function.sort,
+            Associativity.NONE))
+  }
+
+  fun registerFunction(function: DeclareFun) {
+    registerFunction(
+        FunctionDecl(
+            function.name,
+            emptySet(),
+            function.parameters,
+            emptySet(),
+            emptySet(),
+            function.sort,
+            Associativity.NONE))
   }
 
   fun registerFunction(function: FunctionDecl<*>) {
@@ -108,16 +135,19 @@ class Context {
             name.symbol(), emptySet(), params, emptySet(), emptySet(), sort, Associativity.NONE))
   }
 
+  fun registerSort(sort: DeclareSort) {
+    registerSort(sort.name, sort.arity)
+  }
+
   fun registerSort(sort: SortDecl<*>) {
     if (sorts.containsKey(sort.name.toString()))
-        throw Exception("Sort ${sort.name} is already defined in context")
+        throw SortAlreadyDeclaredException(sort.name, sort.signature.sortParameter.size)
 
     sorts[sort.name.toString()] = sort
   }
 
   fun registerSort(name: Symbol, arity: Int) {
-    if (sorts.containsKey(name.toString()))
-        throw Exception("Sort $name is already defined in context")
+    if (sorts.containsKey(name.toString())) throw SortAlreadyDeclaredException(name, arity)
 
     sorts[name.toString()] = UserDefinedSortDecl(name, arity)
   }
@@ -164,3 +194,6 @@ interface TheoryContext {
 
 class FunctionAlreadyDeclaredException(func: FunctionDecl<*>) :
     RuntimeException("Function $func has already been declared")
+
+class SortAlreadyDeclaredException(sort: Symbol, arity: Int) :
+    RuntimeException("Sort ($sort $arity) has already been declared")

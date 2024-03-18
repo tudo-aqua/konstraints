@@ -18,11 +18,24 @@
 
 package tools.aqua.konstraints.smt
 
+import tools.aqua.konstraints.util.reduceOrDefault
+
 abstract class Expression<T : Sort> {
   abstract val symbol: Symbol
   abstract val sort: T
 
   override fun toString() = symbol.toSMTString()
+
+  open val subexpressions = emptyList<Expression<*>>()
+
+  /** Recursive all implementation */
+  fun all(predicate: (Expression<*>) -> Boolean): Boolean {
+    return predicate(this) and
+        subexpressions.map { it.all(predicate) }.reduceOrDefault(true) { t1, t2 -> t1 and t2 }
+  }
+
+  // TODO implement more operations like filter, filterIsInstance, filterIsSort, forEach, onEach
+  // etc.
 
   /**
    * Safely cast this expression to an Expression of Sort S, if this.sort is S Avoids unchecked cast

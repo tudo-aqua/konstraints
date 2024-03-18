@@ -21,6 +21,7 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.parser.Attribute
 import tools.aqua.konstraints.parser.Context
 import tools.aqua.konstraints.solvers.Z3.Z3Solver
+import tools.aqua.konstraints.theories.BitVectorExpressionContext
 
 enum class SatStatus {
   SAT, // program is satisfiable
@@ -37,10 +38,14 @@ enum class SatStatus {
       }
 }
 
-class SMTProgram(val commands: List<Command>, val context: Context) {
+abstract class SMTProgram(commands: List<Command>, val context: Context) {
   var model: Model? = null
   var status = SatStatus.PENDING
   val info: List<Attribute>
+
+  protected val _commands: MutableList<Command> = commands.toMutableList()
+  val commands: List<Command>
+    get() = _commands.toList()
 
   init {
     info = commands.filterIsInstance<SetInfo>().map { it.attribute }
@@ -50,7 +55,6 @@ class SMTProgram(val commands: List<Command>, val context: Context) {
    * currently uses Z3 to solve eventually use an abstract Solver interface
    */
   fun solve() {
-    // TODO maybe save solver as well
     val solver = Z3Solver()
 
     solver.use {
@@ -64,3 +68,80 @@ class SMTProgram(val commands: List<Command>, val context: Context) {
     }
   }
 }
+
+class MutableSMTProgram(commands: List<Command>, context: Context) : SMTProgram(commands, context) {
+  constructor(commands: List<Command>) : this(commands, Context())
+
+  constructor() : this(emptyList(), Context())
+
+  /**
+   * Inserts [command] at the end of the program Checks if [command] is legal w.r.t. the [context]
+   */
+  fun add(command: Command) {
+    if (command is Assert) {
+      require(command.expression.all { context.contains(it) })
+    }
+
+    updateContext(command)
+    _commands.add(command)
+  }
+
+  /**
+   * Inserts [command] at [index] into the program Checks if [command] is legal w.r.t. the [context]
+   */
+  fun add(command: Command, index: Int) {
+    _commands.add(index, command)
+  }
+
+  /**
+   * Inserts all [commands] at the end of the program For each command checks if it is legal w.r.t.
+   * the [context]
+   */
+  fun addAll(commands: List<Command>) = commands.forEach { add(it) }
+
+  fun setLogic(logic: Logic) {
+    if (commands.filterIsInstance<SetLogic>().isNotEmpty()) {
+      throw RuntimeException("Logic already set")
+    }
+
+    when (logic) {
+      Logic.AUFLIA -> TODO()
+      Logic.AUFLIRA -> TODO()
+      Logic.AUFNIRA -> TODO()
+      Logic.LIA -> TODO()
+      Logic.LRA -> TODO()
+      Logic.QF_ABV -> TODO()
+      Logic.QF_AUFBV -> TODO()
+      Logic.QF_AUFLIA -> TODO()
+      Logic.QF_AX -> TODO()
+      Logic.QF_BV -> context.registerTheory(BitVectorExpressionContext)
+      Logic.QF_IDL -> TODO()
+      Logic.QF_LIA -> TODO()
+      Logic.QF_LRA -> TODO()
+      Logic.QF_NIA -> TODO()
+      Logic.QF_NRA -> TODO()
+      Logic.QF_RDL -> TODO()
+      Logic.QF_UF -> TODO()
+      Logic.QF_UFBV -> TODO()
+      Logic.QF_UFIDL -> TODO()
+      Logic.QF_UFLIA -> TODO()
+      Logic.QF_UFLRA -> TODO()
+      Logic.QF_UFNRA -> TODO()
+      Logic.UFLRA -> TODO()
+      Logic.UFNIA -> TODO()
+      Logic.QF_FP -> TODO()
+    }
+  }
+
+  private fun updateContext(command: Command) {
+    when (command) {
+      is SetLogic -> setLogic(command.logic)
+      is DeclareConst -> context.registerFunction(command)
+      is DeclareFun -> context.registerFunction(command)
+      is DeclareSort -> context.registerSort(command)
+      else -> return
+    }
+  }
+}
+
+class DefaultSMTProgram(commands: List<Command>, context: Context) : SMTProgram(commands, context)
