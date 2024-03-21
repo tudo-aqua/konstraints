@@ -45,7 +45,7 @@ open class FunctionDecl<S : Sort>(
   ): Expression<S> {
     bindParametersToExpressions(args, functionIndices)
 
-    return NAryExpression(name, sort, args)
+    return UserDefinedExpression(name, sort, args)
   }
 
   open fun bindParametersToExpressions(args: List<Expression<*>>, indices: Set<NumeralIndex>) =

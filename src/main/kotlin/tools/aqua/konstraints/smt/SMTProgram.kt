@@ -78,18 +78,18 @@ class MutableSMTProgram(commands: List<Command>, context: Context) : SMTProgram(
    * Inserts [command] at the end of the program Checks if [command] is legal w.r.t. the [context]
    */
   fun add(command: Command) {
-    if (command is Assert) {
-      require(command.expression.all { context.contains(it) })
-    }
-
-    updateContext(command)
-    _commands.add(command)
+    add(command, _commands.size)
   }
 
   /**
    * Inserts [command] at [index] into the program Checks if [command] is legal w.r.t. the [context]
    */
   fun add(command: Command, index: Int) {
+    if (command is Assert) {
+      require(command.expression.all { context.contains(it) })
+    }
+
+    updateContext(command)
     _commands.add(index, command)
   }
 

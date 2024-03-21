@@ -50,7 +50,7 @@ internal object BVSortDecl : SortDecl<BVSort>("BitVec".symbol(), emptySet(), set
  * http://smtlib.cs.uiowa.edu/theories-FixedSizeBitVectors.shtml
  */
 
-class BVLiteral(vector: String) : Expression<BVSort>() {
+class BVLiteral(vector: String) : Literal<BVSort>("|$vector|".symbol(), BVSort(1)) {
   val value: BigInteger
   val bits: Int
   val isBinary: Boolean
@@ -70,7 +70,6 @@ class BVLiteral(vector: String) : Expression<BVSort>() {
   }
 
   override val sort = BVSort(bits)
-  override val symbol: Symbol = "|$vector|".symbol()
 
   override fun toString() = symbol.toString()
 }
@@ -81,11 +80,14 @@ class BVLiteral(vector: String) : Expression<BVSort>() {
  * @param [lhs] left [Expression]
  * @param [rhs] right [Expression]
  */
-class BVConcat(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expression<BVSort>() {
+class BVConcat(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) :
+    BinaryExpression<BVSort, BVSort, BVSort>("concat".symbol(), BVSort(1)) {
   override val sort: BVSort = BVSort(lhs.sort.bits + rhs.sort.bits)
   override val symbol: Symbol = "concat".symbol()
 
-  override fun toString(): String = "(concat $lhs $rhs)"
+  override fun lhs(): Expression<BVSort> = lhs
+
+  override fun rhs(): Expression<BVSort> = rhs
 }
 
 object BVConcatDecl :
@@ -115,9 +117,9 @@ object BVConcatDecl :
  * @throws [IllegalArgumentException] if the constraint m > i ≥ j ≥ 0 is violated, where m is the
  *   number of bits in [inner]
  */
-class BVExtract(val i: Int, val j: Int, val inner: Expression<BVSort>) : Expression<BVSort>() {
+class BVExtract(val i: Int, val j: Int, val inner: Expression<BVSort>) :
+    UnaryExpression<BVSort, BVSort>("extract".symbol(), BVSort(1)) {
   override val sort: BVSort = BVSort(i - j + 1)
-  override val symbol: Symbol = "extract".symbol()
 
   init {
     require(j >= 0) { "j needs to be greater or equal to 0, but was $j" }
@@ -126,6 +128,8 @@ class BVExtract(val i: Int, val j: Int, val inner: Expression<BVSort>) : Express
       "i can not be greater than the number of bits in inner, but was $i"
     }
   }
+
+  override fun inner(): Expression<BVSort> = inner
 
   override fun toString(): String = "((_ extract $i $j) $inner)"
 }
@@ -159,11 +163,9 @@ object ExtractDecl :
  *
  * @param [inner] [Expression] to be inverted
  */
-class BVNot(val inner: Expression<BVSort>) : Expression<BVSort>() {
-  override val sort: BVSort = inner.sort
-  override val symbol: Symbol = "bvnot".symbol()
-
-  override fun toString(): String = "(bvnot $inner)"
+class BVNot(val inner: Expression<BVSort>) :
+    UnaryExpression<BVSort, BVSort>("bvnot".symbol(), inner.sort) {
+  override fun inner(): Expression<BVSort> = inner
 }
 
 object BVNotDecl :
@@ -183,11 +185,9 @@ object BVNotDecl :
  *
  * @param [inner] [Expression] to be negated
  */
-class BVNeg(val inner: Expression<BVSort>) : Expression<BVSort>() {
-  override val sort: BVSort = inner.sort
-  override val symbol: Symbol = "bvneg".symbol()
-
-  override fun toString(): String = "(bvneg $inner)"
+class BVNeg(val inner: Expression<BVSort>) :
+    UnaryExpression<BVSort, BVSort>("bvneg".symbol(), inner.sort) {
+  override fun inner(): Expression<BVSort> = inner
 }
 
 object BVNegDecl :
@@ -208,7 +208,8 @@ object BVNegDecl :
  * @param [conjuncts] List of [Expression]s to be combined by and
  * @throws [IllegalArgumentException] if two [conjuncts] do not have the same number of bits
  */
-class BVAnd(val conjuncts: List<Expression<BVSort>>) : Expression<BVSort>() {
+class BVAnd(val conjuncts: List<Expression<BVSort>>) :
+    HomogenousExpression<BVSort, BVSort>("bvand".symbol(), conjuncts.first().sort) {
   /**
    * Bitwise and operation on bitvectors
    *
@@ -217,16 +218,13 @@ class BVAnd(val conjuncts: List<Expression<BVSort>>) : Expression<BVSort>() {
    */
   constructor(vararg conjuncts: Expression<BVSort>) : this(conjuncts.toList())
 
-  override val sort: BVSort = conjuncts.first().sort
-  override val symbol: Symbol = "bvand".symbol()
-
   init {
     require(conjuncts.all { it.sort.bits == sort.bits }) {
       "All bitvectors must have the same number of bits"
     }
   }
 
-  override fun toString(): String = "(bvand ${conjuncts.joinToString(" ")})"
+  override fun subexpressions(): List<Expression<BVSort>> = conjuncts
 }
 
 object BVAndDecl :
@@ -252,7 +250,8 @@ object BVAndDecl :
  * @param [disjuncts] List of [Expression]s to be combined by or
  * @throws [IllegalArgumentException] if two [disjuncts] do not have the same number of bits
  */
-class BVOr(val disjuncts: List<Expression<BVSort>>) : Expression<BVSort>() {
+class BVOr(val disjuncts: List<Expression<BVSort>>) :
+    HomogenousExpression<BVSort, BVSort>("bvor".symbol(), disjuncts.first().sort) {
 
   /**
    * Bitwise or operation on bitvectors
@@ -262,8 +261,7 @@ class BVOr(val disjuncts: List<Expression<BVSort>>) : Expression<BVSort>() {
    */
   constructor(vararg disjuncts: Expression<BVSort>) : this(disjuncts.toList())
 
-  override val sort: BVSort = disjuncts.first().sort
-  override val symbol: Symbol = "bvor".symbol()
+  override fun subexpressions(): List<Expression<BVSort>> = disjuncts
 
   init {
     require(disjuncts.all { it.sort.bits == sort.bits }) {
@@ -297,7 +295,8 @@ object BVOrDecl :
  * @param [summands] List of [Expression]s to be added up
  * @throws [IllegalArgumentException] if two [summands] do not have the same number of bits
  */
-class BVAdd(val summands: List<Expression<BVSort>>) : Expression<BVSort>() {
+class BVAdd(val summands: List<Expression<BVSort>>) :
+    HomogenousExpression<BVSort, BVSort>("bvadd".symbol(), summands.first().sort) {
   /**
    * Addition operation on bitvectors
    *
@@ -306,16 +305,13 @@ class BVAdd(val summands: List<Expression<BVSort>>) : Expression<BVSort>() {
    */
   constructor(vararg summands: Expression<BVSort>) : this(summands.toList())
 
-  override val sort: BVSort = summands.first().sort
-  override val symbol: Symbol = "bvadd".symbol()
-
   init {
     require(summands.all { it.sort.bits == sort.bits }) {
       "All bitvectors must have the same number of bits"
     }
   }
 
-  override fun toString(): String = "(bvadd ${summands.joinToString(" ")})"
+  override fun subexpressions(): List<Expression<BVSort>> = summands
 }
 
 object BVAddDecl :
@@ -341,7 +337,8 @@ object BVAddDecl :
  * @param [factors] List of [Expression]s to be multiplied
  * @throws [IllegalArgumentException] if two [factors] do not have the same number of bits
  */
-class BVMul(val factors: List<Expression<BVSort>>) : Expression<BVSort>() {
+class BVMul(val factors: List<Expression<BVSort>>) :
+    HomogenousExpression<BVSort, BVSort>("bvmul".symbol(), factors.first().sort) {
   /**
    * Multiplication operation on bitvectors
    *
@@ -350,16 +347,13 @@ class BVMul(val factors: List<Expression<BVSort>>) : Expression<BVSort>() {
    */
   constructor(vararg factors: Expression<BVSort>) : this(factors.toList())
 
-  override val sort: BVSort = factors.first().sort
-  override val symbol: Symbol = "bvmul".symbol()
-
   init {
     require(factors.all { it.sort.bits == sort.bits }) {
       "All bitvectors must have the same number of bits"
     }
   }
 
-  override fun toString(): String = "(bvmul ${factors.joinToString(" ")})"
+  override fun subexpressions(): List<Expression<BVSort>> = factors
 }
 
 object BVMulDecl :
@@ -388,10 +382,7 @@ object BVMulDecl :
  *   of bits
  */
 class BVUDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSort>) :
-    Expression<BVSort>() {
-
-  override val sort: BVSort = numerator.sort
-  override val symbol: Symbol = "bvudiv".symbol()
+    BinaryExpression<BVSort, BVSort, BVSort>("bvudiv".symbol(), numerator.sort) {
 
   init {
     require(numerator.sort.bits == denominator.sort.bits) {
@@ -399,7 +390,9 @@ class BVUDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
     }
   }
 
-  override fun toString(): String = "(bvudiv $numerator $denominator)"
+  override fun lhs(): Expression<BVSort> = numerator
+
+  override fun rhs(): Expression<BVSort> = denominator
 }
 
 object BVUDivDecl :
@@ -425,16 +418,15 @@ object BVUDivDecl :
  *   of bits
  */
 class BVURem(val numerator: Expression<BVSort>, val denominator: Expression<BVSort>) :
-    Expression<BVSort>() {
-
-  override val sort: BVSort = numerator.sort
-  override val symbol: Symbol = "bvurem".symbol()
+    BinaryExpression<BVSort, BVSort, BVSort>("bvurem".symbol(), numerator.sort) {
 
   init {
     require(numerator.sort.bits == denominator.sort.bits)
   }
 
-  override fun toString(): String = "(bvurem $numerator $denominator)"
+  override fun lhs(): Expression<BVSort> = numerator
+
+  override fun rhs(): Expression<BVSort> = denominator
 }
 
 object BVURemDecl :
@@ -461,9 +453,7 @@ object BVURemDecl :
  * @throws [IllegalArgumentException] if [value] and [distance] do not have the same number of bits
  */
 class BVShl(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
-    Expression<BVSort>() {
-  override val sort: BVSort = value.sort
-  override val symbol: Symbol = "bvshl".symbol()
+    BinaryExpression<BVSort, BVSort, BVSort>("bvshl".symbol(), value.sort) {
 
   init {
     require(value.sort.bits == distance.sort.bits) {
@@ -471,7 +461,9 @@ class BVShl(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
     }
   }
 
-  override fun toString(): String = "(bvshl $value $distance)"
+  override fun lhs(): Expression<BVSort> = value
+
+  override fun rhs(): Expression<BVSort> = distance
 }
 
 object BVShlDecl :
@@ -498,9 +490,7 @@ object BVShlDecl :
  * @throws [IllegalArgumentException] if [value] and [distance] do not have the same number of bits
  */
 class BVLShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
-    Expression<BVSort>() {
-  override val sort: BVSort = value.sort
-  override val symbol: Symbol = "bvlshr".symbol()
+    BinaryExpression<BVSort, BVSort, BVSort>("bvlshr".symbol(), value.sort) {
 
   init {
     require(value.sort.bits == distance.sort.bits) {
@@ -508,7 +498,9 @@ class BVLShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
     }
   }
 
-  override fun toString(): String = "(bvlshr $value $distance)"
+  override fun lhs(): Expression<BVSort> = value
+
+  override fun rhs(): Expression<BVSort> = distance
 }
 
 object BVLShrDecl :
@@ -534,11 +526,8 @@ object BVLShrDecl :
  * @param [rhs] right value
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
-class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expression<BoolSort>() {
-
-  override val sort: BoolSort = BoolSort
-  override val symbol: Symbol = "bvult".symbol()
-  override val subexpressions = listOf(lhs, rhs)
+class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) :
+    BinaryExpression<BoolSort, BVSort, BVSort>("bvult".symbol(), BoolSort) {
 
   init {
     require(lhs.sort.bits == rhs.sort.bits) {
@@ -546,7 +535,9 @@ class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) : Expressi
     }
   }
 
-  override fun toString(): String = "(bvult $lhs $rhs)"
+  override fun lhs(): Expression<BVSort> = lhs
+
+  override fun rhs(): Expression<BVSort> = rhs
 }
 
 object BVUltDecl :

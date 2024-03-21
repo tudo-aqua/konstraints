@@ -46,18 +46,13 @@ internal object IntSortDecl : SortDecl<IntSort>("Int".symbol(), emptySet(), empt
   override fun getSort(bindings: Bindings): IntSort = IntSort
 }
 
-class IntLiteral(val value: Int) : Expression<IntSort>() {
-  override val symbol: Symbol = "|$value|".symbol()
-  override val sort: IntSort = IntSort
-
+class IntLiteral(val value: Int) : Literal<IntSort>("|$value|".symbol(), IntSort) {
   override fun toString(): String = value.toString()
 }
 
-class IntNeg(val inner: Expression<IntSort>) : Expression<IntSort>() {
-  override val symbol: Symbol = "-".symbol()
-  override val sort: IntSort = IntSort
-
-  override fun toString(): String = "(- $inner)"
+class IntNeg(val inner: Expression<IntSort>) :
+    UnaryExpression<IntSort, IntSort>("-".symbol(), IntSort) {
+  override fun inner(): Expression<IntSort> = inner
 }
 
 object IntNegDecl :
@@ -69,17 +64,15 @@ object IntNegDecl :
   ): Expression<IntSort> = IntNeg(param)
 }
 
-class IntSub(val terms: List<Expression<IntSort>>) : Expression<IntSort>() {
-  override val symbol: Symbol = "-".symbol()
-  override val sort: IntSort = IntSort
-
+class IntSub(val terms: List<Expression<IntSort>>) :
+    HomogenousExpression<IntSort, IntSort>("-".symbol(), IntSort) {
   init {
     require(terms.size > 1) {
       "Integer subtraction needs at least 2 terms but ${terms.size} were provided"
     }
   }
 
-  override fun toString(): String = "(- ${terms.joinToString(separator = " ")})"
+  override fun subexpressions(): List<Expression<IntSort>> = terms
 }
 
 object IntSubDecl :
@@ -93,17 +86,15 @@ object IntSubDecl :
   ): Expression<IntSort> = IntSub(listOf(param1, param2) + varargs)
 }
 
-class IntAdd(val terms: List<Expression<IntSort>>) : Expression<IntSort>() {
-  override val symbol: Symbol = "+".symbol()
-  override val sort: IntSort = IntSort
-
+class IntAdd(val terms: List<Expression<IntSort>>) :
+    HomogenousExpression<IntSort, IntSort>("+".symbol(), IntSort) {
   init {
     require(terms.size > 1) {
       "Integer addition needs at least 2 terms but ${terms.size} were provided"
     }
   }
 
-  override fun toString(): String = "(+ ${terms.joinToString(separator = " ")})"
+  override fun subexpressions(): List<Expression<IntSort>> = terms
 }
 
 object IntAddDecl :
@@ -117,17 +108,15 @@ object IntAddDecl :
   ): Expression<IntSort> = IntAdd(listOf(param1, param2) + varargs)
 }
 
-class IntMul(val factors: List<Expression<IntSort>>) : Expression<IntSort>() {
-  override val symbol: Symbol = "*".symbol()
-  override val sort: IntSort = IntSort
-
+class IntMul(val factors: List<Expression<IntSort>>) :
+    HomogenousExpression<IntSort, IntSort>("*".symbol(), IntSort) {
   init {
     require(factors.size > 1) {
       "Integer multiplication needs at least 2 factors but ${factors.size} were provided"
     }
   }
 
-  override fun toString(): String = "(* ${factors.joinToString(separator = " ")})"
+  override fun subexpressions(): List<Expression<IntSort>> = factors
 }
 
 object IntMulDecl :
@@ -141,17 +130,15 @@ object IntMulDecl :
   ): Expression<IntSort> = IntMul(listOf(param1, param2) + varargs)
 }
 
-class IntDiv(val terms: List<Expression<IntSort>>) : Expression<IntSort>() {
-  override val symbol: Symbol = "/".symbol()
-  override val sort: IntSort = IntSort
-
+class IntDiv(val terms: List<Expression<IntSort>>) :
+    HomogenousExpression<IntSort, IntSort>("/".symbol(), IntSort) {
   init {
     require(terms.size > 1) {
       "Integer division needs at least 2 terms but ${terms.size} were provided"
     }
   }
 
-  override fun toString(): String = "(/ ${terms.joinToString(separator = " ")})"
+  override fun subexpressions(): List<Expression<IntSort>> = terms
 }
 
 object IntDivDecl :
@@ -166,11 +153,11 @@ object IntDivDecl :
 }
 
 class Mod(val dividend: Expression<IntSort>, val divisor: Expression<IntSort>) :
-    Expression<IntSort>() {
-  override val symbol: Symbol = "mod".symbol()
-  override val sort: IntSort = IntSort
+    BinaryExpression<IntSort, IntSort, IntSort>("mod".symbol(), IntSort) {
 
-  override fun toString(): String = "(mod $dividend $divisor)"
+  override fun lhs(): Expression<IntSort> = dividend
+
+  override fun rhs(): Expression<IntSort> = divisor
 }
 
 object ModDecl :
@@ -183,11 +170,9 @@ object ModDecl :
   ): Expression<IntSort> = Mod(param1, param2)
 }
 
-class Abs(val inner: Expression<IntSort>) : Expression<IntSort>() {
-  override val symbol: Symbol = "abs".symbol()
-  override val sort: IntSort = IntSort
-
-  override fun toString(): String = "(abs $inner)"
+class Abs(val inner: Expression<IntSort>) :
+    UnaryExpression<IntSort, IntSort>("abs".symbol(), IntSort) {
+  override fun inner(): Expression<IntSort> = inner
 }
 
 object AbsDecl :
@@ -199,11 +184,9 @@ object AbsDecl :
   ): Expression<IntSort> = Abs(param)
 }
 
-class IntLessEq(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
+class IntLessEq(val terms: List<Expression<IntSort>>) :
+    HomogenousExpression<BoolSort, IntSort>("<=".symbol(), BoolSort) {
   constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
-
-  override val symbol: Symbol = "<=".symbol()
-  override val sort: BoolSort = BoolSort
 
   init {
     require(terms.size > 1) {
@@ -211,7 +194,7 @@ class IntLessEq(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
     }
   }
 
-  override fun toString(): String = "(<= ${terms.joinToString(separator = " ")})"
+  override fun subexpressions(): List<Expression<IntSort>> = terms
 }
 
 object IntLessEqDecl :
@@ -223,11 +206,9 @@ object IntLessEqDecl :
   ): Expression<BoolSort> = IntLessEq(varargs)
 }
 
-class IntLess(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
+class IntLess(val terms: List<Expression<IntSort>>) :
+    HomogenousExpression<BoolSort, IntSort>("<".symbol(), BoolSort) {
   constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
-
-  override val symbol: Symbol = "<".symbol()
-  override val sort: BoolSort = BoolSort
 
   init {
     require(terms.size > 1) {
@@ -235,7 +216,7 @@ class IntLess(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
     }
   }
 
-  override fun toString(): String = "(< ${terms.joinToString(separator = " ")})"
+  override fun subexpressions(): List<Expression<IntSort>> = terms
 }
 
 object IntLessDecl :
@@ -247,11 +228,9 @@ object IntLessDecl :
   ): Expression<BoolSort> = IntLess(varargs)
 }
 
-class IntGreaterEq(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
+class IntGreaterEq(val terms: List<Expression<IntSort>>) :
+    HomogenousExpression<BoolSort, IntSort>(">=".symbol(), BoolSort) {
   constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
-
-  override val symbol: Symbol = ">=".symbol()
-  override val sort: BoolSort = BoolSort
 
   init {
     require(terms.size > 1) {
@@ -259,7 +238,7 @@ class IntGreaterEq(val terms: List<Expression<IntSort>>) : Expression<BoolSort>(
     }
   }
 
-  override fun toString(): String = "(>= ${terms.joinToString(separator = " ")})"
+  override fun subexpressions(): List<Expression<IntSort>> = terms
 }
 
 object IntGreaterEqDecl :
@@ -271,11 +250,9 @@ object IntGreaterEqDecl :
   ): Expression<BoolSort> = IntGreaterEq(varargs)
 }
 
-class IntGreater(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() {
+class IntGreater(val terms: List<Expression<IntSort>>) :
+    HomogenousExpression<BoolSort, IntSort>(">".symbol(), BoolSort) {
   constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
-
-  override val symbol: Symbol = ">".symbol()
-  override val sort: BoolSort = BoolSort
 
   init {
     require(terms.size > 1) {
@@ -283,7 +260,7 @@ class IntGreater(val terms: List<Expression<IntSort>>) : Expression<BoolSort>() 
     }
   }
 
-  override fun toString(): String = "(> ${terms.joinToString(separator = " ")})"
+  override fun subexpressions(): List<Expression<IntSort>> = terms
 }
 
 object IntGreaterDecl :
@@ -295,11 +272,9 @@ object IntGreaterDecl :
   ): Expression<BoolSort> = IntGreater(varargs)
 }
 
-class Divisible(val n: Int, val inner: Expression<IntSort>) : Expression<BoolSort>() {
-  override val symbol: Symbol = "divisible".symbol()
-  override val sort: BoolSort = BoolSort
-
-  override fun toString(): String = "((_ divisible $n) $inner)"
+class Divisible(val n: Int, val inner: Expression<IntSort>) :
+    UnaryExpression<BoolSort, IntSort>("divisible".symbol(), BoolSort) {
+  override fun inner(): Expression<IntSort> = inner
 }
 
 object DivisibleDecl :

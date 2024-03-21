@@ -40,13 +40,15 @@ internal object ArraySortDecl :
       ArraySort(bindings[SortParameter("X")], bindings[SortParameter("Y")])
 }
 
-class ArraySelect(val array: Expression<ArraySort>, val index: Expression<*>) : Expression<Sort>() {
-  override val symbol: Symbol = "select".symbol()
-  override val sort: Sort = array.sort.y
-
+class ArraySelect(val array: Expression<ArraySort>, val index: Expression<*>) :
+    BinaryExpression<Sort, ArraySort, Sort>("select".symbol(), array.sort.y) {
   init {
     require(array.sort.x == index.sort)
   }
+
+  override fun lhs(): Expression<ArraySort> = array
+
+  override fun rhs(): Expression<Sort> = index as Expression<Sort>
 }
 
 object ArraySelectDecl :
@@ -69,14 +71,13 @@ class ArrayStore(
     val array: Expression<ArraySort>,
     val index: Expression<*>,
     val value: Expression<*>
-) : Expression<ArraySort>() {
-  override val symbol: Symbol = "store".symbol()
-  override val sort: ArraySort = array.sort
-
+) : NAryExpression<ArraySort>("store".symbol(), array.sort) {
   init {
     require(array.sort.x == index.sort)
     require(array.sort.y == value.sort)
   }
+
+  override fun subexpressions(): List<Expression<*>> = listOf(array, index, value)
 }
 
 object ArrayStoreDecl :

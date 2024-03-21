@@ -45,18 +45,16 @@ internal object RealSortDecl : SortDecl<RealSort>("Real".symbol(), emptySet(), e
   override fun getSort(bindings: Bindings): RealSort = RealSort
 }
 
-class RealLiteral(val value: BigDecimal) : Expression<RealSort>() {
+class RealLiteral(val value: BigDecimal) : Literal<RealSort>("|$value|".symbol(), RealSort) {
   override val symbol: Symbol = "|$value|".symbol()
   override val sort: RealSort = RealSort
 
   override fun toString(): String = symbol.toSMTString()
 }
 
-class RealNeg(val inner: Expression<RealSort>) : Expression<RealSort>() {
-  override val symbol: Symbol = "-".symbol()
-  override val sort: RealSort = RealSort
-
-  override fun toString(): String = "(- $inner)"
+class RealNeg(val inner: Expression<RealSort>) :
+    UnaryExpression<RealSort, RealSort>("-".symbol(), RealSort) {
+  override fun inner(): Expression<RealSort> = inner
 }
 
 object RealNegDecl :
@@ -68,17 +66,15 @@ object RealNegDecl :
   ): Expression<RealSort> = RealNeg(param)
 }
 
-class RealSub(val terms: List<Expression<RealSort>>) : Expression<RealSort>() {
-  override val symbol: Symbol = "-".symbol()
-  override val sort: RealSort = RealSort
-
+class RealSub(val terms: List<Expression<RealSort>>) :
+    HomogenousExpression<RealSort, RealSort>("-".symbol(), RealSort) {
   init {
     require(terms.size > 1) {
       "Integer subtraction needs at least 2 terms but ${terms.size} were provided"
     }
   }
 
-  override fun toString(): String = "(- ${terms.joinToString(separator = " ")})"
+  override fun subexpressions(): List<Expression<RealSort>> = terms
 }
 
 object RealSubDecl :
@@ -92,17 +88,15 @@ object RealSubDecl :
   ): Expression<RealSort> = RealSub(listOf(param1, param2) + varargs)
 }
 
-class RealAdd(val terms: List<Expression<RealSort>>) : Expression<RealSort>() {
-  override val symbol: Symbol = "+".symbol()
-  override val sort: RealSort = RealSort
-
+class RealAdd(val terms: List<Expression<RealSort>>) :
+    HomogenousExpression<RealSort, RealSort>("+".symbol(), RealSort) {
   init {
     require(terms.size > 1) {
       "Integer addition needs at least 2 terms but ${terms.size} were provided"
     }
   }
 
-  override fun toString(): String = "(+ ${terms.joinToString(separator = " ")})"
+  override fun subexpressions(): List<Expression<RealSort>> = terms
 }
 
 object RealAddDecl :
@@ -116,17 +110,15 @@ object RealAddDecl :
   ): Expression<RealSort> = RealAdd(listOf(param1, param2) + varargs)
 }
 
-class RealMul(val factors: List<Expression<RealSort>>) : Expression<RealSort>() {
-  override val symbol: Symbol = "*".symbol()
-  override val sort: RealSort = RealSort
-
+class RealMul(val factors: List<Expression<RealSort>>) :
+    HomogenousExpression<RealSort, RealSort>("*".symbol(), RealSort) {
   init {
     require(factors.size > 1) {
       "Integer multiplication needs at least 2 factors but ${factors.size} were provided"
     }
   }
 
-  override fun toString(): String = "(* ${factors.joinToString(separator = " ")})"
+  override fun subexpressions(): List<Expression<RealSort>> = factors
 }
 
 object RealMulDecl :
@@ -140,17 +132,15 @@ object RealMulDecl :
   ): Expression<RealSort> = RealMul(listOf(param1, param2) + varargs)
 }
 
-class RealDiv(val terms: List<Expression<RealSort>>) : Expression<RealSort>() {
-  override val symbol: Symbol = "/".symbol()
-  override val sort: RealSort = RealSort
-
+class RealDiv(val terms: List<Expression<RealSort>>) :
+    HomogenousExpression<RealSort, RealSort>("/".symbol(), RealSort) {
   init {
     require(terms.size > 1) {
       "Integer division needs at least 2 terms but ${terms.size} were provided"
     }
   }
 
-  override fun toString(): String = "(/ ${terms.joinToString(separator = " ")})"
+  override fun subexpressions(): List<Expression<RealSort>> = terms
 }
 
 object RealDivDecl :
@@ -164,17 +154,15 @@ object RealDivDecl :
   ): Expression<RealSort> = RealDiv(listOf(param1, param2) + varargs)
 }
 
-class RealLessEq(val terms: List<Expression<RealSort>>) : Expression<BoolSort>() {
-  override val symbol: Symbol = "<=".symbol()
-  override val sort: BoolSort = BoolSort
-
+class RealLessEq(val terms: List<Expression<RealSort>>) :
+    HomogenousExpression<BoolSort, RealSort>("<=".symbol(), BoolSort) {
   init {
     require(terms.size > 1) {
       "Integer comparison needs at least 2 terms but ${terms.size} were provided"
     }
   }
 
-  override fun toString(): String = "(<= ${terms.joinToString(separator = " ")})"
+  override fun subexpressions(): List<Expression<RealSort>> = terms
 }
 
 object RealLessEqDecl :
@@ -186,17 +174,15 @@ object RealLessEqDecl :
   ): Expression<BoolSort> = RealLessEq(varargs)
 }
 
-class RealLess(val terms: List<Expression<RealSort>>) : Expression<BoolSort>() {
-  override val symbol: Symbol = "<".symbol()
-  override val sort: BoolSort = BoolSort
-
+class RealLess(val terms: List<Expression<RealSort>>) :
+    HomogenousExpression<BoolSort, RealSort>("<".symbol(), BoolSort) {
   init {
     require(terms.size > 1) {
       "Integer comparison needs at least 2 terms but ${terms.size} were provided"
     }
   }
 
-  override fun toString(): String = "(< ${terms.joinToString(separator = " ")})"
+  override fun subexpressions(): List<Expression<RealSort>> = terms
 }
 
 object RealLessDecl :
@@ -208,17 +194,15 @@ object RealLessDecl :
   ): Expression<BoolSort> = RealLess(varargs)
 }
 
-class RealGreaterEq(val terms: List<Expression<RealSort>>) : Expression<BoolSort>() {
-  override val symbol: Symbol = ">=".symbol()
-  override val sort: BoolSort = BoolSort
-
+class RealGreaterEq(val terms: List<Expression<RealSort>>) :
+    HomogenousExpression<BoolSort, RealSort>(">=".symbol(), BoolSort) {
   init {
     require(terms.size > 1) {
       "Integer comparison needs at least 2 terms but ${terms.size} were provided"
     }
   }
 
-  override fun toString(): String = "(>= ${terms.joinToString(separator = " ")})"
+  override fun subexpressions(): List<Expression<RealSort>> = terms
 }
 
 object RealGreaterEqDecl :
@@ -230,17 +214,15 @@ object RealGreaterEqDecl :
   ): Expression<BoolSort> = RealGreaterEq(varargs)
 }
 
-class RealGreater(val terms: List<Expression<RealSort>>) : Expression<BoolSort>() {
-  override val symbol: Symbol = ">".symbol()
-  override val sort: BoolSort = BoolSort
-
+class RealGreater(val terms: List<Expression<RealSort>>) :
+    HomogenousExpression<BoolSort, RealSort>(">".symbol(), BoolSort) {
   init {
     require(terms.size > 1) {
       "Integer comparison needs at least 2 terms but ${terms.size} were provided"
     }
   }
 
-  override fun toString(): String = "(> ${terms.joinToString(separator = " ")})"
+  override fun subexpressions(): List<Expression<RealSort>> = terms
 }
 
 object RealGreaterDecl :

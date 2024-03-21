@@ -42,9 +42,9 @@ fun Z3Sort.aquaify(): Sort =
 @JvmName("aquaifyAny")
 fun Expr<*>.aquaify(): Expression<*> =
     when (this.sort) {
-      is Z3BoolSort -> (this as Expr<Z3BoolSort>).aquaify()
-      is Z3IntSort -> (this as Expr<Z3IntSort>).aquaify()
-      is BitVecSort -> (this as Expr<BitVecSort>).aquaify()
+      is Z3BoolSort -> (this as Expr<Z3BoolSort>).aquaify() as Expression<Sort>
+      is Z3IntSort -> (this as Expr<Z3IntSort>).aquaify() as Expression<Sort>
+      is BitVecSort -> (this as Expr<BitVecSort>).aquaify() as Expression<Sort>
       else -> throw RuntimeException("Unknown or unsupported Z3 sort ${this.sort}")
     }
 

@@ -21,10 +21,7 @@ package tools.aqua.konstraints.theories
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.parser.TheoryContext
-import tools.aqua.konstraints.smt.BoolSort
-import tools.aqua.konstraints.smt.Expression
-import tools.aqua.konstraints.smt.Symbol
-import tools.aqua.konstraints.smt.symbol
+import tools.aqua.konstraints.smt.*
 
 internal object RealsIntsContext : TheoryContext {
   override val functions: HashSet<FunctionDecl<*>> =
@@ -58,11 +55,9 @@ internal object RealsIntsContext : TheoryContext {
       mapOf(Pair("Int", IntSortDecl), Pair("Real", RealSortDecl))
 }
 
-class ToReal(val inner: Expression<IntSort>) : Expression<RealSort>() {
-  override val symbol: Symbol = "to_real".symbol()
-  override val sort: RealSort = RealSort
-
-  override fun toString(): String = "(to_real $inner)"
+class ToReal(val inner: Expression<IntSort>) :
+    UnaryExpression<RealSort, IntSort>("to_real".symbol(), RealSort) {
+  override fun inner(): Expression<IntSort> = inner
 }
 
 object ToRealDecl :
@@ -74,11 +69,9 @@ object ToRealDecl :
   ): Expression<RealSort> = ToReal(param)
 }
 
-class ToInt(val inner: Expression<RealSort>) : Expression<IntSort>() {
-  override val symbol: Symbol = "to_int".symbol()
-  override val sort: IntSort = IntSort
-
-  override fun toString(): String = "(to_int $inner)"
+class ToInt(val inner: Expression<RealSort>) :
+    UnaryExpression<IntSort, RealSort>("to_int".symbol(), IntSort) {
+  override fun inner(): Expression<RealSort> = inner
 }
 
 object ToIntDecl :
@@ -90,11 +83,9 @@ object ToIntDecl :
   ): Expression<IntSort> = ToInt(param)
 }
 
-class IsInt(val inner: Expression<RealSort>) : Expression<BoolSort>() {
-  override val symbol: Symbol = "is_int".symbol()
-  override val sort: BoolSort = BoolSort
-
-  override fun toString(): String = "(is_int $inner)"
+class IsInt(val inner: Expression<RealSort>) :
+    UnaryExpression<BoolSort, RealSort>("is_int".symbol(), BoolSort) {
+  override fun inner(): Expression<RealSort> = inner
 }
 
 object IsIntDecl :

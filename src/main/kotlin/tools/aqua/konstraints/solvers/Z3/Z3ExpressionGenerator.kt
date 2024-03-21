@@ -432,7 +432,7 @@ fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
             require(this is NAryExpression)
             context.context.mkApp(
                 context.functions[this.symbol.toString()]!!,
-                *this.tokens.map { it.z3ify(context) }.toTypedArray()) as Expr<Z3IntSort>
+                *this.subexpressions().map { it.z3ify(context) }.toTypedArray()) as Expr<Z3IntSort>
           } else {
             throw IllegalArgumentException("Z3 can not visit expression $this!")
           }

@@ -26,10 +26,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
-import tools.aqua.konstraints.smt.BasicExpression
-import tools.aqua.konstraints.smt.BoolSort
-import tools.aqua.konstraints.smt.Expression
-import tools.aqua.konstraints.smt.symbol
+import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 
 /*
