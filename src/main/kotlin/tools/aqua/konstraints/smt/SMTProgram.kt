@@ -42,6 +42,8 @@ abstract class SMTProgram(commands: List<Command>, val context: Context) {
   var model: Model? = null
   var status = SatStatus.PENDING
   val info: List<Attribute>
+  var logic: Logic? = null
+    protected set
 
   protected val _commands: MutableList<Command> = commands.toMutableList()
   val commands: List<Command>
@@ -99,37 +101,41 @@ class MutableSMTProgram(commands: List<Command>, context: Context) : SMTProgram(
    */
   fun addAll(commands: List<Command>) = commands.forEach { add(it) }
 
+  // conflicting jvm signature with setter of property logic
+  @JvmName("setlogic")
   fun setLogic(logic: Logic) {
-    if (commands.filterIsInstance<SetLogic>().isNotEmpty()) {
+    if (this.logic != null) {
       throw RuntimeException("Logic already set")
     }
 
+    this.logic = logic
+
     when (logic) {
-      Logic.AUFLIA -> TODO()
-      Logic.AUFLIRA -> TODO()
-      Logic.AUFNIRA -> TODO()
-      Logic.LIA -> TODO()
-      Logic.LRA -> TODO()
-      Logic.QF_ABV -> TODO()
-      Logic.QF_AUFBV -> TODO()
-      Logic.QF_AUFLIA -> TODO()
-      Logic.QF_AX -> TODO()
-      Logic.QF_BV -> context.registerTheory(BitVectorExpressionContext)
-      Logic.QF_IDL -> TODO()
-      Logic.QF_LIA -> TODO()
-      Logic.QF_LRA -> TODO()
-      Logic.QF_NIA -> TODO()
-      Logic.QF_NRA -> TODO()
-      Logic.QF_RDL -> TODO()
-      Logic.QF_UF -> TODO()
-      Logic.QF_UFBV -> TODO()
-      Logic.QF_UFIDL -> TODO()
-      Logic.QF_UFLIA -> TODO()
-      Logic.QF_UFLRA -> TODO()
-      Logic.QF_UFNRA -> TODO()
-      Logic.UFLRA -> TODO()
-      Logic.UFNIA -> TODO()
-      Logic.QF_FP -> TODO()
+      AUFLIA -> TODO()
+      AUFLIRA -> TODO()
+      AUFNIRA -> TODO()
+      LIA -> TODO()
+      LRA -> TODO()
+      QF_ABV -> TODO()
+      QF_AUFBV -> TODO()
+      QF_AUFLIA -> TODO()
+      QF_AX -> TODO()
+      QF_BV -> context.registerTheory(BitVectorExpressionContext)
+      QF_IDL -> TODO()
+      QF_LIA -> TODO()
+      QF_LRA -> TODO()
+      QF_NIA -> TODO()
+      QF_NRA -> TODO()
+      QF_RDL -> TODO()
+      QF_UF -> TODO()
+      QF_UFBV -> TODO()
+      QF_UFIDL -> TODO()
+      QF_UFLIA -> TODO()
+      QF_UFLRA -> TODO()
+      QF_UFNRA -> TODO()
+      UFLRA -> TODO()
+      UFNIA -> TODO()
+      QF_FP -> TODO()
     }
   }
 

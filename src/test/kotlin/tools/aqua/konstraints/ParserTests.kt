@@ -29,7 +29,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.petitparser.context.ParseError
 import tools.aqua.konstraints.parser.*
-import tools.aqua.konstraints.smt.Logic
+import tools.aqua.konstraints.smt.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserTests {
@@ -161,29 +161,29 @@ class ParserTests {
 
   private fun getLogics(): Stream<Arguments> {
     return Stream.of(
-        arguments(Logic.AUFLIA),
-        arguments(Logic.AUFLIRA),
-        arguments(Logic.AUFNIRA),
-        arguments(Logic.LIA),
-        arguments(Logic.LRA),
-        arguments(Logic.QF_ABV),
-        arguments(Logic.QF_AUFBV),
-        arguments(Logic.QF_AUFLIA),
-        arguments(Logic.QF_AX),
-        arguments(Logic.QF_BV),
-        arguments(Logic.QF_IDL),
-        arguments(Logic.QF_LIA),
-        arguments(Logic.QF_LRA),
-        arguments(Logic.QF_NIA),
-        arguments(Logic.QF_NRA),
-        arguments(Logic.QF_RDL),
-        arguments(Logic.QF_UF),
-        arguments(Logic.QF_UFBV),
-        arguments(Logic.QF_UFIDL),
-        arguments(Logic.QF_UFLIA),
-        arguments(Logic.QF_UFLRA),
-        arguments(Logic.QF_UFNRA),
-        arguments(Logic.UFLRA),
-        arguments(Logic.UFNIA))
+        arguments(AUFLIA),
+        arguments(AUFLIRA),
+        arguments(AUFNIRA),
+        arguments(LIA),
+        arguments(LRA),
+        arguments(QF_ABV),
+        arguments(QF_AUFBV),
+        arguments(QF_AUFLIA),
+        arguments(QF_AX),
+        arguments(QF_BV),
+        arguments(QF_IDL),
+        arguments(QF_LIA),
+        arguments(QF_LRA),
+        arguments(QF_NIA),
+        arguments(QF_NRA),
+        arguments(QF_RDL),
+        arguments(QF_UF),
+        arguments(QF_UFBV),
+        arguments(QF_UFIDL),
+        arguments(QF_UFLIA),
+        arguments(QF_UFLRA),
+        arguments(QF_UFNRA),
+        arguments(UFLRA),
+        arguments(UFNIA))
   }
 }

@@ -128,7 +128,7 @@ class SMTProgramTests {
     return Stream.of(
         arguments(
             listOf(
-                SetLogic(Logic.QF_BV),
+                SetLogic(QF_BV),
                 DeclareFun("A".symbol(), emptyList(), BVSort(8)),
                 DeclareFun("B".symbol(), emptyList(), BVSort(8)),
                 Assert(
@@ -150,7 +150,7 @@ class SMTProgramTests {
     return Stream.of(
         arguments(
             listOf(
-                SetLogic(Logic.QF_BV),
+                SetLogic(QF_BV),
                 Assert(
                     BVUlt(
                         BasicExpression("A".symbol(), BVSort(8)),

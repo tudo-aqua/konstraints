@@ -63,20 +63,20 @@ internal class ParseTreeVisitor :
 
   override fun visit(protoSetLogic: ProtoSetLogic): SetLogic {
     when (protoSetLogic.logic) {
-      Logic.QF_BV -> context.registerTheory(BitVectorExpressionContext)
-      Logic.QF_IDL -> {
+      QF_BV -> context.registerTheory(BitVectorExpressionContext)
+      QF_IDL -> {
         context.registerTheory(IntsContext)
         context.numeralSort = IntSort
       }
-      Logic.QF_RDL -> {
+      QF_RDL -> {
         context.registerTheory(RealsContext)
         context.numeralSort = RealSort
       }
-      Logic.QF_FP -> context.registerTheory(FloatingPointContext)
+      QF_FP -> context.registerTheory(FloatingPointContext)
       // QF_AX uses only ArrayEx with free function and sort symbols, as free sorts are not yet
       // supported
       // load int theory as well for testing purposes
-      Logic.QF_AX -> {
+      QF_AX -> {
         context.registerTheory(ArrayExContext)
         context.registerTheory(IntsContext)
         context.numeralSort = IntSort

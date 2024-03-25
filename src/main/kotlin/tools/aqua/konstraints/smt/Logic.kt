@@ -18,71 +18,288 @@
 
 package tools.aqua.konstraints.smt
 
-enum class Logic {
-  AUFLIA, // Closed formulas over the theory of linear integer arithmetic and arrays extended with
-  // free sort and function symbols but restricted to arrays with integer indices and
-  // values.
-  AUFLIRA, // Closed linear formulas with free sort and function symbols over one- and
-  // two-dimentional arrays of integer index and real value.
-  AUFNIRA, // Closed formulas with free function and predicate symbols over a theory of arrays of
-  // arrays of integer index and real value.
-  LIA, // Closed linear formulas over linear integer arithmetic.
-  LRA, // Closed linear formulas in linear real arithmetic.
-  QF_ABV, // Closed quantifier-free formulas over the theory of bitvectors and bitvector arrays.
-  QF_AUFBV, // Closed quantifier-free formulas over the theory of bitvectors and bitvector arrays
-  // extended with free sort and function symbols.
-  QF_AUFLIA, // Closed quantifier-free linear formulas over the theory of integer arrays extended
-  // with free sort and function symbols.
-  QF_AX, // Closed quantifier-free formulas over the theory of arrays with extensionality.
-  QF_BV, // Closed quantifier-free formulas over the theory of fixed-size bitvectors.
-  QF_IDL, // Difference Logic over the integers. In essence, Boolean combinations of inequations of
-  // the form x - y < b where x and y are integer variables and b is an integer constant.
-  QF_LIA, // Unquantified linear integer arithmetic. In essence, Boolean combinations of inequations
-  // between linear polynomials over integer variables.
-  QF_LRA, // Unquantified linear real arithmetic. In essence, Boolean combinations of inequations
-  // between linear polynomials over real variables.
-  QF_NIA, // Quantifier-free integer arithmetic.
-  QF_NRA, // Quantifier-free real arithmetic.
-  QF_RDL, // Difference Logic over the reals. In essence, Boolean combinations of inequations of the
-  // form x - y < b where x and y are real variables and b is a rational constant.
-  QF_UF, // Unquantified formulas built over a signature of uninterpreted (i.e., free) sort and
-  // function symbols.
-  QF_UFBV, // Unquantified formulas over bitvectors with uninterpreted sort function and symbols.
-  QF_UFIDL, // Difference Logic over the integers (in essence) but with uninterpreted sort and
-  // function symbols.
-  QF_UFLIA, // Unquantified linear integer arithmetic with uninterpreted sort and function symbols.
-  QF_UFLRA, // Unquantified linear real arithmetic with uninterpreted sort and function symbols.
-  QF_UFNRA, // Unquantified non-linear real arithmetic with uninterpreted sort and function symbols.
-  UFLRA, // Linear real arithmetic with uninterpreted sort and function symbols.
-  UFNIA, // Non-linear integer arithmetic with uninterpreted sort and function symbols.
-  QF_FP; // Quantifier free floating point (missing on smt website)
+import tools.aqua.konstraints.parser.FunctionDecl
+import tools.aqua.konstraints.parser.SortDecl
 
-  override fun toString(): String =
-      when (this) {
-        AUFLIA -> "AUFLIA"
-        AUFLIRA -> "AUFLIRA"
-        AUFNIRA -> "AUFNIRA"
-        LIA -> "LIA"
-        LRA -> "LRA"
-        QF_ABV -> "QF_ABV"
-        QF_AUFBV -> "QF_AUFBV"
-        QF_AUFLIA -> "QF_AUFLIA"
-        QF_AX -> "QF_AX"
-        QF_BV -> "QF_BV"
-        QF_IDL -> "QF_IDL"
-        QF_LIA -> "QF_LIA"
-        QF_LRA -> "QF_LRA"
-        QF_NIA -> "QF_NIA"
-        QF_NRA -> "QF_NRA"
-        QF_RDL -> "QF_RDL"
-        QF_UF -> "QF_UF"
-        QF_UFBV -> "QF_UFBV"
-        QF_UFIDL -> "QF_UFIDL"
-        QF_UFLIA -> "QF_UFLIA"
-        QF_UFLRA -> "QF_UFLRA"
-        QF_UFNRA -> "QF_UFNRA"
-        UFLRA -> "UFLRA"
-        UFNIA -> "UFNIA"
-        QF_FP -> "QF_FP"
-      }
+interface Logic {
+  val sorts: Map<String, SortDecl<*>>
+  val functions: Set<FunctionDecl<*>>
+}
+
+/**
+ * Closed formulas built over arbitrary expansions of the Ints and ArraysEx signatures with free
+ * sort and function symbols, but with the following restrictions:
+ * - all terms of sort Int are linear, that is, have no occurrences of the function symbols *, /,
+ *   div, mod, and abs, except as specified in the :extensions attributes;
+ * - all array terms have sort (Array Int Int).
+ */
+data object AUFLIA : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed formulas built over arbitrary expansions of the Reals_Ints and ArraysEx signatures with
+ * free sort and function symbols, but with the following restrictions:
+ * - all terms of sort Int are linear, that is, have no occurrences of the function symbols *, /,
+ *   div, mod, and abs, except as specified in the :extensions attributes;
+ * - all terms of sort Real are linear, that is, have no occurrences of the function symbols * and
+ *   /, except as specified in the :extensions attribute;
+ * - all array terms have sort (Array Int Real) or (Array Int (Array Int Real)).
+ */
+data object AUFLIRA : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed formulas built over arbitrary expansions of the Reals_Ints and ArraysEx signatures with
+ * free sort and function symbols.
+ */
+data object AUFNIRA : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed formulas built over an arbitrary expansion of the Ints signature with free constant
+ * symbols, but whose terms of sort Int are all linear, that is, have no occurrences of the function
+ * symbols *, /, div, mod, and abs, except as specified the :extensions attribute.
+ */
+data object LIA : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // ODO("Not yet implemented")
+}
+
+/**
+ * Closed formulas built over arbitrary expansions of the Reals signature with free constant
+ * symbols, but containing only linear atoms, that is, atoms with no occurrences of the function
+ * symbols * and /, except as specified the :extensions attribute.
+ */
+data object LRA : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed quantifier-free formulas built over the FixedSizeBitVectors and ArraysEx signatures, with
+ * the restriction that all array terms have sort of the form (Array (_ BitVec i) (_ BitVec j)) for
+ * some i, j > 0.
+ */
+data object QF_ABV : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed quantifier-free formulas built over an arbitrary expansion of the FixedSizeBitVectors and
+ * ArraysEx signatures with free sort and function symbols, but with the restriction that all array
+ * terms have sort of the form (Array (_ BitVec i) (_ BitVec j)) for some i, j > 0.
+ */
+data object QF_AUFBV : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed quantifier-free formulas built over arbitrary expansions of the Ints and ArraysEx
+ * signatures with free sort and function symbols, but with the following restrictions:
+ * - all terms of sort Int are linear, that is, have no occurrences of the function symbols *, /,
+ *   div, mod, and abs, except as specified in the :extensions attributes;
+ * - all array terms have sort (Array Int Int).
+ */
+data object QF_AUFLIA : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed quantifier-free formulas built over an arbitrary expansion of the ArraysEx signature with
+ * free sort and constant symbols.
+ */
+data object QF_AX : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed quantifier-free formulas built over an arbitrary expansion of the FixedSizeBitVectors
+ * signature with free constant symbols over the sorts (_ BitVec m) for 0 < m. Formulas in ite terms
+ * must satisfy the same restriction as well, with the exception that they need not be closed
+ * (because they may be in the scope of a let binder).
+ */
+data object QF_BV : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed quantifier-free formulas with atoms of the form:
+ * - q
+ * - (op (- x y) n),
+ * - (op (- x y) (- n)), or
+ * - (op x y)
+ *
+ * where
+ * - q is a variable or free constant symbol of sort Bool,
+ * - op is <, <=, >, >=, =, or distinct,
+ * - x, y are free constant symbols of sort Int,
+ * - n is a numeral.
+ */
+data object QF_IDL : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed quantifier-free formulas built over an arbitrary expansion of the Ints signature with free
+ * constant symbols, but whose terms of sort Int are all linear, that is, have no occurrences of the
+ * function symbols /, div, mod, and abs, and no occurrences of the function symbol *, except as
+ * specified in the :extensions attribute.
+ */
+data object QF_LIA : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed quantifier-free formulas built over an arbitrary expansion of the Ints signature with free
+ * constant symbols.
+ */
+data object QF_NIA : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed quantifier-free formulas built over arbitrary expansions of the Reals signature with free
+ * constant symbols.
+ */
+data object QF_NRA : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed quantifier-free formulas built over arbitrary expansions of the Reals signature with free
+ * constant symbols, but containing only linear atoms, that is, atoms with no occurrences of the
+ * function symbols * and /, except as specified the :extensions attribute.
+ */
+data object QF_LRA : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed quantifier-free formulas with atoms of the form:
+ * - p
+ * - (op (- x y) c),
+ * - (op x y),
+ * - (op (- (+ x ... x) (+ y ... y)) c) with n > 1 occurrences of x and of y,
+ *
+ *   where
+ * - p is a variable or free constant symbol of sort Bool,
+ * - c is an expression of the form m or (- m) for some numeral m,
+ * - op is <, <=, >, >=, =, or distinct,
+ * - x, y are free constant symbols of sort Real.
+ */
+data object QF_RDL : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed quantifier-free formulas built over an arbitrary expansion of the Core signature with free
+ * sort and function symbols.
+ */
+data object QF_UF : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed quantifier-free formulas built over arbitrary expansions of the FixedSizeBitVectors
+ * signature with free sort and function symbols.
+ */
+data object QF_UFBV : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed quantifier-free formulas built over an arbitrary expansion with free sort and function
+ * symbols of the signature consisting of
+ * - all the sort and function symbols of Core and
+ * - the following symbols of Int:
+ *
+ *     - :sorts ((Int 0))
+ *     - :funs
+ *       - (NUMERAL Int)
+ *       - (- Int Int Int)
+ *       - (+ Int Int Int)
+ *       - (<= Int Int Bool)
+ *       - (< Int Int Bool)
+ *       - (>= Int Int Bool)
+ *       - (> Int Int Bool)
+ *
+ * Additionally, for every term of the form (op t1 t2) with op in {+, -}, at least one of t1 and t2
+ * is a numeral.
+ */
+data object QF_UFIDL : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed quantifier-free formulas built over arbitrary expansions of the Ints signatures with free
+ * sort and function symbols, but with the following restrictions:
+ * - all terms of sort Int are linear, that is, have no occurrences of the function symbols *, /,
+ *   div, mod, and abs, except as specified in the :extensions attributes;
+ */
+data object QF_UFLIA : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed quantifier-free formulas built over arbitrary expansions of the Reals signature with free
+ * sort and function symbols, but containing only linear atoms, that is, atoms with no occurrences
+ * of the function symbols * and /, except as specified the :extensions attribute.
+ */
+data object QF_UFLRA : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed quantifier-free formulas built over arbitrary expansions of the Reals signature with free
+ * sort and function symbols.
+ */
+data object QF_UFNRA : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed formulas built over arbitrary expansions of the Reals signature with free sort and
+ * function symbols, but containing only linear atoms, that is, atoms with no occurrences of the
+ * function symbols * and /, except as specified the :extensions attribute.
+ */
+data object UFLRA : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+/**
+ * Closed formulas built over an arbitrary expansion of the Ints signature with free sort and
+ * function symbols.
+ */
+data object UFNIA : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+}
+
+data object QF_FP : Logic {
+  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
+  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
 }

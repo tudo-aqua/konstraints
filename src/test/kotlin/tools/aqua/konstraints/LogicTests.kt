@@ -24,7 +24,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import tools.aqua.konstraints.smt.Logic
+import tools.aqua.konstraints.smt.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LogicTests {
@@ -37,29 +37,29 @@ class LogicTests {
 
   private fun getLogicsAndString(): Stream<Arguments> {
     return Stream.of(
-        Arguments.arguments("AUFLIA", Logic.AUFLIA),
-        Arguments.arguments("AUFLIRA", Logic.AUFLIRA),
-        Arguments.arguments("AUFNIRA", Logic.AUFNIRA),
-        Arguments.arguments("LIA", Logic.LIA),
-        Arguments.arguments("LRA", Logic.LRA),
-        Arguments.arguments("QF_ABV", Logic.QF_ABV),
-        Arguments.arguments("QF_AUFBV", Logic.QF_AUFBV),
-        Arguments.arguments("QF_AUFLIA", Logic.QF_AUFLIA),
-        Arguments.arguments("QF_AX", Logic.QF_AX),
-        Arguments.arguments("QF_BV", Logic.QF_BV),
-        Arguments.arguments("QF_IDL", Logic.QF_IDL),
-        Arguments.arguments("QF_LIA", Logic.QF_LIA),
-        Arguments.arguments("QF_LRA", Logic.QF_LRA),
-        Arguments.arguments("QF_NIA", Logic.QF_NIA),
-        Arguments.arguments("QF_NRA", Logic.QF_NRA),
-        Arguments.arguments("QF_RDL", Logic.QF_RDL),
-        Arguments.arguments("QF_UF", Logic.QF_UF),
-        Arguments.arguments("QF_UFBV", Logic.QF_UFBV),
-        Arguments.arguments("QF_UFIDL", Logic.QF_UFIDL),
-        Arguments.arguments("QF_UFLIA", Logic.QF_UFLIA),
-        Arguments.arguments("QF_UFLRA", Logic.QF_UFLRA),
-        Arguments.arguments("QF_UFNRA", Logic.QF_UFNRA),
-        Arguments.arguments("UFLRA", Logic.UFLRA),
-        Arguments.arguments("UFNIA", Logic.UFNIA))
+        Arguments.arguments("AUFLIA", AUFLIA),
+        Arguments.arguments("AUFLIRA", AUFLIRA),
+        Arguments.arguments("AUFNIRA", AUFNIRA),
+        Arguments.arguments("LIA", LIA),
+        Arguments.arguments("LRA", LRA),
+        Arguments.arguments("QF_ABV", QF_ABV),
+        Arguments.arguments("QF_AUFBV", QF_AUFBV),
+        Arguments.arguments("QF_AUFLIA", QF_AUFLIA),
+        Arguments.arguments("QF_AX", QF_AX),
+        Arguments.arguments("QF_BV", QF_BV),
+        Arguments.arguments("QF_IDL", QF_IDL),
+        Arguments.arguments("QF_LIA", QF_LIA),
+        Arguments.arguments("QF_LRA", QF_LRA),
+        Arguments.arguments("QF_NIA", QF_NIA),
+        Arguments.arguments("QF_NRA", QF_NRA),
+        Arguments.arguments("QF_RDL", QF_RDL),
+        Arguments.arguments("QF_UF", QF_UF),
+        Arguments.arguments("QF_UFBV", QF_UFBV),
+        Arguments.arguments("QF_UFIDL", QF_UFIDL),
+        Arguments.arguments("QF_UFLIA", QF_UFLIA),
+        Arguments.arguments("QF_UFLRA", QF_UFLRA),
+        Arguments.arguments("QF_UFNRA", QF_UFNRA),
+        Arguments.arguments("UFLRA", UFLRA),
+        Arguments.arguments("UFNIA", UFNIA))
   }
 }

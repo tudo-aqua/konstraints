@@ -185,31 +185,31 @@ object Parser {
 
   // Logics
 
-  private val auflia = of("AUFLIA").map { _: Any -> Logic.AUFLIA }
-  private val auflira = of("AUFLIRA").map { _: Any -> Logic.AUFLIRA }
-  private val aufnira = of("AUFNIRA").map { _: Any -> Logic.AUFNIRA }
-  private val lia = of("LIA").map { _: Any -> Logic.LIA }
-  private val lra = of("LRA").map { _: Any -> Logic.LRA }
-  private val qf_abv = of("QF_ABV").map { _: Any -> Logic.QF_ABV }
-  private val qf_aufbv = of("QF_AUFBV").map { _: Any -> Logic.QF_AUFBV }
-  private val qf_auflia = of("QF_AUFLIA").map { _: Any -> Logic.QF_AUFLIA }
-  private val qf_ax = of("QF_AX").map { _: Any -> Logic.QF_AX }
-  private val qf_bv = of("QF_BV").map { _: Any -> Logic.QF_BV }
-  private val qf_idl = of("QF_IDL").map { _: Any -> Logic.QF_IDL }
-  private val qf_lia = of("QF_LIA").map { _: Any -> Logic.QF_LIA }
-  private val qf_lra = of("QF_LRA").map { _: Any -> Logic.QF_LRA }
-  private val qf_nia = of("QF_NIA").map { _: Any -> Logic.QF_NIA }
-  private val qf_nra = of("QF_NRA").map { _: Any -> Logic.QF_NRA }
-  private val qf_rdl = of("QF_RDL").map { _: Any -> Logic.QF_RDL }
-  private val qf_uf = of("QF_UF").map { _: Any -> Logic.QF_UF }
-  private val qf_ufbv = of("QF_UFBV").map { _: Any -> Logic.QF_UFBV }
-  private val qf_ufidl = of("QF_UFIDL").map { _: Any -> Logic.QF_UFIDL }
-  private val qf_uflia = of("QF_UFLIA").map { _: Any -> Logic.QF_UFLIA }
-  private val qf_uflra = of("QF_UFLRA").map { _: Any -> Logic.QF_UFLRA }
-  private val qf_ufnra = of("QF_UFNRA").map { _: Any -> Logic.QF_UFNRA }
-  private val uflra = of("UFLRA").map { _: Any -> Logic.UFLRA }
-  private val ufnia = of("UFNIA").map { _: Any -> Logic.UFNIA }
-  private val qf_fp = of("QF_FP").map { _: Any -> Logic.QF_FP }
+  private val auflia = of("AUFLIA").map { _: Any -> AUFLIA }
+  private val auflira = of("AUFLIRA").map { _: Any -> AUFLIRA }
+  private val aufnira = of("AUFNIRA").map { _: Any -> AUFNIRA }
+  private val lia = of("LIA").map { _: Any -> LIA }
+  private val lra = of("LRA").map { _: Any -> LRA }
+  private val qf_abv = of("QF_ABV").map { _: Any -> QF_ABV }
+  private val qf_aufbv = of("QF_AUFBV").map { _: Any -> QF_AUFBV }
+  private val qf_auflia = of("QF_AUFLIA").map { _: Any -> QF_AUFLIA }
+  private val qf_ax = of("QF_AX").map { _: Any -> QF_AX }
+  private val qf_bv = of("QF_BV").map { _: Any -> QF_BV }
+  private val qf_idl = of("QF_IDL").map { _: Any -> QF_IDL }
+  private val qf_lia = of("QF_LIA").map { _: Any -> QF_LIA }
+  private val qf_lra = of("QF_LRA").map { _: Any -> QF_LRA }
+  private val qf_nia = of("QF_NIA").map { _: Any -> QF_NIA }
+  private val qf_nra = of("QF_NRA").map { _: Any -> QF_NRA }
+  private val qf_rdl = of("QF_RDL").map { _: Any -> QF_RDL }
+  private val qf_uf = of("QF_UF").map { _: Any -> QF_UF }
+  private val qf_ufbv = of("QF_UFBV").map { _: Any -> QF_UFBV }
+  private val qf_ufidl = of("QF_UFIDL").map { _: Any -> QF_UFIDL }
+  private val qf_uflia = of("QF_UFLIA").map { _: Any -> QF_UFLIA }
+  private val qf_uflra = of("QF_UFLRA").map { _: Any -> QF_UFLRA }
+  private val qf_ufnra = of("QF_UFNRA").map { _: Any -> QF_UFNRA }
+  private val uflra = of("UFLRA").map { _: Any -> UFLRA }
+  private val ufnia = of("UFNIA").map { _: Any -> UFNIA }
+  private val qf_fp = of("QF_FP").map { _: Any -> QF_FP }
 
   internal val logic =
       auflia +
