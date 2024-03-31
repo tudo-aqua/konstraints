@@ -555,3 +555,22 @@ object BVUltDecl :
       bindings: Bindings
   ): Expression<BoolSort> = BVUlt(param1, param2)
 }
+
+fun BVNAnd(lhs: Expression<BVSort>, rhs: Expression<BVSort>) : Expression<BVSort> = BVNot(BVAnd(lhs, rhs))
+
+object BVNAndDecl :
+        FunctionDecl2<BVSort, BVSort, BVSort>(
+            "bvnand".symbol(),
+            emptySet(),
+            BVSort.fromSymbol("m"),
+            BVSort.fromSymbol("m"),
+            emptySet(),
+            setOf(SymbolIndex("m")),
+            BVSort.fromSymbol("m")
+        ) {
+    override fun buildExpression(
+        param1: Expression<BVSort>,
+        param2: Expression<BVSort>,
+        bindings: Bindings
+    ): Expression<BVSort> = BVNAnd(param1, param2)
+}
