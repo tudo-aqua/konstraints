@@ -43,7 +43,7 @@ class StackTests {
   fun testPeek(integers: List<Int>) {
     val stack = Stack(integers)
 
-    assertEquals(integers.last(), stack.peek())
+    assertEquals(integers.first(), stack.peek())
   }
 
   @ParameterizedTest
@@ -52,7 +52,7 @@ class StackTests {
     val stack = Stack(integers)
 
     if (integers.isNotEmpty()) {
-      assertEquals(integers.last(), stack.peekOrNull())
+      assertEquals(integers.first(), stack.peekOrNull())
     } else {
       assertNull(stack.peekOrNull())
     }
@@ -63,7 +63,7 @@ class StackTests {
   fun testPopReturn(integers: List<Int>) {
     val stack = Stack(integers)
 
-    assertEquals(integers.last(), stack.pop())
+    assertEquals(integers.first(), stack.pop())
   }
 
   @ParameterizedTest
@@ -72,7 +72,7 @@ class StackTests {
     val stack = Stack(integers)
 
     if (integers.isNotEmpty()) {
-      assertEquals(integers.last(), stack.popOrNull())
+      assertEquals(integers.first(), stack.popOrNull())
     } else {
       assertNull(stack.popOrNull())
     }
@@ -93,7 +93,7 @@ class StackTests {
     val stack1 = Stack(integers)
     val stack2 = Stack<Int>()
 
-    integers.forEach { stack2.push(it) }
+    integers.asReversed().forEach { stack2.push(it) }
 
     assertTrue((stack1 zip stack2).all { (lhs, rhs) -> lhs == rhs })
   }

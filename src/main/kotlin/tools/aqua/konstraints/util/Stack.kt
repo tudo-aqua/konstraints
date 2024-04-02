@@ -20,35 +20,37 @@ package tools.aqua.konstraints.util
 
 /** Implements a stack/list hybrid that works well with all list operators like forEach */
 class Stack<E>(private val stack: MutableList<E> = mutableListOf()) : List<E> by stack {
-
-  /**
-   * Construct stack from given list, where the first element in the list will be treated as bottom
-   * element of the resulting stack
-   */
-  constructor(stack: List<E>) : this(stack.toMutableList())
+  companion object {
+    /**
+     * Pseudo construct stack from given list, where the first element in the list will be treated
+     * as bottom element of the resulting stack
+     */
+    // this can not be a regular secondary constructor because the jvm signatures would conflict
+    operator fun <E> invoke(stack: List<E>) = Stack(stack.toMutableList())
+  }
 
   /**
    * Retrieve the top element of the stack
    *
    * @throws NoSuchElementException if the stack is empty
    */
-  fun peek() = stack.last()
+  fun peek() = stack.first()
 
   /** Retrieve the top element of the stack or null if no such element exists */
-  fun peekOrNull() = stack.lastOrNull()
+  fun peekOrNull() = stack.firstOrNull()
 
   /**
    * Removes and returns the top element from the stack
    *
    * @throws NoSuchElementException if the stack is empty
    */
-  fun pop() = stack.removeLast()
+  fun pop() = stack.removeFirst()
 
   /** Removes and returns the top element from the stack or null if no such element exists */
-  fun popOrNull() = stack.removeLastOrNull()
+  fun popOrNull() = stack.removeFirstOrNull()
 
   /** Pushes new element on top of the stack */
   fun push(element: E) {
-    stack.add(element)
+    stack.add(0, element)
   }
 }

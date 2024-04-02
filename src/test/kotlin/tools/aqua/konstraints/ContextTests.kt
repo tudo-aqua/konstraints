@@ -68,11 +68,13 @@ class ContextTests {
     context.registerFunction("O", listOf(BoolSort, BoolSort), BoolSort)
     context.registerFunction(overloadedBV)
 
+    /*
     context.functionLookup["and"] = mutableListOf(AndDecl)
     context.functionLookup["or"] = mutableListOf(OrDecl)
     context.functionLookup["xor"] = mutableListOf(XOrDecl)
     context.functionLookup["not"] = mutableListOf(NotDecl)
     context.functionLookup["bvult"] = mutableListOf(BVUltDecl)
+      */
   }
 
   @ParameterizedTest

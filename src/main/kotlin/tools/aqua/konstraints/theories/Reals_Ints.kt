@@ -20,36 +20,37 @@ package tools.aqua.konstraints.theories
 
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.parser.SortDecl
-import tools.aqua.konstraints.parser.TheoryContext
+import tools.aqua.konstraints.parser.Theory
 import tools.aqua.konstraints.smt.*
 
-internal object RealsIntsContext : TheoryContext {
-  override val functions: HashSet<FunctionDecl<*>> =
-      hashSetOf(
-          IntNegDecl,
-          IntSubDecl,
-          IntAddDecl,
-          IntMulDecl,
-          IntDivDecl,
-          ModDecl,
-          AbsDecl,
-          IntLessEqDecl,
-          IntLessDecl,
-          IntGreaterEqDecl,
-          IntGreaterDecl,
-          DivisibleDecl,
-          RealNegDecl,
-          RealSubDecl,
-          RealAddDecl,
-          RealMulDecl,
-          RealDivDecl,
-          RealLessEqDecl,
-          RealLessDecl,
-          RealGreaterEqDecl,
-          RealGreaterDecl,
-          ToRealDecl,
-          ToIntDecl,
-          IsIntDecl)
+internal object RealsIntsContext : Theory {
+  override val functions =
+      listOf(
+              IntNegDecl,
+              IntSubDecl,
+              IntAddDecl,
+              IntMulDecl,
+              IntDivDecl,
+              ModDecl,
+              AbsDecl,
+              IntLessEqDecl,
+              IntLessDecl,
+              IntGreaterEqDecl,
+              IntGreaterDecl,
+              DivisibleDecl,
+              RealNegDecl,
+              RealSubDecl,
+              RealAddDecl,
+              RealMulDecl,
+              RealDivDecl,
+              RealLessEqDecl,
+              RealLessDecl,
+              RealGreaterEqDecl,
+              RealGreaterDecl,
+              ToRealDecl,
+              ToIntDecl,
+              IsIntDecl)
+          .associateBy { it.name.toString() }
 
   override val sorts: Map<String, SortDecl<*>> =
       mapOf(Pair("Int", IntSortDecl), Pair("Real", RealSortDecl))

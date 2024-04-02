@@ -27,14 +27,23 @@ import tools.aqua.konstraints.smt.SortParameter
  * http://smtlib.cs.uiowa.edu/theories-Core.shtml
  */
 
-internal object CoreContext : TheoryContext {
-  override val functions: HashSet<FunctionDecl<*>> =
-      hashSetOf(
-          FalseDecl, TrueDecl, NotDecl, AndDecl, OrDecl, XOrDecl, EqualsDecl, DistinctDecl, IteDecl)
+object CoreContext : Theory {
+  override val functions =
+      listOf(
+              FalseDecl,
+              TrueDecl,
+              NotDecl,
+              AndDecl,
+              OrDecl,
+              XOrDecl,
+              EqualsDecl,
+              DistinctDecl,
+              IteDecl)
+          .associateBy { it.name.toString() }
   override val sorts = mapOf(Pair("Bool", BoolSortDecl))
 }
 
-internal object BoolSortDecl : SortDecl<BoolSort>("Bool".symbol(), emptySet(), emptySet()) {
+object BoolSortDecl : SortDecl<BoolSort>("Bool".symbol(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): BoolSort = BoolSort
 }
 

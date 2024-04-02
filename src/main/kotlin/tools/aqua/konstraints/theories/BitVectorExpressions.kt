@@ -22,22 +22,23 @@ import java.math.BigInteger
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
-internal object BitVectorExpressionContext : TheoryContext {
-  override val functions: HashSet<FunctionDecl<*>> =
-      hashSetOf(
-          BVUltDecl,
-          BVConcatDecl,
-          BVAndDecl,
-          BVNegDecl,
-          BVNotDecl,
-          BVOrDecl,
-          BVAddDecl,
-          BVMulDecl,
-          BVUDivDecl,
-          BVURemDecl,
-          BVShlDecl,
-          BVLShrDecl,
-          ExtractDecl)
+internal object BitVectorExpressionContext : Theory {
+  override val functions =
+      listOf(
+              BVUltDecl,
+              BVConcatDecl,
+              BVAndDecl,
+              BVNegDecl,
+              BVNotDecl,
+              BVOrDecl,
+              BVAddDecl,
+              BVMulDecl,
+              BVUDivDecl,
+              BVURemDecl,
+              BVShlDecl,
+              BVLShrDecl,
+              ExtractDecl)
+          .associateBy { it.name.toString() }
   override val sorts = mapOf(Pair("BitVec", BVSortDecl))
 }
 
@@ -556,21 +557,21 @@ object BVUltDecl :
   ): Expression<BoolSort> = BVUlt(param1, param2)
 }
 
-fun BVNAnd(lhs: Expression<BVSort>, rhs: Expression<BVSort>) : Expression<BVSort> = BVNot(BVAnd(lhs, rhs))
+fun BVNAnd(lhs: Expression<BVSort>, rhs: Expression<BVSort>): Expression<BVSort> =
+    BVNot(BVAnd(lhs, rhs))
 
 object BVNAndDecl :
-        FunctionDecl2<BVSort, BVSort, BVSort>(
-            "bvnand".symbol(),
-            emptySet(),
-            BVSort.fromSymbol("m"),
-            BVSort.fromSymbol("m"),
-            emptySet(),
-            setOf(SymbolIndex("m")),
-            BVSort.fromSymbol("m")
-        ) {
-    override fun buildExpression(
-        param1: Expression<BVSort>,
-        param2: Expression<BVSort>,
-        bindings: Bindings
-    ): Expression<BVSort> = BVNAnd(param1, param2)
+    FunctionDecl2<BVSort, BVSort, BVSort>(
+        "bvnand".symbol(),
+        emptySet(),
+        BVSort.fromSymbol("m"),
+        BVSort.fromSymbol("m"),
+        emptySet(),
+        setOf(SymbolIndex("m")),
+        BVSort.fromSymbol("m")) {
+  override fun buildExpression(
+      param1: Expression<BVSort>,
+      param2: Expression<BVSort>,
+      bindings: Bindings
+  ): Expression<BVSort> = BVNAnd(param1, param2)
 }

@@ -23,18 +23,12 @@ import jdk.jshell.spi.ExecutionControl.NotImplementedException
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 import tools.aqua.konstraints.theories.BitVectorExpressionContext
-import tools.aqua.konstraints.theories.CoreContext
 import tools.aqua.konstraints.theories.IntsContext
 
 internal class ParseTreeVisitor :
     ProtoCommandVisitor, ProtoTermVisitor, ProtoSortVisitor, SpecConstantVisitor {
 
   val context = Context()
-
-  init {
-    // always load core theory
-    context.registerTheory(CoreContext)
-  }
 
   override fun visit(protoAssert: ProtoAssert): Assert {
     val term = visit(protoAssert.term)

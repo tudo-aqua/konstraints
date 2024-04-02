@@ -19,6 +19,8 @@
 package tools.aqua.konstraints.parser
 
 import tools.aqua.konstraints.smt.*
+import tools.aqua.konstraints.theories.CoreContext
+import tools.aqua.konstraints.util.Stack
 
 abstract class SortDecl<T : Sort>(
     val name: Symbol,
@@ -42,24 +44,40 @@ abstract class SortDecl<T : Sort>(
   abstract fun getSort(bindings: Bindings): T
 }
 
+/**
+ * Context class manages the currently loaded logic/theory and all the Assertion-Levels (including
+ * global eventually but this option is currently not supported)
+ */
 class Context {
-  // store the sort of numeral expressions either (NUMERAL Int) or (NUMERAL Real) depending on the
-  // loaded logic
+  // theory setter is private to disallow changing the theory manually
+  // this should only be changed when (set-logic) is used or when reset is called
+  var theory: Theory? = null
+    private set
+
+  // core theory is always loaded
+  val core = CoreContext
+
+  val assertionLevels = Stack<Subcontext>()
+
+  init {
+    assertionLevels.push(core)
+  }
+
   var numeralSort: Sort? = null
 
   fun contains(expression: Expression<*>): Boolean =
       getFunction(expression.symbol.toString(), expression.subexpressions) != null
 
-  fun registerTheory(other: TheoryContext) {
-    other.functions.forEach { func ->
-      if (func.name.toString() in functionLookup) {
-        functionLookup[func.name.toString()]?.add(func)
-      } else {
-        functionLookup[func.name.toString()] = mutableListOf(func)
-      }
+  fun registerTheory(theory: Theory) {
+    if (this.theory != null) {
+      throw TheoryAlreadySetException()
     }
 
-    other.sorts.forEach { registerSort(it.value) }
+    this.theory = theory
+    assertionLevels.push(this.theory!!)
+
+    // add a new level for user definitions above theory
+    assertionLevels.push(AssertionLevel())
   }
 
   fun registerFunction(function: DeclareConst) {
@@ -87,26 +105,13 @@ class Context {
   }
 
   fun registerFunction(function: FunctionDecl<*>) {
-    val conflicts = functionLookup[function.name.toString()]
-
-    if (conflicts != null) {
-      val conflictParams = conflicts.filter { it.accepts(function.params, emptySet()) }
-
-      if (conflictParams.isNotEmpty()) {
-        val conflictReturns =
-            conflictParams.filter { it.signature.bindReturnOrNull(function.sort) != null }
-
-        if (conflictReturns.isNotEmpty()) {
-          throw FunctionAlreadyDeclaredException(function)
-        } else {
-          conflicts.add(function)
-        }
-      } else {
-        conflicts.add(function)
-      }
-    } else {
-      functionLookup[function.name.toString()] = mutableListOf(function)
+    if (theory?.contains(function) == true) {
+      throw IllegalFunctionOverloadException(
+          function.name.toString(), "Can not overload theory symbols")
     }
+
+    // TODO enforce all overloading/shadowing rules
+    assertionLevels.peek().add(function)
   }
 
   internal fun registerFunction(const: ProtoDeclareConst, sort: Sort) {
@@ -140,16 +145,18 @@ class Context {
   }
 
   fun registerSort(sort: SortDecl<*>) {
-    if (sorts.containsKey(sort.name.toString()))
-        throw SortAlreadyDeclaredException(sort.name, sort.signature.sortParameter.size)
+    if (theory?.contains(sort) == true) {
+      throw SortAlreadyDeclaredException(sort.name, sort.signature.sortParameter.size)
+    }
 
-    sorts[sort.name.toString()] = sort
+    // TODO enforce all overloading/shadowing rules
+    assertionLevels.peek().add(sort)
   }
 
   fun registerSort(name: Symbol, arity: Int) {
-    if (sorts.containsKey(name.toString())) throw SortAlreadyDeclaredException(name, arity)
+    val sort = UserDefinedSortDecl(name, arity)
 
-    sorts[name.toString()] = UserDefinedSortDecl(name, arity)
+    registerSort(sort)
   }
 
   /**
@@ -167,33 +174,73 @@ class Context {
    * @throws IllegalArgumentException if the function specified by name and args is ambiguous
    */
   fun getFunction(name: String, args: List<Expression<*>>): FunctionDecl<*>? {
-    return functionLookup[name]?.single { func -> func.accepts(args.map { it.sort }, emptySet()) }
+    return assertionLevels.find { it.containsFunction(name) }?.functions?.get(name)
   }
 
   internal fun getSort(protoSort: ProtoSort): Sort {
     // build all sort parameters first
     val parameters = protoSort.sorts.map { getSort(it) }
+    val sort =
+        assertionLevels.find { it.containsSort(protoSort.name) }?.sorts?.get(protoSort.name)
+            ?: throw NoSuchElementException()
 
-    return sorts[protoSort.name]?.buildSort(protoSort.identifier, parameters)
-        ?: throw Exception("Unknown sort ${protoSort.identifier.symbol}")
+    return sort.buildSort(protoSort.identifier, parameters)
   }
-
-  private val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf()
-
-  /*
-   * Lookup for all simple functions
-   * excludes indexed functions of the form e.g. ((_ extract i j) (_ BitVec m) (_ BitVec n))
-   */
-  val functionLookup: MutableMap<String, MutableList<FunctionDecl<*>>> = mutableMapOf()
 }
 
-interface TheoryContext {
-  val functions: HashSet<FunctionDecl<*>>
+/**
+ * Parent class of all assertion levels (this includes the default assertion levels and binder
+ * assertion levels, as well as theory objects)
+ */
+interface Subcontext {
+  fun contains(function: FunctionDecl<*>) = functions.containsKey(function.name.toString())
+
+  fun contains(function: Expression<*>) = functions.containsKey(function.symbol.toString())
+
+  fun containsFunction(function: String) = functions.containsKey(function)
+
+  fun contains(sort: SortDecl<*>) = sorts.containsKey(sort.name.toString())
+
+  fun contains(sort: Sort) = sorts.containsKey(sort.name.toString())
+
+  fun containsSort(sort: String) = sorts.containsKey(sort)
+
+  fun add(function: FunctionDecl<*>): FunctionDecl<*>?
+
+  fun add(sort: SortDecl<*>): SortDecl<*>?
+
+  val functions: Map<String, FunctionDecl<*>>
   val sorts: Map<String, SortDecl<*>>
 }
+
+/** Represents a single assertion level */
+class AssertionLevel : Subcontext {
+  override fun add(function: FunctionDecl<*>) = functions.put(function.name.toString(), function)
+
+  override fun add(sort: SortDecl<*>) = sorts.put(sort.name.toString(), sort)
+
+  override val functions: MutableMap<String, FunctionDecl<*>> = mutableMapOf()
+  override val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf()
+}
+
+interface Theory : Subcontext {
+  override fun add(function: FunctionDecl<*>) = null
+
+  override fun add(sort: SortDecl<*>) = null
+
+  override val functions: Map<String, FunctionDecl<*>>
+  override val sorts: Map<String, SortDecl<*>>
+}
+
+class IllegalFunctionOverloadException(func: String, msg: String) :
+    RuntimeException("Illegal overload of $func: $msg.")
 
 class FunctionAlreadyDeclaredException(func: FunctionDecl<*>) :
     RuntimeException("Function $func has already been declared")
 
 class SortAlreadyDeclaredException(sort: Symbol, arity: Int) :
     RuntimeException("Sort ($sort $arity) has already been declared")
+
+class TheoryAlreadySetException :
+    RuntimeException(
+        "Theory has already been set, use the smt-command (reset) before using a new logic or theory")
