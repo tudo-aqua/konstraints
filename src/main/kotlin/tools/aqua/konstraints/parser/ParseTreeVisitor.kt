@@ -72,8 +72,6 @@ internal class ParseTreeVisitor :
       // load int theory as well for testing purposes
       QF_AX -> {
         context.registerTheory(ArrayExContext)
-        context.registerTheory(IntsContext)
-        context.numeralSort = IntSort
       }
       else -> throw NotImplementedException("${protoSetLogic.logic} not yet supported")
     }

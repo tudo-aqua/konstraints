@@ -22,8 +22,7 @@ import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
 internal object StringContext : Theory {
-  override val functions =
-      listOf(
+  override val functions = listOf(
               CharDecl,
               StrConcatDecl,
               StrLengthDecl,
@@ -56,7 +55,6 @@ internal object StringContext : Theory {
               RegexRangeDecl,
               RegexPowerDecl,
               RegexLoopDecl)
-          .associateBy { it.name.toString() }
 
   override val sorts: Map<String, SortDecl<*>> =
       mapOf(Pair("String", StringSortDecl), Pair("RegLan", RegLanDecl), Pair("Int", IntSortDecl))

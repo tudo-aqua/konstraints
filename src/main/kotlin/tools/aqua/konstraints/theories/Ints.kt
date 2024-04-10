@@ -22,8 +22,7 @@ import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
 internal object IntsContext : Theory {
-  override val functions =
-      listOf(
+  override val functions = listOf(
               IntNegDecl,
               IntSubDecl,
               IntAddDecl,
@@ -36,7 +35,6 @@ internal object IntsContext : Theory {
               IntGreaterEqDecl,
               IntGreaterDecl,
               DivisibleDecl)
-          .associateBy { it.name.toString() }
 
   override val sorts: Map<String, SortDecl<*>> = mapOf(Pair("Int", IntSortDecl))
 }

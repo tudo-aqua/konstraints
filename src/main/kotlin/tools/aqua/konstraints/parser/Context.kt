@@ -174,7 +174,7 @@ class Context {
    * @throws IllegalArgumentException if the function specified by name and args is ambiguous
    */
   fun getFunction(name: String, args: List<Expression<*>>): FunctionDecl<*>? {
-    return assertionLevels.find { it.containsFunction(name) }?.functions?.get(name)
+    return assertionLevels.find { it.contains(name, args) }?.get(name, args)
   }
 
   internal fun getSort(protoSort: ProtoSort): Sort {
@@ -193,11 +193,13 @@ class Context {
  * assertion levels, as well as theory objects)
  */
 interface Subcontext {
-  fun contains(function: FunctionDecl<*>) = functions.containsKey(function.name.toString())
+    fun contains(function: FunctionDecl<*>) = functions.contains(function)
 
-  fun contains(function: Expression<*>) = functions.containsKey(function.symbol.toString())
+  fun contains(function: String, args: List<Expression<*>>) = get(function, args) != null
 
-  fun containsFunction(function: String) = functions.containsKey(function)
+    fun get(function: String, args: List<Expression<*>>)= functions.find {
+        it.name.toString() == function && it.acceptsExpressions(args, emptySet())
+    }
 
   fun contains(sort: SortDecl<*>) = sorts.containsKey(sort.name.toString())
 
@@ -205,30 +207,32 @@ interface Subcontext {
 
   fun containsSort(sort: String) = sorts.containsKey(sort)
 
-  fun add(function: FunctionDecl<*>): FunctionDecl<*>?
+  fun add(function: FunctionDecl<*>): Boolean
 
   fun add(sort: SortDecl<*>): SortDecl<*>?
 
-  val functions: Map<String, FunctionDecl<*>>
+  val functions: List<FunctionDecl<*>>
   val sorts: Map<String, SortDecl<*>>
 }
 
 /** Represents a single assertion level */
 class AssertionLevel : Subcontext {
-  override fun add(function: FunctionDecl<*>) = functions.put(function.name.toString(), function)
+  override fun add(function: FunctionDecl<*>) = functions.add(function)
 
   override fun add(sort: SortDecl<*>) = sorts.put(sort.name.toString(), sort)
 
-  override val functions: MutableMap<String, FunctionDecl<*>> = mutableMapOf()
+  override val functions: MutableList<FunctionDecl<*>> = mutableListOf()
   override val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf()
 }
 
 interface Theory : Subcontext {
-  override fun add(function: FunctionDecl<*>) = null
+  override fun add(function: FunctionDecl<*>) =
+      throw IllegalOperationException("Theory.add", "Can not add new functions to SMT theories")
 
-  override fun add(sort: SortDecl<*>) = null
+  override fun add(sort: SortDecl<*>) =
+      throw IllegalOperationException("Theory.add", "Can not add new sorts to SMT theories")
 
-  override val functions: Map<String, FunctionDecl<*>>
+  override val functions: List<FunctionDecl<*>>
   override val sorts: Map<String, SortDecl<*>>
 }
 
@@ -244,3 +248,6 @@ class SortAlreadyDeclaredException(sort: Symbol, arity: Int) :
 class TheoryAlreadySetException :
     RuntimeException(
         "Theory has already been set, use the smt-command (reset) before using a new logic or theory")
+
+class IllegalOperationException(operation: String, reason: String) :
+        RuntimeException("Illegal Operation $operation: $reason.")

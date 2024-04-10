@@ -24,8 +24,7 @@ import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.smt.*
 
 internal object RealsContext : Theory {
-  override val functions =
-      listOf(
+  override val functions = listOf(
               RealNegDecl,
               RealSubDecl,
               RealAddDecl,
@@ -35,7 +34,6 @@ internal object RealsContext : Theory {
               RealLessDecl,
               RealGreaterEqDecl,
               RealGreaterDecl)
-          .associateBy { it.name.toString() }
 
   override val sorts: Map<String, SortDecl<*>> = mapOf(Pair("Real", RealSortDecl))
 }

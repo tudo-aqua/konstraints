@@ -242,7 +242,7 @@ abstract class FunctionDecl4<P1 : Sort, P2 : Sort, P3 : Sort, P4 : Sort, S : Sor
       args: List<Expression<*>>,
       functionIndices: Set<NumeralIndex>
   ): Expression<S> {
-    require(args.size == 4)
+    require(args.size == 4) { "$name expected 4 arguments but got ${args.size}: $args" }
     val bindings = bindParametersToExpressions(args, functionIndices)
 
     // TODO suppress unchecked cast warning

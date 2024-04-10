@@ -23,8 +23,7 @@ import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.smt.*
 
 internal object FloatingPointContext : Theory {
-  override val functions =
-      listOf(
+  override val functions = listOf(
               RoundNearestTiesToEvenDecl,
               RNEDecl,
               RoundNearestTiesToAwayDecl,
@@ -73,7 +72,6 @@ internal object FloatingPointContext : Theory {
               FPToUBitVecDecl,
               FPToSBitVecDecl,
               FPToRealDecl)
-          .associateBy { it.name.toString() }
 
   override val sorts: Map<String, SortDecl<*>> =
       mapOf(
@@ -559,7 +557,7 @@ class FPFma(
 
 object FPFmaDecl :
     FunctionDecl4<RoundingMode, FPSort, FPSort, FPSort, FPSort>(
-        "fp.div".symbol(),
+        "fp.fma".symbol(),
         emptySet(),
         RoundingMode,
         FPSort("eb".idx(), "sb".idx()),

@@ -24,10 +24,7 @@ import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.smt.SortParameter
 
 internal object ArrayExContext : Theory {
-  override val functions: MutableMap<String, FunctionDecl<*>> =
-      mutableMapOf(
-          Pair(ArraySelectDecl.name.toString(), ArraySelectDecl),
-          Pair(ArrayStoreDecl.name.toString(), ArraySelectDecl))
+  override val functions: List<FunctionDecl<*>> = listOf(ArraySelectDecl, ArrayStoreDecl)
 
   override val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf(Pair("Array", ArraySortDecl))
 }
