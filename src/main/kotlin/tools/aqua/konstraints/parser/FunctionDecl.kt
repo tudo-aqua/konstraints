@@ -98,7 +98,6 @@ open class FunctionDecl<S : Sort>(
   override fun toString() = "($name (${params.joinToString(" ")}) $sort)"
 }
 
-// TODO are indices necessary here (dont think so)
 abstract class FunctionDecl0<S : Sort>(
     name: Symbol,
     parametricSorts: Set<Sort>,

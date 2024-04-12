@@ -48,37 +48,38 @@ abstract class SortDecl<T : Sort>(
  * Context class manages the currently loaded logic/theory and all the Assertion-Levels (including
  * global eventually but this option is currently not supported)
  */
-class Context {
+class Context(theory: Theory) {
   // theory setter is private to disallow changing the theory manually
   // this should only be changed when (set-logic) is used or when reset is called
-  var theory: Theory? = null
+  var theory: Theory = theory
     private set
-
-  // core theory is always loaded
-  val core = CoreContext
 
   val assertionLevels = Stack<Subcontext>()
 
   init {
-    assertionLevels.push(core)
+      // core theory is always loaded QF_UF and UF are the only logics that load core "manually"
+      // as it is the only theory they rely on, for all other logics core is loaded before
+      // the other theory is loaded
+      if (theory != CoreContext) {
+          assertionLevels.push(CoreContext)
+      }
+
+    assertionLevels.push(theory)
+      assertionLevels.push(AssertionLevel())
   }
 
   var numeralSort: Sort? = null
 
-  fun contains(expression: Expression<*>): Boolean =
-      getFunction(expression.symbol.toString(), expression.subexpressions) != null
+    fun let(varBindings: List<VarBinding>, block: (Context) -> Expression<*>) : Expression<Sort> {
+        assertionLevels.push(LetLevel(varBindings))
+        val result = block(this)
+        assertionLevels.pop()
 
-  fun registerTheory(theory: Theory) {
-    if (this.theory != null) {
-      throw TheoryAlreadySetException()
+        return result as Expression<Sort>
     }
 
-    this.theory = theory
-    assertionLevels.push(this.theory!!)
-
-    // add a new level for user definitions above theory
-    assertionLevels.push(AssertionLevel())
-  }
+  fun contains(expression: Expression<*>): Boolean =
+      getFunction(expression.symbol.toString(), expression.subexpressions) != null
 
   fun registerFunction(function: DeclareConst) {
     registerFunction(
@@ -223,6 +224,23 @@ class AssertionLevel : Subcontext {
 
   override val functions: MutableList<FunctionDecl<*>> = mutableListOf()
   override val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf()
+}
+
+class VarBinding(symbol: Symbol, val term: Expression<Sort>) : FunctionDecl0<Sort>(symbol, emptySet(), emptySet(), term.sort) {
+    override fun buildExpression(bindings: Bindings): Expression<Sort> = term
+
+}
+
+class LetLevel(varBindings : List<VarBinding>) : Subcontext {
+    override fun add(function: FunctionDecl<*>): Boolean =
+        throw IllegalOperationException("LetLevel.add", "Can not add new functions to let assertion level")
+
+    override fun add(sort: SortDecl<*>): SortDecl<*> =
+        throw IllegalOperationException("LetLevel.add", "Can not add new sorts to let assertion level")
+
+    override val functions: List<FunctionDecl<*>> = varBindings
+    override val sorts: Map<String, SortDecl<*>> = emptyMap()
+
 }
 
 interface Theory : Subcontext {

@@ -26,6 +26,8 @@ import org.petitparser.context.ParseError
 import tools.aqua.konstraints.parser.ParseTreeVisitor
 import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.parser.ProtoCommand
+import tools.aqua.konstraints.parser.ProtoSetLogic
+import tools.aqua.konstraints.smt.QF_BV
 import tools.aqua.konstraints.theories.BitVectorExpressionContext
 
 /*
@@ -36,7 +38,7 @@ class VisitorTests {
   private val parseTreeVisitor = ParseTreeVisitor()
 
   init {
-    parseTreeVisitor.context.registerTheory(BitVectorExpressionContext)
+    parseTreeVisitor.visit(ProtoSetLogic(QF_BV))
   }
 
   @ParameterizedTest

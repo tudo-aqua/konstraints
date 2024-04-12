@@ -24,6 +24,7 @@ import java.util.stream.Stream
 import kotlin.streams.asStream
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions.assumeTrue
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
@@ -169,6 +170,64 @@ class Z3Tests {
         .map { file: File -> Arguments.arguments(file) }
         .asStream()
   }
+
+    @ParameterizedTest
+    @MethodSource("getQFIDLLetFile")
+    @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    fun QF_IDL_Let(file: File) {
+
+        val parseTreeVisitor = ParseTreeVisitor()
+        val solver = Z3Solver()
+        val temp = file.bufferedReader().readLines()
+        val program = temp.map { it.trim('\r', '\n') }
+
+        val satStatus =
+            if (program.find { it.contains("unsat") } != null) {
+                "unsat"
+            } else if (program.find { it.contains("unknown") } != null) {
+                return
+            } else {
+                "sat"
+            }
+
+        println("Expected result is $satStatus")
+
+        val result = Parser.script.parse(program.joinToString(""))
+
+        if (result.isSuccess) {
+            val commands =
+                result
+                    .get<List<Any>>()
+                    .filter { it is ProtoCommand || it is Command }
+                    .map { if (it is ProtoCommand) parseTreeVisitor.visit(it) else it } as List<Command>
+
+            println(commands.joinToString("\n"))
+
+            solver.use {
+                commands.map { solver.visit(it) }
+
+                // verify we get the correct status for the test
+                assertEquals(satStatus, solver.status.toString())
+
+                // verify we parsed the correct program
+                /*
+                assertEquals(commands.filterIsInstance<Assert>().single().expression.toString(),
+                    solver.context.solver.assertions.last().toString())
+                */
+            }
+        } else {
+            throw ParseError(result.failure(result.message))
+        }
+    }
+
+    fun getQFIDLLetFile(): Stream<Arguments> {
+        val dir = File(javaClass.getResource("/QF_IDL/Averest/binary_search").file)
+
+        return dir.walk()
+            .filter { file: File -> file.isFile }
+            .map { file: File -> Arguments.arguments(file) }
+            .asStream()
+    }
 
   @ParameterizedTest
   @MethodSource("getQFRDLFile")
@@ -490,4 +549,22 @@ class Z3Tests {
       assertEquals("sat", solver.status.toString())
     }
   }
+
+    @ParameterizedTest
+    @ValueSource(
+        strings = [
+            "(set-logic QF_UF)(declare-fun A () Bool)(declare-fun B () Bool)(assert (let ((C (and A B))) (and C (not C))))(check-sat)"
+        ]
+    )
+    fun testLet(program: String) {
+        val solver = Z3Solver()
+
+        val result = Parser.parse(program)
+        solver.use {
+            result.commands.map { solver.visit(it) }
+
+            // verify we get the correct status for the test
+            assertEquals("unsat", solver.status.toString())
+        }
+    }
 }

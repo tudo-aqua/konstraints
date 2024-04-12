@@ -28,7 +28,7 @@ import tools.aqua.konstraints.theories.IntsContext
 internal class ParseTreeVisitor :
     ProtoCommandVisitor, ProtoTermVisitor, ProtoSortVisitor, SpecConstantVisitor {
 
-  val context = Context()
+  var context : Context? = null
 
   override fun visit(protoAssert: ProtoAssert): Assert {
     val term = visit(protoAssert.term)
@@ -41,7 +41,7 @@ internal class ParseTreeVisitor :
   override fun visit(protoDeclareConst: ProtoDeclareConst): DeclareConst {
     val sort = visit(protoDeclareConst.sort)
 
-    context.registerFunction(protoDeclareConst, sort)
+    context?.registerFunction(protoDeclareConst, sort)
 
     return DeclareConst(Symbol(protoDeclareConst.name), sort)
   }
@@ -50,28 +50,31 @@ internal class ParseTreeVisitor :
     val sort = visit(protoDeclareFun.sort)
     val parameters = protoDeclareFun.parameters.map { visit(it) }
 
-    context.registerFunction(protoDeclareFun, parameters, sort)
+    context?.registerFunction(protoDeclareFun, parameters, sort)
 
     return DeclareFun(protoDeclareFun.name.symbol(), parameters, sort)
   }
 
   override fun visit(protoSetLogic: ProtoSetLogic): SetLogic {
     when (protoSetLogic.logic) {
-      QF_BV -> context.registerTheory(BitVectorExpressionContext)
+      QF_BV -> context = Context(BitVectorExpressionContext)
       QF_IDL -> {
-        context.registerTheory(IntsContext)
-        context.numeralSort = IntSort
+        context = Context(IntsContext)
+        context?.numeralSort = IntSort
       }
       QF_RDL -> {
-        context.registerTheory(RealsContext)
-        context.numeralSort = RealSort
+        context = Context(RealsContext)
+        context?.numeralSort = RealSort
       }
-      QF_FP -> context.registerTheory(FloatingPointContext)
+      QF_FP -> context = Context(FloatingPointContext)
       // QF_AX uses only ArrayEx with free function and sort symbols, as free sorts are not yet
       // supported
       // load int theory as well for testing purposes
       QF_AX -> {
-        context.registerTheory(ArrayExContext)
+        context = Context(ArrayExContext)
+      }
+      QF_UF -> {
+        context = Context(CoreContext)
       }
       else -> throw NotImplementedException("${protoSetLogic.logic} not yet supported")
     }
@@ -80,7 +83,7 @@ internal class ParseTreeVisitor :
   }
 
   override fun visit(protoDeclareSort: ProtoDeclareSort): DeclareSort {
-    context.registerSort(protoDeclareSort.symbol, protoDeclareSort.arity)
+    context?.registerSort(protoDeclareSort.symbol, protoDeclareSort.arity)
 
     return DeclareSort(protoDeclareSort.symbol, protoDeclareSort.arity)
   }
@@ -105,7 +108,7 @@ internal class ParseTreeVisitor :
       SortedVar(protoSortedVar.symbol, visit(protoSortedVar.sort))
 
   override fun visit(simpleQualIdentifier: SimpleQualIdentifier): Expression<*> {
-    val op = context.getFunction(simpleQualIdentifier.identifier, listOf())
+    val op = context?.getFunction(simpleQualIdentifier.identifier, listOf())
 
     if (op != null) {
       return op.buildExpression(listOf(), emptySet())
@@ -127,7 +130,7 @@ internal class ParseTreeVisitor :
     val terms = bracketedProtoTerm.terms.map { visit(it) }
 
     val op =
-        context.getFunction(bracketedProtoTerm.qualIdentifier.identifier.symbol.toString(), terms)
+        context?.getFunction(bracketedProtoTerm.qualIdentifier.identifier.symbol.toString(), terms)
 
     val functionIndices =
         if (bracketedProtoTerm.qualIdentifier.identifier is IndexedIdentifier) {
@@ -149,7 +152,18 @@ internal class ParseTreeVisitor :
   }
 
   override fun visit(protoLet: ProtoLet): Expression<*> {
-    TODO("Implement visit ProtoLet")
+    val bindings = protoLet.bindings.map { VarBinding(it.symbol, visit(it.term) as Expression<Sort>) }
+
+    val inner = context?.let(bindings) {
+      visit(protoLet.term)
+    }!!
+
+    return LetExpression(
+      "xyz".symbol(),
+      inner.sort,
+      bindings,
+      inner
+    )
   }
 
   override fun visit(protoForAll: ProtoForAll): Expression<*> {
@@ -169,7 +183,7 @@ internal class ParseTreeVisitor :
   }
 
   override fun visit(protoSort: ProtoSort): Sort {
-    return context.getSort(protoSort)
+    return context!!.getSort(protoSort)
   }
 
   override fun visit(stringConstant: StringConstant): Expression<*> {
@@ -177,10 +191,10 @@ internal class ParseTreeVisitor :
   }
 
   override fun visit(numeralConstant: NumeralConstant): Expression<*> {
-    if (context.numeralSort == IntSort) return IntLiteral(numeralConstant.numeral)
-    else if (context.numeralSort == RealSort)
+    if (context?.numeralSort == IntSort) return IntLiteral(numeralConstant.numeral)
+    else if (context?.numeralSort == RealSort)
         return RealLiteral(BigDecimal(numeralConstant.numeral))
-    else throw RuntimeException("Unsupported numeral literal sort ${context.numeralSort}")
+    else throw RuntimeException("Unsupported numeral literal sort ${context?.numeralSort}")
   }
 
   override fun visit(binaryConstant: BinaryConstant): Expression<*> {

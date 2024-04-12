@@ -314,7 +314,7 @@ object Parser {
 
   // Terms
 
-  private val term = undefined()
+  internal val term = undefined()
 
   /* maps to an implementation of QualIdentifier */
   private val qualIdentifier =
@@ -324,9 +324,9 @@ object Parser {
           }
 
   /* maps to VarBinding */
-  private val varBinding =
+  internal val varBinding =
       (lparen * symbol * term * rparen).map { results: List<Any> ->
-        VarBinding(results[1] as ParseSymbol, results[2] as ProtoTerm)
+        ProtoVarBinding(results[1] as ParseSymbol, results[2] as ProtoTerm)
       }
 
   /* maps to SortedVar */
@@ -353,17 +353,9 @@ object Parser {
 
   init {
     term.set(
-        specConstant.map { constant: SpecConstant ->
-          SpecConstantTerm(constant)
-        } + /* maps to SpecConstantTerm */
-            qualIdentifier /* Results is either SymbolTree or ProtoAs */ +
-            (lparen * qualIdentifier * term.plus() * rparen).map { results: List<Any> ->
-              /* Results contains QualIdentifier follow by list of ProtoTerm */
-              BracketedProtoTerm(results[1] as QualIdentifier, results[2] as List<ProtoTerm>)
-            } + /* maps to GenericProtoTerm */
             (lparen * letKW * lparen * varBinding.plus() * rparen * term * rparen).map {
                 results: List<Any> ->
-              ProtoLet(results[3] as List<VarBinding>, results[5] as ProtoTerm)
+              ProtoLet(results[3] as List<ProtoVarBinding>, results[5] as ProtoTerm)
               // results[3] is guaranteed to be a list of VarBinding
             } + /* maps to ProtoLet */
             (lparen * forallKW * lparen * sortedVar.plus() * rparen * term * rparen).map {
@@ -384,7 +376,16 @@ object Parser {
             (lparen * exclamationKW * term * attribute.plus() * rparen).map { results: List<Any> ->
               ProtoAnnotation(results[2] as ProtoTerm, results[3] as List<Attribute>)
               // results[3] is guaranteed to be a list of Attributes
-            } /* maps to ProtoExclamation */)
+            } /* maps to ProtoExclamation */ +
+            specConstant.map { constant: SpecConstant ->
+                SpecConstantTerm(constant)
+            } + /* maps to SpecConstantTerm */
+            qualIdentifier /* Results is either SymbolTree or ProtoAs */ +
+            (lparen * qualIdentifier * term.plus() * rparen).map { results: List<Any> ->
+                /* Results contains QualIdentifier follow by list of ProtoTerm */
+                BracketedProtoTerm(results[1] as QualIdentifier, results[2] as List<ProtoTerm>)
+            } /* maps to GenericProtoTerm */
+    )
   }
 
   // Theories
@@ -575,7 +576,7 @@ object Parser {
                 else -> throw IllegalStateException("Illegal type in parse tree $command!")
               }
             },
-        parseTreeVisitor.context)
+        parseTreeVisitor.context!!)
   }
 
   private fun splitInput(program: String): List<String> {

@@ -96,6 +96,7 @@ fun ArraySelect.z3ify(context: Z3Context): Expr<Z3Sort> =
 @JvmName("z3ifyBool")
 fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     when (this) {
+        is LetExpression -> this.inner.z3ify(context) as Expr<Z3BoolSort>
       is True -> this.z3ify(context)
       is False -> this.z3ify(context)
       is Not -> this.z3ify(context)
