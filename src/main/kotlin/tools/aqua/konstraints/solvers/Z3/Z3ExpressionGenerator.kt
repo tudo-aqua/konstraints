@@ -93,9 +93,52 @@ fun Expression<*>.z3ify(context: Z3Context): Expr<*> {
 fun ArraySelect.z3ify(context: Z3Context): Expr<Z3Sort> =
     context.context.mkSelect(this.array.z3ify(context), this.index.z3ify(context) as Expr<Z3Sort>)
 
+@JvmName("z3ifyIteBool")
+fun Ite<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkITE(
+        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+
+@JvmName("z3ifyIteBitVec")
+fun Ite<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkITE(
+        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+
+@JvmName("z3ifyIteInt")
+fun Ite<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
+    context.context.mkITE(
+        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+
+@JvmName("z3ifyIteReal")
+fun Ite<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
+    context.context.mkITE(
+        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+
+@JvmName("z3ifyIteFP")
+fun Ite<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
+    context.context.mkITE(
+        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+
+@JvmName("z3ifyIteRM")
+fun Ite<RoundingMode>.z3ify(context: Z3Context): Expr<FPRMSort> =
+    context.context.mkITE(
+        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+
+@JvmName("z3ifyIteString")
+fun Ite<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
+    context.context.mkITE(
+        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+
+@JvmName("z3ifyIteFreeSort")
+fun Ite<UserDefinedSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
+    context.context.mkITE(
+        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+
 @JvmName("z3ifyBool")
 fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     when (this) {
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
+      is Ite -> this.z3ify(context)
       is True -> this.z3ify(context)
       is False -> this.z3ify(context)
       is Not -> this.z3ify(context)
@@ -325,6 +368,9 @@ fun StrIsDigit.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
 @JvmName("z3ifyBitVec")
 fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
     when (this) {
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
+      is Ite -> this.z3ify(context)
       is BVLiteral -> this.z3ify(context)
       is BVConcat -> this.z3ify(context)
       is BVExtract -> this.z3ify(context)
@@ -412,6 +458,9 @@ fun FPToSBitVec.z3ify(context: Z3Context): Expr<BitVecSort> =
 @JvmName("z3ifyInts")
 fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
     when (this) {
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
+      is Ite -> this.z3ify(context)
       is IntLiteral -> this.z3ify(context)
       is IntNeg -> this.z3ify(context)
       is IntSub -> this.z3ify(context)
@@ -486,6 +535,9 @@ fun StrToCode.z3ify(context: Z3Context): Expr<Z3IntSort> =
 @JvmName("z3ifyReals")
 fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
     when (this) {
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
+      is Ite -> this.z3ify(context)
       is RealLiteral -> this.z3ify(context)
       is RealNeg -> this.z3ify(context)
       is RealSub -> this.z3ify(context)
@@ -534,6 +586,9 @@ fun FPToReal.z3ify(context: Z3Context): Expr<Z3RealSort> =
 @JvmName("z3ifyFloatingPoint")
 fun Expression<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
     when (this) {
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
+      is Ite -> this.z3ify(context)
       is FPLiteral -> this.z3ify(context)
       is FPInfinity -> this.z3ify(context)
       is FPMinusInfinity -> this.z3ify(context)
@@ -663,6 +718,9 @@ fun UBitVecToFP.z3ify(context: Z3Context): Expr<Z3FPSort> =
 @JvmName("z3ifyRoundingMode")
 fun Expression<RoundingMode>.z3ify(context: Z3Context): Expr<FPRMSort> =
     when (this) {
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
+      is Ite -> this.z3ify(context)
       is RoundNearestTiesToEven -> this.z3ify(context)
       is RNE -> this.z3ify(context)
       is RoundNearestTiesToAway -> this.z3ify(context)
@@ -714,6 +772,9 @@ fun RTZ.z3ify(context: Z3Context): Expr<FPRMSort> = context.context.mkFPRTZ()
 @JvmName("z3ifyString")
 fun Expression<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
     when (this) {
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
+      is Ite -> this.z3ify(context)
       is StrConcat -> this.z3ify(context)
       is StrAt -> this.z3ify(context)
       is StrSubstring -> this.z3ify(context)
