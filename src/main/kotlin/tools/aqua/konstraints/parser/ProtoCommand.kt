@@ -150,7 +150,7 @@ internal data class SimpleQualIdentifier(override val identifier: Identifier) : 
 internal data class AsQualIdentifier(override val identifier: Identifier, val sort: ProtoSort) :
     QualIdentifier
 
-internal data class VarBinding(val symbol: ParseSymbol, val term: ProtoTerm)
+internal data class ProtoVarBinding(val symbol: ParseSymbol, val term: ProtoTerm)
 
 internal data class ProtoSortedVar(val symbol: ParseSymbol, val sort: ProtoSort)
 
@@ -167,7 +167,7 @@ internal data class BracketedProtoTerm(
     val terms: List<ProtoTerm>
 ) : ProtoTerm
 
-internal data class ProtoLet(val bindings: List<VarBinding>, val term: ProtoTerm) : ProtoTerm
+internal data class ProtoLet(val bindings: List<ProtoVarBinding>, val term: ProtoTerm) : ProtoTerm
 
 internal data class ProtoForAll(val sortedVars: List<ProtoSortedVar>, val term: ProtoTerm) :
     ProtoTerm

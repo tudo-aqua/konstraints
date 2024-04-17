@@ -20,12 +20,12 @@ package tools.aqua.konstraints.theories
 
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.parser.SortDecl
-import tools.aqua.konstraints.parser.TheoryContext
+import tools.aqua.konstraints.parser.Theory
 import tools.aqua.konstraints.smt.*
 
-internal object RealsIntsContext : TheoryContext {
-  override val functions: HashSet<FunctionDecl<*>> =
-      hashSetOf(
+internal object RealsIntsContext : Theory {
+  override val functions =
+      listOf(
           IntNegDecl,
           IntSubDecl,
           IntAddDecl,

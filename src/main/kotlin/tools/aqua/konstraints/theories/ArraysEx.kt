@@ -23,10 +23,10 @@ import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.smt.SortParameter
 
-internal object ArrayExContext : TheoryContext {
-  override val functions: HashSet<FunctionDecl<*>> = hashSetOf(ArraySelectDecl, ArrayStoreDecl)
+internal object ArrayExContext : Theory {
+  override val functions: List<FunctionDecl<*>> = listOf(ArraySelectDecl, ArrayStoreDecl)
 
-  override val sorts: Map<String, SortDecl<*>> = mapOf(Pair("Array", ArraySortDecl))
+  override val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf(Pair("Array", ArraySortDecl))
 }
 
 class ArraySort(val x: Sort, val y: Sort) : Sort("Array".symbol(), emptyList(), listOf(x, y)) {

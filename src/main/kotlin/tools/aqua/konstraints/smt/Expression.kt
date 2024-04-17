@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.smt
 
+import tools.aqua.konstraints.parser.VarBinding
 import tools.aqua.konstraints.util.reduceOrDefault
 
 sealed interface Expression<T : Sort> {
@@ -64,6 +65,8 @@ sealed interface Expression<T : Sort> {
                     .map { it.all(predicate) }
                     .reduceOrDefault(true) { t1, t2 -> t1 and t2 }
         is TernaryExpression<*, *, *, *> -> TODO()
+        is LetExpression -> TODO()
+        is LocalExpression -> predicate(this)
       }
 
   val subexpressions: List<Expression<*>>
@@ -177,9 +180,26 @@ abstract class NAryExpression<T : Sort>(override val symbol: Symbol, override va
       else symbol.toSMTString()
 }
 
+class LetExpression<T : Sort>(
+    override val symbol: Symbol,
+    override val sort: T,
+    val bindings: List<VarBinding>,
+    val inner: Expression<T>
+) : Expression<T> {
+  override val subexpressions: List<Expression<*>> = listOf(inner)
+}
+
 class UserDefinedExpression<T : Sort>(name: Symbol, sort: T, val args: List<Expression<*>>) :
     NAryExpression<T>(name, sort) {
   override fun subexpressions(): List<Expression<*>> = args
+}
+
+class LocalExpression<T : Sort>(
+    override val symbol: Symbol,
+    override val sort: T,
+    val term: Expression<T>,
+) : Expression<T> {
+  override val subexpressions: List<Expression<*>> = emptyList()
 }
 
 class ExpressionCastException(from: Sort, to: String) :

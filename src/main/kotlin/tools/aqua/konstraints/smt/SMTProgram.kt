@@ -38,7 +38,7 @@ enum class SatStatus {
       }
 }
 
-abstract class SMTProgram(commands: List<Command>, val context: Context) {
+abstract class SMTProgram(commands: List<Command>, var context: Context?) {
   var model: Model? = null
   var status = SatStatus.PENDING
   val info: List<Attribute>
@@ -71,10 +71,11 @@ abstract class SMTProgram(commands: List<Command>, val context: Context) {
   }
 }
 
-class MutableSMTProgram(commands: List<Command>, context: Context) : SMTProgram(commands, context) {
-  constructor(commands: List<Command>) : this(commands, Context())
+class MutableSMTProgram(commands: List<Command>, context: Context?) :
+    SMTProgram(commands, context) {
+  constructor(commands: List<Command>) : this(commands, null)
 
-  constructor() : this(emptyList(), Context())
+  constructor() : this(emptyList(), null)
 
   /**
    * Inserts [command] at the end of the program Checks if [command] is legal w.r.t. the [context]
@@ -88,7 +89,7 @@ class MutableSMTProgram(commands: List<Command>, context: Context) : SMTProgram(
    */
   fun add(command: Command, index: Int) {
     if (command is Assert) {
-      require(command.expression.all { context.contains(it) })
+      require(command.expression.all { context!!.contains(it) })
     }
 
     updateContext(command)
@@ -120,7 +121,7 @@ class MutableSMTProgram(commands: List<Command>, context: Context) : SMTProgram(
       QF_AUFBV -> TODO()
       QF_AUFLIA -> TODO()
       QF_AX -> TODO()
-      QF_BV -> context.registerTheory(BitVectorExpressionContext)
+      QF_BV -> context = Context(BitVectorExpressionContext)
       QF_IDL -> TODO()
       QF_LIA -> TODO()
       QF_LRA -> TODO()
@@ -142,9 +143,9 @@ class MutableSMTProgram(commands: List<Command>, context: Context) : SMTProgram(
   private fun updateContext(command: Command) {
     when (command) {
       is SetLogic -> setLogic(command.logic)
-      is DeclareConst -> context.registerFunction(command)
-      is DeclareFun -> context.registerFunction(command)
-      is DeclareSort -> context.registerSort(command)
+      is DeclareConst -> context?.registerFunction(command)
+      is DeclareFun -> context?.registerFunction(command)
+      is DeclareSort -> context?.registerSort(command)
       else -> return
     }
   }

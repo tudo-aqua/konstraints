@@ -22,9 +22,9 @@ import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.smt.*
 
-internal object FloatingPointContext : TheoryContext {
-  override val functions: HashSet<FunctionDecl<*>> =
-      hashSetOf(
+internal object FloatingPointContext : Theory {
+  override val functions =
+      listOf(
           RoundNearestTiesToEvenDecl,
           RNEDecl,
           RoundNearestTiesToAwayDecl,
@@ -558,7 +558,7 @@ class FPFma(
 
 object FPFmaDecl :
     FunctionDecl4<RoundingMode, FPSort, FPSort, FPSort, FPSort>(
-        "fp.div".symbol(),
+        "fp.fma".symbol(),
         emptySet(),
         RoundingMode,
         FPSort("eb".idx(), "sb".idx()),

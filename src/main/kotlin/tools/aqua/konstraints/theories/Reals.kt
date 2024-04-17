@@ -23,9 +23,9 @@ import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.smt.*
 
-internal object RealsContext : TheoryContext {
-  override val functions: HashSet<FunctionDecl<*>> =
-      hashSetOf(
+internal object RealsContext : Theory {
+  override val functions =
+      listOf(
           RealNegDecl,
           RealSubDecl,
           RealAddDecl,

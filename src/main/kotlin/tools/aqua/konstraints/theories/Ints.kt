@@ -21,9 +21,9 @@ package tools.aqua.konstraints.theories
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
-internal object IntsContext : TheoryContext {
-  override val functions: HashSet<FunctionDecl<*>> =
-      hashSetOf(
+internal object IntsContext : Theory {
+  override val functions =
+      listOf(
           IntNegDecl,
           IntSubDecl,
           IntAddDecl,

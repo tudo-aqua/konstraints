@@ -824,6 +824,8 @@ fun StrFromInt.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
 @JvmName("z3ifyRegLan")
 fun Expression<RegLan>.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
     when (this) {
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
       is RegexNone -> this.z3ify(context)
       is RegexAll -> this.z3ify(context)
       is RegexAllChar -> this.z3ify(context)
@@ -900,6 +902,8 @@ fun RegexLoop.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
 @JvmName("z3ifyArrayEx")
 fun Expression<ArraySort>.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>> =
     when (this) {
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
       is ArrayStore -> this.z3ify(context)
       else ->
           if (context.constants[this.symbol.toString()] != null) {

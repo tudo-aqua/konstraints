@@ -31,7 +31,6 @@ import tools.aqua.konstraints.parser.FunctionAlreadyDeclaredException
 import tools.aqua.konstraints.parser.FunctionDecl
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
-import tools.aqua.konstraints.theories.CoreContext
 
 /*
  * TestInstance per class is needed for parameterized tests
@@ -45,7 +44,7 @@ import tools.aqua.konstraints.theories.CoreContext
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class ContextTests {
-  private val context = Context()
+  private val context = Context(BitVectorExpressionContext)
   private val boolExpression = BasicExpression("A".symbol(), BoolSort)
   private val bv32Expression = BasicExpression("B".symbol(), BVSort(32))
   private val bv16Expression = BasicExpression("B".symbol(), BVSort(16))
@@ -63,16 +62,8 @@ class ContextTests {
           Associativity.NONE)
 
   init {
-    context.registerTheory(CoreContext)
-    context.registerTheory(BitVectorExpressionContext)
     context.registerFunction("O", listOf(BoolSort, BoolSort), BoolSort)
     context.registerFunction(overloadedBV)
-
-    context.functionLookup["and"] = mutableListOf(AndDecl)
-    context.functionLookup["or"] = mutableListOf(OrDecl)
-    context.functionLookup["xor"] = mutableListOf(XOrDecl)
-    context.functionLookup["not"] = mutableListOf(NotDecl)
-    context.functionLookup["bvult"] = mutableListOf(BVUltDecl)
   }
 
   @ParameterizedTest
