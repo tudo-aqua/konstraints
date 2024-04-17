@@ -146,18 +146,25 @@ abstract class HomogenousExpression<T : Sort, S : Sort>(
 /**
  * Implements ite according to Core theory (par (A) (ite Bool A A A))
  *
- * @param statement indicates whether [then] or [els] should be returned
+ * @param statement indicates whether [then] or [otherwise] should be returned
  * @param then value to be returned if [statement] is true
- * @param els value to be returned if [statement] is false
+ * @param otherwise value to be returned if [statement] is false
  */
-class Ite(val statement: Expression<BoolSort>, val then: Expression<*>, val els: Expression<*>) :
-    Expression<Sort> {
-  override val sort: BoolSort = BoolSort
+class Ite<T : Sort>(
+    val statement: Expression<BoolSort>,
+    val then: Expression<T>,
+    val otherwise: Expression<T>
+) : Expression<T> {
+  init {
+    require(then.sort == otherwise.sort)
+  }
+
+  override val sort: T = then.sort
   override val symbol: Symbol = "ite".symbol()
 
-  override val subexpressions: List<Expression<*>> = listOf(statement, then, els)
+  override val subexpressions: List<Expression<*>> = listOf(statement, then, otherwise)
 
-  override fun toString(): String = "(ite $statement $then $els)"
+  override fun toString(): String = "(ite $statement $then $otherwise)"
 }
 
 abstract class NAryExpression<T : Sort>(override val symbol: Symbol, override val sort: T) :
