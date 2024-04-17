@@ -28,16 +28,9 @@ import tools.aqua.konstraints.smt.SortParameter
  */
 
 object CoreContext : Theory {
-  override val functions = listOf(
-              FalseDecl,
-              TrueDecl,
-              NotDecl,
-              AndDecl,
-              OrDecl,
-              XOrDecl,
-              EqualsDecl,
-              DistinctDecl,
-              IteDecl)
+  override val functions =
+      listOf(
+          FalseDecl, TrueDecl, NotDecl, AndDecl, OrDecl, XOrDecl, EqualsDecl, DistinctDecl, IteDecl)
   override val sorts = mapOf(Pair("Bool", BoolSortDecl))
 }
 

@@ -57,26 +57,26 @@ class Context(theory: Theory) {
   val assertionLevels = Stack<Subcontext>()
 
   init {
-      // core theory is always loaded QF_UF and UF are the only logics that load core "manually"
-      // as it is the only theory they rely on, for all other logics core is loaded before
-      // the other theory is loaded
-      if (theory != CoreContext) {
-          assertionLevels.push(CoreContext)
-      }
+    // core theory is always loaded QF_UF and UF are the only logics that load core "manually"
+    // as it is the only theory they rely on, for all other logics core is loaded before
+    // the other theory is loaded
+    if (theory != CoreContext) {
+      assertionLevels.push(CoreContext)
+    }
 
     assertionLevels.push(theory)
-      assertionLevels.push(AssertionLevel())
+    assertionLevels.push(AssertionLevel())
   }
 
   var numeralSort: Sort? = null
 
-    fun let(varBindings: List<VarBinding>, block: (Context) -> Expression<*>) : Expression<Sort> {
-        assertionLevels.push(LetLevel(varBindings))
-        val result = block(this)
-        assertionLevels.pop()
+  fun let(varBindings: List<VarBinding>, block: (Context) -> Expression<*>): Expression<Sort> {
+    assertionLevels.push(LetLevel(varBindings))
+    val result = block(this)
+    assertionLevels.pop()
 
-        return result as Expression<Sort>
-    }
+    return result as Expression<Sort>
+  }
 
   fun contains(expression: Expression<*>): Boolean =
       getFunction(expression.symbol.toString(), expression.subexpressions) != null
@@ -194,13 +194,12 @@ class Context(theory: Theory) {
  * assertion levels, as well as theory objects)
  */
 interface Subcontext {
-    fun contains(function: FunctionDecl<*>) = functions.contains(function)
+  fun contains(function: FunctionDecl<*>) = functions.contains(function)
 
   fun contains(function: String, args: List<Expression<*>>) = get(function, args) != null
 
-    fun get(function: String, args: List<Expression<*>>)= functions.find {
-        it.name.toString() == function && it.acceptsExpressions(args, emptySet())
-    }
+  fun get(function: String, args: List<Expression<*>>) =
+      functions.find { it.name.toString() == function && it.acceptsExpressions(args, emptySet()) }
 
   fun contains(sort: SortDecl<*>) = sorts.containsKey(sort.name.toString())
 
@@ -226,21 +225,23 @@ class AssertionLevel : Subcontext {
   override val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf()
 }
 
-class VarBinding(symbol: Symbol, val term: Expression<Sort>) : FunctionDecl0<Sort>(symbol, emptySet(), emptySet(), term.sort) {
-    override fun buildExpression(bindings: Bindings): Expression<Sort> = term
-
+class VarBinding(symbol: Symbol, val term: Expression<Sort>) :
+    FunctionDecl0<Sort>(symbol, emptySet(), emptySet(), term.sort) {
+  override fun buildExpression(bindings: Bindings): Expression<Sort> =
+      LocalExpression(name, sort, term)
 }
 
-class LetLevel(varBindings : List<VarBinding>) : Subcontext {
-    override fun add(function: FunctionDecl<*>): Boolean =
-        throw IllegalOperationException("LetLevel.add", "Can not add new functions to let assertion level")
+class LetLevel(varBindings: List<VarBinding>) : Subcontext {
+  override fun add(function: FunctionDecl<*>): Boolean =
+      throw IllegalOperationException(
+          "LetLevel.add", "Can not add new functions to let assertion level")
 
-    override fun add(sort: SortDecl<*>): SortDecl<*> =
-        throw IllegalOperationException("LetLevel.add", "Can not add new sorts to let assertion level")
+  override fun add(sort: SortDecl<*>): SortDecl<*> =
+      throw IllegalOperationException(
+          "LetLevel.add", "Can not add new sorts to let assertion level")
 
-    override val functions: List<FunctionDecl<*>> = varBindings
-    override val sorts: Map<String, SortDecl<*>> = emptyMap()
-
+  override val functions: List<FunctionDecl<*>> = varBindings
+  override val sorts: Map<String, SortDecl<*>> = emptyMap()
 }
 
 interface Theory : Subcontext {
@@ -268,4 +269,4 @@ class TheoryAlreadySetException :
         "Theory has already been set, use the smt-command (reset) before using a new logic or theory")
 
 class IllegalOperationException(operation: String, reason: String) :
-        RuntimeException("Illegal Operation $operation: $reason.")
+    RuntimeException("Illegal Operation $operation: $reason.")

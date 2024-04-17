@@ -24,31 +24,32 @@ import tools.aqua.konstraints.parser.Theory
 import tools.aqua.konstraints.smt.*
 
 internal object RealsIntsContext : Theory {
-  override val functions = listOf(
-              IntNegDecl,
-              IntSubDecl,
-              IntAddDecl,
-              IntMulDecl,
-              IntDivDecl,
-              ModDecl,
-              AbsDecl,
-              IntLessEqDecl,
-              IntLessDecl,
-              IntGreaterEqDecl,
-              IntGreaterDecl,
-              DivisibleDecl,
-              RealNegDecl,
-              RealSubDecl,
-              RealAddDecl,
-              RealMulDecl,
-              RealDivDecl,
-              RealLessEqDecl,
-              RealLessDecl,
-              RealGreaterEqDecl,
-              RealGreaterDecl,
-              ToRealDecl,
-              ToIntDecl,
-              IsIntDecl)
+  override val functions =
+      listOf(
+          IntNegDecl,
+          IntSubDecl,
+          IntAddDecl,
+          IntMulDecl,
+          IntDivDecl,
+          ModDecl,
+          AbsDecl,
+          IntLessEqDecl,
+          IntLessDecl,
+          IntGreaterEqDecl,
+          IntGreaterDecl,
+          DivisibleDecl,
+          RealNegDecl,
+          RealSubDecl,
+          RealAddDecl,
+          RealMulDecl,
+          RealDivDecl,
+          RealLessEqDecl,
+          RealLessDecl,
+          RealGreaterEqDecl,
+          RealGreaterDecl,
+          ToRealDecl,
+          ToIntDecl,
+          IsIntDecl)
 
   override val sorts: Map<String, SortDecl<*>> =
       mapOf(Pair("Int", IntSortDecl), Pair("Real", RealSortDecl))

@@ -28,7 +28,7 @@ import tools.aqua.konstraints.theories.IntsContext
 internal class ParseTreeVisitor :
     ProtoCommandVisitor, ProtoTermVisitor, ProtoSortVisitor, SpecConstantVisitor {
 
-  var context : Context? = null
+  var context: Context? = null
 
   override fun visit(protoAssert: ProtoAssert): Assert {
     val term = visit(protoAssert.term)
@@ -152,18 +152,12 @@ internal class ParseTreeVisitor :
   }
 
   override fun visit(protoLet: ProtoLet): Expression<*> {
-    val bindings = protoLet.bindings.map { VarBinding(it.symbol, visit(it.term) as Expression<Sort>) }
+    val bindings =
+        protoLet.bindings.map { VarBinding(it.symbol, visit(it.term) as Expression<Sort>) }
 
-    val inner = context?.let(bindings) {
-      visit(protoLet.term)
-    }!!
+    val inner = context?.let(bindings) { visit(protoLet.term) }!!
 
-    return LetExpression(
-      "xyz".symbol(),
-      inner.sort,
-      bindings,
-      inner
-    )
+    return LetExpression("xyz".symbol(), inner.sort, bindings, inner)
   }
 
   override fun visit(protoForAll: ProtoForAll): Expression<*> {
@@ -179,7 +173,7 @@ internal class ParseTreeVisitor :
   }
 
   override fun visit(protoAnnotation: ProtoAnnotation): Expression<*> {
-    TODO("Implement visit ProtoExclamation")
+    TODO("Implement visit ProtoAnnotation")
   }
 
   override fun visit(protoSort: ProtoSort): Sort {

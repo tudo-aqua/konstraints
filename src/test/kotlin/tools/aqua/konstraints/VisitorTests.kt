@@ -28,7 +28,6 @@ import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.parser.ProtoCommand
 import tools.aqua.konstraints.parser.ProtoSetLogic
 import tools.aqua.konstraints.smt.QF_BV
-import tools.aqua.konstraints.theories.BitVectorExpressionContext
 
 /*
  * Make Lifecycle per class because context needs to be the same for each test input

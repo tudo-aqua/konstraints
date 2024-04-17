@@ -353,11 +353,11 @@ object Parser {
 
   init {
     term.set(
-            (lparen * letKW * lparen * varBinding.plus() * rparen * term * rparen).map {
-                results: List<Any> ->
-              ProtoLet(results[3] as List<ProtoVarBinding>, results[5] as ProtoTerm)
-              // results[3] is guaranteed to be a list of VarBinding
-            } + /* maps to ProtoLet */
+        (lparen * letKW * lparen * varBinding.plus() * rparen * term * rparen).map {
+            results: List<Any> ->
+          ProtoLet(results[3] as List<ProtoVarBinding>, results[5] as ProtoTerm)
+          // results[3] is guaranteed to be a list of VarBinding
+        } + /* maps to ProtoLet */
             (lparen * forallKW * lparen * sortedVar.plus() * rparen * term * rparen).map {
                 results: List<Any> ->
               ProtoForAll(results[3] as List<ProtoSortedVar>, results[5] as ProtoTerm)
@@ -378,14 +378,13 @@ object Parser {
               // results[3] is guaranteed to be a list of Attributes
             } /* maps to ProtoExclamation */ +
             specConstant.map { constant: SpecConstant ->
-                SpecConstantTerm(constant)
+              SpecConstantTerm(constant)
             } + /* maps to SpecConstantTerm */
             qualIdentifier /* Results is either SymbolTree or ProtoAs */ +
             (lparen * qualIdentifier * term.plus() * rparen).map { results: List<Any> ->
-                /* Results contains QualIdentifier follow by list of ProtoTerm */
-                BracketedProtoTerm(results[1] as QualIdentifier, results[2] as List<ProtoTerm>)
-            } /* maps to GenericProtoTerm */
-    )
+              /* Results contains QualIdentifier follow by list of ProtoTerm */
+              BracketedProtoTerm(results[1] as QualIdentifier, results[2] as List<ProtoTerm>)
+            } /* maps to GenericProtoTerm */)
   }
 
   // Theories

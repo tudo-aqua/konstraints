@@ -22,19 +22,20 @@ import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
 internal object IntsContext : Theory {
-  override val functions = listOf(
-              IntNegDecl,
-              IntSubDecl,
-              IntAddDecl,
-              IntMulDecl,
-              IntDivDecl,
-              ModDecl,
-              AbsDecl,
-              IntLessEqDecl,
-              IntLessDecl,
-              IntGreaterEqDecl,
-              IntGreaterDecl,
-              DivisibleDecl)
+  override val functions =
+      listOf(
+          IntNegDecl,
+          IntSubDecl,
+          IntAddDecl,
+          IntMulDecl,
+          IntDivDecl,
+          ModDecl,
+          AbsDecl,
+          IntLessEqDecl,
+          IntLessDecl,
+          IntGreaterEqDecl,
+          IntGreaterDecl,
+          DivisibleDecl)
 
   override val sorts: Map<String, SortDecl<*>> = mapOf(Pair("Int", IntSortDecl))
 }

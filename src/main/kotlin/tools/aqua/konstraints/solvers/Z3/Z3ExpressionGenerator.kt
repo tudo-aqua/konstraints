@@ -96,7 +96,8 @@ fun ArraySelect.z3ify(context: Z3Context): Expr<Z3Sort> =
 @JvmName("z3ifyBool")
 fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     when (this) {
-        is LetExpression -> this.inner.z3ify(context) as Expr<Z3BoolSort>
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
       is True -> this.z3ify(context)
       is False -> this.z3ify(context)
       is Not -> this.z3ify(context)
@@ -326,6 +327,8 @@ fun StrIsDigit.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
 @JvmName("z3ifyBitVec")
 fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
     when (this) {
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
       is BVLiteral -> this.z3ify(context)
       is BVConcat -> this.z3ify(context)
       is BVExtract -> this.z3ify(context)
@@ -413,6 +416,8 @@ fun FPToSBitVec.z3ify(context: Z3Context): Expr<BitVecSort> =
 @JvmName("z3ifyInts")
 fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
     when (this) {
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
       is IntLiteral -> this.z3ify(context)
       is IntNeg -> this.z3ify(context)
       is IntSub -> this.z3ify(context)
@@ -487,6 +492,8 @@ fun StrToCode.z3ify(context: Z3Context): Expr<Z3IntSort> =
 @JvmName("z3ifyReals")
 fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
     when (this) {
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
       is RealLiteral -> this.z3ify(context)
       is RealNeg -> this.z3ify(context)
       is RealSub -> this.z3ify(context)
@@ -535,6 +542,8 @@ fun FPToReal.z3ify(context: Z3Context): Expr<Z3RealSort> =
 @JvmName("z3ifyFloatingPoint")
 fun Expression<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
     when (this) {
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
       is FPLiteral -> this.z3ify(context)
       is FPInfinity -> this.z3ify(context)
       is FPMinusInfinity -> this.z3ify(context)
@@ -664,6 +673,8 @@ fun UBitVecToFP.z3ify(context: Z3Context): Expr<Z3FPSort> =
 @JvmName("z3ifyRoundingMode")
 fun Expression<RoundingMode>.z3ify(context: Z3Context): Expr<FPRMSort> =
     when (this) {
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
       is RoundNearestTiesToEven -> this.z3ify(context)
       is RNE -> this.z3ify(context)
       is RoundNearestTiesToAway -> this.z3ify(context)
@@ -715,6 +726,8 @@ fun RTZ.z3ify(context: Z3Context): Expr<FPRMSort> = context.context.mkFPRTZ()
 @JvmName("z3ifyString")
 fun Expression<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
     when (this) {
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
       is StrConcat -> this.z3ify(context)
       is StrAt -> this.z3ify(context)
       is StrSubstring -> this.z3ify(context)
@@ -764,6 +777,8 @@ fun StrFromInt.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
 @JvmName("z3ifyRegLan")
 fun Expression<RegLan>.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
     when (this) {
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
       is RegexNone -> this.z3ify(context)
       is RegexAll -> this.z3ify(context)
       is RegexAllChar -> this.z3ify(context)
@@ -840,6 +855,8 @@ fun RegexLoop.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
 @JvmName("z3ifyArrayEx")
 fun Expression<ArraySort>.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>> =
     when (this) {
+      is LocalExpression -> this.term.z3ify(context)
+      is LetExpression -> this.inner.z3ify(context)
       is ArrayStore -> this.z3ify(context)
       else ->
           if (context.constants[this.symbol.toString()] != null) {

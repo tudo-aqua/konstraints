@@ -23,20 +23,21 @@ import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
 internal object BitVectorExpressionContext : Theory {
-  override val functions = listOf(
-              BVUltDecl,
-              BVConcatDecl,
-              BVAndDecl,
-              BVNegDecl,
-              BVNotDecl,
-              BVOrDecl,
-              BVAddDecl,
-              BVMulDecl,
-              BVUDivDecl,
-              BVURemDecl,
-              BVShlDecl,
-              BVLShrDecl,
-              ExtractDecl)
+  override val functions =
+      listOf(
+          BVUltDecl,
+          BVConcatDecl,
+          BVAndDecl,
+          BVNegDecl,
+          BVNotDecl,
+          BVOrDecl,
+          BVAddDecl,
+          BVMulDecl,
+          BVUDivDecl,
+          BVURemDecl,
+          BVShlDecl,
+          BVLShrDecl,
+          ExtractDecl)
   override val sorts = mapOf(Pair("BitVec", BVSortDecl))
 }
 

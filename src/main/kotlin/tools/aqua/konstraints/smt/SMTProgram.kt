@@ -71,7 +71,8 @@ abstract class SMTProgram(commands: List<Command>, var context: Context?) {
   }
 }
 
-class MutableSMTProgram(commands: List<Command>, context: Context?) : SMTProgram(commands, context) {
+class MutableSMTProgram(commands: List<Command>, context: Context?) :
+    SMTProgram(commands, context) {
   constructor(commands: List<Command>) : this(commands, null)
 
   constructor() : this(emptyList(), null)
