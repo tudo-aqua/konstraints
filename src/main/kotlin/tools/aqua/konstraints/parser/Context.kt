@@ -70,12 +70,28 @@ class Context(theory: Theory) {
 
   var numeralSort: Sort? = null
 
-  fun let(varBindings: List<VarBinding>, block: (Context) -> Expression<*>): Expression<Sort> {
+  fun <T> let(varBindings: List<VarBinding<*>>, block: (Context) -> T): T {
+    varBindings.forEach {
+      if (theory.contains(it.name))
+          throw IllegalFunctionOverloadException(
+              it.name.toString(), "Can not override theory symbol ${it.name}")
+    }
+
+    if (theory != CoreContext) {
+      varBindings.forEach {
+        if (CoreContext.contains(it.name))
+            throw IllegalFunctionOverloadException(
+                it.name.toString(), "Can not override theory symbol ${it.name}")
+      }
+    }
+
+    assert(varBindings.distinctBy { it.name }.size == varBindings.size)
+
     assertionLevels.push(LetLevel(varBindings))
     val result = block(this)
     assertionLevels.pop()
 
-    return result as Expression<Sort>
+    return result
   }
 
   fun contains(expression: Expression<*>): Boolean =
@@ -106,12 +122,13 @@ class Context(theory: Theory) {
   }
 
   fun registerFunction(function: FunctionDecl<*>) {
-    if (theory?.contains(function) == true) {
-      throw IllegalFunctionOverloadException(
-          function.name.toString(), "Can not overload theory symbols")
+    assertionLevels.forEach { level ->
+      if (level.contains(function.name)) {
+        throw IllegalFunctionOverloadException(
+            function.name.toString(), "Can not override symbol ${function.name}")
+      }
     }
 
-    // TODO enforce all overloading/shadowing rules
     assertionLevels.peek().add(function)
   }
 
@@ -146,7 +163,7 @@ class Context(theory: Theory) {
   }
 
   fun registerSort(sort: SortDecl<*>) {
-    if (theory?.contains(sort) == true) {
+    if (theory.contains(sort)) {
       throw SortAlreadyDeclaredException(sort.name, sort.signature.sortParameter.size)
     }
 
@@ -198,6 +215,9 @@ interface Subcontext {
 
   fun contains(function: String, args: List<Expression<*>>) = get(function, args) != null
 
+  fun contains(function: Symbol) =
+      functions.find { it.name.toString() == function.toString() } != null
+
   fun get(function: String, args: List<Expression<*>>) =
       functions.find { it.name.toString() == function && it.acceptsExpressions(args, emptySet()) }
 
@@ -225,13 +245,13 @@ class AssertionLevel : Subcontext {
   override val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf()
 }
 
-class VarBinding(symbol: Symbol, val term: Expression<Sort>) :
-    FunctionDecl0<Sort>(symbol, emptySet(), emptySet(), term.sort) {
-  override fun buildExpression(bindings: Bindings): Expression<Sort> =
+class VarBinding<T : Sort>(symbol: Symbol, val term: Expression<T>) :
+    FunctionDecl0<T>(symbol, emptySet(), emptySet(), term.sort) {
+  override fun buildExpression(bindings: Bindings): Expression<T> =
       LocalExpression(name, sort, term)
 }
 
-class LetLevel(varBindings: List<VarBinding>) : Subcontext {
+class LetLevel(varBindings: List<VarBinding<*>>) : Subcontext {
   override fun add(function: FunctionDecl<*>): Boolean =
       throw IllegalOperationException(
           "LetLevel.add", "Can not add new functions to let assertion level")

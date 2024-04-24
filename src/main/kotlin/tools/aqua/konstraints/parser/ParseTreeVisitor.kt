@@ -152,12 +152,11 @@ internal class ParseTreeVisitor :
   }
 
   override fun visit(protoLet: ProtoLet): Expression<*> {
-    val bindings =
-        protoLet.bindings.map { VarBinding(it.symbol, visit(it.term) as Expression<Sort>) }
+    val bindings = protoLet.bindings.map { VarBinding(it.symbol, visit(it.term)) }
 
     val inner = context?.let(bindings) { visit(protoLet.term) }!!
 
-    return LetExpression("xyz".symbol(), inner.sort, bindings, inner)
+    return LetExpression("xyz".symbol(), inner.sort, bindings, inner as Expression<Sort>)
   }
 
   override fun visit(protoForAll: ProtoForAll): Expression<*> {

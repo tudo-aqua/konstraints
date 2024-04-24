@@ -183,7 +183,7 @@ abstract class NAryExpression<T : Sort>(override val symbol: Symbol, override va
 class LetExpression<T : Sort>(
     override val symbol: Symbol,
     override val sort: T,
-    val bindings: List<VarBinding>,
+    val bindings: List<VarBinding<*>>,
     val inner: Expression<T>
 ) : Expression<T> {
   override val subexpressions: List<Expression<*>> = listOf(inner)
@@ -201,6 +201,16 @@ class LocalExpression<T : Sort>(
 ) : Expression<T> {
   override val subexpressions: List<Expression<*>> = emptyList()
 }
+
+/*
+class BoundExpression(
+    override val symbol: Symbol,
+    override val sort: BoolSort,
+    val term: Expression<BoolSort>
+) : Expression<BoolSort> {
+    override val subexpressions: List<Expression<*>> = emptyList()
+}
+*/
 
 class ExpressionCastException(from: Sort, to: String) :
     ClassCastException("Can not cast expression from $from to $to")

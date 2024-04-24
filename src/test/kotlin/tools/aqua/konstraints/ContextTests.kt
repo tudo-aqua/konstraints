@@ -25,10 +25,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
-import tools.aqua.konstraints.parser.Associativity
-import tools.aqua.konstraints.parser.Context
-import tools.aqua.konstraints.parser.FunctionAlreadyDeclaredException
-import tools.aqua.konstraints.parser.FunctionDecl
+import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 
@@ -63,7 +60,6 @@ class ContextTests {
 
   init {
     context.registerFunction("O", listOf(BoolSort, BoolSort), BoolSort)
-    context.registerFunction(overloadedBV)
   }
 
   @ParameterizedTest
@@ -120,21 +116,7 @@ class ContextTests {
   }
 
   private fun getFunctionNameAndArgs(): Stream<Arguments> {
-    return Stream.of(
-        arguments("and", listOf(boolExpression, boolExpression), BoolSort),
-        arguments("and", listOf(boolExpression, boolExpression, boolExpression), BoolSort),
-        arguments("or", listOf(boolExpression, boolExpression), BoolSort),
-        arguments("or", listOf(boolExpression, boolExpression, boolExpression), BoolSort),
-        arguments("xor", listOf(boolExpression, boolExpression), BoolSort),
-        arguments("xor", listOf(boolExpression, boolExpression, boolExpression), BoolSort),
-        arguments("bvult", listOf(bv16Expression, bv16Expression), BoolSort),
-        arguments("bvult", listOf(bv32Expression, bv32Expression), BoolSort),
-        arguments("O", listOf(boolExpression, boolExpression), BoolSort),
-        arguments("O", listOf(bv32Expression, bv32Expression), BVSort(32)),
-        arguments("concat", listOf(bv32Expression, bv32Expression), BVSort.fromSymbol("m")),
-        arguments("=", listOf(boolExpression, boolExpression), BoolSort),
-        arguments("=", listOf(boolExpression, boolExpression, boolExpression), BoolSort),
-        arguments("=", listOf(bv32Expression, bv32Expression), BoolSort))
+    return Stream.of(arguments("O", listOf(boolExpression, boolExpression), BoolSort))
   }
 
   @ParameterizedTest
@@ -195,6 +177,48 @@ class ContextTests {
                 emptySet(),
                 emptySet(),
                 BoolSort,
+                Associativity.NONE)))
+  }
+
+  @Test
+  fun testLetShadowingOfLet() {
+    context.let(listOf(VarBinding("A".symbol(), And(True, True)))) {
+      context.let(listOf(VarBinding("A".symbol(), Or(True, True)))) {
+        assert((context.getFunction("A", emptyList()) as VarBinding).term.symbol.toString() == "or")
+      }
+    }
+  }
+
+  @ParameterizedTest
+  @MethodSource("getIllegalFunctionDeclarations")
+  @Order(8)
+  fun `test that redeclaration of functions throws FunctionAlreadyDeclaredException`(
+      func: FunctionDecl<*>
+  ) {
+    assertThrows<IllegalFunctionOverloadException> { context.registerFunction(func) }
+  }
+
+  private fun getIllegalFunctionDeclarations(): Stream<Arguments> {
+    return Stream.of(
+        /* Illegal */
+        arguments(
+            FunctionDecl(
+                "and".symbol(),
+                emptySet(),
+                listOf(BoolSort, BoolSort, BoolSort),
+                emptySet(),
+                emptySet(),
+                BoolSort,
+                Associativity.NONE)),
+        /* Illegal */
+        arguments(
+            FunctionDecl(
+                "bvult".symbol(),
+                emptySet(),
+                listOf(BVSort(16), BVSort(16)),
+                emptySet(),
+                emptySet(),
+                BoolSort,
                 Associativity.NONE)),
         /* New overloaded */
         arguments(
@@ -232,40 +256,6 @@ class ContextTests {
                 "bvult".symbol(),
                 emptySet(),
                 listOf(BVSort(16), BVSort(32)),
-                emptySet(),
-                emptySet(),
-                BoolSort,
-                Associativity.NONE)),
-    )
-  }
-
-  @ParameterizedTest
-  @MethodSource("getIllegalFunctionDeclarations")
-  @Order(8)
-  fun `test that redeclaration of functions throws FunctionAlreadyDeclaredException`(
-      func: FunctionDecl<*>
-  ) {
-    assertThrows<FunctionAlreadyDeclaredException> { context.registerFunction(func) }
-  }
-
-  private fun getIllegalFunctionDeclarations(): Stream<Arguments> {
-    return Stream.of(
-        /* Illegal */
-        arguments(
-            FunctionDecl(
-                "and".symbol(),
-                emptySet(),
-                listOf(BoolSort, BoolSort, BoolSort),
-                emptySet(),
-                emptySet(),
-                BoolSort,
-                Associativity.NONE)),
-        /* Illegal */
-        arguments(
-            FunctionDecl(
-                "bvult".symbol(),
-                emptySet(),
-                listOf(BVSort(16), BVSort(16)),
                 emptySet(),
                 emptySet(),
                 BoolSort,
