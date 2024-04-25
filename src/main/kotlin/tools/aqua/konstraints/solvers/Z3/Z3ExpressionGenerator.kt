@@ -719,6 +719,7 @@ fun UBitVecToFP.z3ify(context: Z3Context): Expr<Z3FPSort> =
 fun Expression<RoundingMode>.z3ify(context: Z3Context): Expr<FPRMSort> =
     when (this) {
       is LocalExpression -> this.term.z3ify(context)
+      // TODO cache z3 object of let variable binding
       is LetExpression -> this.inner.z3ify(context)
       is Ite -> this.z3ify(context)
       is RoundNearestTiesToEven -> this.z3ify(context)

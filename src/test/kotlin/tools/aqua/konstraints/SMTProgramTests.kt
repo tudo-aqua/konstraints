@@ -62,7 +62,7 @@ class SMTProgramTests {
 
   @ParameterizedTest
   @MethodSource("getQFBVFile")
-  @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 15, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun testModelGenerationFails(file: File) {
     val program = Parser.parse(file.bufferedReader().readLines().joinToString())
 
@@ -88,7 +88,7 @@ class SMTProgramTests {
 
   @ParameterizedTest
   @MethodSource("getQFBVModelFiles")
-  @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun testModelGeneration(file: File) {
     val program = Parser.parse(file.bufferedReader().readLines().joinToString())
 

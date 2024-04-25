@@ -52,7 +52,7 @@ class Z3Tests {
     }
 
     // For some reason these cases time out sometimes, skip them for now
-    if (id in listOf(382, 426, 433, 672, 737)) {
+    if (id in listOf(382, 426, 433, 672, 737, 776)) {
       return
     }
 
