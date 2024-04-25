@@ -48,7 +48,7 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: "Run Detekt"
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: detekt
       - name: "Attach Detekt Report"
@@ -68,12 +68,12 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: "Run Spotless"
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: spotlessCheck
       - name: "Apply Spotless Fixes"
         if: failure()
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: spotlessApply
       - name: "Attach Spotless Diff"
@@ -97,7 +97,7 @@ jobs:
           distribution: temurin
           java-version: 17
       - name: "Run JUnit Tests"
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: test
       - name: "Publish Test Results"
