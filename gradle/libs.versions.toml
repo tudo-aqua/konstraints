@@ -28,7 +28,7 @@ kotlin-kover = { id = "org.jetbrains.kotlinx.kover", version = "0.7.6" }
 nexus-publish = { id = "io.github.gradle-nexus.publish-plugin", version = "2.0.0" }
 node = { id = "com.github.node-gradle.node", version = "7.0.2" }
 spotless = { id = "com.diffplug.spotless", version = "6.23.3" }
-taskTree = { id = "com.dorongold.task-tree", version = "2.1.1" }
+taskTree = { id = "com.dorongold.task-tree", version = "3.0.0" }
 versions = { id = "com.github.ben-manes.versions", version = "0.51.0" }
 
 [libraries]
