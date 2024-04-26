@@ -32,7 +32,7 @@ taskTree = { id = "com.dorongold.task-tree", version = "2.1.1" }
 versions = { id = "com.github.ben-manes.versions", version = "0.51.0" }
 
 [libraries]
-junit-bom = { group = "org.junit", name = "junit-bom", version = "5.10.1" }
+junit-bom = { group = "org.junit", name = "junit-bom", version = "5.10.2" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter" } # version from BOM
 z3-turnkey = { group = "tools.aqua", name = "z3-turnkey", version = "4.13.0" }
 petitparser-core = { group = "com.github.petitparser", name = "petitparser-core", version = "2.4.0" }
