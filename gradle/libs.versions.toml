@@ -15,7 +15,7 @@
 #  limitations under the License.
 [versions]
 java-jdk = "11"
-kotlin = "2.0.0-RC1"
+kotlin = "2.0.0-RC2"
 nodejs = "20.5.1"
 prettier-toml = "0.3.1"
 
