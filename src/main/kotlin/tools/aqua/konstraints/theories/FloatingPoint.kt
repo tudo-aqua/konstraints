@@ -22,7 +22,8 @@ import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.smt.*
 
-internal object FloatingPointContext : Theory {
+/** FloatingPoint theory object */
+internal object FloatingPointTheory : Theory {
   override val functions =
       listOf(
           RoundNearestTiesToEvenDecl,
@@ -90,13 +91,23 @@ internal object FloatingPointContext : Theory {
  * New Sorts defined by FloatingPoint theory
  */
 
+/** RoundingMode sort object */
 object RoundingMode : Sort("RoundingMode")
 
+/** RoundíngMode sort declaration object */
 internal object RoundingModeDecl :
     SortDecl<RoundingMode>("RoundingMode".symbol(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): RoundingMode = RoundingMode
 }
 
+/**
+ * Baseclass of all FloatingPoint sorts
+ *
+ * (_ FloatingPoint eb sb)
+ *
+ * @param eb: exponent bits
+ * @param sb: significant bits
+ */
 sealed class FPBase(eb: Index, sb: Index) : Sort("FloatingPoint", listOf(eb, sb)) {
   val exponentBits: Int
   val significantBits: Int
@@ -130,6 +141,14 @@ sealed class FPBase(eb: Index, sb: Index) : Sort("FloatingPoint", listOf(eb, sb)
   }
 }
 
+/**
+ * FloatingPoint sort with any positive number of bits
+ *
+ * (_ FloatingPoint eb sb)
+ *
+ * @param eb exponent bits
+ * @param sb significant bits
+ */
 class FPSort private constructor(eb: Index, sb: Index) : FPBase(eb, sb) {
   companion object {
     operator fun invoke(eb: Int, sb: Int): FPSort = FPSort(NumeralIndex(eb), NumeralIndex(sb))
@@ -142,32 +161,41 @@ class FPSort private constructor(eb: Index, sb: Index) : FPBase(eb, sb) {
   }
 }
 
+/** FloatingPoint sort declaration object */
 internal object FPSortDecl :
     SortDecl<FPSort>("FloatingPoint".symbol(), emptySet(), setOf("eb".idx(), "sb".idx())) {
   override fun getSort(bindings: Bindings): FPSort =
       FPSort(bindings["eb"].numeral, bindings["sb"].numeral)
 }
 
+/** Standard 16-bit FloatingPoint sort */
 object FP16 : FPBase(5.idx(), 11.idx())
 
+/** 16-bit FloatingPoint declaration object */
 internal object FP16Decl : SortDecl<FPSort>("Float16".symbol(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): FPSort = FPSort(5, 11)
 }
 
+/** Standard 32-bit FloatingPoint sort */
 object FP32 : FPBase(8.idx(), 24.idx())
 
+/** 32-bit FloatingPoint declaration object */
 internal object FP32Decl : SortDecl<FPSort>("Float32".symbol(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): FPSort = FPSort(8, 24)
 }
 
+/** Standard 64-bit FloatingPoint sort */
 object FP64 : FPBase(11.idx(), 53.idx())
 
+/** 64-bit FloatingPoint declaration object */
 internal object FP64Decl : SortDecl<FPSort>("Float64".symbol(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): FPSort = FPSort(11, 53)
 }
 
+/** Standard 128-bit FloatingPoint sort */
 object FP128 : FPBase(15.idx(), 113.idx())
 
+/** 128-bit FloatingPoint declaration object */
 internal object FP128Decl : SortDecl<FPSort>("Float128".symbol(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): FPSort = FPSort(15, 113)
 }
@@ -176,77 +204,77 @@ internal object FP128Decl : SortDecl<FPSort>("Float128".symbol(), emptySet(), em
  * RoundingMode functions
  */
 
-class RoundNearestTiesToEven :
+object RoundNearestTiesToEven :
     Literal<RoundingMode>("roundNearestTiesToEven".symbol(), RoundingMode)
 
 object RoundNearestTiesToEvenDecl :
     FunctionDecl0<RoundingMode>(
         "roundNearestTiesToEven".symbol(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> =
-      RoundNearestTiesToEven()
+      RoundNearestTiesToEven
 }
 
-class RNE : Literal<RoundingMode>("RNE".symbol(), RoundingMode)
+object RNE : Literal<RoundingMode>("RNE".symbol(), RoundingMode)
 
 object RNEDecl : FunctionDecl0<RoundingMode>("RNE".symbol(), emptySet(), emptySet(), RoundingMode) {
-  override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RNE()
+  override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RNE
 }
 
-class RoundNearestTiesToAway :
+object RoundNearestTiesToAway :
     Literal<RoundingMode>("roundNearestTiesToAway".symbol(), RoundingMode)
 
 object RoundNearestTiesToAwayDecl :
     FunctionDecl0<RoundingMode>(
         "roundNearestTiesToAway".symbol(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> =
-      RoundNearestTiesToAway()
+      RoundNearestTiesToAway
 }
 
-class RNA : Literal<RoundingMode>("RNA".symbol(), RoundingMode)
+object RNA : Literal<RoundingMode>("RNA".symbol(), RoundingMode)
 
 object RNADecl : FunctionDecl0<RoundingMode>("RNA".symbol(), emptySet(), emptySet(), RoundingMode) {
-  override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RNA()
+  override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RNA
 }
 
-class RoundTowardPositive : Literal<RoundingMode>("roundTowardPositive".symbol(), RoundingMode)
+object RoundTowardPositive : Literal<RoundingMode>("roundTowardPositive".symbol(), RoundingMode)
 
 object RoundTowardPositiveDecl :
     FunctionDecl0<RoundingMode>(
         "roundTowardPositive".symbol(), emptySet(), emptySet(), RoundingMode) {
-  override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RoundTowardPositive()
+  override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RoundTowardPositive
 }
 
-class RTP : Literal<RoundingMode>("RTP".symbol(), RoundingMode)
+object RTP : Literal<RoundingMode>("RTP".symbol(), RoundingMode)
 
 object RTPDecl : FunctionDecl0<RoundingMode>("RTP".symbol(), emptySet(), emptySet(), RoundingMode) {
-  override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RTP()
+  override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RTP
 }
 
-class RoundTowardNegative : Literal<RoundingMode>("roundTowardNegative".symbol(), RoundingMode)
+object RoundTowardNegative : Literal<RoundingMode>("roundTowardNegative".symbol(), RoundingMode)
 
 object RoundTowardNegativeDecl :
     FunctionDecl0<RoundingMode>(
         "RoundTowardNegative".symbol(), emptySet(), emptySet(), RoundingMode) {
-  override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RoundTowardNegative()
+  override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RoundTowardNegative
 }
 
-class RTN : Literal<RoundingMode>("RTN".symbol(), RoundingMode)
+object RTN : Literal<RoundingMode>("RTN".symbol(), RoundingMode)
 
 object RTNDecl : FunctionDecl0<RoundingMode>("RTN".symbol(), emptySet(), emptySet(), RoundingMode) {
-  override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RTN()
+  override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RTN
 }
 
-class RoundTowardZero : Literal<RoundingMode>("roundTowardZero".symbol(), RoundingMode)
+object RoundTowardZero : Literal<RoundingMode>("roundTowardZero".symbol(), RoundingMode)
 
 object RoundTowardZeroDecl :
     FunctionDecl0<RoundingMode>("RoundTowardZero".symbol(), emptySet(), emptySet(), RoundingMode) {
-  override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RoundTowardZero()
+  override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RoundTowardZero
 }
 
-class RTZ : Literal<RoundingMode>("RTZ".symbol(), RoundingMode)
+object RTZ : Literal<RoundingMode>("RTZ".symbol(), RoundingMode)
 
 object RTZDecl : FunctionDecl0<RoundingMode>("RTZ".symbol(), emptySet(), emptySet(), RoundingMode) {
-  override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RTZ()
+  override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RTZ
 }
 
 /*
@@ -276,14 +304,16 @@ object FPLiteralDecl :
   }
 }
 
-/*
- * Infinity
+/**
+ * Representation of plus infinity for a given number of bits
+ *
+ * ((_ +oo [eb] [sb]) (_ FloatingPoint [eb] [sb]))
  */
-
 class FPInfinity(val eb: Int, val sb: Int) : Literal<FPSort>("+oo".symbol(), FPSort(eb, sb)) {
   override fun toString(): String = "(_ +oo $eb $sb)"
 }
 
+/** Plus infinity declaration object */
 object FPInfinityDecl :
     FunctionDecl0<FPSort>(
         "+oo".symbol(), emptySet(), setOf("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())) {
@@ -291,10 +321,16 @@ object FPInfinityDecl :
       FPInfinity(bindings["eb"].numeral, bindings["sb"].numeral)
 }
 
+/**
+ * Representation of minus infinity for a given number of bits
+ *
+ * ((_ -oo [eb] [sb]) (_ FloatingPoint [eb] [sb]))
+ */
 class FPMinusInfinity(val eb: Int, val sb: Int) : Literal<FPSort>("-oo".symbol(), FPSort(eb, sb)) {
   override fun toString(): String = "(_ -oo $eb $sb)"
 }
 
+/** Minus infinity declaration object */
 object FPMinusInfinityDecl :
     FunctionDecl0<FPSort>(
         "-oo".symbol(), emptySet(), setOf("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())) {
@@ -302,14 +338,16 @@ object FPMinusInfinityDecl :
       FPMinusInfinity(bindings["eb"].numeral, bindings["sb"].numeral)
 }
 
-/*
- * Zero
+/**
+ * Representation of plus zero for a given number of bits
+ *
+ * ((_ +zero [eb] [sb]) (_ FloatingPoint [eb] [sb]))
  */
-
 class FPZero(val eb: Int, val sb: Int) : Literal<FPSort>("+zero".symbol(), FPSort(eb, sb)) {
   override fun toString(): String = "(_ +zero $eb $sb)"
 }
 
+/** Plus zero declaration object */
 object FPZeroDecl :
     FunctionDecl0<FPSort>(
         "+zero".symbol(),
@@ -320,10 +358,16 @@ object FPZeroDecl :
       FPZero(bindings["eb"].numeral, bindings["sb"].numeral)
 }
 
+/**
+ * Representation of minus zero for a given number of bits
+ *
+ * ((_ -zero [eb] [sb]) (_ FloatingPoint [eb] [sb]))
+ */
 class FPMinusZero(val eb: Int, val sb: Int) : Literal<FPSort>("-zero".symbol(), FPSort(eb, sb)) {
   override fun toString(): String = "(_ -zero $eb $sb)"
 }
 
+/** Minus zero declaration object */
 object FPMinusZeroDecl :
     FunctionDecl0<FPSort>(
         "-zero".symbol(),
@@ -334,14 +378,16 @@ object FPMinusZeroDecl :
       FPMinusZero(bindings["eb"].numeral, bindings["sb"].numeral)
 }
 
-/*
- * NaN
+/**
+ * Representation of NaN for a given number of bits
+ *
+ * ((_ NaN [eb] [sb]) (_ FloatingPoint [eb] [sb]))
  */
-
 class FPNaN(val eb: Int, val sb: Int) : Literal<FPSort>("NaN".symbol(), FPSort(eb, sb)) {
   override fun toString(): String = "(_ NaN $eb $sb)"
 }
 
+/** NaN declaration object */
 object FPNaNDecl :
     FunctionDecl0<FPSort>(
         "NaN".symbol(), emptySet(), setOf("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())) {
@@ -353,13 +399,20 @@ object FPNaNDecl :
  * Operators
  */
 
+/**
+ * Floating point absolute value, sort will be automatically determined from [inner]
+ *
+ * (fp.abs (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ */
 class FPAbs(val inner: Expression<FPSort>) :
-    UnaryExpression<FPSort, FPSort>("fp.abs".symbol(), FPSort(2, 2)) {
+    UnaryExpression<FPSort, FPSort>(
+        "fp.abs".symbol(), FPSort(2, 2) /* this is just any legal FPSort, will be overwritten */) {
   override val sort: FPSort = inner.sort
 
   override fun inner(): Expression<FPSort> = inner
 }
 
+/** Absolute value declaration object */
 object FPAbsDecl :
     FunctionDecl1<FPSort, FPSort>(
         "fp.abs".symbol(),
@@ -372,6 +425,11 @@ object FPAbsDecl :
       FPAbs(param)
 }
 
+/**
+ * Floating point negation, sort will be automatically determined from [inner]
+ *
+ * (fp.neg (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ */
 class FPNeg(val inner: Expression<FPSort>) :
     UnaryExpression<FPSort, FPSort>("fp.neg".symbol(), FPSort(2, 2)) {
   override val sort: FPSort = inner.sort
@@ -379,6 +437,7 @@ class FPNeg(val inner: Expression<FPSort>) :
   override fun inner(): Expression<FPSort> = inner
 }
 
+/** Negation declaration object */
 object FPNegDecl :
     FunctionDecl1<FPSort, FPSort>(
         "fp.abs".symbol(),
@@ -391,6 +450,13 @@ object FPNegDecl :
       FPNeg(param)
 }
 
+/**
+ * Floating point addition, sort will be automatically determined from [lhs]
+ *
+ * @throws IllegalArgumentException if [lhs] and [rhs] do not have the same sort
+ *
+ * (fp.add RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ */
 class FPAdd(
     val roundingMode: Expression<RoundingMode>,
     val lhs: Expression<FPSort>,
@@ -410,6 +476,7 @@ class FPAdd(
   }
 }
 
+/** Addition declaration object */
 object FPAddDecl :
     FunctionDecl3<RoundingMode, FPSort, FPSort, FPSort>(
         "fp.add".symbol(),
@@ -428,6 +495,13 @@ object FPAddDecl :
   ): Expression<FPSort> = FPAdd(param1, param2, param3)
 }
 
+/**
+ * Floating point subtraction, sort will be automatically determined from [minuend]
+ *
+ * @throws IllegalArgumentException if [minuend] and [subtrahend] do not have the same sort
+ *
+ * (fp.sub RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ */
 class FPSub(
     val roundingMode: Expression<RoundingMode>,
     val minuend: Expression<FPSort>,
@@ -447,6 +521,7 @@ class FPSub(
   }
 }
 
+/** Subtraction declaration object */
 object FPSubDecl :
     FunctionDecl3<RoundingMode, FPSort, FPSort, FPSort>(
         "fp.sub".symbol(),
@@ -465,6 +540,13 @@ object FPSubDecl :
   ): Expression<FPSort> = FPSub(param1, param2, param3)
 }
 
+/**
+ * Floating point multiplication, sort will be automatically determined from [multiplier]
+ *
+ * @throws IllegalArgumentException if [multiplier] and [multiplicand] do not have the same sort
+ *
+ * (fp.mul RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ */
 class FPMul(
     val roundingMode: Expression<RoundingMode>,
     val multiplier: Expression<FPSort>,
@@ -502,6 +584,13 @@ object FPMulDecl :
   ): Expression<FPSort> = FPMul(param1, param2, param3)
 }
 
+/**
+ * Floating point division, sort will be automatically determined from [dividend]
+ *
+ * @throws IllegalArgumentException if [dividend] and [divisor] do not have the same sort
+ *
+ * (fp.div RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ */
 class FPDiv(
     val roundingMode: Expression<RoundingMode>,
     val dividend: Expression<FPSort>,
@@ -539,6 +628,15 @@ object FPDivDecl :
   ): Expression<FPSort> = FPDiv(param1, param2, param3)
 }
 
+/**
+ * Floating point fused multiplication and addition ([multiplier] * [multiplicand]) + [summand],
+ * sort will be automatically determined from [multiplier]
+ *
+ * @throws IllegalArgumentException if [multiplier], [multiplicand] and [summand] do not have the
+ *   same sort
+ *
+ * (fp.fma RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ */
 class FPFma(
     val roundingMode: Expression<RoundingMode>,
     val multiplier: Expression<FPSort>,
@@ -576,6 +674,11 @@ object FPFmaDecl :
   ): Expression<FPSort> = FPFma(param1, param2, param3, param4)
 }
 
+/**
+ * Floating point square root, sort will be automatically determined from [inner]
+ *
+ * (fp.sqrt RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ */
 class FPSqrt(val roundingMode: Expression<RoundingMode>, val inner: Expression<FPSort>) :
     BinaryExpression<FPSort, RoundingMode, FPSort>("fp.sqrt".symbol(), FPSort(2, 2)) {
   override val sort: FPSort = inner.sort
@@ -601,6 +704,14 @@ object FPSqrtDecl :
   ): Expression<FPSort> = FPSqrt(param1, param2)
 }
 
+/**
+ * Floating point remainder: [dividend] - [divisor] * n, where n in Z is nearest to
+ * [dividend]/[divisor], sort will be automatically determined from [dividend]
+ *
+ * @throws IllegalArgumentException if [dividend] and [divisor] do not have the same sort
+ *
+ * (fp.rem (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ */
 class FPRem(val dividend: Expression<FPSort>, val divisor: Expression<FPSort>) :
     BinaryExpression<FPSort, FPSort, FPSort>("fp.rem".symbol(), FPSort(2, 2)) {
   override val sort: FPSort = dividend.sort
@@ -632,6 +743,11 @@ object FPRemDecl :
   ): Expression<FPSort> = FPRem(param1, param2)
 }
 
+/**
+ * Floating point rounding to integral, sort will be automatically determined from [inner]
+ *
+ * (fp.roundToIntegral RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ */
 class FPRoundToIntegral(val roundingMode: Expression<RoundingMode>, val inner: Expression<FPSort>) :
     BinaryExpression<FPSort, RoundingMode, FPSort>("fp.roundToIntegral".symbol(), FPSort(2, 2)) {
   override val sort: FPSort = inner.sort
@@ -657,6 +773,13 @@ object FPRoundToIntegralDecl :
   ): Expression<FPSort> = FPRoundToIntegral(param1, param2)
 }
 
+/**
+ * Floating point minimum, sort will be automatically determined from [lhs]
+ *
+ * @throws IllegalArgumentException if [lhs] and [rhs] do not have the same sort
+ *
+ * (fp.min (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ */
 class FPMin(val lhs: Expression<FPSort>, val rhs: Expression<FPSort>) :
     BinaryExpression<FPSort, FPSort, FPSort>("fp.min".symbol(), FPSort(2, 2)) {
   override val sort: FPSort = lhs.sort
@@ -686,6 +809,13 @@ object FPMinDecl :
   ): Expression<FPSort> = FPMin(param1, param2)
 }
 
+/**
+ * Floating point maximum, sort will be automatically determined from [lhs]
+ *
+ * @throws IllegalArgumentException if [lhs] and [rhs] do not have the same sort
+ *
+ * (fp.max (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ */
 class FPMax(val lhs: Expression<FPSort>, val rhs: Expression<FPSort>) :
     BinaryExpression<FPSort, FPSort, FPSort>("fp.max".symbol(), FPSort(2, 2)) {
   override val sort: FPSort = lhs.sort
@@ -715,6 +845,14 @@ object FPMaxDecl :
   ): Expression<FPSort> = FPMin(param1, param2)
 }
 
+/**
+ * Floating point less equals,
+ *
+ * @throws IllegalArgumentException if less than 2 [terms] are provided
+ * @throws IllegalArgumentException if two [terms] have different sorts
+ *
+ * (fp.leq (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)
+ */
 class FPLeq(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.leq".symbol(), BoolSort) {
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
@@ -743,6 +881,14 @@ object FPLeqDecl :
   ): Expression<BoolSort> = FPLeq(varargs)
 }
 
+/**
+ * Floating point less,
+ *
+ * @throws IllegalArgumentException if less than 2 [terms] are provided
+ * @throws IllegalArgumentException if two [terms] have different sorts
+ *
+ * (fp.lt (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)
+ */
 class FPLt(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.lt".symbol(), BoolSort) {
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
@@ -771,6 +917,14 @@ object FPLtDecl :
   ): Expression<BoolSort> = FPLt(varargs)
 }
 
+/**
+ * Floating point greater equals,
+ *
+ * @throws IllegalArgumentException if less than 2 [terms] are provided
+ * @throws IllegalArgumentException if two [terms] have different sorts
+ *
+ * (fp.geq (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)
+ */
 class FPGeq(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.geq".symbol(), BoolSort) {
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
@@ -799,6 +953,14 @@ object FPGeqDecl :
   ): Expression<BoolSort> = FPGeq(varargs)
 }
 
+/**
+ * Floating point greater,
+ *
+ * @throws IllegalArgumentException if less than 2 [terms] are provided
+ * @throws IllegalArgumentException if two [terms] have different sorts
+ *
+ * (fp.gt (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)
+ */
 class FPGt(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.gt".symbol(), BoolSort) {
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
@@ -827,6 +989,14 @@ object FPGtDecl :
   ): Expression<BoolSort> = FPGt(varargs)
 }
 
+/**
+ * Floating point equality (not SMT equality '='),
+ *
+ * @throws IllegalArgumentException if less than 2 [terms] are provided
+ * @throws IllegalArgumentException if two [terms] have different sorts
+ *
+ * (fp.eq (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)
+ */
 class FPEq(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.eq".symbol(), BoolSort) {
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
@@ -853,6 +1023,7 @@ object FPEqDecl :
   ): Expression<BoolSort> = FPEq(varargs)
 }
 
+/** (fp.isNormal (_ FloatingPoint eb sb) Bool) */
 class FPIsNormal(val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isNormal".symbol(), BoolSort) {
   override fun inner(): Expression<FPSort> = inner
@@ -872,6 +1043,7 @@ object FPIsNormalDecl :
   ): Expression<BoolSort> = FPIsNormal(param)
 }
 
+/** (fp.isSubnormal (_ FloatingPoint eb sb) Bool) */
 class FPIsSubnormal(val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isSubnormal".symbol(), BoolSort) {
   override fun inner(): Expression<FPSort> = inner
@@ -891,6 +1063,7 @@ object FPIsSubormalDecl :
   ): Expression<BoolSort> = FPIsSubnormal(param)
 }
 
+/** (fp.isZero (_ FloatingPoint eb sb) Bool) */
 class FPIsZero(val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isZero".symbol(), BoolSort) {
   override fun inner(): Expression<FPSort> = inner
@@ -910,6 +1083,7 @@ object FPIsZeroDecl :
   ): Expression<BoolSort> = FPIsZero(param)
 }
 
+/** (fp.isInfinite (_ FloatingPoint eb sb) Bool) */
 class FPIsInfinite(val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isInfinite".symbol(), BoolSort) {
   override fun inner(): Expression<FPSort> = inner
@@ -929,6 +1103,7 @@ object FPIsInfiniteDecl :
   ): Expression<BoolSort> = FPIsInfinite(param)
 }
 
+/** (fp.isNaN (_ FloatingPoint eb sb) Bool) */
 class FPIsNaN(val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isNaN".symbol(), BoolSort) {
   override fun inner(): Expression<FPSort> = inner
@@ -948,6 +1123,7 @@ object FPIsNaNDecl :
   ): Expression<BoolSort> = FPIsNaN(param)
 }
 
+/** (fp.isNegative (_ FloatingPoint eb sb) Bool) */
 class FPIsNegative(val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isNegative".symbol(), BoolSort) {
   override fun inner(): Expression<FPSort> = inner
@@ -967,6 +1143,7 @@ object FPIsNegativeDecl :
   ): Expression<BoolSort> = FPIsNegative(param)
 }
 
+/** (fp.isPositive (_ FloatingPoint eb sb) Bool) */
 class FPIsPositive(val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isPositive".symbol(), BoolSort) {
   override fun inner(): Expression<FPSort> = inner
@@ -990,9 +1167,20 @@ object FPIsPositiveDecl :
  * Conversion from other sorts
  */
 
+/**
+ * Convert a bitvector [inner] to floating point with given number of bits [eb] and [sb]
+ *
+ * @throws IllegalArgumentException if number of bits in [inner] is not [eb] + [sb]
+ *
+ * ((_ to_fp eb sb) (_ BitVec m) (_ FloatingPoint eb sb)), with m = eb + sb
+ */
 class BitVecToFP(val inner: Expression<BVSort>, val eb: Int, val sb: Int) :
     UnaryExpression<FPSort, BVSort>("to_fp".symbol(), FPSort(eb, sb)) {
   override fun inner(): Expression<BVSort> = inner
+
+  init {
+    require(inner.sort.bits == eb + sb)
+  }
 }
 
 object BitVecToFPDecl :
@@ -1007,6 +1195,12 @@ object BitVecToFPDecl :
       BitVecToFP(param, bindings["eb"].numeral, bindings["sb"].numeral)
 }
 
+/**
+ * Convert a floating point [inner] to a different floating point with given number of bits [eb] and
+ * [sb]
+ *
+ * ((_ to_fp eb sb) RoundingMode (_ FloatingPoint mb nb) (_ FloatingPoint eb sb))
+ */
 class FPToFP(
     val roundingMode: Expression<RoundingMode>,
     val inner: Expression<FPSort>,
@@ -1036,6 +1230,11 @@ object FPToFPDecl :
   ): Expression<FPSort> = FPToFP(param1, param2, bindings["eb"].numeral, bindings["sb"].numeral)
 }
 
+/**
+ * Convert a real [inner] to a floating point with given number of bits [eb] and [sb]
+ *
+ * ((_ to_fp eb sb) RoundingMode Real (_ FloatingPoint eb sb))
+ */
 class RealToFP(
     val roundingMode: Expression<RoundingMode>,
     val inner: Expression<RealSort>,
@@ -1065,6 +1264,12 @@ object RealToFPDecl :
   ): Expression<FPSort> = RealToFP(param1, param2, bindings["eb"].numeral, bindings["sb"].numeral)
 }
 
+/**
+ * Convert a signed machine integer, represented as a 2's complement bit vector, [inner] to a
+ * floating point with given number of bits [eb] and [sb]
+ *
+ * ((_ to_fp eb sb) RoundingMode (_ BitVec m) (_ FloatingPoint eb sb))
+ */
 class SBitVecToFP(
     val roundingMode: Expression<RoundingMode>,
     val inner: Expression<BVSort>,
@@ -1095,6 +1300,12 @@ object SBitVecToFPDecl :
       SBitVecToFP(param1, param2, bindings["eb"].numeral, bindings["sb"].numeral)
 }
 
+/**
+ * Convert an unsigned machine integer, represented as bit vector, [inner] to a floating point with
+ * given number of bits [eb] and [sb]
+ *
+ * ((_ to_fp_unsigned eb sb) RoundingMode (_ BitVec m) (_ FloatingPoint eb sb))
+ */
 class UBitVecToFP(
     val roundingMode: Expression<RoundingMode>,
     val inner: Expression<BVSort>,
@@ -1129,6 +1340,12 @@ object UBitVecToFPDecl :
  * Conversion to other sorts
  */
 
+/**
+ * Convert a floating point [inner] to an unsigned machine integer, represented as a bit vector of
+ * length [m]
+ *
+ * ((_ fp.to_ubv m) RoundingMode (_ FloatingPoint eb sb) (_ BitVec m))
+ */
 class FPToUBitVec(
     val roundingMode: Expression<RoundingMode>,
     val inner: Expression<FPSort>,
@@ -1157,6 +1374,12 @@ object FPToUBitVecDecl :
   ): Expression<BVSort> = FPToUBitVec(param1, param2, bindings["m"].numeral)
 }
 
+/**
+ * Convert a floating point [inner] to a signed machine integer, represented as a 2's complement bit
+ * vector of length [m]
+ *
+ * ((_ fp.to_ubv m) RoundingMode (_ FloatingPoint eb sb) (_ BitVec m))
+ */
 class FPToSBitVec(
     val roundingMode: Expression<RoundingMode>,
     val inner: Expression<FPSort>,
@@ -1186,6 +1409,11 @@ object FPToSBitVecDecl :
   ): Expression<BVSort> = FPToSBitVec(param1, param2, bindings["m"].numeral)
 }
 
+/**
+ * Convert a floating point [inner] to real
+ *
+ * (fp.to_real (_ FloatingPoint eb sb) Real)
+ */
 class FPToReal(val inner: Expression<FPSort>) :
     UnaryExpression<RealSort, FPSort>("fp.to_real".symbol(), RealSort) {
   override fun inner(): Expression<FPSort> = inner

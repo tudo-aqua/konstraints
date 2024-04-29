@@ -19,7 +19,7 @@
 package tools.aqua.konstraints.parser
 
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.theories.CoreContext
+import tools.aqua.konstraints.theories.CoreTheory
 import tools.aqua.konstraints.util.Stack
 
 abstract class SortDecl<T : Sort>(
@@ -60,8 +60,8 @@ class Context(theory: Theory) {
     // core theory is always loaded QF_UF and UF are the only logics that load core "manually"
     // as it is the only theory they rely on, for all other logics core is loaded before
     // the other theory is loaded
-    if (theory != CoreContext) {
-      assertionLevels.push(CoreContext)
+    if (theory != CoreTheory) {
+      assertionLevels.push(CoreTheory)
     }
 
     assertionLevels.push(theory)
@@ -77,9 +77,9 @@ class Context(theory: Theory) {
               it.name.toString(), "Can not override theory symbol ${it.name}")
     }
 
-    if (theory != CoreContext) {
+    if (theory != CoreTheory) {
       varBindings.forEach {
-        if (CoreContext.contains(it.name))
+        if (CoreTheory.contains(it.name))
             throw IllegalFunctionOverloadException(
                 it.name.toString(), "Can not override theory symbol ${it.name}")
       }

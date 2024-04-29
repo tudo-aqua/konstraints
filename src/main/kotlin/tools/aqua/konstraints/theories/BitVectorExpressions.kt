@@ -22,7 +22,8 @@ import java.math.BigInteger
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
-internal object BitVectorExpressionContext : Theory {
+/** FixedSizeBitVectors theory object */
+internal object BitVectorExpressionTheory : Theory {
   override val functions =
       listOf(
           BVUltDecl,
@@ -41,15 +42,20 @@ internal object BitVectorExpressionContext : Theory {
   override val sorts = mapOf(Pair("BitVec", BVSortDecl))
 }
 
+/**
+ * BitVec sort declaration
+ *
+ * (_ BitVec m)
+ */
 internal object BVSortDecl : SortDecl<BVSort>("BitVec".symbol(), emptySet(), setOf("m".idx())) {
   override fun getSort(bindings: Bindings): BVSort = BVSort(bindings["m"].numeral)
 }
 
-/*
- * This file implements the SMT theory of fixed size bitvectors
- * http://smtlib.cs.uiowa.edu/theories-FixedSizeBitVectors.shtml
+/**
+ * Any form of bitvector literals either
+ * - All binaries #bX of sort (_ BitVec m) where m is the number of digits in X or
+ * - All hexadecimals #xX of sort (_ BitVec m) where m is 4 times the number of digits in X.
  */
-
 class BVLiteral(vector: String) : Literal<BVSort>("|$vector|".symbol(), BVSort(1)) {
   val value: BigInteger
   val bits: Int

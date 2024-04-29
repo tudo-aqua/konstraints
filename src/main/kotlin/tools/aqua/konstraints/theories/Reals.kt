@@ -23,7 +23,8 @@ import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.smt.*
 
-internal object RealsContext : Theory {
+/** Reals theory object */
+internal object RealsTheory : Theory {
   override val functions =
       listOf(
           RealNegDecl,
@@ -39,12 +40,18 @@ internal object RealsContext : Theory {
   override val sorts: Map<String, SortDecl<*>> = mapOf(Pair("Real", RealSortDecl))
 }
 
+/** Real sort */
 object RealSort : Sort("Real")
 
 internal object RealSortDecl : SortDecl<RealSort>("Real".symbol(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): RealSort = RealSort
 }
 
+/**
+ * Real literal
+ *
+ * (NUMERAL Real) (DECIMAL Real)
+ */
 class RealLiteral(val value: BigDecimal) : Literal<RealSort>("|$value|".symbol(), RealSort) {
   override val symbol: Symbol = "|$value|".symbol()
   override val sort: RealSort = RealSort
@@ -52,6 +59,11 @@ class RealLiteral(val value: BigDecimal) : Literal<RealSort>("|$value|".symbol()
   override fun toString(): String = symbol.toSMTString()
 }
 
+/**
+ * Real negation
+ *
+ * (- Real Real)
+ */
 class RealNeg(val inner: Expression<RealSort>) :
     UnaryExpression<RealSort, RealSort>("-".symbol(), RealSort) {
   override fun inner(): Expression<RealSort> = inner
@@ -66,6 +78,11 @@ object RealNegDecl :
   ): Expression<RealSort> = RealNeg(param)
 }
 
+/**
+ * Real subtraction
+ *
+ * (- Real Real Real :left-assoc)
+ */
 class RealSub(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<RealSort, RealSort>("-".symbol(), RealSort) {
   init {
@@ -88,6 +105,11 @@ object RealSubDecl :
   ): Expression<RealSort> = RealSub(listOf(param1, param2) + varargs)
 }
 
+/**
+ * Real addition
+ *
+ * (+ Real Real Real :left-assoc)
+ */
 class RealAdd(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<RealSort, RealSort>("+".symbol(), RealSort) {
   init {
@@ -110,6 +132,11 @@ object RealAddDecl :
   ): Expression<RealSort> = RealAdd(listOf(param1, param2) + varargs)
 }
 
+/**
+ * Real multiplication
+ *
+ * (* Real Real Real :left-assoc)
+ */
 class RealMul(val factors: List<Expression<RealSort>>) :
     HomogenousExpression<RealSort, RealSort>("*".symbol(), RealSort) {
   init {
@@ -132,6 +159,11 @@ object RealMulDecl :
   ): Expression<RealSort> = RealMul(listOf(param1, param2) + varargs)
 }
 
+/**
+ * Real division
+ *
+ * (/ Real Real Real :left-assoc)
+ */
 class RealDiv(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<RealSort, RealSort>("/".symbol(), RealSort) {
   init {
@@ -154,6 +186,11 @@ object RealDivDecl :
   ): Expression<RealSort> = RealDiv(listOf(param1, param2) + varargs)
 }
 
+/**
+ * Real less equals
+ *
+ * (<= Real Real Bool :chainable)
+ */
 class RealLessEq(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<BoolSort, RealSort>("<=".symbol(), BoolSort) {
   init {
@@ -174,6 +211,11 @@ object RealLessEqDecl :
   ): Expression<BoolSort> = RealLessEq(varargs)
 }
 
+/**
+ * Real less
+ *
+ * (<= Real Real Bool :chainable)
+ */
 class RealLess(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<BoolSort, RealSort>("<".symbol(), BoolSort) {
   init {
@@ -194,6 +236,11 @@ object RealLessDecl :
   ): Expression<BoolSort> = RealLess(varargs)
 }
 
+/**
+ * Real greater equals
+ *
+ * (<= Real Real Bool :chainable)
+ */
 class RealGreaterEq(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<BoolSort, RealSort>(">=".symbol(), BoolSort) {
   init {
@@ -214,6 +261,11 @@ object RealGreaterEqDecl :
   ): Expression<BoolSort> = RealGreaterEq(varargs)
 }
 
+/**
+ * Real greater
+ *
+ * (<= Real Real Bool :chainable)
+ */
 class RealGreater(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<BoolSort, RealSort>(">".symbol(), BoolSort) {
   init {

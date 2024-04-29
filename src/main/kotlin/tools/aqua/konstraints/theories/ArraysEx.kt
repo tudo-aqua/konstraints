@@ -23,16 +23,19 @@ import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.smt.SortParameter
 
-internal object ArrayExContext : Theory {
+/** Array extension theory object */
+internal object ArrayExTheory : Theory {
   override val functions: List<FunctionDecl<*>> = listOf(ArraySelectDecl, ArrayStoreDecl)
 
   override val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf(Pair("Array", ArraySortDecl))
 }
 
+/** Array sort */
 class ArraySort(val x: Sort, val y: Sort) : Sort("Array".symbol(), emptyList(), listOf(x, y)) {
   override fun toString(): String = "(Array $x $y)"
 }
 
+/** Sort declaration object for array sort */
 internal object ArraySortDecl :
     SortDecl<ArraySort>(
         "Array".symbol(), setOf(SortParameter("X"), SortParameter("Y")), emptySet()) {
@@ -40,6 +43,11 @@ internal object ArraySortDecl :
       ArraySort(bindings[SortParameter("X")], bindings[SortParameter("Y")])
 }
 
+/**
+ * Array selection operation
+ *
+ * (par (X Y) (select (Array X Y) X Y)
+ */
 class ArraySelect(val array: Expression<ArraySort>, val index: Expression<*>) :
     BinaryExpression<Sort, ArraySort, Sort>("select".symbol(), array.sort.y) {
   init {
@@ -51,6 +59,7 @@ class ArraySelect(val array: Expression<ArraySort>, val index: Expression<*>) :
   override fun rhs(): Expression<Sort> = index as Expression<Sort>
 }
 
+/** Array selection declaration object */
 object ArraySelectDecl :
     FunctionDecl2<ArraySort, Sort, Sort>(
         "select".symbol(),
@@ -67,6 +76,11 @@ object ArraySelectDecl :
   ): Expression<Sort> = ArraySelect(param1, param2)
 }
 
+/**
+ * Array store operation
+ *
+ * (par (X Y) (store (Array X Y) X Y (Array X Y)))
+ */
 class ArrayStore(
     val array: Expression<ArraySort>,
     val index: Expression<*>,
@@ -80,6 +94,7 @@ class ArrayStore(
   override fun subexpressions(): List<Expression<*>> = listOf(array, index, value)
 }
 
+/** Array store declaration object */
 object ArrayStoreDecl :
     FunctionDecl3<ArraySort, Sort, Sort, ArraySort>(
         "store".symbol(),

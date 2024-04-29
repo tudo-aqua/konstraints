@@ -21,7 +21,8 @@ package tools.aqua.konstraints.theories
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
-internal object IntsContext : Theory {
+/** Ints theory object */
+internal object IntsTheory : Theory {
   override val functions =
       listOf(
           IntNegDecl,
@@ -40,16 +41,27 @@ internal object IntsContext : Theory {
   override val sorts: Map<String, SortDecl<*>> = mapOf(Pair("Int", IntSortDecl))
 }
 
+/** Int sort */
 object IntSort : Sort("Int")
 
 internal object IntSortDecl : SortDecl<IntSort>("Int".symbol(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): IntSort = IntSort
 }
 
+/**
+ * Integer literals
+ *
+ * (NUMERAL Int)
+ */
 class IntLiteral(val value: Int) : Literal<IntSort>("|$value|".symbol(), IntSort) {
   override fun toString(): String = value.toString()
 }
 
+/**
+ * Integer negation
+ *
+ * (- Int Int)
+ */
 class IntNeg(val inner: Expression<IntSort>) :
     UnaryExpression<IntSort, IntSort>("-".symbol(), IntSort) {
   override fun inner(): Expression<IntSort> = inner
@@ -64,6 +76,11 @@ object IntNegDecl :
   ): Expression<IntSort> = IntNeg(param)
 }
 
+/**
+ * Integer subtraction
+ *
+ * (- Int Int Int :left-assoc)
+ */
 class IntSub(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<IntSort, IntSort>("-".symbol(), IntSort) {
   init {
@@ -86,6 +103,11 @@ object IntSubDecl :
   ): Expression<IntSort> = IntSub(listOf(param1, param2) + varargs)
 }
 
+/**
+ * Integer addition
+ *
+ * (+ Int Int Int :left-assoc)
+ */
 class IntAdd(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<IntSort, IntSort>("+".symbol(), IntSort) {
   init {
@@ -108,6 +130,11 @@ object IntAddDecl :
   ): Expression<IntSort> = IntAdd(listOf(param1, param2) + varargs)
 }
 
+/**
+ * Integer multiplication
+ *
+ * (* Int Int Int :left-assoc)
+ */
 class IntMul(val factors: List<Expression<IntSort>>) :
     HomogenousExpression<IntSort, IntSort>("*".symbol(), IntSort) {
   init {
@@ -130,6 +157,11 @@ object IntMulDecl :
   ): Expression<IntSort> = IntMul(listOf(param1, param2) + varargs)
 }
 
+/**
+ * Integer division
+ *
+ * (div Int Int Int :left-assoc)
+ */
 class IntDiv(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<IntSort, IntSort>("/".symbol(), IntSort) {
   init {
@@ -152,6 +184,11 @@ object IntDivDecl :
   ): Expression<IntSort> = IntDiv(listOf(param1, param2) + varargs)
 }
 
+/**
+ * Modulo
+ *
+ * (mod Int Int Int)
+ */
 class Mod(val dividend: Expression<IntSort>, val divisor: Expression<IntSort>) :
     BinaryExpression<IntSort, IntSort, IntSort>("mod".symbol(), IntSort) {
 
@@ -170,6 +207,11 @@ object ModDecl :
   ): Expression<IntSort> = Mod(param1, param2)
 }
 
+/**
+ * Absolute value
+ *
+ * (abs Int Int)
+ */
 class Abs(val inner: Expression<IntSort>) :
     UnaryExpression<IntSort, IntSort>("abs".symbol(), IntSort) {
   override fun inner(): Expression<IntSort> = inner
@@ -184,6 +226,11 @@ object AbsDecl :
   ): Expression<IntSort> = Abs(param)
 }
 
+/**
+ * Integer less equals
+ *
+ * (<= Int Int Bool :chainable)
+ */
 class IntLessEq(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<BoolSort, IntSort>("<=".symbol(), BoolSort) {
   constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
@@ -206,6 +253,11 @@ object IntLessEqDecl :
   ): Expression<BoolSort> = IntLessEq(varargs)
 }
 
+/**
+ * Integer less
+ *
+ * (< Int Int Bool :chainable)
+ */
 class IntLess(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<BoolSort, IntSort>("<".symbol(), BoolSort) {
   constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
@@ -228,6 +280,11 @@ object IntLessDecl :
   ): Expression<BoolSort> = IntLess(varargs)
 }
 
+/**
+ * Integer greater equals
+ *
+ * (>= Int Int Bool :chainable)
+ */
 class IntGreaterEq(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<BoolSort, IntSort>(">=".symbol(), BoolSort) {
   constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
@@ -250,6 +307,11 @@ object IntGreaterEqDecl :
   ): Expression<BoolSort> = IntGreaterEq(varargs)
 }
 
+/**
+ * Integer greater
+ *
+ * (> Int Int Bool :chainable)
+ */
 class IntGreater(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<BoolSort, IntSort>(">".symbol(), BoolSort) {
   constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
@@ -272,9 +334,20 @@ object IntGreaterDecl :
   ): Expression<BoolSort> = IntGreater(varargs)
 }
 
+/**
+ * Divisible predicate,
+ *
+ * @throws IllegalArgumentException if [n] <= 0
+ *
+ * ((_ divisible n) Int Bool)
+ */
 class Divisible(val n: Int, val inner: Expression<IntSort>) :
     UnaryExpression<BoolSort, IntSort>("divisible".symbol(), BoolSort) {
   override fun inner(): Expression<IntSort> = inner
+
+  init {
+    require(n > 0)
+  }
 }
 
 object DivisibleDecl :

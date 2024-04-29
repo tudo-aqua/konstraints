@@ -21,7 +21,7 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.parser.Attribute
 import tools.aqua.konstraints.parser.Context
 import tools.aqua.konstraints.solvers.Z3.Z3Solver
-import tools.aqua.konstraints.theories.BitVectorExpressionContext
+import tools.aqua.konstraints.theories.BitVectorExpressionTheory
 
 enum class SatStatus {
   SAT, // program is satisfiable
@@ -121,7 +121,7 @@ class MutableSMTProgram(commands: List<Command>, context: Context?) :
       QF_AUFBV -> TODO()
       QF_AUFLIA -> TODO()
       QF_AX -> TODO()
-      QF_BV -> context = Context(BitVectorExpressionContext)
+      QF_BV -> context = Context(BitVectorExpressionTheory)
       QF_IDL -> TODO()
       QF_LIA -> TODO()
       QF_LRA -> TODO()

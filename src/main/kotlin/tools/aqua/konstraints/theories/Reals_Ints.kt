@@ -23,7 +23,8 @@ import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.parser.Theory
 import tools.aqua.konstraints.smt.*
 
-internal object RealsIntsContext : Theory {
+/** Reals Ints theory context */
+internal object RealsIntsTheory : Theory {
   override val functions =
       listOf(
           IntNegDecl,
@@ -55,6 +56,11 @@ internal object RealsIntsContext : Theory {
       mapOf(Pair("Int", IntSortDecl), Pair("Real", RealSortDecl))
 }
 
+/**
+ * Convert an integer [inner] to real
+ *
+ * (to_real Int Real)
+ */
 class ToReal(val inner: Expression<IntSort>) :
     UnaryExpression<RealSort, IntSort>("to_real".symbol(), RealSort) {
   override fun inner(): Expression<IntSort> = inner
@@ -69,6 +75,11 @@ object ToRealDecl :
   ): Expression<RealSort> = ToReal(param)
 }
 
+/**
+ * Convert a real [inner] to int
+ *
+ * (to_int Real Int)
+ */
 class ToInt(val inner: Expression<RealSort>) :
     UnaryExpression<IntSort, RealSort>("to_int".symbol(), IntSort) {
   override fun inner(): Expression<RealSort> = inner
@@ -83,6 +94,7 @@ object ToIntDecl :
   ): Expression<IntSort> = ToInt(param)
 }
 
+/** (is_int Real Bool) */
 class IsInt(val inner: Expression<RealSort>) :
     UnaryExpression<BoolSort, RealSort>("is_int".symbol(), BoolSort) {
   override fun inner(): Expression<RealSort> = inner

@@ -27,13 +27,24 @@ import tools.aqua.konstraints.smt.SortParameter
  * http://smtlib.cs.uiowa.edu/theories-Core.shtml
  */
 
-object CoreContext : Theory {
+/** Core theory object */
+object CoreTheory : Theory {
   override val functions =
       listOf(
-          FalseDecl, TrueDecl, NotDecl, AndDecl, OrDecl, XOrDecl, EqualsDecl, DistinctDecl, IteDecl)
+          FalseDecl,
+          TrueDecl,
+          NotDecl,
+          AndDecl,
+          OrDecl,
+          XOrDecl,
+          EqualsDecl,
+          DistinctDecl,
+          IteDecl,
+          ImpliesDecl)
   override val sorts = mapOf(Pair("Bool", BoolSortDecl))
 }
 
+/** Declaration object for Bool sort */
 object BoolSortDecl : SortDecl<BoolSort>("Bool".symbol(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): BoolSort = BoolSort
 }
@@ -64,7 +75,7 @@ class Not(val inner: Expression<BoolSort>) :
   override fun toString(): String = "(not $inner)"
 }
 
-/** FunctionDecl Object for Not */
+/** Not declaration object */
 object NotDecl :
     FunctionDecl1<BoolSort, BoolSort>(
         "not".symbol(), emptySet(), BoolSort, emptySet(), emptySet(), BoolSort) {
@@ -86,6 +97,7 @@ class Implies(val statements: List<Expression<BoolSort>>) :
   override fun subexpressions(): List<Expression<BoolSort>> = statements
 }
 
+/** Implies declaration object */
 object ImpliesDecl :
     FunctionDeclRightAssociative<BoolSort, BoolSort, BoolSort>(
         "=>".symbol(), emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
@@ -109,6 +121,7 @@ class And(val conjuncts: List<Expression<BoolSort>>) :
   override fun subexpressions(): List<Expression<BoolSort>> = conjuncts
 }
 
+/** And declaration object */
 object AndDecl :
     FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
         "and".symbol(), emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
@@ -132,6 +145,7 @@ class Or(val disjuncts: List<Expression<BoolSort>>) :
   override fun subexpressions(): List<Expression<BoolSort>> = disjuncts
 }
 
+/** Or declaration object */
 object OrDecl :
     FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
         "or".symbol(), emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
@@ -155,6 +169,7 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) :
   override fun subexpressions(): List<Expression<BoolSort>> = disjuncts
 }
 
+/** Xor declaration object */
 object XOrDecl :
     FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
         "xor".symbol(), emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
@@ -178,6 +193,7 @@ class Equals(val statements: List<Expression<*>>) :
   override fun subexpressions(): List<Expression<Sort>> = statements as List<Expression<Sort>>
 }
 
+/** Equals declaration object */
 object EqualsDecl :
     FunctionDeclChainable<Sort>(
         "=".symbol(),
@@ -205,6 +221,7 @@ class Distinct(val statements: List<Expression<*>>) :
   override fun subexpressions(): List<Expression<Sort>> = statements as List<Expression<Sort>>
 }
 
+/** Distinct declaration object */
 object DistinctDecl :
     FunctionDeclPairwise<Sort>(
         "distinct".symbol(),
@@ -229,6 +246,7 @@ object DistinctDecl :
   ): Expression<BoolSort> = Distinct(varargs)
 }
 
+/** Ite declaration object */
 object IteDecl :
     FunctionDecl3<BoolSort, Sort, Sort, Sort>(
         "ite".symbol(),
