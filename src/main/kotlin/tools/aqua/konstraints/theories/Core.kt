@@ -44,6 +44,9 @@ object CoreTheory : Theory {
   override val sorts = mapOf(Pair("Bool", BoolSortDecl))
 }
 
+/** Bool sort */
+object BoolSort : Sort("Bool")
+
 /** Declaration object for Bool sort */
 object BoolSortDecl : SortDecl<BoolSort>("Bool".symbol(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): BoolSort = BoolSort

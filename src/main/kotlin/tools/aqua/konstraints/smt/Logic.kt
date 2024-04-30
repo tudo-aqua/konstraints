@@ -299,6 +299,7 @@ data object UFNIA : Logic {
   override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
 }
 
+/** Quantifier-free formulas over floating point arithmetic */
 data object QF_FP : Logic {
   override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
   override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")

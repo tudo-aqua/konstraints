@@ -21,6 +21,13 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.parser.Bindings
 import tools.aqua.konstraints.parser.SortDecl
 
+/**
+ * Base class for each SMT sort
+ *
+ * @param name sort name
+ * @param indices indices of indexed sorts (e.g. (_ BitVec m))
+ * @param parameters parameters of parameterized sorts (e.g. (Array 2))
+ */
 open class Sort(
     val name: Symbol,
     val indices: List<Index> = emptyList(),
@@ -63,33 +70,6 @@ open class Sort(
 }
 
 class SortParameter(name: String) : Sort(name, emptyList(), emptyList())
-
-object BoolSort : Sort("Bool")
-
-class BVSort private constructor(index: Index) : Sort("BitVec", listOf(index)) {
-  companion object {
-    operator fun invoke(bits: Int): BVSort = BVSort(NumeralIndex(bits))
-
-    fun fromSymbol(symbol: String): BVSort = BVSort(SymbolIndex(symbol))
-
-    fun fromSymbol(symbol: SymbolIndex): BVSort = BVSort(symbol)
-  }
-
-  val bits: Int
-
-  init {
-    if (indices.single() is NumeralIndex) {
-      bits = (indices.single() as NumeralIndex).numeral
-      require(bits > 0)
-    } else {
-      bits = 0
-    }
-  }
-
-  // TODO enforce this on the sort baseclass
-  // test for any index to be symbolic
-  internal fun isSymbolic() = (indices.single() is SymbolIndex)
-}
 
 class UserDefinedSort(name: Symbol, arity: Int) :
     Sort(name, emptyList(), (0..arity).map { index -> SortParameter("sort$index") })

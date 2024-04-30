@@ -42,6 +42,51 @@ internal object BitVectorExpressionTheory : Theory {
   override val sorts = mapOf(Pair("BitVec", BVSortDecl))
 }
 
+/** Bitvector sort with [bits] length */
+class BVSort private constructor(index: Index) : Sort("BitVec", listOf(index)) {
+  companion object {
+    /**
+     * Get BitVec sort with the given number of [bits].
+     *
+     * Currently, this generates a new BitVec every time it is invoked, this should only create a
+     * single instance for each length
+     */
+    // TODO cache BitVec instances so each length has only one instance
+    operator fun invoke(bits: Int): BVSort = BVSort(NumeralIndex(bits))
+
+    /**
+     * Get a BitVec sort with an unknown number of bits, this is not a valid BitVec sort for SMT but
+     * rather just a placeholder for function definitions that take arguments of any BitVec length
+     */
+    fun fromSymbol(symbol: String): BVSort = BVSort(SymbolIndex(symbol))
+
+    /**
+     * Get a BitVec sort with an unknown number of bits, this is not a valid BitVec sort for SMT but
+     * rather just a placeholder for function definitions that take arguments of any BitVec length
+     */
+    fun fromSymbol(symbol: SymbolIndex): BVSort = BVSort(symbol)
+  }
+
+  val bits: Int
+
+  init {
+    // indices must either be s single numeral index or a symbolic index
+    // if the index is symbolic we set the number of bits to 0 to indicate
+    // that this is not a valid BitVec sort in the SMT sense, but rather used internally as
+    // placeholder
+    if (indices.single() is NumeralIndex) {
+      bits = (indices.single() as NumeralIndex).numeral
+      require(bits > 0)
+    } else {
+      bits = 0
+    }
+  }
+
+  // TODO enforce this on the sort baseclass
+  // test for any index to be symbolic
+  internal fun isSymbolic() = (indices.single() is SymbolIndex)
+}
+
 /**
  * BitVec sort declaration
  *

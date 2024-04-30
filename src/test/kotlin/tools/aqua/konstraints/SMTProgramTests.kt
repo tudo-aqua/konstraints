@@ -131,10 +131,7 @@ class SMTProgramTests {
                 SetLogic(QF_BV),
                 DeclareFun("A".symbol(), emptyList(), BVSort(8)),
                 DeclareFun("B".symbol(), emptyList(), BVSort(8)),
-                Assert(
-                    BVUlt(
-                        BasicExpression("A".symbol(), BVSort(8)),
-                        BasicExpression("B".symbol(), BVSort(8)))),
+                Assert(BVUlt(Variable("A".symbol(), BVSort(8)), Variable("B".symbol(), BVSort(8)))),
                 CheckSat)))
   }
 
@@ -151,10 +148,7 @@ class SMTProgramTests {
         arguments(
             listOf(
                 SetLogic(QF_BV),
-                Assert(
-                    BVUlt(
-                        BasicExpression("A".symbol(), BVSort(8)),
-                        BasicExpression("B".symbol(), BVSort(8)))),
+                Assert(BVUlt(Variable("A".symbol(), BVSort(8)), Variable("B".symbol(), BVSort(8)))),
                 CheckSat)))
   }
 }

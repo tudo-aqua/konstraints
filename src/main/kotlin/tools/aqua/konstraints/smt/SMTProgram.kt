@@ -78,14 +78,18 @@ class MutableSMTProgram(commands: List<Command>, context: Context?) :
   constructor() : this(emptyList(), null)
 
   /**
-   * Inserts [command] at the end of the program Checks if [command] is legal w.r.t. the [context]
+   * Inserts [command] at the end of the program
+   *
+   * Checks if [command] is legal w.r.t. the [context]
    */
   fun add(command: Command) {
     add(command, _commands.size)
   }
 
   /**
-   * Inserts [command] at [index] into the program Checks if [command] is legal w.r.t. the [context]
+   * Inserts [command] at [index] into the program
+   *
+   * Checks if [command] is legal w.r.t. the [context]
    */
   fun add(command: Command, index: Int) {
     if (command is Assert) {
@@ -97,12 +101,18 @@ class MutableSMTProgram(commands: List<Command>, context: Context?) :
   }
 
   /**
-   * Inserts all [commands] at the end of the program For each command checks if it is legal w.r.t.
-   * the [context]
+   * Inserts all [commands] at the end of the program
+   *
+   * For each command checks if it is legal w.r.t. the [context]
    */
   fun addAll(commands: List<Command>) = commands.forEach { add(it) }
 
   // conflicting jvm signature with setter of property logic
+  /**
+   * Set logic used by the SMT-Program this should only be done once
+   *
+   * @throws [RuntimeException] if logic was already set
+   */
   @JvmName("setlogic")
   fun setLogic(logic: Logic) {
     if (this.logic != null) {

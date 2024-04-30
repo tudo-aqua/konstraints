@@ -21,6 +21,7 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.parser.VarBinding
 import tools.aqua.konstraints.util.reduceOrDefault
 
+/** Interface for all sorted SMT terms */
 sealed interface Expression<T : Sort> {
   abstract val symbol: Symbol
   abstract val sort: T
@@ -49,7 +50,7 @@ sealed interface Expression<T : Sort> {
   fun all(predicate: (Expression<*>) -> Boolean): Boolean =
       when (this) {
         is UnaryExpression<*, *> -> predicate(this) and this.inner().all(predicate)
-        is BasicExpression -> predicate(this)
+        is Variable -> predicate(this)
         is BinaryExpression<*, *, *> ->
             predicate(this) and this.lhs().all(predicate) and this.rhs().all(predicate)
         is HomogenousExpression<*, *> ->
@@ -72,19 +73,21 @@ sealed interface Expression<T : Sort> {
   val subexpressions: List<Expression<*>>
 }
 
-// TODO this should be variable
-class BasicExpression<T : Sort>(override val symbol: Symbol, override val sort: T) : Expression<T> {
+/** Constant expression without any children */
+class Variable<T : Sort>(override val symbol: Symbol, override val sort: T) : Expression<T> {
   override val subexpressions: List<Expression<*>> = emptyList()
 
   override fun toString() = "$symbol"
 }
 
+/** SMT Literal */
 open class Literal<T : Sort>(override val symbol: Symbol, override val sort: T) : Expression<T> {
   override val subexpressions: List<Expression<*>> = emptyList()
 
   override fun toString() = "$symbol"
 }
 
+/** Base class of all expressions with exactly one child */
 abstract class UnaryExpression<T : Sort, S : Sort>(
     override val symbol: Symbol,
     override val sort: T
@@ -98,6 +101,7 @@ abstract class UnaryExpression<T : Sort, S : Sort>(
   override fun toString() = "($symbol ${inner()})"
 }
 
+/** Base class of all expressions with exactly two children */
 abstract class BinaryExpression<T : Sort, S1 : Sort, S2 : Sort>(
     override val symbol: Symbol,
     override val sort: T
@@ -113,6 +117,7 @@ abstract class BinaryExpression<T : Sort, S1 : Sort, S2 : Sort>(
   override fun toString() = "($symbol ${lhs()} ${rhs()})"
 }
 
+/** Base class of all expressions with exactly three children */
 abstract class TernaryExpression<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     override val symbol: Symbol,
     override val sort: T
@@ -129,6 +134,10 @@ abstract class TernaryExpression<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
   override fun toString() = "($symbol ${lhs()} ${mid()} ${rhs()})"
 }
 
+/**
+ * Base class of all expressions with any children, where all children are expressions of the same
+ * sort
+ */
 abstract class HomogenousExpression<T : Sort, S : Sort>(
     override val symbol: Symbol,
     override val sort: T
@@ -167,6 +176,7 @@ class Ite<T : Sort>(
   override fun toString(): String = "(ite $statement $then $otherwise)"
 }
 
+/** Base class of all expressions with any number of children */
 abstract class NAryExpression<T : Sort>(override val symbol: Symbol, override val sort: T) :
     Expression<T> {
 
@@ -180,6 +190,7 @@ abstract class NAryExpression<T : Sort>(override val symbol: Symbol, override va
       else symbol.toSMTString()
 }
 
+/** Let expression */
 class LetExpression<T : Sort>(
     override val symbol: Symbol,
     override val sort: T,
@@ -194,6 +205,7 @@ class UserDefinedExpression<T : Sort>(name: Symbol, sort: T, val args: List<Expr
   override fun subexpressions(): List<Expression<*>> = args
 }
 
+/** Expression with a local variable */
 class LocalExpression<T : Sort>(
     override val symbol: Symbol,
     override val sort: T,

@@ -35,9 +35,9 @@ import tools.aqua.konstraints.theories.*
  */
 @TestInstance(Lifecycle.PER_CLASS)
 class CoreTests {
-  private val A = BasicExpression("A".symbol(), BoolSort)
-  private val B = BasicExpression("B".symbol(), BoolSort)
-  private val C = BasicExpression("C".symbol(), BoolSort)
+  private val A = Variable("A".symbol(), BoolSort)
+  private val B = Variable("B".symbol(), BoolSort)
+  private val C = Variable("C".symbol(), BoolSort)
 
   @ParameterizedTest
   @MethodSource("getCoreTheoryExpressionsAndTheirSerialization")

@@ -21,40 +21,69 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.parser.Attribute
 import tools.aqua.konstraints.parser.OptionValue
 
+/** Base class for each SMT command */
 sealed class Command(val command: String) {
   override fun toString(): String = "($command)"
 }
 
+/** SMT (check-sat) command */
 object CheckSat : Command("check-sat")
 
+/** SMT (exit) command */
 object Exit : Command("exit")
 
+/** SMT (get-model) command */
 object GetModel : Command("get-model")
 
+/** SMT (assert) command */
 data class Assert(val expression: Expression<BoolSort>) : Command("assert $expression") {
   override fun toString(): String = super.toString()
 }
 
+/**
+ * SMT (declare-const [name] [sort]) command
+ *
+ * Declares a new a constant function of [sort] with the given [name]
+ */
 data class DeclareConst(val name: Symbol, val sort: Sort) : Command("declare-const $name $sort") {
   override fun toString(): String = super.toString()
 }
 
+/**
+ * SMT (declare-fun [name] ([parameters]) [sort]) command
+ *
+ * Declares a new a function of [sort] with the given [name] and [parameters]
+ */
 data class DeclareFun(val name: Symbol, val parameters: List<Sort>, val sort: Sort) :
     Command("declare-fun $name (${parameters.joinToString(" ")}) $sort") {
   override fun toString(): String = super.toString()
 }
 
+/** SMT (set-info [Attribute.keyword] [Attribute.value]) command */
 data class SetInfo(val attribute: Attribute) :
     Command("set-info ${attribute.keyword} ${attribute.value})")
 
+/**
+ * SMT (declare-sort [name] [arity]) command
+ *
+ * Declare a new sort with the given [name] and [arity]
+ */
 data class DeclareSort(val name: Symbol, val arity: Int) : Command("declare-sort $name $arity")
 
 // TODO string serialization of OptionValue
+/** SMT (set-option [name] [OptionValue]) command */
 data class SetOption(val name: String, val value: OptionValue) : Command("set-option $name $value")
 
+/** SMT (set-logic [logic]) command */
 data class SetLogic(val logic: Logic) : Command("set-logic $logic")
 
-data class DefineFun(val definition: FunctionDef) : Command("define-fun $definition") {
+/** SMT (define-fun [functionDef]) command */
+data class DefineFun(val functionDef: FunctionDef) : Command("define-fun $functionDef") {
+  /**
+   * SMT (define-fun [functionDef]) command
+   *
+   * Automatically construct [functionDef] from individual parameters
+   */
   constructor(
       name: Symbol,
       parameters: List<SortedVar>,
@@ -63,6 +92,10 @@ data class DefineFun(val definition: FunctionDef) : Command("define-fun $definit
   ) : this(FunctionDef(name, parameters, sort, term))
 }
 
+/**
+ * Function definition object holding, [name], [parameters], [sort] and [term] of a function defined
+ * via [DefineFun]
+ */
 data class FunctionDef(
     val name: Symbol,
     val parameters: List<SortedVar>,
