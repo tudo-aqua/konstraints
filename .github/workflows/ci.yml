@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: gradle/wrapper-validation-action@v3
+      - uses: gradle/actions/wrapper-validation@v3
 
   detekt:
     name: "Detekt Analysis"
@@ -47,10 +47,9 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+      - uses: gradle/actions/setup-gradle@v3
       - name: "Run Detekt"
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: detekt
+        run: ./gradlew detekt
       - name: "Attach Detekt Report"
         shell: sh
         run: cat build/reports/detekt/detekt.md >> ${GITHUB_STEP_SUMMARY}
@@ -67,15 +66,12 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+      - uses: gradle/actions/setup-gradle@v3
       - name: "Run Spotless"
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: spotlessCheck
+        run: ./gradlew spotlessCheck
       - name: "Apply Spotless Fixes"
         if: failure()
-        uses: gradle/gradle-build-action@v3
-        with:
-          arguments: spotlessApply
+        run: ./gradlew spotlessApply
       - name: "Attach Spotless Diff"
         if: failure()
         shell: sh
@@ -96,10 +92,11 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - name: "Run JUnit Tests"
-        uses: gradle/gradle-build-action@v3
+      - uses: gradle/actions/setup-gradle@v3
         with:
-          arguments: test
+          dependency-graph: generate-and-submit
+      - name: "Run JUnit Tests"
+        run: ./gradlew test
       - name: "Publish Test Results"
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always() # Must execute after failed tests
