@@ -28,9 +28,9 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
-import tools.aqua.konstraints.smt.BVSort
-import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Sort
+import tools.aqua.konstraints.theories.BVSort
+import tools.aqua.konstraints.theories.BoolSort
 
 /*
  * Lifecycle.PER_CLASS is needed for MethodSource to avoid moving sources to a companion object

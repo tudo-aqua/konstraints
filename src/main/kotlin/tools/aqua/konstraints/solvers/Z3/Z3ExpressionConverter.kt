@@ -25,11 +25,11 @@ import com.microsoft.z3.Expr
 import com.microsoft.z3.IntNum
 import com.microsoft.z3.IntSort as Z3IntSort
 import com.microsoft.z3.Sort as Z3Sort
-import tools.aqua.konstraints.smt.BVSort
-import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.Sort
 import tools.aqua.konstraints.theories.*
+import tools.aqua.konstraints.theories.BVSort
+import tools.aqua.konstraints.theories.BoolSort
 
 fun Z3Sort.aquaify(): Sort =
     when (this) {

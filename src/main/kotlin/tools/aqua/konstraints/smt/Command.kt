@@ -20,6 +20,7 @@ package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.Attribute
 import tools.aqua.konstraints.parser.OptionValue
+import tools.aqua.konstraints.theories.BoolSort
 
 /** Base class for each SMT command */
 sealed class Command(val command: String) {

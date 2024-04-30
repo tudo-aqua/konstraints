@@ -44,9 +44,6 @@ object CoreTheory : Theory {
   override val sorts = mapOf(Pair("Bool", BoolSortDecl))
 }
 
-/** Bool sort */
-object BoolSort : Sort("Bool")
-
 /** Declaration object for Bool sort */
 object BoolSortDecl : SortDecl<BoolSort>("Bool".symbol(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): BoolSort = BoolSort
@@ -267,3 +264,6 @@ object IteDecl :
       bindings: Bindings
   ): Expression<Sort> = Ite(param1, param2, param3)
 }
+
+/** Bool sort */
+object BoolSort : Sort("Bool")

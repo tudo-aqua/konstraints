@@ -42,51 +42,6 @@ internal object BitVectorExpressionTheory : Theory {
   override val sorts = mapOf(Pair("BitVec", BVSortDecl))
 }
 
-/** Bitvector sort with [bits] length */
-class BVSort private constructor(index: Index) : Sort("BitVec", listOf(index)) {
-  companion object {
-    /**
-     * Get BitVec sort with the given number of [bits].
-     *
-     * Currently, this generates a new BitVec every time it is invoked, this should only create a
-     * single instance for each length
-     */
-    // TODO cache BitVec instances so each length has only one instance
-    operator fun invoke(bits: Int): BVSort = BVSort(NumeralIndex(bits))
-
-    /**
-     * Get a BitVec sort with an unknown number of bits, this is not a valid BitVec sort for SMT but
-     * rather just a placeholder for function definitions that take arguments of any BitVec length
-     */
-    fun fromSymbol(symbol: String): BVSort = BVSort(SymbolIndex(symbol))
-
-    /**
-     * Get a BitVec sort with an unknown number of bits, this is not a valid BitVec sort for SMT but
-     * rather just a placeholder for function definitions that take arguments of any BitVec length
-     */
-    fun fromSymbol(symbol: SymbolIndex): BVSort = BVSort(symbol)
-  }
-
-  val bits: Int
-
-  init {
-    // indices must either be s single numeral index or a symbolic index
-    // if the index is symbolic we set the number of bits to 0 to indicate
-    // that this is not a valid BitVec sort in the SMT sense, but rather used internally as
-    // placeholder
-    if (indices.single() is NumeralIndex) {
-      bits = (indices.single() as NumeralIndex).numeral
-      require(bits > 0)
-    } else {
-      bits = 0
-    }
-  }
-
-  // TODO enforce this on the sort baseclass
-  // test for any index to be symbolic
-  internal fun isSymbolic() = (indices.single() is SymbolIndex)
-}
-
 /**
  * BitVec sort declaration
  *
@@ -139,6 +94,11 @@ class BVConcat(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) :
   override fun lhs(): Expression<BVSort> = lhs
 
   override fun rhs(): Expression<BVSort> = rhs
+
+  init {
+    require(!lhs.sort.isSymbolic())
+    require(!rhs.sort.isSymbolic())
+  }
 }
 
 object BVConcatDecl :
@@ -217,6 +177,10 @@ object ExtractDecl :
 class BVNot(val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("bvnot".symbol(), inner.sort) {
   override fun inner(): Expression<BVSort> = inner
+
+  init {
+    require(!inner.sort.isSymbolic())
+  }
 }
 
 object BVNotDecl :
@@ -239,6 +203,10 @@ object BVNotDecl :
 class BVNeg(val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("bvneg".symbol(), inner.sort) {
   override fun inner(): Expression<BVSort> = inner
+
+  init {
+    require(!inner.sort.isSymbolic())
+  }
 }
 
 object BVNegDecl :
@@ -273,6 +241,8 @@ class BVAnd(val conjuncts: List<Expression<BVSort>>) :
     require(conjuncts.all { it.sort.bits == sort.bits }) {
       "All bitvectors must have the same number of bits"
     }
+
+    require(conjuncts.all { !it.sort.isSymbolic() })
   }
 
   override fun subexpressions(): List<Expression<BVSort>> = conjuncts
@@ -318,6 +288,8 @@ class BVOr(val disjuncts: List<Expression<BVSort>>) :
     require(disjuncts.all { it.sort.bits == sort.bits }) {
       "All bitvectors must have the same number of bits"
     }
+
+    require(disjuncts.all { !it.sort.isSymbolic() })
   }
 
   override fun toString(): String = "(bvor ${disjuncts.joinToString(" ")})"
@@ -360,6 +332,8 @@ class BVAdd(val summands: List<Expression<BVSort>>) :
     require(summands.all { it.sort.bits == sort.bits }) {
       "All bitvectors must have the same number of bits"
     }
+
+    require(summands.all { !it.sort.isSymbolic() })
   }
 
   override fun subexpressions(): List<Expression<BVSort>> = summands
@@ -402,6 +376,8 @@ class BVMul(val factors: List<Expression<BVSort>>) :
     require(factors.all { it.sort.bits == sort.bits }) {
       "All bitvectors must have the same number of bits"
     }
+
+    require(factors.all { !it.sort.isSymbolic() })
   }
 
   override fun subexpressions(): List<Expression<BVSort>> = factors
@@ -439,6 +415,9 @@ class BVUDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
     require(numerator.sort.bits == denominator.sort.bits) {
       "Numerator and denominator must have the same number of bits, but were ${numerator.sort.bits} and ${denominator.sort.bits}"
     }
+
+    require(!numerator.sort.isSymbolic())
+    require(!denominator.sort.isSymbolic())
   }
 
   override fun lhs(): Expression<BVSort> = numerator
@@ -473,6 +452,8 @@ class BVURem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
 
   init {
     require(numerator.sort.bits == denominator.sort.bits)
+    require(!numerator.sort.isSymbolic())
+    require(!denominator.sort.isSymbolic())
   }
 
   override fun lhs(): Expression<BVSort> = numerator
@@ -510,6 +491,8 @@ class BVShl(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
     require(value.sort.bits == distance.sort.bits) {
       "value and distance must have the same number of bits, but were ${value.sort.bits} and ${value.sort.bits}"
     }
+    require(!value.sort.isSymbolic())
+    require(!distance.sort.isSymbolic())
   }
 
   override fun lhs(): Expression<BVSort> = value
@@ -547,6 +530,8 @@ class BVLShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
     require(value.sort.bits == distance.sort.bits) {
       "value and distance must have the same number of bits, but were ${value.sort.bits} and ${value.sort.bits}"
     }
+    require(!value.sort.isSymbolic())
+    require(!distance.sort.isSymbolic())
   }
 
   override fun lhs(): Expression<BVSort> = value
@@ -584,6 +569,8 @@ class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) :
     require(lhs.sort.bits == rhs.sort.bits) {
       "lhs and rhs must have the same number of bits, but were ${lhs.sort.bits} and ${rhs.sort.bits}"
     }
+    require(!lhs.sort.isSymbolic())
+    require(!rhs.sort.isSymbolic())
   }
 
   override fun lhs(): Expression<BVSort> = lhs
@@ -624,4 +611,49 @@ object BVNAndDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BVSort> = BVNAnd(param1, param2)
+}
+
+/** Bitvector sort with [bits] length */
+class BVSort private constructor(index: Index) : Sort("BitVec", listOf(index)) {
+  companion object {
+    /**
+     * Get BitVec sort with the given number of [bits].
+     *
+     * Currently, this generates a new BitVec every time it is invoked, this should only create a
+     * single instance for each length
+     */
+    // TODO cache BitVec instances so each length has only one instance
+    operator fun invoke(bits: Int): BVSort = BVSort(NumeralIndex(bits))
+
+    /**
+     * Get a BitVec sort with an unknown number of bits, this is not a valid BitVec sort for SMT but
+     * rather just a placeholder for function definitions that take arguments of any BitVec length
+     */
+    fun fromSymbol(symbol: String): BVSort = BVSort(SymbolIndex(symbol))
+
+    /**
+     * Get a BitVec sort with an unknown number of bits, this is not a valid BitVec sort for SMT but
+     * rather just a placeholder for function definitions that take arguments of any BitVec length
+     */
+    fun fromSymbol(symbol: SymbolIndex): BVSort = BVSort(symbol)
+  }
+
+  val bits: Int
+
+  init {
+    // indices must either be s single numeral index or a symbolic index
+    // if the index is symbolic we set the number of bits to 0 to indicate
+    // that this is not a valid BitVec sort in the SMT sense, but rather used internally as
+    // placeholder
+    if (indices.single() is NumeralIndex) {
+      bits = (indices.single() as NumeralIndex).numeral
+      require(bits > 0)
+    } else {
+      bits = 0
+    }
+  }
+
+  // TODO enforce this on the sort baseclass
+  // test for any index to be symbolic
+  internal fun isSymbolic() = (indices.single() is SymbolIndex)
 }

@@ -34,6 +34,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.parser.SymbolAttributeValue
 import tools.aqua.konstraints.smt.*
+import tools.aqua.konstraints.theories.BVSort
 import tools.aqua.konstraints.theories.BVUlt
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

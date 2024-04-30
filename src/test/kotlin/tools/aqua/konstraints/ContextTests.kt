@@ -42,9 +42,9 @@ import tools.aqua.konstraints.theories.*
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class ContextTests {
   private val context = Context(BitVectorExpressionTheory)
-  private val boolExpression = BasicExpression("A".symbol(), BoolSort)
-  private val bv32Expression = BasicExpression("B".symbol(), BVSort(32))
-  private val bv16Expression = BasicExpression("B".symbol(), BVSort(16))
+  private val boolExpression = Variable("A".symbol(), BoolSort)
+  private val bv32Expression = Variable("B".symbol(), BVSort(32))
+  private val bv16Expression = Variable("B".symbol(), BVSort(16))
 
   // this function has no indices as it is not infinitary, BVSort(32) here means actually only
   // bitvectors of length 32
