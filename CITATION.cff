@@ -23,10 +23,18 @@ authors:
     email: "simon.dierl@tu-dortmund.de"
     orcid: "https://orcid.org/0000-0001-9730-9335"
     affiliation: "TU Dortmund University"
+  - given-names: "Felix"
+    family-names: "Holewa"
+    affiliation: "TU Dortmund University"
   - given-names: "Falk"
     family-names: "Howar"
     email: "falk.howar@tu-dortmund.de"
     orcid: "https://orcid.org/0000-0002-9524-4459"
+    affiliation: "TU Dortmund University"
+  - given-names: "Malte"
+    family-names: "Mues"
+    email: "malte.mues@tu-dortmund.de"
+    orcid: "https://orcid.org/0000-0002-6291-9886"
     affiliation: "TU Dortmund University"
   - given-names: "Laurenz Levi"
     family-names: "Spielmann"
@@ -53,6 +61,24 @@ references:
     type: "report"
     date-published: "2021-05-12"
     url: "https://smtlib.cs.uiowa.edu"
+
+  - authors:
+      - given-names: "Daniel"
+        family-names: "Baier"
+      - given-names: "Dirk"
+        family-names: "Bayer"
+      - given-names: "Karlheinz"
+        family-names: "Friedberger"
+    title: "JavaSMT 3: Interacting with SMT solvers in Java"
+    editors:
+      - given-names: "Alexandra"
+        family-names: "Silva"
+      - given-names: "K. Rustan M."
+        family-names: "Leino"
+    collection-title: "Computer aided verification"
+    type: "conference-paper"
+    date-published: 2021-06-15
+    doi: "10.1007/978-3-030-81688-9_9"
 
   - authors:
       - given-names: "Falk"
