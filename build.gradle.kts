@@ -84,8 +84,7 @@ dependencies {
 
 node {
   download = true
-  version = libs.versions.nodejs.get()
-  workDir = file("${buildDir}/nodejs")
+  workDir = layout.buildDirectory.dir("nodejs")
 }
 
 fun isNonStable(version: String): Boolean {
@@ -131,7 +130,13 @@ spotless {
     prettier(mapOf("prettier-plugin-toml" to libs.versions.prettier.toml.get()))
         .npmInstallCache()
         .nodeExecutable(computeNodeExec(node, computeNodeDir(node)).get())
-        .config(mapOf("parser" to "toml", "printWidth" to 100))
+        .config(
+            mapOf(
+                "plugins" to listOf("prettier-plugin-toml"),
+                "parser" to "toml",
+                "alignComments" to false,
+                "printWidth" to 100,
+            ))
   }
 }
 

@@ -13,11 +13,11 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
+
 [versions]
 java-jdk = "11"
 kotlin = "2.0.0-RC2"
-nodejs = "20.5.1"
-prettier-toml = "0.3.1"
+prettier-toml = "2.0.1"
 
 [plugins]
 detekt = { id = "io.gitlab.arturbosch.detekt", version = "1.23.6" }
