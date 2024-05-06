@@ -116,6 +116,10 @@ class Z3Context {
       } catch (e: UnknownFunctionException) {
         null
       }
+
+    fun getSortOrNull(sort: Sort): Z3Sort? = sorts[sort]
+
+    fun getSort(sort: Sort): Z3Sort = getSortOrNull(sort) ?: throw RuntimeException("Unknown sort $sort")
 }
 
 class UnexpectedSortException(msg: String) : RuntimeException(msg)

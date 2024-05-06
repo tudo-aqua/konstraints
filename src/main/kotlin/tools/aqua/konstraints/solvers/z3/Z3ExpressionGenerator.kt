@@ -73,19 +73,19 @@ fun Expression<*>.z3ify(context: Z3Context): Expr<*> {
 
   return when (this.sort) {
     is BoolSort -> (this castTo BoolSort).z3ify(context)
-    is BVSort -> (this as Expression<BVSort>).z3ify(context)
+    is BVSort -> (this castTo (this.sort as BVSort)).z3ify(context)
     is IntSort -> (this castTo IntSort).z3ify(context)
     is RealSort -> (this castTo RealSort).z3ify(context)
     is RoundingMode -> (this castTo RoundingMode).z3ify(context)
-    is FPSort -> (this as Expression<FPSort>).z3ify(context)
-    is FP16 -> (this as Expression<FPSort>).z3ify(context)
-    is FP32 -> (this as Expression<FPSort>).z3ify(context)
-    is FP64 -> (this as Expression<FPSort>).z3ify(context)
-    is FP128 -> (this as Expression<FPSort>).z3ify(context)
+    is FPSort -> (this castTo (this.sort as FPSort)).z3ify(context)
+    is FP16 -> (this castTo FP16).z3ify(context)
+    is FP32 -> (this castTo FP32).z3ify(context)
+    is FP64 -> (this castTo FP64).z3ify(context)
+    is FP128 -> (this castTo FP128).z3ify(context)
     is StringSort -> (this castTo StringSort).z3ify(context)
     is RegLan -> (this castTo RegLan).z3ify(context)
-    is UserDefinedSort -> (this as Expression<UserDefinedSort>).z3ify(context)
-    is ArraySort -> (this as Expression<ArraySort>).z3ify(context)
+    is UserDefinedSort -> (this castTo (this.sort as UserDefinedSort)).z3ify(context)
+    is ArraySort -> (this castTo (this.sort as ArraySort)).z3ify(context)
     else -> throw RuntimeException("Unknown sort ${this.sort}")
   }
 }
@@ -198,10 +198,10 @@ fun Not.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkNot(this.inner.z3ify(context))
 
 fun Implies.z3ify(context: Z3Context): Expr<Z3BoolSort> =
-    makeRightAssoc(this.statements, context) { lhs, rhs ->
-      context.context.mkImplies(lhs as Expr<Z3BoolSort>, rhs as Expr<Z3BoolSort>)
-    }
-        as Expr<Z3BoolSort>
+    (makeRightAssoc(this.statements, context) { lhs, rhs ->
+      context.context.mkImplies(
+          lhs castTo (context.getSort(BoolSort) as Z3BoolSort), rhs castTo context.context.mkBoolSort())
+    } castTo context.context.mkBoolSort())
 
 fun And.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkAnd(*this.conjuncts.map { it.z3ify(context) }.toTypedArray())
@@ -210,10 +210,10 @@ fun Or.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkOr(*this.disjuncts.map { it.z3ify(context) }.toTypedArray())
 
 fun XOr.z3ify(context: Z3Context): Expr<Z3BoolSort> =
-    makeLeftAssoc(this.disjuncts, context) { lhs, rhs ->
-      context.context.mkXor(lhs as Expr<Z3BoolSort>, rhs as Expr<Z3BoolSort>)
-    }
-        as Expr<Z3BoolSort>
+    (makeLeftAssoc(this.disjuncts, context) { lhs, rhs ->
+      context.context.mkXor(
+          lhs castTo context.context.mkBoolSort(), rhs castTo context.context.mkBoolSort())
+    } castTo context.context.mkBoolSort())
 
 fun Equals.z3ify(context: Z3Context): Expr<Z3BoolSort> {
   val inner =
@@ -982,3 +982,12 @@ fun StringSort.z3ify(context: Z3Context): SeqSort<CharSort> =
 
 fun RegLan.z3ify(context: Z3Context): ReSort<SeqSort<CharSort>> =
     context.context.mkReSort(context.context.mkSeqSort(context.context.mkCharSort()))
+
+/** Typesafe casting for z3 expressions */
+infix fun <T : Z3Sort> Expr<*>.castTo(sort: T): Expr<T> {
+  if (this.sort != sort) {
+    throw RuntimeException("Can not cast z3 expression from ${this.sort} to $sort")
+  }
+
+  @Suppress("UNCHECKED_CAST") return this as Expr<T>
+}
