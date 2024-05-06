@@ -41,7 +41,7 @@ sealed interface Expression<T : Sort> {
    * warnings when casting Expression<*> after binding
    */
   infix fun <S : Sort> castTo(to: S): Expression<S> {
-    if (sort == to) {
+    if (sort != to) {
       throw ExpressionCastException(sort, to.toString())
     }
 

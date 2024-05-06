@@ -35,7 +35,7 @@ import tools.aqua.konstraints.parser.ParseTreeVisitor
 import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.parser.ProtoCommand
 import tools.aqua.konstraints.smt.Command
-import tools.aqua.konstraints.solvers.Z3.Z3Solver
+import tools.aqua.konstraints.solvers.z3.Z3Solver
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Z3Tests {
@@ -626,6 +626,23 @@ class Z3Tests {
 
       // verify we get the correct status for the test
       assertEquals("unsat", solver.status.toString())
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(set-logic QF_UF)(declare-fun A (Bool) Bool)(declare-fun B () Bool)(assert (and (A B) B))(check-sat)(exit)"])
+  fun testFreeFunctions(program: String) {
+    val solver = Z3Solver()
+
+    val result = Parser.parse(program)
+    solver.use {
+      result.commands.map { solver.visit(it) }
+
+      // verify we get the correct status for the test
+      assertEquals("sat", solver.status.toString())
     }
   }
 }

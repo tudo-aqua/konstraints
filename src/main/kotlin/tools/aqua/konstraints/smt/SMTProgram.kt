@@ -20,7 +20,7 @@ package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.Attribute
 import tools.aqua.konstraints.parser.Context
-import tools.aqua.konstraints.solvers.Z3.Z3Solver
+import tools.aqua.konstraints.solvers.z3.Z3Solver
 import tools.aqua.konstraints.theories.BitVectorExpressionTheory
 
 enum class SatStatus {

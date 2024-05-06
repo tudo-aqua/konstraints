@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.solvers.Z3
+package tools.aqua.konstraints.solvers.z3
 
 import com.microsoft.z3.Model as Z3Model
 import com.microsoft.z3.Sort
