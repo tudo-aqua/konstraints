@@ -51,7 +51,6 @@ sealed interface Expression<T : Sort> {
   fun all(predicate: (Expression<*>) -> Boolean): Boolean =
       when (this) {
         is UnaryExpression<*, *> -> predicate(this) and this.inner().all(predicate)
-        is Variable -> predicate(this)
         is BinaryExpression<*, *, *> ->
             predicate(this) and this.lhs().all(predicate) and this.rhs().all(predicate)
         is HomogenousExpression<*, *> ->
@@ -72,13 +71,6 @@ sealed interface Expression<T : Sort> {
       }
 
   val subexpressions: List<Expression<*>>
-}
-
-/** Constant expression without any children */
-class Variable<T : Sort>(override val symbol: Symbol, override val sort: T) : Expression<T> {
-  override val subexpressions: List<Expression<*>> = emptyList()
-
-  override fun toString() = "$symbol"
 }
 
 /** SMT Literal */
@@ -203,6 +195,9 @@ class LetExpression<T : Sort>(
 
 class UserDefinedExpression<T : Sort>(name: Symbol, sort: T, val args: List<Expression<*>>) :
     NAryExpression<T>(name, sort) {
+
+  constructor(name: Symbol, sort: T) : this(name, sort, emptyList())
+
   override fun subexpressions(): List<Expression<*>> = args
 }
 

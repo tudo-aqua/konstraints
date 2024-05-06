@@ -30,7 +30,7 @@ import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import tools.aqua.konstraints.smt.Expression
-import tools.aqua.konstraints.smt.Variable
+import tools.aqua.konstraints.smt.UserDefinedExpression
 import tools.aqua.konstraints.smt.symbol
 import tools.aqua.konstraints.theories.*
 import tools.aqua.konstraints.theories.BVSort
@@ -41,12 +41,12 @@ import tools.aqua.konstraints.theories.BVSort
  */
 @TestInstance(Lifecycle.PER_CLASS)
 class BitvectorTests {
-  private val A = Variable<BVSort>("A".symbol(), BVSort(8))
-  private val B = Variable<BVSort>("B".symbol(), BVSort(8))
-  private val C = Variable<BVSort>("C".symbol(), BVSort(8))
-  private val D = Variable<BVSort>("D".symbol(), BVSort(16))
-  private val symbolicE = Variable("E".symbol(), BVSort.fromSymbol("a"))
-  private val symbolicF = Variable("F".symbol(), BVSort.fromSymbol("b"))
+  private val A = UserDefinedExpression("A".symbol(), BVSort(8))
+  private val B = UserDefinedExpression("B".symbol(), BVSort(8))
+  private val C = UserDefinedExpression("C".symbol(), BVSort(8))
+  private val D = UserDefinedExpression("D".symbol(), BVSort(16))
+  private val symbolicE = UserDefinedExpression("E".symbol(), BVSort.fromSymbol("a"))
+  private val symbolicF = UserDefinedExpression("F".symbol(), BVSort.fromSymbol("b"))
 
   @ParameterizedTest
   @MethodSource("getBVExpressionsAndSerialization")
