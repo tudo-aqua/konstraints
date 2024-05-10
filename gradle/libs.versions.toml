@@ -16,7 +16,7 @@
 
 [versions]
 java-jdk = "11"
-kotlin = "2.0.0-RC2"
+kotlin = "2.0.0-RC3"
 prettier-toml = "2.0.1"
 
 [plugins]
