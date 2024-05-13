@@ -21,7 +21,7 @@ introspection. It is designed to succeed JConstraints[^3] and build upon its con
 At the moment, Konstraints is pre-alpha software. While we are happy te receive feedback from early
 adopters, the library is still incomplete and APIs may change without warning.
 
-### Development
+## Development
 
 Building is completely done using Gradle. Most IDEs should be able to import the project without any
 manual configuration.
@@ -40,7 +40,66 @@ Style enforcement is performed by Spotless. Run
 
 to apply formatting to all files before committing.
 
-### License
+## Roadmap
+
+1. Benchmarks
+2. Forall/Exists support
+3. Datatypes support
+4. Internal parser restructuring
+5. Better exception messages
+6. Theory logic extensions
+7. DSL
+
+## Supported Features
+
+Supported: &check;\
+Partially support: !\
+Unsupported: &cross;
+
+### Theories
+
+|             | ArraysEx | FixedSizeBitVectors | Core    | FloatingPoint | Ints    | Reals   | Reals_Ints | Strings |
+|-------------|----------|---------------------|---------|---------------|---------|---------|------------|---------|
+| Konstraints | &check;  | &check;             | &check; | &check;       | &check; | &check; | &check;    | &check; |
+| Z3          | !        | &check;             | &check; | &check;       | &check; | &check; | &check;    | !       |
+| CVC5        | &cross;  | &cross;             | &cross; | &cross;       | &cross; | &cross; | &cross;    | &cross; |
+
+### SMT Language
+
+|                       | Konstraints | Z3      |
+|-----------------------|-------------|---------|
+| assert                | &check;     | &check; |
+| check-sat             | &check;     | &check; |
+| check-sat-assuming    | &cross;     | &cross; |
+| declare-const         | &check;     | &cross; |
+| declare-datatype      | &cross;     | &cross; |
+| declare-datatypes     | &cross;     | &cross; |
+| declare-fun           | &check;     | &check; |
+| declare-sort          | &check;     | &check; |
+| define-fun            | &check;     | &cross; |
+| define-fun-rec        | &cross;     | &cross; |
+| define-funs-rec       | &cross;     | &cross; |
+| define-sort           | &cross;     | &cross; |
+| echo                  | &cross;     | &cross; |
+| exit                  | &check;     | &cross; |
+| get-assertions        | &cross;     | &cross; |
+| get-assignment        | &cross;     | &cross; |
+| get-info              | &cross;     | &cross; |
+| get-model             | &check;     | !       |
+| get-option            | &cross;     | &cross; |
+| get-proof             | &cross;     | &cross; |
+| get-unsat-assumptions | &cross;     | &cross; |
+| get-unsat-core        | &cross;     | &cross; |
+| get-value             | &cross;     | &cross; |
+| pop                   | !           | &cross; |
+| push                  | !           | &cross; |
+| reset                 | &check;     | &cross; |
+| reset-assertions      | &cross;     | &cross; |
+| set-info              | &check;     | &cross; |
+| set-logic             | &check;     | &cross; |
+| set-option            | &check;     | &cross; |
+
+## License
 
 Konstraints source code is licensed unser the Apache License, Version 2.0. Its documentation is
 licensed under the Creative Commons Attribution 4.0 International License. Dependencies, especially
