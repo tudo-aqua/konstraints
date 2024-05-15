@@ -80,6 +80,7 @@ dependencies {
   implementation(libs.z3.turnkey)
   implementation(libs.petitparser.core)
   implementation(libs.kotlin.coroutines)
+  implementation(libs.commons.compress)
 }
 
 node {

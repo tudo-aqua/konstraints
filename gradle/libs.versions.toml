@@ -37,5 +37,6 @@ junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter" } # versio
 z3-turnkey = { group = "tools.aqua", name = "z3-turnkey", version = "4.13.0" }
 petitparser-core = { group = "com.github.petitparser", name = "petitparser-core", version = "2.4.0" }
 kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.8.0-RC" }
+commons-compress = { group = "org.apache.commons", name = "commons-compress", version = "1.26.1" }
 
 [bundles]
