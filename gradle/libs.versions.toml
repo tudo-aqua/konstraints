@@ -24,7 +24,7 @@ detekt = { id = "io.gitlab.arturbosch.detekt", version = "1.23.6" }
 gitVersioning = { id = "me.qoomon.git-versioning", version = "6.4.3" }
 kotlin-dokka = { id = "org.jetbrains.dokka", version = "1.9.20" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-kover = { id = "org.jetbrains.kotlinx.kover", version = "0.7.6" }
+kotlin-kover = { id = "org.jetbrains.kotlinx.kover", version = "0.8.0" }
 nexus-publish = { id = "io.github.gradle-nexus.publish-plugin", version = "2.0.0" }
 node = { id = "com.github.node-gradle.node", version = "7.0.2" }
 spotless = { id = "com.diffplug.spotless", version = "6.25.0" }
