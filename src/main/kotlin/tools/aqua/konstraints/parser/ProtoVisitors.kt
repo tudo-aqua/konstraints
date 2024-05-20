@@ -46,7 +46,7 @@ internal interface ProtoCommandVisitor {
 
   fun visit(protoFunctionDef: ProtoFunctionDef): FunctionDef
 
-  fun visit(protoSortedVar: ProtoSortedVar): SortedVar
+  fun visit(protoSortedVar: ProtoSortedVar): SortedVar<*>
 }
 
 internal interface SpecConstantVisitor {

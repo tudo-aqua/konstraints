@@ -138,6 +138,32 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     when (this) {
       is LocalExpression -> context.localVariable(this.symbol, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
+      is ForallExpression ->
+          context.context.mkForall(
+              this.vars.map { context.sorts[it.sort] }.toTypedArray(), /* bound var sorts */
+              this.vars
+                  .map { context.context.mkSymbol(it.name.toSMTString()) }
+                  .toTypedArray(), /* bound var names */
+              this.term.z3ify(context), /* inner term */
+              0, /* weight (z3 doc says to pass 0 by default) */
+              emptyArray(), /* patterns */
+              emptyArray(), /* anti-patterns */
+              context.context.mkSymbol("forall"), /* quantifier id */
+              context.context.mkSymbol("skolemID"), /* skolem id */
+          )
+      is ExistsExpression ->
+          context.context.mkForall(
+              this.vars.map { context.sorts[it.sort] }.toTypedArray(), /* bound var sorts */
+              this.vars
+                  .map { context.context.mkSymbol(it.name.toSMTString()) }
+                  .toTypedArray(), /* bound var names */
+              this.term.z3ify(context), /* inner term */
+              0, /* weight (z3 doc says to pass 0 by default) */
+              emptyArray(), /* patterns */
+              emptyArray(), /* anti-patterns */
+              context.context.mkSymbol("exists"), /* quantifier id */
+              context.context.mkSymbol("skolemID"), /* skolem id */
+          )
       is Ite -> this.z3ify(context)
       is True -> this.z3ify(context)
       is False -> this.z3ify(context)
