@@ -139,31 +139,30 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
       is LocalExpression -> context.localVariable(this.symbol, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
       is ForallExpression ->
-          context.context.mkForall(
-              this.vars.map { context.sorts[it.sort] }.toTypedArray(), /* bound var sorts */
-              this.vars
-                  .map { context.context.mkSymbol(it.name.toSMTString()) }
-                  .toTypedArray(), /* bound var names */
-              this.term.z3ify(context), /* inner term */
-              0, /* weight (z3 doc says to pass 0 by default) */
-              emptyArray(), /* patterns */
-              emptyArray(), /* anti-patterns */
-              context.context.mkSymbol("forall"), /* quantifier id */
-              context.context.mkSymbol("skolemID"), /* skolem id */
-          )
+          context.bind(this.vars) { boundVars ->
+            context.context.mkForall(
+                boundVars.toTypedArray(), /* bound variables */
+                this.term.z3ify(context), /* inner term */
+                0, /* weight (z3 doc says to pass 0 by default) */
+                emptyArray(), /* patterns */
+                emptyArray(), /* anti-patterns */
+                context.context.mkSymbol("exists"), /* quantifier id */
+                context.context.mkSymbol("skolemID"), /* skolem id */
+            )
+          }
       is ExistsExpression ->
-          context.context.mkForall(
-              this.vars.map { context.sorts[it.sort] }.toTypedArray(), /* bound var sorts */
-              this.vars
-                  .map { context.context.mkSymbol(it.name.toSMTString()) }
-                  .toTypedArray(), /* bound var names */
-              this.term.z3ify(context), /* inner term */
-              0, /* weight (z3 doc says to pass 0 by default) */
-              emptyArray(), /* patterns */
-              emptyArray(), /* anti-patterns */
-              context.context.mkSymbol("exists"), /* quantifier id */
-              context.context.mkSymbol("skolemID"), /* skolem id */
-          )
+          context.bind(this.vars) { boundVars ->
+            context.context.mkExists(
+                boundVars.toTypedArray(), /* bound variables */
+                this.term.z3ify(context), /* inner term */
+                0, /* weight (z3 doc says to pass 0 by default) */
+                emptyArray(), /* patterns */
+                emptyArray(), /* anti-patterns */
+                context.context.mkSymbol("exists"), /* quantifier id */
+                context.context.mkSymbol("skolemID"), /* skolem id */
+            )
+          }
+      is BoundVariable -> context.boundVariable(this.symbol, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is True -> this.z3ify(context)
       is False -> this.z3ify(context)
@@ -398,6 +397,7 @@ fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
     when (this) {
       is LocalExpression -> context.localVariable(this.symbol, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
+      is BoundVariable -> context.boundVariable(this.symbol, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is BVLiteral -> this.z3ify(context)
       is BVConcat -> this.z3ify(context)
@@ -491,6 +491,7 @@ fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
     when (this) {
       is LocalExpression -> context.localVariable(this.symbol, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
+      is BoundVariable -> context.boundVariable(this.symbol, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is IntLiteral -> this.z3ify(context)
       is IntNeg -> this.z3ify(context)
@@ -568,6 +569,7 @@ fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
     when (this) {
       is LocalExpression -> context.localVariable(this.symbol, context.context.mkRealSort())
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
+      is BoundVariable -> context.boundVariable(this.symbol, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is RealLiteral -> this.z3ify(context)
       is RealNeg -> this.z3ify(context)
@@ -619,6 +621,7 @@ fun Expression<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
     when (this) {
       is LocalExpression -> context.localVariable(this.symbol, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
+      is BoundVariable -> context.boundVariable(this.symbol, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is FPLiteral -> this.z3ify(context)
       is FPInfinity -> this.z3ify(context)
@@ -751,6 +754,7 @@ fun Expression<RoundingMode>.z3ify(context: Z3Context): Expr<FPRMSort> =
     when (this) {
       is LocalExpression -> context.localVariable(this.symbol, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
+      is BoundVariable -> context.boundVariable(this.symbol, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is RoundNearestTiesToEven -> this.z3ify(context)
       is RNE -> this.z3ify(context)
@@ -808,6 +812,7 @@ fun Expression<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
     when (this) {
       is LocalExpression -> context.localVariable(this.symbol, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
+      is BoundVariable -> context.boundVariable(this.symbol, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is StrConcat -> this.z3ify(context)
       is StrAt -> this.z3ify(context)
@@ -863,6 +868,7 @@ fun Expression<RegLan>.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>
     when (this) {
       is LocalExpression -> context.localVariable(this.symbol, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
+      is BoundVariable -> context.boundVariable(this.symbol, this.sort.z3ify(context))
       is RegexNone -> this.z3ify(context)
       is RegexAll -> this.z3ify(context)
       is RegexAllChar -> this.z3ify(context)
