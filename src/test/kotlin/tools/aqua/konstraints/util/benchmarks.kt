@@ -22,16 +22,27 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.decodeFromStream
 
+/**
+ * A loaded benchmark that contains the [set], the [file] metadata and the SMT-Lib [program] as a
+ * string.
+ */
 data class Benchmark(val set: BenchmarkSet, val file: BenchmarkFile, val program: String) {
   override fun toString(): String = "$set/$file"
 }
 
+/**
+ * Load the [BenchmarkDatabase] from [name] using the extended object's class loader. The extended
+ * object *must* be able to see the file (usually, be contained in the same JAR).
+ */
 @OptIn(ExperimentalSerializationApi::class)
-fun Any.loadBenchmarkDatabase(): BenchmarkDatabaseCategory =
-    javaClass.getResourceAsStream("/benchmarks-metadata.json")!!.use {
-      Json.decodeFromStream<BenchmarkDatabaseCategory>(it)
-    }
+fun Any.loadBenchmarkDatabase(name: String = "/benchmarks.json"): BenchmarkDatabase =
+    javaClass.getResourceAsStream(name)!!.use { Json.decodeFromStream<BenchmarkDatabase>(it) }
 
+/**
+ * Lazily load all [Benchmark]s present in the database using the extended object's class loader.
+ * The extended object *must* be able to see the file (usually, be contained in the same JAR).
+ * Resource management is handled automatically by the coroutine.
+ */
 fun Any.loadBenchmarks(metadata: BenchmarkMetadata): Sequence<Benchmark> = sequence {
   metadata.forEach { (set, files) ->
     val lookup = files.associateBy { "${set.category}/${set.set}/${it.name.joinToString("/")}" }

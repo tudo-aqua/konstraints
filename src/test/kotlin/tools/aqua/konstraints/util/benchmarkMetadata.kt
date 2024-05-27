@@ -21,21 +21,40 @@ package tools.aqua.konstraints.util
 import kotlin.Double.Companion.POSITIVE_INFINITY
 import kotlin.math.roundToInt
 
+/**
+ * A single benchmark set, identified by the [category] (e.g., `non-incremental`) and the [set] (a
+ * SMT-Lib logic, e.g. `QF_BV`).
+ */
 data class BenchmarkSet(val category: String, val set: String) {
   override fun toString(): String = "$category/$set"
 }
 
+/**
+ * A single benchmark corresponding to an SMT-Lib file. The [name] describes the path inside the
+ * benchmark set *without* the first two components (`category/set`). The [executionSpeeds] describe
+ * solver speeds on a reference machine for correctly solved benchmarks (with an aggressive
+ * timeout).
+ */
 data class BenchmarkFile(val name: List<String>, val executionSpeeds: Map<String, Double>) {
+  /** Get the solution speed on [solver] or [POSITIVE_INFINITY] if no speed is known. */
   fun speedOn(solver: String): Double = executionSpeeds[solver] ?: POSITIVE_INFINITY
 
   override fun toString(): String = name.joinToString("/")
 }
 
+/**
+ * The collection of known benchmarks, represented as a mapping from benchmark set objects to sets
+ * of files.
+ */
 @JvmInline
 value class BenchmarkMetadata(private val benchmarks: Map<BenchmarkSet, Set<BenchmarkFile>>) :
     Map<BenchmarkSet, Set<BenchmarkFile>> by benchmarks
 
-fun BenchmarkDatabaseCategory.toMetadata(): BenchmarkMetadata =
+/**
+ * Convert a given [BenchmarkDatabase] (i.e., the JSON structure representation) to a
+ * [BenchmarkMetadata] object for simplified access.
+ */
+fun BenchmarkDatabase.toMetadata(): BenchmarkMetadata =
     BenchmarkMetadata(
         entries
             .asSequence()
@@ -50,14 +69,23 @@ fun BenchmarkDatabaseCategory.toMetadata(): BenchmarkMetadata =
             }
             .toMap())
 
+/** Remove sets from a metadata collection that do not satisfy the [predicate]. */
 inline fun BenchmarkMetadata.filterSets(
     crossinline predicate: (BenchmarkSet) -> Boolean
 ): BenchmarkMetadata = BenchmarkMetadata(filter { (set, _) -> predicate(set) })
 
+/**
+ * Remove files from a metadata collection that do not satisfy the [predicate]. If all files from a
+ * set are discarded, so is the set.
+ */
 inline fun BenchmarkMetadata.filterFiles(
     crossinline predicate: (BenchmarkFile) -> Boolean
 ): BenchmarkMetadata = filterSetFiles { _, file -> predicate(file) }
 
+/**
+ * Remove files from a metadata collection that do not satisfy the [predicate]. If all files from a
+ * set are discarded, so is the set.
+ */
 inline fun BenchmarkMetadata.filterSetFiles(
     crossinline predicate: (BenchmarkSet, BenchmarkFile) -> Boolean
 ): BenchmarkMetadata =
@@ -70,6 +98,20 @@ inline fun BenchmarkMetadata.filterSetFiles(
             }
             .toMap())
 
+/**
+ * Reduce a metadata collection to files conforming to certain standards. If all files from a set
+ * are discarded, so is the set.
+ *
+ * Selection works as follows:
+ * - Only files that have timing information for all [solversToConsider] are retained.
+ * - Of those, only files that for *all* [solversToConsider] have timings below or equal to
+ *   [maxSpeed] are retained.
+ * - For each remaining file, the average speed for all [solversToConsider] is computed.
+ * - For each directory in a benchmark set (i.e., one level *below* the logic), the files are
+ *   aggregated.
+ * - For each directory, retain [sharePerGroup] of the files, but at most [maxPerGroup] and at least
+ *   [minPerGroup]. If insufficient files exist, take all.
+ */
 fun BenchmarkMetadata.selectTests(
     vararg solversToConsider: String,
     maxSpeed: Double = POSITIVE_INFINITY,

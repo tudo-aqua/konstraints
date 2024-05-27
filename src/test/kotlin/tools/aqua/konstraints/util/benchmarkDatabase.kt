@@ -25,19 +25,32 @@ import kotlinx.serialization.json.JsonContentPolymorphicSerializer
 import kotlinx.serialization.json.JsonElement
 import kotlinx.serialization.json.JsonObject
 
+/**
+ * A benchmark database corresponding to a full SMT-Lib release. This contains categories indexed by
+ * the category name (i.e., `incremental` and `non-incremental`).
+ */
 @Serializable
 @JvmInline
-value class BenchmarkDatabaseCategory(private val categories: Map<String, BenchmarkDatabaseSet>) :
-    Map<String, BenchmarkDatabaseSet> by categories
+value class BenchmarkDatabase(private val categories: Map<String, BenchmarkCategory>) :
+    Map<String, BenchmarkCategory> by categories
 
+/**
+ * A benchmark category, containing benchmark sets (represented by the file tree root) indexed by
+ * logic name (e.g., `QF_BV`).
+ */
 @Serializable
 @JvmInline
-value class BenchmarkDatabaseSet(private val sets: Map<String, BenchmarkDatabaseDirectory>) :
+value class BenchmarkCategory(private val sets: Map<String, BenchmarkDatabaseDirectory>) :
     Map<String, BenchmarkDatabaseDirectory> by sets
 
+/** An element in a benchmark file tree. Either a file or a directory. */
 @Serializable(with = BenchmarkDatabaseElementSerializer::class)
 sealed interface BenchmarkDatabaseElement
 
+/**
+ * Convert a file tree element to a sequence of tuples of file objects with their path components
+ * inside the archive. This lazily traverses the file tree.
+ */
 fun BenchmarkDatabaseElement.toFileSequence(
     path: List<String> = emptyList()
 ): Sequence<Pair<List<String>, BenchmarkDatabaseFile>> =
@@ -47,7 +60,7 @@ fun BenchmarkDatabaseElement.toFileSequence(
       is BenchmarkDatabaseFile -> sequenceOf(path to this)
     }
 
-object BenchmarkDatabaseElementSerializer :
+private object BenchmarkDatabaseElementSerializer :
     JsonContentPolymorphicSerializer<BenchmarkDatabaseElement>(BenchmarkDatabaseElement::class) {
   override fun selectDeserializer(
       element: JsonElement
@@ -60,6 +73,7 @@ object BenchmarkDatabaseElementSerializer :
   }
 }
 
+/** A directory inside a benchmark archive. */
 @Serializable
 @JvmInline
 value class BenchmarkDatabaseDirectory(private val members: Map<String, BenchmarkDatabaseElement>) :
@@ -67,7 +81,9 @@ value class BenchmarkDatabaseDirectory(private val members: Map<String, Benchmar
 
 private const val EXECUTION_SPEEDS_SERIAL = "speeds"
 
+/** A file inside a benchmark archive, containing metadata. */
 @Serializable
 data class BenchmarkDatabaseFile(
+    /** Execution speeds on a reference machine indexed by solver. */
     @SerialName(EXECUTION_SPEEDS_SERIAL) val executionSpeeds: Map<String, Double>
 ) : BenchmarkDatabaseElement

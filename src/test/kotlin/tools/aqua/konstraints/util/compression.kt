@@ -60,12 +60,12 @@ fun TarArchiveInputStream.asEntrySequence():
 /** Reads a TAR entry as a byte array from the corresponding stream. */
 fun TarArchiveEntry.readBytes(
     from: TarArchiveInputStream,
-): ByteArray = from.bounded(size).readBytes()
+): ByteArray = from.bounded(size, propagateClose = false).use { it.readBytes() }
 
 /** Reads a TAR entry as a string from the corresponding stream using the given [charset]. */
 fun TarArchiveEntry.readText(from: TarArchiveInputStream, charset: Charset = UTF_8): String =
-    from.bounded(size).bufferedReader(charset).readText()
+    from.bounded(size, propagateClose = false).bufferedReader(charset).use { it.readText() }
 
 /** Reads a TAR entry as a list of lines from the corresponding stream using the given [charset]. */
 fun TarArchiveEntry.readLines(from: TarArchiveInputStream, charset: Charset = UTF_8): List<String> =
-    from.bounded(size).bufferedReader(charset).readLines()
+    from.bounded(size, propagateClose = false).bufferedReader(charset).use { it.readLines() }
