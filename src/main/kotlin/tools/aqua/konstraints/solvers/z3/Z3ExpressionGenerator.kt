@@ -136,7 +136,7 @@ fun Ite<UserDefinedSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
 @JvmName("z3ifyBool")
 fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     when (this) {
-      is LocalExpression -> context.localVariable(this.symbol, this.sort.z3ify(context))
+      is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
       is ForallExpression ->
           context.bind(this.vars) { boundVars ->
@@ -162,7 +162,7 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
                 context.context.mkSymbol("skolemID"), /* skolem id */
             )
           }
-      is BoundVariable -> context.boundVariable(this.symbol, this.sort.z3ify(context))
+      is BoundVariable -> context.boundVariable(this.name, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is True -> this.z3ify(context)
       is False -> this.z3ify(context)
@@ -205,12 +205,10 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
       /* free constant and function symbols */
       is UserDefinedExpression ->
           if (this.subexpressions.isEmpty()) {
-            context.getConstant(this.symbol, this.sort.z3ify(context))
+            context.getConstant(this.name, this.sort.z3ify(context))
           } else {
             context.getFunction(
-                this.symbol,
-                this.subexpressions.map { it.z3ify(context) },
-                this.sort.z3ify(context))
+                this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
@@ -395,9 +393,9 @@ fun StrIsDigit.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
 @JvmName("z3ifyBitVec")
 fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
     when (this) {
-      is LocalExpression -> context.localVariable(this.symbol, this.sort.z3ify(context))
+      is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
-      is BoundVariable -> context.boundVariable(this.symbol, this.sort.z3ify(context))
+      is BoundVariable -> context.boundVariable(this.name, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is BVLiteral -> this.z3ify(context)
       is BVConcat -> this.z3ify(context)
@@ -417,12 +415,10 @@ fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
       /* free constant and function symbols */
       is UserDefinedExpression ->
           if (this.subexpressions.isEmpty()) {
-            context.getConstant(this.symbol, this.sort.z3ify(context))
+            context.getConstant(this.name, this.sort.z3ify(context))
           } else {
             context.getFunction(
-                this.symbol,
-                this.subexpressions.map { it.z3ify(context) },
-                this.sort.z3ify(context))
+                this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
@@ -489,9 +485,9 @@ fun FPToSBitVec.z3ify(context: Z3Context): Expr<BitVecSort> =
 @JvmName("z3ifyInts")
 fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
     when (this) {
-      is LocalExpression -> context.localVariable(this.symbol, this.sort.z3ify(context))
+      is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
-      is BoundVariable -> context.boundVariable(this.symbol, this.sort.z3ify(context))
+      is BoundVariable -> context.boundVariable(this.name, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is IntLiteral -> this.z3ify(context)
       is IntNeg -> this.z3ify(context)
@@ -509,12 +505,10 @@ fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
       /* free constant and function symbols */
       is UserDefinedExpression ->
           if (this.subexpressions.isEmpty()) {
-            context.getConstant(this.symbol, this.sort.z3ify(context))
+            context.getConstant(this.name, this.sort.z3ify(context))
           } else {
             context.getFunction(
-                this.symbol,
-                this.subexpressions.map { it.z3ify(context) },
-                this.sort.z3ify(context))
+                this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
@@ -567,9 +561,9 @@ fun StrToCode.z3ify(context: Z3Context): Expr<Z3IntSort> =
 @JvmName("z3ifyReals")
 fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
     when (this) {
-      is LocalExpression -> context.localVariable(this.symbol, context.context.mkRealSort())
+      is LocalExpression -> context.localVariable(this.name, context.context.mkRealSort())
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
-      is BoundVariable -> context.boundVariable(this.symbol, this.sort.z3ify(context))
+      is BoundVariable -> context.boundVariable(this.name, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is RealLiteral -> this.z3ify(context)
       is RealNeg -> this.z3ify(context)
@@ -580,9 +574,9 @@ fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
       is ToReal -> this.z3ify(context)
       is FPToReal -> this.z3ify(context)
       else ->
-          if (context.constants[this.symbol.toString()] != null) {
-            context.constants[this.symbol.toString()]!! as Expr<Z3RealSort>
-          } else if (context.functions[this.symbol.toString()] != null) {
+          if (context.constants[this.name.toString()] != null) {
+            context.constants[this.name.toString()]!! as Expr<Z3RealSort>
+          } else if (context.functions[this.name.toString()] != null) {
             TODO("Implement free function symbols")
           } else {
             throw IllegalArgumentException("Z3 can not visit expression $this!")
@@ -619,9 +613,9 @@ fun FPToReal.z3ify(context: Z3Context): Expr<Z3RealSort> =
 @JvmName("z3ifyFloatingPoint")
 fun Expression<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
     when (this) {
-      is LocalExpression -> context.localVariable(this.symbol, this.sort.z3ify(context))
+      is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
-      is BoundVariable -> context.boundVariable(this.symbol, this.sort.z3ify(context))
+      is BoundVariable -> context.boundVariable(this.name, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is FPLiteral -> this.z3ify(context)
       is FPInfinity -> this.z3ify(context)
@@ -649,12 +643,10 @@ fun Expression<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
       /* free constant and function symbols */
       is UserDefinedExpression ->
           if (this.subexpressions.isEmpty()) {
-            context.getConstant(this.symbol, this.sort.z3ify(context))
+            context.getConstant(this.name, this.sort.z3ify(context))
           } else {
             context.getFunction(
-                this.symbol,
-                this.subexpressions.map { it.z3ify(context) },
-                this.sort.z3ify(context))
+                this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
@@ -752,9 +744,9 @@ fun UBitVecToFP.z3ify(context: Z3Context): Expr<Z3FPSort> =
 @JvmName("z3ifyRoundingMode")
 fun Expression<RoundingMode>.z3ify(context: Z3Context): Expr<FPRMSort> =
     when (this) {
-      is LocalExpression -> context.localVariable(this.symbol, this.sort.z3ify(context))
+      is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
-      is BoundVariable -> context.boundVariable(this.symbol, this.sort.z3ify(context))
+      is BoundVariable -> context.boundVariable(this.name, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is RoundNearestTiesToEven -> this.z3ify(context)
       is RNE -> this.z3ify(context)
@@ -769,12 +761,10 @@ fun Expression<RoundingMode>.z3ify(context: Z3Context): Expr<FPRMSort> =
       /* free constant and function symbols */
       is UserDefinedExpression ->
           if (this.subexpressions.isEmpty()) {
-            context.getConstant(this.symbol, this.sort.z3ify(context))
+            context.getConstant(this.name, this.sort.z3ify(context))
           } else {
             context.getFunction(
-                this.symbol,
-                this.subexpressions.map { it.z3ify(context) },
-                this.sort.z3ify(context))
+                this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
@@ -810,9 +800,9 @@ fun RTZ.z3ify(context: Z3Context): Expr<FPRMSort> = context.context.mkFPRTZ()
 @JvmName("z3ifyString")
 fun Expression<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
     when (this) {
-      is LocalExpression -> context.localVariable(this.symbol, this.sort.z3ify(context))
+      is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
-      is BoundVariable -> context.boundVariable(this.symbol, this.sort.z3ify(context))
+      is BoundVariable -> context.boundVariable(this.name, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is StrConcat -> this.z3ify(context)
       is StrAt -> this.z3ify(context)
@@ -826,12 +816,10 @@ fun Expression<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
       /* free constant and function symbols */
       is UserDefinedExpression ->
           if (this.subexpressions.isEmpty()) {
-            context.getConstant(this.symbol, this.sort.z3ify(context))
+            context.getConstant(this.name, this.sort.z3ify(context))
           } else {
             context.getFunction(
-                this.symbol,
-                this.subexpressions.map { it.z3ify(context) },
-                this.sort.z3ify(context))
+                this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
@@ -866,9 +854,9 @@ fun StrFromInt.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
 @JvmName("z3ifyRegLan")
 fun Expression<RegLan>.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
     when (this) {
-      is LocalExpression -> context.localVariable(this.symbol, this.sort.z3ify(context))
+      is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
-      is BoundVariable -> context.boundVariable(this.symbol, this.sort.z3ify(context))
+      is BoundVariable -> context.boundVariable(this.name, this.sort.z3ify(context))
       is RegexNone -> this.z3ify(context)
       is RegexAll -> this.z3ify(context)
       is RegexAllChar -> this.z3ify(context)
@@ -886,12 +874,10 @@ fun Expression<RegLan>.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>
       /* free constant and function symbols */
       is UserDefinedExpression ->
           if (this.subexpressions.isEmpty()) {
-            context.getConstant(this.symbol, this.sort.z3ify(context))
+            context.getConstant(this.name, this.sort.z3ify(context))
           } else {
             context.getFunction(
-                this.symbol,
-                this.subexpressions.map { it.z3ify(context) },
-                this.sort.z3ify(context))
+                this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
@@ -949,14 +935,14 @@ fun RegexLoop.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
 fun Expression<ArraySort>.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>> =
     when (this) {
       is LocalExpression ->
-          context.localVariable(this.symbol, this.sort.z3ify(context))
+          context.localVariable(this.name, this.sort.z3ify(context))
               as Expr<com.microsoft.z3.ArraySort<com.microsoft.z3.Sort, com.microsoft.z3.Sort>>
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
       is ArrayStore -> this.z3ify(context)
       else ->
-          if (context.constants[this.symbol.toString()] != null) {
-            context.constants[this.symbol.toString()]!! as Expr<Z3ArraySort<Z3Sort, Z3Sort>>
-          } else if (context.functions[this.symbol.toString()] != null) {
+          if (context.constants[this.name.toString()] != null) {
+            context.constants[this.name.toString()]!! as Expr<Z3ArraySort<Z3Sort, Z3Sort>>
+          } else if (context.functions[this.name.toString()] != null) {
             TODO("Implement free function symbols")
           } else {
             throw IllegalArgumentException("Z3 can not visit expression $this!")
@@ -970,9 +956,9 @@ fun ArrayStore.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>> =
         this.value.z3ify(context) as Expr<Z3Sort>)
 
 fun Expression<UserDefinedSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
-    if (context.constants[this.symbol.toString()] != null) {
-      context.constants[this.symbol.toString()]!! as Expr<UninterpretedSort>
-    } else if (context.functions[this.symbol.toString()] != null) {
+    if (context.constants[this.name.toString()] != null) {
+      context.constants[this.name.toString()]!! as Expr<UninterpretedSort>
+    } else if (context.functions[this.name.toString()] != null) {
       TODO("Implement free function symbols")
     } else {
       throw IllegalArgumentException("Z3 can not visit expression $this!")
