@@ -680,19 +680,19 @@ fun FPAdd.z3ify(context: Z3Context): Expr<Z3FPSort> =
         this.roundingMode.z3ify(context), this.rhs.z3ify(context), this.lhs.z3ify(context))
 
 fun FPSub.z3ify(context: Z3Context): Expr<Z3FPSort> =
-    context.context.mkFPAdd(
+    context.context.mkFPSub(
         this.roundingMode.z3ify(context),
         this.minuend.z3ify(context),
         this.subtrahend.z3ify(context))
 
 fun FPMul.z3ify(context: Z3Context): Expr<Z3FPSort> =
-    context.context.mkFPAdd(
+    context.context.mkFPMul(
         this.roundingMode.z3ify(context),
         this.multiplier.z3ify(context),
         this.multiplicand.z3ify(context))
 
 fun FPDiv.z3ify(context: Z3Context): Expr<Z3FPSort> =
-    context.context.mkFPAdd(
+    context.context.mkFPDiv(
         this.roundingMode.z3ify(context), this.dividend.z3ify(context), this.divisor.z3ify(context))
 
 fun FPFma.z3ify(context: Z3Context): Expr<Z3FPSort> =

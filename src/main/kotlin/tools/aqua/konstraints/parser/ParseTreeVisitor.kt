@@ -110,8 +110,15 @@ internal class ParseTreeVisitor :
   override fun visit(simpleQualIdentifier: SimpleQualIdentifier): Expression<*> {
     val op = context?.getFunction(simpleQualIdentifier.identifier, listOf())
 
+    val functionIndices =
+        if (simpleQualIdentifier.identifier is IndexedIdentifier) {
+          simpleQualIdentifier.identifier.indices.map { it as NumeralIndex }.toSet()
+        } else {
+          emptySet()
+        }
+
     if (op != null) {
-      return op.buildExpression(listOf(), emptySet())
+      return op.buildExpression(listOf(), functionIndices)
     } else {
       throw IllegalStateException("Unknown fun ${simpleQualIdentifier.identifier.symbol}")
       // TODO UnknownFunctionException

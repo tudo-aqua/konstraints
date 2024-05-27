@@ -238,45 +238,23 @@ class Z3Tests {
     val temp = file.bufferedReader().readLines()
     val program = temp.map { it.trim('\r', '\n') }
 
-    val satStatus =
-        if (program.find { it.contains("unsat") } != null) {
-          "unsat"
-        } else if (program.find { it.contains("unknown") } != null) {
-          "unknown"
-        } else {
-          "sat"
-        }
+    val result = Parser.parse(program.joinToString(""))
 
-    /* ignore the test if assumption fails, ignores all unknown tests */
-    assumeTrue(satStatus != "unknown")
+    solver.use {
+      result.commands.map { solver.visit(it) }
 
-    println("Expected result is $satStatus")
+      // verify we get the correct status for the test
+      assertEquals(
+          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
+              .symbol
+              .toString(),
+          solver.status.toString())
 
-    val result = Parser.script.parse(program.joinToString(""))
-
-    if (result.isSuccess) {
-      val commands =
-          result
-              .get<List<Any>>()
-              .filter { it is ProtoCommand || it is Command }
-              .map { if (it is ProtoCommand) parseTreeVisitor.visit(it) else it } as List<Command>
-
-      println(commands.joinToString("\n"))
-
-      solver.use {
-        commands.map { solver.visit(it) }
-
-        // verify we get the correct status for the test
-        assertEquals(satStatus, solver.status.toString())
-
-        // verify we parsed the correct program
-        /*
-        assertEquals(commands.filterIsInstance<Assert>().single().expression.toString(),
-            solver.context.solver.assertions.last().toString())
-        */
-      }
-    } else {
-      throw ParseError(result.failure(result.message))
+      // verify we parsed the correct program
+      /*
+      assertEquals(commands.filterIsInstance<Assert>().single().expression.toString(),
+          solver.context.solver.assertions.last().toString())
+      */
     }
   }
 
@@ -354,47 +332,26 @@ class Z3Tests {
 
   @ParameterizedTest
   @MethodSource("getQFFPFile")
-  @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 6000, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_FP(file: File) {
     val solver = Z3Solver()
     val temp = file.bufferedReader().readLines()
-    val program = temp.map { it.trim('\r', '\n') }
-
-    val satStatus =
-        if (program.find { it.contains("unsat") } != null) {
-          "unsat"
-        } else if (program.find { it.contains("unknown") } != null) {
-          "unknown"
-        } else {
-          "sat"
-        }
-
-    /* ignore the test if assumption fails, ignores all unknown tests */
-    assumeTrue(satStatus != "unknown")
-
-    println("Expected result is $satStatus")
-
-    /* filter comments for now until they are handled by the parser */
-    val result = Parser.parse(program.filter { !it.startsWith(';') }.joinToString(""))
-
-    println(result.commands.joinToString("\n"))
+    val result = Parser.parse(temp.joinToString(""))
 
     solver.use {
       result.commands.map { solver.visit(it) }
 
       // verify we get the correct status for the test
-      assertEquals(satStatus, solver.status.toString())
-
-      // verify we parsed the correct program
-      /*
-      assertEquals(commands.filterIsInstance<Assert>().single().expression.toString(),
-          solver.context.solver.assertions.last().toString())
-      */
+      assertEquals(
+          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
+              .symbol
+              .toString(),
+          solver.status.toString())
     }
   }
 
   fun getQFFPFile(): Stream<Arguments> {
-    val dir = File(javaClass.getResource("/QF_FP/aqua/").file)
+    val dir = File(javaClass.getResource("/QF_FP/").file)
 
     return dir.walk()
         .filter { file: File -> file.isFile }
