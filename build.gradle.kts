@@ -84,12 +84,12 @@ dependencies {
   implementation(libs.petitparser.core)
   implementation(libs.z3.turnkey)
 
-  testRuntimeOnly(libs.zstd)
-
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
   testImplementation(libs.kotlin.serialization.json)
   testRuntimeOnly(libs.junit.launcher)
+  testRuntimeOnly(libs.xz)
+  testRuntimeOnly(libs.zstd)
 }
 
 node {

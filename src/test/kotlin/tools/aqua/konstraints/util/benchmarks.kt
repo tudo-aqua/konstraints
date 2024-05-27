@@ -35,8 +35,10 @@ data class Benchmark(val set: BenchmarkSet, val file: BenchmarkFile, val program
  * object *must* be able to see the file (usually, be contained in the same JAR).
  */
 @OptIn(ExperimentalSerializationApi::class)
-fun Any.loadBenchmarkDatabase(name: String = "/benchmarks.json"): BenchmarkDatabase =
-    javaClass.getResourceAsStream(name)!!.use { Json.decodeFromStream<BenchmarkDatabase>(it) }
+fun Any.loadBenchmarkDatabase(name: String = "/benchmarks.json.xz"): BenchmarkDatabase =
+    javaClass.getResourceAsStream(name)!!.buffered().unxz().buffered().use {
+      Json.decodeFromStream<BenchmarkDatabase>(it)
+    }
 
 /**
  * Lazily load all [Benchmark]s present in the database using the extended object's class loader.

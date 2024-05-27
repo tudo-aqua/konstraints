@@ -23,6 +23,7 @@ import java.nio.charset.Charset
 import kotlin.text.Charsets.UTF_8
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry
 import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
+import org.apache.commons.compress.compressors.xz.XZCompressorInputStream
 import org.apache.commons.compress.compressors.zstandard.ZstdCompressorInputStream
 import org.apache.commons.io.input.BoundedInputStream
 
@@ -39,6 +40,9 @@ fun InputStream.bounded(size: Long, propagateClose: Boolean = true): BoundedInpu
 
 /** Wraps this input stream into a TAR input stream. */
 fun InputStream.untar(): TarArchiveInputStream = TarArchiveInputStream(this)
+
+/** Wraps this input stream into a XZ decompressor stream. */
+fun InputStream.unxz(): XZCompressorInputStream = XZCompressorInputStream(this)
 
 /** Wraps this input stream into a Zstandard decompressor stream. */
 fun InputStream.unzstd(): ZstdCompressorInputStream = ZstdCompressorInputStream(this)
