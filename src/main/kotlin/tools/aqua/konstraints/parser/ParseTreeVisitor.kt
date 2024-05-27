@@ -104,7 +104,7 @@ internal class ParseTreeVisitor :
           visit(protoFunctionDef.sort),
           visit(protoFunctionDef.term))
 
-  override fun visit(protoSortedVar: ProtoSortedVar): SortedVar =
+  override fun visit(protoSortedVar: ProtoSortedVar): SortedVar<*> =
       SortedVar(protoSortedVar.symbol, visit(protoSortedVar.sort))
 
   override fun visit(simpleQualIdentifier: SimpleQualIdentifier): Expression<*> {
@@ -160,11 +160,17 @@ internal class ParseTreeVisitor :
   }
 
   override fun visit(protoForAll: ProtoForAll): Expression<*> {
-    TODO("Implement visit ProtoForAll")
+    val sortedVars = protoForAll.sortedVars.map { visit(it) }
+    val term = context?.bindVars(sortedVars) { visit(protoForAll.term) }!!
+
+    return ForallExpression("f".symbol(), sortedVars, term castTo BoolSort)
   }
 
   override fun visit(protoExists: ProtoExists): Expression<*> {
-    TODO("Implement visit ProtoExists")
+    val sortedVars = protoExists.sortedVars.map { visit(it) }
+    val term = context?.bindVars(sortedVars) { visit(protoExists.term) }!!
+
+    return ExistsExpression("e".symbol(), sortedVars, term castTo BoolSort)
   }
 
   override fun visit(protoMatch: ProtoMatch): Expression<*> {

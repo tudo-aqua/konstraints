@@ -34,6 +34,7 @@ import org.petitparser.context.ParseError
 import tools.aqua.konstraints.parser.ParseTreeVisitor
 import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.parser.ProtoCommand
+import tools.aqua.konstraints.parser.SymbolAttributeValue
 import tools.aqua.konstraints.smt.Command
 import tools.aqua.konstraints.solvers.z3.Z3Solver
 
@@ -643,6 +644,30 @@ class Z3Tests {
 
       // verify we get the correct status for the test
       assertEquals("sat", solver.status.toString())
+    }
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(set-logic QF_BV)(set-info :status sat)(assert (exists ((A (_ BitVec 8)) (B (_ BitVec 8))) (= (bvadd A B) (bvmul A B))))(check-sat)",
+              "(set-logic QF_IDL)(set-info :status unsat)(assert (forall ((A Int) (B Int)) (>= (* A B) (+ A B))))(check-sat)",
+              "(set-logic QF_BV)(set-info :status unsat)(assert (forall ((A (_ BitVec 8))) (exists ((B (_ BitVec 8))) (bvult A B))))(check-sat)"])
+  fun testQuantifier(program: String) {
+    val solver = Z3Solver()
+
+    val result = Parser.parse(program)
+
+    solver.use {
+      result.commands.map { solver.visit(it) }
+
+      // verify we get the correct status for the test
+      assertEquals(
+          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
+              .symbol
+              .toString(),
+          solver.status.toString())
     }
   }
 }

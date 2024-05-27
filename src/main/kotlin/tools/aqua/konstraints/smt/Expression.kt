@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.smt
 
+import tools.aqua.konstraints.parser.SortedVar
 import tools.aqua.konstraints.parser.VarBinding
 import tools.aqua.konstraints.theories.BoolSort
 import tools.aqua.konstraints.util.reduceOrDefault
@@ -67,6 +68,9 @@ sealed interface Expression<T : Sort> {
                     .reduceOrDefault(true) { t1, t2 -> t1 and t2 }
         is TernaryExpression<*, *, *, *> -> TODO()
         is LetExpression -> TODO()
+        is ExistsExpression -> TODO()
+        is ForallExpression -> TODO()
+        is BoundVariable -> predicate(this)
         is LocalExpression -> predicate(this)
       }
 
@@ -210,15 +214,27 @@ class LocalExpression<T : Sort>(
   override val subexpressions: List<Expression<*>> = emptyList()
 }
 
-/*
-class BoundExpression(
+class ExistsExpression(
     override val symbol: Symbol,
-    override val sort: BoolSort,
+    val vars: List<SortedVar<*>>,
     val term: Expression<BoolSort>
 ) : Expression<BoolSort> {
-    override val subexpressions: List<Expression<*>> = emptyList()
+  override val sort = BoolSort
+  override val subexpressions: List<Expression<*>> = emptyList()
 }
-*/
+
+class ForallExpression(
+    override val symbol: Symbol,
+    val vars: List<SortedVar<*>>,
+    val term: Expression<BoolSort>
+) : Expression<BoolSort> {
+  override val sort = BoolSort
+  override val subexpressions: List<Expression<*>> = emptyList()
+}
+
+class BoundVariable<T : Sort>(override val symbol: Symbol, override val sort: T) : Expression<T> {
+  override val subexpressions: List<Expression<*>> = emptyList()
+}
 
 class ExpressionCastException(from: Sort, to: String) :
     ClassCastException("Can not cast expression from $from to $to")
