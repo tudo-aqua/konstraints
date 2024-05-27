@@ -103,7 +103,7 @@ class Context(theory: Theory) {
   }
 
   fun contains(expression: Expression<*>): Boolean =
-      getFunction(expression.symbol.toString(), expression.subexpressions) != null
+      getFunction(expression.name.toString(), expression.subexpressions) != null
 
   fun registerFunction(function: DeclareConst) {
     registerFunction(

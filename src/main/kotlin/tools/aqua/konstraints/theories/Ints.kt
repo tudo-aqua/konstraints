@@ -53,7 +53,7 @@ internal object IntSortDecl : SortDecl<IntSort>("Int".symbol(), emptySet(), empt
  *
  * (NUMERAL Int)
  */
-class IntLiteral(val value: Int) : Literal<IntSort>("|$value|".symbol(), IntSort) {
+class IntLiteral(val value: Int) : Literal<IntSort>(LiteralString(value.toString()), IntSort) {
   override fun toString(): String = value.toString()
 }
 

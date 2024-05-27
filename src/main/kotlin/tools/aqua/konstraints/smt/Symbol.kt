@@ -46,7 +46,7 @@ enum class QuotingRule {
  * @throws IllegalSymbolException if [symbol] is not a valid SMT Symbol
  */
 // constructor is internal to prevent external subclassing of Symbol
-open class Symbol internal constructor(symbol: String, rule: QuotingRule) {
+open class Symbol internal constructor(symbol: String, rule: QuotingRule) : SMTSerializable {
   /** If true the Symbol was explicitly quoted when constructed */
   val isQuoted: Boolean
 
