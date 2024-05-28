@@ -286,20 +286,21 @@ object RTZDecl : FunctionDecl0<RoundingMode>("RTZ".symbol(), emptySet(), emptySe
 /**
  * Floating-point literal
  *
- * @param eb number of bits in the exponent
- * @param sb number of bits in the significand (including the hidden bit)
- * @param value binary representation of the floating point number (length must be [eb] + [sb])
+ * @param sign bitvector of length 1, holding the sign
+ * @param exponent bitvector holding the exponent value
+ * @param significand bitvector holding the significand value
  */
-data class FPLiteral(val eb: Int, val sb: Int, val value: String) :
+data class FPLiteral(
+    val sign: Expression<BVSort>,
+    val exponent: Expression<BVSort>,
+    val significand: Expression<BVSort>
+) :
     Literal<FPSort>(
-        LiteralString(
-            "#b${value.substring(0..0)} #b${value.substring(1..eb)} #b${value.substring(eb + 1..<eb + sb)}"),
-        FPSort(eb, sb)) {
-  constructor(
-      hidden: BVLiteral,
-      exponent: BVLiteral,
-      significand: BVLiteral
-  ) : this(exponent.bits, significand.bits + 1, "$hidden $exponent $significand")
+        LiteralString("(fp $sign $exponent $significand)"),
+        FPSort(exponent.sort.bits, significand.sort.bits + 1)) {
+  init {
+    require(sign.sort.bits == 1)
+  }
 }
 
 object FPLiteralDecl :

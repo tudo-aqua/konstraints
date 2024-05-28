@@ -652,7 +652,8 @@ fun Expression<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
     }
 
 fun FPLiteral.z3ify(context: Z3Context): Expr<Z3FPSort> =
-    context.context.mkFP(this.value, this.sort.z3ify(context))
+    context.context.mkFP(
+        this.sign.z3ify(context), this.exponent.z3ify(context), this.significand.z3ify(context))
 
 fun FPInfinity.z3ify(context: Z3Context): Expr<Z3FPSort> =
     context.context.mkFPInf(this.sort.z3ify(context), false)

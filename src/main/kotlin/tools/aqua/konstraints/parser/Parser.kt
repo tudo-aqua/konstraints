@@ -242,11 +242,11 @@ object Parser {
 
   /* maps to an implementation of SpecConstant */
   private val specConstant =
-      decimal.map { decimal: BigDecimal -> DecimalConstant(decimal) } +
+      (decimal.map { decimal: BigDecimal -> DecimalConstant(decimal) } +
           numeral.map { numeral: Int -> NumeralConstant(numeral) } +
           hexadecimal.map { hexadecimal: String -> HexConstant(hexadecimal) } +
           binary.map { binary: String -> BinaryConstant(binary) } +
-          string.map { string: String -> StringConstant(string) }
+          string.map { string: String -> StringConstant(string) }) trim whitespaceCat
   private val sExpression = undefined()
   internal val reserved = reservedCommands + reservedGeneral
 
