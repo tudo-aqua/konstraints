@@ -56,7 +56,7 @@ internal object BVSortDecl : SortDecl<BVSort>("BitVec".symbol(), emptySet(), set
  * - All binaries #bX of sort (_ BitVec m) where m is the number of digits in X or
  * - All hexadecimals #xX of sort (_ BitVec m) where m is 4 times the number of digits in X.
  */
-class BVLiteral(vector: String) : Literal<BVSort>("|$vector|".symbol(), BVSort(1)) {
+class BVLiteral(vector: String) : Literal<BVSort>(LiteralString(vector), BVSort(1)) {
   val value: BigInteger
   val bits: Int
   val isBinary: Boolean
@@ -77,7 +77,7 @@ class BVLiteral(vector: String) : Literal<BVSort>("|$vector|".symbol(), BVSort(1
 
   override val sort = BVSort(bits)
 
-  override fun toString() = symbol.toString()
+  override fun toString() = name.toString()
 }
 
 /**
@@ -89,7 +89,7 @@ class BVLiteral(vector: String) : Literal<BVSort>("|$vector|".symbol(), BVSort(1
 class BVConcat(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("concat".symbol(), BVSort(1)) {
   override val sort: BVSort = BVSort(lhs.sort.bits + rhs.sort.bits)
-  override val symbol: Symbol = "concat".symbol()
+  override val name: Symbol = "concat".symbol()
 
   override fun lhs(): Expression<BVSort> = lhs
 

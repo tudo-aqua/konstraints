@@ -52,11 +52,11 @@ internal object RealSortDecl : SortDecl<RealSort>("Real".symbol(), emptySet(), e
  *
  * (NUMERAL Real) (DECIMAL Real)
  */
-class RealLiteral(val value: BigDecimal) : Literal<RealSort>("|$value|".symbol(), RealSort) {
-  override val symbol: Symbol = "|$value|".symbol()
+class RealLiteral(val value: BigDecimal) :
+    Literal<RealSort>(LiteralString(value.toString()), RealSort) {
   override val sort: RealSort = RealSort
 
-  override fun toString(): String = symbol.toSMTString()
+  override fun toString(): String = name.toString()
 }
 
 /**

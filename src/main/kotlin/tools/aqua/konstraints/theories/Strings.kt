@@ -90,7 +90,7 @@ internal object RegLanDecl : SortDecl<RegLan>("RegLan".symbol(), emptySet(), emp
  *             | A | B | C | D | E | F
  * ```
  */
-class Char(val value: String) : Literal<StringSort>("char".symbol(), StringSort) {
+class Char(val value: String) : Literal<StringSort>(LiteralString("char"), StringSort) {
 
   val character = Char(Integer.parseInt(value.substring(2)))
 }
@@ -100,11 +100,11 @@ object CharDecl :
   override fun buildExpression(bindings: Bindings): Expression<StringSort> = TODO()
 }
 
-class StringLiteral(val value: String) : Literal<StringSort>("|$value|".symbol(), StringSort) {
+class StringLiteral(val value: String) : Literal<StringSort>(LiteralString(value), StringSort) {
   // TODO the symbol needs a different value, probably should not be a symbol here
 
   // use symbol.toString here to get the unquoted string literal
-  override fun toString(): String = symbol.toString()
+  override fun toString(): String = name.toString()
 }
 
 /*
@@ -230,7 +230,7 @@ object InRegexDecl :
  *
  * (re.none RegLan)
  */
-class RegexNone : Literal<RegLan>("re.none".symbol(), RegLan)
+class RegexNone : ConstantExpression<RegLan>("re.none".symbol(), RegLan)
 
 object RegexNoneDecl : FunctionDecl0<RegLan>("re.none".symbol(), emptySet(), emptySet(), RegLan) {
   override fun buildExpression(bindings: Bindings): Expression<RegLan> = RegexNone()
@@ -241,7 +241,7 @@ object RegexNoneDecl : FunctionDecl0<RegLan>("re.none".symbol(), emptySet(), emp
  *
  * (re.all RegLan)
  */
-class RegexAll : Literal<RegLan>("re.all".symbol(), RegLan)
+class RegexAll : ConstantExpression<RegLan>("re.all".symbol(), RegLan)
 
 object RegexAllDecl : FunctionDecl0<RegLan>("re.all".symbol(), emptySet(), emptySet(), RegLan) {
   override fun buildExpression(bindings: Bindings): Expression<RegLan> = RegexAll()
@@ -252,7 +252,7 @@ object RegexAllDecl : FunctionDecl0<RegLan>("re.all".symbol(), emptySet(), empty
  *
  * (re.allchar RegLan)
  */
-class RegexAllChar : Literal<RegLan>("re.allchar".symbol(), RegLan)
+class RegexAllChar : ConstantExpression<RegLan>("re.allchar".symbol(), RegLan)
 
 object RegexAllCharDecl :
     FunctionDecl0<RegLan>("re.allchar".symbol(), emptySet(), emptySet(), RegLan) {

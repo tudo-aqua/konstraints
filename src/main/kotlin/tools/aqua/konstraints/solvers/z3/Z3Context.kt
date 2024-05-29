@@ -22,6 +22,7 @@ import com.microsoft.z3.Context
 import com.microsoft.z3.Expr
 import com.microsoft.z3.FuncDecl
 import com.microsoft.z3.Sort as Z3Sort
+import tools.aqua.konstraints.parser.SortedVar
 import tools.aqua.konstraints.parser.VarBinding
 import tools.aqua.konstraints.smt.Sort
 import tools.aqua.konstraints.smt.Symbol
@@ -34,6 +35,7 @@ class Z3Context {
   internal val functions = HashMap<String, FuncDecl<*>>()
   internal val sorts = HashMap<Sort, Z3Sort>()
   private val letStack = Stack<Map<String, Expr<*>>>()
+  private val boundVars = Stack<Map<String, Expr<*>>>()
 
   /** Create Z3 expressions for all local variables in [bindings]. */
   fun <T> let(bindings: List<VarBinding<*>>, block: () -> T): T {
@@ -46,6 +48,23 @@ class Z3Context {
     val expr = block()
 
     letStack.pop()
+
+    return expr
+  }
+
+  fun <T> bind(sortedVars: List<SortedVar<*>>, block: (List<Expr<*>>) -> T): T {
+    boundVars.push(
+        mapOf(
+            *sortedVars
+                .map { sortedVar ->
+                  sortedVar.name.toString() to
+                      context.mkConst(sortedVar.name.toSMTString(), sortedVar.sort.z3ify(this))
+                }
+                .toTypedArray()))
+
+    val expr = block(boundVars.peek().values.toList())
+
+    boundVars.pop()
 
     return expr
   }
@@ -71,6 +90,23 @@ class Z3Context {
 
     // conversion should not fail as we checked the sort for localVar matches expected sort
     @Suppress("UNCHECKED_CAST") return localVar as Expr<T>
+  }
+
+  fun <T : Z3Sort> boundVariable(symbol: Symbol, sort: T): Expr<T> {
+    val level =
+        boundVars.find { it.containsKey(symbol.toString()) }
+            ?: throw RuntimeException("Unknown local variable $symbol")
+
+    // this exception here should never be thrown, because we checked that the bound variable is in
+    // this stack level
+    val boundVar = level[symbol.toString()] ?: throw RuntimeException()
+
+    if (boundVar.sort != sort)
+        throw RuntimeException(
+            "Bound variable $symbol had unexpected sort: expected $sort but was ${boundVar.sort}")
+
+    // conversion should not fail as we checked the sort for localVar matches expected sort
+    @Suppress("UNCHECKED_CAST") return boundVar as Expr<T>
   }
 
   fun <T : Z3Sort> getConstant(symbol: Symbol, sort: T): Expr<T> {

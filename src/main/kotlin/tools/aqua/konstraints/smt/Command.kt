@@ -20,6 +20,7 @@ package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.Attribute
 import tools.aqua.konstraints.parser.OptionValue
+import tools.aqua.konstraints.parser.SortedVar
 import tools.aqua.konstraints.theories.BoolSort
 
 /** Base class for each SMT command */
@@ -87,7 +88,7 @@ data class DefineFun(val functionDef: FunctionDef) : Command("define-fun $functi
    */
   constructor(
       name: Symbol,
-      parameters: List<SortedVar>,
+      parameters: List<SortedVar<*>>,
       sort: Sort,
       term: Expression<*>
   ) : this(FunctionDef(name, parameters, sort, term))
@@ -99,13 +100,9 @@ data class DefineFun(val functionDef: FunctionDef) : Command("define-fun $functi
  */
 data class FunctionDef(
     val name: Symbol,
-    val parameters: List<SortedVar>,
+    val parameters: List<SortedVar<*>>,
     val sort: Sort,
     val term: Expression<*>
 ) {
   override fun toString(): String = "$name (${parameters.joinToString(" ")}) $sort $term)"
-}
-
-data class SortedVar(val name: Symbol, val sort: Sort) {
-  override fun toString(): String = "($name $sort)"
 }

@@ -50,14 +50,14 @@ object BoolSortDecl : SortDecl<BoolSort>("Bool".symbol(), emptySet(), emptySet()
 }
 
 /** Object for SMT true */
-object True : Literal<BoolSort>("true".symbol(), BoolSort)
+object True : ConstantExpression<BoolSort>("true".symbol(), BoolSort)
 
 object TrueDecl : FunctionDecl0<BoolSort>("true".symbol(), emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(bindings: Bindings): Expression<BoolSort> = True
 }
 
 /** Object for SMT false */
-object False : Literal<BoolSort>("false".symbol(), BoolSort)
+object False : ConstantExpression<BoolSort>("false".symbol(), BoolSort)
 
 object FalseDecl : FunctionDecl0<BoolSort>("false".symbol(), emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(bindings: Bindings): Expression<BoolSort> = False

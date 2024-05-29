@@ -94,8 +94,16 @@ class Context(theory: Theory) {
     return result
   }
 
+  fun <T> bindVars(sortedVars: List<SortedVar<*>>, block: (Context) -> T): T {
+    assertionLevels.push(LocalLevel(sortedVars))
+    val result = block(this)
+    assertionLevels.pop()
+
+    return result
+  }
+
   fun contains(expression: Expression<*>): Boolean =
-      getFunction(expression.symbol.toString(), expression.subexpressions) != null
+      getFunction(expression.name.toString(), expression.subexpressions) != null
 
   fun registerFunction(function: DeclareConst) {
     registerFunction(
@@ -261,6 +269,26 @@ class LetLevel(varBindings: List<VarBinding<*>>) : Subcontext {
           "LetLevel.add", "Can not add new sorts to let assertion level")
 
   override val functions: List<FunctionDecl<*>> = varBindings
+  override val sorts: Map<String, SortDecl<*>> = emptyMap()
+}
+
+class SortedVar<T : Sort>(name: Symbol, sort: T) :
+    FunctionDecl0<T>(name, emptySet(), emptySet(), sort) {
+  override fun toString(): String = "($name $sort)"
+
+  override fun buildExpression(bindings: Bindings): Expression<T> = BoundVariable(name, sort)
+}
+
+class LocalLevel(localVars: List<SortedVar<*>>) : Subcontext {
+  override fun add(function: FunctionDecl<*>): Boolean =
+      throw IllegalOperationException(
+          "LocalLevel.add", "Can not add new functions to local assertion level")
+
+  override fun add(sort: SortDecl<*>): SortDecl<*> =
+      throw IllegalOperationException(
+          "LocalLevel.add", "Can not add new sorts to local assertion level")
+
+  override val functions: List<FunctionDecl<*>> = localVars
   override val sorts: Map<String, SortDecl<*>> = emptyMap()
 }
 

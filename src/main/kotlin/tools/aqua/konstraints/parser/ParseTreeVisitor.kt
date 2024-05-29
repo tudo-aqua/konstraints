@@ -104,14 +104,21 @@ internal class ParseTreeVisitor :
           visit(protoFunctionDef.sort),
           visit(protoFunctionDef.term))
 
-  override fun visit(protoSortedVar: ProtoSortedVar): SortedVar =
+  override fun visit(protoSortedVar: ProtoSortedVar): SortedVar<*> =
       SortedVar(protoSortedVar.symbol, visit(protoSortedVar.sort))
 
   override fun visit(simpleQualIdentifier: SimpleQualIdentifier): Expression<*> {
     val op = context?.getFunction(simpleQualIdentifier.identifier, listOf())
 
+    val functionIndices =
+        if (simpleQualIdentifier.identifier is IndexedIdentifier) {
+          simpleQualIdentifier.identifier.indices.map { it as NumeralIndex }.toSet()
+        } else {
+          emptySet()
+        }
+
     if (op != null) {
-      return op.buildExpression(listOf(), emptySet())
+      return op.buildExpression(listOf(), functionIndices)
     } else {
       throw IllegalStateException("Unknown fun ${simpleQualIdentifier.identifier.symbol}")
       // TODO UnknownFunctionException
@@ -156,15 +163,21 @@ internal class ParseTreeVisitor :
 
     val inner = context?.let(bindings) { visit(protoLet.term) }!!
 
-    return LetExpression("xyz".symbol(), inner.sort, bindings, inner as Expression<Sort>)
+    return LetExpression(inner.sort, bindings, inner as Expression<Sort>)
   }
 
   override fun visit(protoForAll: ProtoForAll): Expression<*> {
-    TODO("Implement visit ProtoForAll")
+    val sortedVars = protoForAll.sortedVars.map { visit(it) }
+    val term = context?.bindVars(sortedVars) { visit(protoForAll.term) }!!
+
+    return ForallExpression(sortedVars, term castTo BoolSort)
   }
 
   override fun visit(protoExists: ProtoExists): Expression<*> {
-    TODO("Implement visit ProtoExists")
+    val sortedVars = protoExists.sortedVars.map { visit(it) }
+    val term = context?.bindVars(sortedVars) { visit(protoExists.term) }!!
+
+    return ExistsExpression(sortedVars, term castTo BoolSort)
   }
 
   override fun visit(protoMatch: ProtoMatch): Expression<*> {

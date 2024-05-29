@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2023 The Konstraints Authors
+ * Copyright 2023-2024 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,22 +16,18 @@
  * limitations under the License.
  */
 
-plugins {
-  id("com.gradle.develocity") version "3.17.4"
-  id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+package tools.aqua.konstraints.smt
+
+import tools.aqua.konstraints.parser.Parser
+
+interface SMTSerializable
+
+class Keyword(val value: String) : SMTSerializable {
+  init {
+    Parser.reserved.parse(value)
+  }
 }
 
-rootProject.name = "konstraints"
-
-develocity {
-  buildScan {
-    val isCI = System.getenv("CI").isNullOrEmpty().not()
-    publishing.onlyIf { isCI }
-    if (isCI) {
-      tag("CI")
-      uploadInBackground = false
-      termsOfUseUrl = "https://gradle.com/help/legal-terms-of-use"
-      termsOfUseAgree = "yes"
-    }
-  }
+class LiteralString(val value: String) : SMTSerializable {
+  override fun toString() = value
 }

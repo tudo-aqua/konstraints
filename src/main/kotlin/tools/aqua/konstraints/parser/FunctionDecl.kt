@@ -102,11 +102,11 @@ open class FunctionDecl<S : Sort>(
 abstract class FunctionDecl0<S : Sort>(
     name: Symbol,
     parametricSorts: Set<Sort>,
-    indices: Set<SymbolIndex>,
+    functionIndices: Set<SymbolIndex>,
     sort: S
 ) :
     FunctionDecl<S>(
-        name, parametricSorts, emptyList(), emptySet(), indices, sort, Associativity.NONE) {
+        name, parametricSorts, emptyList(), functionIndices, emptySet(), sort, Associativity.NONE) {
 
   override fun buildExpression(
       args: List<Expression<*>>,
