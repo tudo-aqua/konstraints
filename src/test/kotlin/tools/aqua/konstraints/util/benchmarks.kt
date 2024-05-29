@@ -50,20 +50,24 @@ fun Any.loadBenchmarks(metadata: BenchmarkMetadata): Sequence<Benchmark> = seque
     val lookup = files.associateBy { "${set.category}/${set.set}/${it.name.joinToString("/")}" }
     var matches = 0
 
-    this@loadBenchmarks.javaClass.getResourceAsStream("/${set.category}/${set.set}.tar.zst")!!.use {
-      val tar = it.buffered().unzstd().buffered().untar()
+    this@loadBenchmarks.javaClass
+        .getResourceAsStream("/${set.category}/${set.set}.tar.zst")!!
+        .buffered()
+        .unzstd()
+        .buffered()
+        .untar()
+        .use { tar ->
+          for ((entry, stream) in tar.asEntrySequence()) {
+            // abort early if we have discovered all described files
+            if (matches == files.size) break
 
-      for ((entry, stream) in tar.asEntrySequence()) {
-        // abort early if we have discovered all described files
-        if (matches == files.size) break
+            if (entry.isFile.not()) continue
+            val file = lookup[entry.name] ?: continue
 
-        if (entry.isFile.not()) continue
-        val file = lookup[entry.name] ?: continue
+            yield(Benchmark(set, file, entry.readText(stream)))
 
-        yield(Benchmark(set, file, entry.readText(stream)))
-
-        matches++
-      }
-    }
+            matches++
+          }
+        }
   }
 }
