@@ -85,5 +85,7 @@ private const val EXECUTION_SPEEDS_SERIAL = "speeds"
 @Serializable
 data class BenchmarkDatabaseFile(
     /** Execution speeds on a reference machine indexed by solver. */
-    @SerialName(EXECUTION_SPEEDS_SERIAL) val executionSpeeds: Map<String, Double>
+    @SerialName(EXECUTION_SPEEDS_SERIAL) val executionSpeeds: Map<String, Double>,
+    /** Decompressed size in bytes. */
+    @SerialName("size") val fileSizeInBytes: Long = Long.MIN_VALUE,
 ) : BenchmarkDatabaseElement

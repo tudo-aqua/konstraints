@@ -131,6 +131,7 @@ def handle_archive(tar: TarFile, data, conf: SolverConfig, exc: Executor):
                     if component:
                         file_data = file_data.setdefault(component, {})
                 file_data.setdefault("speeds", {})[conf.solver] = result
+                file_data["size"] = entry.size
 
         future.add_done_callback(callback)
 

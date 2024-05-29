@@ -27,11 +27,11 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.ParameterizedTest.INDEX_PLACEHOLDER
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.solvers.z3.Z3Solver
 import tools.aqua.konstraints.util.Benchmark
+import tools.aqua.konstraints.util.MiB
 import tools.aqua.konstraints.util.loadBenchmarkDatabase
 import tools.aqua.konstraints.util.loadBenchmarks
 import tools.aqua.konstraints.util.selectTests
@@ -48,25 +48,28 @@ class BenchmarkTest {
 
     @JvmStatic
     fun streamUnitTestZ3Benchmarks(): Stream<Benchmark> =
-        loadBenchmarks(metadata.selectTests("z3", maxSpeed = FAST, maxPerGroup = 3)).asStream()
+        loadBenchmarks(
+                metadata.selectTests("z3", maxSpeed = FAST, maxSize = 1.MiB, maxPerGroup = 3))
+            .asStream()
 
     @JvmStatic
     fun streamFastZ3Benchmarks(): Stream<Benchmark> =
-        loadBenchmarks(metadata.selectTests("z3", maxSpeed = FAST)).asStream()
+        loadBenchmarks(metadata.selectTests("z3", maxSpeed = FAST, maxSize = 5.MiB)).asStream()
 
     @JvmStatic
     fun streamMediumZ3Benchmarks(): Stream<Benchmark> =
-        loadBenchmarks(metadata.selectTests("z3", maxSpeed = MEDIUM)).asStream()
+        loadBenchmarks(metadata.selectTests("z3", maxSpeed = MEDIUM, maxSize = 10.MiB)).asStream()
 
     @JvmStatic
     fun streamAllZ3Benchmarks(): Stream<Benchmark> =
-        loadBenchmarks(metadata.selectTests("z3")).asStream()
+        loadBenchmarks(metadata.selectTests("z3", maxSize = 50.MiB)).asStream()
   }
 
-  @ParameterizedTest(name = "[$INDEX_PLACEHOLDER] {0}")
+  @ParameterizedTest
   @MethodSource("streamUnitTestZ3Benchmarks")
   @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun solve(benchmark: Benchmark) {
+
     val solver = Z3Solver()
 
     val satStatus =
