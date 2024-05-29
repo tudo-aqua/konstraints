@@ -125,7 +125,7 @@ def handle_archive(tar: TarFile, data, conf: SolverConfig, exc: Executor):
         future = exc.submit(handle_smt, smt, conf)
 
         def callback(f):
-            if result := f.result():
+            if result := f.result() is not None:
                 file_data = data
                 for component in entry.name.split("/"):
                     if component:
