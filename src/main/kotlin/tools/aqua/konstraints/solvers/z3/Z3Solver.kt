@@ -66,11 +66,11 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
   }
 
   override fun visit(declareConst: DeclareConst) {
-      context.constants[declareConst.name.toString()]?.let { error("constant already declared.") }
-      context.constants[declareConst.name.toString()] =
-          context.context
-              .mkConstDecl(declareConst.name.toSMTString(), getOrCreateSort(declareConst.sort))
-              .apply()
+    context.constants[declareConst.name.toString()]?.let { error("constant already declared.") }
+    context.constants[declareConst.name.toString()] =
+        context.context
+            .mkConstDecl(declareConst.name.toSMTString(), getOrCreateSort(declareConst.sort))
+            .apply()
   }
 
   override fun visit(declareFun: DeclareFun) {
@@ -140,6 +140,14 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
 
   override fun visit(defineFun: DefineFun) {
     TODO("Not yet implemented")
+  }
+
+  override fun visit(push: Push) {
+    (0 ..< push.n).forEach { _ -> solver.push() }
+  }
+
+  override fun visit(pop: Pop) {
+    solver.pop(pop.n)
   }
 
   // this should later be part of solver interface

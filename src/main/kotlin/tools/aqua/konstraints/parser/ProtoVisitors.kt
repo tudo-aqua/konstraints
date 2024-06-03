@@ -30,6 +30,8 @@ internal interface ProtoCommandVisitor {
         is ProtoSetLogic -> visit(command)
         is ProtoDeclareSort -> visit(command)
         is ProtoDefineFun -> visit(command)
+        is ProtoPop -> visit(command)
+        is ProtoPush -> visit(command)
       }
 
   fun visit(protoAssert: ProtoAssert): Assert
@@ -47,6 +49,10 @@ internal interface ProtoCommandVisitor {
   fun visit(protoFunctionDef: ProtoFunctionDef): FunctionDef
 
   fun visit(protoSortedVar: ProtoSortedVar): SortedVar<*>
+
+  fun visit(protoPush: ProtoPush): Push
+
+  fun visit(protoPop: ProtoPop): Pop
 }
 
 internal interface SpecConstantVisitor {

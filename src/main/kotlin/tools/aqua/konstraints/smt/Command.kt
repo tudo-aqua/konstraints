@@ -106,3 +106,7 @@ data class FunctionDef(
 ) {
   override fun toString(): String = "$name (${parameters.joinToString(" ")}) $sort $term)"
 }
+
+data class Push(val n: Int) : Command("push $n")
+
+data class Pop(val n: Int) : Command("pop $n")

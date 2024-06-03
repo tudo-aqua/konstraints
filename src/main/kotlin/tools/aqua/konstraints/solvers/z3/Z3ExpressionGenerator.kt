@@ -573,15 +573,15 @@ fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
       is RealDiv -> this.z3ify(context)
       is ToReal -> this.z3ify(context)
       is FPToReal -> this.z3ify(context)
-        /* free constant and function symbols */
-        is UserDefinedExpression ->
-            if (this.subexpressions.isEmpty()) {
-                context.getConstant(this.name, this.sort.z3ify(context))
-            } else {
-                context.getFunction(
-                    this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
-            }
-        else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
+      /* free constant and function symbols */
+      is UserDefinedExpression ->
+          if (this.subexpressions.isEmpty()) {
+            context.getConstant(this.name, this.sort.z3ify(context))
+          } else {
+            context.getFunction(
+                this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
+          }
+      else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
 
 fun RealLiteral.z3ify(context: Z3Context): Expr<Z3RealSort> =

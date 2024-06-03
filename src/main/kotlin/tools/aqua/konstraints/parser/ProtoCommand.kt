@@ -57,6 +57,10 @@ internal data class ProtoFunctionDef(
     val term: ProtoTerm
 )
 
+internal data class ProtoPush(val n: Int) : ProtoCommand
+
+internal data class ProtoPop(val n: Int) : ProtoCommand
+
 internal class ParseSymbol(val token: Token) : Symbol(token.getValue(), QuotingRule.NONE) {
   val symbol: String = token.getValue()
 }

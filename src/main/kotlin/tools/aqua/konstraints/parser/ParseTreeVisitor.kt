@@ -83,6 +83,18 @@ internal class ParseTreeVisitor :
   override fun visit(protoSortedVar: ProtoSortedVar): SortedVar<*> =
       SortedVar(protoSortedVar.symbol, visit(protoSortedVar.sort))
 
+  override fun visit(protoPush: ProtoPush): Push {
+    context?.push(protoPush.n)
+
+    return Push(protoPush.n)
+  }
+
+  override fun visit(protoPop: ProtoPop): Pop {
+    context?.pop(protoPop.n)
+
+    return Pop(protoPop.n)
+  }
+
   override fun visit(simpleQualIdentifier: SimpleQualIdentifier): Expression<*> {
     val op = context?.getFunction(simpleQualIdentifier.identifier, listOf())
 
