@@ -23,7 +23,7 @@ import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.smt.*
 
 /** FloatingPoint theory object */
-internal object FloatingPointTheory : Theory {
+object FloatingPointTheory : Theory {
   override val functions =
       listOf(
           RoundNearestTiesToEvenDecl,

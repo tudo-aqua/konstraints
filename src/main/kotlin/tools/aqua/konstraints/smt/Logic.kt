@@ -18,12 +18,11 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.FunctionDecl
-import tools.aqua.konstraints.parser.SortDecl
+import tools.aqua.konstraints.parser.Theory
+import tools.aqua.konstraints.theories.*
 
 interface Logic {
-  val sorts: Map<String, SortDecl<*>>
-  val functions: Set<FunctionDecl<*>>
+  val theories: List<Theory>
 }
 
 /**
@@ -34,8 +33,7 @@ interface Logic {
  * - all array terms have sort (Array Int Int).
  */
 data object AUFLIA : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, IntsTheory, ArrayExTheory)
 }
 
 /**
@@ -48,8 +46,7 @@ data object AUFLIA : Logic {
  * - all array terms have sort (Array Int Real) or (Array Int (Array Int Real)).
  */
 data object AUFLIRA : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, RealsIntsTheory, ArrayExTheory)
 }
 
 /**
@@ -57,8 +54,7 @@ data object AUFLIRA : Logic {
  * free sort and function symbols.
  */
 data object AUFNIRA : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, RealsIntsTheory, ArrayExTheory)
 }
 
 /**
@@ -67,8 +63,7 @@ data object AUFNIRA : Logic {
  * symbols *, /, div, mod, and abs, except as specified the :extensions attribute.
  */
 data object LIA : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // ODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, IntsTheory)
 }
 
 /**
@@ -77,8 +72,7 @@ data object LIA : Logic {
  * symbols * and /, except as specified the :extensions attribute.
  */
 data object LRA : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, RealsTheory)
 }
 
 /**
@@ -87,8 +81,7 @@ data object LRA : Logic {
  * some i, j > 0.
  */
 data object QF_ABV : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, BitVectorExpressionTheory, ArrayExTheory)
 }
 
 /**
@@ -97,8 +90,7 @@ data object QF_ABV : Logic {
  * terms have sort of the form (Array (_ BitVec i) (_ BitVec j)) for some i, j > 0.
  */
 data object QF_AUFBV : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, BitVectorExpressionTheory, ArrayExTheory)
 }
 
 /**
@@ -109,8 +101,7 @@ data object QF_AUFBV : Logic {
  * - all array terms have sort (Array Int Int).
  */
 data object QF_AUFLIA : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, IntsTheory, ArrayExTheory)
 }
 
 /**
@@ -118,8 +109,7 @@ data object QF_AUFLIA : Logic {
  * free sort and constant symbols.
  */
 data object QF_AX : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, ArrayExTheory)
 }
 
 /**
@@ -129,8 +119,7 @@ data object QF_AX : Logic {
  * (because they may be in the scope of a let binder).
  */
 data object QF_BV : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, BitVectorExpressionTheory)
 }
 
 /**
@@ -147,8 +136,7 @@ data object QF_BV : Logic {
  * - n is a numeral.
  */
 data object QF_IDL : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, IntsTheory)
 }
 
 /**
@@ -158,8 +146,7 @@ data object QF_IDL : Logic {
  * specified in the :extensions attribute.
  */
 data object QF_LIA : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, IntsTheory)
 }
 
 /**
@@ -167,8 +154,7 @@ data object QF_LIA : Logic {
  * constant symbols.
  */
 data object QF_NIA : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, IntsTheory)
 }
 
 /**
@@ -176,8 +162,7 @@ data object QF_NIA : Logic {
  * constant symbols.
  */
 data object QF_NRA : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, RealsTheory)
 }
 
 /**
@@ -186,8 +171,7 @@ data object QF_NRA : Logic {
  * function symbols * and /, except as specified the :extensions attribute.
  */
 data object QF_LRA : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, RealsTheory)
 }
 
 /**
@@ -204,8 +188,7 @@ data object QF_LRA : Logic {
  * - x, y are free constant symbols of sort Real.
  */
 data object QF_RDL : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, RealsTheory)
 }
 
 /**
@@ -213,8 +196,7 @@ data object QF_RDL : Logic {
  * sort and function symbols.
  */
 data object QF_UF : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories: List<Theory> = listOf(CoreTheory)
 }
 
 /**
@@ -222,8 +204,7 @@ data object QF_UF : Logic {
  * signature with free sort and function symbols.
  */
 data object QF_UFBV : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, BitVectorExpressionTheory)
 }
 
 /**
@@ -246,8 +227,7 @@ data object QF_UFBV : Logic {
  * is a numeral.
  */
 data object QF_UFIDL : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, IntsTheory)
 }
 
 /**
@@ -257,8 +237,7 @@ data object QF_UFIDL : Logic {
  *   div, mod, and abs, except as specified in the :extensions attributes;
  */
 data object QF_UFLIA : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, IntsTheory)
 }
 
 /**
@@ -267,8 +246,7 @@ data object QF_UFLIA : Logic {
  * of the function symbols * and /, except as specified the :extensions attribute.
  */
 data object QF_UFLRA : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, RealsTheory)
 }
 
 /**
@@ -276,8 +254,7 @@ data object QF_UFLRA : Logic {
  * sort and function symbols.
  */
 data object QF_UFNRA : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, RealsTheory)
 }
 
 /**
@@ -286,8 +263,7 @@ data object QF_UFNRA : Logic {
  * function symbols * and /, except as specified the :extensions attribute.
  */
 data object UFLRA : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, RealsTheory)
 }
 
 /**
@@ -295,12 +271,10 @@ data object UFLRA : Logic {
  * function symbols.
  */
 data object UFNIA : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, IntsTheory)
 }
 
 /** Quantifier-free formulas over floating point arithmetic */
 data object QF_FP : Logic {
-  override val sorts: Map<String, SortDecl<*>> = emptyMap() // TODO("Not yet implemented")
-  override val functions: Set<FunctionDecl<*>> = emptySet() // TODO("Not yet implemented")
+  override val theories = listOf(CoreTheory, FloatingPointTheory)
 }

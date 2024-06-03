@@ -19,11 +19,8 @@
 package tools.aqua.konstraints.parser
 
 import java.math.BigDecimal
-import jdk.jshell.spi.ExecutionControl.NotImplementedException
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
-import tools.aqua.konstraints.theories.BitVectorExpressionTheory
-import tools.aqua.konstraints.theories.IntsTheory
 
 internal class ParseTreeVisitor :
     ProtoCommandVisitor, ProtoTermVisitor, ProtoSortVisitor, SpecConstantVisitor {
@@ -56,28 +53,7 @@ internal class ParseTreeVisitor :
   }
 
   override fun visit(protoSetLogic: ProtoSetLogic): SetLogic {
-    when (protoSetLogic.logic) {
-      QF_BV -> context = Context(BitVectorExpressionTheory)
-      QF_IDL -> {
-        context = Context(IntsTheory)
-        context?.numeralSort = IntSort
-      }
-      QF_RDL -> {
-        context = Context(RealsTheory)
-        context?.numeralSort = RealSort
-      }
-      QF_FP -> context = Context(FloatingPointTheory)
-      // QF_AX uses only ArrayEx with free function and sort symbols, as free sorts are not yet
-      // supported
-      // load int theory as well for testing purposes
-      QF_AX -> {
-        context = Context(ArrayExTheory)
-      }
-      QF_UF -> {
-        context = Context(CoreTheory)
-      }
-      else -> throw NotImplementedException("${protoSetLogic.logic} not yet supported")
-    }
+    context = Context(protoSetLogic.logic)
 
     return SetLogic(protoSetLogic.logic)
   }

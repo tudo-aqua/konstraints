@@ -24,7 +24,7 @@ import tools.aqua.konstraints.parser.Theory
 import tools.aqua.konstraints.smt.*
 
 /** Reals Ints theory context */
-internal object RealsIntsTheory : Theory {
+object RealsIntsTheory : Theory {
   override val functions =
       listOf(
           IntNegDecl,
