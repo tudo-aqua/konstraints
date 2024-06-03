@@ -21,7 +21,6 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.parser.Attribute
 import tools.aqua.konstraints.parser.Context
 import tools.aqua.konstraints.solvers.z3.Z3Solver
-import tools.aqua.konstraints.theories.BitVectorExpressionTheory
 
 enum class SatStatus {
   SAT, // program is satisfiable
@@ -120,34 +119,7 @@ class MutableSMTProgram(commands: List<Command>, context: Context?) :
     }
 
     this.logic = logic
-
-    when (logic) {
-      AUFLIA -> TODO()
-      AUFLIRA -> TODO()
-      AUFNIRA -> TODO()
-      LIA -> TODO()
-      LRA -> TODO()
-      QF_ABV -> TODO()
-      QF_AUFBV -> TODO()
-      QF_AUFLIA -> TODO()
-      QF_AX -> TODO()
-      QF_BV -> context = Context(BitVectorExpressionTheory)
-      QF_IDL -> TODO()
-      QF_LIA -> TODO()
-      QF_LRA -> TODO()
-      QF_NIA -> TODO()
-      QF_NRA -> TODO()
-      QF_RDL -> TODO()
-      QF_UF -> TODO()
-      QF_UFBV -> TODO()
-      QF_UFIDL -> TODO()
-      QF_UFLIA -> TODO()
-      QF_UFLRA -> TODO()
-      QF_UFNRA -> TODO()
-      UFLRA -> TODO()
-      UFNIA -> TODO()
-      QF_FP -> TODO()
-    }
+    context = Context(logic)
   }
 
   private fun updateContext(command: Command) {

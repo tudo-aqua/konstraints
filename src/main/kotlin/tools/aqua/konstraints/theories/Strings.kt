@@ -22,7 +22,7 @@ import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
 /** Strings theory object */
-internal object StringsTheory : Theory {
+object StringsTheory : Theory {
   override val functions =
       listOf(
           CharDecl,

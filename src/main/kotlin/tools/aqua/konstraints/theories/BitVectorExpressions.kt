@@ -23,7 +23,7 @@ import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
 /** FixedSizeBitVectors theory object */
-internal object BitVectorExpressionTheory : Theory {
+object BitVectorExpressionTheory : Theory {
   override val functions =
       listOf(
           BVUltDecl,
@@ -47,7 +47,7 @@ internal object BitVectorExpressionTheory : Theory {
  *
  * (_ BitVec m)
  */
-internal object BVSortDecl : SortDecl<BVSort>("BitVec".symbol(), emptySet(), setOf("m".idx())) {
+object BVSortDecl : SortDecl<BVSort>("BitVec".symbol(), emptySet(), setOf("m".idx())) {
   override fun getSort(bindings: Bindings): BVSort = BVSort(bindings["m"].numeral)
 }
 

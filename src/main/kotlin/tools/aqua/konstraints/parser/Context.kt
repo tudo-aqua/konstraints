@@ -19,7 +19,7 @@
 package tools.aqua.konstraints.parser
 
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.theories.CoreTheory
+import tools.aqua.konstraints.theories.*
 import tools.aqua.konstraints.util.Stack
 
 abstract class SortDecl<T : Sort>(
@@ -48,38 +48,24 @@ abstract class SortDecl<T : Sort>(
  * Context class manages the currently loaded logic/theory and all the Assertion-Levels (including
  * global eventually but this option is currently not supported)
  */
-class Context(theory: Theory) {
-  // theory setter is private to disallow changing the theory manually
-  // this should only be changed when (set-logic) is used or when reset is called
-  var theory: Theory = theory
-    private set
-
+class Context(val logic: Logic) {
   val assertionLevels = Stack<Subcontext>()
+  val numeralSort: Sort? =
+      when {
+        logic.theories.contains(IntsTheory) -> IntSort
+        logic.theories.contains(RealsTheory) || logic.theories.contains(RealsIntsTheory) -> RealSort
+        else -> null
+      }
 
   init {
-    // core theory is always loaded QF_UF and UF are the only logics that load core "manually"
-    // as it is the only theory they rely on, for all other logics core is loaded before
-    // the other theory is loaded
-    if (theory != CoreTheory) {
-      assertionLevels.push(CoreTheory)
-    }
-
-    assertionLevels.push(theory)
+    logic.theories.forEach { assertionLevels.push(it) }
     assertionLevels.push(AssertionLevel())
   }
 
-  var numeralSort: Sort? = null
-
   fun <T> let(varBindings: List<VarBinding<*>>, block: (Context) -> T): T {
-    varBindings.forEach {
-      if (theory.contains(it.name))
-          throw IllegalFunctionOverloadException(
-              it.name.toString(), "Can not override theory symbol ${it.name}")
-    }
-
-    if (theory != CoreTheory) {
+    logic.theories.forEach { theory ->
       varBindings.forEach {
-        if (CoreTheory.contains(it.name))
+        if (theory.contains(it.name))
             throw IllegalFunctionOverloadException(
                 it.name.toString(), "Can not override theory symbol ${it.name}")
       }
@@ -171,8 +157,10 @@ class Context(theory: Theory) {
   }
 
   fun registerSort(sort: SortDecl<*>) {
-    if (theory.contains(sort)) {
-      throw SortAlreadyDeclaredException(sort.name, sort.signature.sortParameter.size)
+    logic.theories.forEach { theory ->
+      if (theory.contains(sort)) {
+        throw SortAlreadyDeclaredException(sort.name, sort.signature.sortParameter.size)
+      }
     }
 
     // TODO enforce all overloading/shadowing rules

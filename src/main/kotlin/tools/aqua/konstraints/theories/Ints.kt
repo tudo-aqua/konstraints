@@ -22,7 +22,7 @@ import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
 /** Ints theory object */
-internal object IntsTheory : Theory {
+object IntsTheory : Theory {
   override val functions =
       listOf(
           IntNegDecl,

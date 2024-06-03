@@ -41,7 +41,7 @@ import tools.aqua.konstraints.theories.*
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class ContextTests {
-  private val context = Context(BitVectorExpressionTheory)
+  private val context = Context(QF_BV)
   private val boolExpression = UserDefinedExpression("A".symbol(), BoolSort)
   private val bv32Expression = UserDefinedExpression("B".symbol(), BVSort(32))
   private val bv16Expression = UserDefinedExpression("B".symbol(), BVSort(16))
