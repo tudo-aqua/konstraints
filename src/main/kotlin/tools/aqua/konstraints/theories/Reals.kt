@@ -24,7 +24,7 @@ import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.smt.*
 
 /** Reals theory object */
-internal object RealsTheory : Theory {
+object RealsTheory : Theory {
   override val functions =
       listOf(
           RealNegDecl,
