@@ -123,7 +123,7 @@ class RealAdd(val terms: List<Expression<RealSort>>) :
 
 object RealAddDecl :
     FunctionDeclLeftAssociative<RealSort, RealSort, RealSort>(
-        "-".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
+        "+".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
   override fun buildExpression(
       param1: Expression<RealSort>,
       param2: Expression<RealSort>,
@@ -150,7 +150,7 @@ class RealMul(val factors: List<Expression<RealSort>>) :
 
 object RealMulDecl :
     FunctionDeclLeftAssociative<RealSort, RealSort, RealSort>(
-        "-".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
+        "*".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
   override fun buildExpression(
       param1: Expression<RealSort>,
       param2: Expression<RealSort>,

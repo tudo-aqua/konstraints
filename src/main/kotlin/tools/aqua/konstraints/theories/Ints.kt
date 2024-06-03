@@ -175,7 +175,7 @@ class IntDiv(val terms: List<Expression<IntSort>>) :
 
 object IntDivDecl :
     FunctionDeclLeftAssociative<IntSort, IntSort, IntSort>(
-        "/".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
+        "div".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param1: Expression<IntSort>,
       param2: Expression<IntSort>,
