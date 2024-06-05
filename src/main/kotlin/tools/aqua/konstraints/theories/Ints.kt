@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.theories
 
+import java.math.BigInteger
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
@@ -53,7 +54,8 @@ internal object IntSortDecl : SortDecl<IntSort>("Int".symbol(), emptySet(), empt
  *
  * (NUMERAL Int)
  */
-class IntLiteral(val value: Int) : Literal<IntSort>(LiteralString(value.toString()), IntSort) {
+class IntLiteral(val value: BigInteger) :
+    Literal<IntSort>(LiteralString(value.toString()), IntSort) {
   override fun toString(): String = value.toString()
 }
 

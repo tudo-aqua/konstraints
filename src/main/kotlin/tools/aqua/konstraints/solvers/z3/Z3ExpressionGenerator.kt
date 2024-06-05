@@ -513,7 +513,8 @@ fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
 
-fun IntLiteral.z3ify(context: Z3Context): Expr<Z3IntSort> = context.context.mkInt(this.value)
+fun IntLiteral.z3ify(context: Z3Context): Expr<Z3IntSort> =
+    context.context.mkInt(this.value.toString())
 
 fun IntNeg.z3ify(context: Z3Context): Expr<Z3IntSort> =
     context.context.mkUnaryMinus(this.inner.z3ify(context))
@@ -541,9 +542,9 @@ fun Mod.z3ify(context: Z3Context): Expr<Z3IntSort> =
  */
 fun Abs.z3ify(context: Z3Context): Expr<Z3IntSort> =
     context.context.mkITE(
-        IntGreaterEq(this.inner, IntLiteral(0)).z3ify(context),
+        context.context.mkGe(this.inner.z3ify(context), context.context.mkInt(0)),
         this.inner.z3ify(context),
-        IntNeg(this.inner).z3ify(context))
+        context.context.mkUnaryMinus(this.inner.z3ify(context)))
 
 fun ToInt.z3ify(context: Z3Context): Expr<Z3IntSort> =
     context.context.mkReal2Int(this.inner.z3ify(context))
@@ -573,15 +574,15 @@ fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
       is RealDiv -> this.z3ify(context)
       is ToReal -> this.z3ify(context)
       is FPToReal -> this.z3ify(context)
-        /* free constant and function symbols */
-        is UserDefinedExpression ->
-            if (this.subexpressions.isEmpty()) {
-                context.getConstant(this.name, this.sort.z3ify(context))
-            } else {
-                context.getFunction(
-                    this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
-            }
-        else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
+      /* free constant and function symbols */
+      is UserDefinedExpression ->
+          if (this.subexpressions.isEmpty()) {
+            context.getConstant(this.name, this.sort.z3ify(context))
+          } else {
+            context.getFunction(
+                this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
+          }
+      else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
 
 fun RealLiteral.z3ify(context: Z3Context): Expr<Z3RealSort> =
