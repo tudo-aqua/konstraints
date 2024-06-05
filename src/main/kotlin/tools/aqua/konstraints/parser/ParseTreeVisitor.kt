@@ -19,6 +19,7 @@
 package tools.aqua.konstraints.parser
 
 import java.math.BigDecimal
+import java.math.BigInteger
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 
@@ -173,7 +174,7 @@ internal class ParseTreeVisitor :
   }
 
   override fun visit(numeralConstant: NumeralConstant): Expression<*> {
-    if (context?.numeralSort == IntSort) return IntLiteral(numeralConstant.numeral)
+    if (context?.numeralSort == IntSort) return IntLiteral(BigInteger(numeralConstant.numeral))
     else if (context?.numeralSort == RealSort)
         return RealLiteral(BigDecimal(numeralConstant.numeral))
     else throw RuntimeException("Unsupported numeral literal sort ${context?.numeralSort}")

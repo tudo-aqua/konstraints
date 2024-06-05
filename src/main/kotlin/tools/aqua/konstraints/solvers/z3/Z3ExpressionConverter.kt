@@ -65,7 +65,7 @@ fun Expr<Z3IntSort>.aquaify(): Expression<IntSort> =
     if (isUMinus) {
       IntNeg(this.args[0].aquaify() as Expression<IntSort>)
     } else if (isIntNum) {
-      IntLiteral((this as IntNum).int)
+      IntLiteral((this as IntNum).bigInteger)
     } else {
       throw RuntimeException("Unknown or unsupported int expression $this")
     }
