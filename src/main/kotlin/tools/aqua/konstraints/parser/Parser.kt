@@ -144,12 +144,9 @@ object Parser {
   private val lparen = of('(') trim whitespaceCat
   private val rparen = of(')') trim whitespaceCat
 
-  private val numeralBase = (of('0') + (range('1', '9') * digitCat.star())).flatten()
-  private val numeral = numeralBase.map(String::toInt)
+  private val numeral = (of('0') + (range('1', '9') * digitCat.star())).flatten()
   private val decimal =
-      (numeralBase * of('.') * of('0').star() * numeralBase)
-          .flatten()
-          .map<String, BigDecimal>(::BigDecimal)
+      (numeral * of('.') * of('0').star() * numeral).flatten().map<String, BigDecimal>(::BigDecimal)
   private val hexadecimal = of("#x") * (digitCat + range('A', 'F') + range('a', 'f')).plus()
   private val binary = (of("#b") * range('0', '1').plus()).flatten()
   // all printable characters that are not double quotes
@@ -243,7 +240,7 @@ object Parser {
   /* maps to an implementation of SpecConstant */
   private val specConstant =
       (decimal.map { decimal: BigDecimal -> DecimalConstant(decimal) } +
-          numeral.map { numeral: Int -> NumeralConstant(numeral) } +
+          numeral.map { numeral: String -> NumeralConstant(numeral) } +
           hexadecimal.map { hexadecimal: String -> HexConstant(hexadecimal) } +
           binary.map { binary: String -> BinaryConstant(binary) } +
           string.map { string: String -> StringConstant(string) }) trim whitespaceCat
@@ -267,7 +264,7 @@ object Parser {
 
   /* maps to an implementation of Index */
   private val index =
-      (numeral.map { numeral: Int -> NumeralIndex(numeral) } +
+      (numeral.map { numeral: String -> NumeralIndex(numeral.toInt()) } +
           symbol.map { symbol: ParseSymbol -> SymbolIndex(symbol.symbol) }) trim whitespaceCat
 
   /* maps to an implementation of Identifier */
@@ -447,7 +444,7 @@ object Parser {
           }
 
   // Commands
-  private val sortDec = lparen * symbol * numeralBase * rparen
+  private val sortDec = lparen * symbol * numeral * rparen
   private val selectorDec = lparen * symbol * sort * rparen
   private val constructorDec = lparen * symbol * selectorDec.star() * rparen
   private val datatypeDec =
@@ -516,7 +513,7 @@ object Parser {
 
   private val declareSortCMD =
       (lparen * declareSortKW * symbol * numeral * rparen).map { results: ArrayList<Any> ->
-        ProtoDeclareSort(results[2] as ParseSymbol, results[3] as Int)
+        ProtoDeclareSort(results[2] as ParseSymbol, (results[3] as String).toInt())
       }
 
   private val getModelCMD = (lparen * getModelKW * rparen).map { _: Any -> GetModel }
