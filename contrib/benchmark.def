@@ -1,0 +1,38 @@
+#  SPDX-License-Identifier: Apache-2.0
+#
+#  Copyright 2023-2024 The Konstraints Authors
+#
+#  Licensed under the Apache License, Version 2.0 (the "License");
+#  you may not use this file except in compliance with the License.
+#  You may obtain a copy of the License at
+#
+#      http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+
+Bootstrap: docker
+From: ubuntu:rolling
+
+%setup
+    wget -qO- https://github.com/cvc5/cvc5/releases/download/cvc5-1.1.2/cvc5-Linux-static.zip |
+      bsdtar --strip-components=2 -xv cvc5-Linux-static/bin/cvc5
+    wget -qO- https://github.com/Z3Prover/z3/releases/download/z3-4.13.0/z3-4.13.0-x64-glibc-2.35.zip |
+      bsdtar --strip-components=2 -xv z3-4.13.0-x64-glibc-2.35/bin/z3
+    chmod +x cvc5 z3
+
+%files
+    cvc5 /usr/bin/cvc5.solver
+    contrib/cvc5-wrapper.sh /usr/bin/cvc5
+
+    z3 /usr/bin
+
+    contrib/run-benchmarks.py /usr/bin
+
+%post
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update
+    apt-get install -y --no-install-recommends python3.12 python3-zstandard

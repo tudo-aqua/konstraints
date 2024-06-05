@@ -19,6 +19,7 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import com.github.gradle.node.variant.computeNodeDir
 import com.github.gradle.node.variant.computeNodeExec
+import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.plugins.JavaBasePlugin.DOCUMENTATION_GROUP
 import org.gradle.api.publish.plugins.PublishingPlugin.PUBLISH_TASK_GROUP
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
@@ -31,10 +32,12 @@ plugins {
   signing
 
   alias(libs.plugins.detekt)
+  alias(libs.plugins.download)
   alias(libs.plugins.gitVersioning)
   alias(libs.plugins.kotlin.dokka)
   alias(libs.plugins.kotlin.jvm)
   alias(libs.plugins.kotlin.kover)
+  alias(libs.plugins.kotlin.serialization)
   alias(libs.plugins.nexus.publish)
   alias(libs.plugins.node)
   alias(libs.plugins.spotless)
@@ -75,11 +78,18 @@ gitVersioning.apply {
 repositories { mavenCentral() }
 
 dependencies {
+  implementation(libs.commons.compress)
+  implementation(libs.commons.io)
+  implementation(libs.kotlin.coroutines)
+  implementation(libs.petitparser.core)
+  implementation(libs.z3.turnkey)
+
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
-  implementation(libs.z3.turnkey)
-  implementation(libs.petitparser.core)
-  implementation(libs.kotlin.coroutines)
+  testImplementation(libs.kotlin.serialization.json)
+  testRuntimeOnly(libs.junit.launcher)
+  testRuntimeOnly(libs.xz)
+  testRuntimeOnly(libs.zstd)
 }
 
 node {
@@ -107,6 +117,20 @@ spotless {
   kotlinGradle {
     licenseHeaderFile(project.file("config/license/Apache-2.0-cstyle"), "(plugins|import )")
     ktfmt("0.46")
+  }
+  format("contribPython") {
+    target("contrib/*.py")
+    licenseHeaderFile(project.file("config/license/Apache-2.0-hashmark"), "import")
+        .skipLinesMatching("#!")
+  }
+  format("contribShell") {
+    target("contrib/*.sh")
+    licenseHeaderFile(project.file("config/license/Apache-2.0-hashmark"), "set")
+        .skipLinesMatching("#!")
+  }
+  format("contribSingularity") {
+    target("contrib/*.def")
+    licenseHeaderFile(project.file("config/license/Apache-2.0-hashmark"), "Bootstrap:")
   }
   format("markdown") {
     target(".github/**/*.md", "*.md")
@@ -176,6 +200,51 @@ java {
 }
 
 kotlin { jvmToolchain(libs.versions.java.jdk.get().toInt()) }
+
+val smtLibDir = layout.buildDirectory.dir("smtlib")
+
+tasks {
+  val incremental = layout.projectDirectory.file("contrib/smtlib-incremental-2024.05.13.urls")
+  incremental.asFile.readLines().forEach { benchmark ->
+    val url = uri(benchmark)
+    val name =
+        url.path.split('/').let { components ->
+          components[components.size - 2].removeSuffix(".tar.zst")
+        }
+    val task =
+        register<Download>("downloadIncremental$name") {
+          inputs.file(incremental)
+          group = "download"
+          src(url)
+          dest(smtLibDir.map { it.file("incremental/$name.tar.zst") })
+          overwrite(false)
+        }
+    processTestResources { dependsOn(task) }
+  }
+}
+
+tasks {
+  val nonIncremental =
+      layout.projectDirectory.file("contrib/smtlib-non-incremental-2024.04.23.urls")
+  nonIncremental.asFile.readLines().forEach { benchmark ->
+    val url = uri(benchmark)
+    val name =
+        url.path.split('/').let { components ->
+          components[components.size - 2].removeSuffix(".tar.zst")
+        }
+    val task =
+        register<Download>("downloadNonIncremental$name") {
+          inputs.file(nonIncremental)
+          group = "download"
+          src(url)
+          dest(smtLibDir.map { it.file("non-incremental/$name.tar.zst") })
+          overwrite(false)
+        }
+    processTestResources { dependsOn(task) }
+  }
+}
+
+sourceSets { test { resources { srcDir(smtLibDir) } } }
 
 tasks.test {
   useJUnitPlatform()
