@@ -66,11 +66,11 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
   }
 
   override fun visit(declareConst: DeclareConst) {
-      context.constants[declareConst.name.toString()]?.let { error("constant already declared.") }
-      context.constants[declareConst.name.toString()] =
-          context.context
-              .mkConstDecl(declareConst.name.toSMTString(), getOrCreateSort(declareConst.sort))
-              .apply()
+    context.constants[declareConst.name.toString()]?.let { error("constant already declared.") }
+    context.constants[declareConst.name.toString()] =
+        context.context
+            .mkConstDecl(declareConst.name.toSMTString(), getOrCreateSort(declareConst.sort))
+            .apply()
   }
 
   override fun visit(declareFun: DeclareFun) {
