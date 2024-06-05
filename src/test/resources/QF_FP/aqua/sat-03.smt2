@@ -1,0 +1,8 @@
+(set-logic QF_FP)
+(set-info :status sat)
+(declare-fun A () (_ FloatingPoint 11 53))
+(declare-fun B () (_ FloatingPoint 11 53))
+(declare-fun rm () RoundingMode)
+(assert (= (fp.mul rm A B) (fp.mul rm B A)))
+(check-sat)
+(exit)
