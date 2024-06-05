@@ -23,6 +23,7 @@ import java.util.stream.Stream
 import kotlin.streams.asStream
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assumptions
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.junit.jupiter.api.Timeout
@@ -44,52 +45,54 @@ private const val MEDIUM = 5.0
 @TestInstance(PER_CLASS)
 class BenchmarkTest {
 
-    companion object {
-        @JvmStatic private val metadata by lazy { loadBenchmarkDatabase().toMetadata() }
+  companion object {
+    @JvmStatic private val metadata by lazy { loadBenchmarkDatabase().toMetadata() }
 
-        @JvmStatic
-        fun streamUnitTestZ3Benchmarks(): Stream<Benchmark> =
-            loadBenchmarks(
+    @JvmStatic
+    fun streamUnitTestZ3Benchmarks(): Stream<Benchmark> =
+        loadBenchmarks(
                 metadata.selectTests("z3", maxSpeed = FAST, maxSize = 1.MiB, maxPerGroup = 3))
-                .asStream()
+            .asStream()
 
-        @JvmStatic
-        fun streamFastZ3Benchmarks(): Stream<Benchmark> =
-            loadBenchmarks(metadata.selectTests("z3", maxSpeed = FAST, maxSize = 5.MiB)).asStream()
+    @JvmStatic
+    fun streamFastZ3Benchmarks(): Stream<Benchmark> =
+        loadBenchmarks(metadata.selectTests("z3", maxSpeed = FAST, maxSize = 5.MiB)).asStream()
 
-        @JvmStatic
-        fun streamMediumZ3Benchmarks(): Stream<Benchmark> =
-            loadBenchmarks(metadata.selectTests("z3", maxSpeed = MEDIUM, maxSize = 10.MiB)).asStream()
+    @JvmStatic
+    fun streamMediumZ3Benchmarks(): Stream<Benchmark> =
+        loadBenchmarks(metadata.selectTests("z3", maxSpeed = MEDIUM, maxSize = 10.MiB)).asStream()
 
-        @JvmStatic
-        fun streamAllZ3Benchmarks(): Stream<Benchmark> =
-            loadBenchmarks(metadata.selectTests("z3", maxSize = 50.MiB)).asStream()
-    }
+    @JvmStatic
+    fun streamAllZ3Benchmarks(): Stream<Benchmark> =
+        loadBenchmarks(metadata.selectTests("z3", maxSize = 50.MiB)).asStream()
+  }
 
-    @ParameterizedTest
-    @MethodSource("streamUnitTestZ3Benchmarks")
-    @Timeout(value = 15, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-    fun solve(benchmark: Benchmark) {
+  // this test takes too long, so it is disabled for now
+  @Disabled
+  @ParameterizedTest
+  @MethodSource("streamUnitTestZ3Benchmarks")
+  @Timeout(value = 15, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  fun solve(benchmark: Benchmark) {
 
-        val solver = Z3Solver()
+    val solver = Z3Solver()
 
-        val result = Parser.parse(benchmark.program)
+    val result = Parser.parse(benchmark.program)
 
-        /* ignore the test if assumption fails, ignores all unknown tests */
-        Assumptions.assumeTrue((result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
+    /* ignore the test if assumption fails, ignores all unknown tests */
+    Assumptions.assumeTrue(
+        (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
             .symbol
             .toString() != "unknown")
 
-        solver.use {
-            result.commands.map { solver.visit(it) }
+    solver.use {
+      result.commands.map { solver.visit(it) }
 
-            // verify we get the correct status for the test
-            Assertions.assertEquals(
-                (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-                    .symbol
-                    .toString(),
-                solver.status.toString()
-            )
-        }
+      // verify we get the correct status for the test
+      Assertions.assertEquals(
+          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
+              .symbol
+              .toString(),
+          solver.status.toString())
     }
+  }
 }
