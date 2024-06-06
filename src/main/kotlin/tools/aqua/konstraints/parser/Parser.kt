@@ -645,11 +645,13 @@ object Parser {
 
   private val pushCMD =
       (lparen * pushKW * numeral * rparen).map { results: ArrayList<Any> ->
-        Push(results[2] as Int)
+        ProtoPush((results[2] as String).toInt())
       }
 
   private val popCMD =
-      (lparen * popKW * numeral * rparen).map { results: ArrayList<Any> -> Pop(results[2] as Int) }
+      (lparen * popKW * numeral * rparen).map { results: ArrayList<Any> ->
+        ProtoPop((results[2] as String).toInt())
+      }
 
   val command =
       ChoiceParser(

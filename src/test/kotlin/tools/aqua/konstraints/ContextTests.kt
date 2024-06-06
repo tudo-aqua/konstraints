@@ -25,10 +25,8 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.junit.jupiter.params.provider.ValueSource
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.solvers.z3.Z3Solver
 import tools.aqua.konstraints.theories.*
 
 /*
@@ -264,22 +262,22 @@ class ContextTests {
                 Associativity.NONE)))
   }
 
-    @Test
-    fun testPushPopFails() {
-        val context = Context(QF_UF)
-        val funA = DeclareFun("A".symbol(), emptyList(), BoolSort)
-        val funB = DeclareFun("B".symbol(), emptyList(), BoolSort)
+  @Test
+  fun testPushPopFails() {
+    val context = Context(QF_UF)
+    val funA = DeclareFun("A".symbol(), emptyList(), BoolSort)
+    val funB = DeclareFun("B".symbol(), emptyList(), BoolSort)
 
-        context.registerFunction(funA)
-        context.push(1)
-        context.registerFunction(funB)
+    context.registerFunction(funA)
+    context.push(1)
+    context.registerFunction(funB)
 
-        assertNotNull(context.getFunction("A", emptyList()))
-        assertNotNull(context.getFunction("B", emptyList()))
+    assertNotNull(context.getFunction("A", emptyList()))
+    assertNotNull(context.getFunction("B", emptyList()))
 
-        context.pop(1)
+    context.pop(1)
 
-        assertNotNull(context.getFunction("A", emptyList()))
-        assertNull(context.getFunction("B", emptyList()))
-    }
+    assertNotNull(context.getFunction("A", emptyList()))
+    assertNull(context.getFunction("B", emptyList()))
+  }
 }
