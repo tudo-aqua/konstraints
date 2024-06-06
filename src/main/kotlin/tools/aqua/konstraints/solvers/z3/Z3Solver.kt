@@ -142,6 +142,14 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     TODO("Not yet implemented")
   }
 
+  override fun visit(push: Push) {
+    (0 ..< push.n).forEach { _ -> solver.push() }
+  }
+
+  override fun visit(pop: Pop) {
+    solver.pop(pop.n)
+  }
+
   // this should later be part of solver interface
   override fun close() {
     solver.reset()

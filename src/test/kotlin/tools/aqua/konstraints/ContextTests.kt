@@ -261,4 +261,23 @@ class ContextTests {
                 BoolSort,
                 Associativity.NONE)))
   }
+
+  @Test
+  fun testPushPopFails() {
+    val context = Context(QF_UF)
+    val funA = DeclareFun("A".symbol(), emptyList(), BoolSort)
+    val funB = DeclareFun("B".symbol(), emptyList(), BoolSort)
+
+    context.registerFunction(funA)
+    context.push(1)
+    context.registerFunction(funB)
+
+    assertNotNull(context.getFunction("A", emptyList()))
+    assertNotNull(context.getFunction("B", emptyList()))
+
+    context.pop(1)
+
+    assertNotNull(context.getFunction("A", emptyList()))
+    assertNull(context.getFunction("B", emptyList()))
+  }
 }

@@ -34,6 +34,8 @@ interface CommandVisitor<T> {
         is DeclareSort -> visit(command)
         is GetModel -> visit(command)
         is DefineFun -> visit(command)
+        is Pop -> visit(command)
+        is Push -> visit(command)
       }
 
   fun visit(assert: Assert): T
@@ -57,4 +59,8 @@ interface CommandVisitor<T> {
   fun visit(getModel: GetModel): T
 
   fun visit(defineFun: DefineFun): T
+
+  fun visit(push: Push): T
+
+  fun visit(pop: Pop): T
 }

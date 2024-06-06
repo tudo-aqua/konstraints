@@ -643,6 +643,16 @@ object Parser {
         ProtoDefineFun(results[2] as ProtoFunctionDef)
       }
 
+  private val pushCMD =
+      (lparen * pushKW * numeral * rparen).map { results: ArrayList<Any> ->
+        ProtoPush((results[2] as String).toInt())
+      }
+
+  private val popCMD =
+      (lparen * popKW * numeral * rparen).map { results: ArrayList<Any> ->
+        ProtoPop((results[2] as String).toInt())
+      }
+
   val command =
       ChoiceParser(
           FailureJoiner.SelectFarthest(),
@@ -654,7 +664,9 @@ object Parser {
           setInfoCMD,
           setLogicCMD,
           declareSortCMD,
-          getModelCMD)
+          getModelCMD,
+          pushCMD,
+          popCMD)
 
   val script = command.star().end()
 

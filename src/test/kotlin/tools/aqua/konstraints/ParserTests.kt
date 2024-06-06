@@ -22,6 +22,7 @@ import java.lang.Exception
 import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
@@ -76,6 +77,15 @@ class ParserTests {
     } else {
       throw ParseError(result.failure(result.message))
     }
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(set-logic QF_UF)(set-info :status sat)(declare-fun A () Bool)(push 1)(declare-fun B () Bool)(assert (= A B))(pop 1)(assert (= A B))(check-sat)"])
+  fun testPushPopFails(program: String) {
+    assertThrows<IllegalStateException> { Parser.parse(program) }
   }
 
   @ParameterizedTest
