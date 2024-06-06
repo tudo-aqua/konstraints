@@ -513,7 +513,8 @@ fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
 
-fun IntLiteral.z3ify(context: Z3Context): Expr<Z3IntSort> = context.context.mkInt(this.value)
+fun IntLiteral.z3ify(context: Z3Context): Expr<Z3IntSort> =
+    context.context.mkInt(this.value.toString())
 
 fun IntNeg.z3ify(context: Z3Context): Expr<Z3IntSort> =
     context.context.mkUnaryMinus(this.inner.z3ify(context))
@@ -541,9 +542,9 @@ fun Mod.z3ify(context: Z3Context): Expr<Z3IntSort> =
  */
 fun Abs.z3ify(context: Z3Context): Expr<Z3IntSort> =
     context.context.mkITE(
-        IntGreaterEq(this.inner, IntLiteral(0)).z3ify(context),
+        context.context.mkGe(this.inner.z3ify(context), context.context.mkInt(0)),
         this.inner.z3ify(context),
-        IntNeg(this.inner).z3ify(context))
+        context.context.mkUnaryMinus(this.inner.z3ify(context)))
 
 fun ToInt.z3ify(context: Z3Context): Expr<Z3IntSort> =
     context.context.mkReal2Int(this.inner.z3ify(context))

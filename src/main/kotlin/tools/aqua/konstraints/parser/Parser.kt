@@ -144,12 +144,9 @@ object Parser {
   private val lparen = of('(') trim whitespaceCat
   private val rparen = of(')') trim whitespaceCat
 
-  private val numeralBase = (of('0') + (range('1', '9') * digitCat.star())).flatten()
-  private val numeral = numeralBase.map(String::toInt)
+  private val numeral = (of('0') + (range('1', '9') * digitCat.star())).flatten()
   private val decimal =
-      (numeralBase * of('.') * of('0').star() * numeralBase)
-          .flatten()
-          .map<String, BigDecimal>(::BigDecimal)
+      (numeral * of('.') * of('0').star() * numeral).flatten().map<String, BigDecimal>(::BigDecimal)
   private val hexadecimal = of("#x") * (digitCat + range('A', 'F') + range('a', 'f')).plus()
   private val binary = (of("#b") * range('0', '1').plus()).flatten()
   // all printable characters that are not double quotes
@@ -185,65 +182,185 @@ object Parser {
 
   // Logics
 
+  private val abv = of("ABV").map { _: Any -> ABV }
+  private val abvfp = of("ABVFP").map { _: Any -> ABVFP }
+  private val abvfplra = of("ABVFPLRA").map { _: Any -> ABVFPLRA }
+  private val alia = of("ALIA").map { _: Any -> ALIA }
+  private val ania = of("ANIA").map { _: Any -> ANIA }
+  private val aufbv = of("AUFBV").map { _: Any -> AUFBV }
+  private val aufbvdtlia = of("AUFBVDTLIA").map { _: Any -> AUFBVDTLIA }
+  private val aufbvdtnia = of("AUFBVDTNIA").map { _: Any -> AUFBVDTNIA }
+  private val aufbvdtnira = of("AUFBVDTNIRA").map { _: Any -> AUFBVDTNIRA }
+  private val aufbvfp = of("AUFBVFP").map { _: Any -> AUFBVFP }
+  private val aufdtlia = of("AUFDTLIA").map { _: Any -> AUFDTLIA }
+  private val aufdtlira = of("AUFDTLIRA").map { _: Any -> AUFDTLIRA }
+  private val aufdtnira = of("AUFDTNIRA").map { _: Any -> AUFDTNIRA }
+  private val auffpdtnira = of("AUFFPDTNIRA").map { _: Any -> AUFFPDTNIRA }
   private val auflia = of("AUFLIA").map { _: Any -> AUFLIA }
   private val auflira = of("AUFLIRA").map { _: Any -> AUFLIRA }
+  private val aufnia = of("AUFNIA").map { _: Any -> AUFNIA }
   private val aufnira = of("AUFNIRA").map { _: Any -> AUFNIRA }
+  private val bv = of("BV").map { _: Any -> BV }
+  private val bvfp = of("BVFP").map { _: Any -> BVFP }
+  private val bvfplra = of("BVFPLRA").map { _: Any -> BVFPLRA }
+  private val fp = of("FP").map { _: Any -> FP }
+  private val fplra = of("FPLRA").map { _: Any -> FPLRA }
   private val lia = of("LIA").map { _: Any -> LIA }
   private val lra = of("LRA").map { _: Any -> LRA }
+  private val nia = of("NIA").map { _: Any -> NIA }
+  private val nra = of("NRA").map { _: Any -> NRA }
   private val qf_abv = of("QF_ABV").map { _: Any -> QF_ABV }
+  private val qf_abvfp = of("QF_ABVFP").map { _: Any -> QF_ABVFP }
+  private val qf_abvfplra = of("QF_ABVFPLRA").map { _: Any -> QF_ABVFPLRA }
+  private val qf_alia = of("QF_ALIA").map { _: Any -> QF_ALIA }
+  private val qf_ania = of("QF_ANIA").map { _: Any -> QF_ANIA }
   private val qf_aufbv = of("QF_AUFBV").map { _: Any -> QF_AUFBV }
+  private val qf_aufbvfp = of("QF_AUFBVFP").map { _: Any -> QF_AUFBVFP }
   private val qf_auflia = of("QF_AUFLIA").map { _: Any -> QF_AUFLIA }
+  private val qf_aufnia = of("QF_AUFNIA").map { _: Any -> QF_AUFNIA }
   private val qf_ax = of("QF_AX").map { _: Any -> QF_AX }
   private val qf_bv = of("QF_BV").map { _: Any -> QF_BV }
+  private val qf_bvfp = of("QF_BVFP").map { _: Any -> QF_BVFP }
+  private val qf_bvfplra = of("QF_BVFPLRA").map { _: Any -> QF_BVFPLRA }
+  private val qf_dt = of("QF_DT").map { _: Any -> QF_DT }
+  private val qf_fp = of("QF_FP").map { _: Any -> QF_FP }
+  private val qf_fplra = of("QF_FPLRA").map { _: Any -> QF_FPLRA }
   private val qf_idl = of("QF_IDL").map { _: Any -> QF_IDL }
   private val qf_lia = of("QF_LIA").map { _: Any -> QF_LIA }
+  private val qf_lira = of("QF_LIRA").map { _: Any -> QF_LIRA }
   private val qf_lra = of("QF_LRA").map { _: Any -> QF_LRA }
   private val qf_nia = of("QF_NIA").map { _: Any -> QF_NIA }
+  private val qf_nira = of("QF_NIRA").map { _: Any -> QF_NIRA }
   private val qf_nra = of("QF_NRA").map { _: Any -> QF_NRA }
   private val qf_rdl = of("QF_RDL").map { _: Any -> QF_RDL }
+  private val qf_s = of("QF_S").map { _: Any -> QF_S }
+  private val qf_slia = of("QF_SLIA").map { _: Any -> QF_SLIA }
+  private val qf_snia = of("QF_SNIA").map { _: Any -> QF_SNIA }
   private val qf_uf = of("QF_UF").map { _: Any -> QF_UF }
   private val qf_ufbv = of("QF_UFBV").map { _: Any -> QF_UFBV }
+  private val qf_ufbvdt = of("QF_UFBVDT").map { _: Any -> QF_UFBVDT }
+  private val qf_ufdt = of("QF_UFDT").map { _: Any -> QF_UFDT }
+  private val qf_ufdtlia = of("QF_UFDTLIA").map { _: Any -> QF_UFDTLIA }
+  private val qf_ufdtlira = of("QF_UFDTLIRA").map { _: Any -> QF_UFDTLIRA }
+  private val qf_ufdtnia = of("QF_UFDTNIA").map { _: Any -> QF_UFDTNIA }
+  private val qf_uffp = of("QF_UFFP").map { _: Any -> QF_UFFP }
+  private val qf_uffpdtnira = of("QF_UFFPDTNIRA").map { _: Any -> QF_UFFPDTNIRA }
   private val qf_ufidl = of("QF_UFIDL").map { _: Any -> QF_UFIDL }
   private val qf_uflia = of("QF_UFLIA").map { _: Any -> QF_UFLIA }
   private val qf_uflra = of("QF_UFLRA").map { _: Any -> QF_UFLRA }
+  private val qf_ufnia = of("QF_UFNIA").map { _: Any -> QF_UFNIA }
   private val qf_ufnra = of("QF_UFNRA").map { _: Any -> QF_UFNRA }
+  private val uf = of("UF").map { _: Any -> UF }
+  private val ufbv = of("UFBV").map { _: Any -> UFBV }
+  private val ufbvdt = of("UFBVDT").map { _: Any -> UFBVDT }
+  private val ufbvfp = of("UFBVFP").map { _: Any -> UFBVFP }
+  private val ufbvlia = of("UFBVLIA").map { _: Any -> UFBVLIA }
+  private val ufdt = of("UFDT").map { _: Any -> UFDT }
+  private val ufdtlia = of("UFDTLIA").map { _: Any -> UFDTLIA }
+  private val ufdtlira = of("UFDTLIRA").map { _: Any -> UFDTLIRA }
+  private val ufdtnia = of("UFDTNIA").map { _: Any -> UFDTNIA }
+  private val ufdtnira = of("UFDTNIRA").map { _: Any -> UFDTNIRA }
+  private val uffpdtnira = of("UFFPDTNIRA").map { _: Any -> UFFPDTNIRA }
+  private val ufidl = of("UFIDL").map { _: Any -> UFIDL }
+  private val uflia = of("UFLIA").map { _: Any -> UFLIA }
   private val uflra = of("UFLRA").map { _: Any -> UFLRA }
   private val ufnia = of("UFNIA").map { _: Any -> UFNIA }
-  private val qf_fp = of("QF_FP").map { _: Any -> QF_FP }
+  private val ufnira = of("UFNIRA").map { _: Any -> UFNIRA }
 
+  // logics must be in reverse alphabetical order so that e.g. QF_UFBV gets parsed before QF_UF
+  // (plus works greedy)
   internal val logic =
-      auflia +
-          auflira +
-          aufnira +
-          lia +
-          lra +
-          qf_abv +
-          qf_aufbv +
-          qf_auflia +
-          qf_ax +
-          qf_bv +
-          qf_idl +
-          qf_lia +
-          qf_lra +
-          qf_nia +
-          qf_nra +
-          qf_rdl +
-          qf_ufbv +
-          qf_ufidl +
-          qf_uflia +
-          qf_uflra +
-          qf_ufnra +
-          uflra +
+      ufnira +
           ufnia +
+          uflra +
+          uflia +
+          ufidl +
+          uffpdtnira +
+          ufdtnira +
+          ufdtnia +
+          ufdtlira +
+          ufdtlia +
+          ufdt +
+          ufbvlia +
+          ufbvfp +
+          ufbvdt +
+          ufbv +
+          uf +
+          qf_ufnra +
+          qf_ufnia +
+          qf_uflra +
+          qf_uflia +
+          qf_ufidl +
+          qf_uffpdtnira +
+          qf_uffp +
+          qf_ufdtnia +
+          qf_ufdtlira +
+          qf_ufdtlia +
+          qf_ufdt +
+          qf_ufbvdt +
+          qf_ufbv +
           qf_uf +
-          qf_fp
+          qf_snia +
+          qf_slia +
+          qf_s +
+          qf_rdl +
+          qf_nra +
+          qf_nira +
+          qf_nia +
+          qf_lra +
+          qf_lira +
+          qf_lia +
+          qf_idl +
+          qf_fplra +
+          qf_fp +
+          qf_dt +
+          qf_bvfplra +
+          qf_bvfp +
+          qf_bv +
+          qf_ax +
+          qf_aufnia +
+          qf_auflia +
+          qf_aufbvfp +
+          qf_aufbv +
+          qf_ania +
+          qf_alia +
+          qf_abvfplra +
+          qf_abvfp +
+          qf_abv +
+          nra +
+          nia +
+          lra +
+          lia +
+          fplra +
+          fp +
+          bvfplra +
+          bvfp +
+          bv +
+          aufnira +
+          aufnia +
+          auflira +
+          auflia +
+          auffpdtnira +
+          aufdtnira +
+          aufdtlira +
+          aufdtlia +
+          aufbvfp +
+          aufbvdtnira +
+          aufbvdtnia +
+          aufbvdtlia +
+          aufbv +
+          ania +
+          alia +
+          abvfplra +
+          abvfp +
+          abv
 
   // S-Expressions
 
   /* maps to an implementation of SpecConstant */
   private val specConstant =
       (decimal.map { decimal: BigDecimal -> DecimalConstant(decimal) } +
-          numeral.map { numeral: Int -> NumeralConstant(numeral) } +
+          numeral.map { numeral: String -> NumeralConstant(numeral) } +
           hexadecimal.map { hexadecimal: String -> HexConstant(hexadecimal) } +
           binary.map { binary: String -> BinaryConstant(binary) } +
           string.map { string: String -> StringConstant(string) }) trim whitespaceCat
@@ -267,7 +384,7 @@ object Parser {
 
   /* maps to an implementation of Index */
   private val index =
-      (numeral.map { numeral: Int -> NumeralIndex(numeral) } +
+      (numeral.map { numeral: String -> NumeralIndex(numeral.toInt()) } +
           symbol.map { symbol: ParseSymbol -> SymbolIndex(symbol.symbol) }) trim whitespaceCat
 
   /* maps to an implementation of Identifier */
@@ -447,7 +564,7 @@ object Parser {
           }
 
   // Commands
-  private val sortDec = lparen * symbol * numeralBase * rparen
+  private val sortDec = lparen * symbol * numeral * rparen
   private val selectorDec = lparen * symbol * sort * rparen
   private val constructorDec = lparen * symbol * selectorDec.star() * rparen
   private val datatypeDec =
@@ -516,7 +633,7 @@ object Parser {
 
   private val declareSortCMD =
       (lparen * declareSortKW * symbol * numeral * rparen).map { results: ArrayList<Any> ->
-        ProtoDeclareSort(results[2] as ParseSymbol, results[3] as Int)
+        ProtoDeclareSort(results[2] as ParseSymbol, (results[3] as String).toInt())
       }
 
   private val getModelCMD = (lparen * getModelKW * rparen).map { _: Any -> GetModel }

@@ -56,7 +56,7 @@ class RealLiteral(val value: BigDecimal) :
     Literal<RealSort>(LiteralString(value.toString()), RealSort) {
   override val sort: RealSort = RealSort
 
-  override fun toString(): String = name.toString()
+  override fun toString(): String = value.toString()
 }
 
 /**

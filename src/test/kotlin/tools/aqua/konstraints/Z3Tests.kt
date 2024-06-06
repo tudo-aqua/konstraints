@@ -23,7 +23,9 @@ import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
 import kotlin.streams.asStream
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assumptions.assumeFalse
 import org.junit.jupiter.api.Assumptions.assumeTrue
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
@@ -111,13 +113,12 @@ class Z3Tests {
     return IntArray(1575) { it }.map { Arguments.arguments(it + 1) }.stream()
   }
 
+  // disable these for now as they take too long to compute
+  @Disabled
   @ParameterizedTest
   @MethodSource("getQFIDLFile")
   @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_IDL(file: File) {
-    // skips these for now as they take too long to compute
-    assumeTrue(false)
-
     val parseTreeVisitor = ParseTreeVisitor()
     val solver = Z3Solver()
     val temp = file.bufferedReader().readLines()
@@ -231,12 +232,13 @@ class Z3Tests {
 
   @ParameterizedTest
   @MethodSource("getQFRDLFile")
-  @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 20, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_RDL(file: File) {
-    val parseTreeVisitor = ParseTreeVisitor()
     val solver = Z3Solver()
     val temp = file.bufferedReader().readLines()
     val program = temp.map { it.trim('\r', '\n') }
+
+    assumeFalse(program.contains("(set-info :status unknown)"))
 
     val result = Parser.parse(program.joinToString(""))
 
