@@ -651,4 +651,26 @@ class Z3Tests {
           solver.status.toString())
     }
   }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(set-logic QF_BV)(set-info :status sat)(declare-fun A () (_ BitVec 8))(define-fun B () (_ BitVec 8) (bvneg A))(assert (= A (bvneg B)))(check-sat)"])
+  fun testDefineFun(program: String) {
+    val solver = Z3Solver()
+
+    val result = Parser.parse(program)
+
+    solver.use {
+      result.commands.map { solver.visit(it) }
+
+      // verify we get the correct status for the test
+      assertEquals(
+          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
+              .symbol
+              .toString(),
+          solver.status.toString())
+    }
+  }
 }

@@ -665,6 +665,7 @@ object Parser {
           setLogicCMD,
           declareSortCMD,
           getModelCMD,
+          defineFunCMD,
           pushCMD,
           popCMD)
 

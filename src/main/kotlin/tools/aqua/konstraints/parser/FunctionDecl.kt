@@ -29,6 +29,8 @@ enum class Associativity {
   NONE
 }
 
+interface Function
+
 open class FunctionDecl<S : Sort>(
     val name: Symbol,
     val parametricSorts: Set<Sort>,
@@ -97,6 +99,52 @@ open class FunctionDecl<S : Sort>(
   override fun hashCode(): Int = name.hashCode() * 961 + params.hashCode() * 31 + sort.hashCode()
 
   override fun toString() = "($name (${params.joinToString(" ")}) $sort)"
+}
+
+class FunctionDefinition<S : Sort>(
+    val name: Symbol,
+    val parameter: List<SortedVar<*>>,
+    val sort: S,
+    val term: Expression<S>
+) {
+  fun build(args: List<Expression<*>>, context: Context): Expression<*> {
+    // term is a placeholder expression using the parameters as expressions
+    // we need to build the same term but replace every occurrence of a parameter with
+    // the corresponding argument expression
+    return transform(term, args, context)
+  }
+
+  private fun transform(
+      expr: Expression<*>,
+      args: List<Expression<*>>,
+      context: Context
+  ): Expression<*> {
+    return if (expr.subexpressions.isEmpty()) {
+      val par = parameter.find { it.name == expr.name }
+
+      if (par != null) {
+        // replace
+        args[parameter.indexOf(par)]
+      } else {
+        // copy
+        context
+            .getFunction(expr.name.toString(), expr.subexpressions)
+            ?.buildExpression(emptyList(), emptySet()) ?: throw IllegalStateException()
+      }
+    } else {
+      val transformedExpressions = expr.subexpressions.map { transform(it, args, context) }
+      context
+          .getFunction(expr.name.toString(), transformedExpressions)
+          ?.buildExpression(transformedExpressions, emptySet()) ?: throw IllegalStateException()
+    }
+  }
+
+  fun transform(
+      expression: Expression<*>,
+      transformation: (Expression<*>) -> Expression<*>
+  ): Expression<*> {
+    return transformation(expression)
+  }
 }
 
 abstract class FunctionDecl0<S : Sort>(
