@@ -64,10 +64,8 @@ class IntLiteral(val value: BigInteger) :
  *
  * (- Int Int)
  */
-class IntNeg(val inner: Expression<IntSort>) :
-    UnaryExpression<IntSort, IntSort>("-".symbol(), IntSort) {
-  override fun inner(): Expression<IntSort> = inner
-}
+class IntNeg(override val inner: Expression<IntSort>) :
+    UnaryExpression<IntSort, IntSort>("-".symbol(), IntSort)
 
 object IntNegDecl :
     FunctionDecl1<IntSort, IntSort>(
@@ -194,9 +192,9 @@ object IntDivDecl :
 class Mod(val dividend: Expression<IntSort>, val divisor: Expression<IntSort>) :
     BinaryExpression<IntSort, IntSort, IntSort>("mod".symbol(), IntSort) {
 
-  override fun lhs(): Expression<IntSort> = dividend
+  override val lhs: Expression<IntSort> = dividend
 
-  override fun rhs(): Expression<IntSort> = divisor
+  override val rhs: Expression<IntSort> = divisor
 }
 
 object ModDecl :
@@ -214,10 +212,8 @@ object ModDecl :
  *
  * (abs Int Int)
  */
-class Abs(val inner: Expression<IntSort>) :
-    UnaryExpression<IntSort, IntSort>("abs".symbol(), IntSort) {
-  override fun inner(): Expression<IntSort> = inner
-}
+class Abs(override val inner: Expression<IntSort>) :
+    UnaryExpression<IntSort, IntSort>("abs".symbol(), IntSort)
 
 object AbsDecl :
     FunctionDecl1<IntSort, IntSort>(
@@ -343,9 +339,8 @@ object IntGreaterDecl :
  *
  * ((_ divisible n) Int Bool)
  */
-class Divisible(val n: Int, val inner: Expression<IntSort>) :
+class Divisible(val n: Int, override val inner: Expression<IntSort>) :
     UnaryExpression<BoolSort, IntSort>("divisible".symbol(), BoolSort) {
-  override fun inner(): Expression<IntSort> = inner
 
   init {
     require(n > 0)

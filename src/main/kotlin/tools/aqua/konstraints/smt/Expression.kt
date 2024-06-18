@@ -52,9 +52,9 @@ sealed interface Expression<T : Sort> {
   fun all(predicate: (Expression<*>) -> Boolean): Boolean =
       when (this) {
         is ConstantExpression -> predicate(this)
-        is UnaryExpression<*, *> -> predicate(this) and this.inner().all(predicate)
+        is UnaryExpression<*, *> -> predicate(this) and this.inner.all(predicate)
         is BinaryExpression<*, *, *> ->
-            predicate(this) and this.lhs().all(predicate) and this.rhs().all(predicate)
+            predicate(this) and this.lhs.all(predicate) and this.rhs.all(predicate)
         is HomogenousExpression<*, *> ->
             predicate(this) and
                 this.subexpressions()
@@ -75,20 +75,36 @@ sealed interface Expression<T : Sort> {
         is ForallExpression -> TODO()
       }
 
-  val subexpressions: List<Expression<*>>
+    fun transform(transformation: (Expression<*>) -> Expression<*>) : Expression<T> {
+        // transform all children
+        val transformedChildren = this.children.map(transformation)
+
+        // check if any child was copied
+        return if((transformedChildren zip this.children).any { (new, old) -> new !== old }) {
+            // return copied expression with new children
+            //val copied = this.copy(transformedChildren)
+            //transformation(copied) castTo sort
+            transformation(this) castTo sort
+        } else {
+            // transform this expression, prevent it from changing the sort
+            transformation(this) castTo sort
+        }
+    }
+
+  val children: List<Expression<*>>
 }
 
 /** SMT Literal */
 open class Literal<T : Sort>(override val name: LiteralString, override val sort: T) :
     Expression<T> {
-  override val subexpressions: List<Expression<*>> = emptyList()
+  override val children: List<Expression<*>> = emptyList()
 
   override fun toString() = name.toString()
 }
 
 abstract class ConstantExpression<T : Sort>(override val name: Symbol, override val sort: T) :
     Expression<T> {
-  override val subexpressions: List<Expression<*>> = emptyList()
+  override val children: List<Expression<*>> = emptyList()
 
   override fun toString() = "$name"
 }
@@ -99,12 +115,12 @@ abstract class UnaryExpression<T : Sort, S : Sort>(
     override val sort: T
 ) : Expression<T> {
 
-  abstract fun inner(): Expression<S>
+  abstract val inner: Expression<S>
 
-  override val subexpressions: List<Expression<*>>
-    get() = listOf(inner())
+  override val children: List<Expression<*>>
+    get() = listOf(inner)
 
-  override fun toString() = "($name ${inner()})"
+  override fun toString() = "($name ${inner})"
 }
 
 /** Base class of all expressions with exactly two children */
@@ -113,14 +129,14 @@ abstract class BinaryExpression<T : Sort, S1 : Sort, S2 : Sort>(
     override val sort: T
 ) : Expression<T> {
 
-  abstract fun lhs(): Expression<S1>
+  abstract val lhs: Expression<S1>
 
-  abstract fun rhs(): Expression<S2>
+  abstract val rhs: Expression<S2>
 
-  override val subexpressions: List<Expression<*>>
-    get() = listOf(lhs(), rhs())
+  override val children: List<Expression<*>>
+    get() = listOf(lhs, rhs)
 
-  override fun toString() = "($name ${lhs()} ${rhs()})"
+  override fun toString() = "($name $lhs $rhs)"
 }
 
 /** Base class of all expressions with exactly three children */
@@ -128,16 +144,16 @@ abstract class TernaryExpression<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     override val name: Symbol,
     override val sort: T
 ) : Expression<T> {
-  abstract fun lhs(): Expression<S1>
+  abstract val lhs: Expression<S1>
 
-  abstract fun mid(): Expression<S2>
+  abstract val mid: Expression<S2>
 
-  abstract fun rhs(): Expression<S3>
+  abstract val rhs: Expression<S3>
 
-  override val subexpressions: List<Expression<*>>
-    get() = listOf(lhs(), mid(), rhs())
+  override val children: List<Expression<*>>
+    get() = listOf(lhs, mid, rhs)
 
-  override fun toString() = "($name ${lhs()} ${mid()} ${rhs()})"
+  override fun toString() = "($name $lhs $mid $rhs)"
 }
 
 /**
@@ -150,7 +166,7 @@ abstract class HomogenousExpression<T : Sort, S : Sort>(
 ) : Expression<T> {
   abstract fun subexpressions(): List<Expression<S>>
 
-  override val subexpressions: List<Expression<*>>
+  override val children: List<Expression<*>>
     get() = subexpressions()
 
   override fun toString() =
@@ -177,7 +193,7 @@ class Ite<T : Sort>(
   override val sort: T = then.sort
   override val name: Symbol = "ite".symbol()
 
-  override val subexpressions: List<Expression<*>> = listOf(statement, then, otherwise)
+  override val children: List<Expression<*>> = listOf(statement, then, otherwise)
 
   override fun toString(): String = "(ite $statement $then $otherwise)"
 }
@@ -188,7 +204,7 @@ abstract class NAryExpression<T : Sort>(override val name: Symbol, override val 
 
   abstract fun subexpressions(): List<Expression<*>>
 
-  override val subexpressions: List<Expression<*>>
+  override val children: List<Expression<*>>
     get() = subexpressions()
 
   override fun toString() =
@@ -203,7 +219,7 @@ class LetExpression<T : Sort>(
     val inner: Expression<T>
 ) : Expression<T> {
   override val name = Keyword("let")
-  override val subexpressions: List<Expression<*>> = listOf(inner)
+  override val children: List<Expression<*>> = listOf(inner)
 }
 
 class UserDefinedExpression<T : Sort>(name: Symbol, sort: T, val args: List<Expression<*>>) :
@@ -220,25 +236,25 @@ class LocalExpression<T : Sort>(
     override val sort: T,
     val term: Expression<T>,
 ) : Expression<T> {
-  override val subexpressions: List<Expression<*>> = emptyList()
+  override val children: List<Expression<*>> = emptyList()
 }
 
 class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSort>) :
     Expression<BoolSort> {
   override val sort = BoolSort
   override val name = Keyword("exists")
-  override val subexpressions: List<Expression<*>> = emptyList()
+  override val children: List<Expression<*>> = emptyList()
 }
 
 class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSort>) :
     Expression<BoolSort> {
   override val sort = BoolSort
   override val name = Keyword("forall")
-  override val subexpressions: List<Expression<*>> = emptyList()
+  override val children: List<Expression<*>> = emptyList()
 }
 
 class BoundVariable<T : Sort>(override val name: Symbol, override val sort: T) : Expression<T> {
-  override val subexpressions: List<Expression<*>> = emptyList()
+  override val children: List<Expression<*>> = emptyList()
 }
 
 class ExpressionCastException(from: Sort, to: String) :

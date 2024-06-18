@@ -68,9 +68,8 @@ object FalseDecl : FunctionDecl0<BoolSort>("false".symbol(), emptySet(), emptySe
  *
  * @param inner [Expression] of [BoolSort] to be negated
  */
-class Not(val inner: Expression<BoolSort>) :
+class Not(override val inner: Expression<BoolSort>) :
     UnaryExpression<BoolSort, BoolSort>("not".symbol(), BoolSort) {
-  override fun inner(): Expression<BoolSort> = inner
 
   override fun toString(): String = "(not $inner)"
 }

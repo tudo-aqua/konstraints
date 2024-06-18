@@ -139,10 +139,8 @@ object StrConcatDecl :
  *
  * (str.len String Int)
  */
-class StrLength(val inner: Expression<StringSort>) :
-    UnaryExpression<IntSort, StringSort>("str.len".symbol(), IntSort) {
-  override fun inner(): Expression<StringSort> = inner
-}
+class StrLength(override val inner: Expression<StringSort>) :
+    UnaryExpression<IntSort, StringSort>("str.len".symbol(), IntSort)
 
 object StrLengthDecl :
     FunctionDecl1<StringSort, IntSort>(
@@ -189,10 +187,8 @@ object StrLexOrderDecl :
  *
  * (str.to_re String RegLan)
  */
-class ToRegex(val inner: Expression<StringSort>) :
-    UnaryExpression<RegLan, StringSort>("str.to_reg".symbol(), RegLan) {
-  override fun inner(): Expression<StringSort> = inner
-}
+class ToRegex(override val inner: Expression<StringSort>) :
+    UnaryExpression<RegLan, StringSort>("str.to_reg".symbol(), RegLan)
 
 object ToRegexDecl :
     FunctionDecl1<StringSort, RegLan>(
@@ -210,9 +206,9 @@ object ToRegexDecl :
  */
 class InRegex(val inner: Expression<StringSort>, val regex: Expression<RegLan>) :
     BinaryExpression<BoolSort, StringSort, RegLan>("str.in_reg".symbol(), BoolSort) {
-  override fun lhs(): Expression<StringSort> = inner
+  override val lhs: Expression<StringSort> = inner
 
-  override fun rhs(): Expression<RegLan> = regex
+  override val rhs: Expression<RegLan> = regex
 }
 
 object InRegexDecl :
@@ -333,10 +329,8 @@ object RegexIntersecDecl :
  *
  * (re.* RegLan RegLan)
  */
-class RegexStar(val inner: Expression<RegLan>) :
-    UnaryExpression<RegLan, RegLan>("re.*".symbol(), RegLan) {
-  override fun inner(): Expression<RegLan> = inner
-}
+class RegexStar(override val inner: Expression<RegLan>) :
+    UnaryExpression<RegLan, RegLan>("re.*".symbol(), RegLan)
 
 object RegexStarDecl :
     FunctionDecl1<RegLan, RegLan>(
@@ -378,9 +372,9 @@ object StrRefLexOrderDecl :
  */
 class StrAt(val inner: Expression<StringSort>, val position: Expression<IntSort>) :
     BinaryExpression<StringSort, StringSort, IntSort>("str.at".symbol(), StringSort) {
-  override fun lhs(): Expression<StringSort> = inner
+  override val lhs: Expression<StringSort> = inner
 
-  override fun rhs(): Expression<IntSort> = position
+  override val rhs: Expression<IntSort> = position
 }
 
 object StrAtDecl :
@@ -403,11 +397,11 @@ class StrSubstring(
     val start: Expression<IntSort>,
     val length: Expression<IntSort>
 ) : TernaryExpression<StringSort, StringSort, IntSort, IntSort>("str.substr".symbol(), StringSort) {
-  override fun lhs(): Expression<StringSort> = inner
+  override val lhs: Expression<StringSort> = inner
 
-  override fun mid(): Expression<IntSort> = start
+  override val mid: Expression<IntSort> = start
 
-  override fun rhs(): Expression<IntSort> = length
+  override val rhs: Expression<IntSort> = length
 }
 
 object StrSubstringDecl :
@@ -435,9 +429,9 @@ object StrSubstringDecl :
  */
 class StrPrefixOf(val prefix: Expression<StringSort>, val inner: Expression<StringSort>) :
     BinaryExpression<BoolSort, StringSort, StringSort>("str.prefixof".symbol(), BoolSort) {
-  override fun lhs(): Expression<StringSort> = prefix
+  override val lhs: Expression<StringSort> = prefix
 
-  override fun rhs(): Expression<StringSort> = inner
+  override val rhs: Expression<StringSort> = inner
 }
 
 object StrPrefixOfDecl :
@@ -463,9 +457,9 @@ object StrPrefixOfDecl :
  */
 class StrSuffixOf(val suffix: Expression<StringSort>, val inner: Expression<StringSort>) :
     BinaryExpression<BoolSort, StringSort, StringSort>("str.suffixof".symbol(), BoolSort) {
-  override fun lhs(): Expression<StringSort> = suffix
+  override val lhs: Expression<StringSort> = suffix
 
-  override fun rhs(): Expression<StringSort> = inner
+  override val rhs: Expression<StringSort> = inner
 }
 
 object StrSuffixOfDecl :
@@ -491,9 +485,9 @@ object StrSuffixOfDecl :
  */
 class StrContains(val string: Expression<StringSort>, val substring: Expression<StringSort>) :
     BinaryExpression<BoolSort, StringSort, StringSort>("str.contains".symbol(), BoolSort) {
-  override fun lhs(): Expression<StringSort> = string
+  override val lhs: Expression<StringSort> = string
 
-  override fun rhs(): Expression<StringSort> = substring
+  override val rhs: Expression<StringSort> = substring
 }
 
 object StrContainsDecl :
@@ -522,11 +516,11 @@ class StrIndexOf(
     val substring: Expression<StringSort>,
     val start: Expression<IntSort>
 ) : TernaryExpression<IntSort, StringSort, StringSort, IntSort>("str.indexof".symbol(), IntSort) {
-  override fun lhs(): Expression<StringSort> = string
+  override val lhs: Expression<StringSort> = string
 
-  override fun mid(): Expression<StringSort> = substring
+  override val mid: Expression<StringSort> = substring
 
-  override fun rhs(): Expression<IntSort> = start
+  override val rhs: Expression<IntSort> = start
 }
 
 object StrIndexOfDecl :
@@ -559,11 +553,11 @@ class StrReplace(
 ) :
     TernaryExpression<StringSort, StringSort, StringSort, StringSort>(
         "str.replace".symbol(), StringSort) {
-  override fun lhs(): Expression<StringSort> = inner
+  override val lhs: Expression<StringSort> = inner
 
-  override fun mid(): Expression<StringSort> = old
+  override val mid: Expression<StringSort> = old
 
-  override fun rhs(): Expression<StringSort> = new
+  override val rhs: Expression<StringSort> = new
 }
 
 object StrReplaceDecl :
@@ -596,11 +590,11 @@ class StrReplaceAll(
 ) :
     TernaryExpression<StringSort, StringSort, StringSort, StringSort>(
         "str.replace_all".symbol(), StringSort) {
-  override fun lhs(): Expression<StringSort> = inner
+  override val lhs: Expression<StringSort> = inner
 
-  override fun mid(): Expression<StringSort> = old
+  override val mid: Expression<StringSort> = old
 
-  override fun rhs(): Expression<StringSort> = new
+  override val rhs: Expression<StringSort> = new
 }
 
 object StrReplaceAllDecl :
@@ -629,11 +623,11 @@ class StrReplaceRegex(
 ) :
     TernaryExpression<StringSort, StringSort, RegLan, StringSort>(
         "str.replace_re".symbol(), StringSort) {
-  override fun lhs(): Expression<StringSort> = inner
+  override val lhs: Expression<StringSort> = inner
 
-  override fun mid(): Expression<RegLan> = old
+  override val mid: Expression<RegLan> = old
 
-  override fun rhs(): Expression<StringSort> = new
+  override val rhs: Expression<StringSort> = new
 }
 
 object StrReplaceRegexDecl :
@@ -662,11 +656,11 @@ class StrReplaceAllRegex(
 ) :
     TernaryExpression<StringSort, StringSort, RegLan, StringSort>(
         "str.replace_re_all".symbol(), StringSort) {
-  override fun lhs(): Expression<StringSort> = inner
+  override val lhs: Expression<StringSort> = inner
 
-  override fun mid(): Expression<RegLan> = old
+  override val mid: Expression<RegLan> = old
 
-  override fun rhs(): Expression<StringSort> = new
+  override val rhs: Expression<StringSort> = new
 }
 
 object StrReplaceAllRegexDecl :
@@ -692,10 +686,8 @@ object StrReplaceAllRegexDecl :
  *
  * (re.comp RegLan RegLan)
  */
-class RegexComp(val inner: Expression<RegLan>) :
-    UnaryExpression<RegLan, RegLan>("re.comp".symbol(), RegLan) {
-  override fun inner(): Expression<RegLan> = inner
-}
+class RegexComp(override val inner: Expression<RegLan>) :
+    UnaryExpression<RegLan, RegLan>("re.comp".symbol(), RegLan)
 
 object RegexCompDecl :
     FunctionDecl1<RegLan, RegLan>(
@@ -732,10 +724,8 @@ object RegexDiffDecl :
  *
  * (re.+ RegLan RegLan)
  */
-class RegexPlus(val inner: Expression<RegLan>) :
-    UnaryExpression<RegLan, RegLan>("re.+".symbol(), RegLan) {
-  override fun inner(): Expression<RegLan> = inner
-}
+class RegexPlus(override val inner: Expression<RegLan>) :
+    UnaryExpression<RegLan, RegLan>("re.+".symbol(), RegLan)
 
 object RegexPlusDecl :
     FunctionDecl1<RegLan, RegLan>(
@@ -749,10 +739,8 @@ object RegexPlusDecl :
  *
  * (re.opt RegLan RegLan)
  */
-class RegexOption(val inner: Expression<RegLan>) :
-    UnaryExpression<RegLan, RegLan>("re.opt".symbol(), RegLan) {
-  override fun inner(): Expression<RegLan> = inner
-}
+class RegexOption(override val inner: Expression<RegLan>) :
+    UnaryExpression<RegLan, RegLan>("re.opt".symbol(), RegLan)
 
 object RegexOptionDecl :
     FunctionDecl1<RegLan, RegLan>(
@@ -766,12 +754,8 @@ object RegexOptionDecl :
  *
  * (re.range String String RegLan)
  */
-class RegexRange(val lhs: Expression<StringSort>, val rhs: Expression<StringSort>) :
-    BinaryExpression<RegLan, StringSort, StringSort>("re.range".symbol(), RegLan) {
-  override fun lhs(): Expression<StringSort> = lhs
-
-  override fun rhs(): Expression<StringSort> = rhs
-}
+class RegexRange(override val lhs: Expression<StringSort>, override val rhs: Expression<StringSort>) :
+    BinaryExpression<RegLan, StringSort, StringSort>("re.range".symbol(), RegLan)
 
 object RegexRangeDecl :
     FunctionDecl2<StringSort, StringSort, RegLan>(
@@ -784,9 +768,8 @@ object RegexRangeDecl :
 }
 
 /** ((_ re.^ n) RegLan RegLan) */
-class RegexPower(val inner: Expression<RegLan>, val n: Int) :
+class RegexPower(override val inner: Expression<RegLan>, val n: Int) :
     UnaryExpression<RegLan, RegLan>("re.^".symbol(), RegLan) {
-  override fun inner(): Expression<RegLan> = inner
 
   override fun toString(): String = "((_ re.^ $n) $inner)"
 }
@@ -799,9 +782,8 @@ object RegexPowerDecl :
 }
 
 /** ((_ re.loop n₁ n₂) RegLan RegLan) */
-class RegexLoop(val inner: Expression<RegLan>, val n: Int, val m: Int) :
+class RegexLoop(override val inner: Expression<RegLan>, val n: Int, val m: Int) :
     UnaryExpression<RegLan, RegLan>("re.loop".symbol(), RegLan) {
-  override fun inner(): Expression<RegLan> = inner
 
   override fun toString(): String = "((_ re.loop $n $m) $inner)"
 }
@@ -823,10 +805,8 @@ object RegexLoopDecl :
  *
  * (str.is_digit String Bool)
  */
-class StrIsDigit(val inner: Expression<StringSort>) :
-    UnaryExpression<BoolSort, StringSort>("str.is_digit".symbol(), BoolSort) {
-  override fun inner(): Expression<StringSort> = inner
-}
+class StrIsDigit(override val inner: Expression<StringSort>) :
+    UnaryExpression<BoolSort, StringSort>("str.is_digit".symbol(), BoolSort)
 
 object StrIsDigitDecl :
     FunctionDecl1<StringSort, BoolSort>(
@@ -838,10 +818,8 @@ object StrIsDigitDecl :
 }
 
 /** (str.to_code String Int) */
-class StrToCode(val inner: Expression<StringSort>) :
-    UnaryExpression<IntSort, StringSort>("str.to_code".symbol(), IntSort) {
-  override fun inner(): Expression<StringSort> = inner
-}
+class StrToCode(override val inner: Expression<StringSort>) :
+    UnaryExpression<IntSort, StringSort>("str.to_code".symbol(), IntSort)
 
 object StrToCodeDecl :
     FunctionDecl1<StringSort, IntSort>(
@@ -853,10 +831,8 @@ object StrToCodeDecl :
 }
 
 /** (str.from_code Int String) */
-class StrFromCode(val inner: Expression<IntSort>) :
-    UnaryExpression<StringSort, IntSort>("str.from_code".symbol(), StringSort) {
-  override fun inner(): Expression<IntSort> = inner
-}
+class StrFromCode(override val inner: Expression<IntSort>) :
+    UnaryExpression<StringSort, IntSort>("str.from_code".symbol(), StringSort)
 
 object StrFromCodeDecl :
     FunctionDecl1<IntSort, StringSort>(
@@ -872,10 +848,8 @@ object StrFromCodeDecl :
  *
  * (str.to_int String Int)
  */
-class StrToInt(val inner: Expression<StringSort>) :
-    UnaryExpression<IntSort, StringSort>("str.to_int".symbol(), IntSort) {
-  override fun inner(): Expression<StringSort> = inner
-}
+class StrToInt(override val inner: Expression<StringSort>) :
+    UnaryExpression<IntSort, StringSort>("str.to_int".symbol(), IntSort)
 
 object StrToIntDecl :
     FunctionDecl1<StringSort, IntSort>(
@@ -891,10 +865,8 @@ object StrToIntDecl :
  *
  * (str.from_int Int String)
  */
-class StrFromInt(val inner: Expression<IntSort>) :
-    UnaryExpression<StringSort, IntSort>("str.from_int".symbol(), StringSort) {
-  override fun inner(): Expression<IntSort> = inner
-}
+class StrFromInt(override val inner: Expression<IntSort>) :
+    UnaryExpression<StringSort, IntSort>("str.from_int".symbol(), StringSort)
 
 object StrFromIntDecl :
     FunctionDecl1<IntSort, StringSort>(

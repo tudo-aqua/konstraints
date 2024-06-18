@@ -54,9 +54,9 @@ class ArraySelect(val array: Expression<ArraySort>, val index: Expression<*>) :
     require(array.sort.x == index.sort)
   }
 
-  override fun lhs(): Expression<ArraySort> = array
+  override val lhs: Expression<ArraySort> = array
 
-  override fun rhs(): Expression<Sort> = index as Expression<Sort>
+  override val rhs: Expression<Sort> = index as Expression<Sort>
 }
 
 /** Array selection declaration object */

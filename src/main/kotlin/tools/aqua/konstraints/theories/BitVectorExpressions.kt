@@ -86,14 +86,10 @@ class BVLiteral(vector: String) : Literal<BVSort>(LiteralString(vector), BVSort(
  * @param [lhs] left [Expression]
  * @param [rhs] right [Expression]
  */
-class BVConcat(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) :
+class BVConcat(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("concat".symbol(), BVSort(1)) {
   override val sort: BVSort = BVSort(lhs.sort.bits + rhs.sort.bits)
   override val name: Symbol = "concat".symbol()
-
-  override fun lhs(): Expression<BVSort> = lhs
-
-  override fun rhs(): Expression<BVSort> = rhs
 
   init {
     require(!lhs.sort.isSymbolic())
@@ -128,7 +124,7 @@ object BVConcatDecl :
  * @throws [IllegalArgumentException] if the constraint m > i ≥ j ≥ 0 is violated, where m is the
  *   number of bits in [inner]
  */
-class BVExtract(val i: Int, val j: Int, val inner: Expression<BVSort>) :
+class BVExtract(val i: Int, val j: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("extract".symbol(), BVSort(1)) {
   override val sort: BVSort = BVSort(i - j + 1)
 
@@ -139,8 +135,6 @@ class BVExtract(val i: Int, val j: Int, val inner: Expression<BVSort>) :
       "i can not be greater than the number of bits in inner, but was $i"
     }
   }
-
-  override fun inner(): Expression<BVSort> = inner
 
   override fun toString(): String = "((_ extract $i $j) $inner)"
 }
@@ -174,9 +168,8 @@ object ExtractDecl :
  *
  * @param [inner] [Expression] to be inverted
  */
-class BVNot(val inner: Expression<BVSort>) :
+class BVNot(override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("bvnot".symbol(), inner.sort) {
-  override fun inner(): Expression<BVSort> = inner
 
   init {
     require(!inner.sort.isSymbolic())
@@ -200,9 +193,8 @@ object BVNotDecl :
  *
  * @param [inner] [Expression] to be negated
  */
-class BVNeg(val inner: Expression<BVSort>) :
+class BVNeg(override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("bvneg".symbol(), inner.sort) {
-  override fun inner(): Expression<BVSort> = inner
 
   init {
     require(!inner.sort.isSymbolic())
@@ -420,9 +412,9 @@ class BVUDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
     require(!denominator.sort.isSymbolic())
   }
 
-  override fun lhs(): Expression<BVSort> = numerator
+  override val lhs: Expression<BVSort> = numerator
 
-  override fun rhs(): Expression<BVSort> = denominator
+  override val rhs: Expression<BVSort> = denominator
 }
 
 object BVUDivDecl :
@@ -456,9 +448,9 @@ class BVURem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
     require(!denominator.sort.isSymbolic())
   }
 
-  override fun lhs(): Expression<BVSort> = numerator
+  override val lhs: Expression<BVSort> = numerator
 
-  override fun rhs(): Expression<BVSort> = denominator
+  override val rhs: Expression<BVSort> = denominator
 }
 
 object BVURemDecl :
@@ -495,9 +487,9 @@ class BVShl(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
     require(!distance.sort.isSymbolic())
   }
 
-  override fun lhs(): Expression<BVSort> = value
+  override val lhs: Expression<BVSort> = value
 
-  override fun rhs(): Expression<BVSort> = distance
+  override val rhs: Expression<BVSort> = distance
 }
 
 object BVShlDecl :
@@ -534,9 +526,9 @@ class BVLShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
     require(!distance.sort.isSymbolic())
   }
 
-  override fun lhs(): Expression<BVSort> = value
+  override val lhs: Expression<BVSort> = value
 
-  override fun rhs(): Expression<BVSort> = distance
+  override val rhs: Expression<BVSort> = distance
 }
 
 object BVLShrDecl :
@@ -562,7 +554,7 @@ object BVLShrDecl :
  * @param [rhs] right value
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
-class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) :
+class BVUlt(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BoolSort, BVSort, BVSort>("bvult".symbol(), BoolSort) {
 
   init {
@@ -572,10 +564,6 @@ class BVUlt(val lhs: Expression<BVSort>, val rhs: Expression<BVSort>) :
     require(!lhs.sort.isSymbolic())
     require(!rhs.sort.isSymbolic())
   }
-
-  override fun lhs(): Expression<BVSort> = lhs
-
-  override fun rhs(): Expression<BVSort> = rhs
 }
 
 object BVUltDecl :

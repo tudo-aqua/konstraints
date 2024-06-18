@@ -64,10 +64,8 @@ class RealLiteral(val value: BigDecimal) :
  *
  * (- Real Real)
  */
-class RealNeg(val inner: Expression<RealSort>) :
-    UnaryExpression<RealSort, RealSort>("-".symbol(), RealSort) {
-  override fun inner(): Expression<RealSort> = inner
-}
+class RealNeg(override val inner: Expression<RealSort>) :
+    UnaryExpression<RealSort, RealSort>("-".symbol(), RealSort)
 
 object RealNegDecl :
     FunctionDecl1<RealSort, RealSort>(
