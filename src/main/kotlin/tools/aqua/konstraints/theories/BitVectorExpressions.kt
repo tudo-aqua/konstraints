@@ -78,6 +78,8 @@ class BVLiteral(vector: String) : Literal<BVSort>(LiteralString(vector), BVSort(
   override val sort = BVSort(bits)
 
   override fun toString() = name.toString()
+
+  override fun copy(children: List<Expression<*>>): Expression<BVSort> = this
 }
 
 /**
@@ -89,12 +91,16 @@ class BVLiteral(vector: String) : Literal<BVSort>(LiteralString(vector), BVSort(
 class BVConcat(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("concat".symbol(), BVSort(1)) {
   override val sort: BVSort = BVSort(lhs.sort.bits + rhs.sort.bits)
+
   override val name: Symbol = "concat".symbol()
 
   init {
     require(!lhs.sort.isSymbolic())
     require(!rhs.sort.isSymbolic())
   }
+
+  override fun copy(children: List<Expression<*>>): Expression<BVSort> =
+      BVConcatDecl.buildExpression(children, emptySet())
 }
 
 object BVConcatDecl :
@@ -137,6 +143,9 @@ class BVExtract(val i: Int, val j: Int, override val inner: Expression<BVSort>) 
   }
 
   override fun toString(): String = "((_ extract $i $j) $inner)"
+
+  override fun copy(children: List<Expression<*>>): Expression<BVSort> =
+      ExtractDecl.buildExpression(children, setOf(i.idx(), j.idx()))
 }
 
 object ExtractDecl :
@@ -174,6 +183,9 @@ class BVNot(override val inner: Expression<BVSort>) :
   init {
     require(!inner.sort.isSymbolic())
   }
+
+  override fun copy(children: List<Expression<*>>): Expression<BVSort> =
+      BVNotDecl.buildExpression(children, emptySet())
 }
 
 object BVNotDecl :
@@ -199,6 +211,9 @@ class BVNeg(override val inner: Expression<BVSort>) :
   init {
     require(!inner.sort.isSymbolic())
   }
+
+  override fun copy(children: List<Expression<*>>): Expression<BVSort> =
+      BVNegDecl.buildExpression(children, emptySet())
 }
 
 object BVNegDecl :
@@ -238,6 +253,9 @@ class BVAnd(val conjuncts: List<Expression<BVSort>>) :
   }
 
   override fun subexpressions(): List<Expression<BVSort>> = conjuncts
+
+  override fun copy(children: List<Expression<*>>): Expression<BVSort> =
+      BVAndDecl.buildExpression(children, emptySet())
 }
 
 object BVAndDecl :
@@ -285,6 +303,9 @@ class BVOr(val disjuncts: List<Expression<BVSort>>) :
   }
 
   override fun toString(): String = "(bvor ${disjuncts.joinToString(" ")})"
+
+  override fun copy(children: List<Expression<*>>): Expression<BVSort> =
+      BVOrDecl.buildExpression(children, emptySet())
 }
 
 object BVOrDecl :
@@ -329,6 +350,9 @@ class BVAdd(val summands: List<Expression<BVSort>>) :
   }
 
   override fun subexpressions(): List<Expression<BVSort>> = summands
+
+  override fun copy(children: List<Expression<*>>): Expression<BVSort> =
+      BVAddDecl.buildExpression(children, emptySet())
 }
 
 object BVAddDecl :
@@ -373,6 +397,9 @@ class BVMul(val factors: List<Expression<BVSort>>) :
   }
 
   override fun subexpressions(): List<Expression<BVSort>> = factors
+
+  override fun copy(children: List<Expression<*>>): Expression<BVSort> =
+      BVMulDecl.buildExpression(children, emptySet())
 }
 
 object BVMulDecl :
@@ -415,6 +442,9 @@ class BVUDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
   override val lhs: Expression<BVSort> = numerator
 
   override val rhs: Expression<BVSort> = denominator
+
+  override fun copy(children: List<Expression<*>>): Expression<BVSort> =
+      BVUDivDecl.buildExpression(children, emptySet())
 }
 
 object BVUDivDecl :
@@ -451,6 +481,9 @@ class BVURem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
   override val lhs: Expression<BVSort> = numerator
 
   override val rhs: Expression<BVSort> = denominator
+
+  override fun copy(children: List<Expression<*>>): Expression<BVSort> =
+      BVURemDecl.buildExpression(children, emptySet())
 }
 
 object BVURemDecl :
@@ -490,6 +523,9 @@ class BVShl(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
   override val lhs: Expression<BVSort> = value
 
   override val rhs: Expression<BVSort> = distance
+
+  override fun copy(children: List<Expression<*>>): Expression<BVSort> =
+      BVShlDecl.buildExpression(children, emptySet())
 }
 
 object BVShlDecl :
@@ -529,6 +565,9 @@ class BVLShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
   override val lhs: Expression<BVSort> = value
 
   override val rhs: Expression<BVSort> = distance
+
+  override fun copy(children: List<Expression<*>>): Expression<BVSort> =
+      BVLShrDecl.buildExpression(children, emptySet())
 }
 
 object BVLShrDecl :
@@ -564,6 +603,9 @@ class BVUlt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
     require(!lhs.sort.isSymbolic())
     require(!rhs.sort.isSymbolic())
   }
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      BVUltDecl.buildExpression(children, emptySet())
 }
 
 object BVUltDecl :

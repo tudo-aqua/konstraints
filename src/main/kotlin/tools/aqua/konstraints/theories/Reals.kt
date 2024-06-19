@@ -57,6 +57,8 @@ class RealLiteral(val value: BigDecimal) :
   override val sort: RealSort = RealSort
 
   override fun toString(): String = value.toString()
+
+  override fun copy(children: List<Expression<*>>): Expression<RealSort> = this
 }
 
 /**
@@ -65,7 +67,10 @@ class RealLiteral(val value: BigDecimal) :
  * (- Real Real)
  */
 class RealNeg(override val inner: Expression<RealSort>) :
-    UnaryExpression<RealSort, RealSort>("-".symbol(), RealSort)
+    UnaryExpression<RealSort, RealSort>("-".symbol(), RealSort) {
+  override fun copy(children: List<Expression<*>>): Expression<RealSort> =
+      RealNegDecl.buildExpression(children, emptySet())
+}
 
 object RealNegDecl :
     FunctionDecl1<RealSort, RealSort>(
@@ -90,6 +95,9 @@ class RealSub(val terms: List<Expression<RealSort>>) :
   }
 
   override fun subexpressions(): List<Expression<RealSort>> = terms
+
+  override fun copy(children: List<Expression<*>>): Expression<RealSort> =
+      RealSubDecl.buildExpression(children, emptySet())
 }
 
 object RealSubDecl :
@@ -117,6 +125,9 @@ class RealAdd(val terms: List<Expression<RealSort>>) :
   }
 
   override fun subexpressions(): List<Expression<RealSort>> = terms
+
+  override fun copy(children: List<Expression<*>>): Expression<RealSort> =
+      RealAddDecl.buildExpression(children, emptySet())
 }
 
 object RealAddDecl :
@@ -144,6 +155,9 @@ class RealMul(val factors: List<Expression<RealSort>>) :
   }
 
   override fun subexpressions(): List<Expression<RealSort>> = factors
+
+  override fun copy(children: List<Expression<*>>): Expression<RealSort> =
+      RealMulDecl.buildExpression(children, emptySet())
 }
 
 object RealMulDecl :
@@ -171,6 +185,9 @@ class RealDiv(val terms: List<Expression<RealSort>>) :
   }
 
   override fun subexpressions(): List<Expression<RealSort>> = terms
+
+  override fun copy(children: List<Expression<*>>): Expression<RealSort> =
+      RealDivDecl.buildExpression(children, emptySet())
 }
 
 object RealDivDecl :
@@ -198,6 +215,9 @@ class RealLessEq(val terms: List<Expression<RealSort>>) :
   }
 
   override fun subexpressions(): List<Expression<RealSort>> = terms
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      RealLessEqDecl.buildExpression(children, emptySet())
 }
 
 object RealLessEqDecl :
@@ -223,6 +243,9 @@ class RealLess(val terms: List<Expression<RealSort>>) :
   }
 
   override fun subexpressions(): List<Expression<RealSort>> = terms
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      RealLessDecl.buildExpression(children, emptySet())
 }
 
 object RealLessDecl :
@@ -248,6 +271,9 @@ class RealGreaterEq(val terms: List<Expression<RealSort>>) :
   }
 
   override fun subexpressions(): List<Expression<RealSort>> = terms
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      RealGreaterEqDecl.buildExpression(children, emptySet())
 }
 
 object RealGreaterEqDecl :
@@ -273,6 +299,9 @@ class RealGreater(val terms: List<Expression<RealSort>>) :
   }
 
   override fun subexpressions(): List<Expression<RealSort>> = terms
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      RealGreaterDecl.buildExpression(children, emptySet())
 }
 
 object RealGreaterDecl :

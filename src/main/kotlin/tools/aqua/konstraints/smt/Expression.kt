@@ -21,6 +21,7 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.parser.SortedVar
 import tools.aqua.konstraints.parser.VarBinding
 import tools.aqua.konstraints.theories.BoolSort
+import tools.aqua.konstraints.theories.IteDecl
 import tools.aqua.konstraints.util.reduceOrDefault
 
 /** Interface for all sorted SMT terms */
@@ -75,27 +76,29 @@ sealed interface Expression<T : Sort> {
         is ForallExpression -> TODO()
       }
 
-    fun transform(transformation: (Expression<*>) -> Expression<*>) : Expression<T> {
-        // transform all children
-        val transformedChildren = this.children.map(transformation)
+  fun transform(transformation: (Expression<*>) -> Expression<*>): Expression<T> {
+    // transform all children
+    val transformedChildren = this.children.map(transformation)
 
-        // check if any child was copied
-        return if((transformedChildren zip this.children).any { (new, old) -> new !== old }) {
-            // return copied expression with new children
-            //val copied = this.copy(transformedChildren)
-            //transformation(copied) castTo sort
-            transformation(this) castTo sort
-        } else {
-            // transform this expression, prevent it from changing the sort
-            transformation(this) castTo sort
-        }
+    // check if any child was copied
+    return if ((transformedChildren zip this.children).any { (new, old) -> new !== old }) {
+      // return copied expression with new children
+      // val copied = this.copy(transformedChildren)
+      // transformation(copied) castTo sort
+      transformation(this) castTo sort
+    } else {
+      // transform this expression, prevent it from changing the sort
+      transformation(this) castTo sort
     }
+  }
+
+  fun copy(children: List<Expression<*>>): Expression<T>
 
   val children: List<Expression<*>>
 }
 
 /** SMT Literal */
-open class Literal<T : Sort>(override val name: LiteralString, override val sort: T) :
+abstract class Literal<T : Sort>(override val name: LiteralString, override val sort: T) :
     Expression<T> {
   override val children: List<Expression<*>> = emptyList()
 
@@ -191,6 +194,10 @@ class Ite<T : Sort>(
   }
 
   override val sort: T = then.sort
+
+  override fun copy(children: List<Expression<*>>): Expression<T> =
+      IteDecl.buildExpression(children, emptySet()) castTo sort
+
   override val name: Symbol = "ite".symbol()
 
   override val children: List<Expression<*>> = listOf(statement, then, otherwise)
@@ -219,6 +226,13 @@ class LetExpression<T : Sort>(
     val inner: Expression<T>
 ) : Expression<T> {
   override val name = Keyword("let")
+
+  override fun copy(children: List<Expression<*>>): Expression<T> {
+    require(children.size == 1)
+
+    return LetExpression(sort, bindings, children.single() castTo sort) castTo sort
+  }
+
   override val children: List<Expression<*>> = listOf(inner)
 }
 
@@ -228,6 +242,9 @@ class UserDefinedExpression<T : Sort>(name: Symbol, sort: T, val args: List<Expr
   constructor(name: Symbol, sort: T) : this(name, sort, emptyList())
 
   override fun subexpressions(): List<Expression<*>> = args
+
+  override fun copy(children: List<Expression<*>>): Expression<T> =
+      UserDefinedExpression(name, sort, children)
 }
 
 /** Expression with a local variable */
@@ -236,6 +253,12 @@ class LocalExpression<T : Sort>(
     override val sort: T,
     val term: Expression<T>,
 ) : Expression<T> {
+  override fun copy(children: List<Expression<*>>): Expression<T> {
+    require(children.size == 1)
+
+    return LocalExpression(name, sort, children.single() castTo sort) castTo sort
+  }
+
   override val children: List<Expression<*>> = emptyList()
 }
 
@@ -243,18 +266,32 @@ class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
     Expression<BoolSort> {
   override val sort = BoolSort
   override val name = Keyword("exists")
-  override val children: List<Expression<*>> = emptyList()
+  override val children: List<Expression<*>> = listOf(term)
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> {
+    require(children.size == 1)
+
+    return ExistsExpression(vars, children.single() castTo sort)
+  }
 }
 
 class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSort>) :
     Expression<BoolSort> {
   override val sort = BoolSort
   override val name = Keyword("forall")
-  override val children: List<Expression<*>> = emptyList()
+  override val children: List<Expression<*>> = listOf(term)
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> {
+    require(children.size == 1)
+
+    return ForallExpression(vars, children.single() castTo sort)
+  }
 }
 
 class BoundVariable<T : Sort>(override val name: Symbol, override val sort: T) : Expression<T> {
   override val children: List<Expression<*>> = emptyList()
+
+  override fun copy(children: List<Expression<*>>): Expression<T> = BoundVariable(name, sort)
 }
 
 class ExpressionCastException(from: Sort, to: String) :

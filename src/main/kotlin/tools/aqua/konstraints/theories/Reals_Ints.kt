@@ -62,7 +62,10 @@ object RealsIntsTheory : Theory {
  * (to_real Int Real)
  */
 class ToReal(override val inner: Expression<IntSort>) :
-    UnaryExpression<RealSort, IntSort>("to_real".symbol(), RealSort)
+    UnaryExpression<RealSort, IntSort>("to_real".symbol(), RealSort) {
+  override fun copy(children: List<Expression<*>>): Expression<RealSort> =
+      ToRealDecl.buildExpression(children, emptySet())
+}
 
 object ToRealDecl :
     FunctionDecl1<IntSort, RealSort>(
@@ -79,7 +82,10 @@ object ToRealDecl :
  * (to_int Real Int)
  */
 class ToInt(override val inner: Expression<RealSort>) :
-    UnaryExpression<IntSort, RealSort>("to_int".symbol(), IntSort)
+    UnaryExpression<IntSort, RealSort>("to_int".symbol(), IntSort) {
+  override fun copy(children: List<Expression<*>>): Expression<IntSort> =
+      ToIntDecl.buildExpression(children, emptySet())
+}
 
 object ToIntDecl :
     FunctionDecl1<RealSort, IntSort>(
@@ -92,7 +98,10 @@ object ToIntDecl :
 
 /** (is_int Real Bool) */
 class IsInt(override val inner: Expression<RealSort>) :
-    UnaryExpression<BoolSort, RealSort>("is_int".symbol(), BoolSort)
+    UnaryExpression<BoolSort, RealSort>("is_int".symbol(), BoolSort) {
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      IsIntDecl.buildExpression(children, emptySet())
+}
 
 object IsIntDecl :
     FunctionDecl1<RealSort, BoolSort>(

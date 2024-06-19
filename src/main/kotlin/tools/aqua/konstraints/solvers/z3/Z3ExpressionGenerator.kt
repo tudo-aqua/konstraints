@@ -680,7 +680,9 @@ fun FPNeg.z3ify(context: Z3Context): Expr<Z3FPSort> =
 
 fun FPAdd.z3ify(context: Z3Context): Expr<Z3FPSort> =
     context.context.mkFPAdd(
-        this.roundingMode.z3ify(context), this.leftTerm.z3ify(context), this.rightTerm.z3ify(context))
+        this.roundingMode.z3ify(context),
+        this.leftTerm.z3ify(context),
+        this.rightTerm.z3ify(context))
 
 fun FPSub.z3ify(context: Z3Context): Expr<Z3FPSort> =
     context.context.mkFPSub(
