@@ -280,4 +280,32 @@ class ContextTests {
     assertNotNull(context.getFunction("A", emptyList()))
     assertNull(context.getFunction("B", emptyList()))
   }
+
+  @Test
+  fun testTransform() {
+    val expr =
+        Or(
+            UserDefinedExpression("A".symbol(), BoolSort),
+            UserDefinedExpression("B".symbol(), BoolSort))
+    val transformed =
+        expr.transform { expression ->
+          if (expression is Or) {
+            And(expression.children.map { Not(it castTo BoolSort) })
+          } else {
+            expression
+          }
+        }
+
+    assertTrue(transformed is And)
+    assertTrue(transformed.children.size == 2)
+    assertTrue(transformed.children.all { it is Not })
+    assertTrue(
+        (transformed.children.flatMap { it.children } zip expr.children).all { (new, old) ->
+          new.name == old.name
+        })
+    assertTrue(
+        (transformed.children.flatMap { it.children } zip expr.children).all { (new, old) ->
+          new === old
+        })
+  }
 }

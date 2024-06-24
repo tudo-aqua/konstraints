@@ -204,11 +204,11 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
       is StrIsDigit -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDefinedExpression ->
-          if (this.subexpressions.isEmpty()) {
+          if (this.children.isEmpty()) {
             context.getConstant(this.name, this.sort.z3ify(context))
           } else {
             context.getFunction(
-                this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
+                this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
@@ -414,11 +414,11 @@ fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
       is FPToSBitVec -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDefinedExpression ->
-          if (this.subexpressions.isEmpty()) {
+          if (this.children.isEmpty()) {
             context.getConstant(this.name, this.sort.z3ify(context))
           } else {
             context.getFunction(
-                this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
+                this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
@@ -504,11 +504,11 @@ fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
       is StrToInt -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDefinedExpression ->
-          if (this.subexpressions.isEmpty()) {
+          if (this.children.isEmpty()) {
             context.getConstant(this.name, this.sort.z3ify(context))
           } else {
             context.getFunction(
-                this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
+                this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
@@ -576,11 +576,11 @@ fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
       is FPToReal -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDefinedExpression ->
-          if (this.subexpressions.isEmpty()) {
+          if (this.children.isEmpty()) {
             context.getConstant(this.name, this.sort.z3ify(context))
           } else {
             context.getFunction(
-                this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
+                this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
@@ -644,11 +644,11 @@ fun Expression<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
       is UBitVecToFP -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDefinedExpression ->
-          if (this.subexpressions.isEmpty()) {
+          if (this.children.isEmpty()) {
             context.getConstant(this.name, this.sort.z3ify(context))
           } else {
             context.getFunction(
-                this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
+                this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
@@ -680,7 +680,9 @@ fun FPNeg.z3ify(context: Z3Context): Expr<Z3FPSort> =
 
 fun FPAdd.z3ify(context: Z3Context): Expr<Z3FPSort> =
     context.context.mkFPAdd(
-        this.roundingMode.z3ify(context), this.rhs.z3ify(context), this.lhs.z3ify(context))
+        this.roundingMode.z3ify(context),
+        this.leftTerm.z3ify(context),
+        this.rightTerm.z3ify(context))
 
 fun FPSub.z3ify(context: Z3Context): Expr<Z3FPSort> =
     context.context.mkFPSub(
@@ -763,11 +765,11 @@ fun Expression<RoundingMode>.z3ify(context: Z3Context): Expr<FPRMSort> =
       is RTZ -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDefinedExpression ->
-          if (this.subexpressions.isEmpty()) {
+          if (this.children.isEmpty()) {
             context.getConstant(this.name, this.sort.z3ify(context))
           } else {
             context.getFunction(
-                this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
+                this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
@@ -818,11 +820,11 @@ fun Expression<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
       is StrFromInt -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDefinedExpression ->
-          if (this.subexpressions.isEmpty()) {
+          if (this.children.isEmpty()) {
             context.getConstant(this.name, this.sort.z3ify(context))
           } else {
             context.getFunction(
-                this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
+                this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
@@ -876,11 +878,11 @@ fun Expression<RegLan>.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>
       is RegexLoop -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDefinedExpression ->
-          if (this.subexpressions.isEmpty()) {
+          if (this.children.isEmpty()) {
             context.getConstant(this.name, this.sort.z3ify(context))
           } else {
             context.getFunction(
-                this.name, this.subexpressions.map { it.z3ify(context) }, this.sort.z3ify(context))
+                this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
