@@ -78,7 +78,7 @@ sealed interface Expression<T : Sort> {
 
   fun transform(transformation: (Expression<*>) -> Expression<*>): Expression<T> {
     // transform all children
-    val transformedChildren = this.children.map(transformation)
+    val transformedChildren = this.children.map { it.transform(transformation) }
 
     // check if any child was copied
     return if ((transformedChildren zip this.children).any { (new, old) -> new !== old }) {
