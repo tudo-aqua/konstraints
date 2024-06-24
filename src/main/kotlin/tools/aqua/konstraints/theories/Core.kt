@@ -50,14 +50,18 @@ object BoolSortDecl : SortDecl<BoolSort>("Bool".symbol(), emptySet(), emptySet()
 }
 
 /** Object for SMT true */
-object True : ConstantExpression<BoolSort>("true".symbol(), BoolSort)
+object True : ConstantExpression<BoolSort>("true".symbol(), BoolSort) {
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
+}
 
 object TrueDecl : FunctionDecl0<BoolSort>("true".symbol(), emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(bindings: Bindings): Expression<BoolSort> = True
 }
 
 /** Object for SMT false */
-object False : ConstantExpression<BoolSort>("false".symbol(), BoolSort)
+object False : ConstantExpression<BoolSort>("false".symbol(), BoolSort) {
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
+}
 
 object FalseDecl : FunctionDecl0<BoolSort>("false".symbol(), emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(bindings: Bindings): Expression<BoolSort> = False
@@ -68,11 +72,13 @@ object FalseDecl : FunctionDecl0<BoolSort>("false".symbol(), emptySet(), emptySe
  *
  * @param inner [Expression] of [BoolSort] to be negated
  */
-class Not(val inner: Expression<BoolSort>) :
+class Not(override val inner: Expression<BoolSort>) :
     UnaryExpression<BoolSort, BoolSort>("not".symbol(), BoolSort) {
-  override fun inner(): Expression<BoolSort> = inner
 
   override fun toString(): String = "(not $inner)"
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      NotDecl.buildExpression(children, emptySet())
 }
 
 /** Not declaration object */
@@ -95,6 +101,9 @@ class Implies(val statements: List<Expression<BoolSort>>) :
   constructor(vararg statements: Expression<BoolSort>) : this(statements.toList())
 
   override fun subexpressions(): List<Expression<BoolSort>> = statements
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      ImpliesDecl.buildExpression(children, emptySet())
 }
 
 /** Implies declaration object */
@@ -119,6 +128,9 @@ class And(val conjuncts: List<Expression<BoolSort>>) :
   constructor(vararg conjuncts: Expression<BoolSort>) : this(conjuncts.toList())
 
   override fun subexpressions(): List<Expression<BoolSort>> = conjuncts
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      AndDecl.buildExpression(children, emptySet())
 }
 
 /** And declaration object */
@@ -143,6 +155,9 @@ class Or(val disjuncts: List<Expression<BoolSort>>) :
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
 
   override fun subexpressions(): List<Expression<BoolSort>> = disjuncts
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      OrDecl.buildExpression(children, emptySet())
 }
 
 /** Or declaration object */
@@ -167,6 +182,9 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) :
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
 
   override fun subexpressions(): List<Expression<BoolSort>> = disjuncts
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      XOrDecl.buildExpression(children, emptySet())
 }
 
 /** Xor declaration object */
@@ -191,6 +209,9 @@ class Equals(val statements: List<Expression<*>>) :
   constructor(vararg statements: Expression<*>) : this(statements.toList())
 
   override fun subexpressions(): List<Expression<Sort>> = statements as List<Expression<Sort>>
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      EqualsDecl.buildExpression(children, emptySet())
 }
 
 /** Equals declaration object */
@@ -219,6 +240,9 @@ class Distinct(val statements: List<Expression<*>>) :
   constructor(vararg statements: Expression<*>) : this(statements.toList())
 
   override fun subexpressions(): List<Expression<Sort>> = statements as List<Expression<Sort>>
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      DistinctDecl.buildExpression(children, emptySet())
 }
 
 /** Distinct declaration object */

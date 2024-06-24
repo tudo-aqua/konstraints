@@ -57,6 +57,8 @@ internal object IntSortDecl : SortDecl<IntSort>("Int".symbol(), emptySet(), empt
 class IntLiteral(val value: BigInteger) :
     Literal<IntSort>(LiteralString(value.toString()), IntSort) {
   override fun toString(): String = value.toString()
+
+  override fun copy(children: List<Expression<*>>): Expression<IntSort> = this
 }
 
 /**
@@ -64,9 +66,10 @@ class IntLiteral(val value: BigInteger) :
  *
  * (- Int Int)
  */
-class IntNeg(val inner: Expression<IntSort>) :
+class IntNeg(override val inner: Expression<IntSort>) :
     UnaryExpression<IntSort, IntSort>("-".symbol(), IntSort) {
-  override fun inner(): Expression<IntSort> = inner
+  override fun copy(children: List<Expression<*>>): Expression<IntSort> =
+      IntNegDecl.buildExpression(children, emptySet())
 }
 
 object IntNegDecl :
@@ -92,6 +95,9 @@ class IntSub(val terms: List<Expression<IntSort>>) :
   }
 
   override fun subexpressions(): List<Expression<IntSort>> = terms
+
+  override fun copy(children: List<Expression<*>>): Expression<IntSort> =
+      IntSubDecl.buildExpression(children, emptySet())
 }
 
 object IntSubDecl :
@@ -119,6 +125,9 @@ class IntAdd(val terms: List<Expression<IntSort>>) :
   }
 
   override fun subexpressions(): List<Expression<IntSort>> = terms
+
+  override fun copy(children: List<Expression<*>>): Expression<IntSort> =
+      IntAddDecl.buildExpression(children, emptySet())
 }
 
 object IntAddDecl :
@@ -146,6 +155,9 @@ class IntMul(val factors: List<Expression<IntSort>>) :
   }
 
   override fun subexpressions(): List<Expression<IntSort>> = factors
+
+  override fun copy(children: List<Expression<*>>): Expression<IntSort> =
+      IntMulDecl.buildExpression(children, emptySet())
 }
 
 object IntMulDecl :
@@ -173,6 +185,9 @@ class IntDiv(val terms: List<Expression<IntSort>>) :
   }
 
   override fun subexpressions(): List<Expression<IntSort>> = terms
+
+  override fun copy(children: List<Expression<*>>): Expression<IntSort> =
+      IntDivDecl.buildExpression(children, emptySet())
 }
 
 object IntDivDecl :
@@ -194,9 +209,12 @@ object IntDivDecl :
 class Mod(val dividend: Expression<IntSort>, val divisor: Expression<IntSort>) :
     BinaryExpression<IntSort, IntSort, IntSort>("mod".symbol(), IntSort) {
 
-  override fun lhs(): Expression<IntSort> = dividend
+  override val lhs: Expression<IntSort> = dividend
 
-  override fun rhs(): Expression<IntSort> = divisor
+  override val rhs: Expression<IntSort> = divisor
+
+  override fun copy(children: List<Expression<*>>): Expression<IntSort> =
+      ModDecl.buildExpression(children, emptySet())
 }
 
 object ModDecl :
@@ -214,9 +232,10 @@ object ModDecl :
  *
  * (abs Int Int)
  */
-class Abs(val inner: Expression<IntSort>) :
+class Abs(override val inner: Expression<IntSort>) :
     UnaryExpression<IntSort, IntSort>("abs".symbol(), IntSort) {
-  override fun inner(): Expression<IntSort> = inner
+  override fun copy(children: List<Expression<*>>): Expression<IntSort> =
+      AbsDecl.buildExpression(children, emptySet())
 }
 
 object AbsDecl :
@@ -244,6 +263,9 @@ class IntLessEq(val terms: List<Expression<IntSort>>) :
   }
 
   override fun subexpressions(): List<Expression<IntSort>> = terms
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      IntLessEqDecl.buildExpression(children, emptySet())
 }
 
 object IntLessEqDecl :
@@ -271,6 +293,9 @@ class IntLess(val terms: List<Expression<IntSort>>) :
   }
 
   override fun subexpressions(): List<Expression<IntSort>> = terms
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      IntLessDecl.buildExpression(children, emptySet())
 }
 
 object IntLessDecl :
@@ -298,6 +323,9 @@ class IntGreaterEq(val terms: List<Expression<IntSort>>) :
   }
 
   override fun subexpressions(): List<Expression<IntSort>> = terms
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      IntGreaterEqDecl.buildExpression(children, emptySet())
 }
 
 object IntGreaterEqDecl :
@@ -325,6 +353,9 @@ class IntGreater(val terms: List<Expression<IntSort>>) :
   }
 
   override fun subexpressions(): List<Expression<IntSort>> = terms
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      IntGreaterDecl.buildExpression(children, emptySet())
 }
 
 object IntGreaterDecl :
@@ -343,13 +374,15 @@ object IntGreaterDecl :
  *
  * ((_ divisible n) Int Bool)
  */
-class Divisible(val n: Int, val inner: Expression<IntSort>) :
+class Divisible(val n: Int, override val inner: Expression<IntSort>) :
     UnaryExpression<BoolSort, IntSort>("divisible".symbol(), BoolSort) {
-  override fun inner(): Expression<IntSort> = inner
 
   init {
     require(n > 0)
   }
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      DivisibleDecl.buildExpression(children, emptySet())
 }
 
 object DivisibleDecl :
