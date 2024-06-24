@@ -19,6 +19,6 @@
 package tools.aqua.konstraints.smt
 
 /** Model class holding the data of solver return get-model */
-data class Model(val definitions: List<FunctionDef>) {
+data class Model(val definitions: List<FunctionDef<*>>) {
   companion object
 }

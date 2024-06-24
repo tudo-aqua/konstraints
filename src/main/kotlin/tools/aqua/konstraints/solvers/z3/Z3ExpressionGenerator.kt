@@ -203,7 +203,7 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
       is StrContains -> this.z3ify(context)
       is StrIsDigit -> this.z3ify(context)
       /* free constant and function symbols */
-      is UserDefinedExpression ->
+      is UserDeclaredExpression ->
           if (this.children.isEmpty()) {
             context.getConstant(this.name, this.sort.z3ify(context))
           } else {
@@ -413,7 +413,7 @@ fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
       is FPToUBitVec -> this.z3ify(context)
       is FPToSBitVec -> this.z3ify(context)
       /* free constant and function symbols */
-      is UserDefinedExpression ->
+      is UserDeclaredExpression ->
           if (this.children.isEmpty()) {
             context.getConstant(this.name, this.sort.z3ify(context))
           } else {
@@ -503,7 +503,7 @@ fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
       is StrToCode -> this.z3ify(context)
       is StrToInt -> this.z3ify(context)
       /* free constant and function symbols */
-      is UserDefinedExpression ->
+      is UserDeclaredExpression ->
           if (this.children.isEmpty()) {
             context.getConstant(this.name, this.sort.z3ify(context))
           } else {
@@ -575,7 +575,7 @@ fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
       is ToReal -> this.z3ify(context)
       is FPToReal -> this.z3ify(context)
       /* free constant and function symbols */
-      is UserDefinedExpression ->
+      is UserDeclaredExpression ->
           if (this.children.isEmpty()) {
             context.getConstant(this.name, this.sort.z3ify(context))
           } else {
@@ -643,7 +643,7 @@ fun Expression<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
       is SBitVecToFP -> this.z3ify(context)
       is UBitVecToFP -> this.z3ify(context)
       /* free constant and function symbols */
-      is UserDefinedExpression ->
+      is UserDeclaredExpression ->
           if (this.children.isEmpty()) {
             context.getConstant(this.name, this.sort.z3ify(context))
           } else {
@@ -764,7 +764,7 @@ fun Expression<RoundingMode>.z3ify(context: Z3Context): Expr<FPRMSort> =
       is RoundTowardZero -> this.z3ify(context)
       is RTZ -> this.z3ify(context)
       /* free constant and function symbols */
-      is UserDefinedExpression ->
+      is UserDeclaredExpression ->
           if (this.children.isEmpty()) {
             context.getConstant(this.name, this.sort.z3ify(context))
           } else {
@@ -819,7 +819,7 @@ fun Expression<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
       is StrFromCode -> this.z3ify(context)
       is StrFromInt -> this.z3ify(context)
       /* free constant and function symbols */
-      is UserDefinedExpression ->
+      is UserDeclaredExpression ->
           if (this.children.isEmpty()) {
             context.getConstant(this.name, this.sort.z3ify(context))
           } else {
@@ -877,7 +877,7 @@ fun Expression<RegLan>.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>
       is RegexPower -> this.z3ify(context)
       is RegexLoop -> this.z3ify(context)
       /* free constant and function symbols */
-      is UserDefinedExpression ->
+      is UserDeclaredExpression ->
           if (this.children.isEmpty()) {
             context.getConstant(this.name, this.sort.z3ify(context))
           } else {

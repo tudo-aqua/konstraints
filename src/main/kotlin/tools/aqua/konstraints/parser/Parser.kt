@@ -583,9 +583,9 @@ object Parser {
       (symbol * lparen * sortedVar.star() * rparen * sort * term).map { result: ArrayList<Any> ->
         ProtoFunctionDef(
             result[0] as ParseSymbol,
-            result.filterIsInstance<ProtoSortedVar>(),
-            result[result.size - 2] as ProtoSort,
-            result[result.size - 1] as ProtoTerm)
+            result[2] as List<ProtoSortedVar>,
+            result[4] as ProtoSort,
+            result[5] as ProtoTerm)
       }
 
   /*

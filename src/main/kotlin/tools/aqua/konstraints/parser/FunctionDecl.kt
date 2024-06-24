@@ -29,8 +29,6 @@ enum class Associativity {
   NONE
 }
 
-interface Function
-
 open class FunctionDecl<S : Sort>(
     val name: Symbol,
     val parametricSorts: Set<Sort>,
@@ -48,7 +46,7 @@ open class FunctionDecl<S : Sort>(
   ): Expression<S> {
     bindParametersToExpressions(args, functionIndices)
 
-    return UserDefinedExpression(name, sort, args)
+    return UserDeclaredExpression(name, sort, args)
   }
 
   open fun bindParametersToExpressions(args: List<Expression<*>>, indices: Set<NumeralIndex>) =
@@ -102,48 +100,32 @@ open class FunctionDecl<S : Sort>(
 }
 
 class FunctionDefinition<S : Sort>(
-    val name: Symbol,
-    val parameter: List<SortedVar<*>>,
-    val sort: S,
-    val term: Expression<S>
-) {
-  fun build(args: List<Expression<*>>, context: Context): Expression<*> {
+    name: Symbol,
+    val namedParams: List<SortedVar<*>>,
+    sort: S,
+    val term: Expression<out S>
+) :
+    FunctionDecl<S>(
+        name,
+        emptySet(),
+        namedParams.map { it.sort },
+        emptySet(),
+        emptySet(),
+        sort,
+        Associativity.NONE) {
+  fun expand(args: List<Expression<*>>): Expression<*> {
     // term is a placeholder expression using the parameters as expressions
     // we need to build the same term but replace every occurrence of a parameter with
     // the corresponding argument expression
-    return transform(term, args, context)
-  }
+    val bindings = (namedParams zip args)
 
-  private fun transform(
-      expr: Expression<*>,
-      args: List<Expression<*>>,
-      context: Context
-  ): Expression<*> {
-    return if (expr.subexpressions.isEmpty()) {
-      val par = parameter.find { it.name == expr.name }
-
-      if (par != null) {
-        // replace
-        args[parameter.indexOf(par)]
+    return term.transform { expr: Expression<*> ->
+      if (expr.children.isEmpty()) {
+        bindings.find { (param, _) -> param.name == expr.name }?.second ?: expr
       } else {
-        // copy
-        context
-            .getFunction(expr.name.toString(), expr.subexpressions)
-            ?.buildExpression(emptyList(), emptySet()) ?: throw IllegalStateException()
+        expr
       }
-    } else {
-      val transformedExpressions = expr.subexpressions.map { transform(it, args, context) }
-      context
-          .getFunction(expr.name.toString(), transformedExpressions)
-          ?.buildExpression(transformedExpressions, emptySet()) ?: throw IllegalStateException()
     }
-  }
-
-  fun transform(
-      expression: Expression<*>,
-      transformation: (Expression<*>) -> Expression<*>
-  ): Expression<*> {
-    return transformation(expression)
   }
 }
 

@@ -236,7 +236,7 @@ class LetExpression<T : Sort>(
   override val children: List<Expression<*>> = listOf(inner)
 }
 
-class UserDefinedExpression<T : Sort>(name: Symbol, sort: T, val args: List<Expression<*>>) :
+class UserDeclaredExpression<T : Sort>(name: Symbol, sort: T, val args: List<Expression<*>>) :
     NAryExpression<T>(name, sort) {
 
   constructor(name: Symbol, sort: T) : this(name, sort, emptyList())
@@ -244,7 +244,7 @@ class UserDefinedExpression<T : Sort>(name: Symbol, sort: T, val args: List<Expr
   override fun subexpressions(): List<Expression<*>> = args
 
   override fun copy(children: List<Expression<*>>): Expression<T> =
-      UserDefinedExpression(name, sort, children)
+      UserDeclaredExpression(name, sort, children)
 }
 
 /** Expression with a local variable */

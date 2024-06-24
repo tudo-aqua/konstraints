@@ -656,7 +656,8 @@ class Z3Tests {
   @ValueSource(
       strings =
           [
-              "(set-logic QF_BV)(set-info :status sat)(declare-fun A () (_ BitVec 8))(define-fun B () (_ BitVec 8) (bvneg A))(assert (= A (bvneg B)))(check-sat)"])
+              "(set-logic QF_BV)(set-info :status sat)(declare-fun A () (_ BitVec 8))(define-fun B () (_ BitVec 8) (bvneg A))(assert (= A (bvneg B)))(check-sat)",
+              "(set-logic QF_BV)(define-fun bvugt8 ((lhs (_ BitVec 8)) (rhs (_ BitVec 8))) Bool (and (not (= lhs rhs)) (not (bvult lhs rhs))))(declare-fun A () (_ BitVec 8))(declare-fun B () (_ BitVec 8))(assert (bvugt8 A B))(check-sat)"])
   fun testDefineFun(program: String) {
     val solver = Z3Solver()
 
