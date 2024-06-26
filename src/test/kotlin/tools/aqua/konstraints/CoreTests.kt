@@ -35,9 +35,9 @@ import tools.aqua.konstraints.theories.*
  */
 @TestInstance(Lifecycle.PER_CLASS)
 class CoreTests {
-  private val A = UserDefinedExpression("A".symbol(), BoolSort)
-  private val B = UserDefinedExpression("B".symbol(), BoolSort)
-  private val C = UserDefinedExpression("C".symbol(), BoolSort)
+  private val A = UserDeclaredExpression("A".symbol(), BoolSort)
+  private val B = UserDeclaredExpression("B".symbol(), BoolSort)
+  private val C = UserDeclaredExpression("C".symbol(), BoolSort)
 
   @ParameterizedTest
   @MethodSource("getCoreTheoryExpressionsAndTheirSerialization")

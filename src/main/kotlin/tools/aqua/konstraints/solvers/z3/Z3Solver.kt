@@ -139,7 +139,9 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
   }
 
   override fun visit(defineFun: DefineFun) {
-    TODO("Not yet implemented")
+    // this is empty as we do not need to do any work when seeing a "defineFun"
+    // Z3 has no concept of function definitions, we replace function created via define-fun
+    // "on the fly" while converting the expression tree into z3 objects
   }
 
   override fun visit(push: Push) {
@@ -164,7 +166,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
 operator fun Model.Companion.invoke(model: Z3Model): Model {
   // TODO implement handling of uninterpreted sorts from model.sorts
 
-  val temp = mutableListOf<FunctionDef>()
+  val temp = mutableListOf<FunctionDef<*>>()
 
   temp.addAll(
       model.constDecls.map { decl ->
@@ -172,7 +174,7 @@ operator fun Model.Companion.invoke(model: Z3Model): Model {
             decl.name.toString().symbol(),
             emptyList(),
             decl.range.aquaify(),
-            model.getConstInterp(decl).aquaify())
+            model.getConstInterp(decl).aquaify() castTo decl.range.aquaify())
       })
 
   temp.addAll(
@@ -183,7 +185,7 @@ operator fun Model.Companion.invoke(model: Z3Model): Model {
               SortedVar("x$index".symbol(), sort.aquaify())
             },
             decl.range.aquaify(),
-            model.getFuncInterp(decl).`else`.aquaify())
+            model.getFuncInterp(decl).`else`.aquaify() castTo decl.range.aquaify())
       })
 
   return Model(temp)

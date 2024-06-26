@@ -68,18 +68,31 @@ internal class ParseTreeVisitor :
   override fun visit(protoDefineFun: ProtoDefineFun): DefineFun {
     val def = visit(protoDefineFun.definition)
 
-    // TODO check if fun exists in current context
-    // Expected behaviour like declare fun
+    context?.registerFunction(def)
 
     return DefineFun(def)
   }
 
-  override fun visit(protoFunctionDef: ProtoFunctionDef): FunctionDef =
-      FunctionDef(
-          protoFunctionDef.symbol,
-          protoFunctionDef.sortedVars.map { visit(it) },
-          visit(protoFunctionDef.sort),
-          visit(protoFunctionDef.term))
+  override fun visit(protoFunctionDef: ProtoFunctionDef): FunctionDef<*> {
+    val namedParameters = protoFunctionDef.sortedVars.map { visit(it) }
+
+    // add a temporary assertion level where all the named parameters are valid
+    // to construct the term
+    context?.push(1)
+    namedParameters.forEach { context?.registerFunction(it) }
+
+    val funDef =
+        FunctionDef(
+            protoFunctionDef.symbol,
+            namedParameters,
+            visit(protoFunctionDef.sort),
+            visit(protoFunctionDef.term) as Expression<Sort>)
+
+    // remove the named parameters from the assertion stack
+    context?.pop(1)
+
+    return funDef
+  }
 
   override fun visit(protoSortedVar: ProtoSortedVar): SortedVar<*> =
       SortedVar(protoSortedVar.symbol, visit(protoSortedVar.sort))
@@ -186,9 +199,8 @@ internal class ParseTreeVisitor :
   }
 
   override fun visit(numeralConstant: NumeralConstant): Expression<*> {
-    if (context?.numeralSort == IntSort) return IntLiteral(BigInteger(numeralConstant.numeral))
-    else if (context?.numeralSort == RealSort)
-        return RealLiteral(BigDecimal(numeralConstant.numeral))
+    return if (context?.numeralSort == IntSort) IntLiteral(BigInteger(numeralConstant.numeral))
+    else if (context?.numeralSort == RealSort) RealLiteral(BigDecimal(numeralConstant.numeral))
     else throw RuntimeException("Unsupported numeral literal sort ${context?.numeralSort}")
   }
 

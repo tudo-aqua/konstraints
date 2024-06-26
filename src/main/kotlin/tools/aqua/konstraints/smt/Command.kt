@@ -80,7 +80,7 @@ data class SetOption(val name: String, val value: OptionValue) : Command("set-op
 data class SetLogic(val logic: Logic) : Command("set-logic $logic")
 
 /** SMT (define-fun [functionDef]) command */
-data class DefineFun(val functionDef: FunctionDef) : Command("define-fun $functionDef") {
+data class DefineFun(val functionDef: FunctionDef<*>) : Command("define-fun $functionDef") {
   /**
    * SMT (define-fun [functionDef]) command
    *
@@ -90,7 +90,7 @@ data class DefineFun(val functionDef: FunctionDef) : Command("define-fun $functi
       name: Symbol,
       parameters: List<SortedVar<*>>,
       sort: Sort,
-      term: Expression<*>
+      term: Expression<Sort>
   ) : this(FunctionDef(name, parameters, sort, term))
 }
 
@@ -98,11 +98,11 @@ data class DefineFun(val functionDef: FunctionDef) : Command("define-fun $functi
  * Function definition object holding, [name], [parameters], [sort] and [term] of a function defined
  * via [DefineFun]
  */
-data class FunctionDef(
+data class FunctionDef<S : Sort>(
     val name: Symbol,
     val parameters: List<SortedVar<*>>,
-    val sort: Sort,
-    val term: Expression<*>
+    val sort: S,
+    val term: Expression<S>
 ) {
   override fun toString(): String = "$name (${parameters.joinToString(" ")}) $sort $term)"
 }

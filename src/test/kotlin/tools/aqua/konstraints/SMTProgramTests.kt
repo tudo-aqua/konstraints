@@ -134,8 +134,8 @@ class SMTProgramTests {
                 DeclareFun("B".symbol(), emptyList(), BVSort(8)),
                 Assert(
                     BVUlt(
-                        UserDefinedExpression("A".symbol(), BVSort(8)),
-                        UserDefinedExpression("B".symbol(), BVSort(8)))),
+                        UserDeclaredExpression("A".symbol(), BVSort(8)),
+                        UserDeclaredExpression("B".symbol(), BVSort(8)))),
                 CheckSat)))
   }
 
@@ -154,8 +154,8 @@ class SMTProgramTests {
                 SetLogic(QF_BV),
                 Assert(
                     BVUlt(
-                        UserDefinedExpression("A".symbol(), BVSort(8)),
-                        UserDefinedExpression("B".symbol(), BVSort(8)))),
+                        UserDeclaredExpression("A".symbol(), BVSort(8)),
+                        UserDeclaredExpression("B".symbol(), BVSort(8)))),
                 CheckSat)))
   }
 }

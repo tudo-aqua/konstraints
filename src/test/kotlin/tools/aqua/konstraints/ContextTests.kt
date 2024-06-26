@@ -42,9 +42,9 @@ import tools.aqua.konstraints.theories.*
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class ContextTests {
   private val context = Context(QF_BV)
-  private val boolExpression = UserDefinedExpression("A".symbol(), BoolSort)
-  private val bv32Expression = UserDefinedExpression("B".symbol(), BVSort(32))
-  private val bv16Expression = UserDefinedExpression("B".symbol(), BVSort(16))
+  private val boolExpression = UserDeclaredExpression("A".symbol(), BoolSort)
+  private val bv32Expression = UserDeclaredExpression("B".symbol(), BVSort(32))
+  private val bv16Expression = UserDeclaredExpression("B".symbol(), BVSort(16))
 
   // this function has no indices as it is not infinitary, BVSort(32) here means actually only
   // bitvectors of length 32
@@ -285,8 +285,8 @@ class ContextTests {
   fun testTransform() {
     val expr =
         Or(
-            UserDefinedExpression("A".symbol(), BoolSort),
-            UserDefinedExpression("B".symbol(), BoolSort))
+            UserDeclaredExpression("A".symbol(), BoolSort),
+            UserDeclaredExpression("B".symbol(), BoolSort))
     val transformed =
         expr.transform { expression ->
           if (expression is Or) {

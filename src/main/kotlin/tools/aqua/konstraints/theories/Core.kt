@@ -100,7 +100,7 @@ class Implies(val statements: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("=>".symbol(), BoolSort) {
   constructor(vararg statements: Expression<BoolSort>) : this(statements.toList())
 
-  override fun subexpressions(): List<Expression<BoolSort>> = statements
+  override val children: List<Expression<BoolSort>> = statements
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       ImpliesDecl.buildExpression(children, emptySet())
@@ -127,7 +127,7 @@ class And(val conjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("and".symbol(), BoolSort) {
   constructor(vararg conjuncts: Expression<BoolSort>) : this(conjuncts.toList())
 
-  override fun subexpressions(): List<Expression<BoolSort>> = conjuncts
+  override val children: List<Expression<BoolSort>> = conjuncts
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       AndDecl.buildExpression(children, emptySet())
@@ -154,7 +154,7 @@ class Or(val disjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("or".symbol(), BoolSort) {
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
 
-  override fun subexpressions(): List<Expression<BoolSort>> = disjuncts
+  override val children: List<Expression<BoolSort>> = disjuncts
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       OrDecl.buildExpression(children, emptySet())
@@ -181,7 +181,7 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("xor".symbol(), BoolSort) {
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
 
-  override fun subexpressions(): List<Expression<BoolSort>> = disjuncts
+  override val children: List<Expression<BoolSort>> = disjuncts
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       XOrDecl.buildExpression(children, emptySet())
@@ -208,7 +208,7 @@ class Equals(val statements: List<Expression<*>>) :
     HomogenousExpression<BoolSort, Sort>("=".symbol(), BoolSort) {
   constructor(vararg statements: Expression<*>) : this(statements.toList())
 
-  override fun subexpressions(): List<Expression<Sort>> = statements as List<Expression<Sort>>
+  override val children: List<Expression<Sort>> = statements as List<Expression<Sort>>
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       EqualsDecl.buildExpression(children, emptySet())
@@ -239,7 +239,7 @@ class Distinct(val statements: List<Expression<*>>) :
     HomogenousExpression<BoolSort, Sort>("distinct".symbol(), BoolSort) {
   constructor(vararg statements: Expression<*>) : this(statements.toList())
 
-  override fun subexpressions(): List<Expression<Sort>> = statements as List<Expression<Sort>>
+  override val children: List<Expression<Sort>> = statements as List<Expression<Sort>>
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       DistinctDecl.buildExpression(children, emptySet())
