@@ -210,6 +210,7 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
+      is UserDefinedExpression -> this.expand().z3ify(context) as Expr<Z3BoolSort>
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
 
@@ -420,7 +421,8 @@ fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-      else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
+      is UserDefinedExpression -> this.expand().z3ify(context) as Expr<BitVecSort>
+      else -> throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
 
 fun BVLiteral.z3ify(context: Z3Context): Expr<BitVecSort> =
@@ -510,7 +512,8 @@ fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-      else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
+        is UserDefinedExpression -> this.expand().z3ify(context) as Expr<Z3IntSort>
+      else -> throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
 
 fun IntLiteral.z3ify(context: Z3Context): Expr<Z3IntSort> =
@@ -582,7 +585,8 @@ fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-      else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
+        is UserDefinedExpression -> this.expand().z3ify(context) as Expr<Z3RealSort>
+      else -> throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
 
 fun RealLiteral.z3ify(context: Z3Context): Expr<Z3RealSort> =
@@ -650,7 +654,8 @@ fun Expression<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-      else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
+        is UserDefinedExpression -> this.expand().z3ify(context) as Expr<Z3FPSort>
+      else -> throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
 
 fun FPLiteral.z3ify(context: Z3Context): Expr<Z3FPSort> =
@@ -771,6 +776,7 @@ fun Expression<RoundingMode>.z3ify(context: Z3Context): Expr<FPRMSort> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
+        is UserDefinedExpression -> this.expand().z3ify(context) as Expr<FPRMSort>
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
 
@@ -826,6 +832,7 @@ fun Expression<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
+        is UserDefinedExpression -> this.expand().z3ify(context) as Expr<SeqSort<CharSort>>
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
 
@@ -884,6 +891,7 @@ fun Expression<RegLan>.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
+        is UserDefinedExpression -> this.expand().z3ify(context) as Expr<ReSort<SeqSort<CharSort>>>
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
 

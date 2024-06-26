@@ -139,7 +139,9 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
   }
 
   override fun visit(defineFun: DefineFun) {
-    TODO("Not yet implemented")
+    // this is empty as we do not need to do any work when seeing a "defineFun"
+    // Z3 has no concept of function definitions, we replace function created via define-fun
+    // "on the fly" while converting the expression tree into z3 objects
   }
 
   override fun visit(push: Push) {

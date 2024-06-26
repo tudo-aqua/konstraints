@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.smt
 
+import tools.aqua.konstraints.parser.FunctionDefinition
 import tools.aqua.konstraints.parser.SortedVar
 import tools.aqua.konstraints.parser.VarBinding
 import tools.aqua.konstraints.theories.BoolSort
@@ -167,8 +168,7 @@ abstract class HomogenousExpression<T : Sort, S : Sort>(
     override val sort: T
 ) : Expression<T> {
   override fun toString() =
-      if (children.isNotEmpty()) "($name ${children.joinToString(" ")})"
-      else name.toSMTString()
+      if (children.isNotEmpty()) "($name ${children.joinToString(" ")})" else name.toSMTString()
 }
 
 /**
@@ -203,8 +203,7 @@ class Ite<T : Sort>(
 abstract class NAryExpression<T : Sort>(override val name: Symbol, override val sort: T) :
     Expression<T> {
   override fun toString() =
-      if (children.isNotEmpty()) "($name ${children.joinToString(" ")})"
-      else name.toSMTString()
+      if (children.isNotEmpty()) "($name ${children.joinToString(" ")})" else name.toSMTString()
 }
 
 /** Let expression */
@@ -235,12 +234,18 @@ class UserDeclaredExpression<T : Sort>(name: Symbol, sort: T, args: List<Express
       UserDeclaredExpression(name, sort, children)
 }
 
-class UserDefinedExpression<T : Sort>(name: Symbol, sort: T, args: List<Expression<*>>, val term: Expression<*>) :
-NAryExpression<T>(name, sort){
+class UserDefinedExpression<T : Sort>(
+    name: Symbol,
+    sort: T,
+    args: List<Expression<*>>,
+    val definition: FunctionDefinition<T>
+) : NAryExpression<T>(name, sort) {
   override val children: List<Expression<*>> = args
 
   override fun copy(children: List<Expression<*>>): Expression<T> =
-          UserDefinedExpression(name, sort, children, term)
+      definition.buildExpression(children, emptySet())
+
+  fun expand(): Expression<*> = definition.expand(children)
 }
 
 /** Expression with a local variable */

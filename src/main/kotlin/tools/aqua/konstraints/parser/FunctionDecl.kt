@@ -113,13 +113,21 @@ class FunctionDefinition<S : Sort>(
         emptySet(),
         sort,
         Associativity.NONE) {
-  fun expand(args: List<Expression<*>>): Expression<*> {
+  override fun buildExpression(
+      args: List<Expression<*>>,
+      functionIndices: Set<NumeralIndex>
+  ): Expression<S> = UserDefinedExpression(name, sort, args, this)
+
+  internal fun expand(args: List<Expression<*>>): Expression<*> {
     // term is a placeholder expression using the parameters as expressions
     // we need to build the same term but replace every occurrence of a parameter with
     // the corresponding argument expression
     val bindings = (namedParams zip args)
 
     return term.transform { expr: Expression<*> ->
+      // TODO do not check name equality here,
+      // its probably better to implement some form of Decl.isInstanceOf(Expression) or
+      // Expression.isInstanceOf(Decl)
       if (expr.children.isEmpty()) {
         bindings.find { (param, _) -> param.name == expr.name }?.second ?: expr
       } else {
