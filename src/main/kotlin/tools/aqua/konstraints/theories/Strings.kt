@@ -124,7 +124,7 @@ class StrConcat(val strings: List<Expression<StringSort>>) :
     HomogenousExpression<StringSort, StringSort>("str.++".symbol(), StringSort) {
   constructor(vararg strings: Expression<StringSort>) : this(strings.toList())
 
-  override fun subexpressions(): List<Expression<StringSort>> = strings
+  override val children: List<Expression<StringSort>> = strings
 
   override fun copy(children: List<Expression<*>>): Expression<StringSort> =
       StrConcatDecl.buildExpression(children, emptySet())
@@ -170,7 +170,7 @@ class StrLexOrder(val strings: List<Expression<StringSort>>) :
     HomogenousExpression<BoolSort, StringSort>("str.<".symbol(), BoolSort) {
   constructor(vararg strings: Expression<StringSort>) : this(strings.toList())
 
-  override fun subexpressions(): List<Expression<StringSort>> = strings
+  override val children: List<Expression<StringSort>> = strings
 
   init {
     require(strings.size > 1) {
@@ -289,7 +289,7 @@ class RegexConcat(val regex: List<Expression<RegLan>>) :
     HomogenousExpression<RegLan, RegLan>("re.++".symbol(), RegLan) {
   constructor(vararg regex: Expression<RegLan>) : this(regex.toList())
 
-  override fun subexpressions(): List<Expression<RegLan>> = regex
+  override val children: List<Expression<RegLan>> = regex
 
   override fun copy(children: List<Expression<*>>): Expression<RegLan> =
       RegexConcatDecl.buildExpression(children, emptySet())
@@ -315,7 +315,7 @@ class RegexUnion(val regex: List<Expression<RegLan>>) :
     HomogenousExpression<RegLan, RegLan>("re.union".symbol(), RegLan) {
   constructor(vararg regex: Expression<RegLan>) : this(regex.toList())
 
-  override fun subexpressions(): List<Expression<RegLan>> = regex
+  override val children: List<Expression<RegLan>> = regex
 
   override fun copy(children: List<Expression<*>>): Expression<RegLan> =
       RegexUnionDecl.buildExpression(children, emptySet())
@@ -341,7 +341,7 @@ class RegexIntersec(val regex: List<Expression<RegLan>>) :
     HomogenousExpression<RegLan, RegLan>("re.inter".symbol(), RegLan) {
   constructor(vararg regex: Expression<RegLan>) : this(regex.toList())
 
-  override fun subexpressions(): List<Expression<RegLan>> = regex
+  override val children: List<Expression<RegLan>> = regex
 
   override fun copy(children: List<Expression<*>>): Expression<RegLan> =
       RegexIntersecDecl.buildExpression(children, emptySet())
@@ -389,7 +389,7 @@ class StrRefLexOrder(val strings: List<Expression<StringSort>>) :
     HomogenousExpression<BoolSort, StringSort>("str.<=".symbol(), BoolSort) {
   constructor(vararg strings: Expression<StringSort>) : this(strings.toList())
 
-  override fun subexpressions(): List<Expression<StringSort>> = strings
+  override val children: List<Expression<StringSort>> = strings
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       StrRefLexOrderDecl.buildExpression(children, emptySet())
@@ -778,7 +778,7 @@ class RegexDiff(val regex: List<Expression<RegLan>>) :
     HomogenousExpression<RegLan, RegLan>("re.diff".symbol(), RegLan) {
   constructor(vararg regex: Expression<RegLan>) : this(regex.toList())
 
-  override fun subexpressions(): List<Expression<RegLan>> = regex
+  override val children: List<Expression<RegLan>> = regex
 
   override fun copy(children: List<Expression<*>>): Expression<RegLan> =
       RegexDiffDecl.buildExpression(children, emptySet())

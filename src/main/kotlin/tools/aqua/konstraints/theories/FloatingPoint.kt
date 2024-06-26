@@ -706,7 +706,7 @@ class FPFma(
     require(multiplier.sort == summand.sort)
   }
 
-  override fun subexpressions(): List<Expression<*>> =
+  override val children: List<Expression<*>> =
       listOf(roundingMode, multiplier, multiplicand, summand)
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
@@ -915,7 +915,7 @@ class FPLeq(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.leq".symbol(), BoolSort) {
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
 
-  override fun subexpressions(): List<Expression<FPSort>> = terms
+  override val children: List<Expression<FPSort>> = terms
 
   init {
     require(terms.size > 1)
@@ -954,7 +954,7 @@ class FPLt(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.lt".symbol(), BoolSort) {
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
 
-  override fun subexpressions(): List<Expression<FPSort>> = terms
+  override val children: List<Expression<FPSort>> = terms
 
   init {
     require(terms.size > 1)
@@ -993,7 +993,7 @@ class FPGeq(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.geq".symbol(), BoolSort) {
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
 
-  override fun subexpressions(): List<Expression<FPSort>> = terms
+  override val children: List<Expression<FPSort>> = terms
 
   init {
     require(terms.size > 1)
@@ -1032,7 +1032,7 @@ class FPGt(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.gt".symbol(), BoolSort) {
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
 
-  override fun subexpressions(): List<Expression<FPSort>> = terms
+  override val children: List<Expression<FPSort>> = terms
 
   init {
     require(terms.size > 1)
@@ -1071,7 +1071,7 @@ class FPEq(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.eq".symbol(), BoolSort) {
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
 
-  override fun subexpressions(): List<Expression<FPSort>> = terms
+  override val children: List<Expression<FPSort>> = terms
 
   init {
     require(terms.size > 1)

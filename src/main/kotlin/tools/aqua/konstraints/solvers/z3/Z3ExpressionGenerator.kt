@@ -424,7 +424,7 @@ fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
     }
 
 fun BVLiteral.z3ify(context: Z3Context): Expr<BitVecSort> =
-    context.context.mkBV(this.value.toInt(), this.bits)
+    context.context.mkBV(this.value.toString(), this.bits)
 
 fun BVConcat.z3ify(context: Z3Context): Expr<BitVecSort> =
     context.context.mkConcat(this.lhs.z3ify(context), this.rhs.z3ify(context))

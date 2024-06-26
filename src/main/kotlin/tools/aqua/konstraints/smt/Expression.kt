@@ -58,14 +58,14 @@ sealed interface Expression<T : Sort> {
             predicate(this) and this.lhs.all(predicate) and this.rhs.all(predicate)
         is HomogenousExpression<*, *> ->
             predicate(this) and
-                this.subexpressions()
+                this.children
                     .map { it.all(predicate) }
                     .reduceOrDefault(true) { t1, t2 -> t1 and t2 }
         is Ite -> TODO()
         is Literal -> TODO()
         is NAryExpression ->
             predicate(this) and
-                this.subexpressions()
+                this.children
                     .map { it.all(predicate) }
                     .reduceOrDefault(true) { t1, t2 -> t1 and t2 }
         is TernaryExpression<*, *, *, *> -> TODO()
@@ -83,9 +83,8 @@ sealed interface Expression<T : Sort> {
     // check if any child was copied
     return if ((transformedChildren zip this.children).any { (new, old) -> new !== old }) {
       // return copied expression with new children
-      // val copied = this.copy(transformedChildren)
-      // transformation(copied) castTo sort
-      transformation(this) castTo sort
+      val copied = this.copy(transformedChildren)
+      transformation(copied) castTo sort
     } else {
       // transform this expression, prevent it from changing the sort
       transformation(this) castTo sort
@@ -167,13 +166,8 @@ abstract class HomogenousExpression<T : Sort, S : Sort>(
     override val name: Symbol,
     override val sort: T
 ) : Expression<T> {
-  abstract fun subexpressions(): List<Expression<S>>
-
-  override val children: List<Expression<*>>
-    get() = subexpressions()
-
   override fun toString() =
-      if (subexpressions().isNotEmpty()) "($name ${subexpressions().joinToString(" ")})"
+      if (children.isNotEmpty()) "($name ${children.joinToString(" ")})"
       else name.toSMTString()
 }
 
@@ -208,14 +202,8 @@ class Ite<T : Sort>(
 /** Base class of all expressions with any number of children */
 abstract class NAryExpression<T : Sort>(override val name: Symbol, override val sort: T) :
     Expression<T> {
-
-  abstract fun subexpressions(): List<Expression<*>>
-
-  override val children: List<Expression<*>>
-    get() = subexpressions()
-
   override fun toString() =
-      if (subexpressions().isNotEmpty()) "($name ${subexpressions().joinToString(" ")})"
+      if (children.isNotEmpty()) "($name ${children.joinToString(" ")})"
       else name.toSMTString()
 }
 
@@ -236,15 +224,23 @@ class LetExpression<T : Sort>(
   override val children: List<Expression<*>> = listOf(inner)
 }
 
-class UserDeclaredExpression<T : Sort>(name: Symbol, sort: T, val args: List<Expression<*>>) :
+class UserDeclaredExpression<T : Sort>(name: Symbol, sort: T, args: List<Expression<*>>) :
     NAryExpression<T>(name, sort) {
 
   constructor(name: Symbol, sort: T) : this(name, sort, emptyList())
 
-  override fun subexpressions(): List<Expression<*>> = args
+  override val children: List<Expression<*>> = args
 
   override fun copy(children: List<Expression<*>>): Expression<T> =
       UserDeclaredExpression(name, sort, children)
+}
+
+class UserDefinedExpression<T : Sort>(name: Symbol, sort: T, args: List<Expression<*>>, val term: Expression<*>) :
+NAryExpression<T>(name, sort){
+  override val children: List<Expression<*>> = args
+
+  override fun copy(children: List<Expression<*>>): Expression<T> =
+          UserDefinedExpression(name, sort, children, term)
 }
 
 /** Expression with a local variable */

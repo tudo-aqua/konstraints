@@ -94,7 +94,7 @@ class IntSub(val terms: List<Expression<IntSort>>) :
     }
   }
 
-  override fun subexpressions(): List<Expression<IntSort>> = terms
+  override val children: List<Expression<IntSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
       IntSubDecl.buildExpression(children, emptySet())
@@ -124,7 +124,7 @@ class IntAdd(val terms: List<Expression<IntSort>>) :
     }
   }
 
-  override fun subexpressions(): List<Expression<IntSort>> = terms
+  override val children: List<Expression<IntSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
       IntAddDecl.buildExpression(children, emptySet())
@@ -154,7 +154,7 @@ class IntMul(val factors: List<Expression<IntSort>>) :
     }
   }
 
-  override fun subexpressions(): List<Expression<IntSort>> = factors
+  override val children: List<Expression<IntSort>> = factors
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
       IntMulDecl.buildExpression(children, emptySet())
@@ -184,7 +184,7 @@ class IntDiv(val terms: List<Expression<IntSort>>) :
     }
   }
 
-  override fun subexpressions(): List<Expression<IntSort>> = terms
+  override val children: List<Expression<IntSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
       IntDivDecl.buildExpression(children, emptySet())
@@ -262,7 +262,7 @@ class IntLessEq(val terms: List<Expression<IntSort>>) :
     }
   }
 
-  override fun subexpressions(): List<Expression<IntSort>> = terms
+  override val children: List<Expression<IntSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       IntLessEqDecl.buildExpression(children, emptySet())
@@ -292,7 +292,7 @@ class IntLess(val terms: List<Expression<IntSort>>) :
     }
   }
 
-  override fun subexpressions(): List<Expression<IntSort>> = terms
+  override val children: List<Expression<IntSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       IntLessDecl.buildExpression(children, emptySet())
@@ -322,7 +322,7 @@ class IntGreaterEq(val terms: List<Expression<IntSort>>) :
     }
   }
 
-  override fun subexpressions(): List<Expression<IntSort>> = terms
+  override val children: List<Expression<IntSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       IntGreaterEqDecl.buildExpression(children, emptySet())
@@ -352,7 +352,7 @@ class IntGreater(val terms: List<Expression<IntSort>>) :
     }
   }
 
-  override fun subexpressions(): List<Expression<IntSort>> = terms
+  override val children: List<Expression<IntSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       IntGreaterDecl.buildExpression(children, emptySet())
