@@ -133,6 +133,10 @@ class Context(val logic: Logic) {
             Associativity.NONE))
   }
 
+  fun registerFunction(def: FunctionDef<*>) {
+    registerFunction(FunctionDefinition(def.name, def.parameters, def.sort, def.term))
+  }
+
   fun registerFunction(function: FunctionDecl<*>) {
     assertionLevels.forEach { level ->
       if (level.contains(function.name)) {

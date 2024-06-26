@@ -46,7 +46,7 @@ open class FunctionDecl<S : Sort>(
   ): Expression<S> {
     bindParametersToExpressions(args, functionIndices)
 
-    return UserDefinedExpression(name, sort, args)
+    return UserDeclaredExpression(name, sort, args)
   }
 
   open fun bindParametersToExpressions(args: List<Expression<*>>, indices: Set<NumeralIndex>) =
@@ -97,6 +97,44 @@ open class FunctionDecl<S : Sort>(
   override fun hashCode(): Int = name.hashCode() * 961 + params.hashCode() * 31 + sort.hashCode()
 
   override fun toString() = "($name (${params.joinToString(" ")}) $sort)"
+}
+
+class FunctionDefinition<S : Sort>(
+    name: Symbol,
+    val namedParams: List<SortedVar<*>>,
+    sort: S,
+    val term: Expression<out S>
+) :
+    FunctionDecl<S>(
+        name,
+        emptySet(),
+        namedParams.map { it.sort },
+        emptySet(),
+        emptySet(),
+        sort,
+        Associativity.NONE) {
+  override fun buildExpression(
+      args: List<Expression<*>>,
+      functionIndices: Set<NumeralIndex>
+  ): Expression<S> = UserDefinedExpression(name, sort, args, this)
+
+  internal fun expand(args: List<Expression<*>>): Expression<*> {
+    // term is a placeholder expression using the parameters as expressions
+    // we need to build the same term but replace every occurrence of a parameter with
+    // the corresponding argument expression
+    val bindings = (namedParams zip args)
+
+    return term.transform { expr: Expression<*> ->
+      // TODO do not check name equality here,
+      // its probably better to implement some form of Decl.isInstanceOf(Expression) or
+      // Expression.isInstanceOf(Decl)
+      if (expr.children.isEmpty()) {
+        bindings.find { (param, _) -> param.name == expr.name }?.second ?: expr
+      } else {
+        expr
+      }
+    }
+  }
 }
 
 abstract class FunctionDecl0<S : Sort>(

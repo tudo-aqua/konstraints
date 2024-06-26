@@ -18,7 +18,8 @@
 
 package tools.aqua.konstraints.smt
 
-/** Model class holding the data of solver return get-model */
-data class Model(val definitions: List<FunctionDef<*>>) {
-  companion object
+class ExpressionTransformer {
+  fun transform(expression: Expression<*>, transformation: (Expression<*>) -> Expression<*>) {
+    return
+  }
 }

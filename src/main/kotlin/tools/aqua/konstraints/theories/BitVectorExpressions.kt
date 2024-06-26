@@ -252,7 +252,7 @@ class BVAnd(val conjuncts: List<Expression<BVSort>>) :
     require(conjuncts.all { !it.sort.isSymbolic() })
   }
 
-  override fun subexpressions(): List<Expression<BVSort>> = conjuncts
+  override val children: List<Expression<BVSort>> = conjuncts
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
       BVAndDecl.buildExpression(children, emptySet())
@@ -292,7 +292,7 @@ class BVOr(val disjuncts: List<Expression<BVSort>>) :
    */
   constructor(vararg disjuncts: Expression<BVSort>) : this(disjuncts.toList())
 
-  override fun subexpressions(): List<Expression<BVSort>> = disjuncts
+  override val children: List<Expression<BVSort>> = disjuncts
 
   init {
     require(disjuncts.all { it.sort.bits == sort.bits }) {
@@ -349,7 +349,7 @@ class BVAdd(val summands: List<Expression<BVSort>>) :
     require(summands.all { !it.sort.isSymbolic() })
   }
 
-  override fun subexpressions(): List<Expression<BVSort>> = summands
+  override val children: List<Expression<BVSort>> = summands
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
       BVAddDecl.buildExpression(children, emptySet())
@@ -396,7 +396,7 @@ class BVMul(val factors: List<Expression<BVSort>>) :
     require(factors.all { !it.sort.isSymbolic() })
   }
 
-  override fun subexpressions(): List<Expression<BVSort>> = factors
+  override val children: List<Expression<BVSort>> = factors
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
       BVMulDecl.buildExpression(children, emptySet())

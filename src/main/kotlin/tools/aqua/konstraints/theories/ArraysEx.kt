@@ -94,7 +94,7 @@ class ArrayStore(
     require(array.sort.y == value.sort)
   }
 
-  override fun subexpressions(): List<Expression<*>> = listOf(array, index, value)
+  override val children: List<Expression<*>> = listOf(array, index, value)
 
   override fun copy(children: List<Expression<*>>): Expression<ArraySort> =
       ArrayStoreDecl.buildExpression(children, emptySet())
