@@ -75,7 +75,9 @@ fun Expr<BitVecSort>.aquaify(): Expression<BVSort> =
     if (isBVNOT) {
       BVNot(this.args[0].aquaify() as Expression<BVSort>)
     } else if (this is BitVecNum) {
-      BVLiteral("#x${this.bigInteger.toString(16)}")
+      // its important that we pass the number of bits here to ensure sort compatibility with the
+      // declared function
+      BVLiteral("#x${this.bigInteger.toString(16)}", this.sort.size)
     } else {
       throw RuntimeException("Unknown or unsupported bitvec expression $this")
     }

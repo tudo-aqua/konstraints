@@ -56,23 +56,33 @@ object BVSortDecl : SortDecl<BVSort>("BitVec".symbol(), emptySet(), setOf("m".id
  * - All binaries #bX of sort (_ BitVec m) where m is the number of digits in X or
  * - All hexadecimals #xX of sort (_ BitVec m) where m is 4 times the number of digits in X.
  */
-class BVLiteral(vector: String) : Literal<BVSort>(LiteralString(vector), BVSort(1)) {
-  val value: BigInteger
-  val bits: Int
-  val isBinary: Boolean
+class BVLiteral
+private constructor(vector: String, val bits: Int, val isBinary: Boolean, val value: BigInteger) :
+    Literal<BVSort>(LiteralString(vector), BVSort(bits)) {
+  companion object {
+    operator fun invoke(vector: String): BVLiteral =
+        if (vector[1] == 'b') {
+          BVLiteral(vector, vector.length - 2)
+        } else if (vector[1] == 'x') {
+          BVLiteral(vector, (vector.length - 2) * 4)
+        } else {
+          throw IllegalArgumentException("$vector is not a valid bitvector literal.")
+        }
 
-  init {
-    if (vector[1] == 'b') {
-      bits = vector.length - 2
-      isBinary = true
-      value = vector.substring(2).toBigInteger(2)
-    } else if (vector[1] == 'x') {
-      bits = (vector.length - 2) * 4
-      isBinary = false
-      value = vector.substring(2).toBigInteger(16)
-    } else {
-      throw IllegalArgumentException("$vector is not a valid bitvector literal.")
-    }
+    operator fun invoke(vector: String, bits: Int) =
+        if (vector[1] == 'b') {
+          require(vector.length - 2 <= bits) {
+            "BitVec literal $vector can not fit into request number of $bits bits"
+          }
+          BVLiteral(vector, vector.length - 2, true, vector.substring(2).toBigInteger(2))
+        } else if (vector[1] == 'x') {
+          require((vector.length - 2) * 4 <= bits) {
+            "BitVec literal $vector can not fit into request number of $bits bits"
+          }
+          BVLiteral(vector, (vector.length - 2) * 4, false, vector.substring(2).toBigInteger(16))
+        } else {
+          throw IllegalArgumentException("$vector is not a valid bitvector literal.")
+        }
   }
 
   override val sort = BVSort(bits)
