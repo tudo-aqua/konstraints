@@ -333,6 +333,35 @@ class Z3Tests {
   }
 
   @ParameterizedTest
+  @MethodSource("getQFUFFile")
+  @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  fun QF_UF(file: File) {
+    val solver = Z3Solver()
+    val temp = file.bufferedReader().readLines()
+    val result = Parser.parse(temp.joinToString(""))
+
+    solver.use {
+      result.commands.map { solver.visit(it) }
+
+      // verify we get the correct status for the test
+      assertEquals(
+          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
+              .symbol
+              .toString(),
+          solver.status.toString())
+    }
+  }
+
+  fun getQFUFFile(): Stream<Arguments> {
+    val dir = File(javaClass.getResource("/QF_UF/2018-Goel-hwbench").file)
+
+    return dir.walk()
+        .filter { file: File -> file.isFile }
+        .map { file: File -> Arguments.arguments(file) }
+        .asStream()
+  }
+
+  @ParameterizedTest
   @MethodSource("getQFFPFile")
   @Timeout(value = 6000, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_FP(file: File) {

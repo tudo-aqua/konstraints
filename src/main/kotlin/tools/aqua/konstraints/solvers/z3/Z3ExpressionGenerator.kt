@@ -512,7 +512,7 @@ fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-        is UserDefinedExpression -> this.expand().z3ify(context) as Expr<Z3IntSort>
+      is UserDefinedExpression -> this.expand().z3ify(context) as Expr<Z3IntSort>
       else -> throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
 
@@ -585,7 +585,7 @@ fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-        is UserDefinedExpression -> this.expand().z3ify(context) as Expr<Z3RealSort>
+      is UserDefinedExpression -> this.expand().z3ify(context) as Expr<Z3RealSort>
       else -> throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
 
@@ -654,7 +654,7 @@ fun Expression<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-        is UserDefinedExpression -> this.expand().z3ify(context) as Expr<Z3FPSort>
+      is UserDefinedExpression -> this.expand().z3ify(context) as Expr<Z3FPSort>
       else -> throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
 
@@ -776,7 +776,7 @@ fun Expression<RoundingMode>.z3ify(context: Z3Context): Expr<FPRMSort> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-        is UserDefinedExpression -> this.expand().z3ify(context) as Expr<FPRMSort>
+      is UserDefinedExpression -> this.expand().z3ify(context) as Expr<FPRMSort>
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
 
@@ -832,7 +832,7 @@ fun Expression<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-        is UserDefinedExpression -> this.expand().z3ify(context) as Expr<SeqSort<CharSort>>
+      is UserDefinedExpression -> this.expand().z3ify(context) as Expr<SeqSort<CharSort>>
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
 
@@ -891,7 +891,7 @@ fun Expression<RegLan>.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-        is UserDefinedExpression -> this.expand().z3ify(context) as Expr<ReSort<SeqSort<CharSort>>>
+      is UserDefinedExpression -> this.expand().z3ify(context) as Expr<ReSort<SeqSort<CharSort>>>
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
 
@@ -969,12 +969,17 @@ fun ArrayStore.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>> =
         this.value.z3ify(context) as Expr<Z3Sort>)
 
 fun Expression<UserDefinedSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
-    if (context.constants[this.name.toString()] != null) {
-      context.constants[this.name.toString()]!! as Expr<UninterpretedSort>
-    } else if (context.functions[this.name.toString()] != null) {
-      TODO("Implement free function symbols")
-    } else {
-      throw IllegalArgumentException("Z3 can not visit expression $this!")
+    when (this) {
+      is Ite -> this.z3ify(context)
+      else ->
+          if (context.constants[this.name.toString()] != null) {
+            context.constants[this.name.toString()]!! as Expr<UninterpretedSort>
+          } else if (context.functions[this.name.toString()] != null) {
+            context.functions[this.name.toString()]!!.apply(
+                *this.children.map { it.z3ify(context) }.toTypedArray()) as Expr<UninterpretedSort>
+          } else {
+            throw IllegalArgumentException("Z3 can not visit expression $this!")
+          }
     }
 
 /*

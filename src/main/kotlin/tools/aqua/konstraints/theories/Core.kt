@@ -259,7 +259,7 @@ object DistinctDecl :
       args: List<Expression<*>>,
       functionIndices: Set<NumeralIndex>
   ): Expression<BoolSort> {
-    val bindings = signature.bindParameters(args.map { it.sort }, functionIndices)
+    val bindings = signature.bindParameters(args.map { it.sort }.slice(0..1), functionIndices)
 
     return buildExpression(args as List<Expression<Sort>>, bindings)
   }
