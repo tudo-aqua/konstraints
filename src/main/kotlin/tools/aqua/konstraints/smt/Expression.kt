@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.smt
 
+import tools.aqua.konstraints.parser.Attribute
 import tools.aqua.konstraints.parser.FunctionDefinition
 import tools.aqua.konstraints.parser.SortedVar
 import tools.aqua.konstraints.parser.VarBinding
@@ -75,6 +76,7 @@ sealed interface Expression<T : Sort> {
         is BoundVariable -> TODO()
         is ExistsExpression -> TODO()
         is ForallExpression -> TODO()
+        is AnnotatedExpression -> predicate(this) and this.term.all(predicate)
       }
 
   fun transform(transformation: (Expression<*>) -> Expression<*>): Expression<T> {
@@ -293,6 +295,20 @@ class BoundVariable<T : Sort>(override val name: Symbol, override val sort: T) :
   override val children: List<Expression<*>> = emptyList()
 
   override fun copy(children: List<Expression<*>>): Expression<T> = BoundVariable(name, sort)
+}
+
+class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: List<Attribute>) :
+    Expression<T> {
+  override val name = Keyword("!")
+  override val sort = term.sort
+
+  override fun copy(children: List<Expression<*>>): Expression<T> {
+    require(children.size == 1)
+
+    return AnnotatedExpression(children.single() castTo sort, annoations)
+  }
+
+  override val children: List<Expression<*>> = listOf(term)
 }
 
 class ExpressionCastException(from: Sort, to: String) :

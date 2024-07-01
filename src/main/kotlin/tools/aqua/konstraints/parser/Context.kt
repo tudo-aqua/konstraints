@@ -229,15 +229,14 @@ class Context(val logic: Logic) {
  * assertion levels, as well as theory objects)
  */
 interface Subcontext {
-  fun contains(function: FunctionDecl<*>) = functions.contains(function)
+  fun contains(function: FunctionDecl<*>) = functions.contains(function.name.toString())
 
   fun contains(function: String, args: List<Expression<*>>) = get(function, args) != null
 
-  fun contains(function: Symbol) =
-      functions.find { it.name.toString() == function.toString() } != null
+  fun contains(function: Symbol) = functions.contains(function.toString())
 
   fun get(function: String, args: List<Expression<*>>) =
-      functions.find { it.name.toString() == function && it.acceptsExpressions(args, emptySet()) }
+      functions[function]?.takeIf { it.acceptsExpressions(args, emptySet()) }
 
   fun contains(sort: SortDecl<*>) = sorts.containsKey(sort.name.toString())
 
@@ -249,17 +248,18 @@ interface Subcontext {
 
   fun add(sort: SortDecl<*>): SortDecl<*>?
 
-  val functions: List<FunctionDecl<*>>
+  val functions: Map<String, FunctionDecl<*>>
   val sorts: Map<String, SortDecl<*>>
 }
 
 /** Represents a single assertion level */
 class AssertionLevel : Subcontext {
-  override fun add(function: FunctionDecl<*>) = functions.add(function)
+  override fun add(function: FunctionDecl<*>) =
+      functions.put(function.name.toString(), function) != null
 
   override fun add(sort: SortDecl<*>) = sorts.put(sort.name.toString(), sort)
 
-  override val functions: MutableList<FunctionDecl<*>> = mutableListOf()
+  override val functions: MutableMap<String, FunctionDecl<*>> = mutableMapOf()
   override val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf()
 }
 
@@ -278,7 +278,8 @@ class LetLevel(varBindings: List<VarBinding<*>>) : Subcontext {
       throw IllegalOperationException(
           "LetLevel.add", "Can not add new sorts to let assertion level")
 
-  override val functions: List<FunctionDecl<*>> = varBindings
+  override val functions: Map<String, FunctionDecl<*>> =
+      varBindings.associateBy { it.name.toString() }
   override val sorts: Map<String, SortDecl<*>> = emptyMap()
 }
 
@@ -298,7 +299,8 @@ class LocalLevel(localVars: List<SortedVar<*>>) : Subcontext {
       throw IllegalOperationException(
           "LocalLevel.add", "Can not add new sorts to local assertion level")
 
-  override val functions: List<FunctionDecl<*>> = localVars
+  override val functions: Map<String, FunctionDecl<*>> =
+      localVars.associateBy { it.name.toString() }
   override val sorts: Map<String, SortDecl<*>> = emptyMap()
 }
 
@@ -309,7 +311,7 @@ interface Theory : Subcontext {
   override fun add(sort: SortDecl<*>) =
       throw IllegalOperationException("Theory.add", "Can not add new sorts to SMT theories")
 
-  override val functions: List<FunctionDecl<*>>
+  override val functions: Map<String, FunctionDecl<*>>
   override val sorts: Map<String, SortDecl<*>>
 }
 

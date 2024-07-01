@@ -187,7 +187,9 @@ internal class ParseTreeVisitor :
   }
 
   override fun visit(protoAnnotation: ProtoAnnotation): Expression<*> {
-    TODO("Implement visit ProtoAnnotation")
+    val term = visit(protoAnnotation.term)
+
+    return AnnotatedExpression(term, protoAnnotation.attributes)
   }
 
   override fun visit(protoSort: ProtoSort): Sort {

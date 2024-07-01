@@ -25,7 +25,8 @@ import tools.aqua.konstraints.smt.SortParameter
 
 /** Array extension theory object */
 object ArrayExTheory : Theory {
-  override val functions: List<FunctionDecl<*>> = listOf(ArraySelectDecl, ArrayStoreDecl)
+  override val functions: Map<String, FunctionDecl<*>> =
+      listOf(ArraySelectDecl, ArrayStoreDecl).associateBy { it.name.toString() }
 
   override val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf(Pair("Array", ArraySortDecl))
 }

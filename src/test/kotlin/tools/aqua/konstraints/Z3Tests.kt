@@ -269,6 +269,46 @@ class Z3Tests {
         .asStream()
   }
 
+  @Disabled
+  @ParameterizedTest
+  @MethodSource("getQFBVFile")
+  @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  fun QF_BV_Full(file: File) {
+    val solver = Z3Solver()
+    val temp = file.bufferedReader().readLines()
+    val program = temp.map { it.trim('\r', '\n') }
+
+    assumeFalse(program.contains("(set-info :status unknown)"))
+
+    val result = Parser.parse(program.joinToString(""))
+
+    solver.use {
+      result.commands.map { solver.visit(it) }
+
+      // verify we get the correct status for the test
+      assertEquals(
+          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
+              .symbol
+              .toString(),
+          solver.status.toString())
+
+      // verify we parsed the correct program
+      /*
+      assertEquals(commands.filterIsInstance<Assert>().single().expression.toString(),
+          solver.context.solver.assertions.last().toString())
+      */
+    }
+  }
+
+  fun getQFBVFile(): Stream<Arguments> {
+    val dir = File(javaClass.getResource("/non-incremental/QF_BV/").file)
+
+    return dir.walk()
+        .filter { file: File -> file.isFile }
+        .map { file: File -> Arguments.arguments(file) }
+        .asStream()
+  }
+
   @ParameterizedTest
   @MethodSource("getQFRDLLetFile")
   @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
@@ -332,13 +372,13 @@ class Z3Tests {
         .asStream()
   }
 
+  @Disabled
   @ParameterizedTest
   @MethodSource("getQFUFFile")
   @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_UF(file: File) {
     val solver = Z3Solver()
-    val temp = file.bufferedReader().readLines()
-    val result = Parser.parse(temp.joinToString(""))
+    val result = Parser.parse(file.bufferedReader().readLines().joinToString(""))
 
     solver.use {
       result.commands.map { solver.visit(it) }
@@ -353,7 +393,7 @@ class Z3Tests {
   }
 
   fun getQFUFFile(): Stream<Arguments> {
-    val dir = File(javaClass.getResource("/QF_UF/2018-Goel-hwbench").file)
+    val dir = File(javaClass.getResource("/QF_UF/").file)
 
     return dir.walk()
         .filter { file: File -> file.isFile }

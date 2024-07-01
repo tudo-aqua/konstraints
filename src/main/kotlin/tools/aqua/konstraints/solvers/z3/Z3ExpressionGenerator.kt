@@ -71,6 +71,11 @@ fun Expression<*>.z3ify(context: Z3Context): Expr<*> {
     return this.z3ify(context)
   }
 
+  // Z3 ignores annotations
+  if (this is AnnotatedExpression) {
+    return this.term.z3ify(context)
+  }
+
   return when (this.sort) {
     is BoolSort -> (this castTo BoolSort).z3ify(context)
     is BVSort -> (this as Expression<BVSort>).z3ify(context)
@@ -163,6 +168,9 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
             )
           }
       is BoundVariable -> context.boundVariable(this.name, this.sort.z3ify(context))
+      // annotations are usually handled by the most generic z3ify function
+      // this is only needed in case the first term in an assert is annotated
+      is AnnotatedExpression -> this.term.z3ify(context)
       is Ite -> this.z3ify(context)
       is True -> this.z3ify(context)
       is False -> this.z3ify(context)
@@ -971,6 +979,11 @@ fun ArrayStore.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>> =
 fun Expression<UserDefinedSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
     when (this) {
       is Ite -> this.z3ify(context)
+      is LocalExpression ->
+          context.localVariable(this.name, this.sort.z3ify(context)) as Expr<UninterpretedSort>
+      is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
+      is BoundVariable ->
+          context.boundVariable(this.name, this.sort.z3ify(context)) as Expr<UninterpretedSort>
       else ->
           if (context.constants[this.name.toString()] != null) {
             context.constants[this.name.toString()]!! as Expr<UninterpretedSort>
@@ -996,8 +1009,9 @@ fun Sort.z3ify(context: Z3Context): Z3Sort =
       is RoundingMode -> this.z3ify(context)
       is StringSort -> this.z3ify(context)
       is RegLan -> this.z3ify(context)
-      // unknown sorts and user defined sorts
-      else -> TODO()
+      is UserDefinedSort -> this.z3ify(context)
+      // unknown sorts
+      else -> throw IllegalStateException("Unknown or unsupported sort $this")
     }
 
 fun BoolSort.z3ify(context: Z3Context): Z3BoolSort = context.context.mkBoolSort()
@@ -1018,3 +1032,6 @@ fun StringSort.z3ify(context: Z3Context): SeqSort<CharSort> =
 
 fun RegLan.z3ify(context: Z3Context): ReSort<SeqSort<CharSort>> =
     context.context.mkReSort(context.context.mkSeqSort(context.context.mkCharSort()))
+
+fun UserDefinedSort.z3ify(context: Z3Context): UninterpretedSort =
+    context.context.mkUninterpretedSort(this.name.toSMTString())

@@ -27,15 +27,16 @@ import tools.aqua.konstraints.smt.*
 object RealsTheory : Theory {
   override val functions =
       listOf(
-          RealNegDecl,
-          RealSubDecl,
-          RealAddDecl,
-          RealMulDecl,
-          RealDivDecl,
-          RealLessEqDecl,
-          RealLessDecl,
-          RealGreaterEqDecl,
-          RealGreaterDecl)
+              RealNegDecl,
+              RealSubDecl,
+              RealAddDecl,
+              RealMulDecl,
+              RealDivDecl,
+              RealLessEqDecl,
+              RealLessDecl,
+              RealGreaterEqDecl,
+              RealGreaterDecl)
+          .associateBy { it.name.toString() }
 
   override val sorts: Map<String, SortDecl<*>> = mapOf(Pair("Real", RealSortDecl))
 }

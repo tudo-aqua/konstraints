@@ -26,19 +26,20 @@ import tools.aqua.konstraints.smt.*
 object BitVectorExpressionTheory : Theory {
   override val functions =
       listOf(
-          BVUltDecl,
-          BVConcatDecl,
-          BVAndDecl,
-          BVNegDecl,
-          BVNotDecl,
-          BVOrDecl,
-          BVAddDecl,
-          BVMulDecl,
-          BVUDivDecl,
-          BVURemDecl,
-          BVShlDecl,
-          BVLShrDecl,
-          ExtractDecl)
+              BVUltDecl,
+              BVConcatDecl,
+              BVAndDecl,
+              BVNegDecl,
+              BVNotDecl,
+              BVOrDecl,
+              BVAddDecl,
+              BVMulDecl,
+              BVUDivDecl,
+              BVURemDecl,
+              BVShlDecl,
+              BVLShrDecl,
+              ExtractDecl)
+          .associateBy { it.name.toString() }
   override val sorts = mapOf(Pair("BitVec", BVSortDecl))
 }
 
@@ -74,12 +75,12 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
           require(vector.length - 2 <= bits) {
             "BitVec literal $vector can not fit into request number of $bits bits"
           }
-          BVLiteral(vector, vector.length - 2, true, vector.substring(2).toBigInteger(2))
+          BVLiteral(vector, bits, true, vector.substring(2).toBigInteger(2))
         } else if (vector[1] == 'x') {
           require((vector.length - 2) * 4 <= bits) {
             "BitVec literal $vector can not fit into request number of $bits bits"
           }
-          BVLiteral(vector, (vector.length - 2) * 4, false, vector.substring(2).toBigInteger(16))
+          BVLiteral(vector, bits, false, vector.substring(2).toBigInteger(16))
         } else {
           throw IllegalArgumentException("$vector is not a valid bitvector literal.")
         }

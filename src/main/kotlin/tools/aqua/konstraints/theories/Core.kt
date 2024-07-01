@@ -31,16 +31,17 @@ import tools.aqua.konstraints.smt.SortParameter
 object CoreTheory : Theory {
   override val functions =
       listOf(
-          FalseDecl,
-          TrueDecl,
-          NotDecl,
-          AndDecl,
-          OrDecl,
-          XOrDecl,
-          EqualsDecl,
-          DistinctDecl,
-          IteDecl,
-          ImpliesDecl)
+              FalseDecl,
+              TrueDecl,
+              NotDecl,
+              AndDecl,
+              OrDecl,
+              XOrDecl,
+              EqualsDecl,
+              DistinctDecl,
+              IteDecl,
+              ImpliesDecl)
+          .associateBy { it.name.toString() }
   override val sorts = mapOf(Pair("Bool", BoolSortDecl))
 }
 

@@ -26,18 +26,19 @@ import tools.aqua.konstraints.smt.*
 object IntsTheory : Theory {
   override val functions =
       listOf(
-          IntNegDecl,
-          IntSubDecl,
-          IntAddDecl,
-          IntMulDecl,
-          IntDivDecl,
-          ModDecl,
-          AbsDecl,
-          IntLessEqDecl,
-          IntLessDecl,
-          IntGreaterEqDecl,
-          IntGreaterDecl,
-          DivisibleDecl)
+              IntNegDecl,
+              IntSubDecl,
+              IntAddDecl,
+              IntMulDecl,
+              IntDivDecl,
+              ModDecl,
+              AbsDecl,
+              IntLessEqDecl,
+              IntLessDecl,
+              IntGreaterEqDecl,
+              IntGreaterDecl,
+              DivisibleDecl)
+          .associateBy { it.name.toString() }
 
   override val sorts: Map<String, SortDecl<*>> = mapOf(Pair("Int", IntSortDecl))
 }
