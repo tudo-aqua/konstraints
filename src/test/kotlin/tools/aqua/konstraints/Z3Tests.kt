@@ -23,7 +23,6 @@ import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
 import kotlin.streams.asStream
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assumptions.assumeFalse
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.TestInstance
@@ -42,6 +41,34 @@ import tools.aqua.konstraints.solvers.z3.Z3Solver
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Z3Tests {
+
+  private fun loadResource(path: String) =
+      File(javaClass.getResource(path)!!.file)
+          .walk()
+          .filter { file: File -> file.isFile }
+          .map { file: File -> Arguments.arguments(file) }
+          .asStream()
+
+  private fun solve(file: File) {
+    val solver = Z3Solver()
+    val result = Parser.parse(file.bufferedReader().readLines().joinToString(""))
+
+    assumeTrue(
+        (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
+            .symbol
+            .toString() != "unknown")
+
+    solver.use {
+      result.commands.map { solver.visit(it) }
+
+      // verify we get the correct status for the test
+      assertEquals(
+          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
+              .symbol
+              .toString(),
+          solver.status.toString())
+    }
+  }
 
   @ParameterizedTest
   @MethodSource("getInts")
@@ -118,467 +145,76 @@ class Z3Tests {
   @ParameterizedTest
   @MethodSource("getQFIDLFile")
   @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-  fun QF_IDL(file: File) {
-    val parseTreeVisitor = ParseTreeVisitor()
-    val solver = Z3Solver()
-    val temp = file.bufferedReader().readLines()
-    val program = temp.map { it.trim('\r', '\n') }
+  fun QF_IDL(file: File) = solve(file)
 
-    val satStatus =
-        if (program.find { it.contains("unsat") } != null) {
-          "unsat"
-        } else if (program.find { it.contains("unknown") } != null) {
-          return
-        } else {
-          "sat"
-        }
-
-    println("Expected result is $satStatus")
-
-    val result = Parser.script.parse(program.joinToString(""))
-
-    if (result.isSuccess) {
-      val commands =
-          result
-              .get<List<Any>>()
-              .filter { it is ProtoCommand || it is Command }
-              .map { if (it is ProtoCommand) parseTreeVisitor.visit(it) else it } as List<Command>
-
-      println(commands.joinToString("\n"))
-
-      solver.use {
-        commands.map { solver.visit(it) }
-
-        // verify we get the correct status for the test
-        assertEquals(satStatus, solver.status.toString())
-
-        // verify we parsed the correct program
-        /*
-        assertEquals(commands.filterIsInstance<Assert>().single().expression.toString(),
-            solver.context.solver.assertions.last().toString())
-        */
-      }
-    } else {
-      throw ParseError(result.failure(result.message))
-    }
-  }
-
-  fun getQFIDLFile(): Stream<Arguments> {
-    val dir = File(javaClass.getResource("/QF_IDL/20210312-Bouvier/").file)
-
-    return dir.walk()
-        .filter { file: File -> file.isFile }
-        .map { file: File -> Arguments.arguments(file) }
-        .asStream()
-  }
+  fun getQFIDLFile(): Stream<Arguments> = loadResource("/QF_IDL/20210312-Bouvier/")
 
   @ParameterizedTest
   @MethodSource("getQFIDLLetFile")
   @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-  fun QF_IDL_Let(file: File) {
+  fun QF_IDL_Let(file: File) = solve(file)
 
-    val parseTreeVisitor = ParseTreeVisitor()
-    val solver = Z3Solver()
-    val temp = file.bufferedReader().readLines()
-    val program = temp.map { it.trim('\r', '\n') }
-
-    val satStatus =
-        if (program.find { it.contains("unsat") } != null) {
-          "unsat"
-        } else if (program.find { it.contains("unknown") } != null) {
-          return
-        } else {
-          "sat"
-        }
-
-    println("Expected result is $satStatus")
-
-    val result = Parser.script.parse(program.joinToString(""))
-
-    if (result.isSuccess) {
-      val commands =
-          result
-              .get<List<Any>>()
-              .filter { it is ProtoCommand || it is Command }
-              .map { if (it is ProtoCommand) parseTreeVisitor.visit(it) else it } as List<Command>
-
-      println(commands.joinToString("\n"))
-
-      solver.use {
-        commands.map { solver.visit(it) }
-
-        // verify we get the correct status for the test
-        assertEquals(satStatus, solver.status.toString())
-
-        // verify we parsed the correct program
-        /*
-        assertEquals(commands.filterIsInstance<Assert>().single().expression.toString(),
-            solver.context.solver.assertions.last().toString())
-        */
-      }
-    } else {
-      throw ParseError(result.failure(result.message))
-    }
-  }
-
-  fun getQFIDLLetFile(): Stream<Arguments> {
-    val dir = File(javaClass.getResource("/QF_IDL/Averest/binary_search").file)
-
-    return dir.walk()
-        .filter { file: File -> file.isFile }
-        .map { file: File -> Arguments.arguments(file) }
-        .asStream()
-  }
+  fun getQFIDLLetFile(): Stream<Arguments> = loadResource("/QF_IDL/Averest/binary_search")
 
   @ParameterizedTest
   @MethodSource("getQFRDLFile")
   @Timeout(value = 20, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-  fun QF_RDL(file: File) {
-    val solver = Z3Solver()
-    val temp = file.bufferedReader().readLines()
-    val program = temp.map { it.trim('\r', '\n') }
+  fun QF_RDL(file: File) = solve(file)
 
-    assumeFalse(program.contains("(set-info :status unknown)"))
-
-    val result = Parser.parse(program.joinToString(""))
-
-    solver.use {
-      result.commands.map { solver.visit(it) }
-
-      // verify we get the correct status for the test
-      assertEquals(
-          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-              .symbol
-              .toString(),
-          solver.status.toString())
-
-      // verify we parsed the correct program
-      /*
-      assertEquals(commands.filterIsInstance<Assert>().single().expression.toString(),
-          solver.context.solver.assertions.last().toString())
-      */
-    }
-  }
-
-  fun getQFRDLFile(): Stream<Arguments> {
-    val dir = File(javaClass.getResource("/QF_RDL/scheduling/").file)
-
-    return dir.walk()
-        .filter { file: File -> file.isFile }
-        .map { file: File -> Arguments.arguments(file) }
-        .asStream()
-  }
+  fun getQFRDLFile(): Stream<Arguments> = loadResource("/QF_RDL/scheduling/")
 
   @Disabled
   @ParameterizedTest
   @MethodSource("getQFBVFile")
   @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-  fun QF_BV_Full(file: File) {
-    val solver = Z3Solver()
-    val temp = file.bufferedReader().readLines()
-    val program = temp.map { it.trim('\r', '\n') }
+  fun QF_BV_Full(file: File) = solve(file)
 
-    assumeFalse(program.contains("(set-info :status unknown)"))
+  fun getQFBVFile(): Stream<Arguments> = loadResource("/non-incremental/QF_BV/")
 
-    val result = Parser.parse(program.joinToString(""))
-
-    solver.use {
-      result.commands.map { solver.visit(it) }
-
-      // verify we get the correct status for the test
-      assertEquals(
-          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-              .symbol
-              .toString(),
-          solver.status.toString())
-
-      // verify we parsed the correct program
-      /*
-      assertEquals(commands.filterIsInstance<Assert>().single().expression.toString(),
-          solver.context.solver.assertions.last().toString())
-      */
-    }
-  }
-
-  fun getQFBVFile(): Stream<Arguments> {
-    val dir = File(javaClass.getResource("/non-incremental/QF_BV/").file)
-
-    return dir.walk()
-        .filter { file: File -> file.isFile }
-        .map { file: File -> Arguments.arguments(file) }
-        .asStream()
-  }
-
+  /* these tests take too long ignore for now */
+  @Disabled
   @ParameterizedTest
   @MethodSource("getQFRDLLetFile")
   @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-  fun QF_RDL_Let(file: File) {
-    /* these tests take too long ignore for now */
-    assumeTrue(false)
+  fun QF_RDL_Let(file: File) = solve(file)
 
-    val parseTreeVisitor = ParseTreeVisitor()
-    val solver = Z3Solver()
-    val temp = file.bufferedReader().readLines()
-    val program = temp.map { it.trim('\r', '\n') }
-
-    val satStatus =
-        if (program.find { it.contains("unsat") } != null) {
-          "unsat"
-        } else if (program.find { it.contains("unknown") } != null) {
-          "unknown"
-        } else {
-          "sat"
-        }
-
-    /* ignore the test if assumption fails, ignores all unknown tests */
-    assumeTrue(satStatus != "unknown")
-
-    println("Expected result is $satStatus")
-
-    val result = Parser.script.parse(program.joinToString(""))
-
-    if (result.isSuccess) {
-      val commands =
-          result
-              .get<List<Any>>()
-              .filter { it is ProtoCommand || it is Command }
-              .map { if (it is ProtoCommand) parseTreeVisitor.visit(it) else it } as List<Command>
-
-      println(commands.joinToString("\n"))
-
-      solver.use {
-        commands.map { solver.visit(it) }
-
-        // verify we get the correct status for the test
-        assertEquals(satStatus, solver.status.toString())
-
-        // verify we parsed the correct program
-        /*
-        assertEquals(commands.filterIsInstance<Assert>().single().expression.toString(),
-            solver.context.solver.assertions.last().toString())
-        */
-      }
-    } else {
-      throw ParseError(result.failure(result.message))
-    }
-  }
-
-  fun getQFRDLLetFile(): Stream<Arguments> {
-    val dir = File(javaClass.getResource("/QF_RDL/sal/").file)
-
-    return dir.walk()
-        .filter { file: File -> file.isFile }
-        .map { file: File -> Arguments.arguments(file) }
-        .asStream()
-  }
+  fun getQFRDLLetFile(): Stream<Arguments> = loadResource("/QF_RDL/sal/")
 
   @Disabled
   @ParameterizedTest
   @MethodSource("getQFUFFile")
-  @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-  fun QF_UF(file: File) {
-    val solver = Z3Solver()
-    val result = Parser.parse(file.bufferedReader().readLines().joinToString(""))
+  @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  fun QF_UF(file: File) = solve(file)
 
-    solver.use {
-      result.commands.map { solver.visit(it) }
-
-      // verify we get the correct status for the test
-      assertEquals(
-          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-              .symbol
-              .toString(),
-          solver.status.toString())
-    }
-  }
-
-  fun getQFUFFile(): Stream<Arguments> {
-    val dir = File(javaClass.getResource("/QF_UF/").file)
-
-    return dir.walk()
-        .filter { file: File -> file.isFile }
-        .map { file: File -> Arguments.arguments(file) }
-        .asStream()
-  }
+  fun getQFUFFile(): Stream<Arguments> = loadResource("/QF_UF/")
 
   @ParameterizedTest
   @MethodSource("getQFFPFile")
   @Timeout(value = 6000, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-  fun QF_FP(file: File) {
-    val solver = Z3Solver()
-    val temp = file.bufferedReader().readLines()
-    val result = Parser.parse(temp.joinToString(""))
+  fun QF_FP(file: File) = solve(file)
 
-    solver.use {
-      result.commands.map { solver.visit(it) }
-
-      // verify we get the correct status for the test
-      assertEquals(
-          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-              .symbol
-              .toString(),
-          solver.status.toString())
-    }
-  }
-
-  fun getQFFPFile(): Stream<Arguments> {
-    val dir = File(javaClass.getResource("/QF_FP/").file)
-
-    return dir.walk()
-        .filter { file: File -> file.isFile }
-        .map { file: File -> Arguments.arguments(file) }
-        .asStream()
-  }
+  fun getQFFPFile(): Stream<Arguments> = loadResource("/QF_FP/")
 
   @ParameterizedTest
   @MethodSource("getQFAXFile")
   @Timeout(value = 20, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-  fun QF_AX(file: File) {
-    val solver = Z3Solver()
-    val temp = file.bufferedReader().readLines()
-    val program = temp.map { it.trim('\r', '\n') }
+  fun QF_AX(file: File) = solve(file)
 
-    val satStatus =
-        if (program.find { it.contains("unsat") } != null) {
-          "unsat"
-        } else if (program.find { it.contains("unknown") } != null) {
-          "unknown"
-        } else {
-          "sat"
-        }
-
-    /* ignore the test if assumption fails, ignores all unknown tests */
-    assumeTrue(satStatus != "unknown")
-
-    println("Expected result is $satStatus")
-
-    /* filter comments for now until they are handled by the parser */
-    val result = Parser.parse(program.filter { !it.startsWith(';') }.joinToString(""))
-
-    println(result.commands.joinToString("\n"))
-
-    solver.use {
-      result.commands.map { solver.visit(it) }
-
-      // verify we get the correct status for the test
-      assertEquals(satStatus, solver.status.toString())
-
-      // verify we parsed the correct program
-      /*
-      assertEquals(commands.filterIsInstance<Assert>().single().expression.toString(),
-          solver.context.solver.assertions.last().toString())
-      */
-    }
-  }
-
-  fun getQFAXFile(): Stream<Arguments> {
-    val dir = File(javaClass.getResource("/QF_AX/aqua/").file)
-
-    return dir.walk()
-        .filter { file: File -> file.isFile }
-        .map { file: File -> Arguments.arguments(file) }
-        .asStream()
-  }
+  fun getQFAXFile(): Stream<Arguments> = loadResource("/QF_AX/aqua/")
 
   @ParameterizedTest
   @MethodSource("getQFIDLModelsFile")
   @Timeout(value = 20, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-  fun QF_IDL_Models(file: File) {
-    val solver = Z3Solver()
-    val temp = file.bufferedReader().readLines()
-    val program = temp.map { it.trim('\r', '\n') }
+  fun QF_IDL_Models(file: File) = solve(file)
 
-    val satStatus =
-        if (program.find { it.contains("unsat") } != null) {
-          "unsat"
-        } else if (program.find { it.contains("unknown") } != null) {
-          "unknown"
-        } else {
-          "sat"
-        }
-
-    /* ignore the test if assumption fails, ignores all unknown tests */
-    assumeTrue(satStatus != "unknown")
-
-    println("Expected result is $satStatus")
-
-    /* filter comments for now until they are handled by the parser */
-    val result = Parser.parse(program.filter { !it.startsWith(';') }.joinToString(""))
-
-    println(result.commands.joinToString("\n"))
-
-    solver.use {
-      result.commands.map { solver.visit(it) }
-
-      // verify we get the correct status for the test
-      assertEquals(satStatus, solver.status.toString())
-
-      // verify we parsed the correct program
-      /*
-      assertEquals(commands.filterIsInstance<Assert>().single().expression.toString(),
-          solver.context.solver.assertions.last().toString())
-      */
-    }
-  }
-
-  fun getQFIDLModelsFile(): Stream<Arguments> {
-    val dir = File(javaClass.getResource("/QF_IDL/Models/").file)
-
-    return dir.walk()
-        .filter { file: File -> file.isFile }
-        .map { file: File -> Arguments.arguments(file) }
-        .asStream()
-  }
+  fun getQFIDLModelsFile(): Stream<Arguments> = loadResource("/QF_IDL/Models/")
 
   @ParameterizedTest
   @MethodSource("getQFBVModelsFile")
   @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-  fun QF_BV_Models(file: File) {
-    val solver = Z3Solver()
-    val temp = file.bufferedReader().readLines()
-    val program = temp.map { it.trim('\r', '\n') }
+  fun QF_BV_Models(file: File) = solve(file)
 
-    val satStatus =
-        if (program.find { it.contains("unsat") } != null) {
-          "unsat"
-        } else if (program.find { it.contains("unknown") } != null) {
-          "unknown"
-        } else {
-          "sat"
-        }
-
-    /* ignore the test if assumption fails, ignores all unknown tests */
-    assumeTrue(satStatus != "unknown")
-
-    println("Expected result is $satStatus")
-
-    /* filter comments for now until they are handled by the parser */
-    val result = Parser.parse(program.filter { !it.startsWith(';') }.joinToString(""))
-
-    println(result.commands.joinToString("\n"))
-
-    solver.use {
-      result.commands.map { solver.visit(it) }
-
-      // verify we get the correct status for the test
-      assertEquals(satStatus, solver.status.toString())
-
-      // verify we parsed the correct program
-      /*
-      assertEquals(commands.filterIsInstance<Assert>().single().expression.toString(),
-          solver.context.solver.assertions.last().toString())
-      */
-    }
-  }
-
-  fun getQFBVModelsFile(): Stream<Arguments> {
-    val dir = File(javaClass.getResource("/QF_BV/Models/").file)
-
-    return dir.walk()
-        .filter { file: File -> file.isFile }
-        .map { file: File -> Arguments.arguments(file) }
-        .asStream()
-  }
+  fun getQFBVModelsFile(): Stream<Arguments> = loadResource("/QF_BV/Models/")
 
   @ParameterizedTest
   @ValueSource(
