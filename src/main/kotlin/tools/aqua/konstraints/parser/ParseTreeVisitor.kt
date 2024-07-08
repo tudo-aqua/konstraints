@@ -121,6 +121,13 @@ internal class ParseTreeVisitor :
 
     if (op != null) {
       return op.buildExpression(listOf(), functionIndices)
+    } else if (simpleQualIdentifier.identifier.symbol.toString().startsWith("bv") &&
+        simpleQualIdentifier.identifier.symbol.toString().substring(2).toBigIntegerOrNull() != null) {
+      // temporary code for (_ bvX n) as context can not handle it right now
+      // convert X into binary
+      return BVLiteral(
+          "#b${simpleQualIdentifier.identifier.symbol.toString().substring(2).toBigInteger().toString(2)}",
+          functionIndices.single().numeral)
     } else {
       throw IllegalStateException("Unknown fun ${simpleQualIdentifier.identifier.symbol}")
       // TODO UnknownFunctionException
