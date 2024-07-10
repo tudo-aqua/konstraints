@@ -182,14 +182,14 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
       is Equals -> this.z3ify(context)
       is Distinct -> this.z3ify(context)
       is BVUlt -> this.z3ify(context)
-        is BVULe -> this.z3ify(context)
-        is BVUGt -> this.z3ify(context)
-        is BVUGe -> this.z3ify(context)
-        is BVSLt -> this.z3ify(context)
-        is BVSLe -> this.z3ify(context)
-        is BVSGt -> this.z3ify(context)
-        is BVSGe -> this.z3ify(context)
-        is IntLessEq -> this.z3ify(context)
+      is BVULe -> this.z3ify(context)
+      is BVUGt -> this.z3ify(context)
+      is BVUGe -> this.z3ify(context)
+      is BVSLt -> this.z3ify(context)
+      is BVSLe -> this.z3ify(context)
+      is BVSGt -> this.z3ify(context)
+      is BVSGe -> this.z3ify(context)
+      is IntLessEq -> this.z3ify(context)
       is IntLess -> this.z3ify(context)
       is IntGreaterEq -> this.z3ify(context)
       is IntGreater -> this.z3ify(context)
@@ -268,19 +268,26 @@ fun Distinct.z3ify(context: Z3Context): Expr<Z3BoolSort> =
 fun BVUlt.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkBVULT(lhs.z3ify(context), rhs.z3ify(context))
 
-fun BVULe.z3ify(context: Z3Context): Expr<Z3BoolSort> = context.context.mkBVULE(lhs.z3ify(context), rhs.z3ify(context))
+fun BVULe.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkBVULE(lhs.z3ify(context), rhs.z3ify(context))
 
-fun BVUGt.z3ify(context: Z3Context): Expr<Z3BoolSort> =context.context.mkBVUGT(lhs.z3ify(context), rhs.z3ify(context))
+fun BVUGt.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkBVUGT(lhs.z3ify(context), rhs.z3ify(context))
 
-fun BVUGe .z3ify(context: Z3Context): Expr<Z3BoolSort> =context.context.mkBVUGE(lhs.z3ify(context), rhs.z3ify(context))
+fun BVUGe.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkBVUGE(lhs.z3ify(context), rhs.z3ify(context))
 
-fun BVSLt .z3ify(context: Z3Context): Expr<Z3BoolSort> =context.context.mkBVSLT(lhs.z3ify(context), rhs.z3ify(context))
+fun BVSLt.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkBVSLT(lhs.z3ify(context), rhs.z3ify(context))
 
-fun BVSLe .z3ify(context: Z3Context): Expr<Z3BoolSort> =context.context.mkBVSLE(lhs.z3ify(context), rhs.z3ify(context))
+fun BVSLe.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkBVSLE(lhs.z3ify(context), rhs.z3ify(context))
 
-fun BVSGt .z3ify(context: Z3Context): Expr<Z3BoolSort> =context.context.mkBVSGT(lhs.z3ify(context), rhs.z3ify(context))
+fun BVSGt.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkBVSGT(lhs.z3ify(context), rhs.z3ify(context))
 
-fun BVSGe .z3ify(context: Z3Context): Expr<Z3BoolSort> =context.context.mkBVSGE(lhs.z3ify(context), rhs.z3ify(context))
+fun BVSGe.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkBVSGE(lhs.z3ify(context), rhs.z3ify(context))
 
 fun IntLessEq.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     makeLeftAssoc(this.terms, context) { lhs, rhs ->
@@ -442,19 +449,21 @@ fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
       is BVLShr -> this.z3ify(context)
       is FPToUBitVec -> this.z3ify(context)
       is FPToSBitVec -> this.z3ify(context)
-        is BVNAnd -> this.z3ify(context)
-        is BVNOr -> this.z3ify(context)
-        is BVXOr -> this.z3ify(context)
-        is BVXNOr -> this.z3ify(context)
-        is BVComp -> this.z3ify(context)
-        is BVSub -> this.z3ify(context)
-        is BVSDiv -> this.z3ify(context)
-        is BVSRem -> this.z3ify(context)
-        is BVSMod -> this.z3ify(context)
-        is BVAShr -> this.z3ify(context)
-        is Repeat -> this.z3ify(context)
-        is ZeroExtend -> this.z3ify(context)
-        is SignExtend -> this.z3ify(context)
+      is BVNAnd -> this.z3ify(context)
+      is BVNOr -> this.z3ify(context)
+      is BVXOr -> this.z3ify(context)
+      is BVXNOr -> this.z3ify(context)
+      is BVComp -> this.z3ify(context)
+      is BVSub -> this.z3ify(context)
+      is BVSDiv -> this.z3ify(context)
+      is BVSRem -> this.z3ify(context)
+      is BVSMod -> this.z3ify(context)
+      is BVAShr -> this.z3ify(context)
+      is Repeat -> this.z3ify(context)
+      is ZeroExtend -> this.z3ify(context)
+      is SignExtend -> this.z3ify(context)
+      is RotateRight -> this.z3ify(context)
+      is RotateLeft -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDeclaredExpression ->
           if (this.children.isEmpty()) {
@@ -526,33 +535,54 @@ fun FPToSBitVec.z3ify(context: Z3Context): Expr<BitVecSort> =
     context.context.mkFPToBV(
         this.roundingMode.z3ify(context), this.inner.z3ify(context), this.m, true)
 
-fun BVNAnd.z3ify(context: Z3Context): Expr<BitVecSort> = context.context.mkBVNAND(lhs.z3ify(context), rhs.z3ify(context))
+fun BVNAnd.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkBVNAND(lhs.z3ify(context), rhs.z3ify(context))
 
-fun BVNOr.z3ify(context: Z3Context): Expr<BitVecSort> = context.context.mkBVNOR(lhs.z3ify(context), rhs.z3ify(context))
+fun BVNOr.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkBVNOR(lhs.z3ify(context), rhs.z3ify(context))
 
-fun BVXOr .z3ify(context: Z3Context): Expr<BitVecSort> = disjuncts.slice(2 ..< disjuncts.size).fold(context.context.mkBVXOR(disjuncts[0].z3ify(context), disjuncts[1].z3ify(context))) {
-    xor, expr -> context.context.mkBVXOR(xor, expr.z3ify(context))
-}
+fun BVXOr.z3ify(context: Z3Context): Expr<BitVecSort> =
+    disjuncts.slice(2 ..< disjuncts.size).fold(
+        context.context.mkBVXOR(disjuncts[0].z3ify(context), disjuncts[1].z3ify(context))) {
+            xor,
+            expr ->
+          context.context.mkBVXOR(xor, expr.z3ify(context))
+        }
 
-fun BVXNOr.z3ify(context: Z3Context): Expr<BitVecSort> = context.context.mkBVXNOR(lhs.z3ify(context), rhs.z3ify(context))
+fun BVXNOr.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkBVXNOR(lhs.z3ify(context), rhs.z3ify(context))
 
 fun BVComp.z3ify(context: Z3Context): Expr<BitVecSort> = this.expand().z3ify(context)
 
-fun BVSub.z3ify(context: Z3Context): Expr<BitVecSort> = context.context.mkBVSub(lhs.z3ify(context), rhs.z3ify(context))
+fun BVSub.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkBVSub(lhs.z3ify(context), rhs.z3ify(context))
 
-fun BVSDiv.z3ify(context: Z3Context): Expr<BitVecSort> = context.context.mkBVSDiv(lhs.z3ify(context), rhs.z3ify(context))
+fun BVSDiv.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkBVSDiv(lhs.z3ify(context), rhs.z3ify(context))
 
-fun BVSRem.z3ify(context: Z3Context): Expr<BitVecSort> = context.context.mkBVSRem(lhs.z3ify(context), rhs.z3ify(context))
+fun BVSRem.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkBVSRem(lhs.z3ify(context), rhs.z3ify(context))
 
-fun BVSMod.z3ify(context: Z3Context): Expr<BitVecSort> = context.context.mkBVSMod(lhs.z3ify(context), rhs.z3ify(context))
+fun BVSMod.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkBVSMod(lhs.z3ify(context), rhs.z3ify(context))
 
-fun BVAShr.z3ify(context: Z3Context): Expr<BitVecSort> = context.context.mkBVASHR(lhs.z3ify(context), rhs.z3ify(context))
+fun BVAShr.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkBVASHR(lhs.z3ify(context), rhs.z3ify(context))
 
-fun Repeat.z3ify(context: Z3Context): Expr<BitVecSort> = context.context.mkRepeat(j, inner.z3ify(context))
+fun Repeat.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkRepeat(j, inner.z3ify(context))
 
-fun ZeroExtend.z3ify(context: Z3Context): Expr<BitVecSort> = context.context.mkZeroExt(i, inner.z3ify(context))
+fun ZeroExtend.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkZeroExt(i, inner.z3ify(context))
 
-fun SignExtend.z3ify(context: Z3Context): Expr<BitVecSort> = context.context.mkSignExt(i, inner.z3ify(context))
+fun SignExtend.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkSignExt(i, inner.z3ify(context))
+
+fun RotateLeft.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkBVRotateLeft(i, inner.z3ify(context))
+
+fun RotateRight.z3ify(context: Z3Context): Expr<BitVecSort> =
+    context.context.mkBVRotateRight(i, inner.z3ify(context))
 
 @JvmName("z3ifyInts")
 fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =

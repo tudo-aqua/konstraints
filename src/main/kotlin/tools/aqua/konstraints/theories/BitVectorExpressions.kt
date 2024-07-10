@@ -52,6 +52,8 @@ object BitVectorExpressionTheory : Theory {
               RepeatDecl,
               ZeroExtendDecl,
               SignExtendDecl,
+              RotateLeftDecl,
+              RotateRightDecl,
               BVULeDecl,
               BVUGtDecl,
               BVUGeDecl,
@@ -1378,6 +1380,63 @@ object SignExtendDecl :
         BVSort.fromSymbol("n")) {
   override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
       ZeroExtend(bindings["i"].numeral, param)
+}
+
+class RotateLeft(val i: Int, override val inner: Expression<BVSort>) :
+    UnaryExpression<BVSort, BVSort>("rotate_left".symbol(), inner.sort) {
+  init {
+    require(i >= 0)
+  }
+
+  override fun copy(children: List<Expression<*>>): Expression<BVSort> =
+      RotateLeftDecl.buildExpression(children, setOf(i.idx()))
+
+  fun expand() =
+      if (i == 0 || sort.bits == 1 || sort.bits == i) {
+        inner
+      } else {
+        val distance = i % sort.bits
+
+        BVConcat(
+            BVExtract(sort.bits - distance - 1, 0, inner),
+            BVExtract(sort.bits - 1, sort.bits - distance, inner))
+      }
+}
+
+object RotateLeftDecl :
+    FunctionDecl1<BVSort, BVSort>(
+        "rotate_left".symbol(),
+        emptySet(),
+        BVSort.fromSymbol("m"),
+        setOf(SymbolIndex("i")),
+        emptySet(),
+        BVSort.fromSymbol("n")) {
+  override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
+      RotateLeft(bindings["i"].numeral, param)
+}
+
+class RotateRight(val i: Int, override val inner: Expression<BVSort>) :
+    UnaryExpression<BVSort, BVSort>("rotate_right".symbol(), inner.sort) {
+  init {
+    require(i >= 0)
+  }
+
+  override fun copy(children: List<Expression<*>>): Expression<BVSort> =
+      RotateRightDecl.buildExpression(children, setOf(i.idx()))
+
+  fun expand(): Expression<BVSort> = TODO()
+}
+
+object RotateRightDecl :
+    FunctionDecl1<BVSort, BVSort>(
+        "rotate_right".symbol(),
+        emptySet(),
+        BVSort.fromSymbol("m"),
+        setOf(SymbolIndex("i")),
+        emptySet(),
+        BVSort.fromSymbol("n")) {
+  override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
+      RotateRight(bindings["i"].numeral, param)
 }
 
 /** Bitvector sort with [bits] length */
