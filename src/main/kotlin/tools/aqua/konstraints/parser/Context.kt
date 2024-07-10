@@ -265,8 +265,10 @@ class AssertionLevel : Subcontext {
 
 class VarBinding<T : Sort>(symbol: Symbol, val term: Expression<T>) :
     FunctionDecl0<T>(symbol, emptySet(), emptySet(), term.sort) {
-  override fun buildExpression(bindings: Bindings): Expression<T> =
-      LocalExpression(name, sort, term)
+
+        val instance = LocalExpression(name, sort, term)
+
+  override fun buildExpression(bindings: Bindings): Expression<T> = instance
 }
 
 class LetLevel(varBindings: List<VarBinding<*>>) : Subcontext {
@@ -287,7 +289,9 @@ class SortedVar<T : Sort>(name: Symbol, sort: T) :
     FunctionDecl0<T>(name, emptySet(), emptySet(), sort) {
   override fun toString(): String = "($name $sort)"
 
-  override fun buildExpression(bindings: Bindings): Expression<T> = BoundVariable(name, sort)
+    val instance = BoundVariable(name, sort)
+
+  override fun buildExpression(bindings: Bindings): Expression<T> = instance
 }
 
 class LocalLevel(localVars: List<SortedVar<*>>) : Subcontext {
