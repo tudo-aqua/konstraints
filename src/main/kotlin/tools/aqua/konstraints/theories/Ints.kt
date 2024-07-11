@@ -26,8 +26,7 @@ import tools.aqua.konstraints.smt.*
 object IntsTheory : Theory {
   override val functions =
       listOf(
-              IntNegDecl,
-              IntSubDecl,
+              IntNegSubDecl,
               IntAddDecl,
               IntMulDecl,
               IntDivDecl,
@@ -110,6 +109,44 @@ object IntSubDecl :
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
   ): Expression<IntSort> = IntSub(listOf(param1, param2) + varargs)
+}
+
+/** Combined function declaration for overloaded '-' operator */
+object IntNegSubDecl :
+    FunctionDecl<IntSort>(
+        "-".symbol(),
+        emptySet(),
+        listOf(IntSort),
+        emptySet(),
+        emptySet(),
+        IntSort,
+        Associativity.NONE) {
+  override fun buildExpression(
+      args: List<Expression<*>>,
+      functionIndices: List<NumeralIndex>
+  ): Expression<IntSort> {
+    require(args.isNotEmpty())
+
+    return if (args.size == 1) {
+      IntNegDecl.buildExpression(args, functionIndices)
+    } else {
+      IntSubDecl.buildExpression(args, functionIndices)
+    }
+  }
+
+  override fun bindParametersTo(args: List<Sort>, indices: List<NumeralIndex>) =
+      if (args.size == 1) {
+        IntNegDecl.bindParametersTo(args, indices)
+      } else {
+        IntSubDecl.bindParametersTo(args, indices)
+      }
+
+  override fun accepts(args: List<Sort>, indices: List<NumeralIndex>) =
+      if (args.size == 1) {
+        IntNegDecl.accepts(args, indices)
+      } else {
+        IntSubDecl.accepts(args, indices)
+      }
 }
 
 /**

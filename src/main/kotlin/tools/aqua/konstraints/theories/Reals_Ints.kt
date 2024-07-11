@@ -27,8 +27,7 @@ import tools.aqua.konstraints.smt.*
 object RealsIntsTheory : Theory {
   override val functions =
       listOf(
-              IntNegDecl,
-              IntSubDecl,
+              IntNegSubDecl,
               IntAddDecl,
               IntMulDecl,
               IntDivDecl,
@@ -39,8 +38,7 @@ object RealsIntsTheory : Theory {
               IntGreaterEqDecl,
               IntGreaterDecl,
               DivisibleDecl,
-              RealNegDecl,
-              RealSubDecl,
+              RealNegSubDecl,
               RealAddDecl,
               RealMulDecl,
               RealDivDecl,

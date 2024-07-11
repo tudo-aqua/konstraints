@@ -1,4 +1,5 @@
 (set-logic QF_IDL)
+(set-info :status sat)
 (declare-fun a () Int)
 (declare-fun b () Int)
 (assert (= a 1))

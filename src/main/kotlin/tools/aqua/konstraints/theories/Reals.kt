@@ -111,9 +111,7 @@ object RealSubDecl :
   ): Expression<RealSort> = RealSub(listOf(param1, param2) + varargs)
 }
 
-/**
- * Combined function declaration for overloaded '-' operator
- */
+/** Combined function declaration for overloaded '-' operator */
 object RealNegSubDecl :
     FunctionDecl<RealSort>(
         "-".symbol(),
@@ -123,32 +121,32 @@ object RealNegSubDecl :
         emptySet(),
         RealSort,
         Associativity.NONE) {
-    override fun buildExpression(
-        args: List<Expression<*>>,
-        functionIndices: List<NumeralIndex>
-    ): Expression<RealSort> {
-        require(args.isNotEmpty())
+  override fun buildExpression(
+      args: List<Expression<*>>,
+      functionIndices: List<NumeralIndex>
+  ): Expression<RealSort> {
+    require(args.isNotEmpty())
 
-        return if (args.size == 1) {
-            RealNegDecl.buildExpression(args, functionIndices)
-        } else {
-            RealSubDecl.buildExpression(args, functionIndices)
-        }
+    return if (args.size == 1) {
+      RealNegDecl.buildExpression(args, functionIndices)
+    } else {
+      RealSubDecl.buildExpression(args, functionIndices)
     }
+  }
 
-    override fun bindParametersTo(args: List<Sort>, indices: List<NumeralIndex>) =
-        if (args.size == 1) {
-            RealNegDecl.bindParametersTo(args, indices)
-        } else {
-            RealSubDecl.bindParametersTo(args, indices)
-        }
+  override fun bindParametersTo(args: List<Sort>, indices: List<NumeralIndex>) =
+      if (args.size == 1) {
+        RealNegDecl.bindParametersTo(args, indices)
+      } else {
+        RealSubDecl.bindParametersTo(args, indices)
+      }
 
-    override fun accepts(args: List<Sort>, indices: List<NumeralIndex>) =
-        if (args.size == 1) {
-            RealNegDecl.accepts(args, indices)
-        } else {
-            RealSubDecl.accepts(args, indices)
-        }
+  override fun accepts(args: List<Sort>, indices: List<NumeralIndex>) =
+      if (args.size == 1) {
+        RealNegDecl.accepts(args, indices)
+      } else {
+        RealSubDecl.accepts(args, indices)
+      }
 }
 
 /**
