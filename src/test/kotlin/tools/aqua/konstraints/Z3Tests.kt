@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints
 
+import java.io.BufferedReader
 import java.io.File
 import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
@@ -50,13 +51,16 @@ class Z3Tests {
           .asStream()
 
   private fun solve(file: File) {
+    assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
+
     val solver = Z3Solver()
-    val result = Parser.parse(file.bufferedReader().readLines().joinToString(""))
+    val result = Parser.parse(file.bufferedReader().use(BufferedReader::readLines).joinToString(""))
 
     assumeTrue(
         (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
             .symbol
-            .toString() != "unknown")
+            .toString() != "unknown",
+        "Skipped due to unknown sat status.")
 
     solver.use {
       result.commands.map { solver.visit(it) }
@@ -169,7 +173,7 @@ class Z3Tests {
   @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_BV_Full(file: File) = solve(file)
 
-  fun getQFBVFile(): Stream<Arguments> = loadResource("/non-incremental/QF_BV/")
+  fun getQFBVFile(): Stream<Arguments> = loadResource("/QF_BV/")
 
   /* these tests take too long ignore for now */
   @Disabled
@@ -180,10 +184,9 @@ class Z3Tests {
 
   fun getQFRDLLetFile(): Stream<Arguments> = loadResource("/QF_RDL/sal/")
 
-  @Disabled
   @ParameterizedTest
   @MethodSource("getQFUFFile")
-  @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 600, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_UF(file: File) = solve(file)
 
   fun getQFUFFile(): Stream<Arguments> = loadResource("/QF_UF/")

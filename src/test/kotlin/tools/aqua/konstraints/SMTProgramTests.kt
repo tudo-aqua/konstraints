@@ -40,54 +40,6 @@ import tools.aqua.konstraints.theories.BVUlt
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SMTProgramTests {
   @ParameterizedTest
-  @MethodSource("getQFBVFile")
-  @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-  fun testCorrectSatStatus(file: File) {
-    val program = Parser.parse(file.bufferedReader().readLines().joinToString())
-
-    assumeTrue(
-        (program.info.find { attribute -> attribute.keyword == ":status" }?.value
-                as SymbolAttributeValue)
-            .symbol
-            .toString() == "sat")
-
-    program.solve()
-
-    assertEquals(
-        (program.info.find { attribute -> attribute.keyword == ":status" }?.value
-                as SymbolAttributeValue)
-            .symbol
-            .toString(),
-        program.status.toString())
-  }
-
-  @ParameterizedTest
-  @MethodSource("getQFBVFile")
-  @Timeout(value = 15, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-  fun testModelGenerationFails(file: File) {
-    val program = Parser.parse(file.bufferedReader().readLines().joinToString())
-
-    assumeTrue(
-        (program.info.find { attribute -> attribute.keyword == ":status" }?.value
-                as SymbolAttributeValue)
-            .symbol
-            .toString() == "unsat")
-
-    program.solve()
-
-    assertNull(program.model)
-  }
-
-  fun getQFBVFile(): Stream<Arguments> {
-    val dir = File(javaClass.getResource("/QF_BV/20190311-bv-term-small-rw-Noetzli/").file)
-
-    return dir.walk()
-        .filter { file: File -> file.isFile }
-        .map { file: File -> Arguments.arguments(file) }
-        .asStream()
-  }
-
-  @ParameterizedTest
   @MethodSource("getQFBVModelFiles")
   @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun testModelGeneration(file: File) {

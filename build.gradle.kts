@@ -19,7 +19,6 @@
 import com.github.benmanes.gradle.versions.updates.DependencyUpdatesTask
 import com.github.gradle.node.variant.computeNodeDir
 import com.github.gradle.node.variant.computeNodeExec
-import de.undercouch.gradle.tasks.download.Download
 import org.gradle.api.plugins.JavaBasePlugin.DOCUMENTATION_GROUP
 import org.gradle.api.publish.plugins.PublishingPlugin.PUBLISH_TASK_GROUP
 import org.gradle.api.tasks.testing.logging.TestLogEvent.FAILED
@@ -201,6 +200,7 @@ java {
 
 kotlin { jvmToolchain(libs.versions.java.jdk.get().toInt()) }
 
+/*
 val smtLibDir = layout.buildDirectory.dir("smtlib")
 
 tasks {
@@ -245,6 +245,7 @@ tasks {
 }
 
 sourceSets { test { resources { srcDir(smtLibDir) } } }
+ */
 
 tasks.test {
   useJUnitPlatform()

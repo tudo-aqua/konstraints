@@ -27,8 +27,7 @@ import tools.aqua.konstraints.smt.*
 object RealsIntsTheory : Theory {
   override val functions =
       listOf(
-              IntNegDecl,
-              IntSubDecl,
+              IntNegSubDecl,
               IntAddDecl,
               IntMulDecl,
               IntDivDecl,
@@ -39,8 +38,7 @@ object RealsIntsTheory : Theory {
               IntGreaterEqDecl,
               IntGreaterDecl,
               DivisibleDecl,
-              RealNegDecl,
-              RealSubDecl,
+              RealNegSubDecl,
               RealAddDecl,
               RealMulDecl,
               RealDivDecl,
@@ -65,7 +63,7 @@ object RealsIntsTheory : Theory {
 class ToReal(override val inner: Expression<IntSort>) :
     UnaryExpression<RealSort, IntSort>("to_real".symbol(), RealSort) {
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
-      ToRealDecl.buildExpression(children, emptySet())
+      ToRealDecl.buildExpression(children, emptyList())
 }
 
 object ToRealDecl :
@@ -85,7 +83,7 @@ object ToRealDecl :
 class ToInt(override val inner: Expression<RealSort>) :
     UnaryExpression<IntSort, RealSort>("to_int".symbol(), IntSort) {
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
-      ToIntDecl.buildExpression(children, emptySet())
+      ToIntDecl.buildExpression(children, emptyList())
 }
 
 object ToIntDecl :
@@ -101,7 +99,7 @@ object ToIntDecl :
 class IsInt(override val inner: Expression<RealSort>) :
     UnaryExpression<BoolSort, RealSort>("is_int".symbol(), BoolSort) {
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      IsIntDecl.buildExpression(children, emptySet())
+      IsIntDecl.buildExpression(children, emptyList())
 }
 
 object IsIntDecl :
