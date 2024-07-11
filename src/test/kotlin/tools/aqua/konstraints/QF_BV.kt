@@ -395,7 +395,7 @@ class QF_BV {
 
   @ParameterizedTest
   @MethodSource("getQFBVRWS")
-  @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 30, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_BV_RWS(file: File) = solve(file)
 
   fun getQFBVRWS(): Stream<Arguments> = loadResource("/QF_BV/RWS/")

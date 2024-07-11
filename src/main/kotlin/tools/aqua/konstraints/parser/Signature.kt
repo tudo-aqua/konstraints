@@ -52,7 +52,7 @@ data class Signature(
    */
   fun bindToOrNull(
       actualParameters: List<Sort>,
-      actualFunctionIndices: Set<NumeralIndex>,
+      actualFunctionIndices: List<NumeralIndex>,
       actualReturn: Sort
   ): Bindings? =
       try {
@@ -75,7 +75,7 @@ data class Signature(
    */
   fun bindTo(
       actualParameters: List<Sort>,
-      actualFunctionIndices: Set<NumeralIndex>,
+      actualFunctionIndices: List<NumeralIndex>,
       actualReturn: Sort
   ): Bindings {
     val parametricBindings = mutableMapOf<Sort, Sort>()
@@ -97,7 +97,7 @@ data class Signature(
    */
   fun bindParametersOrNull(
       actualParameters: List<Sort>,
-      actualFunctionIndices: Set<NumeralIndex>
+      actualFunctionIndices: List<NumeralIndex>
   ): Bindings? =
       try {
         bindParameters(actualParameters, actualFunctionIndices)
@@ -117,7 +117,7 @@ data class Signature(
    */
   fun bindParameters(
       actualParameters: List<Sort>,
-      actualFunctionIndices: Set<NumeralIndex>
+      actualFunctionIndices: List<NumeralIndex>
   ): Bindings {
     val parametricBindings = mutableMapOf<Sort, Sort>()
     val indexBindings = mutableMapOf<SymbolIndex, NumeralIndex>()
@@ -173,7 +173,7 @@ data class Signature(
 
   /** bind each function index to [functionIndices] */
   private fun bindFunctionIndices(
-      funcIndices: Set<NumeralIndex>,
+      funcIndices: List<NumeralIndex>,
       indexBindings: MutableMap<SymbolIndex, NumeralIndex>
   ) {
     // TODO handle case of already bound index (exception?)

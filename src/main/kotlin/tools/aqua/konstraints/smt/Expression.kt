@@ -192,7 +192,7 @@ class Ite<T : Sort>(
   override val sort: T = then.sort
 
   override fun copy(children: List<Expression<*>>): Expression<T> =
-      IteDecl.buildExpression(children, emptySet()) castTo sort
+      IteDecl.buildExpression(children, emptyList()) castTo sort
 
   override val name: Symbol = "ite".symbol()
 
@@ -245,7 +245,7 @@ class UserDefinedExpression<T : Sort>(
   override val children: List<Expression<*>> = args
 
   override fun copy(children: List<Expression<*>>): Expression<T> =
-      definition.buildExpression(children, emptySet())
+      definition.buildExpression(children, emptyList())
 
   fun expand(): Expression<*> = definition.expand(children)
 }

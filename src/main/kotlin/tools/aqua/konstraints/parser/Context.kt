@@ -236,7 +236,7 @@ interface Subcontext {
   fun contains(function: Symbol) = functions.contains(function.toString())
 
   fun get(function: String, args: List<Expression<*>>) =
-      functions[function]?.takeIf { it.acceptsExpressions(args, emptySet()) }
+      functions[function]?.takeIf { it.acceptsExpressions(args, emptyList()) }
 
   fun contains(sort: SortDecl<*>) = sorts.containsKey(sort.name.toString())
 

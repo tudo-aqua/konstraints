@@ -57,6 +57,7 @@ object BitVectorExpressionTheory : Theory {
               BVULeDecl,
               BVUGtDecl,
               BVUGeDecl,
+              BVSLtDecl,
               BVSLeDecl,
               BVSGtDecl,
               BVSGeDecl)
@@ -132,7 +133,7 @@ class BVConcat(override val lhs: Expression<BVSort>, override val rhs: Expressio
   }
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      BVConcatDecl.buildExpression(children, emptySet())
+      BVConcatDecl.buildExpression(children, emptyList())
 }
 
 object BVConcatDecl :
@@ -177,7 +178,7 @@ class BVExtract(val i: Int, val j: Int, override val inner: Expression<BVSort>) 
   override fun toString(): String = "((_ extract $i $j) $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      ExtractDecl.buildExpression(children, setOf(i.idx(), j.idx()))
+      ExtractDecl.buildExpression(children, listOf(i.idx(), j.idx()))
 }
 
 object ExtractDecl :
@@ -191,7 +192,7 @@ object ExtractDecl :
 
   override fun buildExpression(
       args: List<Expression<*>>,
-      functionIndices: Set<NumeralIndex>
+      functionIndices: List<NumeralIndex>
   ): Expression<BVSort> {
     require(args.size == 1)
     val bindings = bindParametersToExpressions(args, functionIndices)
@@ -217,7 +218,7 @@ class BVNot(override val inner: Expression<BVSort>) :
   }
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      BVNotDecl.buildExpression(children, emptySet())
+      BVNotDecl.buildExpression(children, emptyList())
 }
 
 object BVNotDecl :
@@ -245,7 +246,7 @@ class BVNeg(override val inner: Expression<BVSort>) :
   }
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      BVNegDecl.buildExpression(children, emptySet())
+      BVNegDecl.buildExpression(children, emptyList())
 }
 
 object BVNegDecl :
@@ -287,7 +288,7 @@ class BVAnd(val conjuncts: List<Expression<BVSort>>) :
   override val children: List<Expression<BVSort>> = conjuncts
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      BVAndDecl.buildExpression(children, emptySet())
+      BVAndDecl.buildExpression(children, emptyList())
 }
 
 object BVAndDecl :
@@ -337,7 +338,7 @@ class BVOr(val disjuncts: List<Expression<BVSort>>) :
   override fun toString(): String = "(bvor ${disjuncts.joinToString(" ")})"
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      BVOrDecl.buildExpression(children, emptySet())
+      BVOrDecl.buildExpression(children, emptyList())
 }
 
 object BVOrDecl :
@@ -384,7 +385,7 @@ class BVAdd(val summands: List<Expression<BVSort>>) :
   override val children: List<Expression<BVSort>> = summands
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      BVAddDecl.buildExpression(children, emptySet())
+      BVAddDecl.buildExpression(children, emptyList())
 }
 
 object BVAddDecl :
@@ -431,7 +432,7 @@ class BVMul(val factors: List<Expression<BVSort>>) :
   override val children: List<Expression<BVSort>> = factors
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      BVMulDecl.buildExpression(children, emptySet())
+      BVMulDecl.buildExpression(children, emptyList())
 }
 
 object BVMulDecl :
@@ -476,7 +477,7 @@ class BVUDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
   override val rhs: Expression<BVSort> = denominator
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      BVUDivDecl.buildExpression(children, emptySet())
+      BVUDivDecl.buildExpression(children, emptyList())
 }
 
 object BVUDivDecl :
@@ -515,7 +516,7 @@ class BVURem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
   override val rhs: Expression<BVSort> = denominator
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      BVURemDecl.buildExpression(children, emptySet())
+      BVURemDecl.buildExpression(children, emptyList())
 }
 
 object BVURemDecl :
@@ -557,7 +558,7 @@ class BVShl(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
   override val rhs: Expression<BVSort> = distance
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      BVShlDecl.buildExpression(children, emptySet())
+      BVShlDecl.buildExpression(children, emptyList())
 }
 
 object BVShlDecl :
@@ -599,7 +600,7 @@ class BVLShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
   override val rhs: Expression<BVSort> = distance
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      BVLShrDecl.buildExpression(children, emptySet())
+      BVLShrDecl.buildExpression(children, emptyList())
 }
 
 object BVLShrDecl :
@@ -637,7 +638,7 @@ class BVUlt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
   }
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      BVUltDecl.buildExpression(children, emptySet())
+      BVUltDecl.buildExpression(children, emptyList())
 }
 
 object BVUltDecl :
@@ -663,7 +664,7 @@ class BVNAnd(override val lhs: Expression<BVSort>, override val rhs: Expression<
   }
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      BVNAndDecl.buildExpression(children, emptySet())
+      BVNAndDecl.buildExpression(children, emptyList())
 
   fun expand() = BVNot(BVAnd(lhs, rhs))
 }
@@ -691,7 +692,7 @@ class BVNOr(override val lhs: Expression<BVSort>, override val rhs: Expression<B
   }
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      BVNOrDecl.buildExpression(children, emptySet())
+      BVNOrDecl.buildExpression(children, emptyList())
 
   fun expand() = BVNot(BVOr(lhs, rhs))
 }
@@ -728,7 +729,7 @@ class BVXOr(val disjuncts: List<Expression<BVSort>>) :
   override val children: List<Expression<*>> = disjuncts
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      BVXOrDecl.buildExpression(children, emptySet())
+      BVXOrDecl.buildExpression(children, emptyList())
 
   /*
    * expands left associative xnor
@@ -770,7 +771,7 @@ class BVXNOr(override val lhs: Expression<BVSort>, override val rhs: Expression<
   }
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      BVXNOrDecl.buildExpression(children, emptySet())
+      BVXNOrDecl.buildExpression(children, emptyList())
 
   fun expand() = BVOr(BVAnd(lhs, rhs), BVAnd(BVNot(lhs), BVNot(rhs)))
 }
@@ -794,7 +795,7 @@ object BVXNOrDecl :
 class BVComp(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("bvcomp".symbol(), BVSort(1)) {
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      BVCompDecl.buildExpression(children, emptySet())
+      BVCompDecl.buildExpression(children, emptyList())
 
   // recursive expansion as specified in the extension of QF_BV logic
   fun expand(): Expression<BVSort> =
@@ -832,7 +833,8 @@ class BVSub(override val lhs: Expression<BVSort>, override val rhs: Expression<B
     require(lhs.sort.bits == rhs.sort.bits)
   }
 
-  override fun copy(children: List<Expression<*>>) = BVSubDecl.buildExpression(children, emptySet())
+  override fun copy(children: List<Expression<*>>) =
+      BVSubDecl.buildExpression(children, emptyList())
 
   fun expand() = BVAdd(lhs, BVNeg(rhs))
 }
@@ -863,7 +865,7 @@ class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
   override val rhs: Expression<BVSort> = denominator
 
   override fun copy(children: List<Expression<*>>) =
-      BVSDivDecl.buildExpression(children, emptySet())
+      BVSDivDecl.buildExpression(children, emptyList())
 
   fun expand(): Expression<BVSort> {
     val msb_s = VarBinding("?msb_s".symbol(), BVExtract(sort.bits - 1, sort.bits - 1, numerator))
@@ -873,18 +875,18 @@ class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
         listOf(msb_s, msb_t),
         Ite(
             And(
-                Equals(msb_s.buildExpression(emptyList(), emptySet()), BVLiteral("#b0")),
-                Equals(msb_t.buildExpression(emptyList(), emptySet()), BVLiteral("#b0"))),
+                Equals(msb_s.buildExpression(emptyList(), emptyList()), BVLiteral("#b0")),
+                Equals(msb_t.buildExpression(emptyList(), emptyList()), BVLiteral("#b0"))),
             BVUDiv(numerator, denominator),
             Ite(
                 And(
-                    Equals(msb_s.buildExpression(emptyList(), emptySet()), BVLiteral("#b1")),
-                    Equals(msb_t.buildExpression(emptyList(), emptySet()), BVLiteral("#b0"))),
+                    Equals(msb_s.buildExpression(emptyList(), emptyList()), BVLiteral("#b1")),
+                    Equals(msb_t.buildExpression(emptyList(), emptyList()), BVLiteral("#b0"))),
                 BVNeg(BVUDiv(BVNeg(numerator), denominator)),
                 Ite(
                     And(
-                        Equals(msb_s.buildExpression(emptyList(), emptySet()), BVLiteral("#b0")),
-                        Equals(msb_t.buildExpression(emptyList(), emptySet()), BVLiteral("#b1"))),
+                        Equals(msb_s.buildExpression(emptyList(), emptyList()), BVLiteral("#b0")),
+                        Equals(msb_t.buildExpression(emptyList(), emptyList()), BVLiteral("#b1"))),
                     BVNeg(BVUDiv(numerator, BVNeg(denominator))),
                     BVUDiv(BVNeg(numerator), BVNeg(denominator)),
                 ))))
@@ -917,7 +919,7 @@ class BVSRem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
   override val rhs: Expression<BVSort> = denominator
 
   override fun copy(children: List<Expression<*>>) =
-      BVSRemDecl.buildExpression(children, emptySet())
+      BVSRemDecl.buildExpression(children, emptyList())
 
   fun expand(): Expression<BVSort> {
     val msb_s = VarBinding("?msb_s".symbol(), BVExtract(sort.bits - 1, sort.bits - 1, numerator))
@@ -927,18 +929,18 @@ class BVSRem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
         listOf(msb_s, msb_t),
         Ite(
             And(
-                Equals(msb_s.buildExpression(emptyList(), emptySet()), BVLiteral("#b0")),
-                Equals(msb_t.buildExpression(emptyList(), emptySet()), BVLiteral("#b0"))),
+                Equals(msb_s.buildExpression(emptyList(), emptyList()), BVLiteral("#b0")),
+                Equals(msb_t.buildExpression(emptyList(), emptyList()), BVLiteral("#b0"))),
             BVURem(numerator, denominator),
             Ite(
                 And(
-                    Equals(msb_s.buildExpression(emptyList(), emptySet()), BVLiteral("#b1")),
-                    Equals(msb_t.buildExpression(emptyList(), emptySet()), BVLiteral("#b0"))),
+                    Equals(msb_s.buildExpression(emptyList(), emptyList()), BVLiteral("#b1")),
+                    Equals(msb_t.buildExpression(emptyList(), emptyList()), BVLiteral("#b0"))),
                 BVNeg(BVURem(BVNeg(numerator), denominator)),
                 Ite(
                     And(
-                        Equals(msb_s.buildExpression(emptyList(), emptySet()), BVLiteral("#b0")),
-                        Equals(msb_t.buildExpression(emptyList(), emptySet()), BVLiteral("#b1"))),
+                        Equals(msb_s.buildExpression(emptyList(), emptyList()), BVLiteral("#b0")),
+                        Equals(msb_t.buildExpression(emptyList(), emptyList()), BVLiteral("#b1"))),
                     BVURem(numerator, BVNeg(denominator)),
                     BVNeg(BVURem(BVNeg(numerator), BVNeg(denominator))),
                 ))))
@@ -968,7 +970,7 @@ class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<
   }
 
   override fun copy(children: List<Expression<*>>) =
-      BVSModDecl.buildExpression(children, emptySet())
+      BVSModDecl.buildExpression(children, emptyList())
 
   fun expand(): Expression<BVSort> {
     val msb_s = VarBinding("?msb_s".symbol(), BVExtract(sort.bits - 1, sort.bits - 1, lhs))
@@ -977,22 +979,22 @@ class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<
         VarBinding(
             "?msb_s".symbol(),
             Ite(
-                Equals(msb_s.buildExpression(emptyList(), emptySet()), BVLiteral("#b0")),
+                Equals(msb_s.buildExpression(emptyList(), emptyList()), BVLiteral("#b0")),
                 lhs,
                 BVNeg(lhs)))
     val abs_t =
         VarBinding(
             "?msb_t".symbol(),
             Ite(
-                Equals(msb_s.buildExpression(emptyList(), emptySet()), BVLiteral("#b0")),
+                Equals(msb_s.buildExpression(emptyList(), emptyList()), BVLiteral("#b0")),
                 rhs,
                 BVNeg(rhs)))
     val u =
         VarBinding(
             "u".symbol(),
             BVURem(
-                abs_s.buildExpression(emptyList(), emptySet()),
-                abs_t.buildExpression(emptyList(), emptySet())))
+                abs_s.buildExpression(emptyList(), emptyList()),
+                abs_t.buildExpression(emptyList(), emptyList())))
 
     return LetExpression(
         sort,
@@ -1004,34 +1006,35 @@ class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<
                 sort,
                 listOf(u),
                 Ite(
-                    Equals(u.buildExpression(emptyList(), emptySet()), BVLiteral("#b0", sort.bits)),
-                    u.buildExpression(emptyList(), emptySet()),
+                    Equals(
+                        u.buildExpression(emptyList(), emptyList()), BVLiteral("#b0", sort.bits)),
+                    u.buildExpression(emptyList(), emptyList()),
                     Ite(
                         And(
                             Equals(
-                                msb_s.buildExpression(emptyList(), emptySet()), BVLiteral("#b0")),
+                                msb_s.buildExpression(emptyList(), emptyList()), BVLiteral("#b0")),
                             Equals(
-                                msb_t.buildExpression(emptyList(), emptySet()), BVLiteral("#b0"))),
-                        u.buildExpression(emptyList(), emptySet()),
+                                msb_t.buildExpression(emptyList(), emptyList()), BVLiteral("#b0"))),
+                        u.buildExpression(emptyList(), emptyList()),
                         Ite(
                             And(
                                 Equals(
-                                    msb_s.buildExpression(emptyList(), emptySet()),
+                                    msb_s.buildExpression(emptyList(), emptyList()),
                                     BVLiteral("#b1")),
                                 Equals(
-                                    msb_t.buildExpression(emptyList(), emptySet()),
+                                    msb_t.buildExpression(emptyList(), emptyList()),
                                     BVLiteral("#b0"))),
-                            BVAdd(BVNeg(u.buildExpression(emptyList(), emptySet())), rhs),
+                            BVAdd(BVNeg(u.buildExpression(emptyList(), emptyList())), rhs),
                             Ite(
                                 And(
                                     Equals(
-                                        msb_s.buildExpression(emptyList(), emptySet()),
+                                        msb_s.buildExpression(emptyList(), emptyList()),
                                         BVLiteral("#b0")),
                                     Equals(
-                                        msb_t.buildExpression(emptyList(), emptySet()),
+                                        msb_t.buildExpression(emptyList(), emptyList()),
                                         BVLiteral("#b1"))),
-                                BVAdd(u.buildExpression(emptyList(), emptySet()), rhs),
-                                BVNeg(u.buildExpression(emptyList(), emptySet())))))))))
+                                BVAdd(u.buildExpression(emptyList(), emptyList()), rhs),
+                                BVNeg(u.buildExpression(emptyList(), emptyList())))))))))
   }
 }
 
@@ -1057,7 +1060,8 @@ class BVULe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
     require(lhs.sort.bits == rhs.sort.bits)
   }
 
-  override fun copy(children: List<Expression<*>>) = BVULeDecl.buildExpression(children, emptySet())
+  override fun copy(children: List<Expression<*>>) =
+      BVULeDecl.buildExpression(children, emptyList())
 
   fun expand() = Or(BVUlt(lhs, rhs), Equals(lhs, rhs))
 }
@@ -1084,7 +1088,8 @@ class BVUGt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
     require(lhs.sort.bits == rhs.sort.bits)
   }
 
-  override fun copy(children: List<Expression<*>>) = BVUGtDecl.buildExpression(children, emptySet())
+  override fun copy(children: List<Expression<*>>) =
+      BVUGtDecl.buildExpression(children, emptyList())
 
   fun expand() = BVUlt(rhs, lhs)
 }
@@ -1111,7 +1116,8 @@ class BVUGe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
     require(lhs.sort.bits == rhs.sort.bits)
   }
 
-  override fun copy(children: List<Expression<*>>) = BVUGeDecl.buildExpression(children, emptySet())
+  override fun copy(children: List<Expression<*>>) =
+      BVUGeDecl.buildExpression(children, emptyList())
 
   fun expand() = Or(BVUlt(rhs, lhs), Equals(lhs, rhs))
 }
@@ -1138,7 +1144,8 @@ class BVSLt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
     require(lhs.sort.bits == rhs.sort.bits)
   }
 
-  override fun copy(children: List<Expression<*>>) = BVSLtDecl.buildExpression(children, emptySet())
+  override fun copy(children: List<Expression<*>>) =
+      BVSLtDecl.buildExpression(children, emptyList())
 
   fun expand() =
       Or(
@@ -1174,7 +1181,8 @@ class BVSLe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
     require(lhs.sort.bits == rhs.sort.bits)
   }
 
-  override fun copy(children: List<Expression<*>>) = BVSLeDecl.buildExpression(children, emptySet())
+  override fun copy(children: List<Expression<*>>) =
+      BVSLeDecl.buildExpression(children, emptyList())
 
   fun expand() =
       Or(
@@ -1210,7 +1218,8 @@ class BVSGt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
     require(lhs.sort.bits == rhs.sort.bits)
   }
 
-  override fun copy(children: List<Expression<*>>) = BVSGtDecl.buildExpression(children, emptySet())
+  override fun copy(children: List<Expression<*>>) =
+      BVSGtDecl.buildExpression(children, emptyList())
 
   fun expand() = BVSLt(rhs, lhs).expand()
 }
@@ -1237,7 +1246,8 @@ class BVSGe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
     require(lhs.sort.bits == rhs.sort.bits)
   }
 
-  override fun copy(children: List<Expression<*>>) = BVSGeDecl.buildExpression(children, emptySet())
+  override fun copy(children: List<Expression<*>>) =
+      BVSGeDecl.buildExpression(children, emptyList())
 
   fun expand() = BVSLe(rhs, lhs).expand()
 }
@@ -1268,7 +1278,7 @@ class BVAShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
   override val rhs: Expression<BVSort> = distance
 
   override fun copy(children: List<Expression<*>>) =
-      BVAShrDecl.buildExpression(children, emptySet())
+      BVAShrDecl.buildExpression(children, emptyList())
 
   fun expand() =
       Ite(
@@ -1309,7 +1319,7 @@ class Repeat(val j: Int, override val inner: Expression<BVSort>) :
       }
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      RepeatDecl.buildExpression(children, setOf(NumeralIndex(j)))
+      RepeatDecl.buildExpression(children, listOf(j.idx()))
 }
 
 object RepeatDecl :
@@ -1338,7 +1348,7 @@ class ZeroExtend(val i: Int, override val inner: Expression<BVSort>) :
       }
 
   override fun copy(children: List<Expression<*>>) =
-      ZeroExtendDecl.buildExpression(children, emptySet())
+      ZeroExtendDecl.buildExpression(children, emptyList())
 }
 
 object ZeroExtendDecl :
@@ -1367,7 +1377,7 @@ class SignExtend(val i: Int, override val inner: Expression<BVSort>) :
       }
 
   override fun copy(children: List<Expression<*>>) =
-      SignExtendDecl.buildExpression(children, emptySet())
+      SignExtendDecl.buildExpression(children, emptyList())
 }
 
 object SignExtendDecl :
@@ -1389,7 +1399,7 @@ class RotateLeft(val i: Int, override val inner: Expression<BVSort>) :
   }
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      RotateLeftDecl.buildExpression(children, setOf(i.idx()))
+      RotateLeftDecl.buildExpression(children, listOf(i.idx()))
 
   fun expand() =
       if (i == 0 || sort.bits == 1 || sort.bits == i) {
@@ -1422,7 +1432,7 @@ class RotateRight(val i: Int, override val inner: Expression<BVSort>) :
   }
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      RotateRightDecl.buildExpression(children, setOf(i.idx()))
+      RotateRightDecl.buildExpression(children, listOf(i.idx()))
 
   fun expand(): Expression<BVSort> = TODO()
 }

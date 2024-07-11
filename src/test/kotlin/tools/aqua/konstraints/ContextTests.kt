@@ -112,7 +112,7 @@ class ContextTests {
     val function = context.getFunction(name, args)
 
     requireNotNull(function)
-    assert(function.acceptsExpressions(args, emptySet()))
+    assert(function.acceptsExpressions(args, emptyList()))
   }
 
   private fun getFunctionNameAndArgs(): Stream<Arguments> {
@@ -126,7 +126,7 @@ class ContextTests {
       function: FunctionDecl<*>,
       args: List<Expression<*>>
   ) {
-    assertFalse(function.acceptsExpressions(args, emptySet()))
+    assertFalse(function.acceptsExpressions(args, emptyList()))
   }
 
   @ParameterizedTest
@@ -136,7 +136,7 @@ class ContextTests {
       function: FunctionDecl<*>,
       args: List<Expression<*>>
   ) {
-    assertThrows<Exception> { function.buildExpression(args, emptySet()) }
+    assertThrows<Exception> { function.buildExpression(args, emptyList()) }
   }
 
   private fun getFunctionNameAndIncorrectArgs(): Stream<Arguments> {

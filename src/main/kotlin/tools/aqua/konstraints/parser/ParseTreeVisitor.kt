@@ -114,9 +114,9 @@ internal class ParseTreeVisitor :
 
     val functionIndices =
         if (simpleQualIdentifier.identifier is IndexedIdentifier) {
-          simpleQualIdentifier.identifier.indices.map { it as NumeralIndex }.toSet()
+          simpleQualIdentifier.identifier.indices.map { it as NumeralIndex }
         } else {
-          emptySet()
+          emptyList()
         }
 
     if (op != null) {
@@ -151,12 +151,11 @@ internal class ParseTreeVisitor :
 
     val functionIndices =
         if (bracketedProtoTerm.qualIdentifier.identifier is IndexedIdentifier) {
-          (bracketedProtoTerm.qualIdentifier.identifier as IndexedIdentifier)
-              .indices
-              .map { it as NumeralIndex }
-              .toSet()
+          (bracketedProtoTerm.qualIdentifier.identifier as IndexedIdentifier).indices.map {
+            it as NumeralIndex
+          }
         } else {
-          emptySet()
+          emptyList()
         }
 
     if (op != null) {

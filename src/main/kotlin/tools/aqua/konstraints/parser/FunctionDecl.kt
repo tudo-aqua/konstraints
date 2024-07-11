@@ -42,21 +42,21 @@ open class FunctionDecl<S : Sort>(
 
   open fun buildExpression(
       args: List<Expression<*>>,
-      functionIndices: Set<NumeralIndex>
+      functionIndices: List<NumeralIndex>
   ): Expression<S> {
     bindParametersToExpressions(args, functionIndices)
 
     return UserDeclaredExpression(name, sort, args)
   }
 
-  open fun bindParametersToExpressions(args: List<Expression<*>>, indices: Set<NumeralIndex>) =
+  fun bindParametersToExpressions(args: List<Expression<*>>, indices: List<NumeralIndex>) =
       bindParametersTo(args.map { it.sort }, indices)
 
   /** Returns true if the function accepts the arguments provided */
-  fun acceptsExpressions(args: List<Expression<*>>, indices: Set<NumeralIndex>): Boolean =
+  fun acceptsExpressions(args: List<Expression<*>>, indices: List<NumeralIndex>): Boolean =
       accepts(args.map { it.sort }, indices)
 
-  fun bindParametersTo(args: List<Sort>, indices: Set<NumeralIndex>) =
+  open fun bindParametersTo(args: List<Sort>, indices: List<NumeralIndex>) =
       when (associativity) {
         Associativity.LEFT_ASSOC -> {
           args.slice(2 ..< args.size).forEach { require(args[0] == it) }
@@ -77,7 +77,7 @@ open class FunctionDecl<S : Sort>(
         Associativity.NONE -> signature.bindParameters(args, indices)
       }
 
-  fun accepts(args: List<Sort>, indices: Set<NumeralIndex>): Boolean {
+  open fun accepts(args: List<Sort>, indices: List<NumeralIndex>): Boolean {
     try {
       bindParametersTo(args, indices)
     } catch (e: Exception) {
@@ -115,7 +115,7 @@ class FunctionDefinition<S : Sort>(
         Associativity.NONE) {
   override fun buildExpression(
       args: List<Expression<*>>,
-      functionIndices: Set<NumeralIndex>
+      functionIndices: List<NumeralIndex>
   ): Expression<S> = UserDefinedExpression(name, sort, args, this)
 
   internal fun expand(args: List<Expression<*>>): Expression<*> {
@@ -148,7 +148,7 @@ abstract class FunctionDecl0<S : Sort>(
 
   override fun buildExpression(
       args: List<Expression<*>>,
-      functionIndices: Set<NumeralIndex>
+      functionIndices: List<NumeralIndex>
   ): Expression<S> {
     require(args.isEmpty())
     val bindings = bindParametersToExpressions(args, functionIndices)
@@ -173,7 +173,7 @@ abstract class FunctionDecl1<P : Sort, S : Sort>(
 
   override fun buildExpression(
       args: List<Expression<*>>,
-      functionIndices: Set<NumeralIndex>
+      functionIndices: List<NumeralIndex>
   ): Expression<S> {
     require(args.size == 1)
     val bindings = bindParametersToExpressions(args, functionIndices)
@@ -203,7 +203,7 @@ abstract class FunctionDecl2<P1 : Sort, P2 : Sort, S : Sort>(
         Associativity.NONE) {
   override fun buildExpression(
       args: List<Expression<*>>,
-      functionIndices: Set<NumeralIndex>
+      functionIndices: List<NumeralIndex>
   ): Expression<S> {
     require(args.size == 2)
     val bindings = bindParametersToExpressions(args, functionIndices)
@@ -239,7 +239,7 @@ abstract class FunctionDecl3<P1 : Sort, P2 : Sort, P3 : Sort, S : Sort>(
         Associativity.NONE) {
   override fun buildExpression(
       args: List<Expression<*>>,
-      functionIndices: Set<NumeralIndex>
+      functionIndices: List<NumeralIndex>
   ): Expression<S> {
     require(args.size == 3)
     val bindings = bindParametersToExpressions(args, functionIndices)
@@ -278,7 +278,7 @@ abstract class FunctionDecl4<P1 : Sort, P2 : Sort, P3 : Sort, P4 : Sort, S : Sor
         Associativity.NONE) {
   override fun buildExpression(
       args: List<Expression<*>>,
-      functionIndices: Set<NumeralIndex>
+      functionIndices: List<NumeralIndex>
   ): Expression<S> {
     require(args.size == 4) { "$name expected 4 arguments but got ${args.size}: $args" }
     val bindings = bindParametersToExpressions(args, functionIndices)
@@ -320,7 +320,7 @@ abstract class FunctionDeclLeftAssociative<P1 : Sort, P2 : Sort, S : Sort>(
         Associativity.LEFT_ASSOC) {
   override fun buildExpression(
       args: List<Expression<*>>,
-      functionIndices: Set<NumeralIndex>
+      functionIndices: List<NumeralIndex>
   ): Expression<S> {
     val bindings = bindParametersToExpressions(args, functionIndices)
 
@@ -358,7 +358,7 @@ abstract class FunctionDeclRightAssociative<P1 : Sort, P2 : Sort, S : Sort>(
         Associativity.RIGHT_ASSOC) {
   override fun buildExpression(
       args: List<Expression<*>>,
-      functionIndices: Set<NumeralIndex>
+      functionIndices: List<NumeralIndex>
   ): Expression<S> {
     val bindings = bindParametersToExpressions(args, functionIndices)
 
@@ -395,7 +395,7 @@ abstract class FunctionDeclChainable<P : Sort>(
         Associativity.CHAINABLE) {
   override fun buildExpression(
       args: List<Expression<*>>,
-      functionIndices: Set<NumeralIndex>
+      functionIndices: List<NumeralIndex>
   ): Expression<BoolSort> {
     val bindings = bindParametersToExpressions(args, functionIndices)
 
@@ -426,7 +426,7 @@ abstract class FunctionDeclPairwise<P : Sort>(
         Associativity.PAIRWISE) {
   override fun buildExpression(
       args: List<Expression<*>>,
-      functionIndices: Set<NumeralIndex>
+      functionIndices: List<NumeralIndex>
   ): Expression<BoolSort> {
     val bindings = bindParametersToExpressions(args, functionIndices)
 

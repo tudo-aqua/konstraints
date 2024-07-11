@@ -464,7 +464,7 @@ object FPNaNDecl :
 class FPAbs(override val inner: Expression<FPSort>) :
     UnaryExpression<FPSort, FPSort>("fp.abs".symbol(), inner.sort) {
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPAbsDecl.buildExpression(children, emptySet())
+      FPAbsDecl.buildExpression(children, emptyList())
 }
 
 /** Absolute value declaration object */
@@ -488,7 +488,7 @@ object FPAbsDecl :
 class FPNeg(override val inner: Expression<FPSort>) :
     UnaryExpression<FPSort, FPSort>("fp.neg".symbol(), inner.sort) {
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPNegDecl.buildExpression(children, emptySet())
+      FPNegDecl.buildExpression(children, emptyList())
 }
 
 /** Negation declaration object */
@@ -528,7 +528,7 @@ class FPAdd(
   }
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPAddDecl.buildExpression(children, emptySet())
+      FPAddDecl.buildExpression(children, emptyList())
 }
 
 /** Addition declaration object */
@@ -574,7 +574,7 @@ class FPSub(
   }
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPSubDecl.buildExpression(children, emptySet())
+      FPSubDecl.buildExpression(children, emptyList())
 }
 
 /** Subtraction declaration object */
@@ -620,7 +620,7 @@ class FPMul(
   }
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPMulDecl.buildExpression(children, emptySet())
+      FPMulDecl.buildExpression(children, emptyList())
 }
 
 object FPMulDecl :
@@ -665,7 +665,7 @@ class FPDiv(
   }
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPDivDecl.buildExpression(children, emptySet())
+      FPDivDecl.buildExpression(children, emptyList())
 }
 
 object FPDivDecl :
@@ -711,7 +711,7 @@ class FPFma(
       listOf(roundingMode, multiplier, multiplicand, summand)
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPFmaDecl.buildExpression(children, emptySet())
+      FPFmaDecl.buildExpression(children, emptyList())
 }
 
 object FPFmaDecl :
@@ -746,7 +746,7 @@ class FPSqrt(val roundingMode: Expression<RoundingMode>, val inner: Expression<F
   override val rhs: Expression<FPSort> = inner
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPSqrtDecl.buildExpression(children, emptySet())
+      FPSqrtDecl.buildExpression(children, emptyList())
 }
 
 object FPSqrtDecl :
@@ -786,7 +786,7 @@ class FPRem(val dividend: Expression<FPSort>, val divisor: Expression<FPSort>) :
   override fun toString(): String = "(fp.rem $dividend $divisor)"
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPRemDecl.buildExpression(children, emptySet())
+      FPRemDecl.buildExpression(children, emptyList())
 }
 
 object FPRemDecl :
@@ -817,7 +817,7 @@ class FPRoundToIntegral(val roundingMode: Expression<RoundingMode>, val inner: E
   override val rhs: Expression<FPSort> = inner
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPRoundToIntegralDecl.buildExpression(children, emptySet())
+      FPRoundToIntegralDecl.buildExpression(children, emptyList())
 }
 
 object FPRoundToIntegralDecl :
@@ -851,7 +851,7 @@ class FPMin(override val lhs: Expression<FPSort>, override val rhs: Expression<F
   }
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPMinDecl.buildExpression(children, emptySet())
+      FPMinDecl.buildExpression(children, emptyList())
 }
 
 object FPMinDecl :
@@ -885,7 +885,7 @@ class FPMax(override val lhs: Expression<FPSort>, override val rhs: Expression<F
   }
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPMaxDecl.buildExpression(children, emptySet())
+      FPMaxDecl.buildExpression(children, emptyList())
 }
 
 object FPMaxDecl :
@@ -926,7 +926,7 @@ class FPLeq(val terms: List<Expression<FPSort>>) :
   override fun toString(): String = "(fp.leq ${terms.joinToString(" ")})"
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPLeqDecl.buildExpression(children, emptySet())
+      FPLeqDecl.buildExpression(children, emptyList())
 }
 
 object FPLeqDecl :
@@ -965,7 +965,7 @@ class FPLt(val terms: List<Expression<FPSort>>) :
   override fun toString(): String = "(fp.lt ${terms.joinToString(" ")})"
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPLtDecl.buildExpression(children, emptySet())
+      FPLtDecl.buildExpression(children, emptyList())
 }
 
 object FPLtDecl :
@@ -1004,7 +1004,7 @@ class FPGeq(val terms: List<Expression<FPSort>>) :
   override fun toString(): String = "(fp.geq ${terms.joinToString(" ")})"
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPGeqDecl.buildExpression(children, emptySet())
+      FPGeqDecl.buildExpression(children, emptyList())
 }
 
 object FPGeqDecl :
@@ -1043,7 +1043,7 @@ class FPGt(val terms: List<Expression<FPSort>>) :
   override fun toString(): String = "(fp.gt ${terms.joinToString(" ")})"
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPGtDecl.buildExpression(children, emptySet())
+      FPGtDecl.buildExpression(children, emptyList())
 }
 
 object FPGtDecl :
@@ -1080,7 +1080,7 @@ class FPEq(val terms: List<Expression<FPSort>>) :
   }
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPEqDecl.buildExpression(children, emptySet())
+      FPEqDecl.buildExpression(children, emptyList())
 }
 
 object FPEqDecl :
@@ -1101,7 +1101,7 @@ object FPEqDecl :
 class FPIsNormal(override val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isNormal".symbol(), BoolSort) {
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPIsNormalDecl.buildExpression(children, emptySet())
+      FPIsNormalDecl.buildExpression(children, emptyList())
 }
 
 object FPIsNormalDecl :
@@ -1122,7 +1122,7 @@ object FPIsNormalDecl :
 class FPIsSubnormal(override val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isSubnormal".symbol(), BoolSort) {
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPIsSubormalDecl.buildExpression(children, emptySet())
+      FPIsSubormalDecl.buildExpression(children, emptyList())
 }
 
 object FPIsSubormalDecl :
@@ -1143,7 +1143,7 @@ object FPIsSubormalDecl :
 class FPIsZero(override val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isZero".symbol(), BoolSort) {
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPIsZeroDecl.buildExpression(children, emptySet())
+      FPIsZeroDecl.buildExpression(children, emptyList())
 }
 
 object FPIsZeroDecl :
@@ -1164,7 +1164,7 @@ object FPIsZeroDecl :
 class FPIsInfinite(override val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isInfinite".symbol(), BoolSort) {
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPIsInfiniteDecl.buildExpression(children, emptySet())
+      FPIsInfiniteDecl.buildExpression(children, emptyList())
 }
 
 object FPIsInfiniteDecl :
@@ -1185,7 +1185,7 @@ object FPIsInfiniteDecl :
 class FPIsNaN(override val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isNaN".symbol(), BoolSort) {
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPIsNaNDecl.buildExpression(children, emptySet())
+      FPIsNaNDecl.buildExpression(children, emptyList())
 }
 
 object FPIsNaNDecl :
@@ -1206,7 +1206,7 @@ object FPIsNaNDecl :
 class FPIsNegative(override val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isNegative".symbol(), BoolSort) {
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPIsNegativeDecl.buildExpression(children, emptySet())
+      FPIsNegativeDecl.buildExpression(children, emptyList())
 }
 
 object FPIsNegativeDecl :
@@ -1227,7 +1227,7 @@ object FPIsNegativeDecl :
 class FPIsPositive(override val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isPositive".symbol(), BoolSort) {
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPIsPositiveDecl.buildExpression(children, emptySet())
+      FPIsPositiveDecl.buildExpression(children, emptyList())
 }
 
 object FPIsPositiveDecl :
@@ -1263,7 +1263,7 @@ class BitVecToFP(override val inner: Expression<BVSort>, val eb: Int, val sb: In
   }
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      BitVecToFPDecl.buildExpression(children, emptySet())
+      BitVecToFPDecl.buildExpression(children, emptyList())
 }
 
 object BitVecToFPDecl :
@@ -1297,7 +1297,7 @@ class FPToFP(
   override fun toString(): String = "((_ to_fp $eb $sb) $roundingMode $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPToFPDecl.buildExpression(children, emptySet())
+      FPToFPDecl.buildExpression(children, emptyList())
 }
 
 object FPToFPDecl :
@@ -1334,7 +1334,7 @@ class RealToFP(
   override fun toString(): String = "((_ to_fp $eb $sb) $roundingMode $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      RealToFPDecl.buildExpression(children, emptySet())
+      RealToFPDecl.buildExpression(children, emptyList())
 }
 
 object RealToFPDecl :
@@ -1372,7 +1372,7 @@ class SBitVecToFP(
   override fun toString(): String = "((_ to_fp $eb $sb) $roundingMode $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      SBitVecToFPDecl.buildExpression(children, emptySet())
+      SBitVecToFPDecl.buildExpression(children, emptyList())
 }
 
 object SBitVecToFPDecl :
@@ -1411,7 +1411,7 @@ class UBitVecToFP(
   override fun toString(): String = "((_ to_fp_unsigned $eb $sb) $roundingMode $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      UBitVecToFPDecl.buildExpression(children, emptySet())
+      UBitVecToFPDecl.buildExpression(children, emptyList())
 }
 
 object UBitVecToFPDecl :
@@ -1453,7 +1453,7 @@ class FPToUBitVec(
   override fun toString(): String = "((_ fp.to_ubv $m) $roundingMode $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      FPToUBitVecDecl.buildExpression(children, emptySet())
+      FPToUBitVecDecl.buildExpression(children, emptyList())
 }
 
 object FPToUBitVecDecl :
@@ -1491,7 +1491,7 @@ class FPToSBitVec(
   override fun toString(): String = "((_ fp.to_sbv $m) $roundingMode $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      FPToSBitVecDecl.buildExpression(children, emptySet())
+      FPToSBitVecDecl.buildExpression(children, emptyList())
 }
 
 object FPToSBitVecDecl :
@@ -1518,7 +1518,7 @@ object FPToSBitVecDecl :
 class FPToReal(override val inner: Expression<FPSort>) :
     UnaryExpression<RealSort, FPSort>("fp.to_real".symbol(), RealSort) {
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
-      FPToRealDecl.buildExpression(children, emptySet())
+      FPToRealDecl.buildExpression(children, emptyList())
 }
 
 object FPToRealDecl :

@@ -60,7 +60,7 @@ class ArraySelect(val array: Expression<ArraySort>, val index: Expression<*>) :
   override val rhs: Expression<Sort> = index as Expression<Sort>
 
   override fun copy(children: List<Expression<*>>): Expression<Sort> =
-      ArraySelectDecl.buildExpression(children, emptySet())
+      ArraySelectDecl.buildExpression(children, emptyList())
 }
 
 /** Array selection declaration object */
@@ -98,7 +98,7 @@ class ArrayStore(
   override val children: List<Expression<*>> = listOf(array, index, value)
 
   override fun copy(children: List<Expression<*>>): Expression<ArraySort> =
-      ArrayStoreDecl.buildExpression(children, emptySet())
+      ArrayStoreDecl.buildExpression(children, emptyList())
 }
 
 /** Array store declaration object */
