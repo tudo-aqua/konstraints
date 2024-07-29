@@ -35,6 +35,24 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
 
   private var model: Z3Model? = null
 
+  fun solve(terms: List<Expression<BoolSort>>): SatStatus {
+    val declarations = mutableListOf<DeclareFun>()
+    terms.forEach { base ->
+      base.forEach {
+        if (it is UserDeclaredExpression<*> &&
+            declarations.find { decl -> decl.name == it.name } == null) {
+          declarations.add(DeclareFun(it.name, it.children.map { it.sort }, it.sort))
+        }
+      }
+    }
+
+    declarations.forEach { visit(it) }
+    terms.forEach { visit(Assert(it)) }
+    visit(CheckSat)
+
+    return status
+  }
+
   override fun solve(program: SMTProgram): SatStatus {
     program.commands.forEach { visit(it) }
 

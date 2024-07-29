@@ -977,14 +977,14 @@ class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<
     val msb_t = VarBinding("?msb_t".symbol(), BVExtract(sort.bits - 1, sort.bits - 1, rhs))
     val abs_s =
         VarBinding(
-            "?msb_s".symbol(),
+            "?abs_s".symbol(),
             Ite(
                 Equals(msb_s.buildExpression(emptyList(), emptyList()), BVLiteral("#b0")),
                 lhs,
                 BVNeg(lhs)))
     val abs_t =
         VarBinding(
-            "?msb_t".symbol(),
+            "?abs_t".symbol(),
             Ite(
                 Equals(msb_s.buildExpression(emptyList(), emptyList()), BVLiteral("#b0")),
                 rhs,

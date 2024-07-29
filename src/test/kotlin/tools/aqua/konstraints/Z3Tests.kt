@@ -33,12 +33,12 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.petitparser.context.ParseError
+import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.parser.ParseTreeVisitor
-import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.parser.ProtoCommand
-import tools.aqua.konstraints.parser.SymbolAttributeValue
-import tools.aqua.konstraints.smt.Command
+import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.solvers.z3.Z3Solver
+import tools.aqua.konstraints.theories.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Z3Tests {
@@ -381,5 +381,108 @@ class Z3Tests {
               .toString(),
           solver.status.toString())
     }
+  }
+
+  @ParameterizedTest
+  @MethodSource("getTerms")
+  fun testDirectSolvingMode(terms: List<Expression<BoolSort>>) {
+    val solver = Z3Solver()
+
+    val status = solver.solve(terms)
+
+    println(status)
+  }
+
+  fun getTerms(): Stream<Arguments> {
+    val sort = BVSort(16)
+    val lhs = UserDeclaredExpression("A".symbol(), sort)
+    val rhs = UserDeclaredExpression("A".symbol(), sort)
+    val msb_s = VarBinding("?msb_s".symbol(), BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs))
+    val msb_t = VarBinding("?msb_t".symbol(), BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, rhs))
+    val abs_s =
+        VarBinding(
+            "?abs_s".symbol(),
+            Ite(
+                Equals(msb_s.buildExpression(emptyList(), emptyList()), BVLiteral("#b0")),
+                lhs,
+                BVNeg(lhs)))
+    val abs_t =
+        VarBinding(
+            "?abs_t".symbol(),
+            Ite(
+                Equals(msb_s.buildExpression(emptyList(), emptyList()), BVLiteral("#b0")),
+                rhs,
+                BVNeg(rhs)))
+    val u =
+        VarBinding(
+            "u".symbol(),
+            BVURem(
+                abs_s.buildExpression(emptyList(), emptyList()),
+                abs_t.buildExpression(emptyList(), emptyList())))
+
+    return Stream.of(
+        Arguments.arguments(
+            listOf(
+                And(
+                    IntGreaterEq(
+                        UserDeclaredExpression("A".symbol(), IntSort, emptyList()),
+                        UserDeclaredExpression("B".symbol(), IntSort, emptyList())),
+                    IntLessEq(
+                        UserDeclaredExpression("A".symbol(), IntSort, emptyList()),
+                        UserDeclaredExpression("B".symbol(), IntSort, emptyList()))))),
+        Arguments.arguments(
+            listOf(
+                Equals(
+                    LetExpression(
+                        sort,
+                        listOf(msb_s, msb_t),
+                        LetExpression(
+                            sort,
+                            listOf(abs_s, abs_t),
+                            LetExpression(
+                                sort,
+                                listOf(u),
+                                Ite(
+                                    Equals(
+                                        u.buildExpression(emptyList(), emptyList()),
+                                        BVLiteral("#b0", sort.bits)),
+                                    u.buildExpression(emptyList(), emptyList()),
+                                    Ite(
+                                        And(
+                                            Equals(
+                                                msb_s.buildExpression(emptyList(), emptyList()),
+                                                BVLiteral("#b0")),
+                                            Equals(
+                                                msb_t.buildExpression(emptyList(), emptyList()),
+                                                BVLiteral("#b0"))),
+                                        u.buildExpression(emptyList(), emptyList()),
+                                        Ite(
+                                            And(
+                                                Equals(
+                                                    msb_s.buildExpression(emptyList(), emptyList()),
+                                                    BVLiteral("#b1")),
+                                                Equals(
+                                                    msb_t.buildExpression(emptyList(), emptyList()),
+                                                    BVLiteral("#b0"))),
+                                            BVAdd(
+                                                BVNeg(u.buildExpression(emptyList(), emptyList())),
+                                                rhs),
+                                            Ite(
+                                                And(
+                                                    Equals(
+                                                        msb_s.buildExpression(
+                                                            emptyList(), emptyList()),
+                                                        BVLiteral("#b0")),
+                                                    Equals(
+                                                        msb_t.buildExpression(
+                                                            emptyList(), emptyList()),
+                                                        BVLiteral("#b1"))),
+                                                BVAdd(
+                                                    u.buildExpression(emptyList(), emptyList()),
+                                                    rhs),
+                                                BVNeg(
+                                                    u.buildExpression(
+                                                        emptyList(), emptyList()))))))))),
+                    BVSMod(lhs, rhs)))))
   }
 }

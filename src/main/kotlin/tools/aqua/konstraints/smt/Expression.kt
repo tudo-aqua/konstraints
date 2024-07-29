@@ -79,6 +79,11 @@ sealed interface Expression<T : Sort> {
         is AnnotatedExpression -> predicate(this) and this.term.all(predicate)
       }
 
+  fun forEach(action: (Expression<*>) -> Unit) {
+    action(this)
+    this.children.forEach { it.forEach(action) }
+  }
+
   fun transform(transformation: (Expression<*>) -> Expression<*>): Expression<T> {
     // transform all children
     val transformedChildren = this.children.map { it.transform(transformation) }
