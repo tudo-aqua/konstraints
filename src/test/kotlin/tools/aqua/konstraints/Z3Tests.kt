@@ -401,88 +401,104 @@ class Z3Tests {
     val msb_t = VarBinding("?msb_t".symbol(), BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, rhs))
     val abs_s =
         VarBinding(
-            "?abs_s".symbol(),
-            Ite(
-                Equals(msb_s.buildExpression(emptyList(), emptyList()), BVLiteral("#b0")),
-                lhs,
-                BVNeg(lhs)))
+            "?abs_s".symbol(), Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)))
     val abs_t =
         VarBinding(
-            "?abs_t".symbol(),
-            Ite(
-                Equals(msb_s.buildExpression(emptyList(), emptyList()), BVLiteral("#b0")),
-                rhs,
-                BVNeg(rhs)))
-    val u =
-        VarBinding(
-            "u".symbol(),
-            BVURem(
-                abs_s.buildExpression(emptyList(), emptyList()),
-                abs_t.buildExpression(emptyList(), emptyList())))
+            "?abs_t".symbol(), Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)))
+    val u = VarBinding("u".symbol(), BVURem(abs_s.instance, abs_t.instance))
+
+    val A = UserDeclaredExpression("A".symbol(), IntSort)
+    val B = UserDeclaredExpression("B".symbol(), IntSort)
 
     return Stream.of(
-        Arguments.arguments(
-            listOf(
-                And(
-                    IntGreaterEq(
-                        UserDeclaredExpression("A".symbol(), IntSort, emptyList()),
-                        UserDeclaredExpression("B".symbol(), IntSort, emptyList())),
-                    IntLessEq(
-                        UserDeclaredExpression("A".symbol(), IntSort, emptyList()),
-                        UserDeclaredExpression("B".symbol(), IntSort, emptyList()))))),
+        Arguments.arguments(listOf(And(IntGreaterEq(A, B), IntLessEq(A, B)))),
         Arguments.arguments(
             listOf(
                 Equals(
                     LetExpression(
-                        sort,
                         listOf(msb_s, msb_t),
                         LetExpression(
-                            sort,
                             listOf(abs_s, abs_t),
                             LetExpression(
-                                sort,
                                 listOf(u),
                                 Ite(
-                                    Equals(
-                                        u.buildExpression(emptyList(), emptyList()),
-                                        BVLiteral("#b0", sort.bits)),
-                                    u.buildExpression(emptyList(), emptyList()),
+                                    Equals(u.instance, BVLiteral("#b0", sort.bits)),
+                                    u.instance,
                                     Ite(
                                         And(
-                                            Equals(
-                                                msb_s.buildExpression(emptyList(), emptyList()),
-                                                BVLiteral("#b0")),
-                                            Equals(
-                                                msb_t.buildExpression(emptyList(), emptyList()),
-                                                BVLiteral("#b0"))),
-                                        u.buildExpression(emptyList(), emptyList()),
+                                            Equals(msb_s.instance, BVLiteral("#b0")),
+                                            Equals(msb_t.instance, BVLiteral("#b0"))),
+                                        u.instance,
                                         Ite(
                                             And(
-                                                Equals(
-                                                    msb_s.buildExpression(emptyList(), emptyList()),
-                                                    BVLiteral("#b1")),
-                                                Equals(
-                                                    msb_t.buildExpression(emptyList(), emptyList()),
-                                                    BVLiteral("#b0"))),
-                                            BVAdd(
-                                                BVNeg(u.buildExpression(emptyList(), emptyList())),
-                                                rhs),
+                                                Equals(msb_s.instance, BVLiteral("#b1")),
+                                                Equals(msb_t.instance, BVLiteral("#b0"))),
+                                            BVAdd(BVNeg(u.instance), rhs),
                                             Ite(
                                                 And(
-                                                    Equals(
-                                                        msb_s.buildExpression(
-                                                            emptyList(), emptyList()),
-                                                        BVLiteral("#b0")),
-                                                    Equals(
-                                                        msb_t.buildExpression(
-                                                            emptyList(), emptyList()),
-                                                        BVLiteral("#b1"))),
-                                                BVAdd(
-                                                    u.buildExpression(emptyList(), emptyList()),
-                                                    rhs),
-                                                BVNeg(
-                                                    u.buildExpression(
-                                                        emptyList(), emptyList()))))))))),
+                                                    Equals(msb_s.instance, BVLiteral("#b0")),
+                                                    Equals(msb_t.instance, BVLiteral("#b1"))),
+                                                BVAdd(u.instance, rhs),
+                                                BVNeg(u.instance)))))))),
+                    BVSMod(lhs, rhs)))),
+        Arguments.arguments(
+            listOf(
+                Equals(
+                    LetExpression(
+                        VarBinding(
+                            "?msb_s".symbol(),
+                            BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs)),
+                        VarBinding(
+                            "?msb_t".symbol(),
+                            BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, rhs))) { msb_s, msb_t ->
+                          LetExpression(
+                              VarBinding(
+                                  "?abs_s".symbol(),
+                                  Ite(Equals(msb_s, BVLiteral("#b0")), lhs, BVNeg(lhs))),
+                              VarBinding(
+                                  "?abs_t".symbol(),
+                                  Ite(Equals(msb_s, BVLiteral("#b0")), rhs, BVNeg(rhs)))) {
+                                  abs_s,
+                                  abs_t ->
+                                LetExpression(
+                                    VarBinding(
+                                        "u".symbol(),
+                                        BVURem(
+                                            abs_s castTo BVSort((abs_s.sort as BVSort).bits),
+                                            abs_t castTo BVSort((abs_t.sort as BVSort).bits)))) { u
+                                      ->
+                                      Ite(
+                                          Equals(u, BVLiteral("#b0", sort.bits)),
+                                          u,
+                                          Ite(
+                                              And(
+                                                  Equals(msb_s, BVLiteral("#b0")),
+                                                  Equals(msb_t, BVLiteral("#b0"))),
+                                              u,
+                                              Ite(
+                                                  And(
+                                                      Equals(msb_s, BVLiteral("#b1")),
+                                                      Equals(msb_t, BVLiteral("#b0"))),
+                                                  BVAdd(
+                                                      BVNeg(
+                                                          u castTo
+                                                              BVSort((abs_t.sort as BVSort).bits)),
+                                                      rhs),
+                                                  Ite(
+                                                      And(
+                                                          Equals(msb_s, BVLiteral("#b0")),
+                                                          Equals(msb_t, BVLiteral("#b1"))),
+                                                      BVAdd(
+                                                          u castTo
+                                                              BVSort((abs_t.sort as BVSort).bits),
+                                                          rhs),
+                                                      BVNeg(
+                                                          u castTo
+                                                              BVSort(
+                                                                  (abs_t.sort as BVSort).bits))))))
+                                    }
+                              }
+                        },
                     BVSMod(lhs, rhs)))))
   }
 }

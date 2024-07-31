@@ -172,7 +172,7 @@ internal class ParseTreeVisitor :
 
     val inner = context?.let(bindings) { visit(protoLet.term) }!!
 
-    return LetExpression(inner.sort, bindings, inner as Expression<Sort>)
+    return LetExpression(bindings, inner as Expression<Sort>)
   }
 
   override fun visit(protoForAll: ProtoForAll): Expression<*> {

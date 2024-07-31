@@ -187,8 +187,8 @@ abstract class HomogenousExpression<T : Sort, S : Sort>(
  */
 class Ite<T : Sort>(
     val statement: Expression<BoolSort>,
-    val then: Expression<T>,
-    val otherwise: Expression<T>
+    val then: Expression<out T>,
+    val otherwise: Expression<out T>
 ) : Expression<T> {
   init {
     require(then.sort == otherwise.sort)
@@ -214,17 +214,36 @@ abstract class NAryExpression<T : Sort>(override val name: Symbol, override val 
 }
 
 /** Let expression */
-class LetExpression<T : Sort>(
-    override val sort: T,
-    val bindings: List<VarBinding<*>>,
-    val inner: Expression<T>
-) : Expression<T> {
+class LetExpression<T : Sort>(val bindings: List<VarBinding<*>>, val inner: Expression<T>) :
+    Expression<T> {
+  override val sort = inner.sort
   override val name = Keyword("let")
+
+  constructor(
+      bindings: List<VarBinding<*>>,
+      inner: (List<Expression<*>>) -> Expression<T>
+  ) : this(bindings, inner(bindings.map { it.instance }))
+
+  /*constructor(
+      vararg bindings: VarBinding<*>,
+      inner: (List<Expression<*>>) -> Expression<T>
+  ) : this(bindings.toList(), inner(bindings.map { it.instance }))*/
+
+  constructor(
+      binding: VarBinding<*>,
+      inner: (Expression<*>) -> Expression<T>
+  ) : this(listOf(binding), inner(binding.instance))
+
+  constructor(
+      binding1: VarBinding<*>,
+      binding2: VarBinding<*>,
+      inner: (Expression<*>, Expression<*>) -> Expression<T>
+  ) : this(listOf(binding1, binding2), inner(binding1.instance, binding2.instance))
 
   override fun copy(children: List<Expression<*>>): Expression<T> {
     require(children.size == 1)
 
-    return LetExpression(sort, bindings, children.single() castTo sort) castTo sort
+    return LetExpression(bindings, children.single() castTo sort) castTo sort
   }
 
   override val children: List<Expression<*>> = listOf(inner)
