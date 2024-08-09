@@ -1,7 +1,7 @@
 <!--
    SPDX-License-Identifier: CC-BY-4.0
 
-   Copyright 2023-2023 The Konstraints Authors
+   Copyright 2023-2024 The Konstraints Authors
 
    This work is licensed under the Creative Commons Attribution 4.0
    International License.
