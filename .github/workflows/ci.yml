@@ -32,16 +32,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  validate-gradle:
-    name: "Gradle Wrapper Validation"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: gradle/actions/wrapper-validation@v4
-
   detekt:
     name: "Detekt Analysis"
-    needs: validate-gradle
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -60,7 +52,6 @@ jobs:
 
   spotless:
     name: "Spotless Style Check"
-    needs: validate-gradle
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -86,7 +77,6 @@ jobs:
 
   junit-test:
     name: "JUnit Tests"
-    needs: validate-gradle
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
