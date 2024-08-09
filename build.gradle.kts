@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2023 The Konstraints Authors
+ * Copyright 2023-2024 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,30 +110,35 @@ tasks.withType<DependencyUpdatesTask> {
 
 spotless {
   kotlin {
-    licenseHeaderFile(project.file("config/license/Apache-2.0-cstyle"))
+    licenseHeaderFile(project.file("config/license/Apache-2.0-cstyle")).updateYearWithLatest(true)
     ktfmt("0.46")
   }
   kotlinGradle {
     licenseHeaderFile(project.file("config/license/Apache-2.0-cstyle"), "(plugins|import )")
+        .updateYearWithLatest(true)
     ktfmt("0.46")
   }
   format("contribPython") {
     target("contrib/*.py")
     licenseHeaderFile(project.file("config/license/Apache-2.0-hashmark"), "import")
         .skipLinesMatching("#!")
+        .updateYearWithLatest(true)
   }
   format("contribShell") {
     target("contrib/*.sh")
     licenseHeaderFile(project.file("config/license/Apache-2.0-hashmark"), "set")
         .skipLinesMatching("#!")
+        .updateYearWithLatest(true)
   }
   format("contribSingularity") {
     target("contrib/*.def")
     licenseHeaderFile(project.file("config/license/Apache-2.0-hashmark"), "Bootstrap:")
+        .updateYearWithLatest(true)
   }
   format("markdown") {
     target(".github/**/*.md", "*.md")
     licenseHeaderFile(project.file("config/license/CC-BY-4.0-xmlstyle"), "#+")
+        .updateYearWithLatest(true)
     prettier()
         .npmInstallCache()
         .nodeExecutable(computeNodeExec(node, computeNodeDir(node)).get())
@@ -142,6 +147,7 @@ spotless {
   yaml {
     target("config/**/*.yml", ".github/**/*.yml", "CITATION.cff")
     licenseHeaderFile(project.file("config/license/Apache-2.0-hashmark"), "[A-Za-z-]+:")
+        .updateYearWithLatest(true)
     prettier()
         .npmInstallCache()
         .nodeExecutable(computeNodeExec(node, computeNodeDir(node)).get())
@@ -150,6 +156,7 @@ spotless {
   format("toml") {
     target("gradle/libs.versions.toml")
     licenseHeaderFile(project.file("config/license/Apache-2.0-hashmark"), """\[[A-Za-z-]+]""")
+        .updateYearWithLatest(true)
     prettier(mapOf("prettier-plugin-toml" to libs.versions.prettier.toml.get()))
         .npmInstallCache()
         .nodeExecutable(computeNodeExec(node, computeNodeDir(node)).get())
