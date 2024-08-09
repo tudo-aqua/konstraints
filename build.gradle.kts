@@ -111,12 +111,12 @@ tasks.withType<DependencyUpdatesTask> {
 spotless {
   kotlin {
     licenseHeaderFile(project.file("config/license/Apache-2.0-cstyle")).updateYearWithLatest(true)
-    ktfmt("0.46")
+    ktfmt()
   }
   kotlinGradle {
     licenseHeaderFile(project.file("config/license/Apache-2.0-cstyle"), "(plugins|import )")
         .updateYearWithLatest(true)
-    ktfmt("0.46")
+    ktfmt()
   }
   format("contribPython") {
     target("contrib/*.py")
