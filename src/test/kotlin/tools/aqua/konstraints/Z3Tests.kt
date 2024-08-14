@@ -33,12 +33,12 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.petitparser.context.ParseError
+import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.parser.ParseTreeVisitor
-import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.parser.ProtoCommand
-import tools.aqua.konstraints.parser.SymbolAttributeValue
-import tools.aqua.konstraints.smt.Command
+import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.solvers.z3.Z3Solver
+import tools.aqua.konstraints.theories.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Z3Tests {
@@ -381,5 +381,124 @@ class Z3Tests {
               .toString(),
           solver.status.toString())
     }
+  }
+
+  @ParameterizedTest
+  @MethodSource("getTerms")
+  fun testDirectSolvingMode(terms: List<Expression<BoolSort>>) {
+    val solver = Z3Solver()
+
+    val status = solver.solve(terms)
+
+    println(status)
+  }
+
+  fun getTerms(): Stream<Arguments> {
+    val sort = BVSort(16)
+    val lhs = UserDeclaredExpression("A".symbol(), sort)
+    val rhs = UserDeclaredExpression("A".symbol(), sort)
+    val msb_s = VarBinding("?msb_s".symbol(), BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs))
+    val msb_t = VarBinding("?msb_t".symbol(), BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, rhs))
+    val abs_s =
+        VarBinding(
+            "?abs_s".symbol(), Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)))
+    val abs_t =
+        VarBinding(
+            "?abs_t".symbol(), Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)))
+    val u = VarBinding("u".symbol(), BVURem(abs_s.instance, abs_t.instance))
+
+    val A = UserDeclaredExpression("A".symbol(), IntSort)
+    val B = UserDeclaredExpression("B".symbol(), IntSort)
+
+    return Stream.of(
+        Arguments.arguments(listOf(And(IntGreaterEq(A, B), IntLessEq(A, B)))),
+        Arguments.arguments(
+            listOf(
+                Equals(
+                    LetExpression(
+                        listOf(msb_s, msb_t),
+                        LetExpression(
+                            listOf(abs_s, abs_t),
+                            LetExpression(
+                                listOf(u),
+                                Ite(
+                                    Equals(u.instance, BVLiteral("#b0", sort.bits)),
+                                    u.instance,
+                                    Ite(
+                                        And(
+                                            Equals(msb_s.instance, BVLiteral("#b0")),
+                                            Equals(msb_t.instance, BVLiteral("#b0"))),
+                                        u.instance,
+                                        Ite(
+                                            And(
+                                                Equals(msb_s.instance, BVLiteral("#b1")),
+                                                Equals(msb_t.instance, BVLiteral("#b0"))),
+                                            BVAdd(BVNeg(u.instance), rhs),
+                                            Ite(
+                                                And(
+                                                    Equals(msb_s.instance, BVLiteral("#b0")),
+                                                    Equals(msb_t.instance, BVLiteral("#b1"))),
+                                                BVAdd(u.instance, rhs),
+                                                BVNeg(u.instance)))))))),
+                    BVSMod(lhs, rhs)))),
+        Arguments.arguments(
+            listOf(
+                Equals(
+                    LetExpression(
+                        VarBinding(
+                            "?msb_s".symbol(),
+                            BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs)),
+                        VarBinding(
+                            "?msb_t".symbol(),
+                            BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, rhs))) { msb_s, msb_t ->
+                          LetExpression(
+                              VarBinding(
+                                  "?abs_s".symbol(),
+                                  Ite(Equals(msb_s, BVLiteral("#b0")), lhs, BVNeg(lhs))),
+                              VarBinding(
+                                  "?abs_t".symbol(),
+                                  Ite(Equals(msb_s, BVLiteral("#b0")), rhs, BVNeg(rhs)))) {
+                                  abs_s,
+                                  abs_t ->
+                                LetExpression(
+                                    VarBinding(
+                                        "u".symbol(),
+                                        BVURem(
+                                            abs_s castTo BVSort((abs_s.sort as BVSort).bits),
+                                            abs_t castTo BVSort((abs_t.sort as BVSort).bits)))) { u
+                                      ->
+                                      Ite(
+                                          Equals(u, BVLiteral("#b0", sort.bits)),
+                                          u,
+                                          Ite(
+                                              And(
+                                                  Equals(msb_s, BVLiteral("#b0")),
+                                                  Equals(msb_t, BVLiteral("#b0"))),
+                                              u,
+                                              Ite(
+                                                  And(
+                                                      Equals(msb_s, BVLiteral("#b1")),
+                                                      Equals(msb_t, BVLiteral("#b0"))),
+                                                  BVAdd(
+                                                      BVNeg(
+                                                          u castTo
+                                                              BVSort((abs_t.sort as BVSort).bits)),
+                                                      rhs),
+                                                  Ite(
+                                                      And(
+                                                          Equals(msb_s, BVLiteral("#b0")),
+                                                          Equals(msb_t, BVLiteral("#b1"))),
+                                                      BVAdd(
+                                                          u castTo
+                                                              BVSort((abs_t.sort as BVSort).bits),
+                                                          rhs),
+                                                      BVNeg(
+                                                          u castTo
+                                                              BVSort(
+                                                                  (abs_t.sort as BVSort).bits))))))
+                                    }
+                              }
+                        },
+                    BVSMod(lhs, rhs)))))
   }
 }
