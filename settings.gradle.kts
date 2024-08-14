@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2023 The Konstraints Authors
+ * Copyright 2023-2024 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
  */
 
 plugins {
-  id("com.gradle.develocity") version "3.17.5"
+  id("com.gradle.develocity") version "3.17.6"
   id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
