@@ -34,7 +34,7 @@ taskTree = { id = "com.dorongold.task-tree", version = "4.0.0" }
 versions = { id = "com.github.ben-manes.versions", version = "0.51.0" }
 
 [libraries]
-commons-compress = { group = "org.apache.commons", name = "commons-compress", version = "1.27.0" }
+commons-compress = { group = "org.apache.commons", name = "commons-compress", version = "1.27.1" }
 commons-io = { group = "commons-io", name = "commons-io", version = "2.16.1" }
 junit-bom = { group = "org.junit", name = "junit-bom", version = "5.11.0" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter" } # version from BOM
