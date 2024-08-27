@@ -23,6 +23,7 @@ import tools.aqua.konstraints.dsl.*
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.solvers.z3.Z3Solver
 import tools.aqua.konstraints.theories.BoolSort
+import tools.aqua.konstraints.theories.IntSort
 import tools.aqua.konstraints.theories.Not
 
 class DSLTests {
@@ -35,6 +36,8 @@ class DSLTests {
           val A = const("A", BoolSort)
           val B = const("B", BoolSort)
           val C = const("C", BoolSort)
+          val D = const("D", IntSort)
+          val E = const("E", IntSort)
 
           assert {
             ite {
@@ -73,6 +76,16 @@ class DSLTests {
                 not { A }
                 +B
               }
+            }
+          }
+
+          assert {
+            eq {
+              add {
+                +D
+                +E
+              }
+              +(D + E)
             }
           }
         }
