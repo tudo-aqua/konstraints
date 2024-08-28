@@ -80,7 +80,7 @@ class DSLTests {
           }
 
           assert {
-            eq {
+            eq<IntSort> {
               add {
                 +D
                 +E

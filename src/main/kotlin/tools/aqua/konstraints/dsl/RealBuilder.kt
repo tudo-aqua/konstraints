@@ -58,3 +58,9 @@ fun Builder<RealSort>.add(init: Builder<RealSort>.() -> Unit) = this.makeRealOpe
 fun Builder<RealSort>.sub(init: Builder<RealSort>.() -> Unit) = this.makeRealOperator(init, ::RealSub)
 fun Builder<RealSort>.mul(init: Builder<RealSort>.() -> Unit) = this.makeRealOperator(init, ::RealMul)
 fun Builder<RealSort>.div(init: Builder<RealSort>.() -> Unit) = this.makeRealOperator(init, ::RealDiv)
+
+fun Builder<RealSort>.toReal(block: Builder<IntSort>.() -> Expression<IntSort>): ToReal {
+    this.children.add(ToReal(Builder<IntSort>().block()))
+
+    return this.children.last() as ToReal
+}

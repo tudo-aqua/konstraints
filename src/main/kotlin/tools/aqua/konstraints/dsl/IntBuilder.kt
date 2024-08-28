@@ -66,3 +66,9 @@ fun Builder<IntSort>.abs(block: Builder<IntSort>.() -> Expression<IntSort>): Abs
 
     return this.children.last() as Abs
 }
+
+fun Builder<IntSort>.toInt(block: Builder<RealSort>.() -> Expression<RealSort>): ToInt {
+    this.children.add(ToInt(Builder<RealSort>().block()))
+
+    return this.children.last() as ToInt
+}
