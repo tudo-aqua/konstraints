@@ -94,6 +94,8 @@ class RealSub(val terms: List<Expression<RealSort>>) :
     }
   }
 
+    constructor(vararg terms: Expression<RealSort>): this(terms.toList())
+
   override val children: List<Expression<RealSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
@@ -162,6 +164,8 @@ class RealAdd(val terms: List<Expression<RealSort>>) :
     }
   }
 
+    constructor(vararg terms: Expression<RealSort>): this(terms.toList())
+
   override val children: List<Expression<RealSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
@@ -191,6 +195,8 @@ class RealMul(val factors: List<Expression<RealSort>>) :
       "Integer multiplication needs at least 2 factors but ${factors.size} were provided"
     }
   }
+
+    constructor(vararg factors: Expression<RealSort>): this(factors.toList())
 
   override val children: List<Expression<RealSort>> = factors
 
@@ -222,6 +228,8 @@ class RealDiv(val terms: List<Expression<RealSort>>) :
     }
   }
 
+    constructor(vararg terms: Expression<RealSort>): this(terms.toList())
+
   override val children: List<Expression<RealSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
@@ -252,6 +260,8 @@ class RealLessEq(val terms: List<Expression<RealSort>>) :
     }
   }
 
+    constructor(vararg terms: Expression<RealSort>): this(terms.toList())
+
   override val children: List<Expression<RealSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
@@ -279,6 +289,8 @@ class RealLess(val terms: List<Expression<RealSort>>) :
       "Integer comparison needs at least 2 terms but ${terms.size} were provided"
     }
   }
+
+    constructor(vararg terms: Expression<RealSort>): this(terms.toList())
 
   override val children: List<Expression<RealSort>> = terms
 
@@ -308,6 +320,8 @@ class RealGreaterEq(val terms: List<Expression<RealSort>>) :
     }
   }
 
+    constructor(vararg terms: Expression<RealSort>): this(terms.toList())
+
   override val children: List<Expression<RealSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
@@ -335,6 +349,8 @@ class RealGreater(val terms: List<Expression<RealSort>>) :
       "Integer comparison needs at least 2 terms but ${terms.size} were provided"
     }
   }
+
+    constructor(vararg terms: Expression<RealSort>): this(terms.toList())
 
   override val children: List<Expression<RealSort>> = terms
 
