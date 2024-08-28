@@ -22,7 +22,7 @@ prettier-toml = "2.0.1"
 [plugins]
 detekt = { id = "io.gitlab.arturbosch.detekt", version = "1.23.6" }
 download = { id = "de.undercouch.download", version = "5.6.0" }
-gitVersioning = { id = "me.qoomon.git-versioning", version = "6.4.3" }
+gitVersioning = { id = "me.qoomon.git-versioning", version = "6.4.4" }
 kotlin-dokka = { id = "org.jetbrains.dokka", version = "1.9.20" }
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlin-kover = { id = "org.jetbrains.kotlinx.kover", version = "0.8.3" }
@@ -34,7 +34,7 @@ taskTree = { id = "com.dorongold.task-tree", version = "4.0.0" }
 versions = { id = "com.github.ben-manes.versions", version = "0.51.0" }
 
 [libraries]
-commons-compress = { group = "org.apache.commons", name = "commons-compress", version = "1.27.0" }
+commons-compress = { group = "org.apache.commons", name = "commons-compress", version = "1.27.1" }
 commons-io = { group = "commons-io", name = "commons-io", version = "2.16.1" }
 junit-bom = { group = "org.junit", name = "junit-bom", version = "5.11.0" }
 junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter" } # version from BOM
