@@ -112,3 +112,14 @@ fun Builder<BoolSort>.isInt(block: Builder<RealSort>.() -> Expression<RealSort>)
 
     return this.children.last() as IsInt
 }
+
+fun Builder<BoolSort>.bvult(init: Builder<BVSort>.() -> Unit): Expression<BoolSort> {
+    val builder = Builder<BVSort>()
+    builder.init()
+
+    require(builder.children.size == 2)
+
+    this.children.add(BVUlt(builder.children[0], builder.children[1]))
+
+    return this.children.last() as BVUlt
+}

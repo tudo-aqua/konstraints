@@ -115,6 +115,9 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
   override fun copy(children: List<Expression<*>>): Expression<BVSort> = this
 }
 
+fun String.bitvec() = BVLiteral(this)
+fun String.bitvec(bits: Int) = BVLiteral(this, bits)
+
 /**
  * Concatenation of two [Expression]s of [BVSort]
  *
