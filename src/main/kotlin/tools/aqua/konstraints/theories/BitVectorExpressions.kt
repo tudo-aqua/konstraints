@@ -729,7 +729,7 @@ class BVXOr(val disjuncts: List<Expression<BVSort>>) :
 
   constructor(vararg disjuncts: Expression<BVSort>) : this(disjuncts.toList())
 
-  override val children: List<Expression<*>> = disjuncts
+  override val children: List<Expression<BVSort>> = disjuncts
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
       BVXOrDecl.buildExpression(children, emptyList())
