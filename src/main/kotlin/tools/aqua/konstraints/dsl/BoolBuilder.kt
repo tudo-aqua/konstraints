@@ -68,44 +68,18 @@ infix fun<T : Sort> Expression<T>.distinct(other: Expression<T>): Distinct =
         Distinct(this, other)
     }
 
-fun Builder<BoolSort>.not(block: Builder<BoolSort>.() -> Expression<BoolSort>): Not {
-    val expr = Builder<BoolSort>().block()
-
-    val op = Not(expr)
-    this.children.add(op)
-
-    return op
-}
-
-fun Builder<BoolSort>.and(init: Builder<BoolSort>.() -> Unit): And {
+private fun Builder<BoolSort>.makeBoolOperator(init: Builder<BoolSort>.() -> Unit, op: (List<Expression<BoolSort>>) -> Expression<BoolSort>): Expression<BoolSort> {
     val builder = Builder<BoolSort>()
     builder.init()
 
-    val op = And(builder.children)
-    this.children.add(op)
+    this.children.add(op(builder.children))
 
-    return op
+    return this.children.last()
 }
 
-fun Builder<BoolSort>.or(init: Builder<BoolSort>.() -> Unit): Or {
-    val builder = Builder<BoolSort>()
-    builder.init()
-
-    val op = Or(builder.children)
-    this.children.add(op)
-
-    return op
-}
-
-fun Builder<BoolSort>.xor(init: Builder<BoolSort>.() -> Unit): XOr {
-    val builder = Builder<BoolSort>()
-    builder.init()
-
-    val op = XOr(builder.children)
-    this.children.add(op)
-
-    return op
-}
+fun Builder<BoolSort>.and(init: Builder<BoolSort>.() -> Unit) = this.makeBoolOperator(init, ::And)
+fun Builder<BoolSort>.or(init: Builder<BoolSort>.() -> Unit) = this.makeBoolOperator(init, ::Or)
+fun Builder<BoolSort>.xor(init: Builder<BoolSort>.() -> Unit) = this.makeBoolOperator(init, ::XOr)
 
 fun<T : Sort> Builder<BoolSort>.eq(init: Builder<T>.() -> Unit): Equals {
     val builder = Builder<T>()
@@ -125,4 +99,27 @@ fun<T : Sort> Builder<BoolSort>.distinct(init: Builder<T>.() -> Unit): Equals {
     this.children.add(op)
 
     return op
+}
+
+fun Builder<BoolSort>.not(block: Builder<BoolSort>.() -> Expression<BoolSort>): Not {
+    this.children.add(Not(Builder<BoolSort>().block()))
+
+    return this.children.last() as Not
+}
+
+fun Builder<BoolSort>.isInt(block: Builder<RealSort>.() -> Expression<RealSort>): IsInt {
+    this.children.add(IsInt(Builder<RealSort>().block()))
+
+    return this.children.last() as IsInt
+}
+
+fun Builder<BoolSort>.bvult(init: Builder<BVSort>.() -> Unit): Expression<BoolSort> {
+    val builder = Builder<BVSort>()
+    builder.init()
+
+    require(builder.children.size == 2)
+
+    this.children.add(BVUlt(builder.children[0], builder.children[1]))
+
+    return this.children.last() as BVUlt
 }

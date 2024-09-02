@@ -18,14 +18,25 @@
 
 package tools.aqua.konstraints
 
+import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.Arguments.arguments
+import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.dsl.*
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.solvers.z3.Z3Solver
+import tools.aqua.konstraints.theories.BVSort
 import tools.aqua.konstraints.theories.BoolSort
 import tools.aqua.konstraints.theories.IntSort
 import tools.aqua.konstraints.theories.Not
+import tools.aqua.konstraints.theories.bitvec
+import java.util.stream.Stream
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DSLTests {
   @Test
   fun testCoreDSL() {
@@ -36,6 +47,7 @@ class DSLTests {
           val A = const("A", BoolSort)
           val B = const("B", BoolSort)
           val C = const("C", BoolSort)
+
           val D = const("D", IntSort)
           val E = const("E", IntSort)
 
@@ -78,7 +90,7 @@ class DSLTests {
               }
             }
           }
-
+          
           assert {
             eq<IntSort> {
               add {
@@ -94,4 +106,87 @@ class DSLTests {
 
     print(result)
   }
+
+  @ParameterizedTest
+  @MethodSource("getProgramAndStatus")
+  fun testProgram(program: SMTProgram, expected: SatStatus) {
+    val solver = Z3Solver()
+    solver.solve(program)
+
+    assertEquals(expected, solver.status)
+  }
+
+  private fun getProgramAndStatus() : Stream<Arguments> = Stream.of(
+    arguments(
+      smt(QF_BV) {
+        val s = const(BVSort(32))
+        val t = const(BVSort(32))
+
+        assert {
+          not {
+            eq {
+              +(s bvand s)
+              +s
+            }
+          }
+        }
+      },
+      SatStatus.UNSAT
+    ),
+    arguments(
+      smt(QF_BV) {
+        val s = const(BVSort(32))
+        val t = const(BVSort(32))
+
+        assert {
+          not { (s bvand s) eq s }
+        }
+      },
+      SatStatus.UNSAT
+    ),
+    arguments(
+      smt(QF_BV) {
+        val s = const(BVSort(32))
+        val t = const(BVSort(32))
+
+        assert {
+          not { (s bvlshr s) eq "#b0".bitvec(32) }
+        }
+      },
+      SatStatus.UNSAT
+    ),
+    arguments(
+      smt(QF_BV) {
+        val s = const(BVSort(32))
+        val t = const(BVSort(32))
+
+        assert {
+          not { s bvor s eq s }
+        }
+      },
+      SatStatus.UNSAT
+    ),
+    arguments(
+      smt(QF_BV) {
+        val s = const(BVSort(32))
+        val t = const(BVSort(32))
+
+        assert {
+          not { s bvadd "#b0".bitvec(32) eq s }
+        }
+      },
+      SatStatus.UNSAT
+    ),
+    arguments(
+      smt(QF_BV) {
+        val s = const(BVSort(32))
+        val t = const(BVSort(32))
+
+        assert {
+          not { s bvmul "#b0".bitvec(32) eq "#b0".bitvec(32) }
+        }
+      },
+      SatStatus.UNSAT
+    ),
+  )
 }
