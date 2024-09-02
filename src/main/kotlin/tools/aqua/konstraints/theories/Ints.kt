@@ -94,6 +94,8 @@ class IntSub(val terms: List<Expression<IntSort>>) :
     }
   }
 
+    constructor(vararg terms: Expression<IntSort>): this(terms.toList())
+
   override val children: List<Expression<IntSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
@@ -162,6 +164,8 @@ class IntAdd(val terms: List<Expression<IntSort>>) :
     }
   }
 
+    constructor(vararg terms: Expression<IntSort>): this(terms.toList())
+
   override val children: List<Expression<IntSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
@@ -192,6 +196,8 @@ class IntMul(val factors: List<Expression<IntSort>>) :
     }
   }
 
+    constructor(vararg factors: Expression<IntSort>): this(factors.toList())
+
   override val children: List<Expression<IntSort>> = factors
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
@@ -221,6 +227,8 @@ class IntDiv(val terms: List<Expression<IntSort>>) :
       "Integer division needs at least 2 terms but ${terms.size} were provided"
     }
   }
+
+    constructor(vararg terms: Expression<IntSort>): this(terms.toList())
 
   override val children: List<Expression<IntSort>> = terms
 
