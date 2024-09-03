@@ -91,11 +91,11 @@ fun<T : Sort> Builder<BoolSort>.eq(init: Builder<T>.() -> Unit): Equals {
     return op
 }
 
-fun<T : Sort> Builder<BoolSort>.distinct(init: Builder<T>.() -> Unit): Equals {
+fun<T : Sort> Builder<BoolSort>.distinct(init: Builder<T>.() -> Unit): Distinct {
     val builder = Builder<T>()
     builder.init()
 
-    val op = Equals(builder.children)
+    val op = Distinct(builder.children)
     this.children.add(op)
 
     return op
@@ -123,3 +123,21 @@ fun Builder<BoolSort>.bvult(init: Builder<BVSort>.() -> Unit): Expression<BoolSo
 
     return this.children.last() as BVUlt
 }
+
+/*
+ * floating-point classification operations
+ */
+
+private fun Builder<BoolSort>.makeFPOperator(block: Builder<FPSort>.() -> Expression<FPSort>, op: (Expression<FPSort>) -> Expression<BoolSort>): Expression<BoolSort> {
+    this.children.add(op(Builder<FPSort>().block()))
+
+    return this.children.last()
+}
+
+fun Builder<BoolSort>.isNormal(block: Builder<FPSort>.() -> Expression<FPSort>) = this.makeFPOperator(block, ::FPIsNormal)
+fun Builder<BoolSort>.isSubnormal(block: Builder<FPSort>.() -> Expression<FPSort>) = this.makeFPOperator(block, ::FPIsSubnormal)
+fun Builder<BoolSort>.isZero(block: Builder<FPSort>.() -> Expression<FPSort>) = this.makeFPOperator(block, ::FPIsZero)
+fun Builder<BoolSort>.isInfinite(block: Builder<FPSort>.() -> Expression<FPSort>) = this.makeFPOperator(block, ::FPIsInfinite)
+fun Builder<BoolSort>.isNaN(block: Builder<FPSort>.() -> Expression<FPSort>) = this.makeFPOperator(block, ::FPIsNaN)
+fun Builder<BoolSort>.isNegative(block: Builder<FPSort>.() -> Expression<FPSort>) = this.makeFPOperator(block, ::FPIsNegative)
+fun Builder<BoolSort>.isPositive(block: Builder<FPSort>.() -> Expression<FPSort>) = this.makeFPOperator(block, ::FPIsPositive)

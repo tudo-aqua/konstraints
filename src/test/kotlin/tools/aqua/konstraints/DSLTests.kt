@@ -29,11 +29,8 @@ import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.dsl.*
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.solvers.z3.Z3Solver
-import tools.aqua.konstraints.theories.BVSort
-import tools.aqua.konstraints.theories.BoolSort
-import tools.aqua.konstraints.theories.IntSort
-import tools.aqua.konstraints.theories.Not
-import tools.aqua.konstraints.theories.bitvec
+import tools.aqua.konstraints.theories.*
+import java.math.BigDecimal
 import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -50,6 +47,8 @@ class DSLTests {
 
           val D = const("D", IntSort)
           val E = const("E", IntSort)
+
+          val F = const("F", FPSort(5, 11))
 
           assert {
             ite {
@@ -99,6 +98,10 @@ class DSLTests {
               }
               +(D + E)
             }
+          }
+
+          assert {
+              F fpleq F
           }
         }
 
@@ -188,5 +191,43 @@ class DSLTests {
       },
       SatStatus.UNSAT
     ),
+    arguments (
+      smt(QF_FP) {
+        val A = const(FPSort(11, 53))
+        val B = const(FPSort(11, 53))
+
+        assert { (A fpadd B) eq (B fpadd A) }
+      },
+      SatStatus.SAT
+    ),
+    arguments(
+      smt(QF_FP) {
+        val zero = FPZero(5, 11)
+        val nan = FPNaN(5, 11)
+
+        assert { (zero fpdiv zero) eq (nan) }
+      },
+      SatStatus.SAT
+    ),
+    arguments(
+      smt(QF_FP) {
+        val A = const(FPSort(11, 53))
+        val B = const(FPSort(11, 53))
+        val C = const(FPSort(11, 53))
+
+        assert { ((A fpmul B) fpadd C) fpeq (fpfma { A } mul { B } add { C }) }
+      },
+      SatStatus.SAT
+    ),
+    arguments(
+      smt(QF_FP) {
+        val A = const(FPSort(11, 53))
+        val B = const(FPSort(11, 53))
+        val C = const(FPSort(11, 53))
+
+        assert { ((A fpmul B) fpadd C) eq (fpfma { A } mul { B } add { C }) }
+      },
+      SatStatus.SAT
+    )
   )
 }
