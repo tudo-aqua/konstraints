@@ -116,6 +116,7 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
 }
 
 fun String.bitvec() = BVLiteral(this)
+
 fun String.bitvec(bits: Int) = BVLiteral(this, bits)
 
 /**

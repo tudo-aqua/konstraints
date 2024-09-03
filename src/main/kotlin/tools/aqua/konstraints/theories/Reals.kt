@@ -94,7 +94,7 @@ class RealSub(val terms: List<Expression<RealSort>>) :
     }
   }
 
-    constructor(vararg terms: Expression<RealSort>): this(terms.toList())
+  constructor(vararg terms: Expression<RealSort>) : this(terms.toList())
 
   override val children: List<Expression<RealSort>> = terms
 
@@ -164,7 +164,7 @@ class RealAdd(val terms: List<Expression<RealSort>>) :
     }
   }
 
-    constructor(vararg terms: Expression<RealSort>): this(terms.toList())
+  constructor(vararg terms: Expression<RealSort>) : this(terms.toList())
 
   override val children: List<Expression<RealSort>> = terms
 
@@ -196,7 +196,7 @@ class RealMul(val factors: List<Expression<RealSort>>) :
     }
   }
 
-    constructor(vararg factors: Expression<RealSort>): this(factors.toList())
+  constructor(vararg factors: Expression<RealSort>) : this(factors.toList())
 
   override val children: List<Expression<RealSort>> = factors
 
@@ -228,7 +228,7 @@ class RealDiv(val terms: List<Expression<RealSort>>) :
     }
   }
 
-    constructor(vararg terms: Expression<RealSort>): this(terms.toList())
+  constructor(vararg terms: Expression<RealSort>) : this(terms.toList())
 
   override val children: List<Expression<RealSort>> = terms
 
@@ -260,7 +260,7 @@ class RealLessEq(val terms: List<Expression<RealSort>>) :
     }
   }
 
-    constructor(vararg terms: Expression<RealSort>): this(terms.toList())
+  constructor(vararg terms: Expression<RealSort>) : this(terms.toList())
 
   override val children: List<Expression<RealSort>> = terms
 
@@ -290,7 +290,7 @@ class RealLess(val terms: List<Expression<RealSort>>) :
     }
   }
 
-    constructor(vararg terms: Expression<RealSort>): this(terms.toList())
+  constructor(vararg terms: Expression<RealSort>) : this(terms.toList())
 
   override val children: List<Expression<RealSort>> = terms
 
@@ -320,7 +320,7 @@ class RealGreaterEq(val terms: List<Expression<RealSort>>) :
     }
   }
 
-    constructor(vararg terms: Expression<RealSort>): this(terms.toList())
+  constructor(vararg terms: Expression<RealSort>) : this(terms.toList())
 
   override val children: List<Expression<RealSort>> = terms
 
@@ -350,7 +350,7 @@ class RealGreater(val terms: List<Expression<RealSort>>) :
     }
   }
 
-    constructor(vararg terms: Expression<RealSort>): this(terms.toList())
+  constructor(vararg terms: Expression<RealSort>) : this(terms.toList())
 
   override val children: List<Expression<RealSort>> = terms
 

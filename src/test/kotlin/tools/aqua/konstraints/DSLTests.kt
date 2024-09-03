@@ -18,7 +18,7 @@
 
 package tools.aqua.konstraints
 
-import org.junit.jupiter.api.Assertions
+import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -30,8 +30,6 @@ import tools.aqua.konstraints.dsl.*
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.solvers.z3.Z3Solver
 import tools.aqua.konstraints.theories.*
-import java.math.BigDecimal
-import java.util.stream.Stream
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DSLTests {
@@ -50,15 +48,7 @@ class DSLTests {
 
           val F = const("F", FPSort(5, 11))
 
-          assert {
-            ite {
-              A
-            } then {
-              B
-            } otherwise {
-              C
-            }
-          }
+          assert { ite { A } then { B } otherwise { C } }
 
           assert {
             or {
@@ -89,7 +79,7 @@ class DSLTests {
               }
             }
           }
-          
+
           assert {
             eq<IntSort> {
               add {
@@ -100,9 +90,7 @@ class DSLTests {
             }
           }
 
-          assert {
-              F fpleq F
-          }
+          assert { F fpleq F }
         }
 
     val result = solver.solve(program)
@@ -119,115 +107,95 @@ class DSLTests {
     assertEquals(expected, solver.status)
   }
 
-  private fun getProgramAndStatus() : Stream<Arguments> = Stream.of(
-    arguments(
-      smt(QF_BV) {
-        val s = const(BVSort(32))
-        val t = const(BVSort(32))
+  private fun getProgramAndStatus(): Stream<Arguments> =
+      Stream.of(
+          arguments(
+              smt(QF_BV) {
+                val s = const(BVSort(32))
+                val t = const(BVSort(32))
 
-        assert {
-          not {
-            eq {
-              +(s bvand s)
-              +s
-            }
-          }
-        }
-      },
-      SatStatus.UNSAT
-    ),
-    arguments(
-      smt(QF_BV) {
-        val s = const(BVSort(32))
-        val t = const(BVSort(32))
+                assert {
+                  not {
+                    eq {
+                      +(s bvand s)
+                      +s
+                    }
+                  }
+                }
+              },
+              SatStatus.UNSAT),
+          arguments(
+              smt(QF_BV) {
+                val s = const(BVSort(32))
+                val t = const(BVSort(32))
 
-        assert {
-          not { (s bvand s) eq s }
-        }
-      },
-      SatStatus.UNSAT
-    ),
-    arguments(
-      smt(QF_BV) {
-        val s = const(BVSort(32))
-        val t = const(BVSort(32))
+                assert { not { (s bvand s) eq s } }
+              },
+              SatStatus.UNSAT),
+          arguments(
+              smt(QF_BV) {
+                val s = const(BVSort(32))
+                val t = const(BVSort(32))
 
-        assert {
-          not { (s bvlshr s) eq "#b0".bitvec(32) }
-        }
-      },
-      SatStatus.UNSAT
-    ),
-    arguments(
-      smt(QF_BV) {
-        val s = const(BVSort(32))
-        val t = const(BVSort(32))
+                assert { not { (s bvlshr s) eq "#b0".bitvec(32) } }
+              },
+              SatStatus.UNSAT),
+          arguments(
+              smt(QF_BV) {
+                val s = const(BVSort(32))
+                val t = const(BVSort(32))
 
-        assert {
-          not { s bvor s eq s }
-        }
-      },
-      SatStatus.UNSAT
-    ),
-    arguments(
-      smt(QF_BV) {
-        val s = const(BVSort(32))
-        val t = const(BVSort(32))
+                assert { not { s bvor s eq s } }
+              },
+              SatStatus.UNSAT),
+          arguments(
+              smt(QF_BV) {
+                val s = const(BVSort(32))
+                val t = const(BVSort(32))
 
-        assert {
-          not { s bvadd "#b0".bitvec(32) eq s }
-        }
-      },
-      SatStatus.UNSAT
-    ),
-    arguments(
-      smt(QF_BV) {
-        val s = const(BVSort(32))
-        val t = const(BVSort(32))
+                assert { not { s bvadd "#b0".bitvec(32) eq s } }
+              },
+              SatStatus.UNSAT),
+          arguments(
+              smt(QF_BV) {
+                val s = const(BVSort(32))
+                val t = const(BVSort(32))
 
-        assert {
-          not { s bvmul "#b0".bitvec(32) eq "#b0".bitvec(32) }
-        }
-      },
-      SatStatus.UNSAT
-    ),
-    arguments (
-      smt(QF_FP) {
-        val A = const(FPSort(11, 53))
-        val B = const(FPSort(11, 53))
+                assert { not { s bvmul "#b0".bitvec(32) eq "#b0".bitvec(32) } }
+              },
+              SatStatus.UNSAT),
+          arguments(
+              smt(QF_FP) {
+                val A = const(FPSort(11, 53))
+                val B = const(FPSort(11, 53))
 
-        assert { (A fpadd B) eq (B fpadd A) }
-      },
-      SatStatus.SAT
-    ),
-    arguments(
-      smt(QF_FP) {
-        val zero = FPZero(5, 11)
-        val nan = FPNaN(5, 11)
+                assert { (A fpadd B) eq (B fpadd A) }
+              },
+              SatStatus.SAT),
+          arguments(
+              smt(QF_FP) {
+                val zero = FPZero(5, 11)
+                val nan = FPNaN(5, 11)
 
-        assert { (zero fpdiv zero) eq (nan) }
-      },
-      SatStatus.SAT
-    ),
-    arguments(
-      smt(QF_FP) {
-        val A = const(FPSort(11, 53))
-        val B = const(FPSort(11, 53))
-        val C = const(FPSort(11, 53))
+                assert { (zero fpdiv zero) eq (nan) }
+              },
+              SatStatus.SAT),
+          arguments(
+              smt(QF_FP) {
+                val A = const(FPSort(11, 53))
+                val B = const(FPSort(11, 53))
+                val C = const(FPSort(11, 53))
 
-        assert { ((A fpmul B) fpadd C) fpeq (fpfma { A } mul { B } add { C }) }
-      },
-      SatStatus.SAT
-    ),
-    arguments(
-      smt(QF_FP) {
-        val A = const(FPSort(11, 53))
-        val B = const(FPSort(11, 53))
-        val C = const(FPSort(11, 53))
+                assert { ((A fpmul B) fpadd C) fpeq (fpfma { A } mul { B } add { C }) }
+              },
+              SatStatus.SAT),
+          arguments(
+              smt(QF_FP) {
+                val A = const(FPSort(11, 53))
+                val B = const(FPSort(11, 53))
+                val C = const(FPSort(11, 53))
 
-        assert { ((A fpmul B) fpadd C) eq (fpfma { A } mul { B } add { C }) }
-      },
-      SatStatus.SAT
-    )
-  )
+                assert { ((A fpmul B) fpadd C) eq (fpfma { A } mul { B } add { C }) }
+              },
+              SatStatus.SAT))
 }

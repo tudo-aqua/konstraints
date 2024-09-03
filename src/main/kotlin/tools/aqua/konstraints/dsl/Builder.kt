@@ -20,16 +20,12 @@ package tools.aqua.konstraints.dsl
 
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.Sort
-import tools.aqua.konstraints.theories.BoolSort
-import tools.aqua.konstraints.theories.Equals
-import tools.aqua.konstraints.theories.Or
-import tools.aqua.konstraints.theories.XOr
 
 @SMTDSL
 class Builder<T : Sort> {
-    val children: MutableList<Expression<T>> = mutableListOf()
+  val children: MutableList<Expression<T>> = mutableListOf()
 
-    operator fun Expression<T>.unaryPlus() {
-        this@Builder.children.add(this)
-    }
+  operator fun Expression<T>.unaryPlus() {
+    this@Builder.children.add(this)
+  }
 }

@@ -94,7 +94,7 @@ class IntSub(val terms: List<Expression<IntSort>>) :
     }
   }
 
-    constructor(vararg terms: Expression<IntSort>): this(terms.toList())
+  constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
 
   override val children: List<Expression<IntSort>> = terms
 
@@ -164,7 +164,7 @@ class IntAdd(val terms: List<Expression<IntSort>>) :
     }
   }
 
-    constructor(vararg terms: Expression<IntSort>): this(terms.toList())
+  constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
 
   override val children: List<Expression<IntSort>> = terms
 
@@ -196,7 +196,7 @@ class IntMul(val factors: List<Expression<IntSort>>) :
     }
   }
 
-    constructor(vararg factors: Expression<IntSort>): this(factors.toList())
+  constructor(vararg factors: Expression<IntSort>) : this(factors.toList())
 
   override val children: List<Expression<IntSort>> = factors
 
@@ -228,7 +228,7 @@ class IntDiv(val terms: List<Expression<IntSort>>) :
     }
   }
 
-    constructor(vararg terms: Expression<IntSort>): this(terms.toList())
+  constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
 
   override val children: List<Expression<IntSort>> = terms
 
