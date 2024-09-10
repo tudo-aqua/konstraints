@@ -197,5 +197,17 @@ class DSLTests {
 
                 assert { ((A fpmul B) fpadd C) eq (fpfma { A } mul { B } add { C }) }
               },
-              SatStatus.SAT))
+              SatStatus.SAT),
+          arguments(
+              smt(QF_BV) {
+                  assert {
+                      exists(BVSort(8), BVSort(8)) { exprs ->
+                          val x = exprs[0] as Expression<BVSort>
+                          val y = exprs[1] as Expression<BVSort>
+                          (x bvadd y) bvult x
+                      }
+                  }
+              }
+          )
+      )
 }
