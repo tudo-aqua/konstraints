@@ -207,6 +207,17 @@ class DSLTests {
                           (x bvadd y) bvult x
                       }
                   }
+              },
+              SatStatus.UNSAT
+          ),
+          arguments(
+              smt(QF_BV) {
+                  val X by const(BVSort(8))
+                  val Y by const(BVSort(8))
+
+                  assert {
+                      X bvult Y
+                  }
               }
           )
       )

@@ -20,8 +20,10 @@ package tools.aqua.konstraints.dsl
 
 import java.util.UUID
 import tools.aqua.konstraints.parser.Context
+import tools.aqua.konstraints.parser.FunctionDefinition
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.BoolSort
+import kotlin.reflect.KProperty
 
 @DslMarker annotation class SMTDSL
 
@@ -37,14 +39,11 @@ class SMTProgramBuilder(logic: Logic) {
     commands.add(Assert(expr))
   }
 
-  fun <T : Sort> const(sort: T) = const("|const!${UUID.randomUUID()}|", sort)
+  fun <T : Sort> const(sort: T) = Const(sort, "|const!$sort!${UUID.randomUUID()}|")
+  fun <T : Sort> const(sort: Sort, name: String) = Const(sort, name)
+  fun <T : Sort> declare(sort: T) = Declare(sort)
 
-  fun <T : Sort> const(name: String, sort: T): Expression<T> {
-    context.registerFunction(name, emptyList(), sort)
-    commands.add(DeclareConst(name.symbol(), sort))
-
-    return UserDeclaredExpression(name.symbol(), sort)
-  }
+  val test by declare(BoolSort)
 
   fun finalize() = DefaultSMTProgram(commands.also { it.add(CheckSat) }.toList(), context)
 }
@@ -54,4 +53,32 @@ fun smt(logic: Logic, init: SMTProgramBuilder.() -> Unit): SMTProgram {
   program.init()
 
   return program.finalize()
+}
+
+class Const<T : Sort>(val sort: T, val name: String){
+  operator fun getValue(thisRef: Any?, property: KProperty<*>) = UserDeclaredExpression(name.symbol(), sort)
+
+}
+
+class Declare<T: Sort>(val sort: T, val parameters: List<Sort> = emptyList(), val name: String = "") {
+  operator fun getValue(thisRef: Any?, property: KProperty<*>) = SMTFunction("|${thisRef.toString()}|".symbol(), sort, parameters, null)
+
+}
+
+class Define<T: Sort>(val sort: T, val block: Builder<T>.(List<Expression<Sort>>) -> Expression<T>, val parameters: List<Sort> = emptyList(), val name: String = "") {
+  operator fun getValue(thisRef: Any?, property: KProperty<*>) =
+    SMTFunction("|${thisRef.toString()}|".symbol(), sort, parameters, Builder<T>().block(parameters.mapIndexed { id, sort -> UserDeclaredExpression("|${thisRef.toString()}!local!$sort!$id|".symbol(), sort) }))
+
+}
+
+data class SMTFunction<T : Sort>(val name: Symbol, val sort: T, val parameters: List<Sort>, val definition: Expression<T>?) {
+    operator fun invoke(args : List<Expression<*>>): Expression<T> {
+      require(args.size == parameters.size)
+
+      return if (definition == null) {
+        UserDeclaredExpression(name, sort, args)
+      } else {
+        UserDefinedExpression(name, sort, args, definition)
+      }
+    }
 }
