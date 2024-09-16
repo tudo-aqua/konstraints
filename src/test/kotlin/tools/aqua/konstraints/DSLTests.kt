@@ -200,25 +200,94 @@ class DSLTests {
               SatStatus.SAT),
           arguments(
               smt(QF_BV) {
-                  assert {
-                      exists(BVSort(8), BVSort(8)) { exprs ->
-                          val x = exprs[0] as Expression<BVSort>
-                          val y = exprs[1] as Expression<BVSort>
-                          (x bvadd y) bvult x
-                      }
-                  }
+                assert { exists(BVSort(8), BVSort(8)) { x, y -> (x bvadd y) bvult x } }
               },
-              SatStatus.UNSAT
-          ),
+              SatStatus.SAT),
           arguments(
               smt(QF_BV) {
-                  val X by const(BVSort(8))
-                  val Y by const(BVSort(8))
+                assert {
+                  exists(
+                      BVSort(3),
+                      BVSort(3),
+                      BVSort(3),
+                      BVSort(3),
+                      BVSort(3),
+                      BVSort(3),
+                      BVSort(3),
+                      BVSort(3),
+                      BVSort(3)) { exprs ->
+                        val x1 = exprs[0] as Expression<BVSort>
+                        val x2 = exprs[0] as Expression<BVSort>
+                        val x3 = exprs[0] as Expression<BVSort>
+                        val x4 = exprs[0] as Expression<BVSort>
+                        val x5 = exprs[0] as Expression<BVSort>
+                        val x6 = exprs[0] as Expression<BVSort>
+                        val x7 = exprs[0] as Expression<BVSort>
+                        val x8 = exprs[0] as Expression<BVSort>
+                        val x9 = exprs[0] as Expression<BVSort>
+                        (x1 distinct
+                            x2 distinct
+                            x3 distinct
+                            x4 distinct
+                            x5 distinct
+                            x6 distinct
+                            x7 distinct
+                            x8 distinct
+                            x9)
+                      }
+                }
+              },
+              SatStatus.UNSAT),
+          arguments(
+              smt(QF_BV) {
+                val X by declaringConst(BVSort(8))
+                val Y by declaringConst(BVSort(8))
 
-                  assert {
-                      X bvult Y
+                assert { X bvult Y }
+              },
+              SatStatus.SAT),
+          arguments(
+              smt(QF_BV) {
+                assert {
+                  forall(BVSort(8), BVSort(8)) { s, t ->
+                    val msb_s = Builder<BVSort>().extract(s.sort.bits - 1, s.sort.bits - 1) { s }
+                    val msb_t = Builder<BVSort>().extract(t.sort.bits - 1, t.sort.bits - 1) { t }
+                    val expanded =
+                        ite { (msb_s eq "#b0".bitvec()) and (msb_t eq "#b0".bitvec()) } then
+                            {
+                              s bvudiv t
+                            } otherwise
+                            {
+                              ite { (msb_s eq "#b1".bitvec()) and (msb_t eq "#b0".bitvec()) } then
+                                  {
+                                    bvneg { bvneg { s } bvudiv t }
+                                  } otherwise
+                                  {
+                                    ite {
+                                      (msb_s eq "#b0".bitvec()) and (msb_t eq "#b1".bitvec())
+                                    } then
+                                        {
+                                          bvneg { s bvudiv bvneg { t } }
+                                        } otherwise
+                                        {
+                                          bvneg { s } bvudiv bvneg { t }
+                                        }
+                                  }
+                            }
+
+                    (s bvsdiv t) eq expanded
                   }
-              }
+                }
+              },
+              SatStatus.SAT),
+          arguments(
+              smt(QF_BV) {
+                  val bvugt by defining(BoolSort, BVSort(8), BVSort(8)) { s, t -> not { s eq t } and not { s bvult t }}
+                  assert {
+                      bvugt("#b11111111".bitvec(), "#b01111111".bitvec())
+                  }
+              },
+              SatStatus.SAT
           )
       )
 }

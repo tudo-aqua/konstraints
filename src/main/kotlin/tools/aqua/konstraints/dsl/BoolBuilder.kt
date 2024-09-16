@@ -82,17 +82,11 @@ infix fun <T : Sort> Expression<T>.eq(other: Expression<T>): Equals =
       Equals(this, other)
     }
 
-/**
- * Creates a distinct: [this] distinct [other].
- *
- * If [this] is an [Distinct] object, unpacks the children and returns a new combined Distinct.
- */
-infix fun <T : Sort> Expression<T>.distinct(other: Expression<T>): Distinct =
-    if (this is Distinct) {
-      Distinct(*this.children.toTypedArray(), other)
-    } else {
-      Distinct(this, other)
-    }
+/** Creates a distinct: [this] distinct [other]. */
+infix fun <T : Sort> Expression<T>.distinct(other: Expression<T>): Distinct = Distinct(this, other)
+
+infix fun <T : Sort> Distinct.distinct(other: Expression<T>): Distinct =
+    Distinct(*this.children.toTypedArray(), other)
 
 private fun Builder<BoolSort>.makeBoolOperator(
     init: Builder<BoolSort>.() -> Unit,
@@ -157,18 +151,14 @@ fun <T : Sort> Builder<BoolSort>.distinct(init: Builder<T>.() -> Unit): Distinct
   return op
 }
 
-/**
- * Implements logical not operation
- */
+/** Implements logical not operation */
 fun Builder<BoolSort>.not(block: Builder<BoolSort>.() -> Expression<BoolSort>): Not {
   this.children.add(Not(Builder<BoolSort>().block()))
 
   return this.children.last() as Not
 }
 
-/**
- * Implements smt is_int operation
- */
+/** Implements smt is_int operation */
 fun Builder<BoolSort>.isInt(block: Builder<RealSort>.() -> Expression<RealSort>): IsInt {
   this.children.add(IsInt(Builder<RealSort>().block()))
 
@@ -204,44 +194,30 @@ private fun Builder<BoolSort>.makeFPOperator(
   return this.children.last()
 }
 
-/**
- * Implements floating point isNormal operation
- */
+/** Implements floating point isNormal operation */
 fun Builder<BoolSort>.isNormal(block: Builder<FPSort>.() -> Expression<FPSort>) =
     this.makeFPOperator(block, ::FPIsNormal)
 
-/**
- * Implements floating point isSubnormal operation
- */
+/** Implements floating point isSubnormal operation */
 fun Builder<BoolSort>.isSubnormal(block: Builder<FPSort>.() -> Expression<FPSort>) =
     this.makeFPOperator(block, ::FPIsSubnormal)
 
-/**
- * Implements floating point isZero operation
- */
+/** Implements floating point isZero operation */
 fun Builder<BoolSort>.isZero(block: Builder<FPSort>.() -> Expression<FPSort>) =
     this.makeFPOperator(block, ::FPIsZero)
 
-/**
- * Implements floating point isInfinite operation
- */
+/** Implements floating point isInfinite operation */
 fun Builder<BoolSort>.isInfinite(block: Builder<FPSort>.() -> Expression<FPSort>) =
     this.makeFPOperator(block, ::FPIsInfinite)
 
-/**
- * Implements floating point isNaN operation
- */
+/** Implements floating point isNaN operation */
 fun Builder<BoolSort>.isNaN(block: Builder<FPSort>.() -> Expression<FPSort>) =
     this.makeFPOperator(block, ::FPIsNaN)
 
-/**
- * Implements floating point isNegative operation
- */
+/** Implements floating point isNegative operation */
 fun Builder<BoolSort>.isNegative(block: Builder<FPSort>.() -> Expression<FPSort>) =
     this.makeFPOperator(block, ::FPIsNegative)
 
-/**
- * Implements floating point isPositive operation
- */
+/** Implements floating point isPositive operation */
 fun Builder<BoolSort>.isPositive(block: Builder<FPSort>.() -> Expression<FPSort>) =
     this.makeFPOperator(block, ::FPIsPositive)
