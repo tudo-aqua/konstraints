@@ -19,8 +19,7 @@
 package tools.aqua.konstraints.dsl
 
 import java.util.UUID
-import tools.aqua.konstraints.parser.Context
-import tools.aqua.konstraints.parser.SortedVar
+import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.BoolSort
 
@@ -36,6 +35,23 @@ class SMTProgramBuilder(logic: Logic) {
 
   fun assert(expr: Expression<BoolSort>) {
     commands.add(Assert(expr))
+  }
+
+  fun setOptions(init: OptionsBuilder.() -> OptionsBuilder) {
+    val options = OptionsBuilder().init()
+
+    commands.addAll(
+        options.stringOptions.map { (option, value) ->
+          SetOption(option, StringOptionValue(value))
+        })
+
+    commands.addAll(
+        options.numeralOptions.map { (option, value) ->
+          SetOption(option, NumeralOptionValue(value))
+        })
+
+    commands.addAll(
+        options.boolOptions.map { (option, value) -> SetOption(option, BooleanOptionValue(value)) })
   }
 
   internal fun registerFun(name: String, sort: Sort, parameters: List<Sort>) {

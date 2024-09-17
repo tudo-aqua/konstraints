@@ -282,12 +282,11 @@ class DSLTests {
               SatStatus.SAT),
           arguments(
               smt(QF_BV) {
-                  val bvugt by defining(BoolSort, BVSort(8), BVSort(8)) { s, t -> not { s eq t } and not { s bvult t }}
-                  assert {
-                      bvugt("#b11111111".bitvec(), "#b01111111".bitvec())
-                  }
+                val bvugt by
+                    defining(BoolSort, BVSort(8), BVSort(8)) { s, t ->
+                      not { s eq t } and not { s bvult t }
+                    }
+                assert { bvugt("#b11111111".bitvec(), "#b01111111".bitvec()) }
               },
-              SatStatus.SAT
-          )
-      )
+              SatStatus.SAT))
 }
