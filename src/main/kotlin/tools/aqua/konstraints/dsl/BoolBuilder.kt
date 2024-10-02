@@ -34,6 +34,10 @@ infix fun Expression<BoolSort>.implies(other: Expression<BoolSort>): Implies =
       Implies(this, other)
     }
 
+infix fun Expression<BoolSort>.implies(other: () -> Expression<BoolSort>): Implies = this implies other()
+infix fun (() -> Expression<BoolSort>).implies(other: Expression<BoolSort>): Implies = this() implies other
+infix fun (() -> Expression<BoolSort>).implies(other: () -> Expression<BoolSort>): Implies = this() implies other()
+
 /**
  * Creates a logical and: [this] and [other].
  *
@@ -45,6 +49,10 @@ infix fun Expression<BoolSort>.and(other: Expression<BoolSort>): And =
     } else {
       And(this, other)
     }
+
+infix fun Expression<BoolSort>.and(other: () -> Expression<BoolSort>): And = this and other()
+infix fun (() -> Expression<BoolSort>).and(other: Expression<BoolSort>): And = this() and other
+infix fun (() -> Expression<BoolSort>).and(other: () -> Expression<BoolSort>): And = this() and other()
 
 /**
  * Creates a logical or: [this] or [other].
@@ -58,6 +66,10 @@ infix fun Expression<BoolSort>.or(other: Expression<BoolSort>): Or =
       Or(this, other)
     }
 
+infix fun Expression<BoolSort>.or(other: () -> Expression<BoolSort>): Or = this or other()
+infix fun (() -> Expression<BoolSort>).or(other: Expression<BoolSort>): Or = this() or other
+infix fun (() -> Expression<BoolSort>).or(other: () -> Expression<BoolSort>): Or = this() or other()
+
 /**
  * Creates a logical xor: [this] xor [other].
  *
@@ -69,6 +81,10 @@ infix fun Expression<BoolSort>.xor(other: Expression<BoolSort>): XOr =
     } else {
       XOr(this, other)
     }
+
+infix fun Expression<BoolSort>.xor(other: () -> Expression<BoolSort>): XOr = this xor other()
+infix fun (() -> Expression<BoolSort>).xor(other: Expression<BoolSort>): XOr = this() xor other
+infix fun (() -> Expression<BoolSort>).xor(other: () -> Expression<BoolSort>): XOr = this() xor other()
 
 /**
  * Creates an equals: [this] equals [other].
@@ -82,22 +98,28 @@ infix fun <T : Sort> Expression<T>.eq(other: Expression<T>): Equals =
       Equals(this, other)
     }
 
+// allow chaining of equals
+infix fun <T : Sort> Equals.eq(other: Expression<T>): Equals =
+    Equals(*this.children.toTypedArray(), other)
+
+infix fun<T : Sort> Expression<T>.eq(other: () -> Expression<T>): Equals = this eq other()
+infix fun<T : Sort> (() -> Expression<T>).eq(other: Expression<T>): Equals = this() eq other
+infix fun<T : Sort> (() -> Expression<T>).eq(other: () -> Expression<T>): Equals = this() eq other()
+
 /** Creates a distinct: [this] distinct [other]. */
 infix fun <T : Sort> Expression<T>.distinct(other: Expression<T>): Distinct = Distinct(this, other)
 
 infix fun <T : Sort> Distinct.distinct(other: Expression<T>): Distinct =
     Distinct(*this.children.toTypedArray(), other)
 
-private fun Builder<BoolSort>.makeBoolOperator(
+private fun makeBoolOperator(
     init: Builder<BoolSort>.() -> Unit,
     op: (List<Expression<BoolSort>>) -> Expression<BoolSort>
 ): Expression<BoolSort> {
   val builder = Builder<BoolSort>()
   builder.init()
 
-  this.children.add(op(builder.children))
-
-  return this.children.last()
+    return op(builder.children)
 }
 
 /**
@@ -105,35 +127,32 @@ private fun Builder<BoolSort>.makeBoolOperator(
  *
  * Use [Builder.unaryPlus] inside [init] to add [Expression]s to the 'And' expression.
  */
-fun Builder<BoolSort>.and(init: Builder<BoolSort>.() -> Unit) = this.makeBoolOperator(init, ::And)
+fun and(init: Builder<BoolSort>.() -> Unit) = makeBoolOperator(init, ::And)
 
 /**
  * Lambda version of logical [Or].
  *
  * Use [Builder.unaryPlus] inside [init] to add [Expression]s to the 'Or' expression.
  */
-fun Builder<BoolSort>.or(init: Builder<BoolSort>.() -> Unit) = this.makeBoolOperator(init, ::Or)
+fun or(init: Builder<BoolSort>.() -> Unit) = makeBoolOperator(init, ::Or)
 
 /**
  * Lambda version of logical [XOr].
  *
  * Use [Builder.unaryPlus] inside [init] to add [Expression]s to the 'XOr' expression.
  */
-fun Builder<BoolSort>.xor(init: Builder<BoolSort>.() -> Unit) = this.makeBoolOperator(init, ::XOr)
+fun xor(init: Builder<BoolSort>.() -> Unit) = makeBoolOperator(init, ::XOr)
 
 /**
  * Lambda version of logical [Equals].
  *
  * Use [Builder.unaryPlus] inside [init] to add [Expression]s to the 'Equals' expression.
  */
-fun <T : Sort> Builder<BoolSort>.eq(init: Builder<T>.() -> Unit): Equals {
+fun <T : Sort> eq(init: Builder<T>.() -> Unit): Equals {
   val builder = Builder<T>()
   builder.init()
 
-  val op = Equals(builder.children)
-  this.children.add(op)
-
-  return op
+  return Equals(builder.children)
 }
 
 /**
@@ -141,83 +160,53 @@ fun <T : Sort> Builder<BoolSort>.eq(init: Builder<T>.() -> Unit): Equals {
  *
  * Use [Builder.unaryPlus] inside [init] to add [Expression]s to the 'Distinct' expression.
  */
-fun <T : Sort> Builder<BoolSort>.distinct(init: Builder<T>.() -> Unit): Distinct {
+fun <T : Sort> distinct(init: Builder<T>.() -> Unit): Distinct {
   val builder = Builder<T>()
   builder.init()
 
-  val op = Distinct(builder.children)
-  this.children.add(op)
-
-  return op
+  return Distinct(builder.children)
 }
 
 /** Implements logical not operation */
-fun Builder<BoolSort>.not(block: Builder<BoolSort>.() -> Expression<BoolSort>): Not {
-  this.children.add(Not(Builder<BoolSort>().block()))
-
-  return this.children.last() as Not
-}
+fun not(block: () -> Expression<BoolSort>): Not = Not(block())
+fun not(expr: Expression<BoolSort>): Not = Not(expr)
 
 /** Implements smt is_int operation */
-fun Builder<BoolSort>.isInt(block: Builder<RealSort>.() -> Expression<RealSort>): IsInt {
-  this.children.add(IsInt(Builder<RealSort>().block()))
-
-  return this.children.last() as IsInt
-}
-
-/**
- * Implements unsigned less than operation on bitvectors
- *
- * Use [Builder.unaryPlus] inside [init] to add [Expression]s to the 'bvult' expression.
- */
-fun Builder<BoolSort>.bvult(init: Builder<BVSort>.() -> Unit): Expression<BoolSort> {
-  val builder = Builder<BVSort>()
-  builder.init()
-
-  require(builder.children.size == 2)
-
-  this.children.add(BVUlt(builder.children[0], builder.children[1]))
-
-  return this.children.last() as BVUlt
-}
+fun isInt(block: Builder<RealSort>.() -> Expression<RealSort>) = IsInt(Builder<RealSort>().block())
 
 /*
  * floating-point classification operations
  */
 
-private fun Builder<BoolSort>.makeFPOperator(
+private fun makeFPOperator(
     block: Builder<FPSort>.() -> Expression<FPSort>,
     op: (Expression<FPSort>) -> Expression<BoolSort>
-): Expression<BoolSort> {
-  this.children.add(op(Builder<FPSort>().block()))
-
-  return this.children.last()
-}
+): Expression<BoolSort> = op(Builder<FPSort>().block())
 
 /** Implements floating point isNormal operation */
-fun Builder<BoolSort>.isNormal(block: Builder<FPSort>.() -> Expression<FPSort>) =
-    this.makeFPOperator(block, ::FPIsNormal)
+fun isNormal(block: Builder<FPSort>.() -> Expression<FPSort>) =
+    makeFPOperator(block, ::FPIsNormal)
 
 /** Implements floating point isSubnormal operation */
-fun Builder<BoolSort>.isSubnormal(block: Builder<FPSort>.() -> Expression<FPSort>) =
-    this.makeFPOperator(block, ::FPIsSubnormal)
+fun isSubnormal(block: Builder<FPSort>.() -> Expression<FPSort>) =
+    makeFPOperator(block, ::FPIsSubnormal)
 
 /** Implements floating point isZero operation */
-fun Builder<BoolSort>.isZero(block: Builder<FPSort>.() -> Expression<FPSort>) =
-    this.makeFPOperator(block, ::FPIsZero)
+fun isZero(block: Builder<FPSort>.() -> Expression<FPSort>) =
+    makeFPOperator(block, ::FPIsZero)
 
 /** Implements floating point isInfinite operation */
-fun Builder<BoolSort>.isInfinite(block: Builder<FPSort>.() -> Expression<FPSort>) =
-    this.makeFPOperator(block, ::FPIsInfinite)
+fun isInfinite(block: Builder<FPSort>.() -> Expression<FPSort>) =
+    makeFPOperator(block, ::FPIsInfinite)
 
 /** Implements floating point isNaN operation */
-fun Builder<BoolSort>.isNaN(block: Builder<FPSort>.() -> Expression<FPSort>) =
-    this.makeFPOperator(block, ::FPIsNaN)
+fun isNaN(block: Builder<FPSort>.() -> Expression<FPSort>) =
+    makeFPOperator(block, ::FPIsNaN)
 
 /** Implements floating point isNegative operation */
-fun Builder<BoolSort>.isNegative(block: Builder<FPSort>.() -> Expression<FPSort>) =
-    this.makeFPOperator(block, ::FPIsNegative)
+fun isNegative(block: Builder<FPSort>.() -> Expression<FPSort>) =
+    makeFPOperator(block, ::FPIsNegative)
 
 /** Implements floating point isPositive operation */
-fun Builder<BoolSort>.isPositive(block: Builder<FPSort>.() -> Expression<FPSort>) =
-    this.makeFPOperator(block, ::FPIsPositive)
+fun isPositive(block: Builder<FPSort>.() -> Expression<FPSort>) =
+    makeFPOperator(block, ::FPIsPositive)
