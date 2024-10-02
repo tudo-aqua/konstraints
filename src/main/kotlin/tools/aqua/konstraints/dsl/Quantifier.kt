@@ -24,89 +24,65 @@ import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 
 /** Exists quantifier with one bound variable of [sort] */
-fun <S : Sort> Builder<BoolSort>.exists(
+fun <S : Sort> exists(
     sort: S,
-    block: Builder<BoolSort>.(Expression<S>) -> Expression<BoolSort>
+    block: (Expression<S>) -> Expression<BoolSort>
 ): ExistsExpression {
   val boundVar = SortedVar("|$sort!${UUID.randomUUID()}|".symbol(), sort)
 
-  children.add(ExistsExpression(listOf(boundVar), Builder<BoolSort>().block(boundVar.instance)))
-
-  return children.last() as ExistsExpression
+  return ExistsExpression(listOf(boundVar), block(boundVar.instance))
 }
 
 /** Exists quantifier with two bound variable of [sort1], [sort2] */
-fun <S1 : Sort, S2 : Sort> Builder<BoolSort>.exists(
+fun <S1 : Sort, S2 : Sort> exists(
     sort1: S1,
     sort2: S2,
-    block: Builder<BoolSort>.(Expression<S1>, Expression<S2>) -> Expression<BoolSort>
+    block: (Expression<S1>, Expression<S2>) -> Expression<BoolSort>
 ): ExistsExpression {
   val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".symbol(), sort1)
   val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".symbol(), sort2)
 
-  children.add(
-      ExistsExpression(
-          listOf(boundVar1, boundVar2),
-          Builder<BoolSort>().block(boundVar1.instance, boundVar2.instance)))
-
-  return children.last() as ExistsExpression
+  return ExistsExpression(listOf(boundVar1, boundVar2), block(boundVar1.instance, boundVar2.instance))
 }
 
 /** Exists quantifier with three bound variable of [sort1], [sort2], [sort3] */
-fun <S1 : Sort, S2 : Sort, S3 : Sort> Builder<BoolSort>.exists(
+fun <S1 : Sort, S2 : Sort, S3 : Sort> exists(
     sort1: S1,
     sort2: S2,
     sort3: S3,
-    block:
-        Builder<BoolSort>.(Expression<S1>, Expression<S2>, Expression<S3>) -> Expression<BoolSort>
+    block: (Expression<S1>, Expression<S2>, Expression<S3>) -> Expression<BoolSort>
 ): ExistsExpression {
   val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".symbol(), sort1)
   val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".symbol(), sort2)
   val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".symbol(), sort3)
 
-  children.add(
-      ExistsExpression(
-          listOf(boundVar1, boundVar2, boundVar3),
-          Builder<BoolSort>().block(boundVar1.instance, boundVar2.instance, boundVar3.instance)))
-
-  return children.last() as ExistsExpression
+  return ExistsExpression(listOf(boundVar1, boundVar2, boundVar3), block(boundVar1.instance, boundVar2.instance, boundVar3.instance))
 }
 
 /** Exists quantifier with four bound variable of [sort1], [sort2], [sort3], [sort4] */
-fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> Builder<BoolSort>.exists(
+fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> exists(
     sort1: S1,
     sort2: S2,
     sort3: S3,
     sort4: S4,
-    block:
-        Builder<BoolSort>.(
-            Expression<S1>, Expression<S2>, Expression<S3>, Expression<S4>) -> Expression<BoolSort>
+    block: (Expression<S1>, Expression<S2>, Expression<S3>, Expression<S4>) -> Expression<BoolSort>
 ): ExistsExpression {
   val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".symbol(), sort1)
   val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".symbol(), sort2)
   val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".symbol(), sort3)
   val boundVar4 = SortedVar("|$sort4!${UUID.randomUUID()}|".symbol(), sort4)
 
-  children.add(
-      ExistsExpression(
-          listOf(boundVar1, boundVar2, boundVar3, boundVar4),
-          Builder<BoolSort>()
-              .block(
-                  boundVar1.instance, boundVar2.instance, boundVar3.instance, boundVar4.instance)))
-
-  return children.last() as ExistsExpression
+  return ExistsExpression(listOf(boundVar1, boundVar2, boundVar3, boundVar4), block(boundVar1.instance, boundVar2.instance, boundVar3.instance, boundVar4.instance))
 }
 
 /** Exists quantifier with five bound variable of [sort1], [sort2], [sort3], [sort4], [sort5] */
-fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Builder<BoolSort>.exists(
+fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> exists(
     sort1: S1,
     sort2: S2,
     sort3: S3,
     sort4: S4,
     sort5: S5,
-    block:
-        Builder<BoolSort>.(
-            Expression<S1>,
+    block: (Expression<S1>,
             Expression<S2>,
             Expression<S3>,
             Expression<S4>,
@@ -118,29 +94,25 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Builder<BoolSort>.ex
   val boundVar4 = SortedVar("|$sort4!${UUID.randomUUID()}|".symbol(), sort4)
   val boundVar5 = SortedVar("|$sort5!${UUID.randomUUID()}|".symbol(), sort5)
 
-  children.add(
-      ExistsExpression(
-          listOf(boundVar1, boundVar2, boundVar3, boundVar4, boundVar5),
-          Builder<BoolSort>()
-              .block(
-                  boundVar1.instance,
-                  boundVar2.instance,
-                  boundVar3.instance,
-                  boundVar4.instance,
-                  boundVar5.instance)))
-
-  return children.last() as ExistsExpression
+  return ExistsExpression(
+      listOf(boundVar1, boundVar2, boundVar3, boundVar4, boundVar5),
+      block(
+          boundVar1.instance,
+          boundVar2.instance,
+          boundVar3.instance,
+          boundVar4.instance,
+          boundVar5.instance))
 }
 
 /** Exists quantifier with at least 6 bound variable of any sort */
-fun Builder<BoolSort>.exists(
+fun exists(
     sort1: Sort,
     sort2: Sort,
     sort3: Sort,
     sort4: Sort,
     sort5: Sort,
     vararg sorts: Sort,
-    block: Builder<BoolSort>.(List<Expression<*>>) -> Expression<BoolSort>
+    block: (List<Expression<*>>) -> Expression<BoolSort>
 ): ExistsExpression {
   val boundVars =
       listOf(
@@ -151,82 +123,67 @@ fun Builder<BoolSort>.exists(
           SortedVar("|$sort5!${UUID.randomUUID()}|".symbol(), sort5)) +
           sorts.map { sort -> SortedVar("|$sort!${UUID.randomUUID()}|".symbol(), sort) }
 
-  children.add(
-      ExistsExpression(boundVars, Builder<BoolSort>().block(boundVars.map { it.instance })))
-
-  return children.last() as ExistsExpression
+  return ExistsExpression(boundVars, block(boundVars.map { it.instance }))
 }
 
 /** Exists quantifier with any number of bound variable of any sort */
-fun Builder<BoolSort>.exists(
+fun exists(
     sorts: List<Sort>,
-    block: Builder<BoolSort>.(List<Expression<*>>) -> Expression<BoolSort>
+    block: (List<Expression<*>>) -> Expression<BoolSort>
 ): ExistsExpression {
   val boundVars = sorts.map { sort -> SortedVar("|$sort!${UUID.randomUUID()}|".symbol(), sort) }
 
-  children.add(
-      ExistsExpression(boundVars, Builder<BoolSort>().block(boundVars.map { it.instance })))
-
-  return children.last() as ExistsExpression
+  return ExistsExpression(boundVars, block(boundVars.map { it.instance }))
 }
 
 /** Universal quantifier with one bound variable of [sort] */
-fun <S : Sort> Builder<BoolSort>.forall(
+fun <S : Sort> forall(
     sort: S,
-    block: Builder<BoolSort>.(Expression<S>) -> Expression<BoolSort>
+    block: (Expression<S>) -> Expression<BoolSort>
 ): ForallExpression {
   val boundVar = SortedVar("|$sort!${UUID.randomUUID()}|".symbol(), sort)
 
-  children.add(ForallExpression(listOf(boundVar), Builder<BoolSort>().block(boundVar.instance)))
-
-  return children.last() as ForallExpression
+  return ForallExpression(listOf(boundVar), block(boundVar.instance))
 }
 
 /** Universal quantifier with two bound variable of [sort1], [sort2] */
-fun <S1 : Sort, S2 : Sort> Builder<BoolSort>.forall(
+fun <S1 : Sort, S2 : Sort> forall(
     sort1: S1,
     sort2: S2,
-    block: Builder<BoolSort>.(Expression<S1>, Expression<S2>) -> Expression<BoolSort>
+    block: (Expression<S1>, Expression<S2>) -> Expression<BoolSort>
 ): ForallExpression {
   val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".symbol(), sort1)
   val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".symbol(), sort2)
 
-  children.add(
-      ForallExpression(
-          listOf(boundVar1, boundVar2),
-          Builder<BoolSort>().block(boundVar1.instance, boundVar2.instance)))
-
-  return children.last() as ForallExpression
+  return ForallExpression(
+      listOf(boundVar1, boundVar2),
+      block(boundVar1.instance, boundVar2.instance))
 }
 
 /** Universal quantifier with three bound variable of [sort1], [sort2], [sort3] */
-fun <S1 : Sort, S2 : Sort, S3 : Sort> Builder<BoolSort>.forall(
+fun <S1 : Sort, S2 : Sort, S3 : Sort> forall(
     sort1: S1,
     sort2: S2,
     sort3: S3,
-    block:
-        Builder<BoolSort>.(Expression<S1>, Expression<S2>, Expression<S3>) -> Expression<BoolSort>
+    block: (Expression<S1>, Expression<S2>, Expression<S3>) -> Expression<BoolSort>
 ): ForallExpression {
   val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".symbol(), sort1)
   val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".symbol(), sort2)
   val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".symbol(), sort3)
-
-  children.add(
-      ForallExpression(
-          listOf(boundVar1, boundVar2, boundVar3),
-          Builder<BoolSort>().block(boundVar1.instance, boundVar2.instance, boundVar3.instance)))
-
-  return children.last() as ForallExpression
+    
+  return ForallExpression(
+      listOf(boundVar1, boundVar2, boundVar3),
+      block(boundVar1.instance, boundVar2.instance, boundVar3.instance))
 }
 
 /** Universal quantifier with four bound variable of [sort1], [sort2], [sort3], [sort4] */
-fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> Builder<BoolSort>.forall(
+fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> forall(
     sort1: S1,
     sort2: S2,
     sort3: S3,
     sort4: S4,
     block:
-        Builder<BoolSort>.(
+        (
             Expression<S1>, Expression<S2>, Expression<S3>, Expression<S4>) -> Expression<BoolSort>
 ): ForallExpression {
   val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".symbol(), sort1)
@@ -234,25 +191,20 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> Builder<BoolSort>.forall(
   val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".symbol(), sort3)
   val boundVar4 = SortedVar("|$sort4!${UUID.randomUUID()}|".symbol(), sort4)
 
-  children.add(
-      ForallExpression(
-          listOf(boundVar1, boundVar2, boundVar3, boundVar4),
-          Builder<BoolSort>()
-              .block(
-                  boundVar1.instance, boundVar2.instance, boundVar3.instance, boundVar4.instance)))
-
-  return children.last() as ForallExpression
+  return ForallExpression(
+      listOf(boundVar1, boundVar2, boundVar3, boundVar4),
+      block(boundVar1.instance, boundVar2.instance, boundVar3.instance, boundVar4.instance))
 }
 
 /** Universal quantifier with five bound variable of [sort1], [sort2], [sort3], [sort4], [sort5] */
-fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Builder<BoolSort>.forall(
+fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> forall(
     sort1: S1,
     sort2: S2,
     sort3: S3,
     sort4: S4,
     sort5: S5,
     block:
-        Builder<BoolSort>.(
+        (
             Expression<S1>,
             Expression<S2>,
             Expression<S3>,
@@ -265,29 +217,25 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Builder<BoolSort>.fo
   val boundVar4 = SortedVar("|$sort4!${UUID.randomUUID()}|".symbol(), sort4)
   val boundVar5 = SortedVar("|$sort5!${UUID.randomUUID()}|".symbol(), sort5)
 
-  children.add(
-      ForallExpression(
-          listOf(boundVar1, boundVar2, boundVar3, boundVar4, boundVar5),
-          Builder<BoolSort>()
-              .block(
-                  boundVar1.instance,
-                  boundVar2.instance,
-                  boundVar3.instance,
-                  boundVar4.instance,
-                  boundVar5.instance)))
-
-  return children.last() as ForallExpression
+  return ForallExpression(
+      listOf(boundVar1, boundVar2, boundVar3, boundVar4, boundVar5),
+      block(
+          boundVar1.instance,
+          boundVar2.instance,
+          boundVar3.instance,
+          boundVar4.instance,
+          boundVar5.instance))
 }
 
 /** Universal quantifier with at least 6 bound variable of any sort */
-fun Builder<BoolSort>.forall(
+fun forall(
     sort1: Sort,
     sort2: Sort,
     sort3: Sort,
     sort4: Sort,
     sort5: Sort,
     vararg sorts: Sort,
-    block: Builder<BoolSort>.(List<Expression<*>>) -> Expression<BoolSort>
+    block: (List<Expression<*>>) -> Expression<BoolSort>
 ): ForallExpression {
   val boundVars =
       listOf(
@@ -298,21 +246,15 @@ fun Builder<BoolSort>.forall(
           SortedVar("|$sort5!${UUID.randomUUID()}|".symbol(), sort5)) +
           sorts.map { sort -> SortedVar("|$sort!${UUID.randomUUID()}|".symbol(), sort) }
 
-  children.add(
-      ForallExpression(boundVars, Builder<BoolSort>().block(boundVars.map { it.instance })))
-
-  return children.last() as ForallExpression
+  return ForallExpression(boundVars, block(boundVars.map { it.instance }))
 }
 
 /** Universal quantifier with any number of bound variable of any sort */
-fun Builder<BoolSort>.forall(
+fun forall(
     sorts: List<Sort>,
-    block: Builder<BoolSort>.(List<Expression<*>>) -> Expression<BoolSort>
+    block: (List<Expression<*>>) -> Expression<BoolSort>
 ): ForallExpression {
   val boundVars = sorts.map { sort -> SortedVar("|$sort!${UUID.randomUUID()}|".symbol(), sort) }
 
-  children.add(
-      ForallExpression(boundVars, Builder<BoolSort>().block(boundVars.map { it.instance })))
-
-  return children.last() as ForallExpression
+  return ForallExpression(boundVars, block(boundVars.map { it.instance }))
 }
