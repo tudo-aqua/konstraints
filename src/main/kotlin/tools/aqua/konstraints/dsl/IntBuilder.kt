@@ -30,12 +30,20 @@ infix operator fun Expression<IntSort>.minus(other: Expression<IntSort>): IntSub
       IntSub(this, other)
     }
 
+infix fun Expression<IntSort>.minus(other: () -> Expression<IntSort>): IntSub = this minus other()
+infix fun (() -> Expression<IntSort>).minus(other: Expression<IntSort>): IntSub = this() minus other
+infix fun (() -> Expression<IntSort>).minus(other: () -> Expression<IntSort>): IntSub = this() minus other()
+
 infix operator fun Expression<IntSort>.plus(other: Expression<IntSort>): IntAdd =
     if (this is IntAdd) {
       IntAdd(*this.children.toTypedArray(), other)
     } else {
       IntAdd(this, other)
     }
+
+infix fun Expression<IntSort>.plus(other: () -> Expression<IntSort>): IntAdd = this plus other()
+infix fun (() -> Expression<IntSort>).plus(other: Expression<IntSort>): IntAdd = this() plus other
+infix fun (() -> Expression<IntSort>).plus(other: () -> Expression<IntSort>): IntAdd = this() plus other()
 
 infix operator fun Expression<IntSort>.times(other: Expression<IntSort>): IntMul =
     if (this is IntMul) {
@@ -44,6 +52,11 @@ infix operator fun Expression<IntSort>.times(other: Expression<IntSort>): IntMul
       IntMul(this, other)
     }
 
+infix fun Expression<IntSort>.times(other: () -> Expression<IntSort>): IntMul = this times other()
+infix fun (() -> Expression<IntSort>).times(other: Expression<IntSort>): IntMul = this() times other
+infix fun (() -> Expression<IntSort>).times(other: () -> Expression<IntSort>): IntMul = this() times other()
+
+
 infix operator fun Expression<IntSort>.div(other: Expression<IntSort>): IntDiv =
     if (this is IntDiv) {
       IntDiv(*this.children.toTypedArray(), other)
@@ -51,55 +64,82 @@ infix operator fun Expression<IntSort>.div(other: Expression<IntSort>): IntDiv =
       IntDiv(this, other)
     }
 
+infix fun Expression<IntSort>.div(other: () -> Expression<IntSort>): IntDiv = this div other()
+infix fun (() -> Expression<IntSort>).div(other: Expression<IntSort>): IntDiv = this() div other
+infix fun (() -> Expression<IntSort>).div(other: () -> Expression<IntSort>): IntDiv = this() div other()
+
 infix fun Expression<IntSort>.greater(other: Expression<IntSort>) = IntGreater(this, other)
+
+infix fun Expression<IntSort>.greater(other: () -> Expression<IntSort>): IntGreater = this greater other()
+infix fun (() -> Expression<IntSort>).greater(other: Expression<IntSort>): IntGreater = this() greater other
+infix fun (() -> Expression<IntSort>).greater(other: () -> Expression<IntSort>): IntGreater = this() greater other()
 
 infix fun IntGreater.greater(other: Expression<IntSort>) =
     IntGreater(*this.children.toTypedArray(), other)
 
+infix fun IntGreater.greater(block: () -> Expression<IntSort>) =
+    IntGreater(*this.children.toTypedArray(), block())
+
 infix fun Expression<IntSort>.greaterEq(other: Expression<IntSort>) = IntGreaterEq(this, other)
+
+infix fun Expression<IntSort>.greaterEq(other: () -> Expression<IntSort>): IntGreaterEq = this greaterEq other()
+infix fun (() -> Expression<IntSort>).greaterEq(other: Expression<IntSort>): IntGreaterEq = this() greaterEq other
+infix fun (() -> Expression<IntSort>).greaterEq(other: () -> Expression<IntSort>): IntGreaterEq = this() greaterEq other()
 
 infix fun IntGreaterEq.greaterEq(other: Expression<IntSort>) =
     IntGreaterEq(*this.children.toTypedArray(), other)
 
+infix fun IntGreaterEq.greaterEq(block: () -> Expression<IntSort>) =
+    IntGreaterEq(*this.children.toTypedArray(), block())
+
 infix fun Expression<IntSort>.less(other: Expression<IntSort>) = IntLess(this, other)
 
+infix fun Expression<IntSort>.less(other: () -> Expression<IntSort>): IntLess = this less other()
+infix fun (() -> Expression<IntSort>).less(other: Expression<IntSort>): IntLess = this() less other
+infix fun (() -> Expression<IntSort>).less(other: () -> Expression<IntSort>): IntLess = this() less other()
+
 infix fun IntLess.less(other: Expression<IntSort>) = IntLess(*this.children.toTypedArray(), other)
+infix fun IntLess.greater(block: () -> Expression<IntSort>) =
+    IntLess(*this.children.toTypedArray(), block())
 
 infix fun Expression<IntSort>.lessEq(other: Expression<IntSort>) = IntLessEq(this, other)
+
+infix fun Expression<IntSort>.lessEq(other: () -> Expression<IntSort>): IntLessEq = this lessEq other()
+infix fun (() -> Expression<IntSort>).lessEq(other: Expression<IntSort>): IntLessEq = this() lessEq other
+infix fun (() -> Expression<IntSort>).lessEq(other: () -> Expression<IntSort>): IntLessEq = this() lessEq other()
 
 infix fun IntLessEq.lessEq(other: Expression<IntSort>) =
     IntLessEq(*this.children.toTypedArray(), other)
 
+infix fun IntLessEq.greater(block: () -> Expression<IntSort>) =
+    IntLessEq(*this.children.toTypedArray(), block())
+
 infix fun Expression<IntSort>.mod(other: Expression<IntSort>) = Mod(this, other)
 
-private fun Builder<IntSort>.makeIntOperator(
+infix fun Expression<IntSort>.mod(other: () -> Expression<IntSort>): Mod = this mod other()
+infix fun (() -> Expression<IntSort>).mod(other: Expression<IntSort>): Mod = this() mod other
+infix fun (() -> Expression<IntSort>).mod(other: () -> Expression<IntSort>): Mod = this() mod other()
+
+private fun makeIntOperator(
     init: Builder<IntSort>.() -> Unit,
     op: (List<Expression<IntSort>>) -> Expression<IntSort>
 ): Expression<IntSort> {
   val builder = Builder<IntSort>()
   builder.init()
 
-  this.children.add(op(builder.children))
-
-  return this.children.last()
+  return op(builder.children)
 }
 
-fun Builder<IntSort>.add(init: Builder<IntSort>.() -> Unit) = this.makeIntOperator(init, ::IntAdd)
+fun add(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntAdd)
 
-fun Builder<IntSort>.sub(init: Builder<IntSort>.() -> Unit) = this.makeIntOperator(init, ::IntSub)
+fun sub(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntSub)
 
-fun Builder<IntSort>.mul(init: Builder<IntSort>.() -> Unit) = this.makeIntOperator(init, ::IntMul)
+fun mul(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntMul)
 
-fun Builder<IntSort>.div(init: Builder<IntSort>.() -> Unit) = this.makeIntOperator(init, ::IntDiv)
+fun div(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntDiv)
 
-fun Builder<IntSort>.abs(block: Builder<IntSort>.() -> Expression<IntSort>): Abs {
-  this.children.add(Abs(Builder<IntSort>().block()))
+fun  abs(block: () -> Expression<IntSort>) = Abs(block())
+fun  abs(expr: Expression<IntSort>) = Abs(expr)
 
-  return this.children.last() as Abs
-}
-
-fun Builder<IntSort>.toInt(block: Builder<RealSort>.() -> Expression<RealSort>): ToInt {
-  this.children.add(ToInt(Builder<RealSort>().block()))
-
-  return this.children.last() as ToInt
-}
+fun toInt(block: () -> Expression<RealSort>) = ToInt(block())
+fun toInt(expr:  Expression<RealSort>) = ToInt(expr)
