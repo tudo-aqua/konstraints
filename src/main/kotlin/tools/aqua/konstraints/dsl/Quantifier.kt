@@ -24,10 +24,7 @@ import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 
 /** Exists quantifier with one bound variable of [sort] */
-fun <S : Sort> exists(
-    sort: S,
-    block: (Expression<S>) -> Expression<BoolSort>
-): ExistsExpression {
+fun <S : Sort> exists(sort: S, block: (Expression<S>) -> Expression<BoolSort>): ExistsExpression {
   val boundVar = SortedVar("|$sort!${UUID.randomUUID()}|".symbol(), sort)
 
   return ExistsExpression(listOf(boundVar), block(boundVar.instance))
@@ -42,7 +39,8 @@ fun <S1 : Sort, S2 : Sort> exists(
   val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".symbol(), sort1)
   val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".symbol(), sort2)
 
-  return ExistsExpression(listOf(boundVar1, boundVar2), block(boundVar1.instance, boundVar2.instance))
+  return ExistsExpression(
+      listOf(boundVar1, boundVar2), block(boundVar1.instance, boundVar2.instance))
 }
 
 /** Exists quantifier with three bound variable of [sort1], [sort2], [sort3] */
@@ -56,7 +54,9 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort> exists(
   val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".symbol(), sort2)
   val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".symbol(), sort3)
 
-  return ExistsExpression(listOf(boundVar1, boundVar2, boundVar3), block(boundVar1.instance, boundVar2.instance, boundVar3.instance))
+  return ExistsExpression(
+      listOf(boundVar1, boundVar2, boundVar3),
+      block(boundVar1.instance, boundVar2.instance, boundVar3.instance))
 }
 
 /** Exists quantifier with four bound variable of [sort1], [sort2], [sort3], [sort4] */
@@ -72,7 +72,9 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> exists(
   val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".symbol(), sort3)
   val boundVar4 = SortedVar("|$sort4!${UUID.randomUUID()}|".symbol(), sort4)
 
-  return ExistsExpression(listOf(boundVar1, boundVar2, boundVar3, boundVar4), block(boundVar1.instance, boundVar2.instance, boundVar3.instance, boundVar4.instance))
+  return ExistsExpression(
+      listOf(boundVar1, boundVar2, boundVar3, boundVar4),
+      block(boundVar1.instance, boundVar2.instance, boundVar3.instance, boundVar4.instance))
 }
 
 /** Exists quantifier with five bound variable of [sort1], [sort2], [sort3], [sort4], [sort5] */
@@ -82,7 +84,9 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> exists(
     sort3: S3,
     sort4: S4,
     sort5: S5,
-    block: (Expression<S1>,
+    block:
+        (
+            Expression<S1>,
             Expression<S2>,
             Expression<S3>,
             Expression<S4>,
@@ -137,10 +141,7 @@ fun exists(
 }
 
 /** Universal quantifier with one bound variable of [sort] */
-fun <S : Sort> forall(
-    sort: S,
-    block: (Expression<S>) -> Expression<BoolSort>
-): ForallExpression {
+fun <S : Sort> forall(sort: S, block: (Expression<S>) -> Expression<BoolSort>): ForallExpression {
   val boundVar = SortedVar("|$sort!${UUID.randomUUID()}|".symbol(), sort)
 
   return ForallExpression(listOf(boundVar), block(boundVar.instance))
@@ -156,8 +157,7 @@ fun <S1 : Sort, S2 : Sort> forall(
   val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".symbol(), sort2)
 
   return ForallExpression(
-      listOf(boundVar1, boundVar2),
-      block(boundVar1.instance, boundVar2.instance))
+      listOf(boundVar1, boundVar2), block(boundVar1.instance, boundVar2.instance))
 }
 
 /** Universal quantifier with three bound variable of [sort1], [sort2], [sort3] */
@@ -170,7 +170,7 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort> forall(
   val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".symbol(), sort1)
   val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".symbol(), sort2)
   val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".symbol(), sort3)
-    
+
   return ForallExpression(
       listOf(boundVar1, boundVar2, boundVar3),
       block(boundVar1.instance, boundVar2.instance, boundVar3.instance))
@@ -182,9 +182,7 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> forall(
     sort2: S2,
     sort3: S3,
     sort4: S4,
-    block:
-        (
-            Expression<S1>, Expression<S2>, Expression<S3>, Expression<S4>) -> Expression<BoolSort>
+    block: (Expression<S1>, Expression<S2>, Expression<S3>, Expression<S4>) -> Expression<BoolSort>
 ): ForallExpression {
   val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".symbol(), sort1)
   val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".symbol(), sort2)

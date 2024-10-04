@@ -34,9 +34,14 @@ infix fun Expression<BoolSort>.implies(other: Expression<BoolSort>): Implies =
       Implies(this, other)
     }
 
-infix fun Expression<BoolSort>.implies(other: () -> Expression<BoolSort>): Implies = this implies other()
-infix fun (() -> Expression<BoolSort>).implies(other: Expression<BoolSort>): Implies = this() implies other
-infix fun (() -> Expression<BoolSort>).implies(other: () -> Expression<BoolSort>): Implies = this() implies other()
+infix fun Expression<BoolSort>.implies(other: () -> Expression<BoolSort>): Implies =
+    this implies other()
+
+infix fun (() -> Expression<BoolSort>).implies(other: Expression<BoolSort>): Implies =
+    this() implies other
+
+infix fun (() -> Expression<BoolSort>).implies(other: () -> Expression<BoolSort>): Implies =
+    this() implies other()
 
 /**
  * Creates a logical and: [this] and [other].
@@ -51,8 +56,11 @@ infix fun Expression<BoolSort>.and(other: Expression<BoolSort>): And =
     }
 
 infix fun Expression<BoolSort>.and(other: () -> Expression<BoolSort>): And = this and other()
+
 infix fun (() -> Expression<BoolSort>).and(other: Expression<BoolSort>): And = this() and other
-infix fun (() -> Expression<BoolSort>).and(other: () -> Expression<BoolSort>): And = this() and other()
+
+infix fun (() -> Expression<BoolSort>).and(other: () -> Expression<BoolSort>): And =
+    this() and other()
 
 /**
  * Creates a logical or: [this] or [other].
@@ -67,7 +75,9 @@ infix fun Expression<BoolSort>.or(other: Expression<BoolSort>): Or =
     }
 
 infix fun Expression<BoolSort>.or(other: () -> Expression<BoolSort>): Or = this or other()
+
 infix fun (() -> Expression<BoolSort>).or(other: Expression<BoolSort>): Or = this() or other
+
 infix fun (() -> Expression<BoolSort>).or(other: () -> Expression<BoolSort>): Or = this() or other()
 
 /**
@@ -83,8 +93,11 @@ infix fun Expression<BoolSort>.xor(other: Expression<BoolSort>): XOr =
     }
 
 infix fun Expression<BoolSort>.xor(other: () -> Expression<BoolSort>): XOr = this xor other()
+
 infix fun (() -> Expression<BoolSort>).xor(other: Expression<BoolSort>): XOr = this() xor other
-infix fun (() -> Expression<BoolSort>).xor(other: () -> Expression<BoolSort>): XOr = this() xor other()
+
+infix fun (() -> Expression<BoolSort>).xor(other: () -> Expression<BoolSort>): XOr =
+    this() xor other()
 
 /**
  * Creates an equals: [this] equals [other].
@@ -102,9 +115,12 @@ infix fun <T : Sort> Expression<T>.eq(other: Expression<T>): Equals =
 infix fun <T : Sort> Equals.eq(other: Expression<T>): Equals =
     Equals(*this.children.toTypedArray(), other)
 
-infix fun<T : Sort> Expression<T>.eq(other: () -> Expression<T>): Equals = this eq other()
-infix fun<T : Sort> (() -> Expression<T>).eq(other: Expression<T>): Equals = this() eq other
-infix fun<T : Sort> (() -> Expression<T>).eq(other: () -> Expression<T>): Equals = this() eq other()
+infix fun <T : Sort> Expression<T>.eq(other: () -> Expression<T>): Equals = this eq other()
+
+infix fun <T : Sort> (() -> Expression<T>).eq(other: Expression<T>): Equals = this() eq other
+
+infix fun <T : Sort> (() -> Expression<T>).eq(other: () -> Expression<T>): Equals =
+    this() eq other()
 
 /** Creates a distinct: [this] distinct [other]. */
 infix fun <T : Sort> Expression<T>.distinct(other: Expression<T>): Distinct = Distinct(this, other)
@@ -119,7 +135,7 @@ private fun makeBoolOperator(
   val builder = Builder<BoolSort>()
   builder.init()
 
-    return op(builder.children)
+  return op(builder.children)
 }
 
 /**
@@ -169,6 +185,7 @@ fun <T : Sort> distinct(init: Builder<T>.() -> Unit): Distinct {
 
 /** Implements logical not operation */
 fun not(block: () -> Expression<BoolSort>): Not = Not(block())
+
 fun not(expr: Expression<BoolSort>): Not = Not(expr)
 
 /** Implements smt is_int operation */
@@ -184,24 +201,21 @@ private fun makeFPOperator(
 ): Expression<BoolSort> = op(Builder<FPSort>().block())
 
 /** Implements floating point isNormal operation */
-fun isNormal(block: Builder<FPSort>.() -> Expression<FPSort>) =
-    makeFPOperator(block, ::FPIsNormal)
+fun isNormal(block: Builder<FPSort>.() -> Expression<FPSort>) = makeFPOperator(block, ::FPIsNormal)
 
 /** Implements floating point isSubnormal operation */
 fun isSubnormal(block: Builder<FPSort>.() -> Expression<FPSort>) =
     makeFPOperator(block, ::FPIsSubnormal)
 
 /** Implements floating point isZero operation */
-fun isZero(block: Builder<FPSort>.() -> Expression<FPSort>) =
-    makeFPOperator(block, ::FPIsZero)
+fun isZero(block: Builder<FPSort>.() -> Expression<FPSort>) = makeFPOperator(block, ::FPIsZero)
 
 /** Implements floating point isInfinite operation */
 fun isInfinite(block: Builder<FPSort>.() -> Expression<FPSort>) =
     makeFPOperator(block, ::FPIsInfinite)
 
 /** Implements floating point isNaN operation */
-fun isNaN(block: Builder<FPSort>.() -> Expression<FPSort>) =
-    makeFPOperator(block, ::FPIsNaN)
+fun isNaN(block: Builder<FPSort>.() -> Expression<FPSort>) = makeFPOperator(block, ::FPIsNaN)
 
 /** Implements floating point isNegative operation */
 fun isNegative(block: Builder<FPSort>.() -> Expression<FPSort>) =

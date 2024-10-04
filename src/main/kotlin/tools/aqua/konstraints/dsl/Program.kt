@@ -31,10 +31,9 @@ class SMTProgramBuilder(logic: Logic) {
   private val context = Context(logic)
 
   /*fun assert(block: Builder<BoolSort>.() -> Expression<BoolSort>) =
-      assert(Builder<BoolSort>().block())*/
+  assert(Builder<BoolSort>().block())*/
 
-    fun assert(block: () -> Expression<BoolSort>) =
-        assert(block())
+  fun assert(block: () -> Expression<BoolSort>) = assert(block())
 
   fun assert(expr: Expression<BoolSort>) {
     commands.add(Assert(expr))

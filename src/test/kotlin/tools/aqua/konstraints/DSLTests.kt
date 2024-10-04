@@ -240,6 +240,33 @@ class DSLTests {
               SatStatus.UNSAT),
           arguments(
               smt(QF_BV) {
+                assert {
+                  exists(
+                      BVSort(3),
+                      BVSort(3),
+                      BVSort(3),
+                      BVSort(3),
+                      BVSort(3),
+                      BVSort(3),
+                      BVSort(3),
+                      BVSort(3),
+                      BVSort(3)) { exprs ->
+                        val x1 = exprs[0] as Expression<BVSort>
+                        val x2 = exprs[0] as Expression<BVSort>
+                        val x3 = exprs[0] as Expression<BVSort>
+                        val x4 = exprs[0] as Expression<BVSort>
+                        val x5 = exprs[0] as Expression<BVSort>
+                        val x6 = exprs[0] as Expression<BVSort>
+                        val x7 = exprs[0] as Expression<BVSort>
+                        val x8 = exprs[0] as Expression<BVSort>
+                        val x9 = exprs[0] as Expression<BVSort>
+                        (x1 eq { x2 } eq x3 eq x4 eq x5 eq x6 eq x7 eq x8 eq x9)
+                      }
+                }
+              },
+              SatStatus.UNSAT),
+          arguments(
+              smt(QF_BV) {
                 val X by declaringConst(BVSort(8))
                 val Y by declaringConst(BVSort(8))
 
@@ -288,5 +315,11 @@ class DSLTests {
                     }
                 assert { bvugt("#b11111111".bitvec(), "#b01111111".bitvec()) }
               },
-              SatStatus.SAT))
+              SatStatus.SAT),
+          arguments(
+              smt(QF_UF) {
+                val A by declaringConst(BoolSort)
+                val B by declaringConst(BoolSort)
+                assert { A implies { B } implies A }
+              }))
 }
