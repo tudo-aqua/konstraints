@@ -28,12 +28,26 @@ infix fun Expression<BVSort>.bvand(other: Expression<BVSort>) =
       BVAnd(this, other)
     }
 
+infix fun Expression<BVSort>.bvand(other: () -> Expression<BVSort>): BVAnd = this bvand other()
+
+infix fun (() -> Expression<BVSort>).bvand(other: Expression<BVSort>): BVAnd = this() bvand other
+
+infix fun (() -> Expression<BVSort>).bvand(other: () -> Expression<BVSort>): BVAnd =
+    this() bvand other()
+
 infix fun Expression<BVSort>.bvor(other: Expression<BVSort>) =
     if (this is BVOr) {
       BVOr(*this.children.toTypedArray(), other)
     } else {
       BVOr(this, other)
     }
+
+infix fun Expression<BVSort>.bvor(other: () -> Expression<BVSort>): BVOr = this bvor other()
+
+infix fun (() -> Expression<BVSort>).bvor(other: Expression<BVSort>): BVOr = this() bvor other
+
+infix fun (() -> Expression<BVSort>).bvor(other: () -> Expression<BVSort>): BVOr =
+    this() bvor other()
 
 infix fun Expression<BVSort>.bvadd(other: Expression<BVSort>) =
     if (this is BVAdd) {
@@ -42,6 +56,13 @@ infix fun Expression<BVSort>.bvadd(other: Expression<BVSort>) =
       BVAdd(this, other)
     }
 
+infix fun Expression<BVSort>.bvadd(other: () -> Expression<BVSort>): BVAdd = this bvadd other()
+
+infix fun (() -> Expression<BVSort>).bvadd(other: Expression<BVSort>): BVAdd = this() bvadd other
+
+infix fun (() -> Expression<BVSort>).bvadd(other: () -> Expression<BVSort>): BVAdd =
+    this() bvadd other()
+
 infix fun Expression<BVSort>.bvmul(other: Expression<BVSort>) =
     if (this is BVMul) {
       BVMul(*this.children.toTypedArray(), other)
@@ -49,22 +70,76 @@ infix fun Expression<BVSort>.bvmul(other: Expression<BVSort>) =
       BVMul(this, other)
     }
 
+infix fun Expression<BVSort>.bvmul(other: () -> Expression<BVSort>): BVMul = this bvmul other()
+
+infix fun (() -> Expression<BVSort>).bvmul(other: Expression<BVSort>): BVMul = this() bvmul other
+
+infix fun (() -> Expression<BVSort>).bvmul(other: () -> Expression<BVSort>): BVMul =
+    this() bvmul other()
+
 /*
  * Bitvector infix operations
  */
 infix fun Expression<BVSort>.concat(other: Expression<BVSort>) = BVConcat(this, other)
 
+infix fun Expression<BVSort>.concat(other: () -> Expression<BVSort>) = BVConcat(this, other())
+
+infix fun (() -> Expression<BVSort>).concat(other: Expression<BVSort>) = BVConcat(this(), other)
+
+infix fun (() -> Expression<BVSort>).concat(other: () -> Expression<BVSort>) =
+    BVConcat(this(), other())
+
 infix fun Expression<BVSort>.bvudiv(denominator: Expression<BVSort>) = BVUDiv(this, denominator)
+
+infix fun Expression<BVSort>.bvudiv(other: () -> Expression<BVSort>) = BVUDiv(this, other())
+
+infix fun (() -> Expression<BVSort>).bvudiv(other: Expression<BVSort>) = BVUDiv(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvudiv(other: () -> Expression<BVSort>) =
+    BVUDiv(this(), other())
 
 infix fun Expression<BVSort>.bvurem(denominator: Expression<BVSort>) = BVURem(this, denominator)
 
+infix fun Expression<BVSort>.bvurem(other: () -> Expression<BVSort>) = BVURem(this, other())
+
+infix fun (() -> Expression<BVSort>).bvurem(other: Expression<BVSort>) = BVURem(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvurem(other: () -> Expression<BVSort>) =
+    BVURem(this(), other())
+
 infix fun Expression<BVSort>.bvshl(distance: Expression<BVSort>) = BVShl(this, distance)
+
+infix fun Expression<BVSort>.bvshl(other: () -> Expression<BVSort>) = BVShl(this, other())
+
+infix fun (() -> Expression<BVSort>).bvshl(other: Expression<BVSort>) = BVShl(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvshl(other: () -> Expression<BVSort>) = BVShl(this(), other())
 
 infix fun Expression<BVSort>.bvlshr(distance: Expression<BVSort>) = BVLShr(this, distance)
 
+infix fun Expression<BVSort>.bvlshr(other: () -> Expression<BVSort>) = BVLShr(this, other())
+
+infix fun (() -> Expression<BVSort>).bvlshr(other: Expression<BVSort>) = BVLShr(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvlshr(other: () -> Expression<BVSort>) =
+    BVLShr(this(), other())
+
 infix fun Expression<BVSort>.bvnand(rhs: Expression<BVSort>) = BVNAnd(this, rhs)
 
+infix fun Expression<BVSort>.bvnand(other: () -> Expression<BVSort>) = BVNAnd(this, other())
+
+infix fun (() -> Expression<BVSort>).bvnand(other: Expression<BVSort>) = BVNAnd(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvnand(other: () -> Expression<BVSort>) =
+    BVNAnd(this(), other())
+
 infix fun Expression<BVSort>.bvnor(rhs: Expression<BVSort>) = BVNOr(this, rhs)
+
+infix fun Expression<BVSort>.bvnor(other: () -> Expression<BVSort>) = BVNOr(this, other())
+
+infix fun (() -> Expression<BVSort>).bvnor(other: Expression<BVSort>) = BVNOr(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvnor(other: () -> Expression<BVSort>) = BVNOr(this(), other())
 
 infix fun Expression<BVSort>.bvxor(rhs: Expression<BVSort>) =
     if (this is BVXOr) {
@@ -73,19 +148,73 @@ infix fun Expression<BVSort>.bvxor(rhs: Expression<BVSort>) =
       BVXOr(this, rhs)
     }
 
+infix fun Expression<BVSort>.bvxor(other: () -> Expression<BVSort>) = BVXOr(this, other())
+
+infix fun (() -> Expression<BVSort>).bvxor(other: Expression<BVSort>) = BVXOr(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvxor(other: () -> Expression<BVSort>) = BVXOr(this(), other())
+
 infix fun Expression<BVSort>.bvxnor(rhs: Expression<BVSort>) = BVXNOr(this, rhs)
+
+infix fun Expression<BVSort>.bvxnor(other: () -> Expression<BVSort>) = BVXNOr(this, other())
+
+infix fun (() -> Expression<BVSort>).bvxnor(other: Expression<BVSort>) = BVXNOr(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvxnor(other: () -> Expression<BVSort>) =
+    BVXNOr(this(), other())
 
 infix fun Expression<BVSort>.bvcomp(rhs: Expression<BVSort>) = BVComp(this, rhs)
 
+infix fun Expression<BVSort>.bvcomp(other: () -> Expression<BVSort>) = BVComp(this, other())
+
+infix fun (() -> Expression<BVSort>).bvcomp(other: Expression<BVSort>) = BVComp(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvcomp(other: () -> Expression<BVSort>) =
+    BVComp(this(), other())
+
 infix fun Expression<BVSort>.bvsub(rhs: Expression<BVSort>) = BVSub(this, rhs)
+
+infix fun Expression<BVSort>.bvsub(other: () -> Expression<BVSort>) = BVSub(this, other())
+
+infix fun (() -> Expression<BVSort>).bvsub(other: Expression<BVSort>) = BVSub(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvsub(other: () -> Expression<BVSort>) = BVSub(this(), other())
 
 infix fun Expression<BVSort>.bvsdiv(denominator: Expression<BVSort>) = BVSDiv(this, denominator)
 
+infix fun Expression<BVSort>.bvsdiv(other: () -> Expression<BVSort>) = BVSDiv(this, other())
+
+infix fun (() -> Expression<BVSort>).bvsdiv(other: Expression<BVSort>) = BVSDiv(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvsdiv(other: () -> Expression<BVSort>) =
+    BVSDiv(this(), other())
+
 infix fun Expression<BVSort>.bvsrem(denominator: Expression<BVSort>) = BVSRem(this, denominator)
+
+infix fun Expression<BVSort>.bvsrem(other: () -> Expression<BVSort>) = BVSRem(this, other())
+
+infix fun (() -> Expression<BVSort>).bvsrem(other: Expression<BVSort>) = BVSRem(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvsrem(other: () -> Expression<BVSort>) =
+    BVSRem(this(), other())
 
 infix fun Expression<BVSort>.bvsmod(rhs: Expression<BVSort>) = BVSMod(this, rhs)
 
+infix fun Expression<BVSort>.bvsmod(other: () -> Expression<BVSort>) = BVSMod(this, other())
+
+infix fun (() -> Expression<BVSort>).bvsmod(other: Expression<BVSort>) = BVSMod(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvsmod(other: () -> Expression<BVSort>) =
+    BVSMod(this(), other())
+
 infix fun Expression<BVSort>.bvashr(distance: Expression<BVSort>) = BVAShr(this, distance)
+
+infix fun Expression<BVSort>.bvashr(other: () -> Expression<BVSort>) = BVAShr(this, other())
+
+infix fun (() -> Expression<BVSort>).bvashr(other: Expression<BVSort>) = BVAShr(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvashr(other: () -> Expression<BVSort>) =
+    BVAShr(this(), other())
 
 /*
  * bitvector comparison operators
@@ -93,83 +222,113 @@ infix fun Expression<BVSort>.bvashr(distance: Expression<BVSort>) = BVAShr(this,
 
 infix fun Expression<BVSort>.bvult(distance: Expression<BVSort>) = BVUlt(this, distance)
 
+infix fun Expression<BVSort>.bvult(other: () -> Expression<BVSort>) = BVUlt(this, other())
+
+infix fun (() -> Expression<BVSort>).bvult(other: Expression<BVSort>) = BVUlt(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvult(other: () -> Expression<BVSort>) = BVUlt(this(), other())
+
 infix fun Expression<BVSort>.bvule(distance: Expression<BVSort>) = BVULe(this, distance)
+
+infix fun Expression<BVSort>.bvule(other: () -> Expression<BVSort>) = BVULe(this, other())
+
+infix fun (() -> Expression<BVSort>).bvule(other: Expression<BVSort>) = BVULe(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvule(other: () -> Expression<BVSort>) = BVULe(this(), other())
 
 infix fun Expression<BVSort>.bvugt(distance: Expression<BVSort>) = BVUGt(this, distance)
 
+infix fun Expression<BVSort>.bvugt(other: () -> Expression<BVSort>) = BVUGt(this, other())
+
+infix fun (() -> Expression<BVSort>).bvugt(other: Expression<BVSort>) = BVUGt(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvugt(other: () -> Expression<BVSort>) = BVUGt(this(), other())
+
 infix fun Expression<BVSort>.bvuge(distance: Expression<BVSort>) = BVUGe(this, distance)
+
+infix fun Expression<BVSort>.bvuge(other: () -> Expression<BVSort>) = BVUGe(this, other())
+
+infix fun (() -> Expression<BVSort>).bvuge(other: Expression<BVSort>) = BVUGe(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvuge(other: () -> Expression<BVSort>) = BVUGe(this(), other())
 
 infix fun Expression<BVSort>.bvslt(distance: Expression<BVSort>) = BVSLt(this, distance)
 
+infix fun Expression<BVSort>.bvslt(other: () -> Expression<BVSort>) = BVSLt(this, other())
+
+infix fun (() -> Expression<BVSort>).bvslt(other: Expression<BVSort>) = BVSLt(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvslt(other: () -> Expression<BVSort>) = BVSLt(this(), other())
+
 infix fun Expression<BVSort>.bvsle(distance: Expression<BVSort>) = BVSLe(this, distance)
+
+infix fun Expression<BVSort>.bvsle(other: () -> Expression<BVSort>) = BVSLe(this, other())
+
+infix fun (() -> Expression<BVSort>).bvsle(other: Expression<BVSort>) = BVSLe(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvsle(other: () -> Expression<BVSort>) = BVSLe(this(), other())
 
 infix fun Expression<BVSort>.bvsgt(distance: Expression<BVSort>) = BVSGt(this, distance)
 
+infix fun Expression<BVSort>.bvsgt(other: () -> Expression<BVSort>) = BVSGt(this, other())
+
+infix fun (() -> Expression<BVSort>).bvsgt(other: Expression<BVSort>) = BVSGt(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvsgt(other: () -> Expression<BVSort>) = BVSGt(this(), other())
+
 infix fun Expression<BVSort>.bvsge(distance: Expression<BVSort>) = BVSGe(this, distance)
+
+infix fun Expression<BVSort>.bvsge(other: () -> Expression<BVSort>) = BVSGe(this, other())
+
+infix fun (() -> Expression<BVSort>).bvsge(other: Expression<BVSort>) = BVSGe(this(), other)
+
+infix fun (() -> Expression<BVSort>).bvsge(other: () -> Expression<BVSort>) = BVSGe(this(), other())
 
 /*
  * parameterized bitvector operations
  */
 
-private fun Builder<BVSort>.makeUnaryParameterizedOperation(
-    i: Int,
-    block: Builder<BVSort>.() -> Expression<BVSort>,
-    operation: (Int, Expression<BVSort>) -> Expression<BVSort>
-): Expression<BVSort> {
-  this.children.add(operation(i, Builder<BVSort>().block()))
+fun repeat(i: Int, block: () -> Expression<BVSort>) = Repeat(i, block())
 
-  return this.children.last()
-}
+fun repeat(i: Int, expr: Expression<BVSort>) = Repeat(i, expr)
 
-fun Builder<BVSort>.repeat(i: Int, block: Builder<BVSort>.() -> Expression<BVSort>) =
-    this.makeUnaryParameterizedOperation(i, block, ::Repeat)
+fun zeroExtend(i: Int, block: () -> Expression<BVSort>) = ZeroExtend(i, block())
 
-fun Builder<BVSort>.zeroExtend(i: Int, block: Builder<BVSort>.() -> Expression<BVSort>) =
-    this.makeUnaryParameterizedOperation(i, block, ::ZeroExtend)
+fun zeroExtend(i: Int, expr: Expression<BVSort>) = ZeroExtend(i, expr)
 
-fun Builder<BVSort>.signExtend(i: Int, block: Builder<BVSort>.() -> Expression<BVSort>) =
-    this.makeUnaryParameterizedOperation(i, block, ::SignExtend)
+fun signExtend(i: Int, block: () -> Expression<BVSort>) = SignExtend(i, block())
 
-fun Builder<BVSort>.rotateLeft(i: Int, block: Builder<BVSort>.() -> Expression<BVSort>) =
-    this.makeUnaryParameterizedOperation(i, block, ::RotateLeft)
+fun signExtend(i: Int, expr: Expression<BVSort>) = SignExtend(i, expr)
 
-fun Builder<BVSort>.rotateRight(i: Int, block: Builder<BVSort>.() -> Expression<BVSort>) =
-    this.makeUnaryParameterizedOperation(i, block, ::RotateRight)
+fun rotateLeft(i: Int, block: () -> Expression<BVSort>) = RotateLeft(i, block())
 
-fun Builder<BVSort>.extract(
-    i: Int,
-    j: Int,
-    block: Builder<BVSort>.() -> Expression<BVSort>
-): BVExtract {
-  this.children.add(BVExtract(i, j, Builder<BVSort>().block()))
+fun rotateLeft(i: Int, expr: Expression<BVSort>) = RotateLeft(i, expr)
 
-  return this.children.last() as BVExtract
-}
+fun rotateRight(i: Int, block: () -> Expression<BVSort>) = RotateRight(i, block())
+
+fun rotateRight(i: Int, expr: Expression<BVSort>) = RotateRight(i, expr)
+
+fun extract(i: Int, j: Int, block: () -> Expression<BVSort>) = BVExtract(i, j, block())
+
+fun extract(i: Int, j: Int, expr: Expression<BVSort>) = BVExtract(i, j, expr)
 
 /*
  * Unary bitvector operations
  */
 
-private fun Builder<BVSort>.makeUnaryOperation(
-    block: Builder<BVSort>.() -> Expression<BVSort>,
-    operation: (Expression<BVSort>) -> Expression<BVSort>
-): Expression<BVSort> {
-  this.children.add(operation(Builder<BVSort>().block()))
+fun bvnot(block: () -> Expression<BVSort>) = BVNot(block())
 
-  return this.children.last()
-}
+fun bvnot(expr: Expression<BVSort>) = BVNot(expr)
 
-fun Builder<BVSort>.bvnot(block: Builder<BVSort>.() -> Expression<BVSort>) =
-    this.makeUnaryOperation(block, ::BVNot)
+fun bvneg(block: () -> Expression<BVSort>) = BVNeg(block())
 
-fun Builder<BVSort>.bvneg(block: Builder<BVSort>.() -> Expression<BVSort>) =
-    this.makeUnaryOperation(block, ::BVNeg)
+fun bvneg(expr: Expression<BVSort>) = BVNeg(expr)
 
 /*
  * left-associative bitvector operations
  */
 
-private fun Builder<BVSort>.makeOperation(
+private fun makeOperation(
     init: Builder<BVSort>.() -> Unit,
     operation: (List<Expression<BVSort>>) -> Expression<BVSort>
 ): Expression<BVSort> {
@@ -178,21 +337,20 @@ private fun Builder<BVSort>.makeOperation(
 
   require(builder.children.isNotEmpty())
 
-  if (builder.children.size == 1) {
-    this.children.add(builder.children.single())
+  return if (builder.children.size == 1) {
+    builder.children.single()
   } else {
-    this.children.add(operation(builder.children))
+    operation(builder.children)
   }
-
-  return this.children.last()
 }
 
-fun Builder<BVSort>.bvand(init: Builder<BVSort>.() -> Unit) = this.makeOperation(init, ::BVAnd)
+// TODO add more options e.g. bvand(list: List<Expression>)
+fun bvand(init: Builder<BVSort>.() -> Unit) = makeOperation(init, ::BVAnd)
 
-fun Builder<BVSort>.bvor(init: Builder<BVSort>.() -> Unit) = this.makeOperation(init, ::BVOr)
+fun bvor(init: Builder<BVSort>.() -> Unit) = makeOperation(init, ::BVOr)
 
-fun Builder<BVSort>.bvadd(init: Builder<BVSort>.() -> Unit) = this.makeOperation(init, ::BVAdd)
+fun bvadd(init: Builder<BVSort>.() -> Unit) = makeOperation(init, ::BVAdd)
 
-fun Builder<BVSort>.bvmul(init: Builder<BVSort>.() -> Unit) = this.makeOperation(init, ::BVMul)
+fun bvmul(init: Builder<BVSort>.() -> Unit) = makeOperation(init, ::BVMul)
 
-fun Builder<BVSort>.bvxor(init: Builder<BVSort>.() -> Unit) = this.makeOperation(init, ::BVXOr)
+fun bvxor(init: Builder<BVSort>.() -> Unit) = makeOperation(init, ::BVXOr)
