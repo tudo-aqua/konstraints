@@ -21,6 +21,7 @@ package tools.aqua.konstraints.theories
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.smt.*
+import kotlin.math.round
 
 /** FloatingPoint theory object */
 object FloatingPointTheory : Theory {
@@ -160,6 +161,12 @@ class FPSort private constructor(eb: Index, sb: Index) : FPBase(eb, sb) {
 
     fun fromSymbol(eb: SymbolIndex, sb: SymbolIndex): FPSort = FPSort(eb, sb)
   }
+
+    val zero = FPZero(exponentBits, significantBits)
+    val minusZero = FPMinusZero(exponentBits, significantBits)
+    val infinity = FPInfinity(exponentBits, significantBits)
+    val minusInfinity = FPMinusInfinity(exponentBits, significantBits)
+    val nan = FPNaN(exponentBits, significantBits)
 }
 
 /** FloatingPoint sort declaration object */
@@ -1255,11 +1262,13 @@ object FPIsPositiveDecl :
  *
  * ((_ to_fp eb sb) (_ BitVec m) (_ FloatingPoint eb sb)), with m = eb + sb
  */
-class BitVecToFP(override val inner: Expression<BVSort>, val eb: Int, val sb: Int) :
-    UnaryExpression<FPSort, BVSort>("to_fp".symbol(), FPSort(eb, sb)) {
+class BitVecToFP(override val inner: Expression<BVSort>, sort: FPSort) :
+    UnaryExpression<FPSort, BVSort>("to_fp".symbol(), sort) {
+
+        constructor(inner: Expression<BVSort>, eb: Int, sb: Int): this(inner, FPSort(eb, sb))
 
   init {
-    require(inner.sort.bits == eb + sb)
+    require(inner.sort.bits == sort.exponentBits + sort.significantBits)
   }
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
@@ -1287,14 +1296,15 @@ object BitVecToFPDecl :
 class FPToFP(
     val roundingMode: Expression<RoundingMode>,
     val inner: Expression<FPSort>,
-    val eb: Int,
-    val sb: Int
-) : BinaryExpression<FPSort, RoundingMode, FPSort>("to_fp".symbol(), FPSort(eb, sb)) {
+    sort: FPSort
+) : BinaryExpression<FPSort, RoundingMode, FPSort>("to_fp".symbol(), sort) {
+    constructor(roundingMode: Expression<RoundingMode>, inner: Expression<FPSort>, eb: Int, sb: Int) : this(roundingMode, inner, FPSort(eb, sb))
+
   override val lhs: Expression<RoundingMode> = roundingMode
 
   override val rhs: Expression<FPSort> = inner
 
-  override fun toString(): String = "((_ to_fp $eb $sb) $roundingMode $inner)"
+  override fun toString(): String = "((_ to_fp ${sort.exponentBits} ${sort.significantBits}) $roundingMode $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
       FPToFPDecl.buildExpression(children, emptyList())
@@ -1324,14 +1334,15 @@ object FPToFPDecl :
 class RealToFP(
     val roundingMode: Expression<RoundingMode>,
     val inner: Expression<RealSort>,
-    val eb: Int,
-    val sb: Int
-) : BinaryExpression<FPSort, RoundingMode, RealSort>("to_fp".symbol(), FPSort(eb, sb)) {
+    sort : FPSort
+) : BinaryExpression<FPSort, RoundingMode, RealSort>("to_fp".symbol(), sort) {
+    constructor(roundingMode: Expression<RoundingMode>, inner: Expression<RealSort>, eb: Int, sb: Int) : this(roundingMode, inner, FPSort(eb, sb))
+
   override val lhs: Expression<RoundingMode> = roundingMode
 
   override val rhs: Expression<RealSort> = inner
 
-  override fun toString(): String = "((_ to_fp $eb $sb) $roundingMode $inner)"
+  override fun toString(): String = "((_ to_fp ${sort.exponentBits} ${sort.significantBits}) $roundingMode $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
       RealToFPDecl.buildExpression(children, emptyList())
@@ -1362,14 +1373,20 @@ object RealToFPDecl :
 class SBitVecToFP(
     val roundingMode: Expression<RoundingMode>,
     val inner: Expression<BVSort>,
-    val eb: Int,
-    val sb: Int
-) : BinaryExpression<FPSort, RoundingMode, BVSort>("to_fp".symbol(), FPSort(eb, sb)) {
+    sort: FPSort
+) : BinaryExpression<FPSort, RoundingMode, BVSort>("to_fp".symbol(), sort) {
+    constructor(
+        roundingMode: Expression<RoundingMode>,
+        inner: Expression<BVSort>,
+        eb: Int,
+        sb: Int
+    ) : this(roundingMode, inner, FPSort(eb, sb))
+
   override val lhs: Expression<RoundingMode> = roundingMode
 
   override val rhs: Expression<BVSort> = inner
 
-  override fun toString(): String = "((_ to_fp $eb $sb) $roundingMode $inner)"
+  override fun toString(): String = "((_ to_fp ${sort.exponentBits} ${sort.significantBits}) $roundingMode $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
       SBitVecToFPDecl.buildExpression(children, emptyList())
@@ -1401,14 +1418,20 @@ object SBitVecToFPDecl :
 class UBitVecToFP(
     val roundingMode: Expression<RoundingMode>,
     val inner: Expression<BVSort>,
-    val eb: Int,
-    val sb: Int
-) : BinaryExpression<FPSort, RoundingMode, BVSort>("to_fp_unsigned".symbol(), FPSort(eb, sb)) {
+    sort: FPSort
+) : BinaryExpression<FPSort, RoundingMode, BVSort>("to_fp_unsigned".symbol(), sort) {
+    constructor(
+        roundingMode: Expression<RoundingMode>,
+        inner: Expression<BVSort>,
+        eb: Int,
+        sb: Int
+    ) : this(roundingMode, inner, FPSort(eb, sb))
+
   override val lhs: Expression<RoundingMode> = roundingMode
 
   override val rhs: Expression<BVSort> = inner
 
-  override fun toString(): String = "((_ to_fp_unsigned $eb $sb) $roundingMode $inner)"
+  override fun toString(): String = "((_ to_fp_unsigned ${sort.exponentBits} ${sort.significantBits}) $roundingMode $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
       UBitVecToFPDecl.buildExpression(children, emptyList())

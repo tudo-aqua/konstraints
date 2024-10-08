@@ -372,6 +372,18 @@ infix fun (() -> FPEq).fpeq(rhs: () -> Expression<FPSort>) =
  * floating-point conversion operations
  */
 
+/**
+ * from single bitstring representation in IEEE 754-2008 interchange format
+ */
+@JvmName("BVToFP")
+fun toFP(eb: Int, sb: Int, block: () -> Expression<BVSort>) = BitVecToFP(block(), eb, sb)
+
+@JvmName("BVToFP") fun toFP(eb: Int, sb: Int, expr: Expression<BVSort>) = BitVecToFP(expr, eb, sb)
+
+fun Expression<BVSort>.toFP(eb: Int, sb: Int) = BitVecToFP(this, eb, sb)
+
+fun Expression<BVSort>.toFP(sort: FPSort) = BitVecToFP(this, sort)
+
 @JvmName("FPToFP")
 fun toFP(
     eb: Int,
@@ -384,7 +396,11 @@ fun toFP(
 fun toFP(eb: Int, sb: Int, roundingMode: Expression<RoundingMode> = RNE, expr: Expression<FPSort>) =
     FPToFP(roundingMode, expr, eb, sb)
 
-@JvmName("FPToReal")
+fun Expression<FPSort>.toFP(eb : Int, sb : Int, roundingMode: Expression<RoundingMode> = RNE) = FPToFP(roundingMode, this, eb, sb)
+
+fun Expression<FPSort>.toFP(sort: FPSort, roundingMode: Expression<RoundingMode> = RNE) = FPToFP(roundingMode, this, sort)
+
+@JvmName("RealToFP")
 fun toFP(
     eb: Int,
     sb: Int,
@@ -392,7 +408,7 @@ fun toFP(
     block: () -> Expression<RealSort>
 ) = RealToFP(roundingMode, block(), eb, sb)
 
-@JvmName("FPToReal")
+@JvmName("RealToFP")
 fun toFP(
     eb: Int,
     sb: Int,
@@ -400,19 +416,27 @@ fun toFP(
     expr: Expression<RealSort>
 ) = RealToFP(roundingMode, expr, eb, sb)
 
-@JvmName("FPToSBV")
-fun toFP(
+fun Expression<RealSort>.toFP(eb: Int, sb: Int, roundingMode: Expression<RoundingMode> = RNE) = RealToFP(roundingMode, this, eb, sb)
+
+fun Expression<RealSort>.toFP(sort: FPSort, roundingMode: Expression<RoundingMode> = RNE) = RealToFP(roundingMode, this, sort)
+
+@JvmName("SBVToFP")
+fun toFPSigned(
     eb: Int,
     sb: Int,
     roundingMode: Expression<RoundingMode> = RNE,
     block: () -> Expression<BVSort>
 ) = SBitVecToFP(roundingMode, block(), eb, sb)
 
-@JvmName("FPToSBV")
-fun toFP(eb: Int, sb: Int, roundingMode: Expression<RoundingMode> = RNE, expr: Expression<BVSort>) =
+@JvmName("SBVToFP")
+fun toFPSigned(eb: Int, sb: Int, roundingMode: Expression<RoundingMode> = RNE, expr: Expression<BVSort>) =
     SBitVecToFP(roundingMode, expr, eb, sb)
 
-@JvmName("FPToUBV")
+fun Expression<BVSort>.toFPSigned(eb: Int, sb: Int, roundingMode: Expression<RoundingMode>) = SBitVecToFP(roundingMode, this, eb, sb)
+
+fun Expression<BVSort>.toFPSigned(sort: FPSort, roundingMode: Expression<RoundingMode>) = SBitVecToFP(roundingMode, this, sort)
+
+@JvmName("UBVToFP")
 fun toFPUnsigned(
     eb: Int,
     sb: Int,
@@ -420,7 +444,7 @@ fun toFPUnsigned(
     block: () -> Expression<BVSort>
 ) = UBitVecToFP(roundingMode, block(), eb, sb)
 
-@JvmName("FPToUBV")
+@JvmName("UBVToFP")
 fun toFPUnsigned(
     eb: Int,
     sb: Int,
@@ -428,10 +452,9 @@ fun toFPUnsigned(
     expr: Expression<BVSort>
 ) = UBitVecToFP(roundingMode, expr, eb, sb)
 
-@JvmName("BVToFP")
-fun toFP(eb: Int, sb: Int, block: () -> Expression<BVSort>) = BitVecToFP(block(), eb, sb)
+fun Expression<BVSort>.toFPUnsigned(eb: Int, sb: Int, roundingMode: Expression<RoundingMode>) = UBitVecToFP(roundingMode, this, eb, sb)
 
-@JvmName("BVToFP") fun toFP(eb: Int, sb: Int, expr: Expression<BVSort>) = BitVecToFP(expr, eb, sb)
+fun Expression<BVSort>.toFPUnsigned(sort: FPSort, roundingMode: Expression<RoundingMode>) = UBitVecToFP(roundingMode, this, sort)
 
 fun toUBV(m: Int, roundingMode: Expression<RoundingMode> = RNE, block: () -> Expression<FPSort>) =
     FPToUBitVec(roundingMode, block(), m)
@@ -439,15 +462,25 @@ fun toUBV(m: Int, roundingMode: Expression<RoundingMode> = RNE, block: () -> Exp
 fun toUBV(m: Int, roundingMode: Expression<RoundingMode> = RNE, expr: Expression<FPSort>) =
     FPToUBitVec(roundingMode, expr, m)
 
+fun Expression<FPSort>.toUBV(bits: Int, roundingMode: Expression<RoundingMode> = RNE) = FPToUBitVec(roundingMode, this, bits)
+
+fun Expression<FPSort>.toUBV(sort: BVSort, roundingMode: Expression<RoundingMode> = RNE) = FPToUBitVec(roundingMode, this, sort.bits)
+
 fun toSBV(m: Int, roundingMode: Expression<RoundingMode> = RNE, block: () -> Expression<FPSort>) =
     FPToSBitVec(roundingMode, block(), m)
 
 fun toSBV(m: Int, roundingMode: Expression<RoundingMode> = RNE, expr: Expression<FPSort>) =
     FPToSBitVec(roundingMode, expr, m)
 
+fun Expression<FPSort>.toSBV(bits: Int, roundingMode: Expression<RoundingMode> = RNE) = FPToSBitVec(roundingMode, this, bits)
+
+fun Expression<FPSort>.toSBV(sort: BVSort, roundingMode: Expression<RoundingMode> = RNE) = FPToSBitVec(roundingMode, this, sort.bits)
+
 fun toReal(block: () -> Expression<FPSort>) = FPToReal(block())
 
 fun toReal(expr: Expression<FPSort>) = FPToReal(expr)
+
+fun Expression<FPSort>.toReal() = FPToReal(this)
 
 /*
  * fpfma
