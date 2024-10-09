@@ -81,8 +81,8 @@ class DSLTests {
           }
 
           assert {
-            eq<IntSort> {
-              add {
+            eq {
+              intadd {
                 +D
                 +E
               }
@@ -277,8 +277,8 @@ class DSLTests {
               smt(QF_BV) {
                 assert {
                   forall(BVSort(8), BVSort(8)) { s, t ->
-                    val msb_s = Builder<BVSort>().extract(s.sort.bits - 1, s.sort.bits - 1) { s }
-                    val msb_t = Builder<BVSort>().extract(t.sort.bits - 1, t.sort.bits - 1) { t }
+                    val msb_s = extract(s.sort.bits - 1, s.sort.bits - 1) { s }
+                    val msb_t = extract(t.sort.bits - 1, t.sort.bits - 1) { t }
                     val expanded =
                         ite { (msb_s eq "#b0".bitvec()) and (msb_t eq "#b0".bitvec()) } then
                             {
@@ -321,5 +321,15 @@ class DSLTests {
                 val A by declaringConst(BoolSort)
                 val B by declaringConst(BoolSort)
                 assert { A implies { B } implies A }
+              }),
+          arguments(
+              smt(QF_UF) {
+                val A by declaringConst(FPSort(5, 11))
+                val B by declaringConst(FPSort(5, 11))
+                val C by declaringConst(FPSort(5, 11))
+                assert { A fpleq B fpleq C }
+                assert { A fpleq { B } fpleq C }
+                assert { { A } fpleq B fpleq C }
+                assert { { A } fpleq { B } fpleq { C } }
               }))
 }

@@ -163,13 +163,13 @@ private fun makeIntOperator(
   return op(builder.children)
 }
 
-fun add(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntAdd)
+fun intadd(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntAdd)
 
-fun sub(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntSub)
+fun intsub(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntSub)
 
-fun mul(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntMul)
+fun intmul(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntMul)
 
-fun div(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntDiv)
+fun intdiv(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntDiv)
 
 fun abs(block: () -> Expression<IntSort>) = Abs(block())
 

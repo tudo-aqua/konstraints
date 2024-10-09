@@ -161,12 +161,12 @@ private fun makeRealOperator(
   return op(builder.children)
 }
 
-fun add(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealAdd)
+fun realadd(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealAdd)
 
-fun sub(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealSub)
+fun realsub(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealSub)
 
-fun mul(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealMul)
+fun realmul(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealMul)
 
-fun div(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealDiv)
+fun realdiv(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealDiv)
 
 fun toReal(block: Builder<IntSort>.() -> Expression<IntSort>) = ToReal(Builder<IntSort>().block())
