@@ -323,50 +323,50 @@ infix fun (() -> Expression<FPSort>).fpgt(rhs: () -> Expression<FPSort>) = FPGt(
 
 infix fun (() -> Expression<FPSort>).fpeq(rhs: () -> Expression<FPSort>) = FPEq(this(), rhs())
 
-infix fun FPLeq.fpleq(rhs: Expression<FPSort>) = FPLeq(*this.children.toTypedArray(), rhs)
+infix fun FPLeq.fpleq(rhs: Expression<FPSort>) = FPLeq(this.children + rhs)
 
-infix fun FPLt.fplt(rhs: Expression<FPSort>) = FPLt(*this.children.toTypedArray(), rhs)
+infix fun FPLt.fplt(rhs: Expression<FPSort>) = FPLt(this.children + rhs)
 
-infix fun FPGeq.fpgeq(rhs: Expression<FPSort>) = FPGeq(*this.children.toTypedArray(), rhs)
+infix fun FPGeq.fpgeq(rhs: Expression<FPSort>) = FPGeq(this.children + rhs)
 
-infix fun FPGt.fpgt(rhs: Expression<FPSort>) = FPGt(*this.children.toTypedArray(), rhs)
+infix fun FPGt.fpgt(rhs: Expression<FPSort>) = FPGt(this.children + rhs)
 
-infix fun FPEq.fpeq(rhs: Expression<FPSort>) = FPEq(*this.children.toTypedArray(), rhs)
+infix fun FPEq.fpeq(rhs: Expression<FPSort>) = FPEq(this.children + rhs)
 
-infix fun FPLeq.fpleq(rhs: () -> Expression<FPSort>) = FPLeq(*this.children.toTypedArray(), rhs())
+infix fun FPLeq.fpleq(rhs: () -> Expression<FPSort>) = FPLeq(this.children + rhs())
 
-infix fun FPLt.fplt(rhs: () -> Expression<FPSort>) = FPLt(*this.children.toTypedArray(), rhs())
+infix fun FPLt.fplt(rhs: () -> Expression<FPSort>) = FPLt(this.children + rhs())
 
-infix fun FPGeq.fpgeq(rhs: () -> Expression<FPSort>) = FPGeq(*this.children.toTypedArray(), rhs())
+infix fun FPGeq.fpgeq(rhs: () -> Expression<FPSort>) = FPGeq(this.children + rhs())
 
-infix fun FPGt.fpgt(rhs: () -> Expression<FPSort>) = FPGt(*this.children.toTypedArray(), rhs())
+infix fun FPGt.fpgt(rhs: () -> Expression<FPSort>) = FPGt(this.children + rhs())
 
-infix fun FPEq.fpeq(rhs: () -> Expression<FPSort>) = FPEq(*this.children.toTypedArray(), rhs())
+infix fun FPEq.fpeq(rhs: () -> Expression<FPSort>) = FPEq(this.children + rhs())
 
-infix fun (() -> FPLeq).fpleq(rhs: Expression<FPSort>) = FPLeq(*this().children.toTypedArray(), rhs)
+infix fun (() -> FPLeq).fpleq(rhs: Expression<FPSort>) = FPLeq(this().children + rhs)
 
-infix fun (() -> FPLt).fplt(rhs: Expression<FPSort>) = FPLt(*this().children.toTypedArray(), rhs)
+infix fun (() -> FPLt).fplt(rhs: Expression<FPSort>) = FPLt(this().children + rhs)
 
-infix fun (() -> FPGeq).fpgeq(rhs: Expression<FPSort>) = FPGeq(*this().children.toTypedArray(), rhs)
+infix fun (() -> FPGeq).fpgeq(rhs: Expression<FPSort>) = FPGeq(this().children + rhs)
 
-infix fun (() -> FPGt).fpgt(rhs: Expression<FPSort>) = FPGt(*this().children.toTypedArray(), rhs)
+infix fun (() -> FPGt).fpgt(rhs: Expression<FPSort>) = FPGt(this().children + rhs)
 
-infix fun (() -> FPEq).fpeq(rhs: Expression<FPSort>) = FPEq(*this().children.toTypedArray(), rhs)
+infix fun (() -> FPEq).fpeq(rhs: Expression<FPSort>) = FPEq(this().children + rhs)
 
 infix fun (() -> FPLeq).fpleq(rhs: () -> Expression<FPSort>) =
-    FPLeq(*this().children.toTypedArray(), rhs())
+    FPLeq(this().children + rhs())
 
 infix fun (() -> FPLt).fplt(rhs: () -> Expression<FPSort>) =
-    FPLt(*this().children.toTypedArray(), rhs())
+    FPLt(this().children + rhs())
 
 infix fun (() -> FPGeq).fpgeq(rhs: () -> Expression<FPSort>) =
-    FPGeq(*this().children.toTypedArray(), rhs())
+    FPGeq(this().children + rhs())
 
 infix fun (() -> FPGt).fpgt(rhs: () -> Expression<FPSort>) =
-    FPGt(*this().children.toTypedArray(), rhs())
+    FPGt(this().children + rhs())
 
 infix fun (() -> FPEq).fpeq(rhs: () -> Expression<FPSort>) =
-    FPEq(*this().children.toTypedArray(), rhs())
+    FPEq(this().children + rhs())
 
 /*
  * floating-point conversion operations

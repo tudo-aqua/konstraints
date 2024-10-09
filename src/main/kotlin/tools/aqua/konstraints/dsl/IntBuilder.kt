@@ -25,7 +25,7 @@ operator fun Expression<IntSort>.unaryMinus() = IntNeg(this)
 
 infix operator fun Expression<IntSort>.minus(other: Expression<IntSort>): IntSub =
     if (this is IntSub) {
-      IntSub(*this.children.toTypedArray(), other)
+      IntSub(this.children + other)
     } else {
       IntSub(this, other)
     }
@@ -39,7 +39,7 @@ infix fun (() -> Expression<IntSort>).minus(other: () -> Expression<IntSort>): I
 
 infix operator fun Expression<IntSort>.plus(other: Expression<IntSort>): IntAdd =
     if (this is IntAdd) {
-      IntAdd(*this.children.toTypedArray(), other)
+      IntAdd(this.children + other)
     } else {
       IntAdd(this, other)
     }
@@ -53,7 +53,7 @@ infix fun (() -> Expression<IntSort>).plus(other: () -> Expression<IntSort>): In
 
 infix operator fun Expression<IntSort>.times(other: Expression<IntSort>): IntMul =
     if (this is IntMul) {
-      IntMul(*this.children.toTypedArray(), other)
+      IntMul(this.children + other)
     } else {
       IntMul(this, other)
     }
@@ -67,7 +67,7 @@ infix fun (() -> Expression<IntSort>).times(other: () -> Expression<IntSort>): I
 
 infix operator fun Expression<IntSort>.div(other: Expression<IntSort>): IntDiv =
     if (this is IntDiv) {
-      IntDiv(*this.children.toTypedArray(), other)
+      IntDiv(this.children + other)
     } else {
       IntDiv(this, other)
     }
@@ -91,10 +91,10 @@ infix fun (() -> Expression<IntSort>).greater(other: () -> Expression<IntSort>):
     this() greater other()
 
 infix fun IntGreater.greater(other: Expression<IntSort>) =
-    IntGreater(*this.children.toTypedArray(), other)
+    IntGreater(this.children + other)
 
 infix fun IntGreater.greater(block: () -> Expression<IntSort>) =
-    IntGreater(*this.children.toTypedArray(), block())
+    IntGreater(this.children + block())
 
 infix fun Expression<IntSort>.greaterEq(other: Expression<IntSort>) = IntGreaterEq(this, other)
 
@@ -108,10 +108,10 @@ infix fun (() -> Expression<IntSort>).greaterEq(other: () -> Expression<IntSort>
     this() greaterEq other()
 
 infix fun IntGreaterEq.greaterEq(other: Expression<IntSort>) =
-    IntGreaterEq(*this.children.toTypedArray(), other)
+    IntGreaterEq(this.children + other)
 
 infix fun IntGreaterEq.greaterEq(block: () -> Expression<IntSort>) =
-    IntGreaterEq(*this.children.toTypedArray(), block())
+    IntGreaterEq(this.children + block())
 
 infix fun Expression<IntSort>.less(other: Expression<IntSort>) = IntLess(this, other)
 
@@ -122,10 +122,10 @@ infix fun (() -> Expression<IntSort>).less(other: Expression<IntSort>): IntLess 
 infix fun (() -> Expression<IntSort>).less(other: () -> Expression<IntSort>): IntLess =
     this() less other()
 
-infix fun IntLess.less(other: Expression<IntSort>) = IntLess(*this.children.toTypedArray(), other)
+infix fun IntLess.less(other: Expression<IntSort>) = IntLess(this.children + other)
 
 infix fun IntLess.greater(block: () -> Expression<IntSort>) =
-    IntLess(*this.children.toTypedArray(), block())
+    IntLess(this.children + block())
 
 infix fun Expression<IntSort>.lessEq(other: Expression<IntSort>) = IntLessEq(this, other)
 
@@ -139,10 +139,10 @@ infix fun (() -> Expression<IntSort>).lessEq(other: () -> Expression<IntSort>): 
     this() lessEq other()
 
 infix fun IntLessEq.lessEq(other: Expression<IntSort>) =
-    IntLessEq(*this.children.toTypedArray(), other)
+    IntLessEq(this.children + other)
 
 infix fun IntLessEq.greater(block: () -> Expression<IntSort>) =
-    IntLessEq(*this.children.toTypedArray(), block())
+    IntLessEq(this.children + block())
 
 infix fun Expression<IntSort>.mod(other: Expression<IntSort>) = Mod(this, other)
 

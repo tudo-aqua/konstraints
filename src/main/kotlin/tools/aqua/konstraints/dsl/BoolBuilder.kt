@@ -29,7 +29,7 @@ import tools.aqua.konstraints.theories.*
  */
 infix fun Expression<BoolSort>.implies(other: Expression<BoolSort>): Implies =
     if (this is Implies) {
-      Implies(*this.children.toTypedArray(), other)
+      Implies(this.children + other)
     } else {
       Implies(this, other)
     }
@@ -50,7 +50,7 @@ infix fun (() -> Expression<BoolSort>).implies(other: () -> Expression<BoolSort>
  */
 infix fun Expression<BoolSort>.and(other: Expression<BoolSort>): And =
     if (this is And) {
-      And(*this.children.toTypedArray(), other)
+      And(this.children + other)
     } else {
       And(this, other)
     }
@@ -69,7 +69,7 @@ infix fun (() -> Expression<BoolSort>).and(other: () -> Expression<BoolSort>): A
  */
 infix fun Expression<BoolSort>.or(other: Expression<BoolSort>): Or =
     if (this is Or) {
-      Or(*this.children.toTypedArray(), other)
+      Or(children + other)
     } else {
       Or(this, other)
     }
@@ -87,7 +87,7 @@ infix fun (() -> Expression<BoolSort>).or(other: () -> Expression<BoolSort>): Or
  */
 infix fun Expression<BoolSort>.xor(other: Expression<BoolSort>): XOr =
     if (this is XOr) {
-      XOr(*this.children.toTypedArray(), other)
+      XOr(this.children + other)
     } else {
       XOr(this, other)
     }
@@ -106,14 +106,14 @@ infix fun (() -> Expression<BoolSort>).xor(other: () -> Expression<BoolSort>): X
  */
 infix fun <T : Sort> Expression<T>.eq(other: Expression<T>): Equals =
     if (this is Equals) {
-      Equals(*this.children.toTypedArray(), other)
+      Equals(this.children + listOf(other))
     } else {
       Equals(this, other)
     }
 
 // allow chaining of equals
 infix fun <T : Sort> Equals.eq(other: Expression<T>): Equals =
-    Equals(*this.children.toTypedArray(), other)
+    Equals(children + other)
 
 infix fun <T : Sort> Expression<T>.eq(other: () -> Expression<T>): Equals = this eq other()
 
@@ -126,7 +126,7 @@ infix fun <T : Sort> (() -> Expression<T>).eq(other: () -> Expression<T>): Equal
 infix fun <T : Sort> Expression<T>.distinct(other: Expression<T>): Distinct = Distinct(this, other)
 
 infix fun <T : Sort> Distinct.distinct(other: Expression<T>): Distinct =
-    Distinct(*this.children.toTypedArray(), other)
+    Distinct(this.children+other)
 
 private fun makeBoolOperator(
     init: Builder<BoolSort>.() -> Unit,

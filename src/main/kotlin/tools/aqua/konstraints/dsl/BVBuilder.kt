@@ -23,7 +23,7 @@ import tools.aqua.konstraints.theories.*
 
 infix fun Expression<BVSort>.bvand(other: Expression<BVSort>) =
     if (this is BVAnd) {
-      BVAnd(*this.children.toTypedArray(), other)
+      BVAnd(this.children+other)
     } else {
       BVAnd(this, other)
     }
@@ -37,7 +37,7 @@ infix fun (() -> Expression<BVSort>).bvand(other: () -> Expression<BVSort>): BVA
 
 infix fun Expression<BVSort>.bvor(other: Expression<BVSort>) =
     if (this is BVOr) {
-      BVOr(*this.children.toTypedArray(), other)
+      BVOr(this.children+other)
     } else {
       BVOr(this, other)
     }
@@ -51,7 +51,7 @@ infix fun (() -> Expression<BVSort>).bvor(other: () -> Expression<BVSort>): BVOr
 
 infix fun Expression<BVSort>.bvadd(other: Expression<BVSort>) =
     if (this is BVAdd) {
-      BVAdd(*this.children.toTypedArray(), other)
+      BVAdd(this.children+other)
     } else {
       BVAdd(this, other)
     }
@@ -65,7 +65,7 @@ infix fun (() -> Expression<BVSort>).bvadd(other: () -> Expression<BVSort>): BVA
 
 infix fun Expression<BVSort>.bvmul(other: Expression<BVSort>) =
     if (this is BVMul) {
-      BVMul(*this.children.toTypedArray(), other)
+      BVMul(this.children + other)
     } else {
       BVMul(this, other)
     }
@@ -143,7 +143,7 @@ infix fun (() -> Expression<BVSort>).bvnor(other: () -> Expression<BVSort>) = BV
 
 infix fun Expression<BVSort>.bvxor(rhs: Expression<BVSort>) =
     if (this is BVXOr) {
-      BVXOr(*this.children.toTypedArray(), rhs)
+      BVXOr(this.children+rhs)
     } else {
       BVXOr(this, rhs)
     }

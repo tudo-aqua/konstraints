@@ -25,7 +25,7 @@ operator fun Expression<RealSort>.unaryMinus() = RealNeg(this)
 
 infix operator fun Expression<RealSort>.minus(other: Expression<RealSort>): RealSub =
     if (this is RealSub) {
-      RealSub(*this.children.toTypedArray(), other)
+      RealSub(this.children + other)
     } else {
       RealSub(this, other)
     }
@@ -41,7 +41,7 @@ infix fun (() -> Expression<RealSort>).minus(other: () -> Expression<RealSort>):
 
 infix operator fun Expression<RealSort>.plus(other: Expression<RealSort>): RealAdd =
     if (this is RealAdd) {
-      RealAdd(*this.children.toTypedArray(), other)
+      RealAdd(this.children + other)
     } else {
       RealAdd(this, other)
     }
@@ -56,7 +56,7 @@ infix fun (() -> Expression<RealSort>).plus(other: () -> Expression<RealSort>): 
 
 infix operator fun Expression<RealSort>.times(other: Expression<RealSort>): RealMul =
     if (this is RealMul) {
-      RealMul(*this.children.toTypedArray(), other)
+      RealMul(this.children + other)
     } else {
       RealMul(this, other)
     }
@@ -72,7 +72,7 @@ infix fun (() -> Expression<RealSort>).times(other: () -> Expression<RealSort>):
 
 infix operator fun Expression<RealSort>.div(other: Expression<RealSort>): RealDiv =
     if (this is RealDiv) {
-      RealDiv(*this.children.toTypedArray(), other)
+      RealDiv(this.children + other)
     } else {
       RealDiv(this, other)
     }
@@ -96,10 +96,10 @@ infix fun (() -> Expression<RealSort>).greater(other: () -> Expression<RealSort>
     this() greater other()
 
 infix fun RealGreater.greater(other: Expression<RealSort>) =
-    RealGreater(*this.children.toTypedArray(), other)
+    RealGreater(this.children + other)
 
 infix fun RealGreater.greater(block: () -> Expression<RealSort>) =
-    RealGreater(*this.children.toTypedArray(), block())
+    RealGreater(this.children + block())
 
 infix fun Expression<RealSort>.greaterEq(other: Expression<RealSort>) = RealGreaterEq(this, other)
 
@@ -113,10 +113,10 @@ infix fun (() -> Expression<RealSort>).greaterEq(other: () -> Expression<RealSor
     this() greaterEq other()
 
 infix fun RealGreaterEq.greaterEq(other: Expression<RealSort>) =
-    RealGreaterEq(*this.children.toTypedArray(), other)
+    RealGreaterEq(this.children + other)
 
 infix fun RealGreaterEq.greaterEq(block: () -> Expression<RealSort>) =
-    RealGreaterEq(*this.children.toTypedArray(), block())
+    RealGreaterEq(this.children + block())
 
 infix fun Expression<RealSort>.less(other: Expression<RealSort>) = RealLess(this, other)
 
@@ -129,10 +129,10 @@ infix fun (() -> Expression<RealSort>).less(other: () -> Expression<RealSort>): 
     this() less other()
 
 infix fun RealLess.less(other: Expression<RealSort>) =
-    RealLess(*this.children.toTypedArray(), other)
+    RealLess(this.children + other)
 
 infix fun RealLess.less(block: () -> Expression<RealSort>) =
-    RealLess(*this.children.toTypedArray(), block())
+    RealLess(this.children + block())
 
 infix fun Expression<RealSort>.lessEq(other: Expression<RealSort>) = RealLessEq(this, other)
 
@@ -146,10 +146,10 @@ infix fun (() -> Expression<RealSort>).lessEq(other: () -> Expression<RealSort>)
     this() lessEq other()
 
 infix fun RealLessEq.lessEq(other: Expression<RealSort>) =
-    RealLessEq(*this.children.toTypedArray(), other)
+    RealLessEq(this.children + other)
 
 infix fun RealLessEq.lessEq(block: () -> Expression<RealSort>) =
-    RealLessEq(*this.children.toTypedArray(), block())
+    RealLessEq(this.children + block())
 
 private fun makeRealOperator(
     init: Builder<RealSort>.() -> Unit,
