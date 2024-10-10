@@ -24,14 +24,53 @@ import tools.aqua.konstraints.smt.Sort
 import tools.aqua.konstraints.theories.BoolSort
 
 @SMTDSL
-class ITE1(val statement: Expression<BoolSort>) {
-  infix fun <T : Sort> then(expr: Builder<T>.() -> Expression<T>): ITE2<T> =
-      ITE2(statement, Builder<T>().expr())
+class ITE1(val condition: Expression<BoolSort>) {
+    /**
+     * Value of the if-statement, when [condition] is true
+     * Must be followed by an [ITE2.otherwise]
+     *
+     * @param expr: Value of the if-statement, when [condition] is true
+     */
+  infix fun <T : Sort> then(expr: Expression<T>): ITE2<T> = ITE2(condition, expr)
+
+    /**
+     * Value of the if-statement, when [condition] is true
+     * Must be followed by an [ITE2.otherwise]
+     *
+     * @param block: Value of the if-statement, when [condition] is true
+     */
+  infix fun <T : Sort> then(block: () -> Expression<T>): ITE2<T> = ITE2(condition, block())
 }
 
-class ITE2<T : Sort>(val statement: Expression<BoolSort>, val then: Expression<T>) {
-  infix fun otherwise(expr: Builder<T>.() -> Expression<T>): Ite<T> =
-      Ite(statement, then, Builder<T>().expr())
+class ITE2<T : Sort>(val condition: Expression<BoolSort>, val then: Expression<T>) {
+
+    /**
+     * Value of the if-statement, when [condition] is false
+     *
+     * @param expr: Value of the if-statement, when [condition] is true
+     */
+  infix fun otherwise(expr: Expression<T>): Ite<T> = Ite(condition, then, expr)
+
+    /**
+     * Value of the if-statement, when [condition] is false
+     *
+     * @param block: Value of the if-statement, when [condition] is true
+     */
+  infix fun otherwise(block: () -> Expression<T>): Ite<T> = Ite(condition, then, block())
 }
 
-fun ite(init: Builder<BoolSort>.() -> Expression<BoolSort>): ITE1 = ITE1(Builder<BoolSort>().init())
+/**
+ * If-then-else operator.
+ * Must be followed by a [ITE1.then] and [ITE2.otherwise]
+ *
+ * @param condition: lambda yielding an Expression<BoolSort> used as condition for the if-statement
+ */
+fun ite(condition: () -> Expression<BoolSort>): ITE1 = ITE1(condition())
+
+/**
+ * If-then-else operator
+ * Must be followed by a [ITE1.then] and [ITE2.otherwise]
+ *
+ * @param condition: Expression<BoolSort> used as condition for the if-statement
+ */
+fun ite(condition: Expression<BoolSort>): ITE1 = ITE1(condition)
