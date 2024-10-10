@@ -21,152 +21,326 @@ package tools.aqua.konstraints.dsl
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.theories.*
 
+/**
+ * Negation operator for RealSort Expressions
+ */
 operator fun Expression<RealSort>.unaryMinus() = RealNeg(this)
 
-infix operator fun Expression<RealSort>.minus(other: Expression<RealSort>): RealSub =
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined RealSub
+ */
+infix operator fun Expression<RealSort>.minus(subtrahend: Expression<RealSort>) =
     if (this is RealSub) {
-      RealSub(this.children + other)
+        RealSub(this.children + subtrahend)
     } else {
-      RealSub(this, other)
+        RealSub(this, subtrahend)
     }
 
-infix fun Expression<RealSort>.minus(other: () -> Expression<RealSort>): RealSub =
-    this minus other()
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined RealSub
+ */
+infix fun Expression<RealSort>.minus(subtrahend: () -> Expression<RealSort>) = this minus subtrahend()
 
-infix fun (() -> Expression<RealSort>).minus(other: Expression<RealSort>): RealSub =
-    this() minus other
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined RealSub
+ */
+infix fun (() -> Expression<RealSort>).minus(subtrahend: Expression<RealSort>) = this() minus subtrahend
 
-infix fun (() -> Expression<RealSort>).minus(other: () -> Expression<RealSort>): RealSub =
-    this() minus other()
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined RealSub
+ */
+infix fun (() -> Expression<RealSort>).minus(subtrahend: () -> Expression<RealSort>) = this() minus subtrahend()
 
-infix operator fun Expression<RealSort>.plus(other: Expression<RealSort>): RealAdd =
+/**
+ * Addition operator for RealSort Expressions: [this] + [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined RealAdd
+ */
+infix operator fun Expression<RealSort>.plus(summand: Expression<RealSort>) =
     if (this is RealAdd) {
-      RealAdd(this.children + other)
+        RealAdd(this.children + summand)
     } else {
-      RealAdd(this, other)
+        RealAdd(this, summand)
     }
 
-infix fun Expression<RealSort>.plus(other: () -> Expression<RealSort>): RealAdd = this plus other()
 
-infix fun (() -> Expression<RealSort>).plus(other: Expression<RealSort>): RealAdd =
-    this() plus other
+/**
+ * Addition operator for RealSort Expressions: [this] + [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined RealAdd
+ */
+infix fun Expression<RealSort>.plus(summand: () -> Expression<RealSort>) = this plus summand()
 
-infix fun (() -> Expression<RealSort>).plus(other: () -> Expression<RealSort>): RealAdd =
-    this() plus other()
+/**
+ * Addition operator for RealSort Expressions: [this] + [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined RealAdd
+ */
+infix fun (() -> Expression<RealSort>).plus(summand: Expression<RealSort>) = this() plus summand
 
-infix operator fun Expression<RealSort>.times(other: Expression<RealSort>): RealMul =
+/**
+ * Addition operator for RealSort Expressions: [this] + [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined RealAdd
+ */
+infix fun (() -> Expression<RealSort>).plus(summand: () -> Expression<RealSort>) = this() plus summand()
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] * [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined RealMul
+ */
+infix operator fun Expression<RealSort>.times(multiplicand: Expression<RealSort>) =
     if (this is RealMul) {
-      RealMul(this.children + other)
+        RealMul(this.children + multiplicand)
     } else {
-      RealMul(this, other)
+        RealMul(this, multiplicand)
     }
 
-infix fun Expression<RealSort>.times(other: () -> Expression<RealSort>): RealMul =
-    this times other()
+/**
+ * Multiplication operator for RealSort Expressions: [this] * [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined RealMul
+ */
+infix fun Expression<RealSort>.times(multiplicand: () -> Expression<RealSort>) = this times multiplicand()
 
-infix fun (() -> Expression<RealSort>).times(other: Expression<RealSort>): RealMul =
-    this() times other
+/**
+ * Multiplication operator for RealSort Expressions: [this] * [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined RealMul
+ */
+infix fun (() -> Expression<RealSort>).times(multiplicand: Expression<RealSort>) = this() times multiplicand
 
-infix fun (() -> Expression<RealSort>).times(other: () -> Expression<RealSort>): RealMul =
-    this() times other()
+/**
+ * Multiplication operator for RealSort Expressions: [this] * [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined RealMul
+ */
+infix fun (() -> Expression<RealSort>).times(multiplicand: () -> Expression<RealSort>) = this() times multiplicand()
 
-infix operator fun Expression<RealSort>.div(other: Expression<RealSort>): RealDiv =
+/**
+ * Division operator for RealSort Expressions: [this] / [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined RealMul
+ */
+infix operator fun Expression<RealSort>.div(divisor: Expression<RealSort>) =
     if (this is RealDiv) {
-      RealDiv(this.children + other)
+        RealDiv(this.children + divisor)
     } else {
-      RealDiv(this, other)
+        RealDiv(this, divisor)
     }
 
-infix fun Expression<RealSort>.div(other: () -> Expression<RealSort>): RealDiv = this div other()
+/**
+ * Division operator for RealSort Expressions: [this] / [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined RealMul
+ */
+infix fun Expression<RealSort>.div(divisor: () -> Expression<RealSort>) = this div divisor()
 
-infix fun (() -> Expression<RealSort>).div(other: Expression<RealSort>): RealDiv = this() div other
+/**
+ * Division operator for RealSort Expressions: [this] / [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined RealMul
+ */
+infix fun (() -> Expression<RealSort>).div(divisor: Expression<RealSort>) = this() div divisor
 
-infix fun (() -> Expression<RealSort>).div(other: () -> Expression<RealSort>): RealDiv =
-    this() div other()
+/**
+ * Division operator for RealSort Expressions: [this] / [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined RealMul
+ */
+infix fun (() -> Expression<RealSort>).div(divisor: () -> Expression<RealSort>) = this() div divisor()
 
+/**
+ * Greater operator for RealSort Expressions: [this] > [other].
+ */
 infix fun Expression<RealSort>.greater(other: Expression<RealSort>) = RealGreater(this, other)
 
-infix fun Expression<RealSort>.greater(other: () -> Expression<RealSort>): RealGreater =
-    this greater other()
+/**
+ * Greater operator for RealSort Expressions: [this] > [other].
+ */
+infix fun Expression<RealSort>.greater(other: () -> Expression<RealSort>) = this greater other()
 
-infix fun (() -> Expression<RealSort>).greater(other: Expression<RealSort>): RealGreater =
-    this() greater other
+/**
+ * Greater operator for RealSort Expressions: [this] > [other].
+ */
+infix fun (() -> Expression<RealSort>).greater(other: Expression<RealSort>) = this() greater other
 
-infix fun (() -> Expression<RealSort>).greater(other: () -> Expression<RealSort>): RealGreater =
-    this() greater other()
+/**
+ * Greater operator for RealSort Expressions: [this] > [other].
+ */
+infix fun (() -> Expression<RealSort>).greater(other: () -> Expression<RealSort>) = this() greater other()
 
-infix fun RealGreater.greater(other: Expression<RealSort>) =
-    RealGreater(this.children + other)
+/**
+ * Greater operator for RealSort Expressions: [this] > [other].
+ */
+infix fun RealGreater.greater(other: Expression<RealSort>) = RealGreater(this.children + other)
 
-infix fun RealGreater.greater(block: () -> Expression<RealSort>) =
-    RealGreater(this.children + block())
+/**
+ * Greater operator for RealSort Expressions: [this] > [block].
+ */
+infix fun RealGreater.greater(block: () -> Expression<RealSort>) = RealGreater(this.children + block())
 
+/**
+ * Greater equals operator for RealSort Expressions: [this] >= [other].
+ */
 infix fun Expression<RealSort>.greaterEq(other: Expression<RealSort>) = RealGreaterEq(this, other)
 
-infix fun Expression<RealSort>.greaterEq(other: () -> Expression<RealSort>): RealGreaterEq =
-    this greaterEq other()
+/**
+ * Greater equals operator for RealSort Expressions: [this] >= [other].
+ */
+infix fun Expression<RealSort>.greaterEq(other: () -> Expression<RealSort>) = this greaterEq other()
 
-infix fun (() -> Expression<RealSort>).greaterEq(other: Expression<RealSort>): RealGreaterEq =
-    this() greaterEq other
+/**
+ * Greater equals operator for RealSort Expressions: [this] >= [other].
+ */
+infix fun (() -> Expression<RealSort>).greaterEq(other: Expression<RealSort>) = this() greaterEq other
 
-infix fun (() -> Expression<RealSort>).greaterEq(other: () -> Expression<RealSort>): RealGreaterEq =
-    this() greaterEq other()
+/**
+ * Greater equals operator for RealSort Expressions: [this] >= [other].
+ */
+infix fun (() -> Expression<RealSort>).greaterEq(other: () -> Expression<RealSort>) = this() greaterEq other()
 
-infix fun RealGreaterEq.greaterEq(other: Expression<RealSort>) =
-    RealGreaterEq(this.children + other)
+/**
+ * Greater equals operator for RealSort Expressions: [this] >= [other].
+ */
+infix fun RealGreaterEq.greaterEq(other: Expression<RealSort>) = RealGreaterEq(this.children + other)
 
-infix fun RealGreaterEq.greaterEq(block: () -> Expression<RealSort>) =
-    RealGreaterEq(this.children + block())
+/**
+ * Greater equals operator for RealSort Expressions: [this] >= [block].
+ */
+infix fun RealGreaterEq.greaterEq(block: () -> Expression<RealSort>) = RealGreaterEq(this.children + block())
 
+/**
+ * Less operator for RealSort Expressions: [this] < [other].
+ */
 infix fun Expression<RealSort>.less(other: Expression<RealSort>) = RealLess(this, other)
 
-infix fun Expression<RealSort>.less(other: () -> Expression<RealSort>): RealLess = this less other()
+/**
+ * Less operator for RealSort Expressions: [this] < [other].
+ */
+infix fun Expression<RealSort>.less(other: () -> Expression<RealSort>) = this less other()
 
-infix fun (() -> Expression<RealSort>).less(other: Expression<RealSort>): RealLess =
-    this() less other
+/**
+ * Less operator for RealSort Expressions: [this] < [other].
+ */
+infix fun (() -> Expression<RealSort>).less(other: Expression<RealSort>) = this() less other
 
-infix fun (() -> Expression<RealSort>).less(other: () -> Expression<RealSort>): RealLess =
-    this() less other()
+/**
+ * Less operator for RealSort Expressions: [this] < [other].
+ */
+infix fun (() -> Expression<RealSort>).less(other: () -> Expression<RealSort>) = this() less other()
 
-infix fun RealLess.less(other: Expression<RealSort>) =
-    RealLess(this.children + other)
+/**
+ * Less operator for RealSort Expressions: [this] < [other].
+ */
+infix fun RealLess.less(other: Expression<RealSort>) = RealLess(this.children + other)
 
-infix fun RealLess.less(block: () -> Expression<RealSort>) =
-    RealLess(this.children + block())
+/**
+ * Less operator for RealSort Expressions: [this] < [block].
+ */
+infix fun RealLess.less(block: () -> Expression<RealSort>) = RealLess(this.children + block())
 
+/**
+ * Less equals operator for RealSort Expressions: [this] <= [other].
+ */
 infix fun Expression<RealSort>.lessEq(other: Expression<RealSort>) = RealLessEq(this, other)
 
-infix fun Expression<RealSort>.lessEq(other: () -> Expression<RealSort>): RealLessEq =
-    this lessEq other()
+/**
+ * Less equals operator for RealSort Expressions: [this] <= [other].
+ */
+infix fun Expression<RealSort>.lessEq(other: () -> Expression<RealSort>) = this lessEq other()
 
-infix fun (() -> Expression<RealSort>).lessEq(other: Expression<RealSort>): RealLessEq =
-    this() lessEq other
+/**
+ * Less equals operator for RealSort Expressions: [this] <= [other].
+ */
+infix fun (() -> Expression<RealSort>).lessEq(other: Expression<RealSort>) = this() lessEq other
 
-infix fun (() -> Expression<RealSort>).lessEq(other: () -> Expression<RealSort>): RealLessEq =
-    this() lessEq other()
+/**
+ * Less equals operator for RealSort Expressions: [this] <= [other].
+ */
+infix fun (() -> Expression<RealSort>).lessEq(other: () -> Expression<RealSort>) = this() lessEq other()
 
-infix fun RealLessEq.lessEq(other: Expression<RealSort>) =
-    RealLessEq(this.children + other)
+/**
+ * Less equals operator for RealSort Expressions: [this] <= [other].
+ */
+infix fun RealLessEq.lessEq(other: Expression<RealSort>) = RealLessEq(this.children + other)
 
-infix fun RealLessEq.lessEq(block: () -> Expression<RealSort>) =
-    RealLessEq(this.children + block())
+/**
+ * Less equals operator for RealSort Expressions: [this] <= [block].
+ */
+infix fun RealLessEq.lessEq(block: () -> Expression<RealSort>) = RealLessEq(this.children + block())
 
 private fun makeRealOperator(
     init: Builder<RealSort>.() -> Unit,
     op: (List<Expression<RealSort>>) -> Expression<RealSort>
 ): Expression<RealSort> {
-  val builder = Builder<RealSort>()
-  builder.init()
+    val builder = Builder<RealSort>()
+    builder.init()
 
-  return op(builder.children)
+    require(builder.children.isNotEmpty())
+
+    return if (builder.children.size == 1) {
+        builder.children.single()
+    } else {
+        op(builder.children)
+    }
 }
 
+/**
+ * Addition operation for RealSort Expressions.
+ *
+ * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
+ * If only a single subexpression is added, the expression is returned directly.
+ *
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ */
 fun realadd(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealAdd)
 
+/**
+ * Subtraction operation for RealSort Expressions.
+ *
+ * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
+ * If only a single subexpression is added, the expression is returned directly.
+ *
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ */
 fun realsub(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealSub)
 
+/**
+ * Multiplication operation for RealSort Expressions.
+ *
+ * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
+ * If only a single subexpression is added, the expression is returned directly.
+ *
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ */
 fun realmul(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealMul)
 
+/**
+ * Division operation for RealSort Expressions.
+ *
+ * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
+ * If only a single subexpression is added, the expression is returned directly.
+ *
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ */
 fun realdiv(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealDiv)
 
-fun toReal(block: Builder<IntSort>.() -> Expression<IntSort>) = ToReal(Builder<IntSort>().block())
+/**
+ * Casting operator from RealSort to RealSort
+ */
+fun toReal(block: () -> Expression<IntSort>) = ToReal(block())
+
+/**
+ * Casting operator from RealSort to RealSort
+ */
+fun toReal(expr: Expression<IntSort>) = ToReal(expr)

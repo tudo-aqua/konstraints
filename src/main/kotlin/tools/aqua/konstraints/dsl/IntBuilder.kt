@@ -21,137 +21,283 @@ package tools.aqua.konstraints.dsl
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.theories.*
 
+/**
+ * Negation operator for IntSort Expressions
+ */
 operator fun Expression<IntSort>.unaryMinus() = IntNeg(this)
 
-infix operator fun Expression<IntSort>.minus(other: Expression<IntSort>): IntSub =
+/**
+ * Subtraction operator for IntSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [IntSub] object, unpacks the children and returns a new combined IntSub
+ */
+infix operator fun Expression<IntSort>.minus(subtrahend: Expression<IntSort>) =
     if (this is IntSub) {
-      IntSub(this.children + other)
+      IntSub(this.children + subtrahend)
     } else {
-      IntSub(this, other)
+      IntSub(this, subtrahend)
     }
 
-infix fun Expression<IntSort>.minus(other: () -> Expression<IntSort>): IntSub = this minus other()
+/**
+ * Subtraction operator for IntSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [IntSub] object, unpacks the children and returns a new combined IntSub
+ */
+infix fun Expression<IntSort>.minus(subtrahend: () -> Expression<IntSort>) = this minus subtrahend()
 
-infix fun (() -> Expression<IntSort>).minus(other: Expression<IntSort>): IntSub = this() minus other
+/**
+ * Subtraction operator for IntSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [IntSub] object, unpacks the children and returns a new combined IntSub
+ */
+infix fun (() -> Expression<IntSort>).minus(subtrahend: Expression<IntSort>) = this() minus subtrahend
 
-infix fun (() -> Expression<IntSort>).minus(other: () -> Expression<IntSort>): IntSub =
-    this() minus other()
+/**
+ * Subtraction operator for IntSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [IntSub] object, unpacks the children and returns a new combined IntSub
+ */
+infix fun (() -> Expression<IntSort>).minus(subtrahend: () -> Expression<IntSort>) = this() minus subtrahend()
 
-infix operator fun Expression<IntSort>.plus(other: Expression<IntSort>): IntAdd =
+/**
+ * Addition operator for IntSort Expressions: [this] + [summand].
+ *
+ * If [this] is an [IntAdd] object, unpacks the children and returns a new combined IntAdd
+ */
+infix operator fun Expression<IntSort>.plus(summand: Expression<IntSort>) =
     if (this is IntAdd) {
-      IntAdd(this.children + other)
+      IntAdd(this.children + summand)
     } else {
-      IntAdd(this, other)
+      IntAdd(this, summand)
     }
 
-infix fun Expression<IntSort>.plus(other: () -> Expression<IntSort>): IntAdd = this plus other()
 
-infix fun (() -> Expression<IntSort>).plus(other: Expression<IntSort>): IntAdd = this() plus other
+/**
+ * Addition operator for IntSort Expressions: [this] + [summand].
+ *
+ * If [this] is an [IntAdd] object, unpacks the children and returns a new combined IntAdd
+ */
+infix fun Expression<IntSort>.plus(summand: () -> Expression<IntSort>) = this plus summand()
 
-infix fun (() -> Expression<IntSort>).plus(other: () -> Expression<IntSort>): IntAdd =
-    this() plus other()
+/**
+ * Addition operator for IntSort Expressions: [this] + [summand].
+ *
+ * If [this] is an [IntAdd] object, unpacks the children and returns a new combined IntAdd
+ */
+infix fun (() -> Expression<IntSort>).plus(summand: Expression<IntSort>) = this() plus summand
 
-infix operator fun Expression<IntSort>.times(other: Expression<IntSort>): IntMul =
+/**
+ * Addition operator for IntSort Expressions: [this] + [summand].
+ *
+ * If [this] is an [IntAdd] object, unpacks the children and returns a new combined IntAdd
+ */
+infix fun (() -> Expression<IntSort>).plus(summand: () -> Expression<IntSort>) = this() plus summand()
+
+/**
+ * Multiplication operator for IntSort Expressions: [this] * [multiplicand].
+ *
+ * If [this] is an [IntMul] object, unpacks the children and returns a new combined IntMul
+ */
+infix operator fun Expression<IntSort>.times(multiplicand: Expression<IntSort>) =
     if (this is IntMul) {
-      IntMul(this.children + other)
+      IntMul(this.children + multiplicand)
     } else {
-      IntMul(this, other)
+      IntMul(this, multiplicand)
     }
 
-infix fun Expression<IntSort>.times(other: () -> Expression<IntSort>): IntMul = this times other()
+/**
+ * Multiplication operator for IntSort Expressions: [this] * [multiplicand].
+ *
+ * If [this] is an [IntMul] object, unpacks the children and returns a new combined IntMul
+ */
+infix fun Expression<IntSort>.times(multiplicand: () -> Expression<IntSort>) = this times multiplicand()
 
-infix fun (() -> Expression<IntSort>).times(other: Expression<IntSort>): IntMul = this() times other
+/**
+ * Multiplication operator for IntSort Expressions: [this] * [multiplicand].
+ *
+ * If [this] is an [IntMul] object, unpacks the children and returns a new combined IntMul
+ */
+infix fun (() -> Expression<IntSort>).times(multiplicand: Expression<IntSort>) = this() times multiplicand
 
-infix fun (() -> Expression<IntSort>).times(other: () -> Expression<IntSort>): IntMul =
-    this() times other()
+/**
+ * Multiplication operator for IntSort Expressions: [this] * [multiplicand].
+ *
+ * If [this] is an [IntMul] object, unpacks the children and returns a new combined IntMul
+ */
+infix fun (() -> Expression<IntSort>).times(multiplicand: () -> Expression<IntSort>) = this() times multiplicand()
 
-infix operator fun Expression<IntSort>.div(other: Expression<IntSort>): IntDiv =
+/**
+ * Division operator for IntSort Expressions: [this] / [divisor].
+ *
+ * If [this] is an [IntDiv] object, unpacks the children and returns a new combined IntMul
+ */
+infix operator fun Expression<IntSort>.div(divisor: Expression<IntSort>) =
     if (this is IntDiv) {
-      IntDiv(this.children + other)
+      IntDiv(this.children + divisor)
     } else {
-      IntDiv(this, other)
+      IntDiv(this, divisor)
     }
 
-infix fun Expression<IntSort>.div(other: () -> Expression<IntSort>): IntDiv = this div other()
+/**
+ * Division operator for IntSort Expressions: [this] / [divisor].
+ *
+ * If [this] is an [IntDiv] object, unpacks the children and returns a new combined IntMul
+ */
+infix fun Expression<IntSort>.div(divisor: () -> Expression<IntSort>) = this div divisor()
 
-infix fun (() -> Expression<IntSort>).div(other: Expression<IntSort>): IntDiv = this() div other
+/**
+ * Division operator for IntSort Expressions: [this] / [divisor].
+ *
+ * If [this] is an [IntDiv] object, unpacks the children and returns a new combined IntMul
+ */
+infix fun (() -> Expression<IntSort>).div(divisor: Expression<IntSort>) = this() div divisor
 
-infix fun (() -> Expression<IntSort>).div(other: () -> Expression<IntSort>): IntDiv =
-    this() div other()
+/**
+ * Division operator for IntSort Expressions: [this] / [divisor].
+ *
+ * If [this] is an [IntDiv] object, unpacks the children and returns a new combined IntMul
+ */
+infix fun (() -> Expression<IntSort>).div(divisor: () -> Expression<IntSort>) = this() div divisor()
 
+/**
+ * Greater operator for IntSort Expressions: [this] > [other].
+ */
 infix fun Expression<IntSort>.greater(other: Expression<IntSort>) = IntGreater(this, other)
 
-infix fun Expression<IntSort>.greater(other: () -> Expression<IntSort>): IntGreater =
-    this greater other()
+/**
+ * Greater operator for IntSort Expressions: [this] > [other].
+ */
+infix fun Expression<IntSort>.greater(other: () -> Expression<IntSort>) = this greater other()
 
-infix fun (() -> Expression<IntSort>).greater(other: Expression<IntSort>): IntGreater =
-    this() greater other
+/**
+ * Greater operator for IntSort Expressions: [this] > [other].
+ */
+infix fun (() -> Expression<IntSort>).greater(other: Expression<IntSort>) = this() greater other
 
-infix fun (() -> Expression<IntSort>).greater(other: () -> Expression<IntSort>): IntGreater =
-    this() greater other()
+/**
+ * Greater operator for IntSort Expressions: [this] > [other].
+ */
+infix fun (() -> Expression<IntSort>).greater(other: () -> Expression<IntSort>) = this() greater other()
 
-infix fun IntGreater.greater(other: Expression<IntSort>) =
-    IntGreater(this.children + other)
+/**
+ * Greater operator for IntSort Expressions: [this] > [other].
+ */
+infix fun IntGreater.greater(other: Expression<IntSort>) = IntGreater(this.children + other)
 
-infix fun IntGreater.greater(block: () -> Expression<IntSort>) =
-    IntGreater(this.children + block())
+/**
+ * Greater operator for IntSort Expressions: [this] > [block].
+ */
+infix fun IntGreater.greater(block: () -> Expression<IntSort>) = IntGreater(this.children + block())
 
+/**
+ * Greater equals operator for IntSort Expressions: [this] >= [other].
+ */
 infix fun Expression<IntSort>.greaterEq(other: Expression<IntSort>) = IntGreaterEq(this, other)
 
-infix fun Expression<IntSort>.greaterEq(other: () -> Expression<IntSort>): IntGreaterEq =
-    this greaterEq other()
+/**
+ * Greater equals operator for IntSort Expressions: [this] >= [other].
+ */
+infix fun Expression<IntSort>.greaterEq(other: () -> Expression<IntSort>) = this greaterEq other()
 
-infix fun (() -> Expression<IntSort>).greaterEq(other: Expression<IntSort>): IntGreaterEq =
-    this() greaterEq other
+/**
+ * Greater equals operator for IntSort Expressions: [this] >= [other].
+ */
+infix fun (() -> Expression<IntSort>).greaterEq(other: Expression<IntSort>) = this() greaterEq other
 
-infix fun (() -> Expression<IntSort>).greaterEq(other: () -> Expression<IntSort>): IntGreaterEq =
-    this() greaterEq other()
+/**
+ * Greater equals operator for IntSort Expressions: [this] >= [other].
+ */
+infix fun (() -> Expression<IntSort>).greaterEq(other: () -> Expression<IntSort>) = this() greaterEq other()
 
-infix fun IntGreaterEq.greaterEq(other: Expression<IntSort>) =
-    IntGreaterEq(this.children + other)
+/**
+ * Greater equals operator for IntSort Expressions: [this] >= [other].
+ */
+infix fun IntGreaterEq.greaterEq(other: Expression<IntSort>) = IntGreaterEq(this.children + other)
 
-infix fun IntGreaterEq.greaterEq(block: () -> Expression<IntSort>) =
-    IntGreaterEq(this.children + block())
+/**
+ * Greater equals operator for IntSort Expressions: [this] >= [block].
+ */
+infix fun IntGreaterEq.greaterEq(block: () -> Expression<IntSort>) = IntGreaterEq(this.children + block())
 
+/**
+ * Less operator for IntSort Expressions: [this] < [other].
+ */
 infix fun Expression<IntSort>.less(other: Expression<IntSort>) = IntLess(this, other)
 
-infix fun Expression<IntSort>.less(other: () -> Expression<IntSort>): IntLess = this less other()
+/**
+ * Less operator for IntSort Expressions: [this] < [other].
+ */
+infix fun Expression<IntSort>.less(other: () -> Expression<IntSort>) = this less other()
 
-infix fun (() -> Expression<IntSort>).less(other: Expression<IntSort>): IntLess = this() less other
+/**
+ * Less operator for IntSort Expressions: [this] < [other].
+ */
+infix fun (() -> Expression<IntSort>).less(other: Expression<IntSort>) = this() less other
 
-infix fun (() -> Expression<IntSort>).less(other: () -> Expression<IntSort>): IntLess =
-    this() less other()
+/**
+ * Less operator for IntSort Expressions: [this] < [other].
+ */
+infix fun (() -> Expression<IntSort>).less(other: () -> Expression<IntSort>) = this() less other()
 
+/**
+ * Less operator for IntSort Expressions: [this] < [other].
+ */
 infix fun IntLess.less(other: Expression<IntSort>) = IntLess(this.children + other)
 
-infix fun IntLess.greater(block: () -> Expression<IntSort>) =
-    IntLess(this.children + block())
+/**
+ * Less operator for IntSort Expressions: [this] < [block].
+ */
+infix fun IntLess.less(block: () -> Expression<IntSort>) = IntLess(this.children + block())
 
+/**
+ * Less equals operator for IntSort Expressions: [this] <= [other].
+ */
 infix fun Expression<IntSort>.lessEq(other: Expression<IntSort>) = IntLessEq(this, other)
 
-infix fun Expression<IntSort>.lessEq(other: () -> Expression<IntSort>): IntLessEq =
-    this lessEq other()
+/**
+ * Less equals operator for IntSort Expressions: [this] <= [other].
+ */
+infix fun Expression<IntSort>.lessEq(other: () -> Expression<IntSort>) = this lessEq other()
 
-infix fun (() -> Expression<IntSort>).lessEq(other: Expression<IntSort>): IntLessEq =
-    this() lessEq other
+/**
+ * Less equals operator for IntSort Expressions: [this] <= [other].
+ */
+infix fun (() -> Expression<IntSort>).lessEq(other: Expression<IntSort>) = this() lessEq other
 
-infix fun (() -> Expression<IntSort>).lessEq(other: () -> Expression<IntSort>): IntLessEq =
-    this() lessEq other()
+/**
+ * Less equals operator for IntSort Expressions: [this] <= [other].
+ */
+infix fun (() -> Expression<IntSort>).lessEq(other: () -> Expression<IntSort>) = this() lessEq other()
 
-infix fun IntLessEq.lessEq(other: Expression<IntSort>) =
-    IntLessEq(this.children + other)
+/**
+ * Less equals operator for IntSort Expressions: [this] <= [other].
+ */
+infix fun IntLessEq.lessEq(other: Expression<IntSort>) = IntLessEq(this.children + other)
 
-infix fun IntLessEq.greater(block: () -> Expression<IntSort>) =
-    IntLessEq(this.children + block())
+/**
+ * Less equals operator for IntSort Expressions: [this] <= [block].
+ */
+infix fun IntLessEq.lessEq(block: () -> Expression<IntSort>) = IntLessEq(this.children + block())
 
+/**
+ * Modulo operation for IntSort Expressions: [this] mod [other].
+ */
 infix fun Expression<IntSort>.mod(other: Expression<IntSort>) = Mod(this, other)
 
-infix fun Expression<IntSort>.mod(other: () -> Expression<IntSort>): Mod = this mod other()
+/**
+ * Modulo operation for IntSort Expressions: [this] mod [other].
+ */
+infix fun Expression<IntSort>.mod(other: () -> Expression<IntSort>) = this mod other()
 
-infix fun (() -> Expression<IntSort>).mod(other: Expression<IntSort>): Mod = this() mod other
+/**
+ * Modulo operation for IntSort Expressions: [this] mod [other].
+ */
+infix fun (() -> Expression<IntSort>).mod(other: Expression<IntSort>) = this() mod other
 
-infix fun (() -> Expression<IntSort>).mod(other: () -> Expression<IntSort>): Mod =
-    this() mod other()
+/**
+ * Modulo operation for IntSort Expressions: [this] mod [other].
+ */
+infix fun (() -> Expression<IntSort>).mod(other: () -> Expression<IntSort>) = this() mod other()
 
 private fun makeIntOperator(
     init: Builder<IntSort>.() -> Unit,
@@ -160,21 +306,71 @@ private fun makeIntOperator(
   val builder = Builder<IntSort>()
   builder.init()
 
-  return op(builder.children)
+    require(builder.children.isNotEmpty())
+
+    return if (builder.children.size == 1) {
+        builder.children.single()
+    } else {
+        op(builder.children)
+    }
 }
 
+/**
+ * Addition operation for IntSort Expressions.
+ *
+ * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
+ * If only a single subexpression is added, the expression is returned directly.
+ *
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ */
 fun intadd(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntAdd)
 
+/**
+ * Subtraction operation for IntSort Expressions.
+ *
+ * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
+ * If only a single subexpression is added, the expression is returned directly.
+ *
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ */
 fun intsub(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntSub)
 
+/**
+ * Multiplication operation for IntSort Expressions.
+ *
+ * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
+ * If only a single subexpression is added, the expression is returned directly.
+ *
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ */
 fun intmul(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntMul)
 
+/**
+ * Division operation for IntSort Expressions.
+ *
+ * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
+ * If only a single subexpression is added, the expression is returned directly.
+ *
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ */
 fun intdiv(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntDiv)
 
+/**
+ * Absolute value operation for IntSort Expressions.
+ */
 fun abs(block: () -> Expression<IntSort>) = Abs(block())
 
+/**
+ * Absolute value operation for IntSort Expressions.
+ */
 fun abs(expr: Expression<IntSort>) = Abs(expr)
 
+/**
+ * Casting operator from RealSort to IntSort
+ */
 fun toInt(block: () -> Expression<RealSort>) = ToInt(block())
 
+/**
+ * Casting operator from RealSort to IntSort
+ */
 fun toInt(expr: Expression<RealSort>) = ToInt(expr)
