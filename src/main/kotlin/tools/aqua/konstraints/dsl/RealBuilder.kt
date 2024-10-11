@@ -344,3 +344,9 @@ fun toReal(block: () -> Expression<IntSort>) = ToReal(block())
  * Casting operator from RealSort to RealSort
  */
 fun toReal(expr: Expression<IntSort>) = ToReal(expr)
+
+/** Implements smt is_int operation */
+fun isInt(expr: Expression<RealSort>) = IsInt(expr)
+
+/** Implements smt is_int operation */
+fun isInt(block: () -> Expression<RealSort>) = IsInt(block())

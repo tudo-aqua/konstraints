@@ -27,40 +27,66 @@ import tools.aqua.konstraints.theories.*
  *
  * If [this] is an [Implies] object, unpacks the children and returns a new combined Implies.
  */
-infix fun Expression<BoolSort>.implies(other: Expression<BoolSort>): Implies =
+infix fun Expression<BoolSort>.implies(other: Expression<BoolSort>) =
     if (this is Implies) {
-      Implies(this.children + other)
+      Implies(children + other)
     } else {
       Implies(this, other)
     }
 
-infix fun Expression<BoolSort>.implies(other: () -> Expression<BoolSort>): Implies =
-    this implies other()
+/**
+ * Creates a logical implication: [this] => [other].
+ *
+ * If [this] is an [Implies] object, unpacks the children and returns a new combined Implies.
+ */
+infix fun Expression<BoolSort>.implies(other: () -> Expression<BoolSort>) = this implies other()
 
-infix fun (() -> Expression<BoolSort>).implies(other: Expression<BoolSort>): Implies =
-    this() implies other
+/**
+ * Creates a logical implication: [this] => [other].
+ *
+ * If [this] is an [Implies] object, unpacks the children and returns a new combined Implies.
+ */
+infix fun (() -> Expression<BoolSort>).implies(other: Expression<BoolSort>) = this() implies other
 
-infix fun (() -> Expression<BoolSort>).implies(other: () -> Expression<BoolSort>): Implies =
-    this() implies other()
+/**
+ * Creates a logical implication: [this] => [other].
+ *
+ * If [this] is an [Implies] object, unpacks the children and returns a new combined Implies.
+ */
+infix fun (() -> Expression<BoolSort>).implies(other: () -> Expression<BoolSort>) = this() implies other()
 
 /**
  * Creates a logical and: [this] and [other].
  *
  * If [this] is an [And] object, unpacks the children and returns a new combined And.
  */
-infix fun Expression<BoolSort>.and(other: Expression<BoolSort>): And =
+infix fun Expression<BoolSort>.and(other: Expression<BoolSort>) =
     if (this is And) {
       And(this.children + other)
     } else {
       And(this, other)
     }
 
-infix fun Expression<BoolSort>.and(other: () -> Expression<BoolSort>): And = this and other()
+/**
+ * Creates a logical and: [this] and [other].
+ *
+ * If [this] is an [And] object, unpacks the children and returns a new combined And.
+ */
+infix fun Expression<BoolSort>.and(other: () -> Expression<BoolSort>) = this and other()
 
-infix fun (() -> Expression<BoolSort>).and(other: Expression<BoolSort>): And = this() and other
+/**
+ * Creates a logical and: [this] and [other].
+ *
+ * If [this] is an [And] object, unpacks the children and returns a new combined And.
+ */
+infix fun (() -> Expression<BoolSort>).and(other: Expression<BoolSort>) = this() and other
 
-infix fun (() -> Expression<BoolSort>).and(other: () -> Expression<BoolSort>): And =
-    this() and other()
+/**
+ * Creates a logical and: [this] and [other].
+ *
+ * If [this] is an [And] object, unpacks the children and returns a new combined And.
+ */
+infix fun (() -> Expression<BoolSort>).and(other: () -> Expression<BoolSort>) = this() and other()
 
 /**
  * Creates a logical or: [this] or [other].
@@ -74,11 +100,26 @@ infix fun Expression<BoolSort>.or(other: Expression<BoolSort>): Or =
       Or(this, other)
     }
 
-infix fun Expression<BoolSort>.or(other: () -> Expression<BoolSort>): Or = this or other()
+/**
+ * Creates a logical or: [this] or [other].
+ *
+ * If [this] is an [Or] object, unpacks the children and returns a new combined Or.
+ */
+infix fun Expression<BoolSort>.or(other: () -> Expression<BoolSort>) = this or other()
 
-infix fun (() -> Expression<BoolSort>).or(other: Expression<BoolSort>): Or = this() or other
+/**
+ * Creates a logical or: [this] or [other].
+ *
+ * If [this] is an [Or] object, unpacks the children and returns a new combined Or.
+ */
+infix fun (() -> Expression<BoolSort>).or(other: Expression<BoolSort>) = this() or other
 
-infix fun (() -> Expression<BoolSort>).or(other: () -> Expression<BoolSort>): Or = this() or other()
+/**
+ * Creates a logical or: [this] or [other].
+ *
+ * If [this] is an [Or] object, unpacks the children and returns a new combined Or.
+ */
+infix fun (() -> Expression<BoolSort>).or(other: () -> Expression<BoolSort>) = this() or other()
 
 /**
  * Creates a logical xor: [this] xor [other].
@@ -92,35 +133,47 @@ infix fun Expression<BoolSort>.xor(other: Expression<BoolSort>): XOr =
       XOr(this, other)
     }
 
-infix fun Expression<BoolSort>.xor(other: () -> Expression<BoolSort>): XOr = this xor other()
+/**
+ * Creates a logical xor: [this] xor [other].
+ *
+ * If [this] is an [XOr] object, unpacks the children and returns a new combined XOr.
+ */
+infix fun Expression<BoolSort>.xor(other: () -> Expression<BoolSort>) = this xor other()
 
-infix fun (() -> Expression<BoolSort>).xor(other: Expression<BoolSort>): XOr = this() xor other
+/**
+ * Creates a logical xor: [this] xor [other].
+ *
+ * If [this] is an [XOr] object, unpacks the children and returns a new combined XOr.
+ */
+infix fun (() -> Expression<BoolSort>).xor(other: Expression<BoolSort>) = this() xor other
 
-infix fun (() -> Expression<BoolSort>).xor(other: () -> Expression<BoolSort>): XOr =
-    this() xor other()
+/**
+ * Creates a logical xor: [this] xor [other].
+ *
+ * If [this] is an [XOr] object, unpacks the children and returns a new combined XOr.
+ */
+infix fun (() -> Expression<BoolSort>).xor(other: () -> Expression<BoolSort>) = this() xor other()
 
 /**
  * Creates an equals: [this] equals [other].
  *
  * If [this] is an [Equals] object, unpacks the children and returns a new combined Equals.
  */
-infix fun <T : Sort> Expression<T>.eq(other: Expression<T>): Equals =
-    if (this is Equals) {
-      Equals(this.children + listOf(other))
+infix fun <T : Sort> Expression<T>.eq(other: Expression<T>) =
+    if (this is Equals<*>) {
+      Equals(this.children as List<Expression<T>> + other)
     } else {
       Equals(this, other)
     }
 
 // allow chaining of equals
-infix fun <T : Sort> Equals.eq(other: Expression<T>): Equals =
-    Equals(children + other)
+infix fun <T : Sort> Equals<T>.eq(other: Expression<T>) = Equals(children + other)
 
-infix fun <T : Sort> Expression<T>.eq(other: () -> Expression<T>): Equals = this eq other()
+infix fun <T : Sort> Expression<T>.eq(other: () -> Expression<T>) = this eq other()
 
-infix fun <T : Sort> (() -> Expression<T>).eq(other: Expression<T>): Equals = this() eq other
+infix fun <T : Sort> (() -> Expression<T>).eq(other: Expression<T>) = this() eq other
 
-infix fun <T : Sort> (() -> Expression<T>).eq(other: () -> Expression<T>): Equals =
-    this() eq other()
+infix fun <T : Sort> (() -> Expression<T>).eq(other: () -> Expression<T>) = this() eq other()
 
 /** Creates a distinct: [this] distinct [other]. */
 infix fun <T : Sort> Expression<T>.distinct(other: Expression<T>): Distinct = Distinct(this, other)
@@ -164,7 +217,7 @@ fun xor(init: Builder<BoolSort>.() -> Unit) = makeBoolOperator(init, ::XOr)
  *
  * Use [Builder.unaryPlus] inside [init] to add [Expression]s to the 'Equals' expression.
  */
-fun <T : Sort> eq(init: Builder<T>.() -> Unit): Equals {
+fun <T : Sort> eq(init: Builder<T>.() -> Unit): Equals<T> {
   val builder = Builder<T>()
   builder.init()
 
@@ -186,41 +239,5 @@ fun <T : Sort> distinct(init: Builder<T>.() -> Unit): Distinct {
 /** Implements logical not operation */
 fun not(block: () -> Expression<BoolSort>): Not = Not(block())
 
+/** Implements logical not operation */
 fun not(expr: Expression<BoolSort>): Not = Not(expr)
-
-/** Implements smt is_int operation */
-fun isInt(block: Builder<RealSort>.() -> Expression<RealSort>) = IsInt(Builder<RealSort>().block())
-
-/*
- * floating-point classification operations
- */
-
-private fun makeFPOperator(
-    block: Builder<FPSort>.() -> Expression<FPSort>,
-    op: (Expression<FPSort>) -> Expression<BoolSort>
-): Expression<BoolSort> = op(Builder<FPSort>().block())
-
-/** Implements floating point isNormal operation */
-fun isNormal(block: Builder<FPSort>.() -> Expression<FPSort>) = makeFPOperator(block, ::FPIsNormal)
-
-/** Implements floating point isSubnormal operation */
-fun isSubnormal(block: Builder<FPSort>.() -> Expression<FPSort>) =
-    makeFPOperator(block, ::FPIsSubnormal)
-
-/** Implements floating point isZero operation */
-fun isZero(block: Builder<FPSort>.() -> Expression<FPSort>) = makeFPOperator(block, ::FPIsZero)
-
-/** Implements floating point isInfinite operation */
-fun isInfinite(block: Builder<FPSort>.() -> Expression<FPSort>) =
-    makeFPOperator(block, ::FPIsInfinite)
-
-/** Implements floating point isNaN operation */
-fun isNaN(block: Builder<FPSort>.() -> Expression<FPSort>) = makeFPOperator(block, ::FPIsNaN)
-
-/** Implements floating point isNegative operation */
-fun isNegative(block: Builder<FPSort>.() -> Expression<FPSort>) =
-    makeFPOperator(block, ::FPIsNegative)
-
-/** Implements floating point isPositive operation */
-fun isPositive(block: Builder<FPSort>.() -> Expression<FPSort>) =
-    makeFPOperator(block, ::FPIsPositive)

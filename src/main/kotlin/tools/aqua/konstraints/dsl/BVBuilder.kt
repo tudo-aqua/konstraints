@@ -21,6 +21,12 @@ package tools.aqua.konstraints.dsl
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.theories.*
 
+/**
+ * Implements a bitwise and operation: [this] and [other].
+ *
+ * If [this] is a [BVAnd] object, unpacks the children and returns a new combined BVAnd.
+ */
+
 infix fun Expression<BVSort>.bvand(other: Expression<BVSort>) =
     if (this is BVAnd) {
       BVAnd(this.children+other)
@@ -28,13 +34,33 @@ infix fun Expression<BVSort>.bvand(other: Expression<BVSort>) =
       BVAnd(this, other)
     }
 
+/**
+ * Implements a bitwise and operation: [this] and [other].
+ *
+ * If [this] is a [BVAnd] object, unpacks the children and returns a new combined BVAnd.
+ */
 infix fun Expression<BVSort>.bvand(other: () -> Expression<BVSort>): BVAnd = this bvand other()
 
+/**
+ * Implements a bitwise and operation: [this] and [other].
+ *
+ * If [this] is a [BVAnd] object, unpacks the children and returns a new combined BVAnd.
+ */
 infix fun (() -> Expression<BVSort>).bvand(other: Expression<BVSort>): BVAnd = this() bvand other
 
+/**
+ * Implements a bitwise and operation: [this] and [other].
+ *
+ * If [this] is a [BVAnd] object, unpacks the children and returns a new combined BVAnd.
+ */
 infix fun (() -> Expression<BVSort>).bvand(other: () -> Expression<BVSort>): BVAnd =
     this() bvand other()
 
+/**
+ * Implements a bitwise or operation: [this] or [other].
+ *
+ * If [this] is a [BVOr] object, unpacks the children and returns a new combined BVOr.
+ */
 infix fun Expression<BVSort>.bvor(other: Expression<BVSort>) =
     if (this is BVOr) {
       BVOr(this.children+other)
@@ -42,13 +68,33 @@ infix fun Expression<BVSort>.bvor(other: Expression<BVSort>) =
       BVOr(this, other)
     }
 
+/**
+ * Implements a bitwise or operation: [this] or [other].
+ *
+ * If [this] is a [BVOr] object, unpacks the children and returns a new combined BVOr.
+ */
 infix fun Expression<BVSort>.bvor(other: () -> Expression<BVSort>): BVOr = this bvor other()
 
+/**
+ * Implements a bitwise or operation: [this] or [other].
+ *
+ * If [this] is a [BVOr] object, unpacks the children and returns a new combined BVOr.
+ */
 infix fun (() -> Expression<BVSort>).bvor(other: Expression<BVSort>): BVOr = this() bvor other
 
+/**
+ * Implements a bitwise or operation: [this] or [other].
+ *
+ * If [this] is a [BVOr] object, unpacks the children and returns a new combined BVOr.
+ */
 infix fun (() -> Expression<BVSort>).bvor(other: () -> Expression<BVSort>): BVOr =
     this() bvor other()
 
+/**
+ * Implements a bitvector addition operation: [this] + [other].
+ *
+ * If [this] is a [BVAdd] object, unpacks the children and returns a new combined BVAdd.
+ */
 infix fun Expression<BVSort>.bvadd(other: Expression<BVSort>) =
     if (this is BVAdd) {
       BVAdd(this.children+other)
@@ -56,13 +102,33 @@ infix fun Expression<BVSort>.bvadd(other: Expression<BVSort>) =
       BVAdd(this, other)
     }
 
+/**
+ * Implements a bitvector addition operation: [this] + [other].
+ *
+ * If [this] is a [BVAdd] object, unpacks the children and returns a new combined BVAdd.
+ */
 infix fun Expression<BVSort>.bvadd(other: () -> Expression<BVSort>): BVAdd = this bvadd other()
 
+/**
+ * Implements a bitvector addition operation: [this] + [other].
+ *
+ * If [this] is a [BVAdd] object, unpacks the children and returns a new combined BVAdd.
+ */
 infix fun (() -> Expression<BVSort>).bvadd(other: Expression<BVSort>): BVAdd = this() bvadd other
 
+/**
+ * Implements a bitvector addition operation: [this] + [other].
+ *
+ * If [this] is a [BVAdd] object, unpacks the children and returns a new combined BVAdd.
+ */
 infix fun (() -> Expression<BVSort>).bvadd(other: () -> Expression<BVSort>): BVAdd =
     this() bvadd other()
 
+/**
+ * Implements a bitvector multiplication operation: [this] * [other].
+ *
+ * If [this] is a [BVMul] object, unpacks the children and returns a new combined BVMul.
+ */
 infix fun Expression<BVSort>.bvmul(other: Expression<BVSort>) =
     if (this is BVMul) {
       BVMul(this.children + other)
@@ -70,142 +136,345 @@ infix fun Expression<BVSort>.bvmul(other: Expression<BVSort>) =
       BVMul(this, other)
     }
 
+/**
+ * Implements a bitvector multiplication operation: [this] * [other].
+ *
+ * If [this] is a [BVMul] object, unpacks the children and returns a new combined BVMul.
+ */
 infix fun Expression<BVSort>.bvmul(other: () -> Expression<BVSort>): BVMul = this bvmul other()
 
+/**
+ * Implements a bitvector multiplication operation: [this] * [other].
+ *
+ * If [this] is a [BVMul] object, unpacks the children and returns a new combined BVMul.
+ */
 infix fun (() -> Expression<BVSort>).bvmul(other: Expression<BVSort>): BVMul = this() bvmul other
 
+/**
+ * Implements a bitvector multiplication operation: [this] * [other].
+ *
+ * If [this] is a [BVMul] object, unpacks the children and returns a new combined BVMul.
+ */
 infix fun (() -> Expression<BVSort>).bvmul(other: () -> Expression<BVSort>): BVMul =
     this() bvmul other()
 
-/*
- * Bitvector infix operations
+/**
+ * Implements bitvector concatenation operation: [this].[other].
  */
 infix fun Expression<BVSort>.concat(other: Expression<BVSort>) = BVConcat(this, other)
 
+/**
+ * Implements bitvector concatenation operation: [this].[other].
+ */
 infix fun Expression<BVSort>.concat(other: () -> Expression<BVSort>) = BVConcat(this, other())
 
+/**
+ * Implements bitvector concatenation operation: [this].[other].
+ */
 infix fun (() -> Expression<BVSort>).concat(other: Expression<BVSort>) = BVConcat(this(), other)
 
-infix fun (() -> Expression<BVSort>).concat(other: () -> Expression<BVSort>) =
-    BVConcat(this(), other())
+/**
+ * Implements bitvector concatenation operation: [this].[other].
+ */
+infix fun (() -> Expression<BVSort>).concat(other: () -> Expression<BVSort>) = BVConcat(this(), other())
 
+/**
+ * Implements bitvector division operation: [this]/[denominator].
+ */
 infix fun Expression<BVSort>.bvudiv(denominator: Expression<BVSort>) = BVUDiv(this, denominator)
 
-infix fun Expression<BVSort>.bvudiv(other: () -> Expression<BVSort>) = BVUDiv(this, other())
+/**
+ * Implements bitvector division operation: [this]/[denominator].
+ */
+infix fun Expression<BVSort>.bvudiv(denominator: () -> Expression<BVSort>) = BVUDiv(this, denominator())
 
-infix fun (() -> Expression<BVSort>).bvudiv(other: Expression<BVSort>) = BVUDiv(this(), other)
+/**
+ * Implements bitvector division operation: [this]/[denominator].
+ */
+infix fun (() -> Expression<BVSort>).bvudiv(denominator: Expression<BVSort>) = BVUDiv(this(), denominator)
 
-infix fun (() -> Expression<BVSort>).bvudiv(other: () -> Expression<BVSort>) =
-    BVUDiv(this(), other())
+/**
+ * Implements bitvector division operation: [this]/[denominator].
+ */
+infix fun (() -> Expression<BVSort>).bvudiv(denominator: () -> Expression<BVSort>) = BVUDiv(this(), denominator())
 
+/**
+ * Implements bitvector unsigned remainder operation: [this] bvurem [denominator].
+ */
 infix fun Expression<BVSort>.bvurem(denominator: Expression<BVSort>) = BVURem(this, denominator)
 
-infix fun Expression<BVSort>.bvurem(other: () -> Expression<BVSort>) = BVURem(this, other())
+/**
+ * Implements bitvector unsigned remainder operation: [this] bvurem [denominator].
+ */
+infix fun Expression<BVSort>.bvurem(denominator: () -> Expression<BVSort>) = BVURem(this, denominator())
 
-infix fun (() -> Expression<BVSort>).bvurem(other: Expression<BVSort>) = BVURem(this(), other)
+/**
+ * Implements bitvector unsigned remainder operation: [this] bvurem [denominator].
+ */
+infix fun (() -> Expression<BVSort>).bvurem(denominator: Expression<BVSort>) = BVURem(this(), denominator)
 
-infix fun (() -> Expression<BVSort>).bvurem(other: () -> Expression<BVSort>) =
-    BVURem(this(), other())
+/**
+ * Implements bitvector unsigned remainder operation: [this] bvurem [denominator].
+ */
+infix fun (() -> Expression<BVSort>).bvurem(denominator: () -> Expression<BVSort>) = BVURem(this(), denominator())
 
+/**
+ * Implements bitvector left shift operation: [this] bvshl [distance].
+ */
 infix fun Expression<BVSort>.bvshl(distance: Expression<BVSort>) = BVShl(this, distance)
 
-infix fun Expression<BVSort>.bvshl(other: () -> Expression<BVSort>) = BVShl(this, other())
+/**
+ * Implements bitvector left shift operation: [this] bvshl [distance].
+ */
+infix fun Expression<BVSort>.bvshl(distance: () -> Expression<BVSort>) = BVShl(this, distance())
 
-infix fun (() -> Expression<BVSort>).bvshl(other: Expression<BVSort>) = BVShl(this(), other)
+/**
+ * Implements bitvector left shift operation: [this] bvshl [distance].
+ */
+infix fun (() -> Expression<BVSort>).bvshl(distance: Expression<BVSort>) = BVShl(this(), distance)
 
-infix fun (() -> Expression<BVSort>).bvshl(other: () -> Expression<BVSort>) = BVShl(this(), other())
+/**
+ * Implements bitvector left shift operation: [this] bvshl [distance].
+ */
+infix fun (() -> Expression<BVSort>).bvshl(distance: () -> Expression<BVSort>) = BVShl(this(), distance())
 
+/**
+ * Implements bitvector logical right shift operation: [this] bvlshr [distance].
+ */
 infix fun Expression<BVSort>.bvlshr(distance: Expression<BVSort>) = BVLShr(this, distance)
 
-infix fun Expression<BVSort>.bvlshr(other: () -> Expression<BVSort>) = BVLShr(this, other())
+/**
+ * Implements bitvector logical right shift operation: [this] bvlshr [distance].
+ */
+infix fun Expression<BVSort>.bvlshr(distance: () -> Expression<BVSort>) = BVLShr(this, distance())
 
-infix fun (() -> Expression<BVSort>).bvlshr(other: Expression<BVSort>) = BVLShr(this(), other)
+/**
+ * Implements bitvector logical right shift operation: [this] bvlshr [distance].
+ */
+infix fun (() -> Expression<BVSort>).bvlshr(distance: Expression<BVSort>) = BVLShr(this(), distance)
 
-infix fun (() -> Expression<BVSort>).bvlshr(other: () -> Expression<BVSort>) =
-    BVLShr(this(), other())
+/**
+ * Implements bitvector logical right shift operation: [this] bvlshr [distance].
+ */
+infix fun (() -> Expression<BVSort>).bvlshr(distance: () -> Expression<BVSort>) = BVLShr(this(), distance())
 
-infix fun Expression<BVSort>.bvnand(rhs: Expression<BVSort>) = BVNAnd(this, rhs)
+/**
+ * Implements a bitwise nand operation: [this] nand [other].
+ *
+ * If [this] is a [BVNAnd] object, unpacks the children and returns a new combined BVNAnd.
+ */
+infix fun Expression<BVSort>.bvnand(other: Expression<BVSort>) = BVNAnd(this, other)
 
+/**
+ * Implements a bitwise nand operation: [this] nand [other].
+ *
+ * If [this] is a [BVNAnd] object, unpacks the children and returns a new combined BVNAnd.
+ */
 infix fun Expression<BVSort>.bvnand(other: () -> Expression<BVSort>) = BVNAnd(this, other())
 
+/**
+ * Implements a bitwise nand operation: [this] nand [other].
+ *
+ * If [this] is a [BVNAnd] object, unpacks the children and returns a new combined BVNAnd.
+ */
 infix fun (() -> Expression<BVSort>).bvnand(other: Expression<BVSort>) = BVNAnd(this(), other)
 
-infix fun (() -> Expression<BVSort>).bvnand(other: () -> Expression<BVSort>) =
-    BVNAnd(this(), other())
+/**
+ * Implements a bitwise nand operation: [this] nand [other].
+ *
+ * If [this] is a [BVNAnd] object, unpacks the children and returns a new combined BVNAnd.
+ */
+infix fun (() -> Expression<BVSort>).bvnand(other: () -> Expression<BVSort>) = BVNAnd(this(), other())
 
-infix fun Expression<BVSort>.bvnor(rhs: Expression<BVSort>) = BVNOr(this, rhs)
+/**
+ * Implements a bitwise nor operation: [this] nor [other].
+ *
+ * If [this] is a [BVNOr] object, unpacks the children and returns a new combined BVNor.
+ */
+infix fun Expression<BVSort>.bvnor(other: Expression<BVSort>) = BVNOr(this, other)
 
+/**
+ * Implements a bitwise nor operation: [this] nor [other].
+ *
+ * If [this] is a [BVNOr] object, unpacks the children and returns a new combined BVNor.
+ */
 infix fun Expression<BVSort>.bvnor(other: () -> Expression<BVSort>) = BVNOr(this, other())
 
+/**
+ * Implements a bitwise nor operation: [this] nor [other].
+ *
+ * If [this] is a [BVNOr] object, unpacks the children and returns a new combined BVNor.
+ */
 infix fun (() -> Expression<BVSort>).bvnor(other: Expression<BVSort>) = BVNOr(this(), other)
 
+/**
+ * Implements a bitwise nor operation: [this] nor [other].
+ *
+ * If [this] is a [BVNOr] object, unpacks the children and returns a new combined BVNor.
+ */
 infix fun (() -> Expression<BVSort>).bvnor(other: () -> Expression<BVSort>) = BVNOr(this(), other())
 
-infix fun Expression<BVSort>.bvxor(rhs: Expression<BVSort>) =
+/**
+ * Implements a bitwise xor operation: [this] xor [other].
+ *
+ * If [this] is a [BVXOr] object, unpacks the children and returns a new combined BVXor.
+ */
+infix fun Expression<BVSort>.bvxor(other: Expression<BVSort>) =
     if (this is BVXOr) {
-      BVXOr(this.children+rhs)
+      BVXOr(this.children+other)
     } else {
-      BVXOr(this, rhs)
+      BVXOr(this, other)
     }
 
+/**
+ * Implements a bitwise xor operation: [this] xor [other].
+ *
+ * If [this] is a [BVXOr] object, unpacks the children and returns a new combined BVXor.
+ */
 infix fun Expression<BVSort>.bvxor(other: () -> Expression<BVSort>) = BVXOr(this, other())
 
+/**
+ * Implements a bitwise xor operation: [this] xor [other].
+ *
+ * If [this] is a [BVXOr] object, unpacks the children and returns a new combined BVXor.
+ */
 infix fun (() -> Expression<BVSort>).bvxor(other: Expression<BVSort>) = BVXOr(this(), other)
 
+/**
+ * Implements a bitwise xor operation: [this] xor [other].
+ *
+ * If [this] is a [BVXOr] object, unpacks the children and returns a new combined BVXor.
+ */
 infix fun (() -> Expression<BVSort>).bvxor(other: () -> Expression<BVSort>) = BVXOr(this(), other())
 
+/**
+ * Implements a bitwise xnor operation: [this] xnor [other].
+ *
+ * If [this] is a [BVXNOr] object, unpacks the children and returns a new combined BVXNor.
+ */
 infix fun Expression<BVSort>.bvxnor(rhs: Expression<BVSort>) = BVXNOr(this, rhs)
 
+/**
+ * Implements a bitwise xnor operation: [this] xnor [other].
+ *
+ * If [this] is a [BVXNOr] object, unpacks the children and returns a new combined BVXNor.
+ */
 infix fun Expression<BVSort>.bvxnor(other: () -> Expression<BVSort>) = BVXNOr(this, other())
 
+/**
+ * Implements a bitwise xnor operation: [this] xnor [other].
+ *
+ * If [this] is a [BVXNOr] object, unpacks the children and returns a new combined BVXNor.
+ */
 infix fun (() -> Expression<BVSort>).bvxnor(other: Expression<BVSort>) = BVXNOr(this(), other)
 
+/**
+ * Implements a bitwise xnor operation: [this] xnor [other].
+ *
+ * If [this] is a [BVXNOr] object, unpacks the children and returns a new combined BVXNor.
+ */
 infix fun (() -> Expression<BVSort>).bvxnor(other: () -> Expression<BVSort>) =
     BVXNOr(this(), other())
 
-infix fun Expression<BVSort>.bvcomp(rhs: Expression<BVSort>) = BVComp(this, rhs)
+/**
+ * Implements bitwise comparison operator: [this] bvcomp [other]
+ */
+infix fun Expression<BVSort>.bvcomp(other: Expression<BVSort>) = BVComp(this, other)
 
+/**
+ * Implements bitwise comparison operator: [this] bvcomp [other]
+ */
 infix fun Expression<BVSort>.bvcomp(other: () -> Expression<BVSort>) = BVComp(this, other())
 
+/**
+ * Implements bitwise comparison operator: [this] bvcomp [other]
+ */
 infix fun (() -> Expression<BVSort>).bvcomp(other: Expression<BVSort>) = BVComp(this(), other)
 
-infix fun (() -> Expression<BVSort>).bvcomp(other: () -> Expression<BVSort>) =
-    BVComp(this(), other())
+/**
+ * Implements bitwise comparison operator: [this] bvcomp [other]
+ */
+infix fun (() -> Expression<BVSort>).bvcomp(other: () -> Expression<BVSort>) = BVComp(this(), other())
 
-infix fun Expression<BVSort>.bvsub(rhs: Expression<BVSort>) = BVSub(this, rhs)
+/**
+ * Implements bitvector subtraction operator: [this] - [subtrahend]
+ */
+infix fun Expression<BVSort>.bvsub(subtrahend: Expression<BVSort>) = BVSub(this, subtrahend)
 
-infix fun Expression<BVSort>.bvsub(other: () -> Expression<BVSort>) = BVSub(this, other())
+/**
+ * Implements bitvector subtraction operator: [this] - [subtrahend]
+ */
+infix fun Expression<BVSort>.bvsub(subtrahend: () -> Expression<BVSort>) = BVSub(this, subtrahend())
 
-infix fun (() -> Expression<BVSort>).bvsub(other: Expression<BVSort>) = BVSub(this(), other)
+/**
+ * Implements bitvector subtraction operator: [this] - [subtrahend]
+ */
+infix fun (() -> Expression<BVSort>).bvsub(subtrahend: Expression<BVSort>) = BVSub(this(), subtrahend)
 
-infix fun (() -> Expression<BVSort>).bvsub(other: () -> Expression<BVSort>) = BVSub(this(), other())
+/**
+ * Implements bitvector subtraction operator: [this] - [subtrahend]
+ */
+infix fun (() -> Expression<BVSort>).bvsub(subtrahend: () -> Expression<BVSort>) = BVSub(this(), subtrahend())
 
+/**
+ * Implements bitvector signed division operator: [this]/[denominator]
+ */
 infix fun Expression<BVSort>.bvsdiv(denominator: Expression<BVSort>) = BVSDiv(this, denominator)
 
-infix fun Expression<BVSort>.bvsdiv(other: () -> Expression<BVSort>) = BVSDiv(this, other())
+/**
+ * Implements bitvector signed division operator: [this]/[denominator]
+ */
+infix fun Expression<BVSort>.bvsdiv(denominator: () -> Expression<BVSort>) = BVSDiv(this, denominator())
 
-infix fun (() -> Expression<BVSort>).bvsdiv(other: Expression<BVSort>) = BVSDiv(this(), other)
+/**
+ * Implements bitvector signed division operator: [this]/[denominator]
+ */
+infix fun (() -> Expression<BVSort>).bvsdiv(denominator: Expression<BVSort>) = BVSDiv(this(), denominator)
 
-infix fun (() -> Expression<BVSort>).bvsdiv(other: () -> Expression<BVSort>) =
-    BVSDiv(this(), other())
+/**
+ * Implements bitvector signed division operator: [this]/[denominator]
+ */
+infix fun (() -> Expression<BVSort>).bvsdiv(denominator: () -> Expression<BVSort>) = BVSDiv(this(), denominator())
 
+/**
+ * Implements bitvector signed remainder operator: [this]/[denominator]
+ */
 infix fun Expression<BVSort>.bvsrem(denominator: Expression<BVSort>) = BVSRem(this, denominator)
 
-infix fun Expression<BVSort>.bvsrem(other: () -> Expression<BVSort>) = BVSRem(this, other())
+/**
+ * Implements bitvector signed remainder operator: [this]/[denominator]
+ */
+infix fun Expression<BVSort>.bvsrem(denominator: () -> Expression<BVSort>) = BVSRem(this, denominator())
 
-infix fun (() -> Expression<BVSort>).bvsrem(other: Expression<BVSort>) = BVSRem(this(), other)
+/**
+ * Implements bitvector signed remainder operator: [this]/[denominator]
+ */
+infix fun (() -> Expression<BVSort>).bvsrem(denominator: Expression<BVSort>) = BVSRem(this(), denominator)
 
-infix fun (() -> Expression<BVSort>).bvsrem(other: () -> Expression<BVSort>) =
-    BVSRem(this(), other())
+/**
+ * Implements bitvector signed remainder operator: [this]/[denominator]
+ */
+infix fun (() -> Expression<BVSort>).bvsrem(denominator: () -> Expression<BVSort>) = BVSRem(this(), denominator())
 
-infix fun Expression<BVSort>.bvsmod(rhs: Expression<BVSort>) = BVSMod(this, rhs)
+/**
+ * Implements bitvector signed modulo operator: [this]/[other]
+ */
+infix fun Expression<BVSort>.bvsmod(other: Expression<BVSort>) = BVSMod(this, other)
 
+/**
+ * Implements bitvector signed modulo operator: [this]/[other]
+ */
 infix fun Expression<BVSort>.bvsmod(other: () -> Expression<BVSort>) = BVSMod(this, other())
 
+/**
+ * Implements bitvector signed modulo operator: [this]/[other]
+ */
 infix fun (() -> Expression<BVSort>).bvsmod(other: Expression<BVSort>) = BVSMod(this(), other)
 
-infix fun (() -> Expression<BVSort>).bvsmod(other: () -> Expression<BVSort>) =
-    BVSMod(this(), other())
+/**
+ * Implements bitvector signed modulo operator: [this]/[other]
+ */
+infix fun (() -> Expression<BVSort>).bvsmod(other: () -> Expression<BVSort>) = BVSMod(this(), other())
 
 infix fun Expression<BVSort>.bvashr(distance: Expression<BVSort>) = BVAShr(this, distance)
 
@@ -213,8 +482,7 @@ infix fun Expression<BVSort>.bvashr(other: () -> Expression<BVSort>) = BVAShr(th
 
 infix fun (() -> Expression<BVSort>).bvashr(other: Expression<BVSort>) = BVAShr(this(), other)
 
-infix fun (() -> Expression<BVSort>).bvashr(other: () -> Expression<BVSort>) =
-    BVAShr(this(), other())
+infix fun (() -> Expression<BVSort>).bvashr(other: () -> Expression<BVSort>) = BVAShr(this(), other())
 
 /*
  * bitvector comparison operators
