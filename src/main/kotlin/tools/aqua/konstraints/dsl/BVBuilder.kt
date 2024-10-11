@@ -476,120 +476,288 @@ infix fun (() -> Expression<BVSort>).bvsmod(other: Expression<BVSort>) = BVSMod(
  */
 infix fun (() -> Expression<BVSort>).bvsmod(other: () -> Expression<BVSort>) = BVSMod(this(), other())
 
+/**
+ * Implements arithmetic shift right operator.
+ *
+ * Shifts [this] by [distance]
+ */
 infix fun Expression<BVSort>.bvashr(distance: Expression<BVSort>) = BVAShr(this, distance)
 
-infix fun Expression<BVSort>.bvashr(other: () -> Expression<BVSort>) = BVAShr(this, other())
+/**
+ * Implements arithmetic shift right operator.
+ *
+ * Shifts [this] by [distance]
+ */
+infix fun Expression<BVSort>.bvashr(distance: () -> Expression<BVSort>) = BVAShr(this, distance())
 
-infix fun (() -> Expression<BVSort>).bvashr(other: Expression<BVSort>) = BVAShr(this(), other)
+/**
+ * Implements arithmetic shift right operator.
+ *
+ * Shifts [this] by [distance]
+ */
+infix fun (() -> Expression<BVSort>).bvashr(distance: Expression<BVSort>) = BVAShr(this(), distance)
 
-infix fun (() -> Expression<BVSort>).bvashr(other: () -> Expression<BVSort>) = BVAShr(this(), other())
+/**
+ * Implements arithmetic shift right operator.
+ *
+ * Shifts [this] by [distance]
+ */
+infix fun (() -> Expression<BVSort>).bvashr(distance: () -> Expression<BVSort>) = BVAShr(this(), distance())
 
 /*
  * bitvector comparison operators
  */
 
-infix fun Expression<BVSort>.bvult(distance: Expression<BVSort>) = BVUlt(this, distance)
+/**
+ * Unsigned less than operator for bitvectors: [this] < [other].
+ */
+infix fun Expression<BVSort>.bvult(other: Expression<BVSort>) = BVUlt(this, other)
 
+/**
+ * Unsigned less than operator for bitvectors: [this] < [other].
+ */
 infix fun Expression<BVSort>.bvult(other: () -> Expression<BVSort>) = BVUlt(this, other())
 
+/**
+ * Unsigned less than operator for bitvectors: [this] < [other].
+ */
 infix fun (() -> Expression<BVSort>).bvult(other: Expression<BVSort>) = BVUlt(this(), other)
 
+/**
+ * Unsigned less than operator for bitvectors: [this] < [other].
+ */
 infix fun (() -> Expression<BVSort>).bvult(other: () -> Expression<BVSort>) = BVUlt(this(), other())
 
-infix fun Expression<BVSort>.bvule(distance: Expression<BVSort>) = BVULe(this, distance)
+/**
+ * Unsigned less equals operator for bitvectors: [this] <= [other].
+ */
+infix fun Expression<BVSort>.bvule(other: Expression<BVSort>) = BVULe(this, other)
 
+/**
+ * Unsigned less equals operator for bitvectors: [this] <= [other].
+ */
 infix fun Expression<BVSort>.bvule(other: () -> Expression<BVSort>) = BVULe(this, other())
 
+/**
+ * Unsigned less equals operator for bitvectors: [this] <= [other].
+ */
 infix fun (() -> Expression<BVSort>).bvule(other: Expression<BVSort>) = BVULe(this(), other)
 
+/**
+ * Unsigned less equals operator for bitvectors: [this] <= [other].
+ */
 infix fun (() -> Expression<BVSort>).bvule(other: () -> Expression<BVSort>) = BVULe(this(), other())
 
-infix fun Expression<BVSort>.bvugt(distance: Expression<BVSort>) = BVUGt(this, distance)
+/**
+ * Unsigned greater than operator for bitvectors: [this] > [other].
+ */
+infix fun Expression<BVSort>.bvugt(other: Expression<BVSort>) = BVUGt(this, other)
 
+/**
+ * Unsigned greater than operator for bitvectors: [this] > [other].
+ */
 infix fun Expression<BVSort>.bvugt(other: () -> Expression<BVSort>) = BVUGt(this, other())
 
+/**
+ * Unsigned greater than operator for bitvectors: [this] > [other].
+ */
 infix fun (() -> Expression<BVSort>).bvugt(other: Expression<BVSort>) = BVUGt(this(), other)
 
+/**
+ * Unsigned greater than operator for bitvectors: [this] > [other].
+ */
 infix fun (() -> Expression<BVSort>).bvugt(other: () -> Expression<BVSort>) = BVUGt(this(), other())
 
-infix fun Expression<BVSort>.bvuge(distance: Expression<BVSort>) = BVUGe(this, distance)
+/**
+ * Unsigned greater equals operator for bitvectors: [this] >= [other].
+ */
+infix fun Expression<BVSort>.bvuge(other: Expression<BVSort>) = BVUGe(this, other)
 
+/**
+ * Unsigned greater equals operator for bitvectors: [this] >= [other].
+ */
 infix fun Expression<BVSort>.bvuge(other: () -> Expression<BVSort>) = BVUGe(this, other())
 
+/**
+ * Unsigned greater equals operator for bitvectors: [this] >= [other].
+ */
 infix fun (() -> Expression<BVSort>).bvuge(other: Expression<BVSort>) = BVUGe(this(), other)
 
+/**
+ * Unsigned greater equals operator for bitvectors: [this] >= [other].
+ */
 infix fun (() -> Expression<BVSort>).bvuge(other: () -> Expression<BVSort>) = BVUGe(this(), other())
 
-infix fun Expression<BVSort>.bvslt(distance: Expression<BVSort>) = BVSLt(this, distance)
+/**
+ * Signed less than operator for bitvectors: [this] >= [other].
+ */
+infix fun Expression<BVSort>.bvslt(other: Expression<BVSort>) = BVSLt(this, other)
 
+/**
+ * Signed less than operator for bitvectors: [this] >= [other].
+ */
 infix fun Expression<BVSort>.bvslt(other: () -> Expression<BVSort>) = BVSLt(this, other())
 
+/**
+ * Signed less than operator for bitvectors: [this] >= [other].
+ */
 infix fun (() -> Expression<BVSort>).bvslt(other: Expression<BVSort>) = BVSLt(this(), other)
 
+/**
+ * Signed less than operator for bitvectors: [this] >= [other].
+ */
 infix fun (() -> Expression<BVSort>).bvslt(other: () -> Expression<BVSort>) = BVSLt(this(), other())
 
-infix fun Expression<BVSort>.bvsle(distance: Expression<BVSort>) = BVSLe(this, distance)
+/**
+ * Signed less equals operator for bitvectors: [this] <= [other].
+ */
+infix fun Expression<BVSort>.bvsle(other: Expression<BVSort>) = BVSLe(this, other)
 
+/**
+ * Signed less equals operator for bitvectors: [this] <= [other].
+ */
 infix fun Expression<BVSort>.bvsle(other: () -> Expression<BVSort>) = BVSLe(this, other())
 
+/**
+ * Signed less equals operator for bitvectors: [this] <= [other].
+ */
 infix fun (() -> Expression<BVSort>).bvsle(other: Expression<BVSort>) = BVSLe(this(), other)
 
+/**
+ * Signed less equals operator for bitvectors: [this] <= [other].
+ */
 infix fun (() -> Expression<BVSort>).bvsle(other: () -> Expression<BVSort>) = BVSLe(this(), other())
 
-infix fun Expression<BVSort>.bvsgt(distance: Expression<BVSort>) = BVSGt(this, distance)
+/**
+ * Signed greater than operator for bitvectors: [this] > [other].
+ */
+infix fun Expression<BVSort>.bvsgt(other: Expression<BVSort>) = BVSGt(this, other)
 
+/**
+ * Signed greater than operator for bitvectors: [this] > [other].
+ */
 infix fun Expression<BVSort>.bvsgt(other: () -> Expression<BVSort>) = BVSGt(this, other())
 
+/**
+ * Signed greater than operator for bitvectors: [this] > [other].
+ */
 infix fun (() -> Expression<BVSort>).bvsgt(other: Expression<BVSort>) = BVSGt(this(), other)
 
+/**
+ * Signed greater than operator for bitvectors: [this] > [other].
+ */
 infix fun (() -> Expression<BVSort>).bvsgt(other: () -> Expression<BVSort>) = BVSGt(this(), other())
 
-infix fun Expression<BVSort>.bvsge(distance: Expression<BVSort>) = BVSGe(this, distance)
+/**
+ * Signed greater equals operator for bitvectors: [this] >= [other].
+ */
+infix fun Expression<BVSort>.bvsge(other: Expression<BVSort>) = BVSGe(this, other)
 
+/**
+ * Signed greater equals operator for bitvectors: [this] >= [other].
+ */
 infix fun Expression<BVSort>.bvsge(other: () -> Expression<BVSort>) = BVSGe(this, other())
 
+/**
+ * Signed greater equals operator for bitvectors: [this] >= [other].
+ */
 infix fun (() -> Expression<BVSort>).bvsge(other: Expression<BVSort>) = BVSGe(this(), other)
 
+/**
+ * Signed greater equals operator for bitvectors: [this] >= [other].
+ */
 infix fun (() -> Expression<BVSort>).bvsge(other: () -> Expression<BVSort>) = BVSGe(this(), other())
 
 /*
  * parameterized bitvector operations
  */
 
+/**
+ * Repeat the result of [block] [i]-times
+ */
 fun repeat(i: Int, block: () -> Expression<BVSort>) = Repeat(i, block())
 
+/**
+ * Repeat [expr] [i]-times
+ */
 fun repeat(i: Int, expr: Expression<BVSort>) = Repeat(i, expr)
 
+/**
+ * Extends the result of [block] to equivalent bitvector of size m+i.
+ */
 fun zeroExtend(i: Int, block: () -> Expression<BVSort>) = ZeroExtend(i, block())
 
+/**
+ * Extends [expr] to equivalent bitvector of size m+i.
+ */
 fun zeroExtend(i: Int, expr: Expression<BVSort>) = ZeroExtend(i, expr)
 
+/**
+ * Extends the result of [block] to equivalent signed bitvector of size m+i.
+ */
 fun signExtend(i: Int, block: () -> Expression<BVSort>) = SignExtend(i, block())
 
+/**
+ * Extends [expr] to equivalent signed bitvector of size m+i.
+ */
 fun signExtend(i: Int, expr: Expression<BVSort>) = SignExtend(i, expr)
 
+/**
+ * Rotates the result of [block] to the left [i]-times.
+ */
 fun rotateLeft(i: Int, block: () -> Expression<BVSort>) = RotateLeft(i, block())
 
+/**
+ * Rotates [expr] to the left [i]-times.
+ */
 fun rotateLeft(i: Int, expr: Expression<BVSort>) = RotateLeft(i, expr)
 
+/**
+ * Rotates the result of [block] to the right [i]-times.
+ */
 fun rotateRight(i: Int, block: () -> Expression<BVSort>) = RotateRight(i, block())
 
+/**
+ * Rotates [expr] to the right [i]-times.
+ */
 fun rotateRight(i: Int, expr: Expression<BVSort>) = RotateRight(i, expr)
 
+/**
+ * Extracts bits from [j] to [i] from the result of [block].
+ *
+ * This results in a bitvector of size [i] - [j] + 1. [i] and [j] are inclusive.
+ */
 fun extract(i: Int, j: Int, block: () -> Expression<BVSort>) = BVExtract(i, j, block())
 
+/**
+ * Extracts bits from [j] to [i] from [expr].
+ *
+ * This results in a bitvector of size [i] - [j] + 1. [i] and [j] are inclusive.
+ */
 fun extract(i: Int, j: Int, expr: Expression<BVSort>) = BVExtract(i, j, expr)
 
 /*
  * Unary bitvector operations
  */
 
+/**
+ * Bitwise negation operator
+ */
 fun bvnot(block: () -> Expression<BVSort>) = BVNot(block())
 
+/**
+ * Bitwise negation operator
+ */
 fun bvnot(expr: Expression<BVSort>) = BVNot(expr)
 
+/**
+ * 2's complement unary minus
+ */
 fun bvneg(block: () -> Expression<BVSort>) = BVNeg(block())
 
+/**
+ * 2's complement unary minus
+ */
 fun bvneg(expr: Expression<BVSort>) = BVNeg(expr)
 
 /*
@@ -613,12 +781,53 @@ private fun makeOperation(
 }
 
 // TODO add more options e.g. bvand(list: List<Expression>)
+
+/**
+ * Bitwise-and operator for BVSort Expressions.
+ *
+ * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
+ * If only a single subexpression is added, the expression is returned directly.
+ *
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ */
 fun bvand(init: Builder<BVSort>.() -> Unit) = makeOperation(init, ::BVAnd)
 
+/**
+ * Bitwise-or operator for BVSort Expressions.
+ *
+ * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
+ * If only a single subexpression is added, the expression is returned directly.
+ *
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ */
 fun bvor(init: Builder<BVSort>.() -> Unit) = makeOperation(init, ::BVOr)
 
+/**
+ * Addition operator for BVSort Expressions.
+ *
+ * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
+ * If only a single subexpression is added, the expression is returned directly.
+ *
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ */
 fun bvadd(init: Builder<BVSort>.() -> Unit) = makeOperation(init, ::BVAdd)
 
+/**
+ * Multiplication operator for BVSort Expressions.
+ *
+ * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
+ * If only a single subexpression is added, the expression is returned directly.
+ *
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ */
 fun bvmul(init: Builder<BVSort>.() -> Unit) = makeOperation(init, ::BVMul)
 
+/**
+ * Bitwise-xor operator for BVSort Expressions.
+ *
+ * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
+ * If only a single subexpression is added, the expression is returned directly.
+ *
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ */
 fun bvxor(init: Builder<BVSort>.() -> Unit) = makeOperation(init, ::BVXOr)
