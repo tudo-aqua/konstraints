@@ -24,18 +24,65 @@ import tools.aqua.konstraints.parser.FunctionDefinition
 import tools.aqua.konstraints.parser.SortedVar
 import tools.aqua.konstraints.smt.*
 
+/**
+ * Declares an SMT constant: (declare-const |const!sort!UUID| [sort])
+ *
+ * The name of the constant is automatically generated as '|const!sort!UUID|'
+ *
+ * @return [Const]
+ */
 fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T) =
     Const(sort, this, "|const!$sort!${UUID.randomUUID()}|")
 
+/**
+ * Declares an SMT constant: (declare-const [name] [sort])
+ *
+ * If the name is empty, the function automatically generates a name as '|const!sort!UUID|'
+ *
+ * @return [Const]
+ */
 fun <T : Sort> SMTProgramBuilder.declaringConst(sort: Sort, name: String) = Const(sort, this, name)
 
+/**
+ * Declares an SMT function without any parameters: (declare-fun symbol () [sort])
+ *
+ * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
+ * For functions of arity 0, prefer [declaringConst].
+ * The functions name will be the same as the variables name.
+ *
+ * @return an [SMTFunction] object with arity 0.
+ */
 fun <T : Sort> SMTProgramBuilder.declaring(sort: T) = Declare(sort, this)
 
+/**
+ * Declares an SMT function with one parameter: (declare-fun symbol ([par]) [sort])
+ *
+ * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
+ * The functions name will be the same as the variables name.
+ *
+ * @return an [SMTFunction] object with arity 1.
+ */
 fun <T : Sort, S : Sort> SMTProgramBuilder.declaring(sort: T, par: S) = Declare1(sort, par, this)
 
+/**
+ * Declares an SMT function with two parameters: (declare-fun symbol ([par1] [par2]) [sort])
+ *
+ * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
+ * The functions name will be the same as the variables name.
+ *
+ * @return an [SMTFunction] object with arity 2.
+ */
 fun <T : Sort, S1 : Sort, S2 : Sort> SMTProgramBuilder.declaring(sort: T, par1: S1, par2: S2) =
     Declare2(sort, par1, par2, this)
 
+/**
+ * Declares an SMT function with three parameters: (declare-fun symbol ([par1] [par2] [par3]) [sort])
+ *
+ * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
+ * The functions name will be the same as the variables name.
+ *
+ * @return an [SMTFunction] object with arity 3.
+ */
 fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort> SMTProgramBuilder.declaring(
     sort: T,
     par1: S1,
@@ -43,6 +90,14 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort> SMTProgramBuilder.declaring(
     par3: S3
 ) = Declare3(sort, par1, par2, par3, this)
 
+/**
+ * Declares an SMT function with four parameters: (declare-fun symbol ([par1] [par2] [par3] [par4]) [sort])
+ *
+ * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
+ * The functions name will be the same as the variables name.
+ *
+ * @return an [SMTFunction] object with arity 4.
+ */
 fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> SMTProgramBuilder.declaring(
     sort: T,
     par1: S1,
@@ -51,6 +106,14 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> SMTProgramBuilder.dec
     par4: S4
 ) = Declare4(sort, par1, par2, par3, par4, this)
 
+/**
+ * Declares an SMT function with five parameters: (declare-fun symbol ([par1] [par2] [par3] [par4] [par5]) [sort])
+ *
+ * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
+ * The functions name will be the same as the variables name.
+ *
+ * @return an [SMTFunction] object with arity 5.
+ */
 fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> SMTProgramBuilder.declaring(
     sort: T,
     par1: S1,
@@ -60,17 +123,41 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> SMTProgram
     par5: S5
 ) = Declare5(sort, par1, par2, par3, par4, par5, this)
 
+/**
+ * Define an SMT function: (define-fun symbol () [sort] [block])
+ *
+ * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
+ * The functions name will be the same as the variables name.
+ *
+ * @return an [SMTFunction] object with arity 0.
+ */
 fun <T : Sort> SMTProgramBuilder.defining(
     sort: T,
-    block: Builder<T>.(List<Expression<*>>) -> Expression<T>
+    block: (List<Expression<*>>) -> Expression<T>
 ) = Define(sort, block, this)
 
+/**
+ * Define an SMT function: (define-fun symbol ([par]) [sort] [block])
+ *
+ * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
+ * The functions name will be the same as the variables name.
+ *
+ * @return an [SMTFunction] object with arity 1.
+ */
 fun <T : Sort, S : Sort> SMTProgramBuilder.defining(
     sort: T,
     par: S,
-    block: Builder<T>.(Expression<S>) -> Expression<T>
+    block: (Expression<S>) -> Expression<T>
 ) = Define1(sort, block, par, this)
 
+/**
+ * Define an SMT function: (define-fun symbol ([par1] [par2]) [sort] [block])
+ *
+ * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
+ * The functions name will be the same as the variables name.
+ *
+ * @return an [SMTFunction] object with arity 2.
+ */
 fun <T : Sort, S1 : Sort, S2 : Sort> SMTProgramBuilder.defining(
     sort: T,
     par1: S1,
@@ -78,6 +165,14 @@ fun <T : Sort, S1 : Sort, S2 : Sort> SMTProgramBuilder.defining(
     block: Builder<T>.(Expression<S1>, Expression<S2>) -> Expression<T>
 ) = Define2(sort, block, par1, par2, this)
 
+/**
+ * Define an SMT function: (define-fun symbol ([par1] [par2] [par3]) [sort] [block])
+ *
+ * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
+ * The functions name will be the same as the variables name.
+ *
+ * @return an [SMTFunction] object with arity 3.
+ */
 fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort> SMTProgramBuilder.defining(
     sort: T,
     par1: S1,
@@ -86,6 +181,14 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort> SMTProgramBuilder.defining(
     block: Builder<T>.(Expression<S1>, Expression<S2>, Expression<S3>) -> Expression<T>
 ) = Define3(sort, block, par1, par2, par3, this)
 
+/**
+ * Define an SMT function: (define-fun symbol ([par1] [par2] [par3] [par4]) [sort] [block])
+ *
+ * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
+ * The functions name will be the same as the variables name.
+ *
+ * @return an [SMTFunction] object with arity 4.
+ */
 fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> SMTProgramBuilder.defining(
     sort: T,
     par1: S1,
@@ -96,6 +199,14 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> SMTProgramBuilder.def
         Builder<T>.(Expression<S1>, Expression<S2>, Expression<S3>, Expression<S4>) -> Expression<T>
 ) = Define4(sort, block, par1, par2, par3, par4, this)
 
+/**
+ * Define an SMT function: (define-fun symbol ([par1] [par2] [par3] [par4] [par5]) [sort] [block])
+ *
+ * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
+ * The functions name will be the same as the variables name.
+ *
+ * @return an [SMTFunction] object with arity 5.
+ */
 fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> SMTProgramBuilder.defining(
     sort: T,
     par1: S1,
@@ -112,6 +223,13 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> SMTProgram
             Expression<S5>) -> Expression<T>
 ) = Define5(sort, block, par1, par2, par3, par4, par5, this)
 
+/**
+ * Delegate class for declaring SMT constants: (declare-const [name] [sort]).
+ *
+ * Registers the function in the given [program].
+ *
+ * @return [UserDeclaredExpression]
+ */
 class Const<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: String) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): Expression<T> {
     program.registerFun(name, sort, emptyList())
@@ -119,6 +237,14 @@ class Const<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: Str
   }
 }
 
+/**
+ * Delegate class for declaring SMT functions of any arity: (declare-fun [name] ([parameters]) [sort]).
+ *
+ * Registers the function in the given [program].
+ * If [name] is empty, the name register will be the same as the variable.
+ *
+ * @return [SMTFunction]
+ */
 class Declare<T : Sort>(
     val sort: T,
     val program: SMTProgramBuilder,
@@ -126,13 +252,21 @@ class Declare<T : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction<T> {
-    val n = name.ifEmpty { "|${thisRef.toString()}|" }
+    val n = name.ifEmpty { "|$thisRef|" }
 
     program.registerFun(n, sort, parameters)
     return SMTFunction(n.symbol(), sort, parameters, null)
   }
 }
 
+/**
+ * Delegate class for declaring SMT functions: (declare-fun [name] ([par]) [sort]).
+ *
+ * Registers the function in the given [program].
+ * If [name] is empty, the name register will be the same as the variable.
+ *
+ * @return [SMTFunction]
+ */
 class Declare1<T : Sort, S : Sort>(
     val sort: T,
     val par: S,
@@ -140,13 +274,21 @@ class Declare1<T : Sort, S : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction1<T, S> {
-    val n = name.ifEmpty { "|${thisRef.toString()}|" }
+    val n = name.ifEmpty { "|$thisRef|" }
 
     program.registerFun(n, sort, listOf(par))
     return SMTFunction1(n.symbol(), sort, par, null)
   }
 }
 
+/**
+ * Delegate class for declaring SMT functions: (declare-fun [name] ([par1] [par2]) [sort]).
+ *
+ * Registers the function in the given [program].
+ * If [name] is empty, the name register will be the same as the variable.
+ *
+ * @return [SMTFunction]
+ */
 class Declare2<T : Sort, S1 : Sort, S2 : Sort>(
     val sort: T,
     val par1: S1,
@@ -155,13 +297,21 @@ class Declare2<T : Sort, S1 : Sort, S2 : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction2<T, S1, S2> {
-    val n = name.ifEmpty { "|${thisRef.toString()}|" }
+    val n = name.ifEmpty { "|$thisRef|" }
 
     program.registerFun(n, sort, listOf(par1, par2))
     return SMTFunction2(n.symbol(), sort, par1, par2, null)
   }
 }
 
+/**
+ * Delegate class for declaring SMT functions: (declare-fun [name] ([par1] [par2] [par3]) [sort]).
+ *
+ * Registers the function in the given [program].
+ * If [name] is empty, the name register will be the same as the variable.
+ *
+ * @return [SMTFunction]
+ */
 class Declare3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val sort: T,
     val par1: S1,
@@ -171,13 +321,21 @@ class Declare3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction3<T, S1, S2, S3> {
-    val n = name.ifEmpty { "|${thisRef.toString()}|" }
+    val n = name.ifEmpty { "|$thisRef|" }
 
     program.registerFun(n, sort, listOf(par1, par2, par3))
     return SMTFunction3(n.symbol(), sort, par1, par2, par3, null)
   }
 }
 
+/**
+ * Delegate class for declaring SMT functions: (declare-fun [name] ([par1] [par2] [par3] [par4]) [sort]).
+ *
+ * Registers the function in the given [program].
+ * If [name] is empty, the name register will be the same as the variable.
+ *
+ * @return [SMTFunction]
+ */
 class Declare4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val sort: T,
     val par1: S1,
@@ -188,13 +346,21 @@ class Declare4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction4<T, S1, S2, S3, S4> {
-    val n = name.ifEmpty { "|${thisRef.toString()}|" }
+    val n = name.ifEmpty { "|$thisRef|" }
 
     program.registerFun(n, sort, listOf(par1, par2, par3, par4))
     return SMTFunction4(n.symbol(), sort, par1, par2, par3, par4, null)
   }
 }
 
+/**
+ * Delegate class for declaring SMT functions: (declare-fun [name] ([par1] [par2] [par3] [par4] [par5]) [sort]).
+ *
+ * Registers the function in the given [program].
+ * If [name] is empty, the name register will be the same as the variable.
+ *
+ * @return [SMTFunction]
+ */
 class Declare5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
     val sort: T,
     val par1: S1,
@@ -209,27 +375,35 @@ class Declare5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
       thisRef: Any?,
       property: KProperty<*>
   ): SMTFunction5<T, S1, S2, S3, S4, S5> {
-    val n = name.ifEmpty { "|${thisRef.toString()}|" }
+    val n = name.ifEmpty { "|$thisRef|" }
 
     program.registerFun(n, sort, listOf(par1, par2, par3, par4, par5))
     return SMTFunction5(n.symbol(), sort, par1, par2, par3, par4, par5, null)
   }
 }
 
+/**
+ * Delegate class for defining SMT functions of any arity: (define-fun [name] ([parameters]) [sort] [block]).
+ *
+ * Registers the function in the given [program].
+ * If [name] is empty, the name register will be the same as the variable.
+ *
+ * @return [SMTFunction]
+ */
 class Define<T : Sort>(
     val sort: T,
-    val block: Builder<T>.(List<Expression<Sort>>) -> Expression<T>,
+    val block: (List<Expression<Sort>>) -> Expression<T>,
     val program: SMTProgramBuilder,
     val parameters: List<Sort> = emptyList(),
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction<T> {
-    val n = name.ifEmpty { "|${thisRef.toString()}|" }
+    val n = name.ifEmpty { "|$thisRef|" }
     val sortedVars =
         parameters.mapIndexed { id, sort ->
-          SortedVar("|${thisRef.toString()}!local!$sort!$id|".symbol(), sort)
+          SortedVar("|$thisRef!local!$sort!$id|".symbol(), sort)
         }
-    val term = Builder<T>().block(sortedVars.map { it.instance })
+    val term = block(sortedVars.map { it.instance })
 
     program.registerFun(n, sort, sortedVars, term)
     return SMTFunction(
@@ -237,17 +411,25 @@ class Define<T : Sort>(
   }
 }
 
+/**
+ * Delegate class for defining SMT functions: (define-fun [name] ([par]) [sort] [block]).
+ *
+ * Registers the function in the given [program].
+ * If [name] is empty, the name register will be the same as the variable.
+ *
+ * @return [SMTFunction]
+ */
 class Define1<T : Sort, S : Sort>(
     val sort: T,
-    val block: Builder<T>.(Expression<S>) -> Expression<T>,
+    val block: (Expression<S>) -> Expression<T>,
     val par: S,
     val program: SMTProgramBuilder,
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction1<T, S> {
-    val n = name.ifEmpty { "|${thisRef.toString()}|" }
-    val sortedVar = SortedVar("|${thisRef.toString()}!local!$par!1|".symbol(), par)
-    val term = Builder<T>().block(sortedVar.instance)
+    val n = name.ifEmpty { "|$thisRef|" }
+    val sortedVar = SortedVar("|$thisRef!local!$par!1|".symbol(), par)
+    val term = block(sortedVar.instance)
 
     program.registerFun(n, sort, listOf(sortedVar), term)
     return SMTFunction1(
@@ -255,6 +437,14 @@ class Define1<T : Sort, S : Sort>(
   }
 }
 
+/**
+ * Delegate class for defining SMT functions: (define-fun [name] ([par1] [par2]) [sort] [block]).
+ *
+ * Registers the function in the given [program].
+ * If [name] is empty, the name register will be the same as the variable.
+ *
+ * @return [SMTFunction]
+ */
 class Define2<T : Sort, S1 : Sort, S2 : Sort>(
     val sort: T,
     val block: Builder<T>.(Expression<S1>, Expression<S2>) -> Expression<T>,
@@ -264,9 +454,9 @@ class Define2<T : Sort, S1 : Sort, S2 : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction2<T, S1, S2> {
-    val n = name.ifEmpty { "|${thisRef.toString()}|" }
-    val sortedVar1 = SortedVar("|${thisRef.toString()}!local!$par1!1|".symbol(), par1)
-    val sortedVar2 = SortedVar("|${thisRef.toString()}!local!$par2!2|".symbol(), par2)
+    val n = name.ifEmpty { "|$thisRef|" }
+    val sortedVar1 = SortedVar("|$thisRef!local!$par1!1|".symbol(), par1)
+    val sortedVar2 = SortedVar("|$thisRef!local!$par2!2|".symbol(), par2)
     val term = Builder<T>().block(sortedVar1.instance, sortedVar2.instance)
 
     program.registerFun(n, sort, listOf(sortedVar1, sortedVar2), term)
@@ -280,6 +470,14 @@ class Define2<T : Sort, S1 : Sort, S2 : Sort>(
   }
 }
 
+/**
+ * Delegate class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3]) [sort] [block]).
+ *
+ * Registers the function in the given [program].
+ * If [name] is empty, the name register will be the same as the variable.
+ *
+ * @return [SMTFunction]
+ */
 class Define3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val sort: T,
     val block: Builder<T>.(Expression<S1>, Expression<S2>, Expression<S3>) -> Expression<T>,
@@ -290,10 +488,10 @@ class Define3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction3<T, S1, S2, S3> {
-    val n = name.ifEmpty { "|${thisRef.toString()}|" }
-    val sortedVar1 = SortedVar("|${thisRef.toString()}!local!$par1!1|".symbol(), par1)
-    val sortedVar2 = SortedVar("|${thisRef.toString()}!local!$par2!2|".symbol(), par2)
-    val sortedVar3 = SortedVar("|${thisRef.toString()}!local!$par3!3|".symbol(), par3)
+    val n = name.ifEmpty { "|$thisRef|" }
+    val sortedVar1 = SortedVar("|$thisRef!local!$par1!1|".symbol(), par1)
+    val sortedVar2 = SortedVar("|$thisRef!local!$par2!2|".symbol(), par2)
+    val sortedVar3 = SortedVar("|$thisRef!local!$par3!3|".symbol(), par3)
     val term = Builder<T>().block(sortedVar1.instance, sortedVar2.instance, sortedVar3.instance)
 
     program.registerFun(n, sort, listOf(sortedVar1, sortedVar2, sortedVar3), term)
@@ -308,6 +506,14 @@ class Define3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
   }
 }
 
+/**
+ * Delegate class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3] [par4]) [sort] [block]).
+ *
+ * Registers the function in the given [program].
+ * If [name] is empty, the name register will be the same as the variable.
+ *
+ * @return [SMTFunction]
+ */
 class Define4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val sort: T,
     val block:
@@ -321,11 +527,11 @@ class Define4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction4<T, S1, S2, S3, S4> {
-    val n = name.ifEmpty { "|${thisRef.toString()}|" }
-    val sortedVar1 = SortedVar("|${thisRef.toString()}!local!$par1!1|".symbol(), par1)
-    val sortedVar2 = SortedVar("|${thisRef.toString()}!local!$par2!2|".symbol(), par2)
-    val sortedVar3 = SortedVar("|${thisRef.toString()}!local!$par3!3|".symbol(), par3)
-    val sortedVar4 = SortedVar("|${thisRef.toString()}!local!$par4!4|".symbol(), par4)
+    val n = name.ifEmpty { "|$thisRef|" }
+    val sortedVar1 = SortedVar("|$thisRef!local!$par1!1|".symbol(), par1)
+    val sortedVar2 = SortedVar("|$thisRef!local!$par2!2|".symbol(), par2)
+    val sortedVar3 = SortedVar("|$thisRef!local!$par3!3|".symbol(), par3)
+    val sortedVar4 = SortedVar("|$thisRef!local!$par4!4|".symbol(), par4)
     val term =
         Builder<T>()
             .block(
@@ -345,6 +551,14 @@ class Define4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
   }
 }
 
+/**
+ * Delegate class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3] [par4] [par5]) [sort] [block]).
+ *
+ * Registers the function in the given [program].
+ * If [name] is empty, the name register will be the same as the variable.
+ *
+ * @return [SMTFunction]
+ */
 class Define5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
     val sort: T,
     val block:
@@ -366,12 +580,12 @@ class Define5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
       thisRef: Any?,
       property: KProperty<*>
   ): SMTFunction5<T, S1, S2, S3, S4, S5> {
-    val n = name.ifEmpty { "|${thisRef.toString()}|" }
-    val sortedVar1 = SortedVar("|${thisRef.toString()}!local!$par1!1|".symbol(), par1)
-    val sortedVar2 = SortedVar("|${thisRef.toString()}!local!$par2!2|".symbol(), par2)
-    val sortedVar3 = SortedVar("|${thisRef.toString()}!local!$par3!3|".symbol(), par3)
-    val sortedVar4 = SortedVar("|${thisRef.toString()}!local!$par4!4|".symbol(), par4)
-    val sortedVar5 = SortedVar("|${thisRef.toString()}!local!$par5!5|".symbol(), par5)
+    val n = name.ifEmpty { "|$thisRef|" }
+    val sortedVar1 = SortedVar("|$thisRef!local!$par1!1|".symbol(), par1)
+    val sortedVar2 = SortedVar("|$thisRef!local!$par2!2|".symbol(), par2)
+    val sortedVar3 = SortedVar("|$thisRef!local!$par3!3|".symbol(), par3)
+    val sortedVar4 = SortedVar("|$thisRef!local!$par4!4|".symbol(), par4)
+    val sortedVar5 = SortedVar("|$thisRef!local!$par5!5|".symbol(), par5)
     val term =
         Builder<T>()
             .block(
@@ -400,6 +614,11 @@ class Define5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
   }
 }
 
+/**
+ * SMTFunction of any arity.
+ *
+ * Use [invoke] to generate an expression with the given parameters applied.
+ */
 data class SMTFunction<T : Sort>(
     val name: Symbol,
     val sort: T,
@@ -417,6 +636,11 @@ data class SMTFunction<T : Sort>(
   }
 }
 
+/**
+ * SMTFunction of arity 1.
+ *
+ * Use [invoke] to generate an expression with the given parameters applied.
+ */
 data class SMTFunction1<T : Sort, S : Sort>(
     val name: Symbol,
     val sort: T,
@@ -432,6 +656,11 @@ data class SMTFunction1<T : Sort, S : Sort>(
   }
 }
 
+/**
+ * SMTFunction of arity 2.
+ *
+ * Use [invoke] to generate an expression with the given parameters applied.
+ */
 data class SMTFunction2<T : Sort, S1 : Sort, S2 : Sort>(
     val name: Symbol,
     val sort: T,
@@ -448,6 +677,11 @@ data class SMTFunction2<T : Sort, S1 : Sort, S2 : Sort>(
   }
 }
 
+/**
+ * SMTFunction of arity 3.
+ *
+ * Use [invoke] to generate an expression with the given parameters applied.
+ */
 data class SMTFunction3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val name: Symbol,
     val sort: T,
@@ -469,6 +703,11 @@ data class SMTFunction3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
   }
 }
 
+/**
+ * SMTFunction of arity 4.
+ *
+ * Use [invoke] to generate an expression with the given parameters applied.
+ */
 data class SMTFunction4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val name: Symbol,
     val sort: T,
@@ -492,6 +731,11 @@ data class SMTFunction4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
   }
 }
 
+/**
+ * SMTFunction of arity 5.
+ *
+ * Use [invoke] to generate an expression with the given parameters applied.
+ */
 data class SMTFunction5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
     val name: Symbol,
     val sort: T,
