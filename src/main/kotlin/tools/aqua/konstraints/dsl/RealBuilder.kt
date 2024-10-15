@@ -22,14 +22,14 @@ import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.theories.*
 
 /**
- * Negation operator for RealSort Expressions
+ * Negation operator for RealSort Expressions.
  */
 operator fun Expression<RealSort>.unaryMinus() = RealNeg(this)
 
 /**
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
- * If [this] is an [RealSub] object, unpacks the children and returns a new combined RealSub
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined RealSub.
  */
 infix operator fun Expression<RealSort>.minus(subtrahend: Expression<RealSort>) =
     if (this is RealSub) {
@@ -41,28 +41,28 @@ infix operator fun Expression<RealSort>.minus(subtrahend: Expression<RealSort>) 
 /**
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
- * If [this] is an [RealSub] object, unpacks the children and returns a new combined RealSub
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined RealSub.
  */
 infix fun Expression<RealSort>.minus(subtrahend: () -> Expression<RealSort>) = this minus subtrahend()
 
 /**
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
- * If [this] is an [RealSub] object, unpacks the children and returns a new combined RealSub
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined RealSub.
  */
 infix fun (() -> Expression<RealSort>).minus(subtrahend: Expression<RealSort>) = this() minus subtrahend
 
 /**
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
- * If [this] is an [RealSub] object, unpacks the children and returns a new combined RealSub
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined RealSub.
  */
 infix fun (() -> Expression<RealSort>).minus(subtrahend: () -> Expression<RealSort>) = this() minus subtrahend()
 
 /**
  * Addition operator for RealSort Expressions: [this] + [summand].
  *
- * If [this] is an [RealAdd] object, unpacks the children and returns a new combined RealAdd
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined RealAdd.
  */
 infix operator fun Expression<RealSort>.plus(summand: Expression<RealSort>) =
     if (this is RealAdd) {
@@ -75,28 +75,28 @@ infix operator fun Expression<RealSort>.plus(summand: Expression<RealSort>) =
 /**
  * Addition operator for RealSort Expressions: [this] + [summand].
  *
- * If [this] is an [RealAdd] object, unpacks the children and returns a new combined RealAdd
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined RealAdd.
  */
 infix fun Expression<RealSort>.plus(summand: () -> Expression<RealSort>) = this plus summand()
 
 /**
  * Addition operator for RealSort Expressions: [this] + [summand].
  *
- * If [this] is an [RealAdd] object, unpacks the children and returns a new combined RealAdd
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined RealAdd.
  */
 infix fun (() -> Expression<RealSort>).plus(summand: Expression<RealSort>) = this() plus summand
 
 /**
  * Addition operator for RealSort Expressions: [this] + [summand].
  *
- * If [this] is an [RealAdd] object, unpacks the children and returns a new combined RealAdd
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined RealAdd.
  */
 infix fun (() -> Expression<RealSort>).plus(summand: () -> Expression<RealSort>) = this() plus summand()
 
 /**
  * Multiplication operator for RealSort Expressions: [this] * [multiplicand].
  *
- * If [this] is an [RealMul] object, unpacks the children and returns a new combined RealMul
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined RealMul.
  */
 infix operator fun Expression<RealSort>.times(multiplicand: Expression<RealSort>) =
     if (this is RealMul) {
@@ -108,28 +108,28 @@ infix operator fun Expression<RealSort>.times(multiplicand: Expression<RealSort>
 /**
  * Multiplication operator for RealSort Expressions: [this] * [multiplicand].
  *
- * If [this] is an [RealMul] object, unpacks the children and returns a new combined RealMul
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined RealMul.
  */
 infix fun Expression<RealSort>.times(multiplicand: () -> Expression<RealSort>) = this times multiplicand()
 
 /**
  * Multiplication operator for RealSort Expressions: [this] * [multiplicand].
  *
- * If [this] is an [RealMul] object, unpacks the children and returns a new combined RealMul
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined RealMul.
  */
 infix fun (() -> Expression<RealSort>).times(multiplicand: Expression<RealSort>) = this() times multiplicand
 
 /**
  * Multiplication operator for RealSort Expressions: [this] * [multiplicand].
  *
- * If [this] is an [RealMul] object, unpacks the children and returns a new combined RealMul
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined RealMul.
  */
 infix fun (() -> Expression<RealSort>).times(multiplicand: () -> Expression<RealSort>) = this() times multiplicand()
 
 /**
  * Division operator for RealSort Expressions: [this] / [divisor].
  *
- * If [this] is an [RealDiv] object, unpacks the children and returns a new combined RealMul
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined RealMul.
  */
 infix operator fun Expression<RealSort>.div(divisor: Expression<RealSort>) =
     if (this is RealDiv) {
@@ -141,21 +141,21 @@ infix operator fun Expression<RealSort>.div(divisor: Expression<RealSort>) =
 /**
  * Division operator for RealSort Expressions: [this] / [divisor].
  *
- * If [this] is an [RealDiv] object, unpacks the children and returns a new combined RealMul
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined RealMul.
  */
 infix fun Expression<RealSort>.div(divisor: () -> Expression<RealSort>) = this div divisor()
 
 /**
  * Division operator for RealSort Expressions: [this] / [divisor].
  *
- * If [this] is an [RealDiv] object, unpacks the children and returns a new combined RealMul
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined RealMul.
  */
 infix fun (() -> Expression<RealSort>).div(divisor: Expression<RealSort>) = this() div divisor
 
 /**
  * Division operator for RealSort Expressions: [this] / [divisor].
  *
- * If [this] is an [RealDiv] object, unpacks the children and returns a new combined RealMul
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined RealMul.
  */
 infix fun (() -> Expression<RealSort>).div(divisor: () -> Expression<RealSort>) = this() div divisor()
 
@@ -301,7 +301,7 @@ private fun makeRealOperator(
  * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
  * If only a single subexpression is added, the expression is returned directly.
  *
- * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda.
  */
 fun realadd(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealAdd)
 
@@ -311,7 +311,7 @@ fun realadd(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealA
  * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
  * If only a single subexpression is added, the expression is returned directly.
  *
- * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda.
  */
 fun realsub(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealSub)
 
@@ -321,7 +321,7 @@ fun realsub(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealS
  * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
  * If only a single subexpression is added, the expression is returned directly.
  *
- * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda.
  */
 fun realmul(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealMul)
 
@@ -331,22 +331,22 @@ fun realmul(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealM
  * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
  * If only a single subexpression is added, the expression is returned directly.
  *
- * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda.
  */
 fun realdiv(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealDiv)
 
 /**
- * Casting operator from RealSort to RealSort
+ * Casting operator from RealSort to RealSort.
  */
 fun toReal(block: () -> Expression<IntSort>) = ToReal(block())
 
 /**
- * Casting operator from RealSort to RealSort
+ * Casting operator from RealSort to RealSort.
  */
 fun toReal(expr: Expression<IntSort>) = ToReal(expr)
 
-/** Implements smt is_int operation */
+/** Implements smt is_int operation. */
 fun isInt(expr: Expression<RealSort>) = IsInt(expr)
 
-/** Implements smt is_int operation */
+/** Implements smt is_int operation. */
 fun isInt(block: () -> Expression<RealSort>) = IsInt(block())

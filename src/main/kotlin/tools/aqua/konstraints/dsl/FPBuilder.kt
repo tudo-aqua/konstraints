@@ -708,17 +708,17 @@ infix fun Expression<FPSort>.fprem(divisor: Expression<FPSort>) = FPRem(this, di
 /**
  * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to [this]/[divisor].
  */
-infix fun Expression<FPSort>.fprem(rhs: () -> Expression<FPSort>) = FPRem(this, rhs())
+infix fun Expression<FPSort>.fprem(divisor: () -> Expression<FPSort>) = FPRem(this, divisor())
 
 /**
  * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to [this]/[divisor].
  */
-infix fun (() -> Expression<FPSort>).fprem(rhs: Expression<FPSort>) = FPRem(this(), rhs)
+infix fun (() -> Expression<FPSort>).fprem(divisor: Expression<FPSort>) = FPRem(this(), divisor)
 
 /**
  * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to [this]/[divisor].
  */
-infix fun (() -> Expression<FPSort>).fprem(rhs: () -> Expression<FPSort>) = FPRem(this(), rhs())
+infix fun (() -> Expression<FPSort>).fprem(divisor: () -> Expression<FPSort>) = FPRem(this(), divisor())
 
 /*
  * unary floating-point operations
@@ -1215,9 +1215,9 @@ fun Expression<FPSort>.toReal() = FPToReal(this)
 
 /**
  * Fused multiplication addition operator ([multiplier] * multiplicand + summand) for FPSort expressions.
- * Must be followed by [FPFMA1.mul] and [FPFMA2.add]
+ * Must be followed by [FPFMA1.mul] and [FPFMA2.add].
  *
- * @param roundingMode: floating point rounding mode
+ * @param roundingMode: floating point rounding mode.
  */
 fun fpfma(
     roundingMode: Expression<RoundingMode> = RNE,
@@ -1226,9 +1226,9 @@ fun fpfma(
 
 /**
  * Fused multiplication addition operator ([multiplier] * multiplicand + summand) for FPSort expressions.
- * Must be followed by [FPFMA1.mul] and [FPFMA2.add]
+ * Must be followed by [FPFMA1.mul] and [FPFMA2.add].
  *
- * @param roundingMode: floating point rounding mode
+ * @param roundingMode: floating point rounding mode.
  */
 fun fpfma(
     roundingMode: Expression<RoundingMode> = RNE,
@@ -1236,15 +1236,18 @@ fun fpfma(
 ) = FPFMA1(roundingMode, multiplier)
 
 class FPFMA1(val roundingMode: Expression<RoundingMode>, val multiplier: Expression<FPSort>) {
+
     /**
      * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort expressions.
-     * Must be followed by [FPFMA2.add]
+     *
+     * Must be followed by [FPFMA2.add].
      */
   infix fun mul(multiplicand: Expression<FPSort>) = FPFMA2(roundingMode, multiplier, multiplicand)
 
     /**
      * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort expressions.
-     * Must be followed by [FPFMA2.add]
+     *
+     * Must be followed by [FPFMA2.add].
      */
   infix fun mul(multiplicand: () -> Expression<FPSort>) = FPFMA2(roundingMode, multiplier, multiplicand())
 }
@@ -1254,6 +1257,7 @@ class FPFMA2(
     val multiplier: Expression<FPSort>,
     val multiplicand: Expression<FPSort>
 ) {
+
     /**
      * Fused multiplication addition operator (multiplier * multiplicand +  [summand]) for FPSort expressions.
      */

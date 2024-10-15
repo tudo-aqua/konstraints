@@ -348,7 +348,7 @@ infix fun (() -> Expression<BVSort>).bvxor(other: Expression<BVSort>) = BVXOr(th
 infix fun (() -> Expression<BVSort>).bvxor(other: () -> Expression<BVSort>) = BVXOr(this(), other())
 
 /**
- * Implements a bitwise xnor operation: [this] xnor [other].
+ * Implements a bitwise xnor operation: [this] xnor [rhs].
  *
  * If [this] is a [BVXNOr] object, unpacks the children and returns a new combined BVXNor.
  */
@@ -377,130 +377,130 @@ infix fun (() -> Expression<BVSort>).bvxnor(other: () -> Expression<BVSort>) =
     BVXNOr(this(), other())
 
 /**
- * Implements bitwise comparison operator: [this] bvcomp [other]
+ * Implements bitwise comparison operator: [this] bvcomp [other].
  */
 infix fun Expression<BVSort>.bvcomp(other: Expression<BVSort>) = BVComp(this, other)
 
 /**
- * Implements bitwise comparison operator: [this] bvcomp [other]
+ * Implements bitwise comparison operator: [this] bvcomp [other].
  */
 infix fun Expression<BVSort>.bvcomp(other: () -> Expression<BVSort>) = BVComp(this, other())
 
 /**
- * Implements bitwise comparison operator: [this] bvcomp [other]
+ * Implements bitwise comparison operator: [this] bvcomp [other].
  */
 infix fun (() -> Expression<BVSort>).bvcomp(other: Expression<BVSort>) = BVComp(this(), other)
 
 /**
- * Implements bitwise comparison operator: [this] bvcomp [other]
+ * Implements bitwise comparison operator: [this] bvcomp [other].
  */
 infix fun (() -> Expression<BVSort>).bvcomp(other: () -> Expression<BVSort>) = BVComp(this(), other())
 
 /**
- * Implements bitvector subtraction operator: [this] - [subtrahend]
+ * Implements bitvector subtraction operator: [this] - [subtrahend].
  */
 infix fun Expression<BVSort>.bvsub(subtrahend: Expression<BVSort>) = BVSub(this, subtrahend)
 
 /**
- * Implements bitvector subtraction operator: [this] - [subtrahend]
+ * Implements bitvector subtraction operator: [this] - [subtrahend].
  */
 infix fun Expression<BVSort>.bvsub(subtrahend: () -> Expression<BVSort>) = BVSub(this, subtrahend())
 
 /**
- * Implements bitvector subtraction operator: [this] - [subtrahend]
+ * Implements bitvector subtraction operator: [this] - [subtrahend].
  */
 infix fun (() -> Expression<BVSort>).bvsub(subtrahend: Expression<BVSort>) = BVSub(this(), subtrahend)
 
 /**
- * Implements bitvector subtraction operator: [this] - [subtrahend]
+ * Implements bitvector subtraction operator: [this] - [subtrahend].
  */
 infix fun (() -> Expression<BVSort>).bvsub(subtrahend: () -> Expression<BVSort>) = BVSub(this(), subtrahend())
 
 /**
- * Implements bitvector signed division operator: [this]/[denominator]
+ * Implements bitvector signed division operator: [this]/[denominator].
  */
 infix fun Expression<BVSort>.bvsdiv(denominator: Expression<BVSort>) = BVSDiv(this, denominator)
 
 /**
- * Implements bitvector signed division operator: [this]/[denominator]
+ * Implements bitvector signed division operator: [this]/[denominator].
  */
 infix fun Expression<BVSort>.bvsdiv(denominator: () -> Expression<BVSort>) = BVSDiv(this, denominator())
 
 /**
- * Implements bitvector signed division operator: [this]/[denominator]
+ * Implements bitvector signed division operator: [this]/[denominator].
  */
 infix fun (() -> Expression<BVSort>).bvsdiv(denominator: Expression<BVSort>) = BVSDiv(this(), denominator)
 
 /**
- * Implements bitvector signed division operator: [this]/[denominator]
+ * Implements bitvector signed division operator: [this]/[denominator].
  */
 infix fun (() -> Expression<BVSort>).bvsdiv(denominator: () -> Expression<BVSort>) = BVSDiv(this(), denominator())
 
 /**
- * Implements bitvector signed remainder operator: [this]/[denominator]
+ * Implements bitvector signed remainder operator: [this]/[denominator].
  */
 infix fun Expression<BVSort>.bvsrem(denominator: Expression<BVSort>) = BVSRem(this, denominator)
 
 /**
- * Implements bitvector signed remainder operator: [this]/[denominator]
+ * Implements bitvector signed remainder operator: [this]/[denominator].
  */
 infix fun Expression<BVSort>.bvsrem(denominator: () -> Expression<BVSort>) = BVSRem(this, denominator())
 
 /**
- * Implements bitvector signed remainder operator: [this]/[denominator]
+ * Implements bitvector signed remainder operator: [this]/[denominator].
  */
 infix fun (() -> Expression<BVSort>).bvsrem(denominator: Expression<BVSort>) = BVSRem(this(), denominator)
 
 /**
- * Implements bitvector signed remainder operator: [this]/[denominator]
+ * Implements bitvector signed remainder operator: [this]/[denominator].
  */
 infix fun (() -> Expression<BVSort>).bvsrem(denominator: () -> Expression<BVSort>) = BVSRem(this(), denominator())
 
 /**
- * Implements bitvector signed modulo operator: [this]/[other]
+ * Implements bitvector signed modulo operator: [this]/[other].
  */
 infix fun Expression<BVSort>.bvsmod(other: Expression<BVSort>) = BVSMod(this, other)
 
 /**
- * Implements bitvector signed modulo operator: [this]/[other]
+ * Implements bitvector signed modulo operator: [this]/[other].
  */
 infix fun Expression<BVSort>.bvsmod(other: () -> Expression<BVSort>) = BVSMod(this, other())
 
 /**
- * Implements bitvector signed modulo operator: [this]/[other]
+ * Implements bitvector signed modulo operator: [this]/[other].
  */
 infix fun (() -> Expression<BVSort>).bvsmod(other: Expression<BVSort>) = BVSMod(this(), other)
 
 /**
- * Implements bitvector signed modulo operator: [this]/[other]
+ * Implements bitvector signed modulo operator: [this]/[other].
  */
 infix fun (() -> Expression<BVSort>).bvsmod(other: () -> Expression<BVSort>) = BVSMod(this(), other())
 
 /**
  * Implements arithmetic shift right operator.
  *
- * Shifts [this] by [distance]
+ * Shifts [this] by [distance] to the right.
  */
 infix fun Expression<BVSort>.bvashr(distance: Expression<BVSort>) = BVAShr(this, distance)
 
 /**
  * Implements arithmetic shift right operator.
  *
- * Shifts [this] by [distance]
+ * Shifts [this] by [distance] to the right.
  */
 infix fun Expression<BVSort>.bvashr(distance: () -> Expression<BVSort>) = BVAShr(this, distance())
 
 /**
  * Implements arithmetic shift right operator.
  *
- * Shifts [this] by [distance]
+ * Shifts [this] by [distance] to the right.
  */
 infix fun (() -> Expression<BVSort>).bvashr(distance: Expression<BVSort>) = BVAShr(this(), distance)
 
 /**
  * Implements arithmetic shift right operator.
  *
- * Shifts [this] by [distance]
+ * Shifts [this] by [distance] to the right.
  */
 infix fun (() -> Expression<BVSort>).bvashr(distance: () -> Expression<BVSort>) = BVAShr(this(), distance())
 
@@ -673,12 +673,12 @@ infix fun (() -> Expression<BVSort>).bvsge(other: () -> Expression<BVSort>) = BV
  */
 
 /**
- * Repeat the result of [block] [i]-times
+ * Repeat the result of [block] [i]-times.
  */
 fun repeat(i: Int, block: () -> Expression<BVSort>) = Repeat(i, block())
 
 /**
- * Repeat [expr] [i]-times
+ * Repeat [expr] [i]-times.
  */
 fun repeat(i: Int, expr: Expression<BVSort>) = Repeat(i, expr)
 

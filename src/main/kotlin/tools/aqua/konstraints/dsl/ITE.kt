@@ -26,18 +26,20 @@ import tools.aqua.konstraints.theories.BoolSort
 @SMTDSL
 class ITE1(val condition: Expression<BoolSort>) {
     /**
-     * Value of the if-statement, when [condition] is true
-     * Must be followed by an [ITE2.otherwise]
+     * Value of the if-statement, when [condition] is true.
      *
-     * @param expr: Value of the if-statement, when [condition] is true
+     * Must be followed by an [ITE2.otherwise].
+     *
+     * @param expr: Value of the if-statement, when [condition] is true.
      */
   infix fun <T : Sort> then(expr: Expression<T>): ITE2<T> = ITE2(condition, expr)
 
     /**
-     * Value of the if-statement, when [condition] is true
-     * Must be followed by an [ITE2.otherwise]
+     * Value of the if-statement, when [condition] is true.
      *
-     * @param block: Value of the if-statement, when [condition] is true
+     * Must be followed by an [ITE2.otherwise].
+     *
+     * @param block: Value of the if-statement, when [condition] is true.
      */
   infix fun <T : Sort> then(block: () -> Expression<T>): ITE2<T> = ITE2(condition, block())
 }
@@ -45,32 +47,34 @@ class ITE1(val condition: Expression<BoolSort>) {
 class ITE2<T : Sort>(val condition: Expression<BoolSort>, val then: Expression<T>) {
 
     /**
-     * Value of the if-statement, when [condition] is false
+     * Value of the if-statement, when [condition] is false.
      *
-     * @param expr: Value of the if-statement, when [condition] is true
+     * @param expr: Value of the if-statement, when [condition] is true.
      */
   infix fun otherwise(expr: Expression<T>): Ite<T> = Ite(condition, then, expr)
 
     /**
-     * Value of the if-statement, when [condition] is false
+     * Value of the if-statement, when [condition] is false.
      *
-     * @param block: Value of the if-statement, when [condition] is true
+     * @param block: Value of the if-statement, when [condition] is true.
      */
   infix fun otherwise(block: () -> Expression<T>): Ite<T> = Ite(condition, then, block())
 }
 
 /**
  * If-then-else operator.
- * Must be followed by a [ITE1.then] and [ITE2.otherwise]
  *
- * @param condition: lambda yielding an Expression<BoolSort> used as condition for the if-statement
+ * Must be followed by a [ITE1.then] and [ITE2.otherwise].
+ *
+ * @param condition: lambda yielding an Expression<BoolSort> used as condition for the if-statement.
  */
 fun ite(condition: () -> Expression<BoolSort>): ITE1 = ITE1(condition())
 
 /**
- * If-then-else operator
- * Must be followed by a [ITE1.then] and [ITE2.otherwise]
+ * If-then-else operator.
  *
- * @param condition: Expression<BoolSort> used as condition for the if-statement
+ * Must be followed by a [ITE1.then] and [ITE2.otherwise].
+ *
+ * @param condition: Expression<BoolSort> used as condition for the if-statement.
  */
 fun ite(condition: Expression<BoolSort>): ITE1 = ITE1(condition)

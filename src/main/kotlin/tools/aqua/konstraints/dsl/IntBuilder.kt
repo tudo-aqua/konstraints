@@ -22,14 +22,14 @@ import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.theories.*
 
 /**
- * Negation operator for IntSort Expressions
+ * Negation operator for IntSort Expressions.
  */
 operator fun Expression<IntSort>.unaryMinus() = IntNeg(this)
 
 /**
  * Subtraction operator for IntSort Expressions: [this] - [subtrahend].
  *
- * If [this] is an [IntSub] object, unpacks the children and returns a new combined IntSub
+ * If [this] is an [IntSub] object, unpacks the children and returns a new combined IntSub.
  */
 infix operator fun Expression<IntSort>.minus(subtrahend: Expression<IntSort>) =
     if (this is IntSub) {
@@ -41,28 +41,28 @@ infix operator fun Expression<IntSort>.minus(subtrahend: Expression<IntSort>) =
 /**
  * Subtraction operator for IntSort Expressions: [this] - [subtrahend].
  *
- * If [this] is an [IntSub] object, unpacks the children and returns a new combined IntSub
+ * If [this] is an [IntSub] object, unpacks the children and returns a new combined IntSub.
  */
 infix fun Expression<IntSort>.minus(subtrahend: () -> Expression<IntSort>) = this minus subtrahend()
 
 /**
  * Subtraction operator for IntSort Expressions: [this] - [subtrahend].
  *
- * If [this] is an [IntSub] object, unpacks the children and returns a new combined IntSub
+ * If [this] is an [IntSub] object, unpacks the children and returns a new combined IntSub.
  */
 infix fun (() -> Expression<IntSort>).minus(subtrahend: Expression<IntSort>) = this() minus subtrahend
 
 /**
  * Subtraction operator for IntSort Expressions: [this] - [subtrahend].
  *
- * If [this] is an [IntSub] object, unpacks the children and returns a new combined IntSub
+ * If [this] is an [IntSub] object, unpacks the children and returns a new combined IntSub.
  */
 infix fun (() -> Expression<IntSort>).minus(subtrahend: () -> Expression<IntSort>) = this() minus subtrahend()
 
 /**
  * Addition operator for IntSort Expressions: [this] + [summand].
  *
- * If [this] is an [IntAdd] object, unpacks the children and returns a new combined IntAdd
+ * If [this] is an [IntAdd] object, unpacks the children and returns a new combined IntAdd.
  */
 infix operator fun Expression<IntSort>.plus(summand: Expression<IntSort>) =
     if (this is IntAdd) {
@@ -75,28 +75,28 @@ infix operator fun Expression<IntSort>.plus(summand: Expression<IntSort>) =
 /**
  * Addition operator for IntSort Expressions: [this] + [summand].
  *
- * If [this] is an [IntAdd] object, unpacks the children and returns a new combined IntAdd
+ * If [this] is an [IntAdd] object, unpacks the children and returns a new combined IntAdd.
  */
 infix fun Expression<IntSort>.plus(summand: () -> Expression<IntSort>) = this plus summand()
 
 /**
  * Addition operator for IntSort Expressions: [this] + [summand].
  *
- * If [this] is an [IntAdd] object, unpacks the children and returns a new combined IntAdd
+ * If [this] is an [IntAdd] object, unpacks the children and returns a new combined IntAdd.
  */
 infix fun (() -> Expression<IntSort>).plus(summand: Expression<IntSort>) = this() plus summand
 
 /**
  * Addition operator for IntSort Expressions: [this] + [summand].
  *
- * If [this] is an [IntAdd] object, unpacks the children and returns a new combined IntAdd
+ * If [this] is an [IntAdd] object, unpacks the children and returns a new combined IntAdd.
  */
 infix fun (() -> Expression<IntSort>).plus(summand: () -> Expression<IntSort>) = this() plus summand()
 
 /**
  * Multiplication operator for IntSort Expressions: [this] * [multiplicand].
  *
- * If [this] is an [IntMul] object, unpacks the children and returns a new combined IntMul
+ * If [this] is an [IntMul] object, unpacks the children and returns a new combined IntMul.
  */
 infix operator fun Expression<IntSort>.times(multiplicand: Expression<IntSort>) =
     if (this is IntMul) {
@@ -108,28 +108,28 @@ infix operator fun Expression<IntSort>.times(multiplicand: Expression<IntSort>) 
 /**
  * Multiplication operator for IntSort Expressions: [this] * [multiplicand].
  *
- * If [this] is an [IntMul] object, unpacks the children and returns a new combined IntMul
+ * If [this] is an [IntMul] object, unpacks the children and returns a new combined IntMul.
  */
 infix fun Expression<IntSort>.times(multiplicand: () -> Expression<IntSort>) = this times multiplicand()
 
 /**
  * Multiplication operator for IntSort Expressions: [this] * [multiplicand].
  *
- * If [this] is an [IntMul] object, unpacks the children and returns a new combined IntMul
+ * If [this] is an [IntMul] object, unpacks the children and returns a new combined IntMul.
  */
 infix fun (() -> Expression<IntSort>).times(multiplicand: Expression<IntSort>) = this() times multiplicand
 
 /**
  * Multiplication operator for IntSort Expressions: [this] * [multiplicand].
  *
- * If [this] is an [IntMul] object, unpacks the children and returns a new combined IntMul
+ * If [this] is an [IntMul] object, unpacks the children and returns a new combined IntMul.
  */
 infix fun (() -> Expression<IntSort>).times(multiplicand: () -> Expression<IntSort>) = this() times multiplicand()
 
 /**
  * Division operator for IntSort Expressions: [this] / [divisor].
  *
- * If [this] is an [IntDiv] object, unpacks the children and returns a new combined IntMul
+ * If [this] is an [IntDiv] object, unpacks the children and returns a new combined IntMul.
  */
 infix operator fun Expression<IntSort>.div(divisor: Expression<IntSort>) =
     if (this is IntDiv) {
@@ -141,21 +141,21 @@ infix operator fun Expression<IntSort>.div(divisor: Expression<IntSort>) =
 /**
  * Division operator for IntSort Expressions: [this] / [divisor].
  *
- * If [this] is an [IntDiv] object, unpacks the children and returns a new combined IntMul
+ * If [this] is an [IntDiv] object, unpacks the children and returns a new combined IntMul.
  */
 infix fun Expression<IntSort>.div(divisor: () -> Expression<IntSort>) = this div divisor()
 
 /**
  * Division operator for IntSort Expressions: [this] / [divisor].
  *
- * If [this] is an [IntDiv] object, unpacks the children and returns a new combined IntMul
+ * If [this] is an [IntDiv] object, unpacks the children and returns a new combined IntMul.
  */
 infix fun (() -> Expression<IntSort>).div(divisor: Expression<IntSort>) = this() div divisor
 
 /**
  * Division operator for IntSort Expressions: [this] / [divisor].
  *
- * If [this] is an [IntDiv] object, unpacks the children and returns a new combined IntMul
+ * If [this] is an [IntDiv] object, unpacks the children and returns a new combined IntMul.
  */
 infix fun (() -> Expression<IntSort>).div(divisor: () -> Expression<IntSort>) = this() div divisor()
 
@@ -321,7 +321,7 @@ private fun makeIntOperator(
  * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
  * If only a single subexpression is added, the expression is returned directly.
  *
- * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda.
  */
 fun intadd(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntAdd)
 
@@ -331,7 +331,7 @@ fun intadd(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntAdd)
  * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
  * If only a single subexpression is added, the expression is returned directly.
  *
- * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda.
  */
 fun intsub(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntSub)
 
@@ -341,7 +341,7 @@ fun intsub(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntSub)
  * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
  * If only a single subexpression is added, the expression is returned directly.
  *
- * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda.
  */
 fun intmul(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntMul)
 
@@ -351,7 +351,7 @@ fun intmul(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntMul)
  * Use [Builder.unaryPlus] inside the [init] lambda to add Expressions to the addition operation.
  * If only a single subexpression is added, the expression is returned directly.
  *
- * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda
+ * @throws [IllegalArgumentException] if no expression is added inside the [init] lambda.
  */
 fun intdiv(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntDiv)
 
@@ -366,11 +366,11 @@ fun abs(block: () -> Expression<IntSort>) = Abs(block())
 fun abs(expr: Expression<IntSort>) = Abs(expr)
 
 /**
- * Casting operator from RealSort to IntSort
+ * Casting operator from RealSort to IntSort.
  */
 fun toInt(block: () -> Expression<RealSort>) = ToInt(block())
 
 /**
- * Casting operator from RealSort to IntSort
+ * Casting operator from RealSort to IntSort.
  */
 fun toInt(expr: Expression<RealSort>) = ToInt(expr)

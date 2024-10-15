@@ -23,14 +23,14 @@ import tools.aqua.konstraints.parser.SortedVar
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 
-/** Exists quantifier with one bound variable of [sort] */
+/** Exists quantifier with one bound variable of [sort]. */
 fun <S : Sort> exists(sort: S, block: (Expression<S>) -> Expression<BoolSort>): ExistsExpression {
   val boundVar = SortedVar("|$sort!${UUID.randomUUID()}|".symbol(), sort)
 
   return ExistsExpression(listOf(boundVar), block(boundVar.instance))
 }
 
-/** Exists quantifier with two bound variable of [sort1], [sort2] */
+/** Exists quantifier with two bound variable of [sort1], [sort2]. */
 fun <S1 : Sort, S2 : Sort> exists(
     sort1: S1,
     sort2: S2,
@@ -43,7 +43,7 @@ fun <S1 : Sort, S2 : Sort> exists(
       listOf(boundVar1, boundVar2), block(boundVar1.instance, boundVar2.instance))
 }
 
-/** Exists quantifier with three bound variable of [sort1], [sort2], [sort3] */
+/** Exists quantifier with three bound variable of [sort1], [sort2], [sort3]. */
 fun <S1 : Sort, S2 : Sort, S3 : Sort> exists(
     sort1: S1,
     sort2: S2,
@@ -59,7 +59,7 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort> exists(
       block(boundVar1.instance, boundVar2.instance, boundVar3.instance))
 }
 
-/** Exists quantifier with four bound variable of [sort1], [sort2], [sort3], [sort4] */
+/** Exists quantifier with four bound variable of [sort1], [sort2], [sort3], [sort4]. */
 fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> exists(
     sort1: S1,
     sort2: S2,
@@ -77,7 +77,7 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> exists(
       block(boundVar1.instance, boundVar2.instance, boundVar3.instance, boundVar4.instance))
 }
 
-/** Exists quantifier with five bound variable of [sort1], [sort2], [sort3], [sort4], [sort5] */
+/** Exists quantifier with five bound variable of [sort1], [sort2], [sort3], [sort4], [sort5]. */
 fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> exists(
     sort1: S1,
     sort2: S2,
@@ -108,7 +108,7 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> exists(
           boundVar5.instance))
 }
 
-/** Exists quantifier with at least 6 bound variable of any sort */
+/** Exists quantifier with at least 6 bound variable of any sort. */
 fun exists(
     sort1: Sort,
     sort2: Sort,
@@ -130,7 +130,7 @@ fun exists(
   return ExistsExpression(boundVars, block(boundVars.map { it.instance }))
 }
 
-/** Exists quantifier with any number of bound variable of any sort */
+/** Exists quantifier with any number of bound variable of any sort. */
 fun exists(
     sorts: List<Sort>,
     block: (List<Expression<*>>) -> Expression<BoolSort>
@@ -140,14 +140,14 @@ fun exists(
   return ExistsExpression(boundVars, block(boundVars.map { it.instance }))
 }
 
-/** Universal quantifier with one bound variable of [sort] */
+/** Universal quantifier with one bound variable of [sort]. */
 fun <S : Sort> forall(sort: S, block: (Expression<S>) -> Expression<BoolSort>): ForallExpression {
   val boundVar = SortedVar("|$sort!${UUID.randomUUID()}|".symbol(), sort)
 
   return ForallExpression(listOf(boundVar), block(boundVar.instance))
 }
 
-/** Universal quantifier with two bound variable of [sort1], [sort2] */
+/** Universal quantifier with two bound variable of [sort1], [sort2]. */
 fun <S1 : Sort, S2 : Sort> forall(
     sort1: S1,
     sort2: S2,
@@ -160,7 +160,7 @@ fun <S1 : Sort, S2 : Sort> forall(
       listOf(boundVar1, boundVar2), block(boundVar1.instance, boundVar2.instance))
 }
 
-/** Universal quantifier with three bound variable of [sort1], [sort2], [sort3] */
+/** Universal quantifier with three bound variable of [sort1], [sort2], [sort3]. */
 fun <S1 : Sort, S2 : Sort, S3 : Sort> forall(
     sort1: S1,
     sort2: S2,
@@ -176,7 +176,7 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort> forall(
       block(boundVar1.instance, boundVar2.instance, boundVar3.instance))
 }
 
-/** Universal quantifier with four bound variable of [sort1], [sort2], [sort3], [sort4] */
+/** Universal quantifier with four bound variable of [sort1], [sort2], [sort3], [sort4]. */
 fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> forall(
     sort1: S1,
     sort2: S2,
@@ -194,7 +194,7 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> forall(
       block(boundVar1.instance, boundVar2.instance, boundVar3.instance, boundVar4.instance))
 }
 
-/** Universal quantifier with five bound variable of [sort1], [sort2], [sort3], [sort4], [sort5] */
+/** Universal quantifier with five bound variable of [sort1], [sort2], [sort3], [sort4], [sort5]. */
 fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> forall(
     sort1: S1,
     sort2: S2,
@@ -225,7 +225,7 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> forall(
           boundVar5.instance))
 }
 
-/** Universal quantifier with at least 6 bound variable of any sort */
+/** Universal quantifier with at least 6 bound variable of any sort. */
 fun forall(
     sort1: Sort,
     sort2: Sort,
@@ -247,7 +247,7 @@ fun forall(
   return ForallExpression(boundVars, block(boundVars.map { it.instance }))
 }
 
-/** Universal quantifier with any number of bound variable of any sort */
+/** Universal quantifier with any number of bound variable of any sort. */
 fun forall(
     sorts: List<Sort>,
     block: (List<Expression<*>>) -> Expression<BoolSort>

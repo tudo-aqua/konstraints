@@ -252,14 +252,14 @@ class DSLTests {
                       BVSort(3),
                       BVSort(3)) { exprs ->
                         val x1 = exprs[0] as Expression<BVSort>
-                        val x2 = exprs[0] as Expression<BVSort>
-                        val x3 = exprs[0] as Expression<BVSort>
-                        val x4 = exprs[0] as Expression<BVSort>
-                        val x5 = exprs[0] as Expression<BVSort>
-                        val x6 = exprs[0] as Expression<BVSort>
-                        val x7 = exprs[0] as Expression<BVSort>
-                        val x8 = exprs[0] as Expression<BVSort>
-                        val x9 = exprs[0] as Expression<BVSort>
+                        val x2 = exprs[1] as Expression<BVSort>
+                        val x3 = exprs[2] as Expression<BVSort>
+                        val x4 = exprs[3] as Expression<BVSort>
+                        val x5 = exprs[4] as Expression<BVSort>
+                        val x6 = exprs[5] as Expression<BVSort>
+                        val x7 = exprs[6] as Expression<BVSort>
+                        val x8 = exprs[7] as Expression<BVSort>
+                        val x9 = exprs[8] as Expression<BVSort>
                         (x1 eq { x2 } eq x3 eq x4 eq x5 eq x6 eq x7 eq x8 eq x9)
                       }
                 }
@@ -331,5 +331,19 @@ class DSLTests {
                 assert { A fpleq { B } fpleq C }
                 assert { { A } fpleq B fpleq C }
                 assert { { A } fpleq { B } fpleq { C } }
+              }),
+          arguments(
+              smt(QF_UF) {
+                  val A by declaringConst(FPSort(5, 11))
+                  val B by declaringConst(FPSort(5, 11))
+                  val C by declaringConst(FPSort(5, 11))
+
+                  val tmp = { A } eq { B } eq { C }
+                  val temp = tmp eq { C }
+
+                  assert { A eq B eq C }
+                  assert { A eq { B } eq C }
+                  assert { { A } eq B eq C }
+                  assert { { A } eq { B } eq { C } }
               }))
 }
