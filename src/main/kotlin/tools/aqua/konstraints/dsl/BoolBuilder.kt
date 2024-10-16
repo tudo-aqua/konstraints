@@ -53,7 +53,8 @@ infix fun (() -> Expression<BoolSort>).implies(other: Expression<BoolSort>) = th
  *
  * If [this] is an [Implies] object, unpacks the children and returns a new combined Implies.
  */
-infix fun (() -> Expression<BoolSort>).implies(other: () -> Expression<BoolSort>) = this() implies other()
+infix fun (() -> Expression<BoolSort>).implies(other: () -> Expression<BoolSort>) =
+    this() implies other()
 
 /**
  * Creates a logical and: [this] and [other].
@@ -179,7 +180,7 @@ infix fun <T : Sort> (() -> Expression<T>).eq(other: () -> Expression<T>) = this
 infix fun <T : Sort> Expression<T>.distinct(other: Expression<T>): Distinct = Distinct(this, other)
 
 infix fun <T : Sort> Distinct.distinct(other: Expression<T>): Distinct =
-    Distinct(this.children+other)
+    Distinct(this.children + other)
 
 private fun makeBoolOperator(
     init: Builder<BoolSort>.() -> Unit,

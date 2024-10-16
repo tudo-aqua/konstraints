@@ -25,39 +25,39 @@ import tools.aqua.konstraints.theories.BoolSort
 
 @SMTDSL
 class ITE1(val condition: Expression<BoolSort>) {
-    /**
-     * Value of the if-statement, when [condition] is true.
-     *
-     * Must be followed by an [ITE2.otherwise].
-     *
-     * @param expr: Value of the if-statement, when [condition] is true.
-     */
+  /**
+   * Value of the if-statement, when [condition] is true.
+   *
+   * Must be followed by an [ITE2.otherwise].
+   *
+   * @param expr: Value of the if-statement, when [condition] is true.
+   */
   infix fun <T : Sort> then(expr: Expression<T>): ITE2<T> = ITE2(condition, expr)
 
-    /**
-     * Value of the if-statement, when [condition] is true.
-     *
-     * Must be followed by an [ITE2.otherwise].
-     *
-     * @param block: Value of the if-statement, when [condition] is true.
-     */
+  /**
+   * Value of the if-statement, when [condition] is true.
+   *
+   * Must be followed by an [ITE2.otherwise].
+   *
+   * @param block: Value of the if-statement, when [condition] is true.
+   */
   infix fun <T : Sort> then(block: () -> Expression<T>): ITE2<T> = ITE2(condition, block())
 }
 
 class ITE2<T : Sort>(val condition: Expression<BoolSort>, val then: Expression<T>) {
 
-    /**
-     * Value of the if-statement, when [condition] is false.
-     *
-     * @param expr: Value of the if-statement, when [condition] is true.
-     */
+  /**
+   * Value of the if-statement, when [condition] is false.
+   *
+   * @param expr: Value of the if-statement, when [condition] is true.
+   */
   infix fun otherwise(expr: Expression<T>): Ite<T> = Ite(condition, then, expr)
 
-    /**
-     * Value of the if-statement, when [condition] is false.
-     *
-     * @param block: Value of the if-statement, when [condition] is true.
-     */
+  /**
+   * Value of the if-statement, when [condition] is false.
+   *
+   * @param block: Value of the if-statement, when [condition] is true.
+   */
   infix fun otherwise(block: () -> Expression<T>): Ite<T> = Ite(condition, then, block())
 }
 

@@ -47,8 +47,8 @@ fun <T : Sort> SMTProgramBuilder.declaringConst(sort: Sort, name: String) = Cons
  * Declares an SMT function without any parameters: (declare-fun symbol () [sort])
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
- * For functions of arity 0, prefer [declaringConst].
- * The functions name will be the same as the variables name.
+ * For functions of arity 0, prefer [declaringConst]. The functions name will be the same as the
+ * variables name.
  *
  * @return an [SMTFunction] object with arity 0.
  */
@@ -76,7 +76,8 @@ fun <T : Sort, S1 : Sort, S2 : Sort> SMTProgramBuilder.declaring(sort: T, par1: 
     Declare2(sort, par1, par2, this)
 
 /**
- * Declares an SMT function with three parameters: (declare-fun symbol ([par1] [par2] [par3]) [sort])
+ * Declares an SMT function with three parameters: (declare-fun symbol ([par1] [par2] [par3])
+ * [sort])
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * The functions name will be the same as the variables name.
@@ -91,7 +92,8 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort> SMTProgramBuilder.declaring(
 ) = Declare3(sort, par1, par2, par3, this)
 
 /**
- * Declares an SMT function with four parameters: (declare-fun symbol ([par1] [par2] [par3] [par4]) [sort])
+ * Declares an SMT function with four parameters: (declare-fun symbol ([par1] [par2] [par3] [par4])
+ * [sort])
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * The functions name will be the same as the variables name.
@@ -107,7 +109,8 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> SMTProgramBuilder.dec
 ) = Declare4(sort, par1, par2, par3, par4, this)
 
 /**
- * Declares an SMT function with five parameters: (declare-fun symbol ([par1] [par2] [par3] [par4] [par5]) [sort])
+ * Declares an SMT function with five parameters: (declare-fun symbol ([par1] [par2] [par3] [par4]
+ * [par5]) [sort])
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * The functions name will be the same as the variables name.
@@ -131,10 +134,8 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> SMTProgram
  *
  * @return an [SMTFunction] object with arity 0.
  */
-fun <T : Sort> SMTProgramBuilder.defining(
-    sort: T,
-    block: (List<Expression<*>>) -> Expression<T>
-) = Define(sort, block, this)
+fun <T : Sort> SMTProgramBuilder.defining(sort: T, block: (List<Expression<*>>) -> Expression<T>) =
+    Define(sort, block, this)
 
 /**
  * Define an SMT function: (define-fun symbol ([par]) [sort] [block])
@@ -238,10 +239,11 @@ class Const<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: Str
 }
 
 /**
- * Delegate class for declaring SMT functions of any arity: (declare-fun [name] ([parameters]) [sort]).
+ * Delegate class for declaring SMT functions of any arity: (declare-fun [name] ([parameters])
+ * [sort]).
  *
- * Registers the function in the given [program].
- * If [name] is empty, the name register will be the same as the variable.
+ * Registers the function in the given [program]. If [name] is empty, the name register will be the
+ * same as the variable.
  *
  * @return [SMTFunction]
  */
@@ -262,8 +264,8 @@ class Declare<T : Sort>(
 /**
  * Delegate class for declaring SMT functions: (declare-fun [name] ([par]) [sort]).
  *
- * Registers the function in the given [program].
- * If [name] is empty, the name register will be the same as the variable.
+ * Registers the function in the given [program]. If [name] is empty, the name register will be the
+ * same as the variable.
  *
  * @return [SMTFunction]
  */
@@ -284,8 +286,8 @@ class Declare1<T : Sort, S : Sort>(
 /**
  * Delegate class for declaring SMT functions: (declare-fun [name] ([par1] [par2]) [sort]).
  *
- * Registers the function in the given [program].
- * If [name] is empty, the name register will be the same as the variable.
+ * Registers the function in the given [program]. If [name] is empty, the name register will be the
+ * same as the variable.
  *
  * @return [SMTFunction]
  */
@@ -307,8 +309,8 @@ class Declare2<T : Sort, S1 : Sort, S2 : Sort>(
 /**
  * Delegate class for declaring SMT functions: (declare-fun [name] ([par1] [par2] [par3]) [sort]).
  *
- * Registers the function in the given [program].
- * If [name] is empty, the name register will be the same as the variable.
+ * Registers the function in the given [program]. If [name] is empty, the name register will be the
+ * same as the variable.
  *
  * @return [SMTFunction]
  */
@@ -329,10 +331,11 @@ class Declare3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
 }
 
 /**
- * Delegate class for declaring SMT functions: (declare-fun [name] ([par1] [par2] [par3] [par4]) [sort]).
+ * Delegate class for declaring SMT functions: (declare-fun [name] ([par1] [par2] [par3] [par4])
+ * [sort]).
  *
- * Registers the function in the given [program].
- * If [name] is empty, the name register will be the same as the variable.
+ * Registers the function in the given [program]. If [name] is empty, the name register will be the
+ * same as the variable.
  *
  * @return [SMTFunction]
  */
@@ -354,10 +357,11 @@ class Declare4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
 }
 
 /**
- * Delegate class for declaring SMT functions: (declare-fun [name] ([par1] [par2] [par3] [par4] [par5]) [sort]).
+ * Delegate class for declaring SMT functions: (declare-fun [name] ([par1] [par2] [par3] [par4]
+ * [par5]) [sort]).
  *
- * Registers the function in the given [program].
- * If [name] is empty, the name register will be the same as the variable.
+ * Registers the function in the given [program]. If [name] is empty, the name register will be the
+ * same as the variable.
  *
  * @return [SMTFunction]
  */
@@ -383,10 +387,11 @@ class Declare5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
 }
 
 /**
- * Delegate class for defining SMT functions of any arity: (define-fun [name] ([parameters]) [sort] [block]).
+ * Delegate class for defining SMT functions of any arity: (define-fun [name] ([parameters]) [sort]
+ * [block]).
  *
- * Registers the function in the given [program].
- * If [name] is empty, the name register will be the same as the variable.
+ * Registers the function in the given [program]. If [name] is empty, the name register will be the
+ * same as the variable.
  *
  * @return [SMTFunction]
  */
@@ -400,9 +405,7 @@ class Define<T : Sort>(
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction<T> {
     val n = name.ifEmpty { "|$thisRef|" }
     val sortedVars =
-        parameters.mapIndexed { id, sort ->
-          SortedVar("|$thisRef!local!$sort!$id|".symbol(), sort)
-        }
+        parameters.mapIndexed { id, sort -> SortedVar("|$thisRef!local!$sort!$id|".symbol(), sort) }
     val term = block(sortedVars.map { it.instance })
 
     program.registerFun(n, sort, sortedVars, term)
@@ -414,8 +417,8 @@ class Define<T : Sort>(
 /**
  * Delegate class for defining SMT functions: (define-fun [name] ([par]) [sort] [block]).
  *
- * Registers the function in the given [program].
- * If [name] is empty, the name register will be the same as the variable.
+ * Registers the function in the given [program]. If [name] is empty, the name register will be the
+ * same as the variable.
  *
  * @return [SMTFunction]
  */
@@ -440,8 +443,8 @@ class Define1<T : Sort, S : Sort>(
 /**
  * Delegate class for defining SMT functions: (define-fun [name] ([par1] [par2]) [sort] [block]).
  *
- * Registers the function in the given [program].
- * If [name] is empty, the name register will be the same as the variable.
+ * Registers the function in the given [program]. If [name] is empty, the name register will be the
+ * same as the variable.
  *
  * @return [SMTFunction]
  */
@@ -471,10 +474,11 @@ class Define2<T : Sort, S1 : Sort, S2 : Sort>(
 }
 
 /**
- * Delegate class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3]) [sort] [block]).
+ * Delegate class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3]) [sort]
+ * [block]).
  *
- * Registers the function in the given [program].
- * If [name] is empty, the name register will be the same as the variable.
+ * Registers the function in the given [program]. If [name] is empty, the name register will be the
+ * same as the variable.
  *
  * @return [SMTFunction]
  */
@@ -507,10 +511,11 @@ class Define3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
 }
 
 /**
- * Delegate class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3] [par4]) [sort] [block]).
+ * Delegate class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3] [par4])
+ * [sort] [block]).
  *
- * Registers the function in the given [program].
- * If [name] is empty, the name register will be the same as the variable.
+ * Registers the function in the given [program]. If [name] is empty, the name register will be the
+ * same as the variable.
  *
  * @return [SMTFunction]
  */
@@ -552,10 +557,11 @@ class Define4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
 }
 
 /**
- * Delegate class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3] [par4] [par5]) [sort] [block]).
+ * Delegate class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3] [par4]
+ * [par5]) [sort] [block]).
  *
- * Registers the function in the given [program].
- * If [name] is empty, the name register will be the same as the variable.
+ * Registers the function in the given [program]. If [name] is empty, the name register will be the
+ * same as the variable.
  *
  * @return [SMTFunction]
  */

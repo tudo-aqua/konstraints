@@ -325,9 +325,9 @@ class DSLTests {
               SatStatus.SAT),
           arguments(
               smt(QF_UF) {
-                  val A = const(BoolSort)
-                  val B = const(BoolSort)
-                  assert { A implies { B } implies A }
+                val A = const(BoolSort)
+                val B = const(BoolSort)
+                assert { A implies { B } implies A }
               },
               SatStatus.SAT),
           arguments(
@@ -340,5 +340,6 @@ class DSLTests {
                 assert { { A } fpleq B fpleq C }
                 assert { { A } fpleq { B } fpleq { C } }
               },
-              SatStatus.SAT),)
+              SatStatus.SAT),
+      )
 }
