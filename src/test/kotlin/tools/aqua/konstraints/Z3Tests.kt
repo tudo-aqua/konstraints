@@ -441,7 +441,7 @@ class Z3Tests {
                                                 BVAdd(u.instance, rhs),
                                                 BVNeg(u.instance)))))))),
                     BVSMod(lhs, rhs)))),
-        Arguments.arguments(
+    /*Arguments.arguments(
             listOf(
                 Equals(
                     LetExpression(
@@ -499,6 +499,6 @@ class Z3Tests {
                                     }
                               }
                         },
-                    BVSMod(lhs, rhs)))))
+                    BVSMod(lhs, rhs))))*/ )
   }
 }

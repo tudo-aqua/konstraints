@@ -205,11 +205,11 @@ object XOrDecl :
  *
  * @param statements multiple [Expression] of [BoolSort] to be checked in equals statement
  */
-class Equals(val statements: List<Expression<*>>) :
+class Equals<T : Sort>(val statements: List<Expression<T>>) :
     HomogenousExpression<BoolSort, Sort>("=".symbol(), BoolSort) {
-  constructor(vararg statements: Expression<*>) : this(statements.toList())
+  constructor(vararg statements: Expression<T>) : this(statements.toList())
 
-  override val children: List<Expression<Sort>> = statements as List<Expression<Sort>>
+  override val children: List<Expression<T>> = statements
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       EqualsDecl.buildExpression(children, emptyList())

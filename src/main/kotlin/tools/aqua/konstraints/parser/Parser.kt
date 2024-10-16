@@ -19,6 +19,7 @@
 package tools.aqua.konstraints.parser
 
 import java.math.BigDecimal
+import java.math.BigInteger
 import org.petitparser.context.Token
 import org.petitparser.parser.Parser
 import org.petitparser.parser.combinators.ChoiceParser
@@ -556,7 +557,7 @@ object Parser {
                   (reproducibleResourceLimitOption * numeral) +
                   (verbosityOption * numeral))
               .map { results: List<Any> ->
-                listOf(results[0] as Token, NumeralOptionValue(results[1] as Int))
+                listOf(results[0] as Token, NumeralOptionValue(results[1] as BigInteger))
               } +
           attribute.map { result: Attribute ->
             // set-option requires

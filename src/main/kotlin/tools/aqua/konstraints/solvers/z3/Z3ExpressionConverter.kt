@@ -55,7 +55,7 @@ fun Expr<Z3BoolSort>.aquaify(): Expression<BoolSort> =
     } else if (isFalse) {
       False
     } else if (isEq) {
-      Equals(*this.args.map { it.aquaify() }.toTypedArray())
+      Equals(this.args.map { it.aquaify() }.toList() as List<Expression<Sort>>)
     } else {
       throw RuntimeException("Unknown or unsupported bool expression $this")
     }

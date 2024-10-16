@@ -19,6 +19,7 @@
 package tools.aqua.konstraints.parser
 
 import java.math.BigDecimal
+import java.math.BigInteger
 import org.petitparser.context.Token
 import tools.aqua.konstraints.smt.Index
 import tools.aqua.konstraints.smt.Logic
@@ -138,7 +139,7 @@ data class BooleanOptionValue(val bool: Boolean) : OptionValue
 
 data class StringOptionValue(val sting: String) : OptionValue
 
-data class NumeralOptionValue(val numeral: Int) : OptionValue
+data class NumeralOptionValue(val numeral: BigInteger) : OptionValue
 
 data class AttributeOptionValue(val attribute: Attribute) : OptionValue
 

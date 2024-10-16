@@ -291,6 +291,8 @@ class LocalExpression<T : Sort>(
 
 class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSort>) :
     Expression<BoolSort> {
+  constructor(vararg vars: SortedVar<*>, term: Expression<BoolSort>) : this(vars.toList(), term)
+
   override val sort = BoolSort
   override val name = Keyword("exists")
   override val children: List<Expression<*>> = listOf(term)
