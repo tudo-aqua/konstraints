@@ -162,11 +162,13 @@ class FPSort private constructor(eb: Index, sb: Index) : FPBase(eb, sb) {
     fun fromSymbol(eb: SymbolIndex, sb: SymbolIndex): FPSort = FPSort(eb, sb)
   }
 
+    /*
     val zero = FPZero(exponentBits, significantBits)
     val minusZero = FPMinusZero(exponentBits, significantBits)
     val infinity = FPInfinity(exponentBits, significantBits)
     val minusInfinity = FPMinusInfinity(exponentBits, significantBits)
     val nan = FPNaN(exponentBits, significantBits)
+    */
 }
 
 /** FloatingPoint sort declaration object */

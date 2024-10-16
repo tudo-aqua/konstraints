@@ -195,7 +195,7 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
       is And -> this.z3ify(context)
       is Or -> this.z3ify(context)
       is XOr -> this.z3ify(context)
-      is Equals -> this.z3ify(context)
+      is Equals<*> -> this.z3ify(context)
       is Distinct -> this.z3ify(context)
       is BVUlt -> this.z3ify(context)
       is BVULe -> this.z3ify(context)
@@ -270,7 +270,7 @@ fun XOr.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     }
         as Expr<Z3BoolSort>
 
-fun Equals.z3ify(context: Z3Context): Expr<Z3BoolSort> {
+fun Equals<*>.z3ify(context: Z3Context): Expr<Z3BoolSort> {
   val inner =
       this.statements.zipWithNext { a, b ->
         context.context.mkEq(a.z3ify(context), b.z3ify(context))

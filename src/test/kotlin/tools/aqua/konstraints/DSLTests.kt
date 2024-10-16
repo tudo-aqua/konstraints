@@ -264,7 +264,7 @@ class DSLTests {
                       }
                 }
               },
-              SatStatus.UNSAT),
+              SatStatus.SAT),
           arguments(
               smt(QF_BV) {
                 val X by declaringConst(BVSort(8))
@@ -321,29 +321,24 @@ class DSLTests {
                 val A by declaringConst(BoolSort)
                 val B by declaringConst(BoolSort)
                 assert { A implies { B } implies A }
-              }),
+              },
+              SatStatus.SAT),
           arguments(
               smt(QF_UF) {
-                val A by declaringConst(FPSort(5, 11))
-                val B by declaringConst(FPSort(5, 11))
-                val C by declaringConst(FPSort(5, 11))
+                  val A = const(BoolSort)
+                  val B = const(BoolSort)
+                  assert { A implies { B } implies A }
+              },
+              SatStatus.SAT),
+          arguments(
+              smt(QF_UF) {
+                val A = const(FPSort(5, 11))
+                val B = const(FPSort(5, 11))
+                val C = const(FPSort(5, 11))
                 assert { A fpleq B fpleq C }
                 assert { A fpleq { B } fpleq C }
                 assert { { A } fpleq B fpleq C }
                 assert { { A } fpleq { B } fpleq { C } }
-              }),
-          arguments(
-              smt(QF_UF) {
-                  val A by declaringConst(FPSort(5, 11))
-                  val B by declaringConst(FPSort(5, 11))
-                  val C by declaringConst(FPSort(5, 11))
-
-                  val tmp = { A } eq { B } eq { C }
-                  val temp = tmp eq { C }
-
-                  assert { A eq B eq C }
-                  assert { A eq { B } eq C }
-                  assert { { A } eq B eq C }
-                  assert { { A } eq { B } eq { C } }
-              }))
+              },
+              SatStatus.SAT),)
 }

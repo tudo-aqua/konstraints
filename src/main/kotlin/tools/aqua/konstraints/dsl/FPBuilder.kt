@@ -851,52 +851,62 @@ infix fun Expression<FPSort>.fpeq(rhs: () -> Expression<FPSort>) = FPEq(this, rh
 /**
  * Less equals operator for FPSort expressions: [this] <= [rhs].
  */
+@JvmName("fpleq1")
 infix fun (() -> Expression<FPSort>).fpleq(rhs: Expression<FPSort>) = FPLeq(this(), rhs)
 
 /**
  * Less than operator for FPSort expressions: [this] < [rhs].
  */
+@JvmName("fplt1")
 infix fun (() -> Expression<FPSort>).fplt(rhs: Expression<FPSort>) = FPLt(this(), rhs)
 
 /**
  * Greater equals operator for FPSort expressions: [this] >= [rhs].
  */
+@JvmName("fpgeq1")
 infix fun (() -> Expression<FPSort>).fpgeq(rhs: Expression<FPSort>) = FPGeq(this(), rhs)
 
 /**
  * Greater than operator for FPSort expressions: [this] > [rhs].
  */
+@JvmName("fpgt1")
 infix fun (() -> Expression<FPSort>).fpgt(rhs: Expression<FPSort>) = FPGt(this(), rhs)
 
 /**
  * Equals operator for FPSort expressions: [this] = [rhs].
  */
+@JvmName("fpeq1")
 infix fun (() -> Expression<FPSort>).fpeq(rhs: Expression<FPSort>) = FPEq(this(), rhs)
 
 
 /**
  * Less equals operator for FPSort expressions: [this] <= [rhs].
  */
+@JvmName("fpleq2")
 infix fun (() -> Expression<FPSort>).fpleq(rhs: () -> Expression<FPSort>) = FPLeq(this(), rhs())
 
 /**
  * Less than operator for FPSort expressions: [this] < [rhs].
  */
+@JvmName("fplt2")
 infix fun (() -> Expression<FPSort>).fplt(rhs: () -> Expression<FPSort>) = FPLt(this(), rhs())
 
 /**
  * Greater equals operator for FPSort expressions: [this] >= [rhs].
  */
+@JvmName("fpgeq2")
 infix fun (() -> Expression<FPSort>).fpgeq(rhs: () -> Expression<FPSort>) = FPGeq(this(), rhs())
 
 /**
  * Greater than operator for FPSort expressions: [this] > [rhs].
  */
+@JvmName("fpgt2")
 infix fun (() -> Expression<FPSort>).fpgt(rhs: () -> Expression<FPSort>) = FPGt(this(), rhs())
 
 /**
  * Equals operator for FPSort expressions: [this] = [rhs].
  */
+@JvmName("fpeq2")
 infix fun (() -> Expression<FPSort>).fpeq(rhs: () -> Expression<FPSort>) = FPEq(this(), rhs())
 
 
@@ -1202,11 +1212,13 @@ fun toReal(block: () -> Expression<FPSort>) = FPToReal(block())
 /**
  * Conversion operator to real sort
  */
+@JvmName("toReal1")
 fun toReal(expr: Expression<FPSort>) = FPToReal(expr)
 
 /**
  * Conversion operator to real sort
  */
+@JvmName("toReal2")
 fun Expression<FPSort>.toReal() = FPToReal(this)
 
 /*
