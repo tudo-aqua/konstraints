@@ -44,4 +44,4 @@ kotlin-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-s
 petitparser-core = { group = "com.github.petitparser", name = "petitparser-core", version = "2.4.0" }
 xz = { group = "org.tukaani", name = "xz", version = "1.10" }
 zstd = { group = "com.github.luben", name = "zstd-jni", version = "1.5.6-6" }
-z3-turnkey = { group = "tools.aqua", name = "z3-turnkey", version = "4.13.0" }
+z3-turnkey = { group = "tools.aqua", name = "z3-turnkey", version = "4.13.0.1" }
