@@ -124,7 +124,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
           is FP32 -> context.context.mkFPSort32()
           is FP64 -> context.context.mkFPSort64()
           is FP128 -> context.context.mkFPSort128()
-          is ArraySort ->
+          is ArraySort<*, *> ->
               context.context.mkArraySort(getOrCreateSort(sort.x), getOrCreateSort(sort.y))
           else -> context.context.mkUninterpretedSort(sort.toSMTString())
         }
