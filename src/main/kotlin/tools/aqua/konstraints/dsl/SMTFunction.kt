@@ -233,9 +233,15 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> SMTProgram
  */
 class Const<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: String) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): Expression<T> {
-    program.registerFun(name, sort, emptyList())
-    return UserDeclaredExpression(name.symbol(), sort)
+    if (const == null) {
+      program.registerFun(name, sort, emptyList())
+      const = UserDeclaredExpression(name.symbol(), sort)
+    }
+
+    return checkNotNull(const)
   }
+
+  var const: Expression<T>? = null
 }
 
 /**
@@ -254,11 +260,17 @@ class Declare<T : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction<T> {
-    val n = name.ifEmpty { "|$thisRef|" }
+    if (func == null) {
+      val n = name.ifEmpty { "|$thisRef|" }
 
-    program.registerFun(n, sort, parameters)
-    return SMTFunction(n.symbol(), sort, parameters, null)
+      program.registerFun(n, sort, parameters)
+      func = SMTFunction(n.symbol(), sort, parameters, null)
+    }
+
+    return checkNotNull(func)
   }
+
+  var func: SMTFunction<T>? = null
 }
 
 /**
@@ -276,11 +288,16 @@ class Declare1<T : Sort, S : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction1<T, S> {
-    val n = name.ifEmpty { "|$thisRef|" }
+    if (func == null) {
+      val n = name.ifEmpty { "|$thisRef|" }
 
-    program.registerFun(n, sort, listOf(par))
-    return SMTFunction1(n.symbol(), sort, par, null)
+      program.registerFun(n, sort, listOf(par))
+      func = SMTFunction1(n.symbol(), sort, par, null)
+    }
+    return checkNotNull(func)
   }
+
+  private var func: SMTFunction1<T, S>? = null
 }
 
 /**
@@ -299,11 +316,17 @@ class Declare2<T : Sort, S1 : Sort, S2 : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction2<T, S1, S2> {
-    val n = name.ifEmpty { "|$thisRef|" }
+    if (func != null) {
+      val n = name.ifEmpty { "|$thisRef|" }
 
-    program.registerFun(n, sort, listOf(par1, par2))
-    return SMTFunction2(n.symbol(), sort, par1, par2, null)
+      program.registerFun(n, sort, listOf(par1, par2))
+      func = SMTFunction2(n.symbol(), sort, par1, par2, null)
+    }
+
+    return checkNotNull(func)
   }
+
+  private var func: SMTFunction2<T, S1, S2>? = null
 }
 
 /**
@@ -323,11 +346,17 @@ class Declare3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction3<T, S1, S2, S3> {
-    val n = name.ifEmpty { "|$thisRef|" }
+    if (func == null) {
+      val n = name.ifEmpty { "|$thisRef|" }
 
-    program.registerFun(n, sort, listOf(par1, par2, par3))
-    return SMTFunction3(n.symbol(), sort, par1, par2, par3, null)
+      program.registerFun(n, sort, listOf(par1, par2, par3))
+      func = SMTFunction3(n.symbol(), sort, par1, par2, par3, null)
+    }
+
+    return checkNotNull(func)
   }
+
+  private var func: SMTFunction3<T, S1, S2, S3>? = null
 }
 
 /**
@@ -349,11 +378,17 @@ class Declare4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction4<T, S1, S2, S3, S4> {
-    val n = name.ifEmpty { "|$thisRef|" }
+    if (func == null) {
+      val n = name.ifEmpty { "|$thisRef|" }
 
-    program.registerFun(n, sort, listOf(par1, par2, par3, par4))
-    return SMTFunction4(n.symbol(), sort, par1, par2, par3, par4, null)
+      program.registerFun(n, sort, listOf(par1, par2, par3, par4))
+      func = SMTFunction4(n.symbol(), sort, par1, par2, par3, par4, null)
+    }
+
+    return checkNotNull(func)
   }
+
+  private var func: SMTFunction4<T, S1, S2, S3, S4>? = null
 }
 
 /**
@@ -379,11 +414,17 @@ class Declare5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
       thisRef: Any?,
       property: KProperty<*>
   ): SMTFunction5<T, S1, S2, S3, S4, S5> {
-    val n = name.ifEmpty { "|$thisRef|" }
+    if (func == null) {
+      val n = name.ifEmpty { "|$thisRef|" }
 
-    program.registerFun(n, sort, listOf(par1, par2, par3, par4, par5))
-    return SMTFunction5(n.symbol(), sort, par1, par2, par3, par4, par5, null)
+      program.registerFun(n, sort, listOf(par1, par2, par3, par4, par5))
+      func = SMTFunction5(n.symbol(), sort, par1, par2, par3, par4, par5, null)
+    }
+
+    return checkNotNull(func)
   }
+
+  private var func: SMTFunction5<T, S1, S2, S3, S4, S5>? = null
 }
 
 /**
@@ -403,15 +444,24 @@ class Define<T : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction<T> {
-    val n = name.ifEmpty { "|$thisRef|" }
-    val sortedVars =
-        parameters.mapIndexed { id, sort -> SortedVar("|$thisRef!local!$sort!$id|".symbol(), sort) }
-    val term = block(sortedVars.map { it.instance })
+    if (func == null) {
+      val n = name.ifEmpty { "|$thisRef|" }
+      val sortedVars =
+          parameters.mapIndexed { id, sort ->
+            SortedVar("|$thisRef!local!$sort!$id|".symbol(), sort)
+          }
+      val term = block(sortedVars.map { it.instance })
 
-    program.registerFun(n, sort, sortedVars, term)
-    return SMTFunction(
-        n.symbol(), sort, parameters, FunctionDefinition(n.symbol(), emptyList(), sort, term))
+      program.registerFun(n, sort, sortedVars, term)
+      func =
+          SMTFunction(
+              n.symbol(), sort, parameters, FunctionDefinition(n.symbol(), emptyList(), sort, term))
+    }
+
+    return checkNotNull(func)
   }
+
+  private var func: SMTFunction<T>? = null
 }
 
 /**
@@ -430,14 +480,21 @@ class Define1<T : Sort, S : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction1<T, S> {
-    val n = name.ifEmpty { "|$thisRef|" }
-    val sortedVar = SortedVar("|$thisRef!local!$par!1|".symbol(), par)
-    val term = block(sortedVar.instance)
+    if (func == null) {
+      val n = name.ifEmpty { "|$thisRef|" }
+      val sortedVar = SortedVar("|$thisRef!local!$par!1|".symbol(), par)
+      val term = block(sortedVar.instance)
 
-    program.registerFun(n, sort, listOf(sortedVar), term)
-    return SMTFunction1(
-        n.symbol(), sort, par, FunctionDefinition(n.symbol(), listOf(sortedVar), sort, term))
+      program.registerFun(n, sort, listOf(sortedVar), term)
+      func =
+          SMTFunction1(
+              n.symbol(), sort, par, FunctionDefinition(n.symbol(), listOf(sortedVar), sort, term))
+    }
+
+    return checkNotNull(func)
   }
+
+  private var func: SMTFunction1<T, S>? = null
 }
 
 /**
@@ -457,20 +514,27 @@ class Define2<T : Sort, S1 : Sort, S2 : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction2<T, S1, S2> {
-    val n = name.ifEmpty { "|$thisRef|" }
-    val sortedVar1 = SortedVar("|$thisRef!local!$par1!1|".symbol(), par1)
-    val sortedVar2 = SortedVar("|$thisRef!local!$par2!2|".symbol(), par2)
-    val term = Builder<T>().block(sortedVar1.instance, sortedVar2.instance)
+    if (func == null) {
+      val n = name.ifEmpty { "|$thisRef|" }
+      val sortedVar1 = SortedVar("|$thisRef!local!$par1!1|".symbol(), par1)
+      val sortedVar2 = SortedVar("|$thisRef!local!$par2!2|".symbol(), par2)
+      val term = Builder<T>().block(sortedVar1.instance, sortedVar2.instance)
 
-    program.registerFun(n, sort, listOf(sortedVar1, sortedVar2), term)
+      program.registerFun(n, sort, listOf(sortedVar1, sortedVar2), term)
 
-    return SMTFunction2(
-        n.symbol(),
-        sort,
-        par1,
-        par2,
-        FunctionDefinition(n.symbol(), listOf(sortedVar1, sortedVar2), sort, term))
+      func =
+          SMTFunction2(
+              n.symbol(),
+              sort,
+              par1,
+              par2,
+              FunctionDefinition(n.symbol(), listOf(sortedVar1, sortedVar2), sort, term))
+    }
+
+    return checkNotNull(func)
   }
+
+  private var func: SMTFunction2<T, S1, S2>? = null
 }
 
 /**
@@ -492,22 +556,28 @@ class Define3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction3<T, S1, S2, S3> {
-    val n = name.ifEmpty { "|$thisRef|" }
-    val sortedVar1 = SortedVar("|$thisRef!local!$par1!1|".symbol(), par1)
-    val sortedVar2 = SortedVar("|$thisRef!local!$par2!2|".symbol(), par2)
-    val sortedVar3 = SortedVar("|$thisRef!local!$par3!3|".symbol(), par3)
-    val term = Builder<T>().block(sortedVar1.instance, sortedVar2.instance, sortedVar3.instance)
+    if (func == null) {
+      val n = name.ifEmpty { "|$thisRef|" }
+      val sortedVar1 = SortedVar("|$thisRef!local!$par1!1|".symbol(), par1)
+      val sortedVar2 = SortedVar("|$thisRef!local!$par2!2|".symbol(), par2)
+      val sortedVar3 = SortedVar("|$thisRef!local!$par3!3|".symbol(), par3)
+      val term = Builder<T>().block(sortedVar1.instance, sortedVar2.instance, sortedVar3.instance)
 
-    program.registerFun(n, sort, listOf(sortedVar1, sortedVar2, sortedVar3), term)
+      program.registerFun(n, sort, listOf(sortedVar1, sortedVar2, sortedVar3), term)
 
-    return SMTFunction3(
-        n.symbol(),
-        sort,
-        par1,
-        par2,
-        par3,
-        FunctionDefinition(n.symbol(), listOf(sortedVar1, sortedVar2, sortedVar3), sort, term))
+      return SMTFunction3(
+          n.symbol(),
+          sort,
+          par1,
+          par2,
+          par3,
+          FunctionDefinition(n.symbol(), listOf(sortedVar1, sortedVar2, sortedVar3), sort, term))
+    }
+
+    return checkNotNull(func)
   }
+
+  private var func: SMTFunction3<T, S1, S2, S3>? = null
 }
 
 /**
@@ -532,28 +602,38 @@ class Define4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val name: String = ""
 ) {
   operator fun getValue(thisRef: Any?, property: KProperty<*>): SMTFunction4<T, S1, S2, S3, S4> {
-    val n = name.ifEmpty { "|$thisRef|" }
-    val sortedVar1 = SortedVar("|$thisRef!local!$par1!1|".symbol(), par1)
-    val sortedVar2 = SortedVar("|$thisRef!local!$par2!2|".symbol(), par2)
-    val sortedVar3 = SortedVar("|$thisRef!local!$par3!3|".symbol(), par3)
-    val sortedVar4 = SortedVar("|$thisRef!local!$par4!4|".symbol(), par4)
-    val term =
-        Builder<T>()
-            .block(
-                sortedVar1.instance, sortedVar2.instance, sortedVar3.instance, sortedVar4.instance)
+    if (func == null) {
+      val n = name.ifEmpty { "|$thisRef|" }
+      val sortedVar1 = SortedVar("|$thisRef!local!$par1!1|".symbol(), par1)
+      val sortedVar2 = SortedVar("|$thisRef!local!$par2!2|".symbol(), par2)
+      val sortedVar3 = SortedVar("|$thisRef!local!$par3!3|".symbol(), par3)
+      val sortedVar4 = SortedVar("|$thisRef!local!$par4!4|".symbol(), par4)
+      val term =
+          Builder<T>()
+              .block(
+                  sortedVar1.instance,
+                  sortedVar2.instance,
+                  sortedVar3.instance,
+                  sortedVar4.instance)
 
-    program.registerFun(n, sort, listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4), term)
+      program.registerFun(n, sort, listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4), term)
 
-    return SMTFunction4(
-        n.symbol(),
-        sort,
-        par1,
-        par2,
-        par3,
-        par4,
-        FunctionDefinition(
-            n.symbol(), listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4), sort, term))
+      func =
+          SMTFunction4(
+              n.symbol(),
+              sort,
+              par1,
+              par2,
+              par3,
+              par4,
+              FunctionDefinition(
+                  n.symbol(), listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4), sort, term))
+    }
+
+    return checkNotNull(func)
   }
+
+  private var func: SMTFunction4<T, S1, S2, S3, S4>? = null
 }
 
 /**
@@ -586,38 +666,45 @@ class Define5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
       thisRef: Any?,
       property: KProperty<*>
   ): SMTFunction5<T, S1, S2, S3, S4, S5> {
-    val n = name.ifEmpty { "|$thisRef|" }
-    val sortedVar1 = SortedVar("|$thisRef!local!$par1!1|".symbol(), par1)
-    val sortedVar2 = SortedVar("|$thisRef!local!$par2!2|".symbol(), par2)
-    val sortedVar3 = SortedVar("|$thisRef!local!$par3!3|".symbol(), par3)
-    val sortedVar4 = SortedVar("|$thisRef!local!$par4!4|".symbol(), par4)
-    val sortedVar5 = SortedVar("|$thisRef!local!$par5!5|".symbol(), par5)
-    val term =
-        Builder<T>()
-            .block(
-                sortedVar1.instance,
-                sortedVar2.instance,
-                sortedVar3.instance,
-                sortedVar4.instance,
-                sortedVar5.instance)
+    if (func == null) {
+      val n = name.ifEmpty { "|$thisRef|" }
+      val sortedVar1 = SortedVar("|$thisRef!local!$par1!1|".symbol(), par1)
+      val sortedVar2 = SortedVar("|$thisRef!local!$par2!2|".symbol(), par2)
+      val sortedVar3 = SortedVar("|$thisRef!local!$par3!3|".symbol(), par3)
+      val sortedVar4 = SortedVar("|$thisRef!local!$par4!4|".symbol(), par4)
+      val sortedVar5 = SortedVar("|$thisRef!local!$par5!5|".symbol(), par5)
+      val term =
+          Builder<T>()
+              .block(
+                  sortedVar1.instance,
+                  sortedVar2.instance,
+                  sortedVar3.instance,
+                  sortedVar4.instance,
+                  sortedVar5.instance)
 
-    program.registerFun(
-        n, sort, listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4, sortedVar5), term)
+      program.registerFun(
+          n, sort, listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4, sortedVar5), term)
 
-    return SMTFunction5(
-        n.symbol(),
-        sort,
-        par1,
-        par2,
-        par3,
-        par4,
-        par5,
-        FunctionDefinition(
-            n.symbol(),
-            listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4, sortedVar5),
-            sort,
-            term))
+      func =
+          SMTFunction5(
+              n.symbol(),
+              sort,
+              par1,
+              par2,
+              par3,
+              par4,
+              par5,
+              FunctionDefinition(
+                  n.symbol(),
+                  listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4, sortedVar5),
+                  sort,
+                  term))
+    }
+
+    return checkNotNull(func)
   }
+
+  private var func: SMTFunction5<T, S1, S2, S3, S4, S5>? = null
 }
 
 /**
