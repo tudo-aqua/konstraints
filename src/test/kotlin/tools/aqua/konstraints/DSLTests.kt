@@ -341,5 +341,18 @@ class DSLTests {
                 assert { { A } fpleq { B } fpleq { C } }
               },
               SatStatus.SAT),
-      )
+          arguments(
+              smt(QF_ABV) {
+                val x by declaringConst(ArraySort(BVSort(32), BVSort(8)))
+                val y by declaringConst(ArraySort(BVSort(32), BVSort(8)))
+
+                assert {
+                  ("#b0".bitvec(30) concat extract(2, 1) { select(x, "#b0".bitvec(32)) }) eq
+                      ("#b11".bitvec(32))
+                }
+                assert {
+                  not(not { extract(3, 3) { select(y, "#b0".bitvec(32)) } eq "#b0".bitvec(1) })
+                }
+              },
+              SatStatus.SAT))
 }
