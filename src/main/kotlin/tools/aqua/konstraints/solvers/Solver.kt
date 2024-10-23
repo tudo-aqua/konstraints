@@ -26,12 +26,12 @@ interface Solver : AutoCloseable {
   /** Solves the provided program using this solver */
   fun solve(program: SMTProgram): SatStatus
 
-  /** Returns a model if available, else returns null */
-  fun getModelOrNull(): Model?
+  /** A model if available, else null */
+  val modelOrNull: Model?
 
-  /** Returns the model if one was generated */
-  fun getModel(): Model
+  /** The model if one was generated */
+  val model: Model get() = checkNotNull(modelOrNull) { "model is null" }
 
-  /** Checks if model is available */
-  fun isModelAvailable(): Boolean
+  /** True if a model is available */
+  val isModelAvailable: Boolean
 }

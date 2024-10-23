@@ -213,6 +213,13 @@ class Z3Tests {
   fun getQFAXFile(): Stream<Arguments> = loadResource("/QF_AX/aqua/")
 
   @ParameterizedTest
+  @MethodSource("getQFABVFile")
+  @Timeout(value = 600, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  fun QF_ABV(file: File) = solve(file)
+
+  fun getQFABVFile(): Stream<Arguments> = loadResource("/QF_ABV/bench_ab/")
+
+  @ParameterizedTest
   @MethodSource("getQFIDLModelsFile")
   @Timeout(value = 20, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_IDL_Models(file: File) = solve(file)

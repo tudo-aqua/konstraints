@@ -63,8 +63,8 @@ abstract class SMTProgram(commands: List<Command>, var context: Context?) {
 
       println(status)
 
-      if (solver.isModelAvailable()) {
-        model = solver.getModel()
+      if (solver.isModelAvailable) {
+        model = solver.model
       }
     }
   }
