@@ -30,7 +30,8 @@ interface Solver : AutoCloseable {
   val modelOrNull: Model?
 
   /** The model if one was generated */
-  val model: Model get() = checkNotNull(modelOrNull) { "model is null" }
+  val model: Model
+    get() = checkNotNull(modelOrNull) { "model is null" }
 
   /** True if a model is available */
   val isModelAvailable: Boolean

@@ -40,7 +40,9 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     val declarationsByName = mutableMapOf<Symbol, DeclareFun>()
     terms.forEach { base ->
       base.asSequence().filterIsInstance<UserDeclaredExpression<*>>().forEach { expr ->
-        declarationsByName.computeIfAbsentAndMerge(expr.name) { _ -> DeclareFun(expr.name, expr.children.map(Expression<*>::sort), expr.sort) }
+        declarationsByName.computeIfAbsentAndMerge(expr.name) { _ ->
+          DeclareFun(expr.name, expr.children.map(Expression<*>::sort), expr.sort)
+        }
       }
     }
 
@@ -57,9 +59,11 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     return status
   }
 
-  override val modelOrNull: Model? get() = z3model?.let { Model(it) }
+  override val modelOrNull: Model?
+    get() = z3model?.let { Model(it) }
 
-  override val isModelAvailable: Boolean get() = z3model != null
+  override val isModelAvailable: Boolean
+    get() = z3model != null
 
   override fun visit(assert: Assert) {
     val assertion = assert.expression.z3ify(context)
@@ -82,16 +86,17 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     }
 
     val name = declareFun.name.toString()
-    require (name !in context.functions) { "function $declareFun already declared." }
-      context.functions[name] =
-          context.context.mkFuncDecl(
-              declareFun.name.toSMTString(),
-              declareFun.parameters.map { getOrCreateSort(it) }.toTypedArray(),
-              getOrCreateSort(declareFun.sort))
+    require(name !in context.functions) { "function $declareFun already declared." }
+    context.functions[name] =
+        context.context.mkFuncDecl(
+            declareFun.name.toSMTString(),
+            declareFun.parameters.map { getOrCreateSort(it) }.toTypedArray(),
+            getOrCreateSort(declareFun.sort))
   }
 
-  private fun getOrCreateSort(sort: tools.aqua.konstraints.smt.Sort): Sort = context.sorts.computeIfAbsentAndMerge(sort) { _ ->
-      when (sort) {
+  private fun getOrCreateSort(sort: tools.aqua.konstraints.smt.Sort): Sort =
+      context.sorts.computeIfAbsentAndMerge(sort) { _ ->
+        when (sort) {
           is BoolSort -> context.context.mkBoolSort()
           is BVSort -> context.context.mkBitVecSort(sort.bits)
           is IntSort -> context.context.mkIntSort()
@@ -104,16 +109,16 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
           is FP128 -> context.context.mkFPSort128()
           is ArraySort<*, *> ->
               context.context.mkArraySort(getOrCreateSort(sort.x), getOrCreateSort(sort.y))
-
           else -> context.context.mkUninterpretedSort(sort.toSMTString())
+        }
       }
-  }
 
-  override fun visit(checkSat: CheckSat): Unit = when (solver.check()) {
-    Status.UNSATISFIABLE -> status = SatStatus.UNSAT
-    Status.UNKNOWN -> status = SatStatus.UNKNOWN
-    Status.SATISFIABLE -> status = SatStatus.SAT
-  }
+  override fun visit(checkSat: CheckSat): Unit =
+      when (solver.check()) {
+        Status.UNSATISFIABLE -> status = SatStatus.UNSAT
+        Status.UNKNOWN -> status = SatStatus.UNKNOWN
+        Status.SATISFIABLE -> status = SatStatus.SAT
+      }
 
   override fun visit(exit: Exit) {}
 
