@@ -79,10 +79,10 @@ sealed interface Expression<T : Sort> {
         is AnnotatedExpression -> predicate(this) and this.term.all(predicate)
       }
 
-    fun asSequence(): Sequence<Expression<*>> = sequence {
-        yield(this@Expression)
-        children.forEach { yieldAll(it.asSequence()) }
-    }
+  fun asSequence(): Sequence<Expression<*>> = sequence {
+    yield(this@Expression)
+    children.forEach { yieldAll(it.asSequence()) }
+  }
 
   fun transform(transformation: (Expression<*>) -> Expression<*>): Expression<T> {
     // transform all children

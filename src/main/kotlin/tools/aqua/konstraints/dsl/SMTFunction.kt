@@ -578,7 +578,8 @@ class Define4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val sortedVar2 = SortedVar("|$thisRef!local!$par2!2|".symbol(), par2)
     val sortedVar3 = SortedVar("|$thisRef!local!$par3!3|".symbol(), par3)
     val sortedVar4 = SortedVar("|$thisRef!local!$par4!4|".symbol(), par4)
-    val term = block(sortedVar1.instance, sortedVar2.instance, sortedVar3.instance, sortedVar4.instance)
+    val term =
+        block(sortedVar1.instance, sortedVar2.instance, sortedVar3.instance, sortedVar4.instance)
 
     program.registerFun(n, sort, listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4), term)
 
@@ -607,7 +608,7 @@ class Define4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
 class Define5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
     val sort: T,
     val block:
-       (
+        (
             Expression<S1>,
             Expression<S2>,
             Expression<S3>,
@@ -631,12 +632,13 @@ class Define5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
     val sortedVar3 = SortedVar("|$thisRef!local!$par3!3|".symbol(), par3)
     val sortedVar4 = SortedVar("|$thisRef!local!$par4!4|".symbol(), par4)
     val sortedVar5 = SortedVar("|$thisRef!local!$par5!5|".symbol(), par5)
-    val term = block(
-                sortedVar1.instance,
-                sortedVar2.instance,
-                sortedVar3.instance,
-                sortedVar4.instance,
-                sortedVar5.instance)
+    val term =
+        block(
+            sortedVar1.instance,
+            sortedVar2.instance,
+            sortedVar3.instance,
+            sortedVar4.instance,
+            sortedVar5.instance)
 
     program.registerFun(
         n, sort, listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4, sortedVar5), term)
