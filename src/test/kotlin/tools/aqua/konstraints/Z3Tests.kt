@@ -198,6 +198,13 @@ class Z3Tests {
 
   fun getQFFPFile(): Stream<Arguments> = loadResource("/QF_FP/")
 
+    @ParameterizedTest
+    @MethodSource("getUFFile")
+    @Timeout(value = 600, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+    fun UF(file: File) = solve(file)
+
+    fun getUFFile(): Stream<Arguments> = loadResource("/UF/")
+
   @ParameterizedTest
   @MethodSource("getQFAXFile")
   @Timeout(value = 20, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
