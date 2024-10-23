@@ -244,8 +244,8 @@ class Const<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: Str
 }
 
 /**
- * Delegate provider class for declaring SMT functions of any arity: (declare-fun [name] ([parameters])
- * [sort]).
+ * Delegate provider class for declaring SMT functions of any arity: (declare-fun [name]
+ * ([parameters]) [sort]).
  *
  * Registers the function in the given [program]. If [name] is empty, the name register will be the
  * same as the variable.
@@ -323,7 +323,8 @@ class Declare2<T : Sort, S1 : Sort, S2 : Sort>(
 }
 
 /**
- * Delegate provider class for declaring SMT functions: (declare-fun [name] ([par1] [par2] [par3]) [sort]).
+ * Delegate provider class for declaring SMT functions: (declare-fun [name] ([par1] [par2] [par3])
+ * [sort]).
  *
  * Registers the function in the given [program]. If [name] is empty, the name register will be the
  * same as the variable.
@@ -351,8 +352,8 @@ class Declare3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
 }
 
 /**
- * Delegate provider class for declaring SMT functions: (declare-fun [name] ([par1] [par2] [par3] [par4])
- * [sort]).
+ * Delegate provider class for declaring SMT functions: (declare-fun [name] ([par1] [par2] [par3]
+ * [par4]) [sort]).
  *
  * Registers the function in the given [program]. If [name] is empty, the name register will be the
  * same as the variable.
@@ -380,8 +381,8 @@ class Declare4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
 }
 
 /**
- * Delegate provider class for declaring SMT functions: (declare-fun [name] ([par1] [par2] [par3] [par4]
- * [par5]) [sort]).
+ * Delegate provider class for declaring SMT functions: (declare-fun [name] ([par1] [par2] [par3]
+ * [par4] [par5]) [sort]).
  *
  * Registers the function in the given [program]. If [name] is empty, the name register will be the
  * same as the variable.
@@ -410,8 +411,8 @@ class Declare5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
 }
 
 /**
- * Delegate provider class for defining SMT functions of any arity: (define-fun [name] ([parameters]) [sort]
- * [block]).
+ * Delegate provider class for defining SMT functions of any arity: (define-fun [name]
+ * ([parameters]) [sort] [block]).
  *
  * Registers the function in the given [program]. If [name] is empty, the name register will be the
  * same as the variable.
@@ -472,7 +473,8 @@ class Define1<T : Sort, S : Sort>(
 }
 
 /**
- * Delegate provider class for defining SMT functions: (define-fun [name] ([par1] [par2]) [sort] [block]).
+ * Delegate provider class for defining SMT functions: (define-fun [name] ([par1] [par2]) [sort]
+ * [block]).
  *
  * Registers the function in the given [program]. If [name] is empty, the name register will be the
  * same as the variable.
@@ -509,8 +511,8 @@ class Define2<T : Sort, S1 : Sort, S2 : Sort>(
 }
 
 /**
- * Delegate provider class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3]) [sort]
- * [block]).
+ * Delegate provider class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3])
+ * [sort] [block]).
  *
  * Registers the function in the given [program]. If [name] is empty, the name register will be the
  * same as the variable.
@@ -550,8 +552,8 @@ class Define3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
 }
 
 /**
- * Delegate provider class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3] [par4])
- * [sort] [block]).
+ * Delegate provider class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3]
+ * [par4]) [sort] [block]).
  *
  * Registers the function in the given [program]. If [name] is empty, the name register will be the
  * same as the variable.
@@ -600,8 +602,8 @@ class Define4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
 }
 
 /**
- * Delegate provider class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3] [par4]
- * [par5]) [sort] [block]).
+ * Delegate provider class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3]
+ * [par4] [par5]) [sort] [block]).
  *
  * Registers the function in the given [program]. If [name] is empty, the name register will be the
  * same as the variable.
