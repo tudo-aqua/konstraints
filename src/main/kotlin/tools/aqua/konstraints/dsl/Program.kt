@@ -61,7 +61,7 @@ class SMTProgramBuilder(logic: Logic) {
   }
 
   internal fun registerFun(name: String, sort: Sort, parameters: List<Sort>) {
-    // context.registerFunction(name, parameters, sort)
+    context.registerFunction(name, parameters, sort)
     commands.add(DeclareFun(name.symbol(), parameters, sort))
   }
 
