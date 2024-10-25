@@ -23,6 +23,10 @@ plugins {
 
 rootProject.name = "konstraints"
 
+include("konstraints-all", "konstraints-core", "konstraints-integration-tests")
+
+include(/*"konstraints-cvc5",*/ "konstraints-z3")
+
 develocity {
   buildScan {
     val isCI = System.getenv("CI").isNullOrEmpty().not()

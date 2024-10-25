@@ -26,14 +26,10 @@ on:
   workflow_dispatch:
 
 permissions:
-  checks: write
-  contents: read
-  packages: read
-  pull-requests: write
+  contents: write
 
 jobs:
-  detekt:
-    name: "Detekt Analysis"
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -44,14 +40,9 @@ jobs:
           distribution: temurin
           java-version: 17
       - uses: gradle/actions/setup-gradle@v4
-      - name: "Run Detekt"
-        run: ./gradlew detekt
-      - name: "Attach Detekt Report"
-        shell: sh
-        run: cat build/reports/detekt/detekt.md >> ${GITHUB_STEP_SUMMARY}
+      - run: ./gradlew build
 
-  spotless:
-    name: "Spotless Style Check"
+  dependency-submission:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -61,39 +52,4 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
-      - uses: gradle/actions/setup-gradle@v4
-      - name: "Run Spotless"
-        run: ./gradlew spotlessCheck
-      - name: "Apply Spotless Fixes"
-        if: failure()
-        run: ./gradlew spotlessApply
-      - name: "Attach Spotless Diff"
-        if: failure()
-        shell: sh
-        run: >
-          echo "# Spotless Changes\n\n```diff" >> ${GITHUB_STEP_SUMMARY}       
-          git diff >> ${GITHUB_STEP_SUMMARY}
-          echo "```" >> ${GITHUB_STEP_SUMMARY}
-
-  junit-test:
-    name: "JUnit Tests"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0 # Required for version number generation
-      - uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 17
-      - uses: gradle/actions/setup-gradle@v4
-        with:
-          dependency-graph: generate-and-submit
-      - name: "Run JUnit Tests"
-        run: ./gradlew test
-      - name: "Publish Test Results"
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always() # Must execute after failed tests
-        with:
-          files: "build/test-results/test/TEST-*.xml"
-          comment_mode: off
+      - uses: gradle/actions/dependency-submission@v4
