@@ -16,8 +16,6 @@
  * limitations under the License.
  */
 
-plugins {
-  id("konstraints.developer-utilities")
-  id("konstraints.root-setup")
-  id("konstraints.root-static-analysis")
+dependencyResolutionManagement {
+  versionCatalogs { create("libs") { from(files("../gradle/libs.versions.toml")) } }
 }

@@ -16,8 +16,18 @@
  * limitations under the License.
  */
 
-plugins {
-  id("konstraints.developer-utilities")
-  id("konstraints.root-setup")
-  id("konstraints.root-static-analysis")
-}
+package tools.aqua
+
+private val stableKeywords = setOf("RELEASE", "FINAL", "GA")
+private val versionRegex = "^[0-9,.v-]+(-r)?$".toRegex()
+
+/** Checks is this string appears to encode a stable version. */
+val String.isStableVersion: Boolean
+  get() {
+    val hasStableKeyword = stableKeywords.any { this.uppercase().contains(it) }
+    return hasStableKeyword || versionRegex.matches(this)
+  }
+
+/** Checks is this string appears to encode a prerelease version. */
+val String.isPrereleaseVersion: Boolean
+  get() = !isStableVersion

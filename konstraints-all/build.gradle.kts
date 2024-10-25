@@ -18,6 +18,19 @@
 
 plugins {
   id("konstraints.developer-utilities")
-  id("konstraints.root-setup")
-  id("konstraints.root-static-analysis")
+  id("konstraints.maven-library")
+}
+
+metadata {
+  name = "Konstraints Full Bundle"
+  description = "The Konstraints library and all accompanying solver plugins"
+}
+
+dependencies {
+  api(project(":konstraints-core"))
+  api(project(":konstraints-z3"))
+}
+
+publishing.publications.withType(MavenPublication::class) {
+  pom { packaging = "pom" }
 }

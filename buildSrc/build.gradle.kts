@@ -16,8 +16,25 @@
  * limitations under the License.
  */
 
-plugins {
-  id("konstraints.developer-utilities")
-  id("konstraints.root-setup")
-  id("konstraints.root-static-analysis")
+plugins { `kotlin-dsl` }
+
+repositories {
+  gradlePluginPortal()
+  mavenCentral()
+}
+
+dependencies {
+  // dependency catalog sharing
+  implementation(files(libs.javaClass.superclass.protectionDomain.codeSource.location))
+
+  implementation(libs.gradle.detekt)
+  implementation(libs.gradle.gitVersioning)
+  implementation(libs.gradle.kotlin.dokka)
+  implementation(libs.gradle.kotlin.jvm)
+  implementation(libs.gradle.kotlin.serialization)
+  implementation(libs.gradle.nexus.publish)
+  implementation(libs.gradle.node)
+  implementation(libs.gradle.spotless)
+  implementation(libs.gradle.taskTree)
+  implementation(libs.gradle.versions)
 }

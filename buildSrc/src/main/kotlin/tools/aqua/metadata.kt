@@ -16,8 +16,14 @@
  * limitations under the License.
  */
 
-plugins {
-  id("konstraints.developer-utilities")
-  id("konstraints.root-setup")
-  id("konstraints.root-static-analysis")
+package tools.aqua
+
+import org.gradle.api.provider.Property
+
+/** Stores metadata that is passed to generated Maven artifacts. */
+interface MetadataExtension {
+  /** The project's human-readable name. */
+  val name: Property<String>
+  /** The project's human-readable description. */
+  val description: Property<String>
 }

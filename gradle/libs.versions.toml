@@ -19,21 +19,20 @@ java-jdk = "11"
 kotlin = "2.0.21"
 prettier-toml = "2.0.1"
 
-[plugins]
-detekt = { id = "io.gitlab.arturbosch.detekt", version = "1.23.7" }
-download = { id = "de.undercouch.download", version = "5.6.0" }
-gitVersioning = { id = "me.qoomon.git-versioning", version = "6.4.4" }
-kotlin-dokka = { id = "org.jetbrains.dokka", version = "1.9.20" }
-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
-kotlin-kover = { id = "org.jetbrains.kotlinx.kover", version = "0.8.3" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-nexus-publish = { id = "io.github.gradle-nexus.publish-plugin", version = "2.0.0" }
-node = { id = "com.github.node-gradle.node", version = "7.1.0" }
-spotless = { id = "com.diffplug.spotless", version = "6.25.0" }
-taskTree = { id = "com.dorongold.task-tree", version = "4.0.0" }
-versions = { id = "com.github.ben-manes.versions", version = "0.51.0" }
-
 [libraries]
+# gradle plugins
+gradle-detekt = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version = "1.23.7" }
+gradle-gitVersioning = { group = "me.qoomon", name = "gradle-git-versioning-plugin", version = "6.4.4" }
+gradle-kotlin-dokka = { group = "org.jetbrains.dokka", name = "dokka-gradle-plugin", version = "1.9.20" }
+gradle-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
+gradle-kotlin-serialization = { group = "org.jetbrains.kotlin", name = "kotlin-serialization", version.ref = "kotlin" }
+gradle-nexus-publish = { group = "io.github.gradle-nexus", name = "publish-plugin", version = "2.0.0" }
+gradle-node = { group = "com.github.node-gradle", name = "gradle-node-plugin", version = "7.1.0" }
+gradle-spotless = { group = "com.diffplug.spotless", name = "spotless-plugin-gradle", version = "6.25.0" }
+gradle-taskTree = { group = "com.dorongold.plugins", name = "task-tree", version = "4.0.0" }
+gradle-versions = { group = "com.github.ben-manes", name = "gradle-versions-plugin", version = "0.51.0" }
+
+# regular libraries
 commons-compress = { group = "org.apache.commons", name = "commons-compress", version = "1.27.1" }
 commons-io = { group = "commons-io", name = "commons-io", version = "2.17.0" }
 junit-bom = { group = "org.junit", name = "junit-bom", version = "5.11.3" }

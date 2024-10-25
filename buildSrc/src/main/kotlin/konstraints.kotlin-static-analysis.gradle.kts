@@ -16,8 +16,29 @@
  * limitations under the License.
  */
 
+import org.gradle.accessors.dm.LibrariesForLibs
+import org.gradle.kotlin.dsl.*
+
 plugins {
-  id("konstraints.developer-utilities")
-  id("konstraints.root-setup")
-  id("konstraints.root-static-analysis")
+  id("io.gitlab.arturbosch.detekt")
+  id("com.diffplug.spotless")
 }
+
+val libs = the<LibrariesForLibs>()
+
+repositories { mavenCentral() }
+
+spotless {
+  kotlin {
+    licenseHeaderFile(rootProject.file("config/license/Apache-2.0-cstyle"))
+        .updateYearWithLatest(true)
+    ktfmt()
+  }
+  kotlinGradle {
+    licenseHeaderFile(rootProject.file("config/license/Apache-2.0-cstyle"), "(plugins|import )")
+        .updateYearWithLatest(true)
+    ktfmt()
+  }
+}
+
+detekt { ignoreFailures = true }

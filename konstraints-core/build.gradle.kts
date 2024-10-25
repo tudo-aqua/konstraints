@@ -18,6 +18,19 @@
 
 plugins {
   id("konstraints.developer-utilities")
-  id("konstraints.root-setup")
-  id("konstraints.root-static-analysis")
+  id("konstraints.kotlin-library")
+  id("konstraints.kotlin-static-analysis")
+  id("konstraints.maven-library")
+}
+
+metadata {
+  name = "Konstraints Core"
+  description = "A library for working with SMT expressions on the JVM"
+}
+
+dependencies {
+  implementation(libs.commons.compress)
+  implementation(libs.commons.io)
+  implementation(libs.kotlin.coroutines)
+  implementation(libs.petitparser.core)
 }

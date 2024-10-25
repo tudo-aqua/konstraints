@@ -16,8 +16,15 @@
  * limitations under the License.
  */
 
+import tools.aqua.isPrereleaseVersion
+import tools.aqua.isStableVersion
+
 plugins {
-  id("konstraints.developer-utilities")
-  id("konstraints.root-setup")
-  id("konstraints.root-static-analysis")
+  id("com.dorongold.task-tree")
+  id("com.github.ben-manes.versions")
+}
+
+tasks.dependencyUpdates {
+  gradleReleaseChannel = "current"
+  rejectVersionIf { candidate.version.isPrereleaseVersion && currentVersion.isStableVersion }
 }

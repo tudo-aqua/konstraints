@@ -16,8 +16,27 @@
  * limitations under the License.
  */
 
+import org.gradle.kotlin.dsl.*
+import tools.aqua.MetadataExtension
+import tools.aqua.commonSetup
+
 plugins {
-  id("konstraints.developer-utilities")
-  id("konstraints.root-setup")
-  id("konstraints.root-static-analysis")
+  `java-library`
+  `maven-publish`
+  signing
+}
+
+val metadata = project.extensions.create<MetadataExtension>("metadata")
+
+val maven by
+    publishing.publications.creating(MavenPublication::class) {
+      from(components["java"])
+
+      pom { commonSetup(metadata) }
+    }
+
+signing {
+  setRequired { gradle.taskGraph.allTasks.any { it is PublishToMavenRepository } }
+  useGpgCmd()
+  sign(maven)
 }
