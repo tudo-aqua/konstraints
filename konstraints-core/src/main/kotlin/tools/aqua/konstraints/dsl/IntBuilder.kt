@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.dsl
 
+import java.math.BigInteger
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.theories.*
 
@@ -197,6 +198,42 @@ infix operator fun Long.minus(subtrahend: () -> Expression<IntSort>) =
     IntLiteral(this) minus subtrahend()
 
 /**
+ * Subtraction operator for IntSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [IntSub] object, unpacks the children and returns a new combined [IntSub].
+ * Converts subtrahend from [BigInteger] to [IntLiteral].
+ */
+infix operator fun Expression<IntSort>.minus(subtrahend: BigInteger) =
+    this minus IntLiteral(subtrahend)
+
+/**
+ * Subtraction operator for IntSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [IntSub] object, unpacks the children and returns a new combined [IntSub].
+ * Converts subtrahend from [BigInteger] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<IntSort>).minus(subtrahend: BigInteger) =
+    this() minus IntLiteral(subtrahend)
+
+/**
+ * Subtraction operator for IntSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [IntSub] object, unpacks the children and returns a new combined [IntSub].
+ * Converts [this] from [BigInteger] to [IntLiteral].
+ */
+infix operator fun BigInteger.minus(subtrahend: Expression<IntSort>) =
+    IntLiteral(this) minus subtrahend
+
+/**
+ * Subtraction operator for IntSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [IntSub] object, unpacks the children and returns a new combined [IntSub].
+ * Converts [this] from [BigInteger] to [IntLiteral].
+ */
+infix operator fun BigInteger.minus(subtrahend: () -> Expression<IntSort>) =
+    IntLiteral(this) minus subtrahend()
+
+/**
  * Addition operator for IntSort Expressions: [this] - [summand].
  *
  * If [this] is an [IntAdd] object, unpacks the children and returns a new combined [IntAdd].
@@ -360,6 +397,40 @@ infix operator fun Long.plus(summand: Expression<IntSort>) = IntLiteral(this) pl
  * Converts [this] from [Long] to [IntLiteral].
  */
 infix operator fun Long.plus(summand: () -> Expression<IntSort>) = IntLiteral(this) plus summand()
+
+/**
+ * Addition operator for IntSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [IntAdd] object, unpacks the children and returns a new combined [IntAdd].
+ * Converts summand from [BigInteger] to [IntLiteral].
+ */
+infix operator fun Expression<IntSort>.plus(summand: BigInteger) = this plus IntLiteral(summand)
+
+/**
+ * Addition operator for IntSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [IntAdd] object, unpacks the children and returns a new combined [IntAdd].
+ * Converts summand from [BigInteger] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<IntSort>).plus(summand: BigInteger) =
+    this() plus IntLiteral(summand)
+
+/**
+ * Addition operator for IntSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [IntAdd] object, unpacks the children and returns a new combined [IntAdd].
+ * Converts [this] from [BigInteger] to [IntLiteral].
+ */
+infix operator fun BigInteger.plus(summand: Expression<IntSort>) = IntLiteral(this) plus summand
+
+/**
+ * Addition operator for IntSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [IntAdd] object, unpacks the children and returns a new combined [IntAdd].
+ * Converts [this] from [BigInteger] to [IntLiteral].
+ */
+infix operator fun BigInteger.plus(summand: () -> Expression<IntSort>) =
+    IntLiteral(this) plus summand()
 
 /**
  * Multiplication operator for IntSort Expressions: [this] - [multiplicand].
@@ -542,6 +613,42 @@ infix operator fun Long.times(multiplicand: () -> Expression<IntSort>) =
     IntLiteral(this) times multiplicand()
 
 /**
+ * Multiplication operator for IntSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [IntMul] object, unpacks the children and returns a new combined [IntMul].
+ * Converts multiplicand from [BigInteger] to [IntLiteral].
+ */
+infix operator fun Expression<IntSort>.times(multiplicand: BigInteger) =
+    this times IntLiteral(multiplicand)
+
+/**
+ * Multiplication operator for IntSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [IntMul] object, unpacks the children and returns a new combined [IntMul].
+ * Converts multiplicand from [BigInteger] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<IntSort>).times(multiplicand: BigInteger) =
+    this() times IntLiteral(multiplicand)
+
+/**
+ * Multiplication operator for IntSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [IntMul] object, unpacks the children and returns a new combined [IntMul].
+ * Converts [this] from [BigInteger] to [IntLiteral].
+ */
+infix operator fun BigInteger.times(multiplicand: Expression<IntSort>) =
+    IntLiteral(this) times multiplicand
+
+/**
+ * Multiplication operator for IntSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [IntMul] object, unpacks the children and returns a new combined [IntMul].
+ * Converts [this] from [BigInteger] to [IntLiteral].
+ */
+infix operator fun BigInteger.times(multiplicand: () -> Expression<IntSort>) =
+    IntLiteral(this) times multiplicand()
+
+/**
  * Divison operator for IntSort Expressions: [this] - [divisor].
  *
  * If [this] is an [IntDiv] object, unpacks the children and returns a new combined [IntDiv].
@@ -703,6 +810,40 @@ infix operator fun Long.div(divisor: Expression<IntSort>) = IntLiteral(this) div
  * Converts [this] from [Long] to [IntLiteral].
  */
 infix operator fun Long.div(divisor: () -> Expression<IntSort>) = IntLiteral(this) div divisor()
+
+/**
+ * Divison operator for IntSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [IntDiv] object, unpacks the children and returns a new combined [IntDiv].
+ * Converts divisor from [BigInteger] to [IntLiteral].
+ */
+infix operator fun Expression<IntSort>.div(divisor: BigInteger) = this div IntLiteral(divisor)
+
+/**
+ * Divison operator for IntSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [IntDiv] object, unpacks the children and returns a new combined [IntDiv].
+ * Converts divisor from [BigInteger] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<IntSort>).div(divisor: BigInteger) =
+    this() div IntLiteral(divisor)
+
+/**
+ * Divison operator for IntSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [IntDiv] object, unpacks the children and returns a new combined [IntDiv].
+ * Converts [this] from [BigInteger] to [IntLiteral].
+ */
+infix operator fun BigInteger.div(divisor: Expression<IntSort>) = IntLiteral(this) div divisor
+
+/**
+ * Divison operator for IntSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [IntDiv] object, unpacks the children and returns a new combined [IntDiv].
+ * Converts [this] from [BigInteger] to [IntLiteral].
+ */
+infix operator fun BigInteger.div(divisor: () -> Expression<IntSort>) =
+    IntLiteral(this) div divisor()
 
 /** Absolute value operation for IntSort Expressions. */
 fun abs(block: () -> Expression<IntSort>) = Abs(block())
@@ -884,6 +1025,43 @@ infix fun Long.greater(block: () -> Expression<IntSort>) = IntLiteral(this) grea
  * [IntLiteral].
  */
 infix fun Long.greater(other: IntGreater) = IntGreater(listOf(IntLiteral(this)) + other.children)
+
+/**
+ * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [BigInteger]
+ * to [IntLiteral].
+ */
+infix fun Expression<IntSort>.greater(other: BigInteger) = this greater IntLiteral(other)
+
+/**
+ * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [BigInteger]
+ * to [IntLiteral].
+ */
+infix fun (() -> Expression<IntSort>).greater(other: BigInteger) = this() greater IntLiteral(other)
+
+/**
+ * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [BigInteger]
+ * to [IntLiteral].
+ */
+infix fun IntGreater.greater(other: BigInteger) = IntGreater(this.children + IntLiteral(other))
+
+/**
+ * Greater operator for IntSort Expressions: [this] > [other]. [this] is converted from [BigInteger]
+ * to [IntLiteral].
+ */
+infix fun BigInteger.greater(other: Expression<IntSort>) = IntLiteral(this) greater other
+
+/**
+ * Greater operator for IntSort Expressions: [this] > [block]. [this] is converted from [BigInteger]
+ * to [IntLiteral].
+ */
+infix fun BigInteger.greater(block: () -> Expression<IntSort>) = IntLiteral(this) greater block()
+
+/**
+ * Greater operator for IntSort Expressions: [this] > [other]. [this] is converted from [BigInteger]
+ * to [IntLiteral].
+ */
+infix fun BigInteger.greater(other: IntGreater) =
+    IntGreater(listOf(IntLiteral(this)) + other.children)
 
 private fun makeIntOperator(
     init: Builder<IntSort>.() -> Unit,
