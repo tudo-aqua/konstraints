@@ -54,6 +54,14 @@ internal object RealSortDecl : SortDecl<RealSort>("Real".symbol(), emptySet(), e
  */
 class RealLiteral(val value: BigDecimal) :
     Literal<RealSort>(LiteralString(value.toString()), RealSort) {
+  constructor(value: Byte) : this(value.toInt().toBigDecimal())
+
+  constructor(value: Short) : this(value.toInt().toBigDecimal())
+
+  constructor(value: Int) : this(value.toBigDecimal())
+
+  constructor(value: Long) : this(value.toBigDecimal())
+
   override val sort: RealSort = RealSort
 
   override fun toString(): String = value.toString()

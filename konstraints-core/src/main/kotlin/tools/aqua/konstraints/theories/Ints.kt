@@ -56,6 +56,15 @@ internal object IntSortDecl : SortDecl<IntSort>("Int".symbol(), emptySet(), empt
  */
 class IntLiteral(val value: BigInteger) :
     Literal<IntSort>(LiteralString(value.toString()), IntSort) {
+
+  constructor(value: Byte) : this(value.toInt().toBigInteger())
+
+  constructor(value: Short) : this(value.toInt().toBigInteger())
+
+  constructor(value: Int) : this(value.toBigInteger())
+
+  constructor(value: Long) : this(value.toBigInteger())
+
   override fun toString(): String = value.toString()
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> = this
