@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.theories
 
+import java.math.BigDecimal
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.smt.*
@@ -330,6 +331,30 @@ data class FPLiteral(
         FPSort(exponent.sort.bits, significand.sort.bits + 1)) {
   init {
     require(sign.sort.bits == 1)
+  }
+
+  companion object {
+    operator fun invoke(value: BigDecimal): FPLiteral = TODO()
+
+    operator fun invoke(value: Double): FPLiteral {
+      // TODO special cases (NaN, Inf etc.)
+      val bitvec = value.toBits().toString()
+
+      return FPLiteral(
+          bitvec.substring(0..0).bitvec(),
+          bitvec.substring(1..11).bitvec(),
+          bitvec.substring(12).bitvec())
+    }
+
+    operator fun invoke(value: Float): FPLiteral {
+      // TODO special cases (NaN, Inf etc.)
+      val bitvec = value.toBits().toString()
+
+      return FPLiteral(
+          bitvec.substring(0..0).bitvec(),
+          bitvec.substring(1..8).bitvec(),
+          bitvec.substring(9).bitvec())
+    }
   }
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> = this
