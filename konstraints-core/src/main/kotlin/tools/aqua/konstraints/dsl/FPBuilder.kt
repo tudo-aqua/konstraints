@@ -2960,6 +2960,102 @@ infix fun (() -> Expression<FPSort>).fprem(divisor: Expression<FPSort>) = FPRem(
 infix fun (() -> Expression<FPSort>).fprem(divisor: () -> Expression<FPSort>) =
     FPRem(this(), divisor())
 
+/**
+ * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
+ * [this]/[divisor].
+ *
+ * Converts [this] from [Float] to [FPLiteral] with sort (_ FloatingPoint 8 24).
+ */
+infix fun Float.fprem(divisor: Expression<FPSort>) = FPRem(FPLiteral(this), divisor)
+
+/**
+ * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
+ * [this]/[divisor].
+ *
+ * Converts [this] from [Float] to [FPLiteral] with sort (_ FloatingPoint 8 24).
+ */
+infix fun Float.fprem(divisor: () -> Expression<FPSort>) = FPRem(FPLiteral(this), divisor())
+
+/**
+ * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
+ * [this]/[divisor].
+ *
+ * Converts [divisor] from [Float] to [FPLiteral] with sort (_ FloatingPoint 8 24).
+ */
+infix fun Expression<FPSort>.fprem(divisor: Float) = FPRem(this, FPLiteral(divisor))
+
+/**
+ * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
+ * [this]/[divisor].
+ *
+ * Converts [divisor] from [Float] to [FPLiteral] with sort (_ FloatingPoint 8 24).
+ */
+infix fun (() -> Expression<FPSort>).fprem(divisor: Float) = FPRem(this(), FPLiteral(divisor))
+
+/**
+ * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
+ * [this]/[divisor].
+ *
+ * Converts [this] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ */
+infix fun Double.fprem(divisor: Expression<FPSort>) = FPRem(FPLiteral(this), divisor)
+
+/**
+ * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
+ * [this]/[divisor].
+ *
+ * Converts [this] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ */
+infix fun Double.fprem(divisor: () -> Expression<FPSort>) = FPRem(FPLiteral(this), divisor())
+
+/**
+ * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
+ * [this]/[divisor].
+ *
+ * Converts [divisor] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ */
+infix fun Expression<FPSort>.fprem(divisor: Double) = FPRem(this, FPLiteral(divisor))
+
+/**
+ * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
+ * [this]/[divisor].
+ *
+ * Converts [divisor] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ */
+infix fun (() -> Expression<FPSort>).fprem(divisor: Double) = FPRem(this(), FPLiteral(divisor))
+
+/**
+ * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
+ * [this]/[divisor].
+ *
+ * Converts [this] from [BigDecimal] to [FPLiteral].
+ */
+infix fun BigDecimal.fprem(divisor: Expression<FPSort>) = FPRem(FPLiteral(this), divisor)
+
+/**
+ * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
+ * [this]/[divisor].
+ *
+ * Converts [this] from [BigDecimal] to [FPLiteral].
+ */
+infix fun BigDecimal.fprem(divisor: () -> Expression<FPSort>) = FPRem(FPLiteral(this), divisor())
+
+/**
+ * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
+ * [this]/[divisor].
+ *
+ * Converts [divisor] from [BigDecimal] to [FPLiteral].
+ */
+infix fun Expression<FPSort>.fprem(divisor: BigDecimal) = FPRem(this, FPLiteral(divisor))
+
+/**
+ * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
+ * [this]/[divisor].
+ *
+ * Converts [divisor] from [BigDecimal] to [FPLiteral].
+ */
+infix fun (() -> Expression<FPSort>).fprem(divisor: BigDecimal) = FPRem(this(), FPLiteral(divisor))
+
 /*
  * unary floating-point operations
  */
@@ -2972,6 +3068,30 @@ fun fpsqrt(roundingMode: Expression<RoundingMode> = RNE, block: () -> Expression
 fun fpsqrt(roundingMode: Expression<RoundingMode> = RNE, expr: Expression<FPSort>) =
     FPSqrt(roundingMode, expr)
 
+/**
+ * Square root operator for FPSort expressions.
+ *
+ * Converts [expr] from [Float] to [FPLiteral] with sort (_ FloatingPoint 8 24).
+ */
+fun fpsqrt(roundingMode: Expression<RoundingMode> = RNE, expr: Float) =
+    FPSqrt(roundingMode, FPLiteral(expr))
+
+/**
+ * Square root operator for FPSort expressions.
+ *
+ * Converts [expr] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ */
+fun fpsqrt(roundingMode: Expression<RoundingMode> = RNE, expr: Double) =
+    FPSqrt(roundingMode, FPLiteral(expr))
+
+/**
+ * Square root operator for FPSort expressions.
+ *
+ * Converts [expr] from [BigDecimal] to [FPLiteral].
+ */
+fun fpsqrt(roundingMode: Expression<RoundingMode> = RNE, expr: BigDecimal) =
+    FPSqrt(roundingMode, FPLiteral(expr))
+
 /** Round to integral operator for FPSort expressions. */
 fun fproundToIntegral(
     roundingMode: Expression<RoundingMode> = RNE,
@@ -2982,33 +3102,141 @@ fun fproundToIntegral(
 fun fproundToIntegral(roundingMode: Expression<RoundingMode> = RNE, expr: Expression<FPSort>) =
     FPRoundToIntegral(roundingMode, expr)
 
+/**
+ * Round to integral operator for FPSort expressions.
+ *
+ * Converts [expr] from [Float] to [FPLiteral] with sort (_ FloatingPoint 8 24).
+ */
+fun fproundToIntegral(roundingMode: Expression<RoundingMode> = RNE, expr: Float) =
+    FPRoundToIntegral(roundingMode, FPLiteral(expr))
+
+/**
+ * Round to integral operator for FPSort expressions.
+ *
+ * Converts [expr] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ */
+fun fproundToIntegral(roundingMode: Expression<RoundingMode> = RNE, expr: Double) =
+    FPRoundToIntegral(roundingMode, FPLiteral(expr))
+
+/**
+ * Round to integral operator for FPSort expressions.
+ *
+ * Converts [expr] from [BigDecimal] to [FPLiteral].
+ */
+fun fproundToIntegral(roundingMode: Expression<RoundingMode> = RNE, expr: BigDecimal) =
+    FPRoundToIntegral(roundingMode, FPLiteral(expr))
+
 /*
  * floating-point comparison operators
  */
 
 /** Min operator for FPSort expressions. */
-fun fpmin(rhs: Expression<FPSort>, lhs: Expression<FPSort>) = FPMin(rhs, lhs)
+fun fpmin(lhs: Expression<FPSort>, rhs: Expression<FPSort>) = FPMin(lhs, rhs)
 
 /** Min operator for FPSort expressions. */
-fun fpmin(rhs: Expression<FPSort>, lhs: () -> Expression<FPSort>) = FPMin(rhs, lhs())
+fun fpmin(lhs: Expression<FPSort>, rhs: () -> Expression<FPSort>) = FPMin(lhs, rhs())
 
 /** Min operator for FPSort expressions. */
-fun fpmin(rhs: () -> Expression<FPSort>, lhs: Expression<FPSort>) = FPMin(rhs(), lhs)
+fun fpmin(lhs: () -> Expression<FPSort>, rhs: Expression<FPSort>) = FPMin(lhs(), rhs)
 
 /** Min operator for FPSort expressions. */
-fun fpmin(rhs: () -> Expression<FPSort>, lhs: () -> Expression<FPSort>) = FPMin(rhs(), lhs())
+fun fpmin(lhs: () -> Expression<FPSort>, rhs: () -> Expression<FPSort>) = FPMin(lhs(), rhs())
+
+/**
+ * Min operator for FPSort expressions.
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort (_ FloatingPoint 4 24).
+ */
+fun fpmin(lhs: Expression<FPSort>, rhs: Float) = FPMin(lhs, FPLiteral(rhs))
+
+/**
+ * Min operator for FPSort expressions.
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ */
+fun fpmin(lhs: Expression<FPSort>, rhs: Double) = FPMin(lhs, FPLiteral(rhs))
+
+/**
+ * Min operator for FPSort expressions.
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral].
+ */
+fun fpmin(lhs: Expression<FPSort>, rhs: BigDecimal) = FPMin(lhs, FPLiteral(rhs))
+
+/**
+ * Min operator for FPSort expressions.
+ *
+ * Converts [lhs] from [Float] to [FPLiteral] with sort (_ FloatingPoint 4 24).
+ */
+fun fpmin(lhs: Float, rhs: Expression<FPSort>) = FPMin(FPLiteral(lhs), rhs)
+
+/**
+ * Min operator for FPSort expressions.
+ *
+ * Converts [lhs] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ */
+fun fpmin(lhs: Double, rhs: Expression<FPSort>) = FPMin(FPLiteral(lhs), rhs)
+
+/**
+ * Min operator for FPSort expressions.
+ *
+ * Converts [lhs] from [BigDecimal] to [FPLiteral].
+ */
+fun fpmin(lhs: BigDecimal, rhs: Expression<FPSort>) = FPMin(FPLiteral(lhs), rhs)
 
 /** Max operator for FPSort expressions. */
-fun fpmax(rhs: Expression<FPSort>, lhs: Expression<FPSort>) = FPMax(rhs, lhs)
+fun fpmax(lhs: Expression<FPSort>, rhs: Expression<FPSort>) = FPMax(lhs, rhs)
 
 /** Max operator for FPSort expressions. */
-fun fpmax(rhs: Expression<FPSort>, lhs: () -> Expression<FPSort>) = FPMax(rhs, lhs())
+fun fpmax(lhs: Expression<FPSort>, rhs: () -> Expression<FPSort>) = FPMax(lhs, rhs())
 
 /** Max operator for FPSort expressions. */
-fun fpmax(rhs: () -> Expression<FPSort>, lhs: Expression<FPSort>) = FPMax(rhs(), lhs)
+fun fpmax(lhs: () -> Expression<FPSort>, rhs: Expression<FPSort>) = FPMax(lhs(), rhs)
 
 /** Max operator for FPSort expressions. */
-fun fpmax(rhs: () -> Expression<FPSort>, lhs: () -> Expression<FPSort>) = FPMax(rhs(), lhs())
+fun fpmax(lhs: () -> Expression<FPSort>, rhs: () -> Expression<FPSort>) = FPMax(lhs(), rhs())
+
+/**
+ * Max operator for FPSort expressions.
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort (_ FloatingPoint 4 24).
+ */
+fun fpmax(lhs: Expression<FPSort>, rhs: Float) = FPMax(lhs, FPLiteral(rhs))
+
+/**
+ * Max operator for FPSort expressions.
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ */
+fun fpmax(lhs: Expression<FPSort>, rhs: Double) = FPMax(lhs, FPLiteral(rhs))
+
+/**
+ * Max operator for FPSort expressions.
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral].
+ */
+fun fpmax(lhs: Expression<FPSort>, rhs: BigDecimal) = FPMax(lhs, FPLiteral(rhs))
+
+/**
+ * Max operator for FPSort expressions.
+ *
+ * Converts [lhs] from [Float] to [FPLiteral] with sort (_ FloatingPoint 4 24).
+ */
+fun fpmax(lhs: Float, rhs: Expression<FPSort>) = FPMax(FPLiteral(lhs), rhs)
+
+/**
+ * Max operator for FPSort expressions.
+ *
+ * Converts [lhs] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ */
+fun fpmax(lhs: Double, rhs: Expression<FPSort>) = FPMax(FPLiteral(lhs), rhs)
+
+/**
+ * Max operator for FPSort expressions.
+ *
+ * Converts [lhs] from [BigDecimal] to [FPLiteral].
+ */
+fun fpmax(lhs: BigDecimal, rhs: Expression<FPSort>) = FPMax(FPLiteral(lhs), rhs)
 
 /** Less equals operator for FPSort expressions: [this] <= [rhs]. */
 infix fun Expression<FPSort>.fpleq(rhs: Expression<FPSort>) = FPLeq(this, rhs)
@@ -3099,306 +3327,366 @@ infix fun (() -> FPGt).fpgt(rhs: () -> Expression<FPSort>) = FPGt(this().childre
 infix fun (() -> FPEq).fpeq(rhs: () -> Expression<FPSort>) = FPEq(this().children + rhs())
 
 /**
- * Less equals operator for FPSort expressions: [this] <= [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Less equals operator for FPSort expressions: [this] <= [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Expression<FPSort>.fpleq(rhs: Float) = FPLeq(this, FPLiteral(rhs))
 /**
- * Less equals operator for FPSort expressions: [this] <= [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Less equals operator for FPSort expressions: [this] <= [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun Expression<FPSort>.fpleq(rhs: Double) = FPLeq(this, FPLiteral(rhs))
 /**
- * Less equals operator for FPSort expressions: [this] <= [rhs]. Converts [rhs] from [BigDecimal] to
- * [FPLiteral] with sort [()]
+ * Less equals operator for FPSort expressions: [this] <= [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun Expression<FPSort>.fpleq(rhs: BigDecimal) = FPLeq(this, FPLiteral(rhs))
 /**
- * Less than operator for FPSort expressions: [this] < [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Less than operator for FPSort expressions: [this] < [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Expression<FPSort>.fplt(rhs: Float) = FPLt(this, FPLiteral(rhs))
 /**
- * Less than operator for FPSort expressions: [this] < [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Less than operator for FPSort expressions: [this] < [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun Expression<FPSort>.fplt(rhs: Double) = FPLt(this, FPLiteral(rhs))
 /**
- * Less than operator for FPSort expressions: [this] < [rhs]. Converts [rhs] from [BigDecimal] to
- * [FPLiteral] with sort [()]
+ * Less than operator for FPSort expressions: [this] < [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun Expression<FPSort>.fplt(rhs: BigDecimal) = FPLt(this, FPLiteral(rhs))
 /**
- * Greater equals operator for FPSort expressions: [this] >= [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Greater equals operator for FPSort expressions: [this] >= [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Expression<FPSort>.fpgeq(rhs: Float) = FPGeq(this, FPLiteral(rhs))
 /**
- * Greater equals operator for FPSort expressions: [this] >= [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Greater equals operator for FPSort expressions: [this] >= [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun Expression<FPSort>.fpgeq(rhs: Double) = FPGeq(this, FPLiteral(rhs))
 /**
- * Greater equals operator for FPSort expressions: [this] >= [rhs]. Converts [rhs] from [BigDecimal]
- * to [FPLiteral] with sort [()]
+ * Greater equals operator for FPSort expressions: [this] >= [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun Expression<FPSort>.fpgeq(rhs: BigDecimal) = FPGeq(this, FPLiteral(rhs))
 /**
- * Greater than operator for FPSort expressions: [this] > [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Greater than operator for FPSort expressions: [this] > [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Expression<FPSort>.fpgt(rhs: Float) = FPGt(this, FPLiteral(rhs))
 /**
- * Greater than operator for FPSort expressions: [this] > [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Greater than operator for FPSort expressions: [this] > [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun Expression<FPSort>.fpgt(rhs: Double) = FPGt(this, FPLiteral(rhs))
 /**
- * Greater than operator for FPSort expressions: [this] > [rhs]. Converts [rhs] from [BigDecimal] to
- * [FPLiteral] with sort [()]
+ * Greater than operator for FPSort expressions: [this] > [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun Expression<FPSort>.fpgt(rhs: BigDecimal) = FPGt(this, FPLiteral(rhs))
 /**
- * Equals operator for FPSort expressions: [this] = [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Equals operator for FPSort expressions: [this] = [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Expression<FPSort>.fpeq(rhs: Float) = FPEq(this, FPLiteral(rhs))
 /**
- * Equals operator for FPSort expressions: [this] = [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Equals operator for FPSort expressions: [this] = [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun Expression<FPSort>.fpeq(rhs: Double) = FPEq(this, FPLiteral(rhs))
 /**
- * Equals operator for FPSort expressions: [this] = [rhs]. Converts [rhs] from [BigDecimal] to
- * [FPLiteral] with sort [()]
+ * Equals operator for FPSort expressions: [this] = [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun Expression<FPSort>.fpeq(rhs: BigDecimal) = FPEq(this, FPLiteral(rhs))
 
 /**
- * Less equals operator for FPSort expressions: [this] <= [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Less equals operator for FPSort expressions: [this] <= [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun (() -> Expression<FPSort>).fpleq(rhs: Float) = FPLeq(this(), FPLiteral(rhs))
 /**
- * Less equals operator for FPSort expressions: [this] <= [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Less equals operator for FPSort expressions: [this] <= [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun (() -> Expression<FPSort>).fpleq(rhs: Double) = FPLeq(this(), FPLiteral(rhs))
 /**
- * Less equals operator for FPSort expressions: [this] <= [rhs]. Converts [rhs] from [BigDecimal] to
- * [FPLiteral] with sort [()]
+ * Less equals operator for FPSort expressions: [this] <= [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun (() -> Expression<FPSort>).fpleq(rhs: BigDecimal) = FPLeq(this(), FPLiteral(rhs))
 /**
- * Less than operator for FPSort expressions: [this] < [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Less than operator for FPSort expressions: [this] < [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun (() -> Expression<FPSort>).fplt(rhs: Float) = FPLt(this(), FPLiteral(rhs))
 /**
- * Less than operator for FPSort expressions: [this] < [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Less than operator for FPSort expressions: [this] < [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun (() -> Expression<FPSort>).fplt(rhs: Double) = FPLt(this(), FPLiteral(rhs))
 /**
- * Less than operator for FPSort expressions: [this] < [rhs]. Converts [rhs] from [BigDecimal] to
- * [FPLiteral] with sort [()]
+ * Less than operator for FPSort expressions: [this] < [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun (() -> Expression<FPSort>).fplt(rhs: BigDecimal) = FPLt(this(), FPLiteral(rhs))
 /**
- * Greater equals operator for FPSort expressions: [this] >= [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Greater equals operator for FPSort expressions: [this] >= [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun (() -> Expression<FPSort>).fpgeq(rhs: Float) = FPGeq(this(), FPLiteral(rhs))
 /**
- * Greater equals operator for FPSort expressions: [this] >= [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Greater equals operator for FPSort expressions: [this] >= [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun (() -> Expression<FPSort>).fpgeq(rhs: Double) = FPGeq(this(), FPLiteral(rhs))
 /**
- * Greater equals operator for FPSort expressions: [this] >= [rhs]. Converts [rhs] from [BigDecimal]
- * to [FPLiteral] with sort [()]
+ * Greater equals operator for FPSort expressions: [this] >= [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun (() -> Expression<FPSort>).fpgeq(rhs: BigDecimal) = FPGeq(this(), FPLiteral(rhs))
 /**
- * Greater than operator for FPSort expressions: [this] > [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Greater than operator for FPSort expressions: [this] > [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun (() -> Expression<FPSort>).fpgt(rhs: Float) = FPGt(this(), FPLiteral(rhs))
 /**
- * Greater than operator for FPSort expressions: [this] > [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Greater than operator for FPSort expressions: [this] > [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun (() -> Expression<FPSort>).fpgt(rhs: Double) = FPGt(this(), FPLiteral(rhs))
 /**
- * Greater than operator for FPSort expressions: [this] > [rhs]. Converts [rhs] from [BigDecimal] to
- * [FPLiteral] with sort [()]
+ * Greater than operator for FPSort expressions: [this] > [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun (() -> Expression<FPSort>).fpgt(rhs: BigDecimal) = FPGt(this(), FPLiteral(rhs))
 /**
- * Equals operator for FPSort expressions: [this] = [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Equals operator for FPSort expressions: [this] = [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun (() -> Expression<FPSort>).fpeq(rhs: Float) = FPEq(this(), FPLiteral(rhs))
 /**
- * Equals operator for FPSort expressions: [this] = [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Equals operator for FPSort expressions: [this] = [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun (() -> Expression<FPSort>).fpeq(rhs: Double) = FPEq(this(), FPLiteral(rhs))
 /**
- * Equals operator for FPSort expressions: [this] = [rhs]. Converts [rhs] from [BigDecimal] to
- * [FPLiteral] with sort [()]
+ * Equals operator for FPSort expressions: [this] = [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun (() -> Expression<FPSort>).fpeq(rhs: BigDecimal) = FPEq(this(), FPLiteral(rhs))
 
 /**
- * Less equals operator for FPSort expressions: [this] <= [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Less equals operator for FPSort expressions: [this] <= [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fpleq(rhs: Expression<FPSort>) = FPLeq(FPLiteral(this), rhs)
 /**
- * Less equals operator for FPSort expressions: [this] <= [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Less equals operator for FPSort expressions: [this] <= [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun Double.fpleq(rhs: Expression<FPSort>) = FPLeq(FPLiteral(this), rhs)
 /**
- * Less equals operator for FPSort expressions: [this] <= [rhs]. Converts [rhs] from [BigDecimal] to
- * [FPLiteral] with sort [()]
+ * Less equals operator for FPSort expressions: [this] <= [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun BigDecimal.fpleq(rhs: Expression<FPSort>) = FPLeq(FPLiteral(this), rhs)
 /**
- * Less than operator for FPSort expressions: [this] < [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Less than operator for FPSort expressions: [this] < [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fplt(rhs: Expression<FPSort>) = FPLt(FPLiteral(this), rhs)
 /**
- * Less than operator for FPSort expressions: [this] < [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Less than operator for FPSort expressions: [this] < [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun Double.fplt(rhs: Expression<FPSort>) = FPLt(FPLiteral(this), rhs)
 /**
- * Less than operator for FPSort expressions: [this] < [rhs]. Converts [rhs] from [BigDecimal] to
- * [FPLiteral] with sort [()]
+ * Less than operator for FPSort expressions: [this] < [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun BigDecimal.fplt(rhs: Expression<FPSort>) = FPLt(FPLiteral(this), rhs)
 /**
- * Greater equals operator for FPSort expressions: [this] >= [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Greater equals operator for FPSort expressions: [this] >= [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fpgeq(rhs: Expression<FPSort>) = FPGeq(FPLiteral(this), rhs)
 /**
- * Greater equals operator for FPSort expressions: [this] >= [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Greater equals operator for FPSort expressions: [this] >= [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun Double.fpgeq(rhs: Expression<FPSort>) = FPGeq(FPLiteral(this), rhs)
 /**
- * Greater equals operator for FPSort expressions: [this] >= [rhs]. Converts [rhs] from [BigDecimal]
- * to [FPLiteral] with sort [()]
+ * Greater equals operator for FPSort expressions: [this] >= [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun BigDecimal.fpgeq(rhs: Expression<FPSort>) = FPGeq(FPLiteral(this), rhs)
 /**
- * Greater than operator for FPSort expressions: [this] > [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Greater than operator for FPSort expressions: [this] > [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fpgt(rhs: Expression<FPSort>) = FPGt(FPLiteral(this), rhs)
 /**
- * Greater than operator for FPSort expressions: [this] > [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Greater than operator for FPSort expressions: [this] > [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun Double.fpgt(rhs: Expression<FPSort>) = FPGt(FPLiteral(this), rhs)
 /**
- * Greater than operator for FPSort expressions: [this] > [rhs]. Converts [rhs] from [BigDecimal] to
- * [FPLiteral] with sort [()]
+ * Greater than operator for FPSort expressions: [this] > [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun BigDecimal.fpgt(rhs: Expression<FPSort>) = FPGt(FPLiteral(this), rhs)
 /**
- * Equals operator for FPSort expressions: [this] = [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Equals operator for FPSort expressions: [this] = [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fpeq(rhs: Expression<FPSort>) = FPEq(FPLiteral(this), rhs)
 /**
- * Equals operator for FPSort expressions: [this] = [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Equals operator for FPSort expressions: [this] = [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun Double.fpeq(rhs: Expression<FPSort>) = FPEq(FPLiteral(this), rhs)
 /**
- * Equals operator for FPSort expressions: [this] = [rhs]. Converts [rhs] from [BigDecimal] to
- * [FPLiteral] with sort [()]
+ * Equals operator for FPSort expressions: [this] = [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun BigDecimal.fpeq(rhs: Expression<FPSort>) = FPEq(FPLiteral(this), rhs)
 
 /**
- * Less equals operator for FPSort expressions: [this] <= [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Less equals operator for FPSort expressions: [this] <= [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fpleq(rhs: () -> Expression<FPSort>) = FPLeq(FPLiteral(this), rhs())
 /**
- * Less equals operator for FPSort expressions: [this] <= [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Less equals operator for FPSort expressions: [this] <= [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun Double.fpleq(rhs: () -> Expression<FPSort>) = FPLeq(FPLiteral(this), rhs())
 /**
- * Less equals operator for FPSort expressions: [this] <= [rhs]. Converts [rhs] from [BigDecimal] to
- * [FPLiteral] with sort [()]
+ * Less equals operator for FPSort expressions: [this] <= [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun BigDecimal.fpleq(rhs: () -> Expression<FPSort>) = FPLeq(FPLiteral(this), rhs())
 /**
- * Less than operator for FPSort expressions: [this] < [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Less than operator for FPSort expressions: [this] < [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fplt(rhs: () -> Expression<FPSort>) = FPLt(FPLiteral(this), rhs())
 /**
- * Less than operator for FPSort expressions: [this] < [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Less than operator for FPSort expressions: [this] < [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun Double.fplt(rhs: () -> Expression<FPSort>) = FPLt(FPLiteral(this), rhs())
 /**
- * Less than operator for FPSort expressions: [this] < [rhs]. Converts [rhs] from [BigDecimal] to
- * [FPLiteral] with sort [()]
+ * Less than operator for FPSort expressions: [this] < [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun BigDecimal.fplt(rhs: () -> Expression<FPSort>) = FPLt(FPLiteral(this), rhs())
 /**
- * Greater equals operator for FPSort expressions: [this] >= [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Greater equals operator for FPSort expressions: [this] >= [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fpgeq(rhs: () -> Expression<FPSort>) = FPGeq(FPLiteral(this), rhs())
 /**
- * Greater equals operator for FPSort expressions: [this] >= [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Greater equals operator for FPSort expressions: [this] >= [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun Double.fpgeq(rhs: () -> Expression<FPSort>) = FPGeq(FPLiteral(this), rhs())
 /**
- * Greater equals operator for FPSort expressions: [this] >= [rhs]. Converts [rhs] from [BigDecimal]
- * to [FPLiteral] with sort [()]
+ * Greater equals operator for FPSort expressions: [this] >= [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun BigDecimal.fpgeq(rhs: () -> Expression<FPSort>) = FPGeq(FPLiteral(this), rhs())
 /**
- * Greater than operator for FPSort expressions: [this] > [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Greater than operator for FPSort expressions: [this] > [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fpgt(rhs: () -> Expression<FPSort>) = FPGt(FPLiteral(this), rhs())
 /**
- * Greater than operator for FPSort expressions: [this] > [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Greater than operator for FPSort expressions: [this] > [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun Double.fpgt(rhs: () -> Expression<FPSort>) = FPGt(FPLiteral(this), rhs())
 /**
- * Greater than operator for FPSort expressions: [this] > [rhs]. Converts [rhs] from [BigDecimal] to
- * [FPLiteral] with sort [()]
+ * Greater than operator for FPSort expressions: [this] > [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun BigDecimal.fpgt(rhs: () -> Expression<FPSort>) = FPGt(FPLiteral(this), rhs())
 /**
- * Equals operator for FPSort expressions: [this] = [rhs]. Converts [rhs] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * Equals operator for FPSort expressions: [this] = [rhs].
+ *
+ * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fpeq(rhs: () -> Expression<FPSort>) = FPEq(FPLiteral(this), rhs())
 /**
- * Equals operator for FPSort expressions: [this] = [rhs]. Converts [rhs] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * Equals operator for FPSort expressions: [this] = [rhs].
+ *
+ * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun Double.fpeq(rhs: () -> Expression<FPSort>) = FPEq(FPLiteral(this), rhs())
 /**
- * Equals operator for FPSort expressions: [this] = [rhs]. Converts [rhs] from [BigDecimal] to
- * [FPLiteral] with sort [()]
+ * Equals operator for FPSort expressions: [this] = [rhs].
+ *
+ * Converts [rhs] from [BigDecimal] to [FPLiteral] with sort [()].
  */
 infix fun BigDecimal.fpeq(rhs: () -> Expression<FPSort>) = FPEq(FPLiteral(this), rhs())
 
