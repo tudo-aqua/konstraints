@@ -3261,25 +3261,35 @@ infix fun Expression<FPSort>.fpgt(rhs: () -> Expression<FPSort>) = FPGt(this, rh
 infix fun Expression<FPSort>.fpeq(rhs: () -> Expression<FPSort>) = FPEq(this, rhs())
 
 /** Less equals operator for FPSort expressions: [this] <= [rhs]. */
+@JvmName("fpleq_expr")
 infix fun (() -> Expression<FPSort>).fpleq(rhs: Expression<FPSort>) = FPLeq(this(), rhs)
 /** Less than operator for FPSort expressions: [this] < [rhs]. */
+@JvmName("fplt_expr")
 infix fun (() -> Expression<FPSort>).fplt(rhs: Expression<FPSort>) = FPLt(this(), rhs)
 /** Greater equals operator for FPSort expressions: [this] >= [rhs]. */
+@JvmName("fpgeq_expr")
 infix fun (() -> Expression<FPSort>).fpgeq(rhs: Expression<FPSort>) = FPGeq(this(), rhs)
 /** Greater than operator for FPSort expressions: [this] > [rhs]. */
+@JvmName("fpgt_expr")
 infix fun (() -> Expression<FPSort>).fpgt(rhs: Expression<FPSort>) = FPGt(this(), rhs)
 /** Equals operator for FPSort expressions: [this] = [rhs]. */
+@JvmName("fpeq_expr")
 infix fun (() -> Expression<FPSort>).fpeq(rhs: Expression<FPSort>) = FPEq(this(), rhs)
 
 /** Less equals operator for FPSort expressions: [this] <= [rhs]. */
+@JvmName("fpleq_lambda")
 infix fun (() -> Expression<FPSort>).fpleq(rhs: () -> Expression<FPSort>) = FPLeq(this(), rhs())
 /** Less than operator for FPSort expressions: [this] < [rhs]. */
+@JvmName("fplt_lambda")
 infix fun (() -> Expression<FPSort>).fplt(rhs: () -> Expression<FPSort>) = FPLt(this(), rhs())
 /** Greater equals operator for FPSort expressions: [this] >= [rhs]. */
+@JvmName("fpgeq_lambda")
 infix fun (() -> Expression<FPSort>).fpgeq(rhs: () -> Expression<FPSort>) = FPGeq(this(), rhs())
 /** Greater than operator for FPSort expressions: [this] > [rhs]. */
+@JvmName("fpgt_lambda")
 infix fun (() -> Expression<FPSort>).fpgt(rhs: () -> Expression<FPSort>) = FPGt(this(), rhs())
 /** Equals operator for FPSort expressions: [this] = [rhs]. */
+@JvmName("fpeq_lambda")
 infix fun (() -> Expression<FPSort>).fpeq(rhs: () -> Expression<FPSort>) = FPEq(this(), rhs())
 
 /** Less equals operator for FPSort expressions: [this] <= [rhs]. */
