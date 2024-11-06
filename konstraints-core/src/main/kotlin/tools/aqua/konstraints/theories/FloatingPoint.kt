@@ -334,8 +334,6 @@ data class FPLiteral(
   }
 
   companion object {
-    operator fun invoke(value: BigDecimal): FPLiteral = TODO()
-
     operator fun invoke(value: Double): FPLiteral {
       // TODO special cases (NaN, Inf etc.)
       val bitvec = value.toBits().toString()
