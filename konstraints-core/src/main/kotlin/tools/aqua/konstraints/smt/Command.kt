@@ -18,10 +18,9 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.Attribute
-import tools.aqua.konstraints.parser.OptionValue
 import tools.aqua.konstraints.parser.SortedVar
 import tools.aqua.konstraints.theories.BoolSort
+import java.math.BigInteger
 
 /** Base class for each SMT command */
 sealed class Command(val command: String) {
@@ -65,6 +64,16 @@ data class DeclareFun(val name: Symbol, val parameters: List<Sort>, val sort: So
 data class SetInfo(val attribute: Attribute) :
     Command("set-info ${attribute.keyword} ${attribute.value})")
 
+data class Attribute(val keyword: String, val value: AttributeValue?)
+
+sealed interface AttributeValue
+
+data class ConstantAttributeValue(val constant: SpecConstant) : AttributeValue
+
+data class SymbolAttributeValue(val symbol: Symbol) : AttributeValue
+
+data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : AttributeValue
+
 /**
  * SMT (declare-sort [name] [arity]) command
  *
@@ -75,6 +84,16 @@ data class DeclareSort(val name: Symbol, val arity: Int) : Command("declare-sort
 // TODO string serialization of OptionValue
 /** SMT (set-option [name] [OptionValue]) command */
 data class SetOption(val name: String, val value: OptionValue) : Command("set-option $name $value")
+
+sealed interface OptionValue
+
+data class BooleanOptionValue(val bool: Boolean) : OptionValue
+
+data class StringOptionValue(val sting: String) : OptionValue
+
+data class NumeralOptionValue(val numeral: BigInteger) : OptionValue
+
+data class AttributeOptionValue(val attribute: Attribute) : OptionValue
 
 /** SMT (set-logic [logic]) command */
 data class SetLogic(val logic: Logic) : Command("set-logic $logic")

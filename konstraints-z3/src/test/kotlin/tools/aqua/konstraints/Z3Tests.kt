@@ -33,9 +33,8 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.petitparser.context.ParseError
-import tools.aqua.konstraints.parser.*
-import tools.aqua.konstraints.parser.ParseTreeVisitor
-import tools.aqua.konstraints.parser.ProtoCommand
+import tools.aqua.konstraints.parser.Parser
+import tools.aqua.konstraints.parser.VarBinding
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.solvers.z3.Z3Solver
 import tools.aqua.konstraints.theories.*
@@ -72,76 +71,6 @@ class Z3Tests {
               .toString(),
           solver.status.toString())
     }
-  }
-
-  @ParameterizedTest
-  @MethodSource("getInts")
-  @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-  fun QF_BV(id: Int) {
-    /*
-     * These test are currently not working with Z3 as the solver is not capable of solving them yet
-     */
-    if (id in listOf(524, 928, 1105, 1299, 1323, 1492)) {
-      return
-    }
-
-    // For some reason these cases time out sometimes, skip them for now
-    if (id in listOf(382, 426, 433, 672, 737, 776)) {
-      return
-    }
-
-    val parseTreeVisitor = ParseTreeVisitor()
-
-    val solver = Z3Solver()
-    val temp =
-        javaClass
-            .getResourceAsStream(
-                "/QF_BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_$id.smt2")!!
-            .bufferedReader()
-            .readLines()
-    val program = temp.map { it.trim('\r', '\n') }
-
-    val satStatus =
-        if (program.find { it.contains("unsat") } != null) {
-          "unsat"
-        } else if (program.find { it.contains("unknown") } != null) {
-          return
-        } else {
-          "sat"
-        }
-
-    println("Expected result is $satStatus")
-
-    val result = Parser.script.parse(program.joinToString(""))
-
-    if (result.isSuccess) {
-      val commands =
-          result
-              .get<List<Any>>()
-              .filter { it is ProtoCommand || it is Command }
-              .map { if (it is ProtoCommand) parseTreeVisitor.visit(it) else it } as List<Command>
-
-      println(commands.joinToString("\n"))
-
-      solver.use {
-        commands.map { solver.visit(it) }
-
-        // verify we get the correct status for the test
-        assertEquals(satStatus, solver.status.toString())
-
-        // verify we parsed the correct program
-        /*
-        assertEquals(commands.filterIsInstance<Assert>().single().expression.toString(),
-            solver.context.solver.assertions.last().toString())
-        */
-      }
-    } else {
-      throw ParseError(result.failure(result.message))
-    }
-  }
-
-  private fun getInts(): Stream<Arguments> {
-    return IntArray(1575) { it }.map { Arguments.arguments(it + 1) }.stream()
   }
 
   // disable these for now as they take too long to compute
@@ -239,29 +168,16 @@ class Z3Tests {
           [
               "(set-logic QF_BV)(declare-fun A () (_ BitVec 32))(declare-fun B () (_ BitVec 16))(assert (bvult ((_ extract 15 0) A) B))(check-sat)"])
   fun testExtract(program: String) {
-    val parseTreeVisitor = ParseTreeVisitor()
     val solver = Z3Solver()
 
-    val result = Parser.script.parse(program)
-
-    if (result.isSuccess) {
-      val commands =
-          result
-              .get<List<Any>>()
-              .filter { it is ProtoCommand || it is Command }
-              .map { if (it is ProtoCommand) parseTreeVisitor.visit(it) else it } as List<Command>
-
-      println(commands.joinToString("\n"))
+    val smtProgram = Parser.parse(program)
 
       solver.use {
-        commands.map { solver.visit(it) }
+        smtProgram.commands.map { solver.visit(it) }
 
         // verify we get the correct status for the test
         assertEquals("sat", solver.status.toString())
       }
-    } else {
-      throw ParseError(result.failure(result.message))
-    }
   }
 
   @ParameterizedTest

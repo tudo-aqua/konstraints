@@ -18,7 +18,6 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.Attribute
 import tools.aqua.konstraints.parser.FunctionDefinition
 import tools.aqua.konstraints.parser.SortedVar
 import tools.aqua.konstraints.parser.VarBinding
