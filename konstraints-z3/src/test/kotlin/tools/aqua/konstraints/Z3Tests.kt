@@ -32,10 +32,9 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
-import org.petitparser.context.ParseError
 import tools.aqua.konstraints.parser.Parser
-import tools.aqua.konstraints.parser.VarBinding
 import tools.aqua.konstraints.smt.*
+import tools.aqua.konstraints.smt.VarBinding
 import tools.aqua.konstraints.solvers.z3.Z3Solver
 import tools.aqua.konstraints.theories.*
 
@@ -172,12 +171,12 @@ class Z3Tests {
 
     val smtProgram = Parser.parse(program)
 
-      solver.use {
-        smtProgram.commands.map { solver.visit(it) }
+    solver.use {
+      smtProgram.commands.map { solver.visit(it) }
 
-        // verify we get the correct status for the test
-        assertEquals("sat", solver.status.toString())
-      }
+      // verify we get the correct status for the test
+      assertEquals("sat", solver.status.toString())
+    }
   }
 
   @ParameterizedTest

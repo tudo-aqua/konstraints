@@ -18,11 +18,8 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.FunctionDefinition
-import tools.aqua.konstraints.parser.SortedVar
-import tools.aqua.konstraints.parser.VarBinding
+import tools.aqua.konstraints.parser.IteDecl
 import tools.aqua.konstraints.theories.BoolSort
-import tools.aqua.konstraints.theories.IteDecl
 import tools.aqua.konstraints.util.reduceOrDefault
 
 /** Interface for all sorted SMT terms */
@@ -263,12 +260,17 @@ class UserDefinedExpression<T : Sort>(
     name: Symbol,
     sort: T,
     args: List<Expression<*>>,
-    val definition: FunctionDefinition<T>
+    val definition: FunctionDef<T>
 ) : NAryExpression<T>(name, sort) {
+  init {
+    // check that args.sort matches expected sorts from definition
+    require(args.zip(definition.parameters).all { (arg, par) -> arg.sort == par.sort })
+  }
+
   override val children: List<Expression<*>> = args
 
   override fun copy(children: List<Expression<*>>): Expression<T> =
-      definition.buildExpression(children, emptyList())
+      UserDefinedExpression(name, sort, children, definition)
 
   fun expand(): Expression<*> = definition.expand(children)
 }
@@ -338,3 +340,16 @@ class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: Lis
 
 class ExpressionCastException(from: Sort, to: String) :
     ClassCastException("Can not cast expression from $from to $to")
+
+class VarBinding<T : Sort>(val symbol: Symbol, val term: Expression<T>) {
+
+  val sort: T = term.sort
+
+  val instance = LocalExpression(symbol, sort, term)
+}
+
+class SortedVar<T : Sort>(val name: Symbol, val sort: T) {
+  override fun toString(): String = "($name $sort)"
+
+  val instance = BoundVariable(name, sort)
+}

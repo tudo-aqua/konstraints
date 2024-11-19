@@ -21,62 +21,11 @@ package tools.aqua.konstraints.theories
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
-/** Strings theory object */
-object StringsTheory : Theory {
-  override val functions =
-      listOf(
-              CharDecl,
-              StrConcatDecl,
-              StrLengthDecl,
-              StrLexOrderDecl,
-              StrRefLexOrderDecl,
-              StrAtDecl,
-              StrSubstringDecl,
-              StrPrefixOfDecl,
-              StrSuffixOfDecl,
-              StrContainsDecl,
-              StrIndexOfDecl,
-              StrReplaceDecl,
-              StrReplaceAllDecl,
-              StrReplaceRegexDecl,
-              StrIsDigitDecl,
-              StrToCodeDecl,
-              StrToIntDecl,
-              StrFromCodeDecl,
-              StrFromIntDecl,
-              RegexNoneDecl,
-              RegexAllDecl,
-              RegexAllCharDecl,
-              RegexConcatDecl,
-              RegexUnionDecl,
-              RegexIntersecDecl,
-              RegexStarDecl,
-              RegexCompDecl,
-              RegexDiffDecl,
-              RegexPlusDecl,
-              RegexOptionDecl,
-              RegexRangeDecl,
-              RegexPowerDecl,
-              RegexLoopDecl)
-          .associateBy { it.name.toString() }
-
-  override val sorts: Map<String, SortDecl<*>> =
-      mapOf(Pair("String", StringSortDecl), Pair("RegLan", RegLanDecl), Pair("Int", IntSortDecl))
-}
-
 /** String sort */
 object StringSort : Sort("String")
 
-internal object StringSortDecl : SortDecl<StringSort>("String".symbol(), emptySet(), emptySet()) {
-  override fun getSort(bindings: Bindings): StringSort = StringSort
-}
-
 /** Regular expression sort */
 object RegLan : Sort("RegLan")
-
-internal object RegLanDecl : SortDecl<RegLan>("RegLan".symbol(), emptySet(), emptySet()) {
-  override fun getSort(bindings: Bindings): RegLan = RegLan
-}
 
 /**
  * [value] holds the hexadecimal unicode of the character, [character] hold the kotlin
@@ -96,11 +45,6 @@ class Char(val value: String) : Literal<StringSort>(LiteralString("char"), Strin
   val character = Char(Integer.parseInt(value.substring(2)))
 
   override fun copy(children: List<Expression<*>>): Expression<StringSort> = this
-}
-
-object CharDecl :
-    FunctionDecl0<StringSort>("char".symbol(), emptySet(), setOf("H".idx()), StringSort) {
-  override fun buildExpression(bindings: Bindings): Expression<StringSort> = TODO()
 }
 
 class StringLiteral(val value: String) : Literal<StringSort>(LiteralString(value), StringSort) {
@@ -131,17 +75,6 @@ class StrConcat(val strings: List<Expression<StringSort>>) :
       StrConcatDecl.buildExpression(children, emptyList())
 }
 
-object StrConcatDecl :
-    FunctionDeclLeftAssociative<StringSort, StringSort, StringSort>(
-        "str.++".symbol(), emptySet(), StringSort, StringSort, emptySet(), emptySet(), StringSort) {
-  override fun buildExpression(
-      param1: Expression<StringSort>,
-      param2: Expression<StringSort>,
-      varargs: List<Expression<StringSort>>,
-      bindings: Bindings
-  ): Expression<StringSort> = StrConcat(param1, param2, *varargs.toTypedArray())
-}
-
 /**
  * String length
  *
@@ -151,15 +84,6 @@ class StrLength(override val inner: Expression<StringSort>) :
     UnaryExpression<IntSort, StringSort>("str.len".symbol(), IntSort) {
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
       StrLengthDecl.buildExpression(children, emptyList())
-}
-
-object StrLengthDecl :
-    FunctionDecl1<StringSort, IntSort>(
-        "str.len".symbol(), emptySet(), StringSort, emptySet(), emptySet(), IntSort) {
-  override fun buildExpression(
-      param: Expression<StringSort>,
-      bindings: Bindings
-  ): Expression<IntSort> = StrLength(param)
 }
 
 /**
@@ -183,15 +107,6 @@ class StrLexOrder(val strings: List<Expression<StringSort>>) :
       StrLexOrderDecl.buildExpression(children, emptyList())
 }
 
-object StrLexOrderDecl :
-    FunctionDeclChainable<StringSort>(
-        "str.<".symbol(), emptySet(), StringSort, StringSort, emptySet(), emptySet()) {
-  override fun buildExpression(
-      varargs: List<Expression<StringSort>>,
-      bindings: Bindings
-  ): Expression<BoolSort> = StrLexOrder(varargs)
-}
-
 /*
  * Regular expression functions
  */
@@ -205,15 +120,6 @@ class ToRegex(override val inner: Expression<StringSort>) :
     UnaryExpression<RegLan, StringSort>("str.to_reg".symbol(), RegLan) {
   override fun copy(children: List<Expression<*>>): Expression<RegLan> =
       ToRegexDecl.buildExpression(children, emptyList())
-}
-
-object ToRegexDecl :
-    FunctionDecl1<StringSort, RegLan>(
-        "str.to_reg".symbol(), emptySet(), StringSort, emptySet(), emptySet(), RegLan) {
-  override fun buildExpression(
-      param: Expression<StringSort>,
-      bindings: Bindings
-  ): Expression<RegLan> = ToRegex(param)
 }
 
 /**
@@ -231,16 +137,6 @@ class InRegex(val inner: Expression<StringSort>, val regex: Expression<RegLan>) 
       InRegexDecl.buildExpression(children, emptyList())
 }
 
-object InRegexDecl :
-    FunctionDecl2<StringSort, RegLan, BoolSort>(
-        "str.in_reg".symbol(), emptySet(), StringSort, RegLan, emptySet(), emptySet(), BoolSort) {
-  override fun buildExpression(
-      param1: Expression<StringSort>,
-      param2: Expression<RegLan>,
-      bindings: Bindings
-  ): Expression<BoolSort> = InRegex(param1, param2)
-}
-
 /**
  * Constant denoting the empty set of strings
  *
@@ -248,10 +144,6 @@ object InRegexDecl :
  */
 object RegexNone : ConstantExpression<RegLan>("re.none".symbol(), RegLan) {
   override fun copy(children: List<Expression<*>>): Expression<RegLan> = this
-}
-
-object RegexNoneDecl : FunctionDecl0<RegLan>("re.none".symbol(), emptySet(), emptySet(), RegLan) {
-  override fun buildExpression(bindings: Bindings): Expression<RegLan> = RegexNone
 }
 
 /**
@@ -263,10 +155,6 @@ object RegexAll : ConstantExpression<RegLan>("re.all".symbol(), RegLan) {
   override fun copy(children: List<Expression<*>>): Expression<RegLan> = this
 }
 
-object RegexAllDecl : FunctionDecl0<RegLan>("re.all".symbol(), emptySet(), emptySet(), RegLan) {
-  override fun buildExpression(bindings: Bindings): Expression<RegLan> = RegexAll
-}
-
 /**
  * Constant denoting the set of all strings of length 1
  *
@@ -274,11 +162,6 @@ object RegexAllDecl : FunctionDecl0<RegLan>("re.all".symbol(), emptySet(), empty
  */
 object RegexAllChar : ConstantExpression<RegLan>("re.allchar".symbol(), RegLan) {
   override fun copy(children: List<Expression<*>>): Expression<RegLan> = this
-}
-
-object RegexAllCharDecl :
-    FunctionDecl0<RegLan>("re.allchar".symbol(), emptySet(), emptySet(), RegLan) {
-  override fun buildExpression(bindings: Bindings): Expression<RegLan> = RegexAllChar
 }
 
 /**
@@ -296,17 +179,6 @@ class RegexConcat(val regex: List<Expression<RegLan>>) :
       RegexConcatDecl.buildExpression(children, emptyList())
 }
 
-object RegexConcatDecl :
-    FunctionDeclLeftAssociative<RegLan, RegLan, RegLan>(
-        "re.++".symbol(), emptySet(), RegLan, RegLan, emptySet(), emptySet(), RegLan) {
-  override fun buildExpression(
-      param1: Expression<RegLan>,
-      param2: Expression<RegLan>,
-      varargs: List<Expression<RegLan>>,
-      bindings: Bindings
-  ): Expression<RegLan> = RegexConcat(param1, param2, *varargs.toTypedArray())
-}
-
 /**
  * RE union
  *
@@ -320,17 +192,6 @@ class RegexUnion(val regex: List<Expression<RegLan>>) :
 
   override fun copy(children: List<Expression<*>>): Expression<RegLan> =
       RegexUnionDecl.buildExpression(children, emptyList())
-}
-
-object RegexUnionDecl :
-    FunctionDeclLeftAssociative<RegLan, RegLan, RegLan>(
-        "re.union".symbol(), emptySet(), RegLan, RegLan, emptySet(), emptySet(), RegLan) {
-  override fun buildExpression(
-      param1: Expression<RegLan>,
-      param2: Expression<RegLan>,
-      varargs: List<Expression<RegLan>>,
-      bindings: Bindings
-  ): Expression<RegLan> = RegexUnion(param1, param2, *varargs.toTypedArray())
 }
 
 /**
@@ -348,17 +209,6 @@ class RegexIntersec(val regex: List<Expression<RegLan>>) :
       RegexIntersecDecl.buildExpression(children, emptyList())
 }
 
-object RegexIntersecDecl :
-    FunctionDeclLeftAssociative<RegLan, RegLan, RegLan>(
-        "re.inter".symbol(), emptySet(), RegLan, RegLan, emptySet(), emptySet(), RegLan) {
-  override fun buildExpression(
-      param1: Expression<RegLan>,
-      param2: Expression<RegLan>,
-      varargs: List<Expression<RegLan>>,
-      bindings: Bindings
-  ): Expression<RegLan> = RegexIntersec(param1, param2, *varargs.toTypedArray())
-}
-
 /**
  * Kleene Closure
  *
@@ -368,13 +218,6 @@ class RegexStar(override val inner: Expression<RegLan>) :
     UnaryExpression<RegLan, RegLan>("re.*".symbol(), RegLan) {
   override fun copy(children: List<Expression<*>>): Expression<RegLan> =
       RegexStarDecl.buildExpression(children, emptyList())
-}
-
-object RegexStarDecl :
-    FunctionDecl1<RegLan, RegLan>(
-        "re.*".symbol(), emptySet(), RegLan, emptySet(), emptySet(), RegLan) {
-  override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
-      RegexStar(param)
 }
 
 /*
@@ -396,15 +239,6 @@ class StrRefLexOrder(val strings: List<Expression<StringSort>>) :
       StrRefLexOrderDecl.buildExpression(children, emptyList())
 }
 
-object StrRefLexOrderDecl :
-    FunctionDeclChainable<StringSort>(
-        "str.<=".symbol(), emptySet(), StringSort, StringSort, emptySet(), emptySet()) {
-  override fun buildExpression(
-      varargs: List<Expression<StringSort>>,
-      bindings: Bindings
-  ): Expression<BoolSort> = StrRefLexOrder(varargs)
-}
-
 /**
  * Singleton string containing a character at given position or empty string when position is out of
  * range. The leftmost position is 0.
@@ -419,16 +253,6 @@ class StrAt(val inner: Expression<StringSort>, val position: Expression<IntSort>
 
   override fun copy(children: List<Expression<*>>): Expression<StringSort> =
       StrAtDecl.buildExpression(children, emptyList())
-}
-
-object StrAtDecl :
-    FunctionDecl2<StringSort, IntSort, StringSort>(
-        "str.at".symbol(), emptySet(), StringSort, IntSort, emptySet(), emptySet(), StringSort) {
-  override fun buildExpression(
-      param1: Expression<StringSort>,
-      param2: Expression<IntSort>,
-      bindings: Bindings
-  ): Expression<StringSort> = StrAt(param1, param2)
 }
 
 /**
@@ -451,24 +275,6 @@ class StrSubstring(
       StrSubstringDecl.buildExpression(children, emptyList())
 }
 
-object StrSubstringDecl :
-    FunctionDecl3<StringSort, IntSort, IntSort, StringSort>(
-        "str.substr".symbol(),
-        emptySet(),
-        StringSort,
-        IntSort,
-        IntSort,
-        emptySet(),
-        emptySet(),
-        StringSort) {
-  override fun buildExpression(
-      param1: Expression<StringSort>,
-      param2: Expression<IntSort>,
-      param3: Expression<IntSort>,
-      bindings: Bindings
-  ): Expression<StringSort> = StrSubstring(param1, param2, param3)
-}
-
 /**
  * [prefix] is a prefix of [inner]
  *
@@ -482,22 +288,6 @@ class StrPrefixOf(val prefix: Expression<StringSort>, val inner: Expression<Stri
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       StrPrefixOfDecl.buildExpression(children, emptyList())
-}
-
-object StrPrefixOfDecl :
-    FunctionDecl2<StringSort, StringSort, BoolSort>(
-        "str.prefixof".symbol(),
-        emptySet(),
-        StringSort,
-        StringSort,
-        emptySet(),
-        emptySet(),
-        BoolSort) {
-  override fun buildExpression(
-      param1: Expression<StringSort>,
-      param2: Expression<StringSort>,
-      bindings: Bindings
-  ): Expression<BoolSort> = StrPrefixOf(param1, param2)
 }
 
 /**
@@ -515,22 +305,6 @@ class StrSuffixOf(val suffix: Expression<StringSort>, val inner: Expression<Stri
       StrSuffixOfDecl.buildExpression(children, emptyList())
 }
 
-object StrSuffixOfDecl :
-    FunctionDecl2<StringSort, StringSort, BoolSort>(
-        "str.suffixof".symbol(),
-        emptySet(),
-        StringSort,
-        StringSort,
-        emptySet(),
-        emptySet(),
-        BoolSort) {
-  override fun buildExpression(
-      param1: Expression<StringSort>,
-      param2: Expression<StringSort>,
-      bindings: Bindings
-  ): Expression<BoolSort> = StrSuffixOf(param1, param2)
-}
-
 /**
  * [string] contains [substring]
  *
@@ -544,22 +318,6 @@ class StrContains(val string: Expression<StringSort>, val substring: Expression<
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       StrContainsDecl.buildExpression(children, emptyList())
-}
-
-object StrContainsDecl :
-    FunctionDecl2<StringSort, StringSort, BoolSort>(
-        "str.contains".symbol(),
-        emptySet(),
-        StringSort,
-        StringSort,
-        emptySet(),
-        emptySet(),
-        BoolSort) {
-  override fun buildExpression(
-      param1: Expression<StringSort>,
-      param2: Expression<StringSort>,
-      bindings: Bindings
-  ): Expression<BoolSort> = StrContains(param1, param2)
 }
 
 /**
@@ -580,24 +338,6 @@ class StrIndexOf(
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
       StrIndexOfDecl.buildExpression(children, emptyList())
-}
-
-object StrIndexOfDecl :
-    FunctionDecl3<StringSort, StringSort, IntSort, IntSort>(
-        "str.indexof".symbol(),
-        emptySet(),
-        StringSort,
-        StringSort,
-        IntSort,
-        emptySet(),
-        emptySet(),
-        IntSort) {
-  override fun buildExpression(
-      param1: Expression<StringSort>,
-      param2: Expression<StringSort>,
-      param3: Expression<IntSort>,
-      bindings: Bindings
-  ): Expression<IntSort> = StrIndexOf(param1, param2, param3)
 }
 
 /**
@@ -622,24 +362,6 @@ class StrReplace(
       StrReplaceDecl.buildExpression(children, emptyList())
 }
 
-object StrReplaceDecl :
-    FunctionDecl3<StringSort, StringSort, StringSort, StringSort>(
-        "str.replace".symbol(),
-        emptySet(),
-        StringSort,
-        StringSort,
-        StringSort,
-        emptySet(),
-        emptySet(),
-        StringSort) {
-  override fun buildExpression(
-      param1: Expression<StringSort>,
-      param2: Expression<StringSort>,
-      param3: Expression<StringSort>,
-      bindings: Bindings
-  ): Expression<StringSort> = StrReplace(param1, param2, param3)
-}
-
 /**
  * String Replace All
  *
@@ -662,24 +384,6 @@ class StrReplaceAll(
       StrReplaceAllDecl.buildExpression(children, emptyList())
 }
 
-object StrReplaceAllDecl :
-    FunctionDecl3<StringSort, StringSort, StringSort, StringSort>(
-        "str.replace".symbol(),
-        emptySet(),
-        StringSort,
-        StringSort,
-        StringSort,
-        emptySet(),
-        emptySet(),
-        StringSort) {
-  override fun buildExpression(
-      param1: Expression<StringSort>,
-      param2: Expression<StringSort>,
-      param3: Expression<StringSort>,
-      bindings: Bindings
-  ): Expression<StringSort> = StrReplaceAll(param1, param2, param3)
-}
-
 /** (str.replace_re String RegLan String String) */
 class StrReplaceRegex(
     val inner: Expression<StringSort>,
@@ -696,24 +400,6 @@ class StrReplaceRegex(
 
   override fun copy(children: List<Expression<*>>): Expression<StringSort> =
       StrReplaceRegexDecl.buildExpression(children, emptyList())
-}
-
-object StrReplaceRegexDecl :
-    FunctionDecl3<StringSort, RegLan, StringSort, StringSort>(
-        "str.replace_re".symbol(),
-        emptySet(),
-        StringSort,
-        RegLan,
-        StringSort,
-        emptySet(),
-        emptySet(),
-        StringSort) {
-  override fun buildExpression(
-      param1: Expression<StringSort>,
-      param2: Expression<RegLan>,
-      param3: Expression<StringSort>,
-      bindings: Bindings
-  ): Expression<StringSort> = StrReplaceRegex(param1, param2, param3)
 }
 
 /** (str.replace_re_all String RegLan String String) */
@@ -734,24 +420,6 @@ class StrReplaceAllRegex(
       StrReplaceAllRegexDecl.buildExpression(children, emptyList())
 }
 
-object StrReplaceAllRegexDecl :
-    FunctionDecl3<StringSort, RegLan, StringSort, StringSort>(
-        "str.replace_re_all".symbol(),
-        emptySet(),
-        StringSort,
-        RegLan,
-        StringSort,
-        emptySet(),
-        emptySet(),
-        StringSort) {
-  override fun buildExpression(
-      param1: Expression<StringSort>,
-      param2: Expression<RegLan>,
-      param3: Expression<StringSort>,
-      bindings: Bindings
-  ): Expression<StringSort> = StrReplaceRegex(param1, param2, param3)
-}
-
 /**
  * RE complement
  *
@@ -761,13 +429,6 @@ class RegexComp(override val inner: Expression<RegLan>) :
     UnaryExpression<RegLan, RegLan>("re.comp".symbol(), RegLan) {
   override fun copy(children: List<Expression<*>>): Expression<RegLan> =
       RegexCompDecl.buildExpression(children, emptyList())
-}
-
-object RegexCompDecl :
-    FunctionDecl1<RegLan, RegLan>(
-        "re.comp".symbol(), emptySet(), RegLan, emptySet(), emptySet(), RegLan) {
-  override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
-      RegexComp(param)
 }
 
 /**
@@ -785,17 +446,6 @@ class RegexDiff(val regex: List<Expression<RegLan>>) :
       RegexDiffDecl.buildExpression(children, emptyList())
 }
 
-object RegexDiffDecl :
-    FunctionDeclLeftAssociative<RegLan, RegLan, RegLan>(
-        "re.diff".symbol(), emptySet(), RegLan, RegLan, emptySet(), emptySet(), RegLan) {
-  override fun buildExpression(
-      param1: Expression<RegLan>,
-      param2: Expression<RegLan>,
-      varargs: List<Expression<RegLan>>,
-      bindings: Bindings
-  ): Expression<RegLan> = RegexDiff(param1, param2, *varargs.toTypedArray())
-}
-
 /**
  * RE Kleene cross
  *
@@ -807,13 +457,6 @@ class RegexPlus(override val inner: Expression<RegLan>) :
       RegexPlusDecl.buildExpression(children, emptyList())
 }
 
-object RegexPlusDecl :
-    FunctionDecl1<RegLan, RegLan>(
-        "re.+".symbol(), emptySet(), RegLan, emptySet(), emptySet(), RegLan) {
-  override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
-      RegexPlus(param)
-}
-
 /**
  * RE option
  *
@@ -823,13 +466,6 @@ class RegexOption(override val inner: Expression<RegLan>) :
     UnaryExpression<RegLan, RegLan>("re.opt".symbol(), RegLan) {
   override fun copy(children: List<Expression<*>>): Expression<RegLan> =
       RegexOptionDecl.buildExpression(children, emptyList())
-}
-
-object RegexOptionDecl :
-    FunctionDecl1<RegLan, RegLan>(
-        "re.opt".symbol(), emptySet(), RegLan, emptySet(), emptySet(), RegLan) {
-  override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
-      RegexOption(param)
 }
 
 /**
@@ -845,16 +481,6 @@ class RegexRange(
       RegexRangeDecl.buildExpression(children, emptyList())
 }
 
-object RegexRangeDecl :
-    FunctionDecl2<StringSort, StringSort, RegLan>(
-        "re.range".symbol(), emptySet(), StringSort, StringSort, emptySet(), emptySet(), RegLan) {
-  override fun buildExpression(
-      param1: Expression<StringSort>,
-      param2: Expression<StringSort>,
-      bindings: Bindings
-  ): Expression<RegLan> = RegexRange(param1, param2)
-}
-
 /** ((_ re.^ n) RegLan RegLan) */
 class RegexPower(override val inner: Expression<RegLan>, val n: Int) :
     UnaryExpression<RegLan, RegLan>("re.^".symbol(), RegLan) {
@@ -865,13 +491,6 @@ class RegexPower(override val inner: Expression<RegLan>, val n: Int) :
       RegexPowerDecl.buildExpression(children, emptyList())
 }
 
-object RegexPowerDecl :
-    FunctionDecl1<RegLan, RegLan>(
-        "re.^".symbol(), emptySet(), RegLan, setOf("n".idx()), emptySet(), RegLan) {
-  override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
-      RegexPower(param, bindings["n"].numeral)
-}
-
 /** ((_ re.loop n₁ n₂) RegLan RegLan) */
 class RegexLoop(override val inner: Expression<RegLan>, val n: Int, val m: Int) :
     UnaryExpression<RegLan, RegLan>("re.loop".symbol(), RegLan) {
@@ -880,13 +499,6 @@ class RegexLoop(override val inner: Expression<RegLan>, val n: Int, val m: Int) 
 
   override fun copy(children: List<Expression<*>>): Expression<RegLan> =
       RegexLoopDecl.buildExpression(children, emptyList())
-}
-
-object RegexLoopDecl :
-    FunctionDecl1<RegLan, RegLan>(
-        "re.loop".symbol(), emptySet(), RegLan, setOf("n1".idx(), "n2".idx()), emptySet(), RegLan) {
-  override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
-      RegexLoop(param, bindings["n1"].numeral, bindings["n2"].numeral)
 }
 
 /*
@@ -905,15 +517,6 @@ class StrIsDigit(override val inner: Expression<StringSort>) :
       StrIsDigitDecl.buildExpression(children, emptyList())
 }
 
-object StrIsDigitDecl :
-    FunctionDecl1<StringSort, BoolSort>(
-        "str.is_digit".symbol(), emptySet(), StringSort, emptySet(), emptySet(), BoolSort) {
-  override fun buildExpression(
-      param: Expression<StringSort>,
-      bindings: Bindings
-  ): Expression<BoolSort> = StrIsDigit(param)
-}
-
 /** (str.to_code String Int) */
 class StrToCode(override val inner: Expression<StringSort>) :
     UnaryExpression<IntSort, StringSort>("str.to_code".symbol(), IntSort) {
@@ -921,29 +524,11 @@ class StrToCode(override val inner: Expression<StringSort>) :
       StrToCodeDecl.buildExpression(children, emptyList())
 }
 
-object StrToCodeDecl :
-    FunctionDecl1<StringSort, IntSort>(
-        "str.to_code".symbol(), emptySet(), StringSort, emptySet(), emptySet(), IntSort) {
-  override fun buildExpression(
-      param: Expression<StringSort>,
-      bindings: Bindings
-  ): Expression<IntSort> = StrToCode(param)
-}
-
 /** (str.from_code Int String) */
 class StrFromCode(override val inner: Expression<IntSort>) :
     UnaryExpression<StringSort, IntSort>("str.from_code".symbol(), StringSort) {
   override fun copy(children: List<Expression<*>>): Expression<StringSort> =
       StrFromCodeDecl.buildExpression(children, emptyList())
-}
-
-object StrFromCodeDecl :
-    FunctionDecl1<IntSort, StringSort>(
-        "str.from_code".symbol(), emptySet(), IntSort, emptySet(), emptySet(), StringSort) {
-  override fun buildExpression(
-      param: Expression<IntSort>,
-      bindings: Bindings
-  ): Expression<StringSort> = StrFromCode(param)
 }
 
 /**
@@ -957,15 +542,6 @@ class StrToInt(override val inner: Expression<StringSort>) :
       StrToIntDecl.buildExpression(children, emptyList())
 }
 
-object StrToIntDecl :
-    FunctionDecl1<StringSort, IntSort>(
-        "str.to_code".symbol(), emptySet(), StringSort, emptySet(), emptySet(), IntSort) {
-  override fun buildExpression(
-      param: Expression<StringSort>,
-      bindings: Bindings
-  ): Expression<IntSort> = StrToInt(param)
-}
-
 /**
  * Conversion from integers
  *
@@ -975,13 +551,4 @@ class StrFromInt(override val inner: Expression<IntSort>) :
     UnaryExpression<StringSort, IntSort>("str.from_int".symbol(), StringSort) {
   override fun copy(children: List<Expression<*>>): Expression<StringSort> =
       StrFromIntDecl.buildExpression(children, emptyList())
-}
-
-object StrFromIntDecl :
-    FunctionDecl1<IntSort, StringSort>(
-        "str.from_code".symbol(), emptySet(), IntSort, emptySet(), emptySet(), StringSort) {
-  override fun buildExpression(
-      param: Expression<IntSort>,
-      bindings: Bindings
-  ): Expression<StringSort> = StrFromInt(param)
 }

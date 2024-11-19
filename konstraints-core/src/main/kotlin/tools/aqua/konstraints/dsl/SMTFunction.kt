@@ -21,7 +21,7 @@ package tools.aqua.konstraints.dsl
 import java.util.*
 import kotlin.reflect.KProperty
 import tools.aqua.konstraints.parser.FunctionDefinition
-import tools.aqua.konstraints.parser.SortedVar
+import tools.aqua.konstraints.parser.SortedVarDecl
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.util.SimpleDelegate
 
@@ -431,13 +431,15 @@ class Define<T : Sort>(
   ): SimpleDelegate<SMTFunction<T>> {
     val n = name.ifEmpty { "|$thisRef|" }
     val sortedVars =
-        parameters.mapIndexed { id, sort -> SortedVar("|$thisRef!local!$sort!$id|".symbol(), sort) }
+        parameters.mapIndexed { id, sort ->
+          SortedVar("|$thisRef!local!$sort!$id|".symbol(), sort)
+        }
     val term = block(sortedVars.map { it.instance })
 
     program.registerFun(n, sort, sortedVars, term)
     return SimpleDelegate(
         SMTFunction(
-            n.symbol(), sort, parameters, FunctionDefinition(n.symbol(), emptyList(), sort, term)))
+            n.symbol(), sort, parameters, FunctionDef(n.symbol(), emptyList(), sort, term)))
   }
 }
 
@@ -467,7 +469,7 @@ class Define1<T : Sort, S : Sort>(
     program.registerFun(n, sort, listOf(sortedVar), term)
     return SimpleDelegate(
         SMTFunction1(
-            n.symbol(), sort, par, FunctionDefinition(n.symbol(), listOf(sortedVar), sort, term)))
+            n.symbol(), sort, par, FunctionDef(n.symbol(), listOf(sortedVar), sort, term)))
   }
 }
 
@@ -505,7 +507,7 @@ class Define2<T : Sort, S1 : Sort, S2 : Sort>(
             sort,
             par1,
             par2,
-            FunctionDefinition(n.symbol(), listOf(sortedVar1, sortedVar2), sort, term)))
+            FunctionDef(n.symbol(), listOf(sortedVar1, sortedVar2), sort, term)))
   }
 }
 
@@ -546,7 +548,7 @@ class Define3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
             par1,
             par2,
             par3,
-            FunctionDefinition(n.symbol(), listOf(sortedVar1, sortedVar2, sortedVar3), sort, term)))
+            FunctionDef(n.symbol(), listOf(sortedVar1, sortedVar2, sortedVar3), sort, term)))
   }
 }
 
@@ -591,7 +593,7 @@ class Define4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
             par2,
             par3,
             par4,
-            FunctionDefinition(
+            FunctionDef(
                 n.symbol(), listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4), sort, term)))
   }
 }
@@ -652,7 +654,7 @@ class Define5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
             par3,
             par4,
             par5,
-            FunctionDefinition(
+            FunctionDef(
                 n.symbol(),
                 listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4, sortedVar5),
                 sort,
@@ -669,7 +671,7 @@ data class SMTFunction<T : Sort>(
     val name: Symbol,
     val sort: T,
     val parameters: List<Sort>,
-    val definition: FunctionDefinition<T>?
+    val definition: FunctionDef<T>?
 ) {
   operator fun invoke(args: List<Expression<*>>): Expression<T> {
     require(args.size == parameters.size)
@@ -691,7 +693,7 @@ data class SMTFunction1<T : Sort, S : Sort>(
     val name: Symbol,
     val sort: T,
     val parameter: S,
-    val definition: FunctionDefinition<T>?
+    val definition: FunctionDef<T>?
 ) {
   operator fun invoke(arg: Expression<S>): Expression<T> {
     return if (definition == null) {
@@ -712,7 +714,7 @@ data class SMTFunction2<T : Sort, S1 : Sort, S2 : Sort>(
     val sort: T,
     val parameter1: S1,
     val parameter2: S2,
-    val definition: FunctionDefinition<T>?
+    val definition: FunctionDef<T>?
 ) {
   operator fun invoke(arg1: Expression<S1>, arg2: Expression<S2>): Expression<T> {
     return if (definition == null) {
@@ -734,7 +736,7 @@ data class SMTFunction3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val parameter1: S1,
     val parameter2: S2,
     val parameter3: S3,
-    val definition: FunctionDefinition<T>?
+    val definition: FunctionDef<T>?
 ) {
   operator fun invoke(
       arg1: Expression<S1>,
@@ -761,7 +763,7 @@ data class SMTFunction4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val parameter2: S2,
     val parameter3: S3,
     val parameter4: S4,
-    val definition: FunctionDefinition<T>?
+    val definition: FunctionDef<T>?
 ) {
   operator fun invoke(
       arg1: Expression<S1>,
@@ -790,7 +792,7 @@ data class SMTFunction5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5
     val parameter3: S3,
     val parameter4: S4,
     val parameter5: S5,
-    val definition: FunctionDefinition<T>?
+    val definition: FunctionDef<T>?
 ) {
   operator fun invoke(
       arg1: Expression<S1>,

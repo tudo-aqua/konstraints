@@ -22,10 +22,10 @@ import com.microsoft.z3.Context
 import com.microsoft.z3.Expr
 import com.microsoft.z3.FuncDecl
 import com.microsoft.z3.Sort as Z3Sort
-import tools.aqua.konstraints.parser.SortedVar
-import tools.aqua.konstraints.parser.VarBinding
+import tools.aqua.konstraints.parser.SortedVarDecl
 import tools.aqua.konstraints.smt.Sort
 import tools.aqua.konstraints.smt.Symbol
+import tools.aqua.konstraints.smt.VarBinding
 import tools.aqua.konstraints.util.Stack
 
 class Z3Context {
@@ -52,7 +52,7 @@ class Z3Context {
     return expr
   }
 
-  fun <T> bind(sortedVars: List<SortedVar<*>>, block: (List<Expr<*>>) -> T): T {
+  fun <T> bind(sortedVars: List<SortedVarDecl<*>>, block: (List<Expr<*>>) -> T): T {
     boundVars.push(
         mapOf(
             *sortedVars

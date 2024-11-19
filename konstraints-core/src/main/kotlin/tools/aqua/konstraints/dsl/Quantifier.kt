@@ -19,7 +19,7 @@
 package tools.aqua.konstraints.dsl
 
 import java.util.*
-import tools.aqua.konstraints.parser.SortedVar
+import tools.aqua.konstraints.parser.SortedVarDecl
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 

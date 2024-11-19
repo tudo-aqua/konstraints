@@ -18,8 +18,7 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.Theory
-import tools.aqua.konstraints.theories.*
+import tools.aqua.konstraints.parser.*
 
 interface Logic {
   val theories: List<Theory>

@@ -18,9 +18,8 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.SortedVar
-import tools.aqua.konstraints.theories.BoolSort
 import java.math.BigInteger
+import tools.aqua.konstraints.theories.BoolSort
 
 /** Base class for each SMT command */
 sealed class Command(val command: String) {
@@ -124,6 +123,24 @@ data class FunctionDef<S : Sort>(
     val term: Expression<S>
 ) {
   override fun toString(): String = "$name (${parameters.joinToString(" ")}) $sort $term)"
+
+  fun expand(args: List<Expression<*>>): Expression<*> {
+    // term is a placeholder expression using the parameters as expressions
+    // we need to build the same term but replace every occurrence of a parameter with
+    // the corresponding argument expression
+    val bindings = (parameters zip args)
+
+    return term.transform { expr: Expression<*> ->
+      // TODO do not check name equality here,
+      // its probably better to implement some form of Decl.isInstanceOf(Expression) or
+      // Expression.isInstanceOf(Decl)
+      if (expr.children.isEmpty()) {
+        bindings.find { (param, _) -> param.name == expr.name }?.second ?: expr
+      } else {
+        expr
+      }
+    }
+  }
 }
 
 data class Push(val n: Int) : Command("push $n")

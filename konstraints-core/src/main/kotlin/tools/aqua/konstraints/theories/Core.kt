@@ -20,52 +20,20 @@ package tools.aqua.konstraints.theories
 
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.smt.SortParameter
 
 /*
  * This file implements the SMT core theory
  * http://smtlib.cs.uiowa.edu/theories-Core.shtml
  */
 
-/** Core theory object */
-object CoreTheory : Theory {
-  override val functions =
-      listOf(
-              FalseDecl,
-              TrueDecl,
-              NotDecl,
-              AndDecl,
-              OrDecl,
-              XOrDecl,
-              EqualsDecl,
-              DistinctDecl,
-              IteDecl,
-              ImpliesDecl)
-          .associateBy { it.name.toString() }
-  override val sorts = mapOf(Pair("Bool", BoolSortDecl))
-}
-
-/** Declaration object for Bool sort */
-object BoolSortDecl : SortDecl<BoolSort>("Bool".symbol(), emptySet(), emptySet()) {
-  override fun getSort(bindings: Bindings): BoolSort = BoolSort
-}
-
 /** Object for SMT true */
 object True : ConstantExpression<BoolSort>("true".symbol(), BoolSort) {
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
 }
 
-object TrueDecl : FunctionDecl0<BoolSort>("true".symbol(), emptySet(), emptySet(), BoolSort) {
-  override fun buildExpression(bindings: Bindings): Expression<BoolSort> = True
-}
-
 /** Object for SMT false */
 object False : ConstantExpression<BoolSort>("false".symbol(), BoolSort) {
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
-}
-
-object FalseDecl : FunctionDecl0<BoolSort>("false".symbol(), emptySet(), emptySet(), BoolSort) {
-  override fun buildExpression(bindings: Bindings): Expression<BoolSort> = False
 }
 
 /**
@@ -80,16 +48,6 @@ class Not(override val inner: Expression<BoolSort>) :
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       NotDecl.buildExpression(children, emptyList())
-}
-
-/** Not declaration object */
-object NotDecl :
-    FunctionDecl1<BoolSort, BoolSort>(
-        "not".symbol(), emptySet(), BoolSort, emptySet(), emptySet(), BoolSort) {
-  override fun buildExpression(
-      param: Expression<BoolSort>,
-      bindings: Bindings
-  ): Expression<BoolSort> = Not(param)
 }
 
 /**
@@ -107,18 +65,6 @@ class Implies(val statements: List<Expression<BoolSort>>) :
       ImpliesDecl.buildExpression(children, emptyList())
 }
 
-/** Implies declaration object */
-object ImpliesDecl :
-    FunctionDeclRightAssociative<BoolSort, BoolSort, BoolSort>(
-        "=>".symbol(), emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
-  override fun buildExpression(
-      param1: Expression<BoolSort>,
-      param2: Expression<BoolSort>,
-      varargs: List<Expression<BoolSort>>,
-      bindings: Bindings
-  ) = Implies(listOf(param1, param2).plus(varargs))
-}
-
 /**
  * Implements and according to Core theory (and Bool Bool Bool :left-assoc)
  *
@@ -132,18 +78,6 @@ class And(val conjuncts: List<Expression<BoolSort>>) :
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       AndDecl.buildExpression(children, emptyList())
-}
-
-/** And declaration object */
-object AndDecl :
-    FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
-        "and".symbol(), emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
-  override fun buildExpression(
-      param1: Expression<BoolSort>,
-      param2: Expression<BoolSort>,
-      varargs: List<Expression<BoolSort>>,
-      bindings: Bindings
-  ) = And(listOf(param1, param2).plus(varargs))
 }
 
 /**
@@ -161,18 +95,6 @@ class Or(val disjuncts: List<Expression<BoolSort>>) :
       OrDecl.buildExpression(children, emptyList())
 }
 
-/** Or declaration object */
-object OrDecl :
-    FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
-        "or".symbol(), emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
-  override fun buildExpression(
-      param1: Expression<BoolSort>,
-      param2: Expression<BoolSort>,
-      varargs: List<Expression<BoolSort>>,
-      bindings: Bindings
-  ) = Or(listOf(param1, param2).plus(varargs))
-}
-
 /**
  * Implements xor according to Core theory (xor Bool Bool Bool :left-assoc)
  *
@@ -186,18 +108,6 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) :
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       XOrDecl.buildExpression(children, emptyList())
-}
-
-/** Xor declaration object */
-object XOrDecl :
-    FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
-        "xor".symbol(), emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
-  override fun buildExpression(
-      param1: Expression<BoolSort>,
-      param2: Expression<BoolSort>,
-      varargs: List<Expression<BoolSort>>,
-      bindings: Bindings
-  ) = XOr(listOf(param1, param2).plus(varargs))
 }
 
 /**
@@ -215,22 +125,6 @@ class Equals<T : Sort>(val statements: List<Expression<T>>) :
       EqualsDecl.buildExpression(children, emptyList())
 }
 
-/** Equals declaration object */
-object EqualsDecl :
-    FunctionDeclChainable<Sort>(
-        "=".symbol(),
-        setOf(SortParameter("A")),
-        SortParameter("A"),
-        SortParameter("A"),
-        emptySet(),
-        emptySet()) {
-
-  override fun buildExpression(
-      varargs: List<Expression<Sort>>,
-      bindings: Bindings
-  ): Expression<BoolSort> = Equals(varargs)
-}
-
 /**
  * Implements distinct according to Core theory (par (A) (distinct A A Bool :pairwise))
  *
@@ -244,50 +138,6 @@ class Distinct(val statements: List<Expression<*>>) :
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       DistinctDecl.buildExpression(children, emptyList())
-}
-
-/** Distinct declaration object */
-object DistinctDecl :
-    FunctionDeclPairwise<Sort>(
-        "distinct".symbol(),
-        setOf(SortParameter("A")),
-        SortParameter("A"),
-        SortParameter("A"),
-        emptySet(),
-        emptySet()) {
-
-  override fun buildExpression(
-      args: List<Expression<*>>,
-      functionIndices: List<NumeralIndex>
-  ): Expression<BoolSort> {
-    val bindings = signature.bindParameters(args.map { it.sort }.slice(0..1), functionIndices)
-
-    return buildExpression(args as List<Expression<Sort>>, bindings)
-  }
-
-  override fun buildExpression(
-      varargs: List<Expression<Sort>>,
-      bindings: Bindings
-  ): Expression<BoolSort> = Distinct(varargs)
-}
-
-/** Ite declaration object */
-object IteDecl :
-    FunctionDecl3<BoolSort, Sort, Sort, Sort>(
-        "ite".symbol(),
-        setOf(SortParameter("A")),
-        BoolSort,
-        SortParameter("A"),
-        SortParameter("A"),
-        emptySet(),
-        emptySet(),
-        SortParameter("A")) {
-  override fun buildExpression(
-      param1: Expression<BoolSort>,
-      param2: Expression<Sort>,
-      param3: Expression<Sort>,
-      bindings: Bindings
-  ): Expression<Sort> = Ite(param1, param2, param3)
 }
 
 /** Bool sort */

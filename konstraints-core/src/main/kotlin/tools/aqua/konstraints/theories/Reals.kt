@@ -20,32 +20,10 @@ package tools.aqua.konstraints.theories
 
 import java.math.BigDecimal
 import tools.aqua.konstraints.parser.*
-import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.smt.*
-
-/** Reals theory object */
-object RealsTheory : Theory {
-  override val functions =
-      listOf(
-              RealNegSubDecl,
-              RealAddDecl,
-              RealMulDecl,
-              RealDivDecl,
-              RealLessEqDecl,
-              RealLessDecl,
-              RealGreaterEqDecl,
-              RealGreaterDecl)
-          .associateBy { it.name.toString() }
-
-  override val sorts: Map<String, SortDecl<*>> = mapOf(Pair("Real", RealSortDecl))
-}
 
 /** Real sort */
 object RealSort : Sort("Real")
-
-internal object RealSortDecl : SortDecl<RealSort>("Real".symbol(), emptySet(), emptySet()) {
-  override fun getSort(bindings: Bindings): RealSort = RealSort
-}
 
 /**
  * Real literal
@@ -72,15 +50,6 @@ class RealNeg(override val inner: Expression<RealSort>) :
       RealNegDecl.buildExpression(children, emptyList())
 }
 
-object RealNegDecl :
-    FunctionDecl1<RealSort, RealSort>(
-        "-".symbol(), emptySet(), RealSort, emptySet(), emptySet(), RealSort) {
-  override fun buildExpression(
-      param: Expression<RealSort>,
-      bindings: Bindings
-  ): Expression<RealSort> = RealNeg(param)
-}
-
 /**
  * Real subtraction
  *
@@ -100,55 +69,6 @@ class RealSub(val terms: List<Expression<RealSort>>) :
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
       RealSubDecl.buildExpression(children, emptyList())
-}
-
-object RealSubDecl :
-    FunctionDeclLeftAssociative<RealSort, RealSort, RealSort>(
-        "-".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
-  override fun buildExpression(
-      param1: Expression<RealSort>,
-      param2: Expression<RealSort>,
-      varargs: List<Expression<RealSort>>,
-      bindings: Bindings
-  ): Expression<RealSort> = RealSub(listOf(param1, param2) + varargs)
-}
-
-/** Combined function declaration for overloaded '-' operator */
-object RealNegSubDecl :
-    FunctionDecl<RealSort>(
-        "-".symbol(),
-        emptySet(),
-        listOf(RealSort),
-        emptySet(),
-        emptySet(),
-        RealSort,
-        Associativity.NONE) {
-  override fun buildExpression(
-      args: List<Expression<*>>,
-      functionIndices: List<NumeralIndex>
-  ): Expression<RealSort> {
-    require(args.isNotEmpty())
-
-    return if (args.size == 1) {
-      RealNegDecl.buildExpression(args, functionIndices)
-    } else {
-      RealSubDecl.buildExpression(args, functionIndices)
-    }
-  }
-
-  override fun bindParametersTo(args: List<Sort>, indices: List<NumeralIndex>) =
-      if (args.size == 1) {
-        RealNegDecl.bindParametersTo(args, indices)
-      } else {
-        RealSubDecl.bindParametersTo(args, indices)
-      }
-
-  override fun accepts(args: List<Sort>, indices: List<NumeralIndex>) =
-      if (args.size == 1) {
-        RealNegDecl.accepts(args, indices)
-      } else {
-        RealSubDecl.accepts(args, indices)
-      }
 }
 
 /**
@@ -172,17 +92,6 @@ class RealAdd(val terms: List<Expression<RealSort>>) :
       RealAddDecl.buildExpression(children, emptyList())
 }
 
-object RealAddDecl :
-    FunctionDeclLeftAssociative<RealSort, RealSort, RealSort>(
-        "+".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
-  override fun buildExpression(
-      param1: Expression<RealSort>,
-      param2: Expression<RealSort>,
-      varargs: List<Expression<RealSort>>,
-      bindings: Bindings
-  ): Expression<RealSort> = RealAdd(listOf(param1, param2) + varargs)
-}
-
 /**
  * Real multiplication
  *
@@ -202,17 +111,6 @@ class RealMul(val factors: List<Expression<RealSort>>) :
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
       RealMulDecl.buildExpression(children, emptyList())
-}
-
-object RealMulDecl :
-    FunctionDeclLeftAssociative<RealSort, RealSort, RealSort>(
-        "*".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
-  override fun buildExpression(
-      param1: Expression<RealSort>,
-      param2: Expression<RealSort>,
-      varargs: List<Expression<RealSort>>,
-      bindings: Bindings
-  ): Expression<RealSort> = RealMul(listOf(param1, param2) + varargs)
 }
 
 /**
@@ -236,17 +134,6 @@ class RealDiv(val terms: List<Expression<RealSort>>) :
       RealDivDecl.buildExpression(children, emptyList())
 }
 
-object RealDivDecl :
-    FunctionDeclLeftAssociative<RealSort, RealSort, RealSort>(
-        "/".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
-  override fun buildExpression(
-      param1: Expression<RealSort>,
-      param2: Expression<RealSort>,
-      varargs: List<Expression<RealSort>>,
-      bindings: Bindings
-  ): Expression<RealSort> = RealDiv(listOf(param1, param2) + varargs)
-}
-
 /**
  * Real less equals
  *
@@ -266,15 +153,6 @@ class RealLessEq(val terms: List<Expression<RealSort>>) :
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       RealLessEqDecl.buildExpression(children, emptyList())
-}
-
-object RealLessEqDecl :
-    FunctionDeclChainable<RealSort>(
-        "<=".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
-  override fun buildExpression(
-      varargs: List<Expression<RealSort>>,
-      bindings: Bindings
-  ): Expression<BoolSort> = RealLessEq(varargs)
 }
 
 /**
@@ -298,15 +176,6 @@ class RealLess(val terms: List<Expression<RealSort>>) :
       RealLessDecl.buildExpression(children, emptyList())
 }
 
-object RealLessDecl :
-    FunctionDeclChainable<RealSort>(
-        "<".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
-  override fun buildExpression(
-      varargs: List<Expression<RealSort>>,
-      bindings: Bindings
-  ): Expression<BoolSort> = RealLess(varargs)
-}
-
 /**
  * Real greater equals
  *
@@ -328,15 +197,6 @@ class RealGreaterEq(val terms: List<Expression<RealSort>>) :
       RealGreaterEqDecl.buildExpression(children, emptyList())
 }
 
-object RealGreaterEqDecl :
-    FunctionDeclChainable<RealSort>(
-        ">=".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
-  override fun buildExpression(
-      varargs: List<Expression<RealSort>>,
-      bindings: Bindings
-  ): Expression<BoolSort> = RealGreaterEq(varargs)
-}
-
 /**
  * Real greater
  *
@@ -356,13 +216,4 @@ class RealGreater(val terms: List<Expression<RealSort>>) :
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       RealGreaterDecl.buildExpression(children, emptyList())
-}
-
-object RealGreaterDecl :
-    FunctionDeclChainable<RealSort>(
-        ">".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
-  override fun buildExpression(
-      varargs: List<Expression<RealSort>>,
-      bindings: Bindings
-  ): Expression<BoolSort> = RealGreater(varargs)
 }

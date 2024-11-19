@@ -21,7 +21,7 @@ package tools.aqua.konstraints.solvers.z3
 import com.microsoft.z3.Model as Z3Model
 import com.microsoft.z3.Sort
 import com.microsoft.z3.Status
-import tools.aqua.konstraints.parser.SortedVar
+import tools.aqua.konstraints.parser.SortedVarDecl
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.solvers.Solver
 import tools.aqua.konstraints.theories.*
@@ -180,7 +180,7 @@ operator fun Model.Companion.invoke(model: Z3Model): Model {
         FunctionDef(
             decl.name.toString().symbol(),
             (decl.domain zip 0 ..< decl.domainSize).map { (sort, index) ->
-              SortedVar("x$index".symbol(), sort.aquaify())
+              SortedVarDecl("x$index".symbol(), sort.aquaify())
             },
             decl.range.aquaify(),
             model.getFuncInterp(decl).`else`.aquaify() castTo decl.range.aquaify())

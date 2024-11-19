@@ -76,20 +76,15 @@ internal class ParseTreeVisitor :
   override fun visit(protoFunctionDef: ProtoFunctionDef): FunctionDef<*> {
     val namedParameters = protoFunctionDef.sortedVars.map { visit(it) }
 
-    // add a temporary assertion level where all the named parameters are valid
-    // to construct the term
-    context?.push(1)
-    namedParameters.forEach { context?.registerFunction(it) }
-
-    val funDef =
-        FunctionDef(
-            protoFunctionDef.symbol,
-            namedParameters,
-            visit(protoFunctionDef.sort),
-            visit(protoFunctionDef.term) as Expression<Sort>)
-
-    // remove the named parameters from the assertion stack
-    context?.pop(1)
+    val funDef = context?.bindVars(namedParameters) {
+      val sort = visit(protoFunctionDef.sort)
+      FunctionDef(
+        protoFunctionDef.symbol,
+        namedParameters,
+        sort,
+        visit(protoFunctionDef.term) castTo sort
+      )
+    }!!
 
     return funDef
   }

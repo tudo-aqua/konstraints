@@ -48,7 +48,7 @@ abstract class SortDecl<T : Sort>(
  * Context class manages the currently loaded logic/theory and all the Assertion-Levels (including
  * global eventually but this option is currently not supported)
  */
-class Context(val logic: Logic) {
+internal class Context(val logic: Logic) {
   val assertionLevels = Stack<Subcontext>()
   val numeralSort: Sort? =
       when {
@@ -65,15 +65,15 @@ class Context(val logic: Logic) {
   fun <T> let(varBindings: List<VarBinding<*>>, block: (Context) -> T): T {
     logic.theories.forEach { theory ->
       varBindings.forEach {
-        if (theory.contains(it.name))
+        if (theory.contains(it.symbol))
             throw IllegalFunctionOverloadException(
-                it.name.toString(), "Can not override theory symbol ${it.name}")
+                it.symbol.toString(), "Can not override theory symbol ${it.symbol}")
       }
     }
 
-    assert(varBindings.distinctBy { it.name }.size == varBindings.size)
+    assert(varBindings.distinctBy { it.symbol }.size == varBindings.size)
 
-    assertionLevels.push(LetLevel(varBindings))
+    assertionLevels.push(LetLevel(varBindings.map { VarBindingDecl(it) }))
     val result = block(this)
     assertionLevels.pop()
 
@@ -81,7 +81,7 @@ class Context(val logic: Logic) {
   }
 
   fun <T> bindVars(sortedVars: List<SortedVar<*>>, block: (Context) -> T): T {
-    assertionLevels.push(LocalLevel(sortedVars))
+    assertionLevels.push(LocalLevel(sortedVars.map { SortedVarDecl(it) }))
     val result = block(this)
     assertionLevels.pop()
 
@@ -134,7 +134,7 @@ class Context(val logic: Logic) {
   }
 
   fun registerFunction(def: FunctionDef<*>) {
-    registerFunction(FunctionDefinition(def.name, def.parameters, def.sort, def.term))
+    registerFunction(FunctionDefinition(def))
   }
 
   fun registerFunction(function: FunctionDecl<*>) {
@@ -228,7 +228,7 @@ class Context(val logic: Logic) {
  * Parent class of all assertion levels (this includes the default assertion levels and binder
  * assertion levels, as well as theory objects)
  */
-interface Subcontext {
+internal interface Subcontext {
   fun contains(function: FunctionDecl<*>) = functions.contains(function.name.toString())
 
   fun contains(function: String, args: List<Expression<*>>) = get(function, args) != null
@@ -253,7 +253,7 @@ interface Subcontext {
 }
 
 /** Represents a single assertion level */
-class AssertionLevel : Subcontext {
+internal class AssertionLevel : Subcontext {
   override fun add(function: FunctionDecl<*>) =
       functions.put(function.name.toString(), function) != null
 
@@ -263,15 +263,14 @@ class AssertionLevel : Subcontext {
   override val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf()
 }
 
-class VarBinding<T : Sort>(symbol: Symbol, val term: Expression<T>) :
-    FunctionDecl0<T>(symbol, emptySet(), emptySet(), term.sort) {
+/** Allows context to use [VarBinding] as [FunctionDecl0]. */
+internal class VarBindingDecl<T : Sort>(val binding: VarBinding<T>) :
+    FunctionDecl0<T>(binding.symbol, emptySet(), emptySet(), binding.term.sort) {
 
-  val instance = LocalExpression(name, sort, term)
-
-  override fun buildExpression(bindings: Bindings): Expression<T> = instance
+  override fun buildExpression(bindings: Bindings): Expression<T> = binding.instance
 }
 
-class LetLevel(varBindings: List<VarBinding<*>>) : Subcontext {
+internal class LetLevel(varBindings: List<VarBindingDecl<*>>) : Subcontext {
   override fun add(function: FunctionDecl<*>): Boolean =
       throw IllegalOperationException(
           "LetLevel.add", "Can not add new functions to let assertion level")
@@ -285,16 +284,15 @@ class LetLevel(varBindings: List<VarBinding<*>>) : Subcontext {
   override val sorts: Map<String, SortDecl<*>> = emptyMap()
 }
 
-class SortedVar<T : Sort>(name: Symbol, sort: T) :
-    FunctionDecl0<T>(name, emptySet(), emptySet(), sort) {
+/** This class allows the context to use [SortedVar] as [FunctionDecl0]. */
+internal class SortedVarDecl<T : Sort>(val sortedVar: SortedVar<T>) :
+    FunctionDecl0<T>(sortedVar.name, emptySet(), emptySet(), sortedVar.sort) {
   override fun toString(): String = "($name $sort)"
 
-  val instance = BoundVariable(name, sort)
-
-  override fun buildExpression(bindings: Bindings): Expression<T> = instance
+  override fun buildExpression(bindings: Bindings): Expression<T> = sortedVar.instance
 }
 
-class LocalLevel(localVars: List<SortedVar<*>>) : Subcontext {
+internal class LocalLevel(localVars: List<SortedVarDecl<*>>) : Subcontext {
   override fun add(function: FunctionDecl<*>): Boolean =
       throw IllegalOperationException(
           "LocalLevel.add", "Can not add new functions to local assertion level")
@@ -308,7 +306,7 @@ class LocalLevel(localVars: List<SortedVar<*>>) : Subcontext {
   override val sorts: Map<String, SortDecl<*>> = emptyMap()
 }
 
-interface Theory : Subcontext {
+internal interface Theory : Subcontext {
   override fun add(function: FunctionDecl<*>) =
       throw IllegalOperationException("Theory.add", "Can not add new functions to SMT theories")
 
@@ -322,7 +320,7 @@ interface Theory : Subcontext {
 class IllegalFunctionOverloadException(func: String, msg: String) :
     RuntimeException("Illegal overload of $func: $msg.")
 
-class FunctionAlreadyDeclaredException(func: FunctionDecl<*>) :
+internal class FunctionAlreadyDeclaredException(func: FunctionDecl<*>) :
     RuntimeException("Function $func has already been declared")
 
 class SortAlreadyDeclaredException(sort: Symbol, arity: Int) :

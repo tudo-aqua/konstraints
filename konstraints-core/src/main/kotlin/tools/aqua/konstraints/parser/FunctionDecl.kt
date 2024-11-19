@@ -29,7 +29,7 @@ enum class Associativity {
   NONE
 }
 
-open class FunctionDecl<S : Sort>(
+internal open class FunctionDecl<S : Sort>(
     val name: Symbol,
     val parametricSorts: Set<Sort>,
     val params: List<Sort>,
@@ -99,45 +99,25 @@ open class FunctionDecl<S : Sort>(
   override fun toString() = "($name (${params.joinToString(" ")}) $sort)"
 }
 
-class FunctionDefinition<S : Sort>(
-    name: Symbol,
-    val namedParams: List<SortedVar<*>>,
-    sort: S,
-    val term: Expression<out S>
+internal class FunctionDefinition<S : Sort>(
+    val definition : FunctionDef<S>
 ) :
     FunctionDecl<S>(
-        name,
+        definition.name,
         emptySet(),
-        namedParams.map { it.sort },
+        definition.parameters.map { it.sort },
         emptySet(),
         emptySet(),
-        sort,
+        definition.sort,
         Associativity.NONE) {
+
   override fun buildExpression(
       args: List<Expression<*>>,
       functionIndices: List<NumeralIndex>
-  ): Expression<S> = UserDefinedExpression(name, sort, args, this)
-
-  internal fun expand(args: List<Expression<*>>): Expression<*> {
-    // term is a placeholder expression using the parameters as expressions
-    // we need to build the same term but replace every occurrence of a parameter with
-    // the corresponding argument expression
-    val bindings = (namedParams zip args)
-
-    return term.transform { expr: Expression<*> ->
-      // TODO do not check name equality here,
-      // its probably better to implement some form of Decl.isInstanceOf(Expression) or
-      // Expression.isInstanceOf(Decl)
-      if (expr.children.isEmpty()) {
-        bindings.find { (param, _) -> param.name == expr.name }?.second ?: expr
-      } else {
-        expr
-      }
-    }
-  }
+  ): Expression<S> = UserDefinedExpression(name, sort, args, definition)
 }
 
-abstract class FunctionDecl0<S : Sort>(
+internal abstract class FunctionDecl0<S : Sort>(
     name: Symbol,
     parametricSorts: Set<Sort>,
     functionIndices: Set<SymbolIndex>,
@@ -160,7 +140,7 @@ abstract class FunctionDecl0<S : Sort>(
 }
 
 // TODO refactor sort into more meaningful name i.e. return
-abstract class FunctionDecl1<P : Sort, S : Sort>(
+internal abstract class FunctionDecl1<P : Sort, S : Sort>(
     name: Symbol,
     parametricSorts: Set<Sort>,
     param: P,
@@ -184,7 +164,7 @@ abstract class FunctionDecl1<P : Sort, S : Sort>(
   abstract fun buildExpression(param: Expression<P>, bindings: Bindings): Expression<S>
 }
 
-abstract class FunctionDecl2<P1 : Sort, P2 : Sort, S : Sort>(
+internal abstract class FunctionDecl2<P1 : Sort, P2 : Sort, S : Sort>(
     name: Symbol,
     parametricSorts: Set<Sort>,
     param1: P1,
@@ -219,7 +199,7 @@ abstract class FunctionDecl2<P1 : Sort, P2 : Sort, S : Sort>(
   ): Expression<S>
 }
 
-abstract class FunctionDecl3<P1 : Sort, P2 : Sort, P3 : Sort, S : Sort>(
+internal abstract class FunctionDecl3<P1 : Sort, P2 : Sort, P3 : Sort, S : Sort>(
     name: Symbol,
     parametricSorts: Set<Sort>,
     param1: P1,
@@ -257,7 +237,7 @@ abstract class FunctionDecl3<P1 : Sort, P2 : Sort, P3 : Sort, S : Sort>(
   ): Expression<S>
 }
 
-abstract class FunctionDecl4<P1 : Sort, P2 : Sort, P3 : Sort, P4 : Sort, S : Sort>(
+internal abstract class FunctionDecl4<P1 : Sort, P2 : Sort, P3 : Sort, P4 : Sort, S : Sort>(
     name: Symbol,
     parametricSorts: Set<Sort>,
     param1: P1,
@@ -301,7 +281,7 @@ abstract class FunctionDecl4<P1 : Sort, P2 : Sort, P3 : Sort, P4 : Sort, S : Sor
   ): Expression<S>
 }
 
-abstract class FunctionDeclLeftAssociative<P1 : Sort, P2 : Sort, S : Sort>(
+internal abstract class FunctionDeclLeftAssociative<P1 : Sort, P2 : Sort, S : Sort>(
     name: Symbol,
     parametricSorts: Set<Sort>,
     param1: Sort,
@@ -339,7 +319,7 @@ abstract class FunctionDeclLeftAssociative<P1 : Sort, P2 : Sort, S : Sort>(
   ): Expression<S>
 }
 
-abstract class FunctionDeclRightAssociative<P1 : Sort, P2 : Sort, S : Sort>(
+internal abstract class FunctionDeclRightAssociative<P1 : Sort, P2 : Sort, S : Sort>(
     name: Symbol,
     parametricSorts: Set<Sort>,
     param1: P1,
@@ -377,7 +357,7 @@ abstract class FunctionDeclRightAssociative<P1 : Sort, P2 : Sort, S : Sort>(
   ): Expression<S>
 }
 
-abstract class FunctionDeclChainable<P : Sort>(
+internal abstract class FunctionDeclChainable<P : Sort>(
     name: Symbol,
     parametricSorts: Set<Sort>,
     param1: P,
@@ -408,7 +388,7 @@ abstract class FunctionDeclChainable<P : Sort>(
   ): Expression<BoolSort>
 }
 
-abstract class FunctionDeclPairwise<P : Sort>(
+internal abstract class FunctionDeclPairwise<P : Sort>(
     name: Symbol,
     parametricSorts: Set<Sort>,
     param1: P,
