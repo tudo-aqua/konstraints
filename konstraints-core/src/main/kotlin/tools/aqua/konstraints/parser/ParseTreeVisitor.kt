@@ -23,7 +23,7 @@ import java.math.BigInteger
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 
-internal class ParseTreeVisitor :
+class ParseTreeVisitor :
     ProtoCommandVisitor, ProtoTermVisitor, ProtoSortVisitor, SpecConstantVisitor {
 
   var context: Context? = null

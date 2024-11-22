@@ -26,16 +26,16 @@ import tools.aqua.konstraints.smt.Logic
 import tools.aqua.konstraints.smt.QuotingRule
 import tools.aqua.konstraints.smt.Symbol
 
-internal sealed interface ProtoCommand
+sealed interface ProtoCommand
 
-internal data class ProtoAssert(val term: ProtoTerm) : ProtoCommand
+data class ProtoAssert(val term: ProtoTerm) : ProtoCommand
 
 // TODO what is symbol necessary for here
-internal data class ProtoDeclareConst(val symbol: ParseSymbol, val sort: ProtoSort) : ProtoCommand {
+data class ProtoDeclareConst(val symbol: ParseSymbol, val sort: ProtoSort) : ProtoCommand {
   val name = symbol.token.getValue<String>()
 }
 
-internal data class ProtoDeclareFun(
+data class ProtoDeclareFun(
     val symbol: ParseSymbol,
     val parameters: List<ProtoSort>,
     val sort: ProtoSort
@@ -43,26 +43,26 @@ internal data class ProtoDeclareFun(
   val name = symbol.symbol
 }
 
-internal data class ProtoSetLogic(val logic: Logic) : ProtoCommand
+data class ProtoSetLogic(val logic: Logic) : ProtoCommand
 
-internal data class ProtoDeclareSort(val symbol: ParseSymbol, val arity: Int) : ProtoCommand {
+data class ProtoDeclareSort(val symbol: ParseSymbol, val arity: Int) : ProtoCommand {
   val name = symbol.symbol
 }
 
-internal data class ProtoDefineFun(val definition: ProtoFunctionDef) : ProtoCommand
+data class ProtoDefineFun(val definition: ProtoFunctionDef) : ProtoCommand
 
-internal data class ProtoFunctionDef(
+data class ProtoFunctionDef(
     val symbol: ParseSymbol,
     val sortedVars: List<ProtoSortedVar>,
     val sort: ProtoSort,
     val term: ProtoTerm
 )
 
-internal data class ProtoPush(val n: Int) : ProtoCommand
+data class ProtoPush(val n: Int) : ProtoCommand
 
-internal data class ProtoPop(val n: Int) : ProtoCommand
+data class ProtoPop(val n: Int) : ProtoCommand
 
-internal class ParseSymbol(val token: Token) : Symbol(token.getValue(), QuotingRule.NONE) {
+class ParseSymbol(val token: Token) : Symbol(token.getValue(), QuotingRule.NONE) {
   val symbol: String = token.getValue()
 }
 
@@ -94,14 +94,14 @@ sealed interface Identifier {
   val symbol: Symbol
 }
 
-internal data class SymbolIdentifier(override val symbol: ParseSymbol) : Identifier
+data class SymbolIdentifier(override val symbol: ParseSymbol) : Identifier
 
-internal data class IndexedIdentifier(override val symbol: ParseSymbol, val indices: List<Index>) :
+data class IndexedIdentifier(override val symbol: ParseSymbol, val indices: List<Index>) :
     Identifier
 
 // Sorts
 
-internal data class ProtoSort(val identifier: Identifier, val sorts: List<ProtoSort>) {
+data class ProtoSort(val identifier: Identifier, val sorts: List<ProtoSort>) {
   val name = identifier.symbol.toString()
 }
 
@@ -146,41 +146,36 @@ data class AttributeOptionValue(val attribute: Attribute) : OptionValue
 // Terms
 
 // QualIdentifier is also a ProtoTerm because BracketedProtoTerm.terms can be more QualIdentifiers
-internal sealed interface QualIdentifier : ProtoTerm {
+sealed interface QualIdentifier : ProtoTerm {
   val identifier: Identifier
 }
 
-internal data class SimpleQualIdentifier(override val identifier: Identifier) : QualIdentifier
+data class SimpleQualIdentifier(override val identifier: Identifier) : QualIdentifier
 
-internal data class AsQualIdentifier(override val identifier: Identifier, val sort: ProtoSort) :
+data class AsQualIdentifier(override val identifier: Identifier, val sort: ProtoSort) :
     QualIdentifier
 
-internal data class ProtoVarBinding(val symbol: ParseSymbol, val term: ProtoTerm)
+data class ProtoVarBinding(val symbol: ParseSymbol, val term: ProtoTerm)
 
-internal data class ProtoSortedVar(val symbol: ParseSymbol, val sort: ProtoSort)
+data class ProtoSortedVar(val symbol: ParseSymbol, val sort: ProtoSort)
 
-internal data class Pattern(val symbols: List<ParseSymbol>)
+data class Pattern(val symbols: List<ParseSymbol>)
 
-internal data class MatchCase(val pattern: Pattern, val term: ProtoTerm)
+data class MatchCase(val pattern: Pattern, val term: ProtoTerm)
 
-internal sealed interface ProtoTerm
+sealed interface ProtoTerm
 
-internal data class SpecConstantTerm(val specConstant: SpecConstant) : ProtoTerm
+data class SpecConstantTerm(val specConstant: SpecConstant) : ProtoTerm
 
-internal data class BracketedProtoTerm(
-    val qualIdentifier: QualIdentifier,
-    val terms: List<ProtoTerm>
-) : ProtoTerm
-
-internal data class ProtoLet(val bindings: List<ProtoVarBinding>, val term: ProtoTerm) : ProtoTerm
-
-internal data class ProtoForAll(val sortedVars: List<ProtoSortedVar>, val term: ProtoTerm) :
+data class BracketedProtoTerm(val qualIdentifier: QualIdentifier, val terms: List<ProtoTerm>) :
     ProtoTerm
 
-internal data class ProtoExists(val sortedVars: List<ProtoSortedVar>, val term: ProtoTerm) :
-    ProtoTerm
+data class ProtoLet(val bindings: List<ProtoVarBinding>, val term: ProtoTerm) : ProtoTerm
 
-internal data class ProtoMatch(val term: ProtoTerm, val matchCases: List<MatchCase>) : ProtoTerm
+data class ProtoForAll(val sortedVars: List<ProtoSortedVar>, val term: ProtoTerm) : ProtoTerm
 
-internal data class ProtoAnnotation(val term: ProtoTerm, val attributes: List<Attribute>) :
-    ProtoTerm
+data class ProtoExists(val sortedVars: List<ProtoSortedVar>, val term: ProtoTerm) : ProtoTerm
+
+data class ProtoMatch(val term: ProtoTerm, val matchCases: List<MatchCase>) : ProtoTerm
+
+data class ProtoAnnotation(val term: ProtoTerm, val attributes: List<Attribute>) : ProtoTerm

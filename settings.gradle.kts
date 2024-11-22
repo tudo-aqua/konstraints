@@ -23,7 +23,7 @@ plugins {
 
 rootProject.name = "konstraints"
 
-include("konstraints-all", "konstraints-core")
+include("konstraints-all", "konstraints-core", "konstraints-integration-tests")
 
 include(/*"konstraints-cvc5",*/ "konstraints-z3")
 

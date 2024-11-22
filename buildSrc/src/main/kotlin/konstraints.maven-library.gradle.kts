@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 
+import org.gradle.accessors.dm.LibrariesForLibs
 import org.gradle.kotlin.dsl.*
 import tools.aqua.MetadataExtension
 import tools.aqua.commonSetup
@@ -25,6 +26,12 @@ plugins {
   `maven-publish`
   signing
 }
+
+val libs = the<LibrariesForLibs>()
+
+repositories { mavenCentral() }
+
+java { toolchain { languageVersion = JavaLanguageVersion.of(libs.versions.java.jdk.get()) } }
 
 val metadata = project.extensions.create<MetadataExtension>("metadata")
 

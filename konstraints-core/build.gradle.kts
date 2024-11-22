@@ -29,8 +29,6 @@ metadata {
 }
 
 dependencies {
-  implementation(libs.commons.compress)
-  implementation(libs.commons.io)
   implementation(libs.kotlin.coroutines)
-  implementation(libs.petitparser.core)
+  api(libs.petitparser.core)
 }
