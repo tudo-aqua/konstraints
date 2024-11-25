@@ -99,9 +99,7 @@ enum class Associativity {
   override fun toString() = "($name (${params.joinToString(" ")}) $sort)"
 }
 
-internal class FunctionDefinition<S : Sort>(
-    val definition : FunctionDef<S>
-) :
+internal class FunctionDefinition<S : Sort>(val definition: FunctionDef<S>) :
     FunctionDecl<S>(
         definition.name,
         emptySet(),

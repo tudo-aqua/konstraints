@@ -22,7 +22,6 @@ import com.microsoft.z3.Context
 import com.microsoft.z3.Expr
 import com.microsoft.z3.FuncDecl
 import com.microsoft.z3.Sort as Z3Sort
-import tools.aqua.konstraints.parser.SortedVarDecl
 import tools.aqua.konstraints.smt.Sort
 import tools.aqua.konstraints.smt.SortedVar
 import tools.aqua.konstraints.smt.Symbol

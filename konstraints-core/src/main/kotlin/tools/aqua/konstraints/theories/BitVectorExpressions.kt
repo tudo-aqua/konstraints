@@ -514,9 +514,7 @@ class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
     return LetExpression(
         listOf(msb_s, msb_t),
         Ite(
-            And(
-                Equals(msb_s.instance, BVLiteral("#b0")),
-                Equals(msb_t.instance, BVLiteral("#b0"))),
+            And(Equals(msb_s.instance, BVLiteral("#b0")), Equals(msb_t.instance, BVLiteral("#b0"))),
             BVUDiv(numerator, denominator),
             Ite(
                 And(
@@ -551,9 +549,7 @@ class BVSRem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
     return LetExpression(
         listOf(msb_s, msb_t),
         Ite(
-            And(
-                Equals(msb_s.instance, BVLiteral("#b0")),
-                Equals(msb_t.instance, BVLiteral("#b0"))),
+            And(Equals(msb_s.instance, BVLiteral("#b0")), Equals(msb_t.instance, BVLiteral("#b0"))),
             BVURem(numerator, denominator),
             Ite(
                 And(
@@ -584,24 +580,11 @@ class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<
     val msb_t = VarBinding("?msb_t".symbol(), BVExtract(sort.bits - 1, sort.bits - 1, rhs))
     val abs_s =
         VarBinding(
-            "?abs_s".symbol(),
-            Ite(
-                Equals(msb_s.instance, BVLiteral("#b0")),
-                lhs,
-                BVNeg(lhs)))
+            "?abs_s".symbol(), Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)))
     val abs_t =
         VarBinding(
-            "?abs_t".symbol(),
-            Ite(
-                Equals(msb_s.instance, BVLiteral("#b0")),
-                rhs,
-                BVNeg(rhs)))
-    val u =
-        VarBinding(
-            "u".symbol(),
-            BVURem(
-                abs_s.instance,
-                abs_t.instance))
+            "?abs_t".symbol(), Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)))
+    val u = VarBinding("u".symbol(), BVURem(abs_s.instance, abs_t.instance))
 
     return LetExpression(
         listOf(msb_s, msb_t),
@@ -610,33 +593,22 @@ class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<
             LetExpression(
                 listOf(u),
                 Ite(
-                    Equals(
-                        u.instance, BVLiteral("#b0", sort.bits)),
+                    Equals(u.instance, BVLiteral("#b0", sort.bits)),
                     u.instance,
                     Ite(
                         And(
-                            Equals(
-                                msb_s.instance, BVLiteral("#b0")),
-                            Equals(
-                                msb_t.instance, BVLiteral("#b0"))),
+                            Equals(msb_s.instance, BVLiteral("#b0")),
+                            Equals(msb_t.instance, BVLiteral("#b0"))),
                         u.instance,
                         Ite(
                             And(
-                                Equals(
-                                    msb_s.instance,
-                                    BVLiteral("#b1")),
-                                Equals(
-                                    msb_t.instance,
-                                    BVLiteral("#b0"))),
+                                Equals(msb_s.instance, BVLiteral("#b1")),
+                                Equals(msb_t.instance, BVLiteral("#b0"))),
                             BVAdd(BVNeg(u.instance), rhs),
                             Ite(
                                 And(
-                                    Equals(
-                                        msb_s.instance,
-                                        BVLiteral("#b0")),
-                                    Equals(
-                                        msb_t.instance,
-                                        BVLiteral("#b1"))),
+                                    Equals(msb_s.instance, BVLiteral("#b0")),
+                                    Equals(msb_t.instance, BVLiteral("#b1"))),
                                 BVAdd(u.instance, rhs),
                                 BVNeg(u.instance))))))))
   }

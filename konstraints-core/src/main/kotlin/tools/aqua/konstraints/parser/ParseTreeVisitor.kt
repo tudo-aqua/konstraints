@@ -76,15 +76,15 @@ internal class ParseTreeVisitor :
   override fun visit(protoFunctionDef: ProtoFunctionDef): FunctionDef<*> {
     val namedParameters = protoFunctionDef.sortedVars.map { visit(it) }
 
-    val funDef = context?.bindVars(namedParameters) {
-      val sort = visit(protoFunctionDef.sort)
-      FunctionDef(
-        protoFunctionDef.symbol,
-        namedParameters,
-        sort,
-        visit(protoFunctionDef.term) castTo sort
-      )
-    }!!
+    val funDef =
+        context?.bindVars(namedParameters) {
+          val sort = visit(protoFunctionDef.sort)
+          FunctionDef(
+              protoFunctionDef.symbol,
+              namedParameters,
+              sort,
+              visit(protoFunctionDef.term) castTo sort)
+        }!!
 
     return funDef
   }
