@@ -18,13 +18,8 @@
 
 package tools.aqua.konstraints.parser
 
-import java.math.BigDecimal
-import java.math.BigInteger
 import org.petitparser.context.Token
-import tools.aqua.konstraints.smt.Index
-import tools.aqua.konstraints.smt.Logic
-import tools.aqua.konstraints.smt.QuotingRule
-import tools.aqua.konstraints.smt.Symbol
+import tools.aqua.konstraints.smt.*
 
 sealed interface ProtoCommand
 
@@ -66,82 +61,11 @@ class ParseSymbol(val token: Token) : Symbol(token.getValue(), QuotingRule.NONE)
   val symbol: String = token.getValue()
 }
 
-sealed interface SpecConstant
-
-data class StringConstant(val string: String) : SpecConstant
-
-data class NumeralConstant(val numeral: String) : SpecConstant
-
-/* BinaryConstant of the form #b followed by a non-empty sequence of 0 and 1 characters */
-data class BinaryConstant(val binary: String) : SpecConstant {
-  /* Number of bits for this binary */
-  val bits = binary.length - 2
-}
-
-/* Hexadecimal constant of the form
- * #x followed by a non-empty sequence of digits and letters from A to F , capitalized or not
- */
-data class HexConstant(val hexadecimal: String) : SpecConstant {
-  /* Number of bits for this hexadecimal */
-  val bits = (hexadecimal.length - 2) * 4
-}
-
-data class DecimalConstant(val decimal: BigDecimal) : SpecConstant
-
-// Identifiers
-
-sealed interface Identifier {
-  val symbol: Symbol
-}
-
-data class SymbolIdentifier(override val symbol: ParseSymbol) : Identifier
-
-data class IndexedIdentifier(override val symbol: ParseSymbol, val indices: List<Index>) :
-    Identifier
-
 // Sorts
 
 data class ProtoSort(val identifier: Identifier, val sorts: List<ProtoSort>) {
   val name = identifier.symbol.toString()
 }
-
-// S-Expression
-
-sealed interface SExpression
-
-data class SubSExpression(val subExpressions: List<SExpression>) : SExpression
-
-data class SExpressionConstant(val constant: SpecConstant) : SExpression
-
-data class SExpressionSymbol(val symbol: Symbol) : SExpression
-
-data class SExpressionReserved(val reserved: Token) : SExpression
-
-data class SExpressionKeyword(val keyword: Token) : SExpression
-
-// Attributes
-
-// keyword is a token, so when we pass an Attribute to a solver via set-info, we can generate a
-// better failure message
-data class Attribute(val keyword: String, val value: AttributeValue?)
-
-sealed interface AttributeValue
-
-data class ConstantAttributeValue(val constant: SpecConstant) : AttributeValue
-
-data class SymbolAttributeValue(val symbol: Symbol) : AttributeValue
-
-data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : AttributeValue
-
-sealed interface OptionValue
-
-data class BooleanOptionValue(val bool: Boolean) : OptionValue
-
-data class StringOptionValue(val sting: String) : OptionValue
-
-data class NumeralOptionValue(val numeral: BigInteger) : OptionValue
-
-data class AttributeOptionValue(val attribute: Attribute) : OptionValue
 
 // Terms
 

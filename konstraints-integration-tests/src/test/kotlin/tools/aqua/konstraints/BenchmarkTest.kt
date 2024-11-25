@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.parser.Parser
+import tools.aqua.konstraints.smt.SymbolAttributeValue
 import tools.aqua.konstraints.solvers.z3.Z3Solver
 import tools.aqua.konstraints.util.Benchmark
 import tools.aqua.konstraints.util.MiB
@@ -79,8 +80,7 @@ class BenchmarkTest {
 
     /* ignore the test if assumption fails, ignores all unknown tests */
     Assumptions.assumeTrue(
-        (result.info.find { it.keyword == ":status" }?.value
-                as tools.aqua.konstraints.parser.SymbolAttributeValue)
+        (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
             .symbol
             .toString() != "unknown")
 
@@ -89,8 +89,7 @@ class BenchmarkTest {
 
       // verify we get the correct status for the test
       Assertions.assertEquals(
-          (result.info.find { it.keyword == ":status" }?.value
-                  as tools.aqua.konstraints.parser.SymbolAttributeValue)
+          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
               .symbol
               .toString(),
           solver.status.toString())

@@ -22,10 +22,10 @@ import com.microsoft.z3.Context
 import com.microsoft.z3.Expr
 import com.microsoft.z3.FuncDecl
 import com.microsoft.z3.Sort as Z3Sort
-import tools.aqua.konstraints.parser.SortedVar
-import tools.aqua.konstraints.parser.VarBinding
 import tools.aqua.konstraints.smt.Sort
+import tools.aqua.konstraints.smt.SortedVar
 import tools.aqua.konstraints.smt.Symbol
+import tools.aqua.konstraints.smt.VarBinding
 import tools.aqua.konstraints.util.Stack
 
 class Z3Context {
@@ -42,7 +42,7 @@ class Z3Context {
     letStack.push(
         mapOf(
             *bindings
-                .map { binding -> binding.name.toString() to binding.term.z3ify(this) }
+                .map { binding -> binding.symbol.toString() to binding.term.z3ify(this) }
                 .toTypedArray()))
 
     val expr = block()

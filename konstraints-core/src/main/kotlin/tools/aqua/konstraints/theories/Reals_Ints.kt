@@ -19,41 +19,7 @@
 package tools.aqua.konstraints.theories
 
 import tools.aqua.konstraints.parser.*
-import tools.aqua.konstraints.parser.SortDecl
-import tools.aqua.konstraints.parser.Theory
 import tools.aqua.konstraints.smt.*
-
-/** Reals Ints theory context */
-object RealsIntsTheory : Theory {
-  override val functions =
-      listOf(
-              IntNegSubDecl,
-              IntAddDecl,
-              IntMulDecl,
-              IntDivDecl,
-              ModDecl,
-              AbsDecl,
-              IntLessEqDecl,
-              IntLessDecl,
-              IntGreaterEqDecl,
-              IntGreaterDecl,
-              DivisibleDecl,
-              RealNegSubDecl,
-              RealAddDecl,
-              RealMulDecl,
-              RealDivDecl,
-              RealLessEqDecl,
-              RealLessDecl,
-              RealGreaterEqDecl,
-              RealGreaterDecl,
-              ToRealDecl,
-              ToIntDecl,
-              IsIntDecl)
-          .associateBy { it.name.toString() }
-
-  override val sorts: Map<String, SortDecl<*>> =
-      mapOf(Pair("Int", IntSortDecl), Pair("Real", RealSortDecl))
-}
 
 /**
  * Convert an integer [inner] to real
@@ -64,15 +30,6 @@ class ToReal(override val inner: Expression<IntSort>) :
     UnaryExpression<RealSort, IntSort>("to_real".symbol(), RealSort) {
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
       ToRealDecl.buildExpression(children, emptyList())
-}
-
-object ToRealDecl :
-    FunctionDecl1<IntSort, RealSort>(
-        "to_real".symbol(), emptySet(), IntSort, emptySet(), emptySet(), RealSort) {
-  override fun buildExpression(
-      param: Expression<IntSort>,
-      bindings: Bindings
-  ): Expression<RealSort> = ToReal(param)
 }
 
 /**
@@ -86,27 +43,9 @@ class ToInt(override val inner: Expression<RealSort>) :
       ToIntDecl.buildExpression(children, emptyList())
 }
 
-object ToIntDecl :
-    FunctionDecl1<RealSort, IntSort>(
-        "to_real".symbol(), emptySet(), RealSort, emptySet(), emptySet(), IntSort) {
-  override fun buildExpression(
-      param: Expression<RealSort>,
-      bindings: Bindings
-  ): Expression<IntSort> = ToInt(param)
-}
-
 /** (is_int Real Bool) */
 class IsInt(override val inner: Expression<RealSort>) :
     UnaryExpression<BoolSort, RealSort>("is_int".symbol(), BoolSort) {
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       IsIntDecl.buildExpression(children, emptyList())
-}
-
-object IsIntDecl :
-    FunctionDecl1<RealSort, BoolSort>(
-        "to_real".symbol(), emptySet(), RealSort, emptySet(), emptySet(), BoolSort) {
-  override fun buildExpression(
-      param: Expression<RealSort>,
-      bindings: Bindings
-  ): Expression<BoolSort> = IsInt(param)
 }

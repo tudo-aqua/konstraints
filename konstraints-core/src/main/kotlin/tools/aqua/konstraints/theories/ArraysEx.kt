@@ -19,30 +19,12 @@
 package tools.aqua.konstraints.theories
 
 import tools.aqua.konstraints.parser.*
-import tools.aqua.konstraints.parser.SortDecl
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.smt.SortParameter
-
-/** Array extension theory object */
-object ArrayExTheory : Theory {
-  override val functions: Map<String, FunctionDecl<*>> =
-      listOf(ArraySelectDecl, ArrayStoreDecl).associateBy { it.name.toString() }
-
-  override val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf(Pair("Array", ArraySortDecl))
-}
 
 /** Array sort */
 class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) :
     Sort("Array".symbol(), emptyList(), listOf(x, y)) {
   override fun toString(): String = "(Array $x $y)"
-}
-
-/** Sort declaration object for array sort */
-internal object ArraySortDecl :
-    SortDecl<ArraySort<Sort, Sort>>(
-        "Array".symbol(), setOf(SortParameter("X"), SortParameter("Y")), emptySet()) {
-  override fun getSort(bindings: Bindings): ArraySort<Sort, Sort> =
-      ArraySort(bindings[SortParameter("X")], bindings[SortParameter("Y")])
 }
 
 /**
@@ -64,23 +46,6 @@ class ArraySelect<X : Sort, Y : Sort>(
 
   override fun copy(children: List<Expression<*>>): Expression<Y> =
       ArraySelectDecl.buildExpression(children, emptyList()) as Expression<Y>
-}
-
-/** Array selection declaration object */
-object ArraySelectDecl :
-    FunctionDecl2<ArraySort<Sort, Sort>, Sort, Sort>(
-        "select".symbol(),
-        setOf(SortParameter("X"), SortParameter("Y")),
-        ArraySort(SortParameter("X"), SortParameter("Y")),
-        SortParameter("X"),
-        emptySet(),
-        emptySet(),
-        SortParameter("Y")) {
-  override fun buildExpression(
-      param1: Expression<ArraySort<Sort, Sort>>,
-      param2: Expression<Sort>,
-      bindings: Bindings
-  ): Expression<Sort> = ArraySelect(param1, param2)
 }
 
 /**
@@ -106,23 +71,4 @@ class ArrayStore<X : Sort, Y : Sort>(
 
   override fun copy(children: List<Expression<*>>): Expression<ArraySort<X, Y>> =
       ArrayStoreDecl.buildExpression(children, emptyList()) as Expression<ArraySort<X, Y>>
-}
-
-/** Array store declaration object */
-object ArrayStoreDecl :
-    FunctionDecl3<ArraySort<Sort, Sort>, Sort, Sort, ArraySort<Sort, Sort>>(
-        "store".symbol(),
-        setOf(SortParameter("X"), SortParameter("Y")),
-        ArraySort(SortParameter("X"), SortParameter("Y")),
-        SortParameter("X"),
-        SortParameter("Y"),
-        emptySet(),
-        emptySet(),
-        ArraySort(SortParameter("X"), SortParameter("Y"))) {
-  override fun buildExpression(
-      param1: Expression<ArraySort<Sort, Sort>>,
-      param2: Expression<Sort>,
-      param3: Expression<Sort>,
-      bindings: Bindings
-  ): Expression<ArraySort<Sort, Sort>> = ArrayStore(param1, param2, param3)
 }
