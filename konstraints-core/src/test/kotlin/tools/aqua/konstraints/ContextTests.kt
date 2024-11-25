@@ -184,7 +184,7 @@ class ContextTests {
   fun testLetShadowingOfLet() {
     context.let(listOf(VarBinding("A".symbol(), And(True, True)))) {
       context.let(listOf(VarBinding("A".symbol(), Or(True, True)))) {
-        assert((context.getFunction("A", emptyList()) as VarBinding).term.name.toString() == "or")
+        assert((context.getFunction("A", emptyList()) as VarBindingDecl).binding.term.name.toString() == "or")
       }
     }
   }

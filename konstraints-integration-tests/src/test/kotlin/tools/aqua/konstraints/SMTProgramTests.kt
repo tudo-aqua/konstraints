@@ -32,7 +32,6 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.parser.Parser
-import tools.aqua.konstraints.parser.SymbolAttributeValue
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.BVSort
 import tools.aqua.konstraints.theories.BVUlt

@@ -22,7 +22,7 @@ import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 
 /** Core theory internal object */
-internal object CoreTheory : Theory {
+/*internal*/ object CoreTheory : Theory {
   override val functions =
       listOf(
               FalseDecl,
@@ -40,7 +40,7 @@ internal object CoreTheory : Theory {
 }
 
 /** Declaration internal object for Bool sort */
-internal object BoolSortDecl : SortDecl<BoolSort>("Bool".symbol(), emptySet(), emptySet()) {
+/*internal*/ object BoolSortDecl : SortDecl<BoolSort>("Bool".symbol(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): BoolSort = BoolSort
 }
 

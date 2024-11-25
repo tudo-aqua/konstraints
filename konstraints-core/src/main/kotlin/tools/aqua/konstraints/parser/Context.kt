@@ -48,7 +48,7 @@ abstract class SortDecl<T : Sort>(
  * Context class manages the currently loaded logic/theory and all the Assertion-Levels (including
  * global eventually but this option is currently not supported)
  */
-internal class Context(val logic: Logic) {
+/*internal*/ class Context(val logic: Logic) {
   val assertionLevels = Stack<Subcontext>()
   val numeralSort: Sort? =
       when {
@@ -228,7 +228,7 @@ internal class Context(val logic: Logic) {
  * Parent class of all assertion levels (this includes the default assertion levels and binder
  * assertion levels, as well as theory objects)
  */
-internal interface Subcontext {
+/*internal*/ interface Subcontext {
   fun contains(function: FunctionDecl<*>) = functions.contains(function.name.toString())
 
   fun contains(function: String, args: List<Expression<*>>) = get(function, args) != null
@@ -285,7 +285,7 @@ internal class LetLevel(varBindings: List<VarBindingDecl<*>>) : Subcontext {
 }
 
 /** This class allows the context to use [SortedVar] as [FunctionDecl0]. */
-internal class SortedVarDecl<T : Sort>(val sortedVar: SortedVar<T>) :
+/*internal*/ class SortedVarDecl<T : Sort>(val sortedVar: SortedVar<T>) :
     FunctionDecl0<T>(sortedVar.name, emptySet(), emptySet(), sortedVar.sort) {
   override fun toString(): String = "($name $sort)"
 
@@ -306,7 +306,7 @@ internal class LocalLevel(localVars: List<SortedVarDecl<*>>) : Subcontext {
   override val sorts: Map<String, SortDecl<*>> = emptyMap()
 }
 
-internal interface Theory : Subcontext {
+/*internal*/ interface Theory : Subcontext {
   override fun add(function: FunctionDecl<*>) =
       throw IllegalOperationException("Theory.add", "Can not add new functions to SMT theories")
 

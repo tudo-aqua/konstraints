@@ -180,7 +180,7 @@ operator fun Model.Companion.invoke(model: Z3Model): Model {
         FunctionDef(
             decl.name.toString().symbol(),
             (decl.domain zip 0 ..< decl.domainSize).map { (sort, index) ->
-              SortedVarDecl("x$index".symbol(), sort.aquaify())
+              SortedVar("x$index".symbol(), sort.aquaify())
             },
             decl.range.aquaify(),
             model.getFuncInterp(decl).`else`.aquaify() castTo decl.range.aquaify())

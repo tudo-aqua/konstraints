@@ -29,7 +29,7 @@ enum class Associativity {
   NONE
 }
 
-internal open class FunctionDecl<S : Sort>(
+/*internal*/ open class FunctionDecl<S : Sort>(
     val name: Symbol,
     val parametricSorts: Set<Sort>,
     val params: List<Sort>,
@@ -117,7 +117,7 @@ internal class FunctionDefinition<S : Sort>(
   ): Expression<S> = UserDefinedExpression(name, sort, args, definition)
 }
 
-internal abstract class FunctionDecl0<S : Sort>(
+/*internal*/ abstract class FunctionDecl0<S : Sort>(
     name: Symbol,
     parametricSorts: Set<Sort>,
     functionIndices: Set<SymbolIndex>,
