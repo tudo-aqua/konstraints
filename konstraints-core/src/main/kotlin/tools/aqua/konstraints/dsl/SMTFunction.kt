@@ -20,6 +20,7 @@ package tools.aqua.konstraints.dsl
 
 import java.util.*
 import kotlin.reflect.KProperty
+import tools.aqua.konstraints.parser.FunctionDefinition
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.util.SimpleDelegate
 
@@ -434,7 +435,8 @@ class Define<T : Sort>(
 
     program.registerFun(n, sort, sortedVars, term)
     return SimpleDelegate(
-        SMTFunction(n.symbol(), sort, parameters, FunctionDef(n.symbol(), emptyList(), sort, term)))
+        SMTFunction(
+            n.symbol(), sort, parameters, FunctionDef(n.symbol(), emptyList(), sort, term)))
   }
 }
 
@@ -463,7 +465,8 @@ class Define1<T : Sort, S : Sort>(
 
     program.registerFun(n, sort, listOf(sortedVar), term)
     return SimpleDelegate(
-        SMTFunction1(n.symbol(), sort, par, FunctionDef(n.symbol(), listOf(sortedVar), sort, term)))
+        SMTFunction1(
+            n.symbol(), sort, par, FunctionDef(n.symbol(), listOf(sortedVar), sort, term)))
   }
 }
 

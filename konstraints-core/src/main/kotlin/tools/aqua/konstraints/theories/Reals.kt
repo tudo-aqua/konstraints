@@ -21,6 +21,7 @@ package tools.aqua.konstraints.theories
 import java.math.BigDecimal
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
+import java.math.BigInteger
 
 /** Real sort */
 object RealSort : Sort("Real")
@@ -32,6 +33,20 @@ object RealSort : Sort("Real")
  */
 class RealLiteral(val value: BigDecimal) :
     Literal<RealSort>(LiteralString(value.toString()), RealSort) {
+    constructor(value: Byte) : this(value.toInt().toBigDecimal())
+
+    constructor(value: Short) : this(value.toInt().toBigDecimal())
+
+    constructor(value: Int) : this(value.toBigDecimal())
+
+    constructor(value: Long) : this(value.toBigDecimal())
+
+    constructor(value: BigInteger) : this(value.toBigDecimal())
+
+    constructor(value: Float) : this(value.toBigDecimal())
+
+    constructor(value: Double) : this(value.toBigDecimal())
+
   override val sort: RealSort = RealSort
 
   override fun toString(): String = value.toString()

@@ -18,6 +18,8 @@
 
 package tools.aqua.konstraints.dsl
 
+import java.math.BigDecimal
+import java.math.BigInteger
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.theories.*
 
@@ -27,7 +29,7 @@ operator fun Expression<RealSort>.unaryMinus() = RealNeg(this)
 /**
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
- * If [this] is an [RealSub] object, unpacks the children and returns a new combined RealSub.
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
  */
 infix operator fun Expression<RealSort>.minus(subtrahend: Expression<RealSort>) =
     if (this is RealSub) {
@@ -39,31 +41,313 @@ infix operator fun Expression<RealSort>.minus(subtrahend: Expression<RealSort>) 
 /**
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
- * If [this] is an [RealSub] object, unpacks the children and returns a new combined RealSub.
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
  */
-infix fun Expression<RealSort>.minus(subtrahend: () -> Expression<RealSort>) =
+infix operator fun Expression<RealSort>.minus(subtrahend: () -> Expression<RealSort>) =
     this minus subtrahend()
 
 /**
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
- * If [this] is an [RealSub] object, unpacks the children and returns a new combined RealSub.
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
  */
-infix fun (() -> Expression<RealSort>).minus(subtrahend: Expression<RealSort>) =
+infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Expression<RealSort>) =
     this() minus subtrahend
 
 /**
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
- * If [this] is an [RealSub] object, unpacks the children and returns a new combined RealSub.
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
  */
-infix fun (() -> Expression<RealSort>).minus(subtrahend: () -> Expression<RealSort>) =
+infix operator fun (() -> Expression<RealSort>).minus(subtrahend: () -> Expression<RealSort>) =
     this() minus subtrahend()
 
 /**
- * Addition operator for RealSort Expressions: [this] + [summand].
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
- * If [this] is an [RealAdd] object, unpacks the children and returns a new combined RealAdd.
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts subtrahend from [Byte] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.minus(subtrahend: Byte) = this minus RealLiteral(subtrahend)
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts subtrahend from [Byte] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Byte) =
+    this() minus RealLiteral(subtrahend)
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts [this] from [Byte] to [IntLiteral].
+ */
+infix operator fun Byte.minus(subtrahend: Expression<RealSort>) = RealLiteral(this) minus subtrahend
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts [this] from [Byte] to [IntLiteral].
+ */
+infix operator fun Byte.minus(subtrahend: () -> Expression<RealSort>) =
+    RealLiteral(this) minus subtrahend()
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts subtrahend from [Short] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.minus(subtrahend: Short) =
+    this minus RealLiteral(subtrahend)
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts subtrahend from [Short] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Short) =
+    this() minus RealLiteral(subtrahend)
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts [this] from [Short] to [IntLiteral].
+ */
+infix operator fun Short.minus(subtrahend: Expression<RealSort>) =
+    RealLiteral(this) minus subtrahend
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts [this] from [Short] to [IntLiteral].
+ */
+infix operator fun Short.minus(subtrahend: () -> Expression<RealSort>) =
+    RealLiteral(this) minus subtrahend()
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts subtrahend from [Int] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.minus(subtrahend: Int) = this minus RealLiteral(subtrahend)
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts subtrahend from [Int] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Int) =
+    this() minus RealLiteral(subtrahend)
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts [this] from [Int] to [IntLiteral].
+ */
+infix operator fun Int.minus(subtrahend: Expression<RealSort>) = RealLiteral(this) minus subtrahend
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts [this] from [Int] to [IntLiteral].
+ */
+infix operator fun Int.minus(subtrahend: () -> Expression<RealSort>) =
+    RealLiteral(this) minus subtrahend()
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts subtrahend from [Long] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.minus(subtrahend: Long) = this minus RealLiteral(subtrahend)
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts subtrahend from [Long] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Long) =
+    this() minus RealLiteral(subtrahend)
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts [this] from [Long] to [IntLiteral].
+ */
+infix operator fun Long.minus(subtrahend: Expression<RealSort>) = RealLiteral(this) minus subtrahend
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts [this] from [Long] to [IntLiteral].
+ */
+infix operator fun Long.minus(subtrahend: () -> Expression<RealSort>) =
+    RealLiteral(this) minus subtrahend()
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts subtrahend from [BigInteger] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.minus(subtrahend: BigInteger) =
+    this minus RealLiteral(subtrahend)
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts subtrahend from [BigInteger] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).minus(subtrahend: BigInteger) =
+    this() minus RealLiteral(subtrahend)
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts [this] from [BigInteger] to [IntLiteral].
+ */
+infix operator fun BigInteger.minus(subtrahend: Expression<RealSort>) =
+    RealLiteral(this) minus subtrahend
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts [this] from [BigInteger] to [IntLiteral].
+ */
+infix operator fun BigInteger.minus(subtrahend: () -> Expression<RealSort>) =
+    RealLiteral(this) minus subtrahend()
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts subtrahend from [Float] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.minus(subtrahend: Float) =
+    this minus RealLiteral(subtrahend)
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts subtrahend from [Float] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Float) =
+    this() minus RealLiteral(subtrahend)
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts [this] from [Float] to [IntLiteral].
+ */
+infix operator fun Float.minus(subtrahend: Expression<RealSort>) =
+    RealLiteral(this) minus subtrahend
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts [this] from [Float] to [IntLiteral].
+ */
+infix operator fun Float.minus(subtrahend: () -> Expression<RealSort>) =
+    RealLiteral(this) minus subtrahend()
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts subtrahend from [Double] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.minus(subtrahend: Double) =
+    this minus RealLiteral(subtrahend)
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts subtrahend from [Double] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Double) =
+    this() minus RealLiteral(subtrahend)
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts [this] from [Double] to [IntLiteral].
+ */
+infix operator fun Double.minus(subtrahend: Expression<RealSort>) =
+    RealLiteral(this) minus subtrahend
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts [this] from [Double] to [IntLiteral].
+ */
+infix operator fun Double.minus(subtrahend: () -> Expression<RealSort>) =
+    RealLiteral(this) minus subtrahend()
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts subtrahend from [BigDecimal] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.minus(subtrahend: BigDecimal) =
+    this minus RealLiteral(subtrahend)
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts subtrahend from [BigDecimal] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).minus(subtrahend: BigDecimal) =
+    this() minus RealLiteral(subtrahend)
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts [this] from [BigDecimal] to [IntLiteral].
+ */
+infix operator fun BigDecimal.minus(subtrahend: Expression<RealSort>) =
+    RealLiteral(this) minus subtrahend
+
+/**
+ * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
+ *
+ * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
+ * Converts [this] from [BigDecimal] to [IntLiteral].
+ */
+infix operator fun BigDecimal.minus(subtrahend: () -> Expression<RealSort>) =
+    RealLiteral(this) minus subtrahend()
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
  */
 infix operator fun Expression<RealSort>.plus(summand: Expression<RealSort>) =
     if (this is RealAdd) {
@@ -73,31 +357,302 @@ infix operator fun Expression<RealSort>.plus(summand: Expression<RealSort>) =
     }
 
 /**
- * Addition operator for RealSort Expressions: [this] + [summand].
+ * Addition operator for RealSort Expressions: [this] - [summand].
  *
- * If [this] is an [RealAdd] object, unpacks the children and returns a new combined RealAdd.
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
  */
-infix fun Expression<RealSort>.plus(summand: () -> Expression<RealSort>) = this plus summand()
+infix operator fun Expression<RealSort>.plus(summand: () -> Expression<RealSort>) =
+    this plus summand()
 
 /**
- * Addition operator for RealSort Expressions: [this] + [summand].
+ * Addition operator for RealSort Expressions: [this] - [summand].
  *
- * If [this] is an [RealAdd] object, unpacks the children and returns a new combined RealAdd.
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
  */
-infix fun (() -> Expression<RealSort>).plus(summand: Expression<RealSort>) = this() plus summand
+infix operator fun (() -> Expression<RealSort>).plus(summand: Expression<RealSort>) =
+    this() plus summand
 
 /**
- * Addition operator for RealSort Expressions: [this] + [summand].
+ * Addition operator for RealSort Expressions: [this] - [summand].
  *
- * If [this] is an [RealAdd] object, unpacks the children and returns a new combined RealAdd.
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
  */
-infix fun (() -> Expression<RealSort>).plus(summand: () -> Expression<RealSort>) =
+infix operator fun (() -> Expression<RealSort>).plus(summand: () -> Expression<RealSort>) =
     this() plus summand()
 
 /**
- * Multiplication operator for RealSort Expressions: [this] * [multiplicand].
+ * Addition operator for RealSort Expressions: [this] - [summand].
  *
- * If [this] is an [RealMul] object, unpacks the children and returns a new combined RealMul.
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts summand from [Byte] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.plus(summand: Byte) = this plus RealLiteral(summand)
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts summand from [Byte] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).plus(summand: Byte) =
+    this() plus RealLiteral(summand)
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts [this] from [Byte] to [IntLiteral].
+ */
+infix operator fun Byte.plus(summand: Expression<RealSort>) = RealLiteral(this) plus summand
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts [this] from [Byte] to [IntLiteral].
+ */
+infix operator fun Byte.plus(summand: () -> Expression<RealSort>) = RealLiteral(this) plus summand()
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts summand from [Short] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.plus(summand: Short) = this plus RealLiteral(summand)
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts summand from [Short] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).plus(summand: Short) =
+    this() plus RealLiteral(summand)
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts [this] from [Short] to [IntLiteral].
+ */
+infix operator fun Short.plus(summand: Expression<RealSort>) = RealLiteral(this) plus summand
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts [this] from [Short] to [IntLiteral].
+ */
+infix operator fun Short.plus(summand: () -> Expression<RealSort>) =
+    RealLiteral(this) plus summand()
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts summand from [Int] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.plus(summand: Int) = this plus RealLiteral(summand)
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts summand from [Int] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).plus(summand: Int) =
+    this() plus RealLiteral(summand)
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts [this] from [Int] to [IntLiteral].
+ */
+infix operator fun Int.plus(summand: Expression<RealSort>) = RealLiteral(this) plus summand
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts [this] from [Int] to [IntLiteral].
+ */
+infix operator fun Int.plus(summand: () -> Expression<RealSort>) = RealLiteral(this) plus summand()
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts summand from [Long] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.plus(summand: Long) = this plus RealLiteral(summand)
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts summand from [Long] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).plus(summand: Long) =
+    this() plus RealLiteral(summand)
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts [this] from [Long] to [IntLiteral].
+ */
+infix operator fun Long.plus(summand: Expression<RealSort>) = RealLiteral(this) plus summand
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts [this] from [Long] to [IntLiteral].
+ */
+infix operator fun Long.plus(summand: () -> Expression<RealSort>) = RealLiteral(this) plus summand()
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts summand from [BigInteger] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.plus(summand: BigInteger) = this plus RealLiteral(summand)
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts summand from [BigInteger] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).plus(summand: BigInteger) =
+    this() plus RealLiteral(summand)
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts [this] from [BigInteger] to [IntLiteral].
+ */
+infix operator fun BigInteger.plus(summand: Expression<RealSort>) = RealLiteral(this) plus summand
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts [this] from [BigInteger] to [IntLiteral].
+ */
+infix operator fun BigInteger.plus(summand: () -> Expression<RealSort>) =
+    RealLiteral(this) plus summand()
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts summand from [Float] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.plus(summand: Float) = this plus RealLiteral(summand)
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts summand from [Float] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).plus(summand: Float) =
+    this() plus RealLiteral(summand)
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts [this] from [Float] to [IntLiteral].
+ */
+infix operator fun Float.plus(summand: Expression<RealSort>) = RealLiteral(this) plus summand
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts [this] from [Float] to [IntLiteral].
+ */
+infix operator fun Float.plus(summand: () -> Expression<RealSort>) =
+    RealLiteral(this) plus summand()
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts summand from [Double] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.plus(summand: Double) = this plus RealLiteral(summand)
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts summand from [Double] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).plus(summand: Double) =
+    this() plus RealLiteral(summand)
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts [this] from [Double] to [IntLiteral].
+ */
+infix operator fun Double.plus(summand: Expression<RealSort>) = RealLiteral(this) plus summand
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts [this] from [Double] to [IntLiteral].
+ */
+infix operator fun Double.plus(summand: () -> Expression<RealSort>) =
+    RealLiteral(this) plus summand()
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts summand from [BigDecimal] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.plus(summand: BigDecimal) = this plus RealLiteral(summand)
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts summand from [BigDecimal] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).plus(summand: BigDecimal) =
+    this() plus RealLiteral(summand)
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts [this] from [BigDecimal] to [IntLiteral].
+ */
+infix operator fun BigDecimal.plus(summand: Expression<RealSort>) = RealLiteral(this) plus summand
+
+/**
+ * Addition operator for RealSort Expressions: [this] - [summand].
+ *
+ * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
+ * Converts [this] from [BigDecimal] to [IntLiteral].
+ */
+infix operator fun BigDecimal.plus(summand: () -> Expression<RealSort>) =
+    RealLiteral(this) plus summand()
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
  */
 infix operator fun Expression<RealSort>.times(multiplicand: Expression<RealSort>) =
     if (this is RealMul) {
@@ -107,33 +662,321 @@ infix operator fun Expression<RealSort>.times(multiplicand: Expression<RealSort>
     }
 
 /**
- * Multiplication operator for RealSort Expressions: [this] * [multiplicand].
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
- * If [this] is an [RealMul] object, unpacks the children and returns a new combined RealMul.
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
  */
-infix fun Expression<RealSort>.times(multiplicand: () -> Expression<RealSort>) =
+infix operator fun Expression<RealSort>.times(multiplicand: () -> Expression<RealSort>) =
     this times multiplicand()
 
 /**
- * Multiplication operator for RealSort Expressions: [this] * [multiplicand].
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
- * If [this] is an [RealMul] object, unpacks the children and returns a new combined RealMul.
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
  */
-infix fun (() -> Expression<RealSort>).times(multiplicand: Expression<RealSort>) =
+infix operator fun (() -> Expression<RealSort>).times(multiplicand: Expression<RealSort>) =
     this() times multiplicand
 
 /**
- * Multiplication operator for RealSort Expressions: [this] * [multiplicand].
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
- * If [this] is an [RealMul] object, unpacks the children and returns a new combined RealMul.
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
  */
-infix fun (() -> Expression<RealSort>).times(multiplicand: () -> Expression<RealSort>) =
+infix operator fun (() -> Expression<RealSort>).times(multiplicand: () -> Expression<RealSort>) =
     this() times multiplicand()
 
 /**
- * Division operator for RealSort Expressions: [this] / [divisor].
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
- * If [this] is an [RealDiv] object, unpacks the children and returns a new combined RealMul.
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts multiplicand from [Byte] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.times(multiplicand: Byte) =
+    this times RealLiteral(multiplicand)
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts multiplicand from [Byte] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).times(multiplicand: Byte) =
+    this() times RealLiteral(multiplicand)
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts [this] from [Byte] to [IntLiteral].
+ */
+infix operator fun Byte.times(multiplicand: Expression<RealSort>) =
+    RealLiteral(this) times multiplicand
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts [this] from [Byte] to [IntLiteral].
+ */
+infix operator fun Byte.times(multiplicand: () -> Expression<RealSort>) =
+    RealLiteral(this) times multiplicand()
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts multiplicand from [Short] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.times(multiplicand: Short) =
+    this times RealLiteral(multiplicand)
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts multiplicand from [Short] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).times(multiplicand: Short) =
+    this() times RealLiteral(multiplicand)
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts [this] from [Short] to [IntLiteral].
+ */
+infix operator fun Short.times(multiplicand: Expression<RealSort>) =
+    RealLiteral(this) times multiplicand
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts [this] from [Short] to [IntLiteral].
+ */
+infix operator fun Short.times(multiplicand: () -> Expression<RealSort>) =
+    RealLiteral(this) times multiplicand()
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts multiplicand from [Int] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.times(multiplicand: Int) =
+    this times RealLiteral(multiplicand)
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts multiplicand from [Int] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).times(multiplicand: Int) =
+    this() times RealLiteral(multiplicand)
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts [this] from [Int] to [IntLiteral].
+ */
+infix operator fun Int.times(multiplicand: Expression<RealSort>) =
+    RealLiteral(this) times multiplicand
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts [this] from [Int] to [IntLiteral].
+ */
+infix operator fun Int.times(multiplicand: () -> Expression<RealSort>) =
+    RealLiteral(this) times multiplicand()
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts multiplicand from [Long] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.times(multiplicand: Long) =
+    this times RealLiteral(multiplicand)
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts multiplicand from [Long] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).times(multiplicand: Long) =
+    this() times RealLiteral(multiplicand)
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts [this] from [Long] to [IntLiteral].
+ */
+infix operator fun Long.times(multiplicand: Expression<RealSort>) =
+    RealLiteral(this) times multiplicand
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts [this] from [Long] to [IntLiteral].
+ */
+infix operator fun Long.times(multiplicand: () -> Expression<RealSort>) =
+    RealLiteral(this) times multiplicand()
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts multiplicand from [BigInteger] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.times(multiplicand: BigInteger) =
+    this times RealLiteral(multiplicand)
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts multiplicand from [BigInteger] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).times(multiplicand: BigInteger) =
+    this() times RealLiteral(multiplicand)
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts [this] from [BigInteger] to [IntLiteral].
+ */
+infix operator fun BigInteger.times(multiplicand: Expression<RealSort>) =
+    RealLiteral(this) times multiplicand
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts [this] from [BigInteger] to [IntLiteral].
+ */
+infix operator fun BigInteger.times(multiplicand: () -> Expression<RealSort>) =
+    RealLiteral(this) times multiplicand()
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts multiplicand from [Float] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.times(multiplicand: Float) =
+    this times RealLiteral(multiplicand)
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts multiplicand from [Float] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).times(multiplicand: Float) =
+    this() times RealLiteral(multiplicand)
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts [this] from [Float] to [IntLiteral].
+ */
+infix operator fun Float.times(multiplicand: Expression<RealSort>) =
+    RealLiteral(this) times multiplicand
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts [this] from [Float] to [IntLiteral].
+ */
+infix operator fun Float.times(multiplicand: () -> Expression<RealSort>) =
+    RealLiteral(this) times multiplicand()
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts multiplicand from [Double] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.times(multiplicand: Double) =
+    this times RealLiteral(multiplicand)
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts multiplicand from [Double] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).times(multiplicand: Double) =
+    this() times RealLiteral(multiplicand)
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts [this] from [Double] to [IntLiteral].
+ */
+infix operator fun Double.times(multiplicand: Expression<RealSort>) =
+    RealLiteral(this) times multiplicand
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts [this] from [Double] to [IntLiteral].
+ */
+infix operator fun Double.times(multiplicand: () -> Expression<RealSort>) =
+    RealLiteral(this) times multiplicand()
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts multiplicand from [BigDecimal] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.times(multiplicand: BigDecimal) =
+    this times RealLiteral(multiplicand)
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts multiplicand from [BigDecimal] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).times(multiplicand: BigDecimal) =
+    this() times RealLiteral(multiplicand)
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts [this] from [BigDecimal] to [IntLiteral].
+ */
+infix operator fun BigDecimal.times(multiplicand: Expression<RealSort>) =
+    RealLiteral(this) times multiplicand
+
+/**
+ * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
+ *
+ * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
+ * Converts [this] from [BigDecimal] to [IntLiteral].
+ */
+infix operator fun BigDecimal.times(multiplicand: () -> Expression<RealSort>) =
+    RealLiteral(this) times multiplicand()
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
  */
 infix operator fun Expression<RealSort>.div(divisor: Expression<RealSort>) =
     if (this is RealDiv) {
@@ -143,39 +986,304 @@ infix operator fun Expression<RealSort>.div(divisor: Expression<RealSort>) =
     }
 
 /**
- * Division operator for RealSort Expressions: [this] / [divisor].
+ * Divison operator for RealSort Expressions: [this] - [divisor].
  *
- * If [this] is an [RealDiv] object, unpacks the children and returns a new combined RealMul.
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
  */
-infix fun Expression<RealSort>.div(divisor: () -> Expression<RealSort>) = this div divisor()
+infix operator fun Expression<RealSort>.div(divisor: () -> Expression<RealSort>) =
+    this div divisor()
 
 /**
- * Division operator for RealSort Expressions: [this] / [divisor].
+ * Divison operator for RealSort Expressions: [this] - [divisor].
  *
- * If [this] is an [RealDiv] object, unpacks the children and returns a new combined RealMul.
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
  */
-infix fun (() -> Expression<RealSort>).div(divisor: Expression<RealSort>) = this() div divisor
+infix operator fun (() -> Expression<RealSort>).div(divisor: Expression<RealSort>) =
+    this() div divisor
 
 /**
- * Division operator for RealSort Expressions: [this] / [divisor].
+ * Divison operator for RealSort Expressions: [this] - [divisor].
  *
- * If [this] is an [RealDiv] object, unpacks the children and returns a new combined RealMul.
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
  */
-infix fun (() -> Expression<RealSort>).div(divisor: () -> Expression<RealSort>) =
+infix operator fun (() -> Expression<RealSort>).div(divisor: () -> Expression<RealSort>) =
     this() div divisor()
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts divisor from [Byte] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.div(divisor: Byte) = this div RealLiteral(divisor)
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts divisor from [Byte] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).div(divisor: Byte) = this() div RealLiteral(divisor)
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts [this] from [Byte] to [IntLiteral].
+ */
+infix operator fun Byte.div(divisor: Expression<RealSort>) = RealLiteral(this) div divisor
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts [this] from [Byte] to [IntLiteral].
+ */
+infix operator fun Byte.div(divisor: () -> Expression<RealSort>) = RealLiteral(this) div divisor()
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts divisor from [Short] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.div(divisor: Short) = this div RealLiteral(divisor)
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts divisor from [Short] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).div(divisor: Short) =
+    this() div RealLiteral(divisor)
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts [this] from [Short] to [IntLiteral].
+ */
+infix operator fun Short.div(divisor: Expression<RealSort>) = RealLiteral(this) div divisor
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts [this] from [Short] to [IntLiteral].
+ */
+infix operator fun Short.div(divisor: () -> Expression<RealSort>) = RealLiteral(this) div divisor()
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts divisor from [Int] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.div(divisor: Int) = this div RealLiteral(divisor)
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts divisor from [Int] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).div(divisor: Int) = this() div RealLiteral(divisor)
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts [this] from [Int] to [IntLiteral].
+ */
+infix operator fun Int.div(divisor: Expression<RealSort>) = RealLiteral(this) div divisor
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts [this] from [Int] to [IntLiteral].
+ */
+infix operator fun Int.div(divisor: () -> Expression<RealSort>) = RealLiteral(this) div divisor()
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts divisor from [Long] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.div(divisor: Long) = this div RealLiteral(divisor)
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts divisor from [Long] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).div(divisor: Long) = this() div RealLiteral(divisor)
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts [this] from [Long] to [IntLiteral].
+ */
+infix operator fun Long.div(divisor: Expression<RealSort>) = RealLiteral(this) div divisor
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts [this] from [Long] to [IntLiteral].
+ */
+infix operator fun Long.div(divisor: () -> Expression<RealSort>) = RealLiteral(this) div divisor()
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts divisor from [BigInteger] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.div(divisor: BigInteger) = this div RealLiteral(divisor)
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts divisor from [BigInteger] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).div(divisor: BigInteger) =
+    this() div RealLiteral(divisor)
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts [this] from [BigInteger] to [IntLiteral].
+ */
+infix operator fun BigInteger.div(divisor: Expression<RealSort>) = RealLiteral(this) div divisor
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts [this] from [BigInteger] to [IntLiteral].
+ */
+infix operator fun BigInteger.div(divisor: () -> Expression<RealSort>) =
+    RealLiteral(this) div divisor()
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts divisor from [Float] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.div(divisor: Float) = this div RealLiteral(divisor)
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts divisor from [Float] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).div(divisor: Float) =
+    this() div RealLiteral(divisor)
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts [this] from [Float] to [IntLiteral].
+ */
+infix operator fun Float.div(divisor: Expression<RealSort>) = RealLiteral(this) div divisor
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts [this] from [Float] to [IntLiteral].
+ */
+infix operator fun Float.div(divisor: () -> Expression<RealSort>) = RealLiteral(this) div divisor()
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts divisor from [Double] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.div(divisor: Double) = this div RealLiteral(divisor)
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts divisor from [Double] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).div(divisor: Double) =
+    this() div RealLiteral(divisor)
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts [this] from [Double] to [IntLiteral].
+ */
+infix operator fun Double.div(divisor: Expression<RealSort>) = RealLiteral(this) div divisor
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts [this] from [Double] to [IntLiteral].
+ */
+infix operator fun Double.div(divisor: () -> Expression<RealSort>) = RealLiteral(this) div divisor()
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts divisor from [BigDecimal] to [IntLiteral].
+ */
+infix operator fun Expression<RealSort>.div(divisor: BigDecimal) = this div RealLiteral(divisor)
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts divisor from [BigDecimal] to [IntLiteral].
+ */
+infix operator fun (() -> Expression<RealSort>).div(divisor: BigDecimal) =
+    this() div RealLiteral(divisor)
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts [this] from [BigDecimal] to [IntLiteral].
+ */
+infix operator fun BigDecimal.div(divisor: Expression<RealSort>) = RealLiteral(this) div divisor
+
+/**
+ * Divison operator for RealSort Expressions: [this] - [divisor].
+ *
+ * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
+ * Converts [this] from [BigDecimal] to [IntLiteral].
+ */
+infix operator fun BigDecimal.div(divisor: () -> Expression<RealSort>) =
+    RealLiteral(this) div divisor()
 
 /** Greater operator for RealSort Expressions: [this] > [other]. */
 infix fun Expression<RealSort>.greater(other: Expression<RealSort>) = RealGreater(this, other)
 
-/** Greater operator for RealSort Expressions: [this] > [other]. */
-infix fun Expression<RealSort>.greater(other: () -> Expression<RealSort>) = this greater other()
+/** Greater operator for RealSort Expressions: [this] > [block]. */
+infix fun Expression<RealSort>.greater(block: () -> Expression<RealSort>) = this greater block()
 
 /** Greater operator for RealSort Expressions: [this] > [other]. */
 infix fun (() -> Expression<RealSort>).greater(other: Expression<RealSort>) = this() greater other
 
-/** Greater operator for RealSort Expressions: [this] > [other]. */
-infix fun (() -> Expression<RealSort>).greater(other: () -> Expression<RealSort>) =
-    this() greater other()
+/** Greater operator for RealSort Expressions: [this] > [block]. */
+infix fun (() -> Expression<RealSort>).greater(block: () -> Expression<RealSort>) =
+    this() greater block()
 
 /** Greater operator for RealSort Expressions: [this] > [other]. */
 infix fun RealGreater.greater(other: Expression<RealSort>) = RealGreater(this.children + other)
@@ -184,64 +1292,300 @@ infix fun RealGreater.greater(other: Expression<RealSort>) = RealGreater(this.ch
 infix fun RealGreater.greater(block: () -> Expression<RealSort>) =
     RealGreater(this.children + block())
 
-/** Greater equals operator for RealSort Expressions: [this] >= [other]. */
-infix fun Expression<RealSort>.greaterEq(other: Expression<RealSort>) = RealGreaterEq(this, other)
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Byte] to
+ * [RealLiteral].
+ */
+infix fun Expression<RealSort>.greater(other: Byte) = this greater RealLiteral(other)
 
-/** Greater equals operator for RealSort Expressions: [this] >= [other]. */
-infix fun Expression<RealSort>.greaterEq(other: () -> Expression<RealSort>) = this greaterEq other()
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Byte] to
+ * [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).greater(other: Byte) = this() greater RealLiteral(other)
 
-/** Greater equals operator for RealSort Expressions: [this] >= [other]. */
-infix fun (() -> Expression<RealSort>).greaterEq(other: Expression<RealSort>) =
-    this() greaterEq other
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Byte] to
+ * [RealLiteral].
+ */
+infix fun RealGreater.greater(other: Byte) = RealGreater(this.children + RealLiteral(other))
 
-/** Greater equals operator for RealSort Expressions: [this] >= [other]. */
-infix fun (() -> Expression<RealSort>).greaterEq(other: () -> Expression<RealSort>) =
-    this() greaterEq other()
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Byte] to
+ * [RealLiteral].
+ */
+infix fun Byte.greater(other: Expression<RealSort>) = RealLiteral(this) greater other
 
-/** Greater equals operator for RealSort Expressions: [this] >= [other]. */
-infix fun RealGreaterEq.greaterEq(other: Expression<RealSort>) =
-    RealGreaterEq(this.children + other)
+/**
+ * Greater operator for RealSort Expressions: [this] > [block]. [this] is converted from [Byte] to
+ * [RealLiteral].
+ */
+infix fun Byte.greater(block: () -> Expression<RealSort>) = RealLiteral(this) greater block()
 
-/** Greater equals operator for RealSort Expressions: [this] >= [block]. */
-infix fun RealGreaterEq.greaterEq(block: () -> Expression<RealSort>) =
-    RealGreaterEq(this.children + block())
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Byte] to
+ * [RealLiteral].
+ */
+infix fun Byte.greater(other: RealGreater) = RealGreater(listOf(RealLiteral(this)) + other.children)
 
-/** Less operator for RealSort Expressions: [this] < [other]. */
-infix fun Expression<RealSort>.less(other: Expression<RealSort>) = RealLess(this, other)
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Short] to
+ * [RealLiteral].
+ */
+infix fun Expression<RealSort>.greater(other: Short) = this greater RealLiteral(other)
 
-/** Less operator for RealSort Expressions: [this] < [other]. */
-infix fun Expression<RealSort>.less(other: () -> Expression<RealSort>) = this less other()
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Short] to
+ * [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).greater(other: Short) = this() greater RealLiteral(other)
 
-/** Less operator for RealSort Expressions: [this] < [other]. */
-infix fun (() -> Expression<RealSort>).less(other: Expression<RealSort>) = this() less other
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Short] to
+ * [RealLiteral].
+ */
+infix fun RealGreater.greater(other: Short) = RealGreater(this.children + RealLiteral(other))
 
-/** Less operator for RealSort Expressions: [this] < [other]. */
-infix fun (() -> Expression<RealSort>).less(other: () -> Expression<RealSort>) = this() less other()
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Short] to
+ * [RealLiteral].
+ */
+infix fun Short.greater(other: Expression<RealSort>) = RealLiteral(this) greater other
 
-/** Less operator for RealSort Expressions: [this] < [other]. */
-infix fun RealLess.less(other: Expression<RealSort>) = RealLess(this.children + other)
+/**
+ * Greater operator for RealSort Expressions: [this] > [block]. [this] is converted from [Short] to
+ * [RealLiteral].
+ */
+infix fun Short.greater(block: () -> Expression<RealSort>) = RealLiteral(this) greater block()
 
-/** Less operator for RealSort Expressions: [this] < [block]. */
-infix fun RealLess.less(block: () -> Expression<RealSort>) = RealLess(this.children + block())
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Short] to
+ * [RealLiteral].
+ */
+infix fun Short.greater(other: RealGreater) =
+    RealGreater(listOf(RealLiteral(this)) + other.children)
 
-/** Less equals operator for RealSort Expressions: [this] <= [other]. */
-infix fun Expression<RealSort>.lessEq(other: Expression<RealSort>) = RealLessEq(this, other)
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Int] to
+ * [RealLiteral].
+ */
+infix fun Expression<RealSort>.greater(other: Int) = this greater RealLiteral(other)
 
-/** Less equals operator for RealSort Expressions: [this] <= [other]. */
-infix fun Expression<RealSort>.lessEq(other: () -> Expression<RealSort>) = this lessEq other()
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Int] to
+ * [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).greater(other: Int) = this() greater RealLiteral(other)
 
-/** Less equals operator for RealSort Expressions: [this] <= [other]. */
-infix fun (() -> Expression<RealSort>).lessEq(other: Expression<RealSort>) = this() lessEq other
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Int] to
+ * [RealLiteral].
+ */
+infix fun RealGreater.greater(other: Int) = RealGreater(this.children + RealLiteral(other))
 
-/** Less equals operator for RealSort Expressions: [this] <= [other]. */
-infix fun (() -> Expression<RealSort>).lessEq(other: () -> Expression<RealSort>) =
-    this() lessEq other()
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Int] to
+ * [RealLiteral].
+ */
+infix fun Int.greater(other: Expression<RealSort>) = RealLiteral(this) greater other
 
-/** Less equals operator for RealSort Expressions: [this] <= [other]. */
-infix fun RealLessEq.lessEq(other: Expression<RealSort>) = RealLessEq(this.children + other)
+/**
+ * Greater operator for RealSort Expressions: [this] > [block]. [this] is converted from [Int] to
+ * [RealLiteral].
+ */
+infix fun Int.greater(block: () -> Expression<RealSort>) = RealLiteral(this) greater block()
 
-/** Less equals operator for RealSort Expressions: [this] <= [block]. */
-infix fun RealLessEq.lessEq(block: () -> Expression<RealSort>) = RealLessEq(this.children + block())
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Int] to
+ * [RealLiteral].
+ */
+infix fun Int.greater(other: RealGreater) = RealGreater(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Long] to
+ * [RealLiteral].
+ */
+infix fun Expression<RealSort>.greater(other: Long) = this greater RealLiteral(other)
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Long] to
+ * [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).greater(other: Long) = this() greater RealLiteral(other)
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Long] to
+ * [RealLiteral].
+ */
+infix fun RealGreater.greater(other: Long) = RealGreater(this.children + RealLiteral(other))
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Long] to
+ * [RealLiteral].
+ */
+infix fun Long.greater(other: Expression<RealSort>) = RealLiteral(this) greater other
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [block]. [this] is converted from [Long] to
+ * [RealLiteral].
+ */
+infix fun Long.greater(block: () -> Expression<RealSort>) = RealLiteral(this) greater block()
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Long] to
+ * [RealLiteral].
+ */
+infix fun Long.greater(other: RealGreater) = RealGreater(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [BigInteger]
+ * to [RealLiteral].
+ */
+infix fun Expression<RealSort>.greater(other: BigInteger) = this greater RealLiteral(other)
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [BigInteger]
+ * to [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).greater(other: BigInteger) =
+    this() greater RealLiteral(other)
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [BigInteger]
+ * to [RealLiteral].
+ */
+infix fun RealGreater.greater(other: BigInteger) = RealGreater(this.children + RealLiteral(other))
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [BigInteger] to [RealLiteral].
+ */
+infix fun BigInteger.greater(other: Expression<RealSort>) = RealLiteral(this) greater other
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [block]. [this] is converted from
+ * [BigInteger] to [RealLiteral].
+ */
+infix fun BigInteger.greater(block: () -> Expression<RealSort>) = RealLiteral(this) greater block()
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [BigInteger] to [RealLiteral].
+ */
+infix fun BigInteger.greater(other: RealGreater) =
+    RealGreater(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Float] to
+ * [RealLiteral].
+ */
+infix fun Expression<RealSort>.greater(other: Float) = this greater RealLiteral(other)
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Float] to
+ * [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).greater(other: Float) = this() greater RealLiteral(other)
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Float] to
+ * [RealLiteral].
+ */
+infix fun RealGreater.greater(other: Float) = RealGreater(this.children + RealLiteral(other))
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Float] to
+ * [RealLiteral].
+ */
+infix fun Float.greater(other: Expression<RealSort>) = RealLiteral(this) greater other
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [block]. [this] is converted from [Float] to
+ * [RealLiteral].
+ */
+infix fun Float.greater(block: () -> Expression<RealSort>) = RealLiteral(this) greater block()
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Float] to
+ * [RealLiteral].
+ */
+infix fun Float.greater(other: RealGreater) =
+    RealGreater(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Double] to
+ * [RealLiteral].
+ */
+infix fun Expression<RealSort>.greater(other: Double) = this greater RealLiteral(other)
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Double] to
+ * [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).greater(other: Double) = this() greater RealLiteral(other)
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Double] to
+ * [RealLiteral].
+ */
+infix fun RealGreater.greater(other: Double) = RealGreater(this.children + RealLiteral(other))
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Double] to
+ * [RealLiteral].
+ */
+infix fun Double.greater(other: Expression<RealSort>) = RealLiteral(this) greater other
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [block]. [this] is converted from [Double] to
+ * [RealLiteral].
+ */
+infix fun Double.greater(block: () -> Expression<RealSort>) = RealLiteral(this) greater block()
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Double] to
+ * [RealLiteral].
+ */
+infix fun Double.greater(other: RealGreater) =
+    RealGreater(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [BigDecimal]
+ * to [RealLiteral].
+ */
+infix fun Expression<RealSort>.greater(other: BigDecimal) = this greater RealLiteral(other)
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [BigDecimal]
+ * to [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).greater(other: BigDecimal) =
+    this() greater RealLiteral(other)
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [BigDecimal]
+ * to [RealLiteral].
+ */
+infix fun RealGreater.greater(other: BigDecimal) = RealGreater(this.children + RealLiteral(other))
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [BigDecimal] to [RealLiteral].
+ */
+infix fun BigDecimal.greater(other: Expression<RealSort>) = RealLiteral(this) greater other
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [block]. [this] is converted from
+ * [BigDecimal] to [RealLiteral].
+ */
+infix fun BigDecimal.greater(block: () -> Expression<RealSort>) = RealLiteral(this) greater block()
+
+/**
+ * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [BigDecimal] to [RealLiteral].
+ */
+infix fun BigDecimal.greater(other: RealGreater) =
+    RealGreater(listOf(RealLiteral(this)) + other.children)
 
 private fun makeRealOperator(
     init: Builder<RealSort>.() -> Unit,
