@@ -28,14 +28,14 @@ import tools.aqua.konstraints.smt.*
 
 /** Object for SMT true */
 object True : ConstantExpression<BoolSort>("true".symbol(), BoolSort) {
-    override val theories = setOf(Theories.CORE)
+  override val theories = setOf(Theories.CORE)
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
 }
 
 /** Object for SMT false */
 object False : ConstantExpression<BoolSort>("false".symbol(), BoolSort) {
-    override val theories = setOf(Theories.CORE)
+  override val theories = setOf(Theories.CORE)
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
 }
@@ -47,13 +47,12 @@ object False : ConstantExpression<BoolSort>("false".symbol(), BoolSort) {
  */
 class Not(override val inner: Expression<BoolSort>) :
     UnaryExpression<BoolSort, BoolSort>("not".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.CORE)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.CORE)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
-
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override fun toString(): String = "(not $inner)"
 
@@ -68,12 +67,12 @@ class Not(override val inner: Expression<BoolSort>) :
  */
 class Implies(val statements: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("=>".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.CORE)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.CORE)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   constructor(vararg statements: Expression<BoolSort>) : this(statements.toList())
 
@@ -90,12 +89,12 @@ class Implies(val statements: List<Expression<BoolSort>>) :
  */
 class And(val conjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("and".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.CORE)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.CORE)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   constructor(vararg conjuncts: Expression<BoolSort>) : this(conjuncts.toList())
 
@@ -112,12 +111,12 @@ class And(val conjuncts: List<Expression<BoolSort>>) :
  */
 class Or(val disjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("or".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.CORE)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.CORE)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
 
@@ -134,12 +133,12 @@ class Or(val disjuncts: List<Expression<BoolSort>>) :
  */
 class XOr(val disjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("xor".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.CORE)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.CORE)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
 
@@ -156,12 +155,12 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) :
  */
 class Equals<T : Sort>(val statements: List<Expression<T>>) :
     HomogenousExpression<BoolSort, Sort>("=".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.CORE)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.CORE)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   constructor(vararg statements: Expression<T>) : this(statements.toList())
 
@@ -178,12 +177,12 @@ class Equals<T : Sort>(val statements: List<Expression<T>>) :
  */
 class Distinct(val statements: List<Expression<*>>) :
     HomogenousExpression<BoolSort, Sort>("distinct".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.CORE)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.CORE)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   constructor(vararg statements: Expression<*>) : this(statements.toList())
 

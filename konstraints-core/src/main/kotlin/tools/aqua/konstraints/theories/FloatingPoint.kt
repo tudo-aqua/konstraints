@@ -115,65 +115,65 @@ object FP128 : FPBase(15.idx(), 113.idx())
 
 object RoundNearestTiesToEven :
     ConstantExpression<RoundingMode>("roundNearestTiesToEven".symbol(), RoundingMode) {
-    override val theories = setOf(Theories.FLOATING_POINT)
+  override val theories = setOf(Theories.FLOATING_POINT)
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
 object RNE : ConstantExpression<RoundingMode>("RNE".symbol(), RoundingMode) {
-    override val theories = setOf(Theories.FLOATING_POINT)
+  override val theories = setOf(Theories.FLOATING_POINT)
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
 object RoundNearestTiesToAway :
     ConstantExpression<RoundingMode>("roundNearestTiesToAway".symbol(), RoundingMode) {
-    override val theories = setOf(Theories.FLOATING_POINT)
+  override val theories = setOf(Theories.FLOATING_POINT)
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
 object RNA : ConstantExpression<RoundingMode>("RNA".symbol(), RoundingMode) {
-    override val theories = setOf(Theories.FLOATING_POINT)
+  override val theories = setOf(Theories.FLOATING_POINT)
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
 object RoundTowardPositive :
     ConstantExpression<RoundingMode>("roundTowardPositive".symbol(), RoundingMode) {
-    override val theories = setOf(Theories.FLOATING_POINT)
+  override val theories = setOf(Theories.FLOATING_POINT)
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
 object RTP : ConstantExpression<RoundingMode>("RTP".symbol(), RoundingMode) {
-    override val theories = setOf(Theories.FLOATING_POINT)
+  override val theories = setOf(Theories.FLOATING_POINT)
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
 object RoundTowardNegative :
     ConstantExpression<RoundingMode>("roundTowardNegative".symbol(), RoundingMode) {
-    override val theories = setOf(Theories.FLOATING_POINT)
+  override val theories = setOf(Theories.FLOATING_POINT)
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
 object RTN : ConstantExpression<RoundingMode>("RTN".symbol(), RoundingMode) {
-    override val theories = setOf(Theories.FLOATING_POINT)
+  override val theories = setOf(Theories.FLOATING_POINT)
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
 object RoundTowardZero :
     ConstantExpression<RoundingMode>("roundTowardZero".symbol(), RoundingMode) {
-    override val theories = setOf(Theories.FLOATING_POINT)
+  override val theories = setOf(Theories.FLOATING_POINT)
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
 object RTZ : ConstantExpression<RoundingMode>("RTZ".symbol(), RoundingMode) {
-    override val theories = setOf(Theories.FLOATING_POINT)
+  override val theories = setOf(Theories.FLOATING_POINT)
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
@@ -198,39 +198,38 @@ data class FPLiteral(
         LiteralString("(fp $sign $exponent $significand)"),
         FPSort(exponent.sort.bits, significand.sort.bits + 1)) {
 
+  init {
+    require(sign.sort.bits == 1)
+  }
 
-    init {
-        require(sign.sort.bits == 1)
+  companion object {
+    operator fun invoke(value: Double): FPLiteral {
+      // TODO special cases (NaN, Inf etc.)
+      val bitvec = value.toRawBits().toString()
+
+      return FPLiteral(
+          bitvec.substring(0..0).bitvec(),
+          bitvec.substring(1..11).bitvec(),
+          bitvec.substring(12).bitvec())
     }
 
-    companion object {
-        operator fun invoke(value: Double): FPLiteral {
-            // TODO special cases (NaN, Inf etc.)
-            val bitvec = value.toRawBits().toString()
+    operator fun invoke(value: Float): FPLiteral {
+      // TODO special cases (NaN, Inf etc.)
+      val bitvec = value.toRawBits().toString()
 
-            return FPLiteral(
-                bitvec.substring(0..0).bitvec(),
-                bitvec.substring(1..11).bitvec(),
-                bitvec.substring(12).bitvec())
-        }
-
-        operator fun invoke(value: Float): FPLiteral {
-            // TODO special cases (NaN, Inf etc.)
-            val bitvec = value.toRawBits().toString()
-
-            return FPLiteral(
-                bitvec.substring(0..0).bitvec(),
-                bitvec.substring(1..8).bitvec(),
-                bitvec.substring(9).bitvec())
-        }
-
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
+      return FPLiteral(
+          bitvec.substring(0..0).bitvec(),
+          bitvec.substring(1..8).bitvec(),
+          bitvec.substring(9).bitvec())
     }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override fun copy(children: List<Expression<*>>): Expression<FPSort> = this
+  override val theories: Set<Theories>
+    get() = theoriesSet
+
+  override fun copy(children: List<Expression<*>>): Expression<FPSort> = this
 }
 
 /**
@@ -240,12 +239,12 @@ data class FPLiteral(
  */
 class FPInfinity(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("+oo".symbol(), FPSort(eb, sb)) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override fun toString(): String = "(_ +oo $eb $sb)"
 
@@ -259,12 +258,12 @@ class FPInfinity(val eb: Int, val sb: Int) :
  */
 class FPMinusInfinity(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("-oo".symbol(), FPSort(eb, sb)) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override fun toString(): String = "(_ -oo $eb $sb)"
 
@@ -278,12 +277,12 @@ class FPMinusInfinity(val eb: Int, val sb: Int) :
  */
 class FPZero(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("+zero".symbol(), FPSort(eb, sb)) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override fun toString(): String = "(_ +zero $eb $sb)"
 
@@ -297,12 +296,12 @@ class FPZero(val eb: Int, val sb: Int) :
  */
 class FPMinusZero(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("-zero".symbol(), FPSort(eb, sb)) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override fun toString(): String = "(_ -zero $eb $sb)"
 
@@ -315,12 +314,12 @@ class FPMinusZero(val eb: Int, val sb: Int) :
  * ((_ NaN [eb] [sb]) (_ FloatingPoint [eb] [sb]))
  */
 class FPNaN(val eb: Int, val sb: Int) : ConstantExpression<FPSort>("NaN".symbol(), FPSort(eb, sb)) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override fun toString(): String = "(_ NaN $eb $sb)"
 
@@ -338,12 +337,12 @@ class FPNaN(val eb: Int, val sb: Int) : ConstantExpression<FPSort>("NaN".symbol(
  */
 class FPAbs(override val inner: Expression<FPSort>) :
     UnaryExpression<FPSort, FPSort>("fp.abs".symbol(), inner.sort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
       FPAbsDecl.buildExpression(children, emptyList())
@@ -356,12 +355,12 @@ class FPAbs(override val inner: Expression<FPSort>) :
  */
 class FPNeg(override val inner: Expression<FPSort>) :
     UnaryExpression<FPSort, FPSort>("fp.neg".symbol(), inner.sort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
       FPNegDecl.buildExpression(children, emptyList())
@@ -379,12 +378,12 @@ class FPAdd(
     val leftTerm: Expression<FPSort>,
     val rightTerm: Expression<FPSort>
 ) : TernaryExpression<FPSort, RoundingMode, FPSort, FPSort>("fp.add".symbol(), leftTerm.sort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override val lhs: Expression<RoundingMode> = roundingMode
 
@@ -413,12 +412,12 @@ class FPSub(
     val minuend: Expression<FPSort>,
     val subtrahend: Expression<FPSort>
 ) : TernaryExpression<FPSort, RoundingMode, FPSort, FPSort>("fp.sub".symbol(), minuend.sort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override val lhs: Expression<RoundingMode> = roundingMode
 
@@ -447,12 +446,12 @@ class FPMul(
     val multiplier: Expression<FPSort>,
     val multiplicand: Expression<FPSort>
 ) : TernaryExpression<FPSort, RoundingMode, FPSort, FPSort>("fp.mul".symbol(), multiplier.sort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override val lhs: Expression<RoundingMode> = roundingMode
 
@@ -481,12 +480,12 @@ class FPDiv(
     val dividend: Expression<FPSort>,
     val divisor: Expression<FPSort>
 ) : TernaryExpression<FPSort, RoundingMode, FPSort, FPSort>("fp.div".symbol(), dividend.sort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override val lhs: Expression<RoundingMode> = roundingMode
 
@@ -518,12 +517,12 @@ class FPFma(
     val multiplicand: Expression<FPSort>,
     val summand: Expression<FPSort>
 ) : NAryExpression<FPSort>("fp.fma".symbol(), multiplier.sort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   init {
     require(multiplier.sort == multiplicand.sort)
@@ -544,12 +543,12 @@ class FPFma(
  */
 class FPSqrt(val roundingMode: Expression<RoundingMode>, val inner: Expression<FPSort>) :
     BinaryExpression<FPSort, RoundingMode, FPSort>("fp.sqrt".symbol(), inner.sort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override val lhs: Expression<RoundingMode> = roundingMode
 
@@ -569,12 +568,12 @@ class FPSqrt(val roundingMode: Expression<RoundingMode>, val inner: Expression<F
  */
 class FPRem(val dividend: Expression<FPSort>, val divisor: Expression<FPSort>) :
     BinaryExpression<FPSort, FPSort, FPSort>("fp.rem".symbol(), dividend.sort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override val lhs: Expression<FPSort> = dividend
 
@@ -597,12 +596,12 @@ class FPRem(val dividend: Expression<FPSort>, val divisor: Expression<FPSort>) :
  */
 class FPRoundToIntegral(val roundingMode: Expression<RoundingMode>, val inner: Expression<FPSort>) :
     BinaryExpression<FPSort, RoundingMode, FPSort>("fp.roundToIntegral".symbol(), inner.sort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override val lhs: Expression<RoundingMode> = roundingMode
 
@@ -621,12 +620,12 @@ class FPRoundToIntegral(val roundingMode: Expression<RoundingMode>, val inner: E
  */
 class FPMin(override val lhs: Expression<FPSort>, override val rhs: Expression<FPSort>) :
     BinaryExpression<FPSort, FPSort, FPSort>("fp.min".symbol(), lhs.sort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   init {
     require(lhs.sort == rhs.sort)
@@ -645,12 +644,12 @@ class FPMin(override val lhs: Expression<FPSort>, override val rhs: Expression<F
  */
 class FPMax(override val lhs: Expression<FPSort>, override val rhs: Expression<FPSort>) :
     BinaryExpression<FPSort, FPSort, FPSort>("fp.max".symbol(), lhs.sort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   init {
     require(lhs.sort == rhs.sort)
@@ -670,12 +669,12 @@ class FPMax(override val lhs: Expression<FPSort>, override val rhs: Expression<F
  */
 class FPLeq(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.leq".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
 
@@ -702,12 +701,12 @@ class FPLeq(val terms: List<Expression<FPSort>>) :
  */
 class FPLt(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.lt".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
 
@@ -734,12 +733,12 @@ class FPLt(val terms: List<Expression<FPSort>>) :
  */
 class FPGeq(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.geq".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
 
@@ -766,12 +765,12 @@ class FPGeq(val terms: List<Expression<FPSort>>) :
  */
 class FPGt(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.gt".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
 
@@ -798,12 +797,12 @@ class FPGt(val terms: List<Expression<FPSort>>) :
  */
 class FPEq(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.eq".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
 
@@ -821,12 +820,12 @@ class FPEq(val terms: List<Expression<FPSort>>) :
 /** (fp.isNormal (_ FloatingPoint eb sb) Bool) */
 class FPIsNormal(override val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isNormal".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       FPIsNormalDecl.buildExpression(children, emptyList())
@@ -835,12 +834,12 @@ class FPIsNormal(override val inner: Expression<FPSort>) :
 /** (fp.isSubnormal (_ FloatingPoint eb sb) Bool) */
 class FPIsSubnormal(override val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isSubnormal".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       FPIsSubormalDecl.buildExpression(children, emptyList())
@@ -849,12 +848,12 @@ class FPIsSubnormal(override val inner: Expression<FPSort>) :
 /** (fp.isZero (_ FloatingPoint eb sb) Bool) */
 class FPIsZero(override val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isZero".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       FPIsZeroDecl.buildExpression(children, emptyList())
@@ -863,12 +862,12 @@ class FPIsZero(override val inner: Expression<FPSort>) :
 /** (fp.isInfinite (_ FloatingPoint eb sb) Bool) */
 class FPIsInfinite(override val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isInfinite".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       FPIsInfiniteDecl.buildExpression(children, emptyList())
@@ -877,12 +876,12 @@ class FPIsInfinite(override val inner: Expression<FPSort>) :
 /** (fp.isNaN (_ FloatingPoint eb sb) Bool) */
 class FPIsNaN(override val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isNaN".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       FPIsNaNDecl.buildExpression(children, emptyList())
@@ -891,12 +890,12 @@ class FPIsNaN(override val inner: Expression<FPSort>) :
 /** (fp.isNegative (_ FloatingPoint eb sb) Bool) */
 class FPIsNegative(override val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isNegative".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       FPIsNegativeDecl.buildExpression(children, emptyList())
@@ -905,12 +904,12 @@ class FPIsNegative(override val inner: Expression<FPSort>) :
 /** (fp.isPositive (_ FloatingPoint eb sb) Bool) */
 class FPIsPositive(override val inner: Expression<FPSort>) :
     UnaryExpression<BoolSort, FPSort>("fp.isPositive".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       FPIsPositiveDecl.buildExpression(children, emptyList())
@@ -931,12 +930,12 @@ class BitVecToFP(override val inner: Expression<BVSort>, sort: FPSort) :
     UnaryExpression<FPSort, BVSort>("to_fp".symbol(), sort) {
   constructor(inner: Expression<BVSort>, eb: Int, sb: Int) : this(inner, FPSort(eb, sb))
 
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   init {
     require(inner.sort.bits == sort.exponentBits + sort.significantBits)
@@ -964,12 +963,12 @@ class FPToFP(
       sb: Int
   ) : this(roundingMode, inner, FPSort(eb, sb))
 
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override val lhs: Expression<RoundingMode> = roundingMode
 
@@ -999,12 +998,12 @@ class RealToFP(
       sb: Int
   ) : this(roundingMode, inner, FPSort(eb, sb))
 
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override val lhs: Expression<RoundingMode> = roundingMode
 
@@ -1035,12 +1034,12 @@ class SBitVecToFP(
       sb: Int
   ) : this(roundingMode, inner, FPSort(eb, sb))
 
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override val lhs: Expression<RoundingMode> = roundingMode
 
@@ -1071,12 +1070,12 @@ class UBitVecToFP(
       sb: Int
   ) : this(roundingMode, inner, FPSort(eb, sb))
 
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override val lhs: Expression<RoundingMode> = roundingMode
 
@@ -1104,12 +1103,12 @@ class FPToUBitVec(
     val inner: Expression<FPSort>,
     val m: Int
 ) : BinaryExpression<BVSort, RoundingMode, FPSort>("fp.to_ubv".symbol(), BVSort(m)) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override val lhs: Expression<RoundingMode> = roundingMode
 
@@ -1132,12 +1131,12 @@ class FPToSBitVec(
     val inner: Expression<FPSort>,
     val m: Int
 ) : BinaryExpression<BVSort, RoundingMode, FPSort>("fp.to_sbv".symbol(), BVSort(m)) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override val lhs: Expression<RoundingMode> = roundingMode
 
@@ -1156,12 +1155,12 @@ class FPToSBitVec(
  */
 class FPToReal(override val inner: Expression<FPSort>) :
     UnaryExpression<RealSort, FPSort>("fp.to_real".symbol(), RealSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.FLOATING_POINT)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.FLOATING_POINT)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
       FPToRealDecl.buildExpression(children, emptyList())

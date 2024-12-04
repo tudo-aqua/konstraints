@@ -19,9 +19,9 @@
 package tools.aqua.konstraints.theories
 
 import java.math.BigDecimal
+import java.math.BigInteger
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
-import java.math.BigInteger
 
 /** Real sort */
 object RealSort : Sort("Real")
@@ -33,26 +33,26 @@ object RealSort : Sort("Real")
  */
 class RealLiteral(val value: BigDecimal) :
     Literal<RealSort>(LiteralString(value.toString()), RealSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
-    constructor(value: Byte) : this(value.toInt().toBigDecimal())
+  constructor(value: Byte) : this(value.toInt().toBigDecimal())
 
-    constructor(value: Short) : this(value.toInt().toBigDecimal())
+  constructor(value: Short) : this(value.toInt().toBigDecimal())
 
-    constructor(value: Int) : this(value.toBigDecimal())
+  constructor(value: Int) : this(value.toBigDecimal())
 
-    constructor(value: Long) : this(value.toBigDecimal())
+  constructor(value: Long) : this(value.toBigDecimal())
 
-    constructor(value: BigInteger) : this(value.toBigDecimal())
+  constructor(value: BigInteger) : this(value.toBigDecimal())
 
-    constructor(value: Float) : this(value.toBigDecimal())
+  constructor(value: Float) : this(value.toBigDecimal())
 
-    constructor(value: Double) : this(value.toBigDecimal())
+  constructor(value: Double) : this(value.toBigDecimal())
 
   override val sort: RealSort = RealSort
 
@@ -68,12 +68,12 @@ class RealLiteral(val value: BigDecimal) :
  */
 class RealNeg(override val inner: Expression<RealSort>) :
     UnaryExpression<RealSort, RealSort>("-".symbol(), RealSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
       RealNegDecl.buildExpression(children, emptyList())
@@ -86,12 +86,12 @@ class RealNeg(override val inner: Expression<RealSort>) :
  */
 class RealSub(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<RealSort, RealSort>("-".symbol(), RealSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   init {
     require(terms.size > 1) {
@@ -114,12 +114,12 @@ class RealSub(val terms: List<Expression<RealSort>>) :
  */
 class RealAdd(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<RealSort, RealSort>("+".symbol(), RealSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   init {
     require(terms.size > 1) {
@@ -142,12 +142,12 @@ class RealAdd(val terms: List<Expression<RealSort>>) :
  */
 class RealMul(val factors: List<Expression<RealSort>>) :
     HomogenousExpression<RealSort, RealSort>("*".symbol(), RealSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   init {
     require(factors.size > 1) {
@@ -170,12 +170,12 @@ class RealMul(val factors: List<Expression<RealSort>>) :
  */
 class RealDiv(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<RealSort, RealSort>("/".symbol(), RealSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   init {
     require(terms.size > 1) {
@@ -198,12 +198,12 @@ class RealDiv(val terms: List<Expression<RealSort>>) :
  */
 class RealLessEq(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<BoolSort, RealSort>("<=".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   init {
     require(terms.size > 1) {
@@ -226,12 +226,12 @@ class RealLessEq(val terms: List<Expression<RealSort>>) :
  */
 class RealLess(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<BoolSort, RealSort>("<".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   init {
     require(terms.size > 1) {
@@ -254,12 +254,12 @@ class RealLess(val terms: List<Expression<RealSort>>) :
  */
 class RealGreaterEq(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<BoolSort, RealSort>(">=".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   init {
     require(terms.size > 1) {
@@ -282,12 +282,12 @@ class RealGreaterEq(val terms: List<Expression<RealSort>>) :
  */
 class RealGreater(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<BoolSort, RealSort>(">".symbol(), BoolSort) {
-    companion object {
-        private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
-    }
+  companion object {
+    private val theoriesSet = setOf(Theories.REALS, Theories.REALS_INTS)
+  }
 
-    override val theories : Set<Theories>
-        get() = theoriesSet
+  override val theories: Set<Theories>
+    get() = theoriesSet
 
   init {
     require(terms.size > 1) {
