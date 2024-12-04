@@ -20,12 +20,14 @@ package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.IteDecl
 import tools.aqua.konstraints.theories.BoolSort
+import tools.aqua.konstraints.theories.Theories
 import tools.aqua.konstraints.util.reduceOrDefault
 
 /** Interface for all sorted SMT terms */
 sealed interface Expression<T : Sort> {
   val name: SMTSerializable
   val sort: T
+  val theories : Set<Theories>
 
   /**
    * Recursive all implementation fun all(predicate: (Expression<*>) -> Boolean): Boolean { return
@@ -191,6 +193,7 @@ class Ite<T : Sort>(
   }
 
   override val sort: T = then.sort
+    override val theories = emptySet<Theories>()
 
   override fun copy(children: List<Expression<*>>): Expression<T> =
       IteDecl.buildExpression(children, emptyList()) castTo sort
@@ -214,6 +217,7 @@ class LetExpression<T : Sort>(val bindings: List<VarBinding<*>>, val inner: Expr
     Expression<T> {
   override val sort = inner.sort
   override val name = Keyword("let")
+    override val theories = emptySet<Theories>()
 
   constructor(
       bindings: List<VarBinding<*>>,
@@ -247,6 +251,7 @@ class LetExpression<T : Sort>(val bindings: List<VarBinding<*>>, val inner: Expr
 
 class UserDeclaredExpression<T : Sort>(name: Symbol, sort: T, args: List<Expression<*>>) :
     NAryExpression<T>(name, sort) {
+    override val theories = emptySet<Theories>()
 
   constructor(name: Symbol, sort: T) : this(name, sort, emptyList())
 
@@ -262,6 +267,8 @@ class UserDefinedExpression<T : Sort>(
     args: List<Expression<*>>,
     val definition: FunctionDef<T>
 ) : NAryExpression<T>(name, sort) {
+    override val theories = emptySet<Theories>()
+
   init {
     // check that args.sort matches expected sorts from definition
     require(args.zip(definition.parameters).all { (arg, par) -> arg.sort == par.sort })
@@ -281,6 +288,8 @@ class LocalExpression<T : Sort>(
     override val sort: T,
     val term: Expression<T>,
 ) : Expression<T> {
+    override val theories = emptySet<Theories>()
+
   override fun copy(children: List<Expression<*>>): Expression<T> {
     require(children.size == 1)
 
@@ -292,6 +301,8 @@ class LocalExpression<T : Sort>(
 
 class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSort>) :
     Expression<BoolSort> {
+    override val theories = emptySet<Theories>()
+
   constructor(vararg vars: SortedVar<*>, term: Expression<BoolSort>) : this(vars.toList(), term)
 
   override val sort = BoolSort
@@ -307,6 +318,8 @@ class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
 
 class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSort>) :
     Expression<BoolSort> {
+    override val theories = emptySet<Theories>()
+
   override val sort = BoolSort
   override val name = Keyword("forall")
   override val children: List<Expression<*>> = listOf(term)
@@ -319,6 +332,8 @@ class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
 }
 
 class BoundVariable<T : Sort>(override val name: Symbol, override val sort: T) : Expression<T> {
+    override val theories = emptySet<Theories>()
+
   override val children: List<Expression<*>> = emptyList()
 
   override fun copy(children: List<Expression<*>>): Expression<T> = BoundVariable(name, sort)
@@ -326,6 +341,8 @@ class BoundVariable<T : Sort>(override val name: Symbol, override val sort: T) :
 
 class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: List<Attribute>) :
     Expression<T> {
+    override val theories = emptySet<Theories>()
+
   override val name = Keyword("!")
   override val sort = term.sort
 

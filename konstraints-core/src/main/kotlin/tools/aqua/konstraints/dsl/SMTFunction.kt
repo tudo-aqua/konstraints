@@ -40,7 +40,7 @@ fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T) =
  *
  * @return [Const]
  */
-fun <T : Sort> SMTProgramBuilder.declaringConst(sort: Sort, name: String) = Const(sort, this, name)
+fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T, name: String) = Const(sort, this, name)
 
 /**
  * Declares an SMT function without any parameters: (declare-fun symbol () [sort])
