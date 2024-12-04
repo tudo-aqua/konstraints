@@ -18,7 +18,6 @@
 
 package tools.aqua.konstraints.dsl
 
-import java.math.BigDecimal
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.theories.*
 
@@ -2179,7 +2178,6 @@ infix fun Double.fpdiv_rtn(divisor: () -> Expression<FPSort>) =
 infix fun Double.fpdiv_rtz(divisor: () -> Expression<FPSort>) =
     FPDiv(RTZ, FPLiteral(this), divisor())
 
-
 /**
  * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
  * [this]/[divisor].
@@ -2570,7 +2568,6 @@ infix fun Expression<FPSort>.fpeq(rhs: Float) = FPEq(this, FPLiteral(rhs))
  */
 infix fun Expression<FPSort>.fpeq(rhs: Double) = FPEq(this, FPLiteral(rhs))
 
-
 /**
  * Less equals operator for FPSort expressions: [this] <= [rhs].
  *
@@ -2636,7 +2633,6 @@ infix fun (() -> Expression<FPSort>).fpeq(rhs: Float) = FPEq(this(), FPLiteral(r
  */
 infix fun (() -> Expression<FPSort>).fpeq(rhs: Double) = FPEq(this(), FPLiteral(rhs))
 
-
 /**
  * Less equals operator for FPSort expressions: [this] <= [rhs].
  *
@@ -2701,7 +2697,6 @@ infix fun Float.fpeq(rhs: Expression<FPSort>) = FPEq(FPLiteral(this), rhs)
  * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
  */
 infix fun Double.fpeq(rhs: Expression<FPSort>) = FPEq(FPLiteral(this), rhs)
-
 
 /**
  * Less equals operator for FPSort expressions: [this] <= [rhs].

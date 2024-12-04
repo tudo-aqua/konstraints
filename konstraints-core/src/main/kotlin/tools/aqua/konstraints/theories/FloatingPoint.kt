@@ -177,33 +177,33 @@ data class FPLiteral(
     Literal<FPSort>(
         LiteralString("(fp $sign $exponent $significand)"),
         FPSort(exponent.sort.bits, significand.sort.bits + 1)) {
-    init {
-        require(sign.sort.bits == 1)
+  init {
+    require(sign.sort.bits == 1)
+  }
+
+  companion object {
+    operator fun invoke(value: Double): FPLiteral {
+      // TODO special cases (NaN, Inf etc.)
+      val bitvec = value.toRawBits().toString()
+
+      return FPLiteral(
+          bitvec.substring(0..0).bitvec(),
+          bitvec.substring(1..11).bitvec(),
+          bitvec.substring(12).bitvec())
     }
 
-    companion object {
-        operator fun invoke(value: Double): FPLiteral {
-            // TODO special cases (NaN, Inf etc.)
-            val bitvec = value.toRawBits().toString()
+    operator fun invoke(value: Float): FPLiteral {
+      // TODO special cases (NaN, Inf etc.)
+      val bitvec = value.toRawBits().toString()
 
-            return FPLiteral(
-                bitvec.substring(0..0).bitvec(),
-                bitvec.substring(1..11).bitvec(),
-                bitvec.substring(12).bitvec())
-        }
-
-        operator fun invoke(value: Float): FPLiteral {
-            // TODO special cases (NaN, Inf etc.)
-            val bitvec = value.toRawBits().toString()
-
-            return FPLiteral(
-                bitvec.substring(0..0).bitvec(),
-                bitvec.substring(1..8).bitvec(),
-                bitvec.substring(9).bitvec())
-        }
+      return FPLiteral(
+          bitvec.substring(0..0).bitvec(),
+          bitvec.substring(1..8).bitvec(),
+          bitvec.substring(9).bitvec())
     }
+  }
 
-    override fun copy(children: List<Expression<*>>): Expression<FPSort> = this
+  override fun copy(children: List<Expression<*>>): Expression<FPSort> = this
 }
 
 /**
