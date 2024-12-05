@@ -48,28 +48,47 @@ abstract class SortDecl<T : Sort>(
  * Context class manages the currently loaded logic/theory and all the Assertion-Levels (including
  * global eventually but this option is currently not supported)
  */
-/*internal*/ class Context(val logic: Logic) {
+/*internal*/ class ParseContext(val logic: Logic) {
   val assertionLevels = Stack<Subcontext>()
+
+  // the sort of numeral literals depends on the theory
+  // if only INTS is loaded numerals are of sort Int
+  // if REALS or REALS_INTS is loaded numerals are of sort Real
   val numeralSort: Sort? =
       when {
-        logic.theories.contains(IntsTheory) -> IntSort
-        logic.theories.contains(RealsTheory) || logic.theories.contains(RealsIntsTheory) -> RealSort
+        logic.theories.contains(Theories.INTS) -> IntSort
+        logic.theories.contains(Theories.REALS) || logic.theories.contains(Theories.REALS_INTS) ->
+            RealSort
         else -> null
       }
 
+  private val logicLookup =
+      mapOf(
+          Pair(Theories.CORE, CoreTheory),
+          Pair(Theories.FIXED_SIZE_BIT_VECTORS, BitVectorExpressionTheory),
+          Pair(Theories.INTS, IntsTheory),
+          Pair(Theories.REALS, RealsTheory),
+          Pair(Theories.REALS_INTS, RealsIntsTheory),
+          Pair(Theories.FLOATING_POINT, FloatingPointTheory),
+          Pair(Theories.ARRAYS_EX, ArrayExTheory),
+          Pair(Theories.STRINGS, StringsTheory))
+
   init {
-    logic.theories.forEach { assertionLevels.push(it) }
+    logic.theories.forEach { assertionLevels.push(logicLookup[it]!!) }
     assertionLevels.push(AssertionLevel())
   }
 
-  fun <T> let(varBindings: List<VarBinding<*>>, block: (Context) -> T): T {
-    logic.theories.forEach { theory ->
-      varBindings.forEach {
-        if (theory.contains(it.symbol))
-            throw IllegalFunctionOverloadException(
-                it.symbol.toString(), "Can not override theory symbol ${it.symbol}")
-      }
-    }
+  fun <T> let(varBindings: List<VarBinding<*>>, block: (ParseContext) -> T): T {
+    // disallow name shadowing of theory functions
+    logic.theories
+        .map { logicLookup[it]!! }
+        .forEach { theory ->
+          varBindings.forEach {
+            if (theory.contains(it.symbol))
+                throw IllegalFunctionOverloadException(
+                    it.symbol.toString(), "Can not override theory symbol ${it.symbol}")
+          }
+        }
 
     assert(varBindings.distinctBy { it.symbol }.size == varBindings.size)
 
@@ -80,7 +99,7 @@ abstract class SortDecl<T : Sort>(
     return result
   }
 
-  fun <T> bindVars(sortedVars: List<SortedVar<*>>, block: (Context) -> T): T {
+  fun <T> bindVars(sortedVars: List<SortedVar<*>>, block: (ParseContext) -> T): T {
     assertionLevels.push(LocalLevel(sortedVars.map { SortedVarDecl(it) }))
     val result = block(this)
     assertionLevels.pop()
@@ -179,11 +198,13 @@ abstract class SortDecl<T : Sort>(
   }
 
   fun registerSort(sort: SortDecl<*>) {
-    logic.theories.forEach { theory ->
-      if (theory.contains(sort)) {
-        throw SortAlreadyDeclaredException(sort.name, sort.signature.sortParameter.size)
-      }
-    }
+    logic.theories
+        .map { logicLookup[it]!! }
+        .forEach { theory ->
+          if (theory.contains(sort)) {
+            throw SortAlreadyDeclaredException(sort.name, sort.signature.sortParameter.size)
+          }
+        }
 
     // TODO enforce all overloading/shadowing rules
     assertionLevels.peek().add(sort)
@@ -285,7 +306,7 @@ internal class LetLevel(varBindings: List<VarBindingDecl<*>>) : Subcontext {
 }
 
 /** This class allows the context to use [SortedVar] as [FunctionDecl0]. */
-/*internal*/ class SortedVarDecl<T : Sort>(val sortedVar: SortedVar<T>) :
+internal class SortedVarDecl<T : Sort>(val sortedVar: SortedVar<T>) :
     FunctionDecl0<T>(sortedVar.name, emptySet(), emptySet(), sortedVar.sort) {
   override fun toString(): String = "($name $sort)"
 
@@ -306,7 +327,7 @@ internal class LocalLevel(localVars: List<SortedVarDecl<*>>) : Subcontext {
   override val sorts: Map<String, SortDecl<*>> = emptyMap()
 }
 
-/*internal*/ interface Theory : Subcontext {
+internal interface Theory : Subcontext {
   override fun add(function: FunctionDecl<*>) =
       throw IllegalOperationException("Theory.add", "Can not add new functions to SMT theories")
 

@@ -26,7 +26,7 @@ import tools.aqua.konstraints.theories.*
 internal class ParseTreeVisitor :
     ProtoCommandVisitor, ProtoTermVisitor, ProtoSortVisitor, SpecConstantVisitor {
 
-  var context: Context? = null
+  var context: ParseContext? = null
 
   override fun visit(protoAssert: ProtoAssert): Assert {
     val term = visit(protoAssert.term)
@@ -54,7 +54,7 @@ internal class ParseTreeVisitor :
   }
 
   override fun visit(protoSetLogic: ProtoSetLogic): SetLogic {
-    context = Context(protoSetLogic.logic)
+    context = ParseContext(protoSetLogic.logic)
 
     return SetLogic(protoSetLogic.logic)
   }

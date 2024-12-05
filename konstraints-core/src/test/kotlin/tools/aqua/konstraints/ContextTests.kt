@@ -41,7 +41,7 @@ import tools.aqua.konstraints.theories.*
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class ContextTests {
-  private val context = Context(QF_BV)
+  private val context = ParseContext(QF_BV)
   private val boolExpression = UserDeclaredExpression("A".symbol(), BoolSort)
   private val bv32Expression = UserDeclaredExpression("B".symbol(), BVSort(32))
   private val bv16Expression = UserDeclaredExpression("B".symbol(), BVSort(16))
@@ -269,7 +269,7 @@ class ContextTests {
 
   @Test
   fun testPushPopFails() {
-    val context = Context(QF_UF)
+    val context = ParseContext(QF_UF)
     val funA = DeclareFun("A".symbol(), emptyList(), BoolSort)
     val funB = DeclareFun("B".symbol(), emptyList(), BoolSort)
 

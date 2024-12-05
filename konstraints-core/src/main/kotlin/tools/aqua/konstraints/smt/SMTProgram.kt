@@ -18,7 +18,7 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.Context
+import tools.aqua.konstraints.parser.ParseContext
 
 enum class SatStatus {
   SAT, // program is satisfiable
@@ -35,7 +35,7 @@ enum class SatStatus {
       }
 }
 
-abstract class SMTProgram(commands: List<Command>, var context: Context?) {
+abstract class SMTProgram(commands: List<Command>, var context: ParseContext?) {
   var model: Model? = null
   var status = SatStatus.PENDING
   val info: List<Attribute>
@@ -51,7 +51,7 @@ abstract class SMTProgram(commands: List<Command>, var context: Context?) {
   }
 }
 
-class MutableSMTProgram(commands: List<Command>, context: Context?) :
+class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
     SMTProgram(commands, context) {
   constructor(commands: List<Command>) : this(commands, null)
 
@@ -100,7 +100,7 @@ class MutableSMTProgram(commands: List<Command>, context: Context?) :
     }
 
     this.logic = logic
-    context = Context(logic)
+    context = ParseContext(logic)
   }
 
   private fun updateContext(command: Command) {
@@ -114,4 +114,5 @@ class MutableSMTProgram(commands: List<Command>, context: Context?) :
   }
 }
 
-class DefaultSMTProgram(commands: List<Command>, context: Context) : SMTProgram(commands, context)
+class DefaultSMTProgram(commands: List<Command>, context: ParseContext) :
+    SMTProgram(commands, context)

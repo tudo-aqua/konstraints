@@ -28,7 +28,7 @@ import tools.aqua.konstraints.theories.BoolSort
 @SMTDSL
 class SMTProgramBuilder(logic: Logic) {
   private val commands = mutableListOf<Command>()
-  private val context = Context(logic)
+  private val context = ParseContext(logic)
 
   /** Adds a new assertion: (assert [block]) */
   fun assert(block: () -> Expression<BoolSort>) = assert(block())
