@@ -26,7 +26,9 @@ import tools.aqua.konstraints.smt.*
  */
 
 /** RoundingMode sort object */
-object RoundingMode : Sort("RoundingMode")
+object RoundingMode : Sort("RoundingMode") {
+  override val theories = setOf(Theories.FLOATING_POINT)
+}
 
 /**
  * Baseclass of all FloatingPoint sorts
@@ -52,6 +54,8 @@ sealed class FPBase(eb: Index, sb: Index) : Sort("FloatingPoint", listOf(eb, sb)
       significantBits = 0
     }
   }
+
+  override val theories = setOf(Theories.FLOATING_POINT)
 
   override fun equals(other: Any?): Boolean =
       when {

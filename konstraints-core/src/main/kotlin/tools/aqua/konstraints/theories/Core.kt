@@ -193,4 +193,6 @@ class Distinct(val statements: List<Expression<*>>) :
 }
 
 /** Bool sort */
-object BoolSort : Sort("Bool")
+object BoolSort : Sort("Bool") {
+  override val theories = emptySet<Theories>()
+}

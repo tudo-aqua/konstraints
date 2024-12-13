@@ -20,6 +20,7 @@ package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.Bindings
 import tools.aqua.konstraints.parser.SortDecl
+import tools.aqua.konstraints.theories.Theories
 
 /**
  * Base class for each SMT sort
@@ -28,7 +29,7 @@ import tools.aqua.konstraints.parser.SortDecl
  * @param indices indices of indexed sorts (e.g. (_ BitVec m))
  * @param parameters parameters of parameterized sorts (e.g. (Array 2))
  */
-open class Sort(
+abstract class Sort(
     val name: Symbol,
     val indices: List<Index> = emptyList(),
     val parameters: List<Sort> = emptyList()
@@ -38,6 +39,8 @@ open class Sort(
       indices: List<Index> = emptyList(),
       parameters: List<Sort> = emptyList()
   ) : this(Symbol(name), indices, parameters)
+
+  abstract val theories: Set<Theories>
 
   constructor(name: String, vararg indices: Index) : this(name, indices.toList())
 
@@ -69,10 +72,14 @@ open class Sort(
   fun toSMTString() = name.toSMTString()
 }
 
-class SortParameter(name: String) : Sort(name, emptyList(), emptyList())
+class SortParameter(name: String) : Sort(name, emptyList(), emptyList()) {
+  override val theories = emptySet<Theories>()
+}
 
 class UserDefinedSort(name: Symbol, arity: Int) :
-    Sort(name, emptyList(), (0..arity).map { index -> SortParameter("sort$index") })
+    Sort(name, emptyList(), (0..arity).map { index -> SortParameter("sort$index") }) {
+  override val theories = emptySet<Theories>()
+}
 
 internal class UserDefinedSortDecl(name: Symbol, val arity: Int) :
     SortDecl<Sort>(

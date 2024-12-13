@@ -23,7 +23,9 @@ import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
 /** Int sort */
-object IntSort : Sort("Int")
+object IntSort : Sort("Int") {
+  override val theories = setOf(Theories.INTS, Theories.REALS_INTS, Theories.STRINGS)
+}
 
 /**
  * Integer literals

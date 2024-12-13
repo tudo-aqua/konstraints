@@ -22,10 +22,14 @@ import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
 /** String sort */
-object StringSort : Sort("String")
+object StringSort : Sort("String") {
+  override val theories = setOf(Theories.STRINGS)
+}
 
 /** Regular expression sort */
-object RegLan : Sort("RegLan")
+object RegLan : Sort("RegLan") {
+  override val theories = setOf(Theories.STRINGS)
+}
 
 /**
  * [value] holds the hexadecimal unicode of the character, [character] hold the kotlin

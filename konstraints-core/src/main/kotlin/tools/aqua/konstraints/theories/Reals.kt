@@ -24,7 +24,9 @@ import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
 /** Real sort */
-object RealSort : Sort("Real")
+object RealSort : Sort("Real") {
+  override val theories = setOf(Theories.REALS, Theories.REALS_INTS)
+}
 
 /**
  * Real literal

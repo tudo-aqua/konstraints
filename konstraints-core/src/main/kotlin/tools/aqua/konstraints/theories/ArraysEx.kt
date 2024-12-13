@@ -25,6 +25,8 @@ import tools.aqua.konstraints.smt.*
 class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) :
     Sort("Array".symbol(), emptyList(), listOf(x, y)) {
   override fun toString(): String = "(Array $x $y)"
+
+  override val theories = setOf(Theories.ARRAYS_EX)
 }
 
 /**

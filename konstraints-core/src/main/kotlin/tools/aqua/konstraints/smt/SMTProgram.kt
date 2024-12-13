@@ -19,6 +19,7 @@
 package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.ParseContext
+import tools.aqua.konstraints.theories.BoolSort
 
 enum class SatStatus {
   SAT, // program is satisfiable
@@ -48,6 +49,23 @@ abstract class SMTProgram(commands: List<Command>, var context: ParseContext?) {
 
   init {
     info = commands.filterIsInstance<SetInfo>().map { it.attribute }
+  }
+
+  fun assert(expr: Expression<BoolSort>) {
+    // check expr is in logic when logic is set
+    if (logic != null) {
+      require(
+          expr.all {
+            (it.theories.isEmpty() or it.theories.any { it in logic!!.theories }) and
+                (it.sort.theories.isEmpty() or it.sort.theories.any { it in logic!!.theories })
+          }) {
+            "Expression not in boundaries of logic"
+          }
+    }
+
+    // check all symbols are known
+
+    _commands.add(Assert(expr))
   }
 }
 

@@ -61,19 +61,30 @@ sealed interface Expression<T : Sort> {
                 this.children
                     .map { it.all(predicate) }
                     .reduceOrDefault(true) { t1, t2 -> t1 and t2 }
-        is Ite -> TODO()
-        is Literal -> TODO()
+        is Ite ->
+            predicate(this.statement) and
+                predicate(this.then) and
+                predicate(this.otherwise) and
+                this.statement.all(predicate) and
+                this.then.all(predicate) and
+                this.otherwise.all(predicate)
+        is Literal -> predicate(this)
         is NAryExpression ->
             predicate(this) and
                 this.children
                     .map { it.all(predicate) }
                     .reduceOrDefault(true) { t1, t2 -> t1 and t2 }
-        is TernaryExpression<*, *, *, *> -> TODO()
-        is LetExpression -> TODO()
+        is TernaryExpression<*, *, *, *> ->
+            predicate(this) and
+                this.lhs.all(predicate) and
+                this.mid.all(predicate) and
+                this.lhs.all(predicate)
+        is LetExpression ->
+            this.inner.all(predicate) // TODO maybe this should also check all bindings
         is LocalExpression -> predicate(this)
-        is BoundVariable -> TODO()
-        is ExistsExpression -> TODO()
-        is ForallExpression -> TODO()
+        is BoundVariable -> predicate(this)
+        is ExistsExpression -> this.term.all(predicate)
+        is ForallExpression -> this.term.all(predicate)
         is AnnotatedExpression -> predicate(this) and this.term.all(predicate)
       }
 

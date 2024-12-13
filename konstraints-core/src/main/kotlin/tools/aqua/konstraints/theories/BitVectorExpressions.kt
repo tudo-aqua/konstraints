@@ -1086,6 +1086,7 @@ class BVSort private constructor(index: Index) : Sort("BitVec", listOf(index)) {
   }
 
   val bits: Int
+  override val theories = setOf(Theories.FIXED_SIZE_BIT_VECTORS, Theories.FLOATING_POINT)
 
   init {
     // indices must either be s single numeral index or a symbolic index
