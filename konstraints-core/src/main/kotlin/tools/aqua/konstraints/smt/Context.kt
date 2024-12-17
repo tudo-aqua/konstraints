@@ -18,42 +18,69 @@
 
 package tools.aqua.konstraints.smt
 
-/*
+import tools.aqua.konstraints.dsl.SMTFunction
+import tools.aqua.konstraints.util.Stack
+
+
 abstract class Context {
     private val nameLookup = mutableMapOf<String, Int>()
-    private val assertionStack = Stack<AssertionLevel>()
+    private val assertionStack = Stack<AssertionLevel<>>()
 
     abstract fun let(bindings: List<VarBinding<*>>, lambda: (List<VarBinding<*>>) -> Unit)
     abstract fun exists(locals: List<SortedVar<*>>)
     abstract fun forall(locals: List<SortedVar<*>>)
 }
 
-interface AssertionLevel<FuncType, SortType> {
-    fun contains(function: FunctionDecl<*>) = functions.contains(function.name.toString())
-
+interface AssertionLevel<SortType> {
     fun contains(function: String, args: List<Expression<*>>) = get(function, args) != null
 
     fun contains(function: Symbol) = functions.contains(function.toString())
 
     fun get(function: String, args: List<Expression<*>>) =
-        functions[function]?.takeIf { it.acceptsExpressions(args, emptyList()) }
+        functions[function]?.takeIf { it.accepts(args.map { it.sort }) }
 
+    /*
     fun contains(sort: SortDecl<*>) = sorts.containsKey(sort.name.toString())
 
     fun contains(sort: Sort) = sorts.containsKey(sort.name.toString())
 
     fun containsSort(sort: String) = sorts.containsKey(sort)
+    */
 
-    fun add(function: FunctionDecl<*>): Boolean
+    fun add(function: SMTFunction<*>): Boolean
 
-    fun add(sort: SortDecl<*>): SortDecl<*>?
+    //fun add(sort: SortDecl<*>): SortDecl<*>?
 
-    val functions: Map<String, FuncType>
+    val functions: Map<String, SMTFunction<*>>
     val sorts: Map<String, SortType>
 }
 
-interface ContextManagable {
+interface GenericAssertionLevel : AssertionLevel<SMTFunction, ContextSort> {
+    override fun contains(function: String, args: List<Expression<*>>) = get(function, args) != null
+
+    override fun contains(function: Symbol) = functions.contains(function.toString())
+
+    override fun get(function: String, args: List<Expression<*>>) =
+        functions[function]?.takeIf { it(args) }
+
+    override fun contains(sort: SortDecl<*>) = sorts.containsKey(sort.name.toString())
+
+    override fun contains(sort: Sort) = sorts.containsKey(sort.name.toString())
+
+    override fun containsSort(sort: String) = sorts.containsKey(sort)
+
+    override fun add(function: FunctionDecl<*>): Boolean
+
+    override fun add(sort: SortDecl<*>): SortDecl<*>?
+}
+
+interface ContextFunction {
     fun name(): String
+    fun accepts(args: List<Sort>): Boolean
+    fun acceptsExpressions(args: List<Expression<*>>): Boolean
 
 }
-*/
+
+interface ContextSort {
+
+}

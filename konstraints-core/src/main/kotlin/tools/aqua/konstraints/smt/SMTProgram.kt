@@ -67,6 +67,14 @@ abstract class SMTProgram(commands: List<Command>, var context: ParseContext?) {
 
     _commands.add(Assert(expr))
   }
+
+  fun declareConst(name: Symbol, parameter: List<Sort>, sort: Sort) {
+
+  }
+
+  fun declareFun() {
+
+  }
 }
 
 class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
