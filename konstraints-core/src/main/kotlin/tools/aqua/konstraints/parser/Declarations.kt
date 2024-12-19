@@ -35,7 +35,7 @@ import tools.aqua.konstraints.theories.*
               DistinctDecl,
               IteDecl,
               ImpliesDecl)
-          .associateBy { it.name.toString() }
+          .associateBy { it.symbol.toString() }
   override val sorts = mapOf(Pair("Bool", BoolSortDecl))
 }
 
@@ -211,7 +211,7 @@ internal object BitVectorExpressionTheory : Theory {
               BVSLeDecl,
               BVSGtDecl,
               BVSGeDecl)
-          .associateBy { it.name.toString() }
+          .associateBy { it.symbol.toString() }
   override val sorts = mapOf(Pair("BitVec", BVSortDecl))
 }
 
@@ -786,7 +786,7 @@ internal object IntsTheory : Theory {
               IntGreaterEqDecl,
               IntGreaterDecl,
               DivisibleDecl)
-          .associateBy { it.name.toString() }
+          .associateBy { it.symbol.toString() }
 
   override val sorts: Map<String, SortDecl<*>> = mapOf(Pair("Int", IntSortDecl))
 }
@@ -962,7 +962,7 @@ internal object RealsTheory : Theory {
               RealLessDecl,
               RealGreaterEqDecl,
               RealGreaterDecl)
-          .associateBy { it.name.toString() }
+          .associateBy { it.symbol.toString() }
 
   override val sorts: Map<String, SortDecl<*>> = mapOf(Pair("Real", RealSortDecl))
 }
@@ -1124,7 +1124,7 @@ internal object RealsIntsTheory : Theory {
               ToRealDecl,
               ToIntDecl,
               IsIntDecl)
-          .associateBy { it.name.toString() }
+          .associateBy { it.symbol.toString() }
 
   override val sorts: Map<String, SortDecl<*>> =
       mapOf(Pair("Int", IntSortDecl), Pair("Real", RealSortDecl))
@@ -1209,7 +1209,7 @@ internal object FloatingPointTheory : Theory {
               FPToUBitVecDecl,
               FPToSBitVecDecl,
               FPToRealDecl)
-          .associateBy { it.name.toString() }
+          .associateBy { it.symbol.toString() }
 
   override val sorts: Map<String, SortDecl<*>> =
       mapOf(
@@ -1873,7 +1873,7 @@ internal object FPToRealDecl :
 /** Array extension theory internal object */
 internal object ArrayExTheory : Theory {
   override val functions: Map<String, FunctionDecl<*>> =
-      listOf(ArraySelectDecl, ArrayStoreDecl).associateBy { it.name.toString() }
+      listOf(ArraySelectDecl, ArrayStoreDecl).associateBy { it.symbol.toString() }
 
   override val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf(Pair("Array", ArraySortDecl))
 }
@@ -1959,7 +1959,7 @@ internal object StringsTheory : Theory {
               RegexRangeDecl,
               RegexPowerDecl,
               RegexLoopDecl)
-          .associateBy { it.name.toString() }
+          .associateBy { it.symbol.toString() }
 
   override val sorts: Map<String, SortDecl<*>> =
       mapOf(Pair("String", StringSortDecl), Pair("RegLan", RegLanDecl), Pair("Int", IntSortDecl))

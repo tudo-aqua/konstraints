@@ -30,15 +30,17 @@ enum class Associativity {
 }
 
 /*internal*/ open class FunctionDecl<S : Sort>(
-    val name: Symbol,
+    val symbol: Symbol,
     val parametricSorts: Set<Sort>,
-    val params: List<Sort>,
+    override val parameters: List<Sort>,
     val functionIndices: Set<SymbolIndex>,
     val paramIndices: Set<SymbolIndex>,
-    val sort: S,
+    override val sort: S,
     val associativity: Associativity
-) {
-  val signature = Signature(parametricSorts, functionIndices, paramIndices, params, sort)
+) : ContextFunction<Sort> {
+
+  override val name = symbol.toString()
+  val signature = Signature(parametricSorts, functionIndices, paramIndices, parameters, sort)
 
   open fun buildExpression(
       args: List<Expression<*>>,
@@ -46,7 +48,7 @@ enum class Associativity {
   ): Expression<S> {
     bindParametersToExpressions(args, functionIndices)
 
-    return UserDeclaredExpression(name, sort, args)
+    return UserDeclaredExpression(symbol, sort, args)
   }
 
   fun bindParametersToExpressions(args: List<Expression<*>>, indices: List<NumeralIndex>) =
@@ -91,12 +93,13 @@ enum class Associativity {
       when {
         this === other -> true
         other !is FunctionDecl<*> -> false
-        else -> (name == other.name) && (params == other.params) && (sort == other.sort)
+        else -> (symbol == other.symbol) && (parameters == other.parameters) && (sort == other.sort)
       }
 
-  override fun hashCode(): Int = name.hashCode() * 961 + params.hashCode() * 31 + sort.hashCode()
+  override fun hashCode(): Int =
+      symbol.hashCode() * 961 + parameters.hashCode() * 31 + sort.hashCode()
 
-  override fun toString() = "($name (${params.joinToString(" ")}) $sort)"
+  override fun toString() = "($symbol (${parameters.joinToString(" ")}) $sort)"
 }
 
 internal class FunctionDefinition<S : Sort>(val definition: FunctionDef<S>) :
@@ -112,7 +115,7 @@ internal class FunctionDefinition<S : Sort>(val definition: FunctionDef<S>) :
   override fun buildExpression(
       args: List<Expression<*>>,
       functionIndices: List<NumeralIndex>
-  ): Expression<S> = UserDefinedExpression(name, sort, args, definition)
+  ): Expression<S> = UserDefinedExpression(symbol, sort, args, definition)
 }
 
 /*internal*/ abstract class FunctionDecl0<S : Sort>(
@@ -258,7 +261,7 @@ internal abstract class FunctionDecl4<P1 : Sort, P2 : Sort, P3 : Sort, P4 : Sort
       args: List<Expression<*>>,
       functionIndices: List<NumeralIndex>
   ): Expression<S> {
-    require(args.size == 4) { "$name expected 4 arguments but got ${args.size}: $args" }
+    require(args.size == 4) { "$symbol expected 4 arguments but got ${args.size}: $args" }
     val bindings = bindParametersToExpressions(args, functionIndices)
 
     // TODO suppress unchecked cast warning

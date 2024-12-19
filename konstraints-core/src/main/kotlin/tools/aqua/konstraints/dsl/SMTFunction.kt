@@ -22,7 +22,6 @@ import java.util.*
 import kotlin.reflect.KProperty
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.util.SimpleDelegate
-import tools.aqua.konstraints.util.zipWithSameLength
 
 /**
  * Declares an SMT constant: (declare-const |const!sort!UUID| [sort])
@@ -435,7 +434,8 @@ class Define<T : Sort>(
 
     program.registerFun(n, sort, sortedVars, term)
     return SimpleDelegate(
-        SMTFunctionN(n.symbol(), sort, parameters, FunctionDef(n.symbol(), emptyList(), sort, term)))
+        SMTFunctionN(
+            n.symbol(), sort, parameters, FunctionDef(n.symbol(), emptyList(), sort, term)))
   }
 }
 
@@ -657,35 +657,8 @@ class Define5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
   }
 }
 
-/**
- * SMTFunction of any arity.
- *
- * Use [invoke] to generate an expression with the given parameters applied.
- */
-sealed interface SMTFunction<T : Sort> {
-    val name: Symbol
-    val sort: T
-    val parameters: List<Sort>
-    val definition: FunctionDef<T>?
-
-  operator fun invoke(args: List<Expression<*>>): Expression<T> {
-      require(args.size == parameters.size)
-      require((args zipWithSameLength parameters).all { (par, sort) -> par.sort == sort })
-
-      return if (definition == null) {
-          UserDeclaredExpression(name, sort, args)
-      } else {
-          UserDefinedExpression(name, sort, emptyList(), definition!!)
-      }
-  }
-
-    fun accepts(args: List<Sort>): Boolean {
-        return (args.size == parameters.size) && ((args zipWithSameLength parameters).all { (arg, sort) -> arg == sort })
-    }
-}
-
 data class SMTFunctionN<T : Sort>(
-    override val name: Symbol,
+    override val symbol: Symbol,
     override val sort: T,
     override val parameters: List<Sort>,
     override val definition: FunctionDef<T>?
@@ -697,18 +670,18 @@ data class SMTFunctionN<T : Sort>(
  * Use [invoke] to generate an expression with the given parameters applied.
  */
 data class SMTFunction1<T : Sort, S : Sort>(
-    override val name: Symbol,
+    override val symbol: Symbol,
     override val sort: T,
     val parameter: S,
     override val definition: FunctionDef<T>?
 ) : SMTFunction<T> {
-    override val parameters = listOf(parameter)
+  override val parameters = listOf(parameter)
 
   operator fun invoke(arg: Expression<S>): Expression<T> {
     return if (definition == null) {
-      UserDeclaredExpression(name, sort, listOf(arg))
+      UserDeclaredExpression(symbol, sort, listOf(arg))
     } else {
-      UserDefinedExpression(name, sort, listOf(arg), definition)
+      UserDefinedExpression(symbol, sort, listOf(arg), definition)
     }
   }
 }
@@ -719,19 +692,19 @@ data class SMTFunction1<T : Sort, S : Sort>(
  * Use [invoke] to generate an expression with the given parameters applied.
  */
 data class SMTFunction2<T : Sort, S1 : Sort, S2 : Sort>(
-    override val name: Symbol,
+    override val symbol: Symbol,
     override val sort: T,
     val parameter1: S1,
     val parameter2: S2,
     override val definition: FunctionDef<T>?
 ) : SMTFunction<T> {
-    override val parameters = listOf(parameter1, parameter2)
+  override val parameters = listOf(parameter1, parameter2)
 
   operator fun invoke(arg1: Expression<S1>, arg2: Expression<S2>): Expression<T> {
     return if (definition == null) {
-      UserDeclaredExpression(name, sort, listOf(arg1, arg2))
+      UserDeclaredExpression(symbol, sort, listOf(arg1, arg2))
     } else {
-      UserDefinedExpression(name, sort, listOf(arg1, arg2), definition)
+      UserDefinedExpression(symbol, sort, listOf(arg1, arg2), definition)
     }
   }
 }
@@ -742,14 +715,14 @@ data class SMTFunction2<T : Sort, S1 : Sort, S2 : Sort>(
  * Use [invoke] to generate an expression with the given parameters applied.
  */
 data class SMTFunction3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
-    override val name: Symbol,
+    override val symbol: Symbol,
     override val sort: T,
     val parameter1: S1,
     val parameter2: S2,
     val parameter3: S3,
     override val definition: FunctionDef<T>?
 ) : SMTFunction<T> {
-    override val parameters = listOf(parameter1, parameter2, parameter3)
+  override val parameters = listOf(parameter1, parameter2, parameter3)
 
   operator fun invoke(
       arg1: Expression<S1>,
@@ -757,9 +730,9 @@ data class SMTFunction3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
       arg3: Expression<S3>
   ): Expression<T> {
     return if (definition == null) {
-      UserDeclaredExpression(name, sort, listOf(arg1, arg2, arg3))
+      UserDeclaredExpression(symbol, sort, listOf(arg1, arg2, arg3))
     } else {
-      UserDefinedExpression(name, sort, listOf(arg1, arg2, arg3), definition)
+      UserDefinedExpression(symbol, sort, listOf(arg1, arg2, arg3), definition)
     }
   }
 }
@@ -770,7 +743,7 @@ data class SMTFunction3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
  * Use [invoke] to generate an expression with the given parameters applied.
  */
 data class SMTFunction4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
-    override val name: Symbol,
+    override val symbol: Symbol,
     override val sort: T,
     val parameter1: S1,
     val parameter2: S2,
@@ -778,7 +751,7 @@ data class SMTFunction4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val parameter4: S4,
     override val definition: FunctionDef<T>?
 ) : SMTFunction<T> {
-    override val parameters = listOf(parameter1, parameter2, parameter3, parameter4)
+  override val parameters = listOf(parameter1, parameter2, parameter3, parameter4)
 
   operator fun invoke(
       arg1: Expression<S1>,
@@ -787,9 +760,9 @@ data class SMTFunction4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
       arg4: Expression<S4>
   ): Expression<T> {
     return if (definition == null) {
-      UserDeclaredExpression(name, sort, listOf(arg1, arg2, arg3, arg4))
+      UserDeclaredExpression(symbol, sort, listOf(arg1, arg2, arg3, arg4))
     } else {
-      UserDefinedExpression(name, sort, listOf(arg1, arg2, arg3, arg4), definition)
+      UserDefinedExpression(symbol, sort, listOf(arg1, arg2, arg3, arg4), definition)
     }
   }
 }
@@ -800,7 +773,7 @@ data class SMTFunction4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
  * Use [invoke] to generate an expression with the given parameters applied.
  */
 data class SMTFunction5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
-    override val name: Symbol,
+    override val symbol: Symbol,
     override val sort: T,
     val parameter1: S1,
     val parameter2: S2,
@@ -809,7 +782,7 @@ data class SMTFunction5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5
     val parameter5: S5,
     override val definition: FunctionDef<T>?
 ) : SMTFunction<T> {
-    override val parameters = listOf(parameter1, parameter2, parameter3, parameter4, parameter5)
+  override val parameters = listOf(parameter1, parameter2, parameter3, parameter4, parameter5)
 
   operator fun invoke(
       arg1: Expression<S1>,
@@ -819,9 +792,9 @@ data class SMTFunction5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5
       arg5: Expression<S5>
   ): Expression<T> {
     return if (definition == null) {
-      UserDeclaredExpression(name, sort, listOf(arg1, arg2, arg3, arg4, arg5))
+      UserDeclaredExpression(symbol, sort, listOf(arg1, arg2, arg3, arg4, arg5))
     } else {
-      UserDefinedExpression(name, sort, listOf(arg1, arg2, arg3, arg4, arg5), definition)
+      UserDefinedExpression(symbol, sort, listOf(arg1, arg2, arg3, arg4, arg5), definition)
     }
   }
 }

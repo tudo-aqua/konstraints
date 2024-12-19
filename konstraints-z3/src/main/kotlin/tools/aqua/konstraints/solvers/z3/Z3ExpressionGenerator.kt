@@ -1191,7 +1191,7 @@ fun RegLan.z3ify(context: Z3Context): ReSort<SeqSort<CharSort>> =
     context.context.mkReSort(context.context.mkSeqSort(context.context.mkCharSort()))
 
 fun UserDefinedSort.z3ify(context: Z3Context): UninterpretedSort =
-    context.context.mkUninterpretedSort(this.name.toSMTString())
+    context.context.mkUninterpretedSort(this.symbol.toSMTString())
 
 fun ArraySort<*, *>.z3ify(context: Z3Context): Z3ArraySort<*, *> =
     context.context.mkArraySort(this.x.z3ify(context), this.y.z3ify(context))

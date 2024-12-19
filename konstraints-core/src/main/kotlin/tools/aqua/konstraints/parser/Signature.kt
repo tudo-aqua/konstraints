@@ -196,7 +196,7 @@ data class Signature(
       // bind if not already bound
       parametricBindings.bindParametersTo(symbolic, actual)
     } else {
-      require(symbolic.name == actual.name)
+      require(symbolic.symbol == actual.symbol)
 
       (symbolic.indices zipWithSameLength actual.indices).forEach { (symbolicIndex, actualIndex) ->
         when (symbolicIndex) {

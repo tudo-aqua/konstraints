@@ -85,7 +85,7 @@ class ContextTests {
   ) {
     val function = context.getFunction(name, args)
 
-    assertEquals(name.symbol(), function?.name)
+    assertEquals(name.symbol(), function?.symbol)
   }
 
   @ParameterizedTest
