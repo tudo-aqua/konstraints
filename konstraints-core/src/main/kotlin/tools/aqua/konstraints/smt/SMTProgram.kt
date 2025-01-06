@@ -36,12 +36,14 @@ enum class SatStatus {
       }
 }
 
-abstract class SMTProgram(commands: List<Command>, var context: ParseContext?) {
+abstract class SMTProgram(commands: List<Command>, context: ParseContext?) {
   var model: Model? = null
   var status = SatStatus.PENDING
   val info: List<Attribute>
   var logic: Logic? = null
     protected set
+
+  protected val context = Context()
 
   protected val _commands: MutableList<Command> = commands.toMutableList()
   val commands: List<Command>
@@ -68,7 +70,9 @@ abstract class SMTProgram(commands: List<Command>, var context: ParseContext?) {
     _commands.add(Assert(expr))
   }
 
-  fun declareConst(name: Symbol, parameter: List<Sort>, sort: Sort) {}
+  fun declareConst(name: Symbol, parameter: List<Sort>, sort: Sort) {
+
+  }
 
   fun declareFun() {}
 }

@@ -40,6 +40,18 @@ class Stack<E>(private val stack: MutableList<E> = mutableListOf()) : List<E> by
   fun peekOrNull() = stack.firstOrNull()
 
   /**
+   * Retrieve the bottom element of the stack
+   *
+   * @throws NoSuchElementException if the stack is empty
+   */
+  fun bottom() = stack.last()
+
+  /**
+   * Retrieve tje bottom element of the stack or null if no such element exists
+   */
+  fun bottomOrNull() = stack.lastOrNull()
+
+  /**
    * Removes and returns the top element from the stack
    *
    * @throws NoSuchElementException if the stack is empty

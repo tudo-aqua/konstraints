@@ -21,21 +21,59 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.util.Stack
 import tools.aqua.konstraints.util.zipWithSameLength
 
-abstract class Context {
-  private val nameLookup = mutableMapOf<String, Int>()
+class Context {
+  private val functionNameLookup = mutableMapOf<String, Int>()
+  private val sortNameLookup = mutableMapOf<String, Int>()
   private val assertionStack = Stack<AssertionLevel<SMTFunction<Sort>, Sort>>()
 
-  abstract fun let(bindings: List<VarBinding<*>>, lambda: (List<VarBinding<*>>) -> Unit)
+  fun<T : Sort> addFun(func: SMTFunction<T>) {
+    if (functionNameLookup.containsKey(func.name)) {
+      // possible name conflict
 
-  abstract fun exists(locals: List<SortedVar<*>>)
+      // theory symbol can not be shadowed
+      if(assertionStack.bottom().contains(func.name)) {
+        throw IllegalStateException("Can not shadow theory symbol ${func.name}!")
+      }
+    }
 
-  abstract fun forall(locals: List<SortedVar<*>>)
+    val top = assertionStack.peek()
+
+    if(top is MutableAssertionLevel) {
+      top.addFun(func)
+    } else {
+      throw IllegalStateException("Can not add $func to none mutable stack level!")
+    }
+  }
+
+  fun contains(expression: Expression<*>): Boolean {
+    // check if any function matching the name exists
+    if(!functionNameLookup.containsKey(expression.name.toString())) {
+      return false
+    }
+
+    // TODO this should be optimized
+    // check if any function matches name and parameters
+    return assertionStack.any { level -> level.contains(expression.name.toString(), expression.children) }
+  }
+
+  fun contains(sort: Sort): Boolean {
+    // check if any function matching the name exists
+    if(!sortNameLookup.containsKey(sort.name.toString())) {
+      return false
+    }
+
+    // TODO this should be optimized
+    // check if any function matches name and parameters
+    return assertionStack.any { level -> level.contains(sort) }
+  }
 }
 
 interface AssertionLevel<out FuncType : ContextFunction<*>, out SortType : ContextSort> {
   fun contains(function: String, args: List<Expression<*>>) = get(function, args) != null
 
   fun contains(function: Symbol) = functions.contains(function.toString())
+
+  fun contains(function: String) = functions.contains(function)
 
   fun get(function: String, args: List<Expression<*>>) =
       functions[function]?.takeIf { func ->
@@ -64,4 +102,13 @@ interface ContextFunction<S> {
 interface ContextSort {
   val name: String
   val arity: Int
+}
+
+class MutableAssertionLevel : AssertionLevel<ContextFunction<Sort>, ContextSort> {
+  override val functions: MutableMap<String, ContextFunction<Sort>> = mutableMapOf()
+  override val sorts: MutableMap<String, ContextSort> = mutableMapOf()
+
+  fun addFun(func: ContextFunction<Sort>) = functions.put(func.name.toString(), func)
+
+  fun addSort(func: ContextSort) = sorts.put(func.name.toString(), func)
 }
