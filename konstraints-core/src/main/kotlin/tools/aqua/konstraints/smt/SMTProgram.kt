@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2024 The Konstraints Authors
+ * Copyright 2023-2025 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,6 +52,40 @@ abstract class SMTProgram(commands: List<Command>, context: ParseContext?) {
   init {
     info = commands.filterIsInstance<SetInfo>().map { it.attribute }
   }
+}
+
+class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
+    SMTProgram(commands, context) {
+  constructor(commands: List<Command>) : this(commands, null)
+
+  constructor() : this(emptyList(), null)
+
+  /**
+   * Inserts [command] at the end of the program
+   *
+   * Checks if [command] is legal w.r.t. the [context]
+   */
+  @Deprecated(
+      "Prefer usage of specialized functions (e.g. assert)", level = DeprecationLevel.WARNING)
+  fun add(command: Command) {
+    add(command, _commands.size)
+  }
+
+  /**
+   * Inserts [command] at [index] into the program
+   *
+   * Checks if [command] is legal w.r.t. the [context]
+   */
+  @Deprecated(
+      "Prefer usage of specialized functions (e.g. assert)", level = DeprecationLevel.WARNING)
+  fun add(command: Command, index: Int) {
+    if (command is Assert) {
+      require(command.expression.all { context!!.contains(it) })
+    }
+
+    updateContext(command)
+    _commands.add(index, command)
+  }
 
   fun assert(expr: Expression<BoolSort>) {
     // check expr is in logic when logic is set
@@ -70,41 +104,9 @@ abstract class SMTProgram(commands: List<Command>, context: ParseContext?) {
     _commands.add(Assert(expr))
   }
 
-  fun declareConst(name: Symbol, parameter: List<Sort>, sort: Sort) {
-
-  }
+  fun declareConst(name: Symbol, parameter: List<Sort>, sort: Sort) {}
 
   fun declareFun() {}
-}
-
-class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
-    SMTProgram(commands, context) {
-  constructor(commands: List<Command>) : this(commands, null)
-
-  constructor() : this(emptyList(), null)
-
-  /**
-   * Inserts [command] at the end of the program
-   *
-   * Checks if [command] is legal w.r.t. the [context]
-   */
-  fun add(command: Command) {
-    add(command, _commands.size)
-  }
-
-  /**
-   * Inserts [command] at [index] into the program
-   *
-   * Checks if [command] is legal w.r.t. the [context]
-   */
-  fun add(command: Command, index: Int) {
-    if (command is Assert) {
-      require(command.expression.all { context!!.contains(it) })
-    }
-
-    updateContext(command)
-    _commands.add(index, command)
-  }
 
   /**
    * Inserts all [commands] at the end of the program
@@ -126,15 +128,11 @@ class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
     }
 
     this.logic = logic
-    context = ParseContext(logic)
   }
 
   private fun updateContext(command: Command) {
     when (command) {
       is SetLogic -> setLogic(command.logic)
-      is DeclareConst -> context?.registerFunction(command)
-      is DeclareFun -> context?.registerFunction(command)
-      is DeclareSort -> context?.registerSort(command)
       else -> return
     }
   }

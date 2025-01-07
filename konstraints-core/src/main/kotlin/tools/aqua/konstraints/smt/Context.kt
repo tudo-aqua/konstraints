@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2024 The Konstraints Authors
+ * Copyright 2023-2025 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.smt
 
+import tools.aqua.konstraints.theories.Theories
 import tools.aqua.konstraints.util.Stack
 import tools.aqua.konstraints.util.zipWithSameLength
 
@@ -25,20 +26,29 @@ class Context {
   private val functionNameLookup = mutableMapOf<String, Int>()
   private val sortNameLookup = mutableMapOf<String, Int>()
   private val assertionStack = Stack<AssertionLevel<SMTFunction<Sort>, Sort>>()
+  private val forbiddenNames = mutableSetOf<String>()
 
-  fun<T : Sort> addFun(func: SMTFunction<T>) {
+  fun <T : Sort> addFunOrNull(func: SMTFunction<T>): SMTFunction<T>? {
+    try {
+      addFun(func)
+      return func
+    } catch (e: Exception) {
+      return null
+    }
+  }
+
+  fun <T : Sort> addFun(func: SMTFunction<T>) {
+    if (forbiddenNames.contains(func.name)) {
+      throw IllegalStateException("Can not shadow theory symbol ${func.name}!")
+    }
+
     if (functionNameLookup.containsKey(func.name)) {
       // possible name conflict
-
-      // theory symbol can not be shadowed
-      if(assertionStack.bottom().contains(func.name)) {
-        throw IllegalStateException("Can not shadow theory symbol ${func.name}!")
-      }
     }
 
     val top = assertionStack.peek()
 
-    if(top is MutableAssertionLevel) {
+    if (top is MutableAssertionLevel) {
       top.addFun(func)
     } else {
       throw IllegalStateException("Can not add $func to none mutable stack level!")
@@ -47,24 +57,175 @@ class Context {
 
   fun contains(expression: Expression<*>): Boolean {
     // check if any function matching the name exists
-    if(!functionNameLookup.containsKey(expression.name.toString())) {
+    if (!functionNameLookup.containsKey(expression.name.toString())) {
       return false
     }
 
     // TODO this should be optimized
     // check if any function matches name and parameters
-    return assertionStack.any { level -> level.contains(expression.name.toString(), expression.children) }
+    return assertionStack.any { level ->
+      level.contains(expression.name.toString(), expression.children)
+    }
   }
 
   fun contains(sort: Sort): Boolean {
     // check if any function matching the name exists
-    if(!sortNameLookup.containsKey(sort.name.toString())) {
+    if (!sortNameLookup.containsKey(sort.name.toString())) {
       return false
     }
 
     // TODO this should be optimized
     // check if any function matches name and parameters
     return assertionStack.any { level -> level.contains(sort) }
+  }
+
+  fun setLogic(logic: Logic) {
+    logic.theories.forEach {
+      when (it) {
+        Theories.ARRAYS_EX -> forbiddenNames.addAll(listOf("select", "store"))
+        Theories.FIXED_SIZE_BIT_VECTORS ->
+            forbiddenNames.addAll(
+                listOf(
+                    "bvult",
+                    "concat",
+                    "bvand",
+                    "bvneg",
+                    "bvnot",
+                    "bvor",
+                    "bvadd",
+                    "bvmul",
+                    "bvudiv",
+                    "bvurem",
+                    "bvshl",
+                    "bvlshr",
+                    "extract",
+                    "bvnand",
+                    "bvnor",
+                    "bvxor",
+                    "bvxnor",
+                    "bvcomp",
+                    "bvsub",
+                    "bvsdiv",
+                    "bvsrem",
+                    "bvsmod",
+                    "bvashr",
+                    "repeat",
+                    "zero_extend",
+                    "sign_extend",
+                    "rotate_left",
+                    "rotate_right",
+                    "bvule",
+                    "bvugt",
+                    "bvuge",
+                    "bvslt",
+                    "bvsle",
+                    "bvsgt",
+                    "bvsge"))
+        Theories.CORE ->
+            forbiddenNames.addAll(
+                listOf("false", "true", "not", "and", "or", "xor", "=", "distinct", "ite", "=>"))
+        Theories.FLOATING_POINT ->
+            forbiddenNames.addAll(
+                listOf(
+                    "roundNearestTiesToEven",
+                    "RNE",
+                    "roundNearestTiesToAway",
+                    "RNA",
+                    "roundTowardPositive",
+                    "RTP",
+                    "RoundTowardNegative",
+                    "RTN",
+                    "RoundTowardZero",
+                    "RTZ",
+                    "fp",
+                    "+oo",
+                    "-oo",
+                    "+zero",
+                    "-zero",
+                    "NaN",
+                    "fp.abs",
+                    "fp.neg",
+                    "fp.add",
+                    "fp.sub",
+                    "fp.mul",
+                    "fp.div",
+                    "fp.fma",
+                    "fp.sqrt",
+                    "fp.rem",
+                    "fp.roundToIntegral",
+                    "fp.min",
+                    "fp.max",
+                    "fp.leq",
+                    "fp.lt",
+                    "fp.geq",
+                    "fp.gt",
+                    "fp.eq",
+                    "fp.isNormal",
+                    "fp.isSubormal",
+                    "fp.isZero",
+                    "fp.isInfinite",
+                    "fp.isNan",
+                    "fp.isNegative",
+                    "fp.isPositive",
+                    "to_fp",
+                    "to_fp_unsigned",
+                    "fp.to_ubv",
+                    "fp.to_real"))
+        Theories.INTS ->
+            forbiddenNames.addAll(
+                listOf("-", "+", "*", "div", "mod", "abs", "<=", "<", ">=", ">", "divisible"))
+        Theories.REALS -> forbiddenNames.addAll(listOf("-", "+", "*", "/", "<=", "<", ">=", ">"))
+        Theories.REALS_INTS ->
+            forbiddenNames.addAll(
+                listOf(
+                    "-",
+                    "+",
+                    "*",
+                    "div",
+                    "mod",
+                    "abs",
+                    "<=",
+                    "<",
+                    ">=",
+                    ">",
+                    "divisible",
+                    "/",
+                    "to_real"))
+        Theories.STRINGS ->
+            forbiddenNames.addAll(
+                listOf(
+                    "char",
+                    "str.++",
+                    "str.len",
+                    "str.<",
+                    "str.<=",
+                    "str.at",
+                    "str.substr",
+                    "str.prefixof",
+                    "str.suffixof",
+                    "str.contains",
+                    "str.indexof",
+                    "str.replace",
+                    "str.replace_re",
+                    "str.is_digit",
+                    "str.to_code",
+                    "str.from_code",
+                    "re.none",
+                    "re.all",
+                    "re.allchar",
+                    "re.++",
+                    "re.union",
+                    "re.inter",
+                    "re.*",
+                    "re.comp",
+                    "re.diff",
+                    "re.+",
+                    "re.opt",
+                    "re.range",
+                    "re.^",
+                    "re.loop"))
+      }
+    }
   }
 }
 
