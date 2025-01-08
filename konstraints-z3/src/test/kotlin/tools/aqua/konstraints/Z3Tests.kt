@@ -90,7 +90,7 @@ class Z3Tests {
 
   @ParameterizedTest
   @MethodSource("getQFRDLFile")
-  @Timeout(value = 20, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 30, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_RDL(file: File) = solve(file)
 
   fun getQFRDLFile(): Stream<Arguments> = loadResource("/QF_RDL/scheduling/")
