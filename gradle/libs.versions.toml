@@ -28,7 +28,7 @@ gradle-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plug
 gradle-kotlin-serialization = { group = "org.jetbrains.kotlin", name = "kotlin-serialization", version.ref = "kotlin" }
 gradle-nexus-publish = { group = "io.github.gradle-nexus", name = "publish-plugin", version = "2.0.0" }
 gradle-node = { group = "com.github.node-gradle", name = "gradle-node-plugin", version = "7.1.0" }
-gradle-spotless = { group = "com.diffplug.spotless", name = "spotless-plugin-gradle", version = "6.25.0" }
+gradle-spotless = { group = "com.diffplug.spotless", name = "spotless-plugin-gradle", version = "7.0.1" }
 gradle-taskTree = { group = "com.dorongold.plugins", name = "task-tree", version = "4.0.0" }
 gradle-versions = { group = "com.github.ben-manes", name = "gradle-versions-plugin", version = "0.51.0" }
 
