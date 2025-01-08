@@ -42,5 +42,5 @@ kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutine
 kotlin-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.7.3" }
 petitparser-core = { group = "com.github.petitparser", name = "petitparser-core", version = "2.4.0" }
 xz = { group = "org.tukaani", name = "xz", version = "1.10" }
-zstd = { group = "com.github.luben", name = "zstd-jni", version = "1.5.6-8" }
+zstd = { group = "com.github.luben", name = "zstd-jni", version = "1.5.6-9" }
 z3-turnkey = { group = "tools.aqua", name = "z3-turnkey", version = "4.13.0.1" }
