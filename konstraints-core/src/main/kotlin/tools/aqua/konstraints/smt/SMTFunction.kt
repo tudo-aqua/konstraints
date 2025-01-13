@@ -25,14 +25,14 @@ import tools.aqua.konstraints.util.zipWithSameLength
  *
  * Use [invoke] to generate an expression with the given parameters applied.
  */
-interface SMTFunction<T : Sort> : ContextFunction<Sort> {
-  val symbol: Symbol
+abstract class SMTFunction<T : Sort> : ContextFunction<Sort> {
+  abstract val symbol: Symbol
   override val name: String
     get() = symbol.toString()
 
-  override val sort: T
-  override val parameters: List<Sort>
-  val definition: FunctionDef<T>?
+  abstract override val sort: T
+  abstract override val parameters: List<Sort>
+  abstract val definition: FunctionDef<T>?
 
   operator fun invoke(args: List<Expression<*>>): Expression<T> {
     require(args.size == parameters.size)
@@ -43,5 +43,26 @@ interface SMTFunction<T : Sort> : ContextFunction<Sort> {
     } else {
       UserDefinedExpression(symbol, sort, emptyList(), definition!!)
     }
+  }
+
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (other !is SMTFunction<*>) return false
+    else if (
+      symbol == other.symbol && // symbol equality
+      sort == other.sort && // same sort
+      parameters.size == other.parameters.size && // same number of parameters
+      (parameters zip other.parameters).all {(s1, s2) -> s1 == s2} // pairwise equal parameters
+      ) return true
+    return false
+  }
+
+  override fun hashCode(): Int {
+    var result = symbol.hashCode()
+    result = 31 * result + name.hashCode()
+    result = 31 * result + sort.hashCode()
+    result = 31 * result + parameters.hashCode()
+    result = 31 * result + (definition?.hashCode() ?: 0)
+    return result
   }
 }

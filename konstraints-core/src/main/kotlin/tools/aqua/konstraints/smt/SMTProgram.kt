@@ -80,7 +80,7 @@ class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
       "Prefer usage of specialized functions (e.g. assert)", level = DeprecationLevel.WARNING)
   fun add(command: Command, index: Int) {
     if (command is Assert) {
-      require(command.expression.all { context!!.contains(it) })
+      require(command.expression.all { context.contains(it) })
     }
 
     updateContext(command)

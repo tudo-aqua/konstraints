@@ -662,7 +662,7 @@ data class SMTFunctionN<T : Sort>(
     override val sort: T,
     override val parameters: List<Sort>,
     override val definition: FunctionDef<T>?
-) : SMTFunction<T>
+) : SMTFunction<T>()
 
 /**
  * SMTFunction of arity 1.
@@ -674,7 +674,7 @@ data class SMTFunction1<T : Sort, S : Sort>(
     override val sort: T,
     val parameter: S,
     override val definition: FunctionDef<T>?
-) : SMTFunction<T> {
+) : SMTFunction<T>() {
   override val parameters = listOf(parameter)
 
   operator fun invoke(arg: Expression<S>): Expression<T> {
@@ -697,7 +697,7 @@ data class SMTFunction2<T : Sort, S1 : Sort, S2 : Sort>(
     val parameter1: S1,
     val parameter2: S2,
     override val definition: FunctionDef<T>?
-) : SMTFunction<T> {
+) : SMTFunction<T>() {
   override val parameters = listOf(parameter1, parameter2)
 
   operator fun invoke(arg1: Expression<S1>, arg2: Expression<S2>): Expression<T> {
@@ -721,7 +721,7 @@ data class SMTFunction3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val parameter2: S2,
     val parameter3: S3,
     override val definition: FunctionDef<T>?
-) : SMTFunction<T> {
+) : SMTFunction<T>() {
   override val parameters = listOf(parameter1, parameter2, parameter3)
 
   operator fun invoke(
@@ -750,7 +750,7 @@ data class SMTFunction4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val parameter3: S3,
     val parameter4: S4,
     override val definition: FunctionDef<T>?
-) : SMTFunction<T> {
+) : SMTFunction<T>() {
   override val parameters = listOf(parameter1, parameter2, parameter3, parameter4)
 
   operator fun invoke(
@@ -781,7 +781,7 @@ data class SMTFunction5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5
     val parameter4: S4,
     val parameter5: S5,
     override val definition: FunctionDef<T>?
-) : SMTFunction<T> {
+) : SMTFunction<T>() {
   override val parameters = listOf(parameter1, parameter2, parameter3, parameter4, parameter5)
 
   operator fun invoke(

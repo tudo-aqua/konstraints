@@ -23,12 +23,16 @@ import tools.aqua.konstraints.util.Stack
 import tools.aqua.konstraints.util.zipWithSameLength
 
 class Context {
-  private val functionNameLookup = mutableMapOf<String, Int>()
+    // lookup smt functions by name
+  private val functionNameLookup = mutableMapOf<String, MutableSet<SMTFunction<Sort>>>()
+
+    // lookup assertion level by smt function
+    private val functionLevelLookup = mutableMapOf<SMTFunction<Sort>, MutableSet<AssertionLevel<SMTFunction<Sort>, Sort>>>()
   private val sortNameLookup = mutableMapOf<String, Int>()
   private val assertionStack = Stack<AssertionLevel<SMTFunction<Sort>, Sort>>()
   private val forbiddenNames = mutableSetOf<String>()
 
-  fun <T : Sort> addFunOrNull(func: SMTFunction<T>): SMTFunction<T>? {
+  fun addFunOrNull(func: SMTFunction<Sort>): SMTFunction<Sort>? {
     try {
       addFun(func)
       return func
@@ -37,19 +41,34 @@ class Context {
     }
   }
 
-  fun <T : Sort> addFun(func: SMTFunction<T>) {
+  fun addFun(func: SMTFunction<Sort>) {
     if (forbiddenNames.contains(func.name)) {
       throw IllegalStateException("Can not shadow theory symbol ${func.name}!")
     }
 
-    if (functionNameLookup.containsKey(func.name)) {
+    if (functionNameLookup.containsKey(func.name) && functionNameLookup[func.name]!!.contains(func)) {
       // possible name conflict
+        // check if the function is in the top stack level
+        if(functionLevelLookup[func]!!.contains(assertionStack.peek())) {
+            throw IllegalStateException("Can not overload function ${func.name}!")
+        }
     }
 
     val top = assertionStack.peek()
 
     if (top is MutableAssertionLevel) {
       top.addFun(func)
+        if(functionNameLookup[func.name] == null) {
+            functionNameLookup[func.name] = mutableSetOf()
+        }
+
+        functionNameLookup[func.name]?.add(func)
+
+        if (functionLevelLookup[func] == null) {
+            functionLevelLookup[func] = mutableSetOf()
+        }
+
+        functionLevelLookup[func]?.add(top)
     } else {
       throw IllegalStateException("Can not add $func to none mutable stack level!")
     }
