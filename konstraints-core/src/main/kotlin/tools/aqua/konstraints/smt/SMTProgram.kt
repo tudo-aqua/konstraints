@@ -18,6 +18,8 @@
 
 package tools.aqua.konstraints.smt
 
+import tools.aqua.konstraints.dsl.SMTFunction0
+import tools.aqua.konstraints.dsl.SMTFunctionN
 import tools.aqua.konstraints.parser.ParseContext
 import tools.aqua.konstraints.theories.BoolSort
 
@@ -83,7 +85,6 @@ class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
       require(command.expression.all { context.contains(it) })
     }
 
-    updateContext(command)
     _commands.add(index, command)
   }
 
@@ -104,15 +105,36 @@ class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
     _commands.add(Assert(expr))
   }
 
-  fun declareConst(name: Symbol, parameter: List<Sort>, sort: Sort) {}
+  fun declareConst(name: Symbol, sort: Sort) : SMTFunction0<Sort> {
+    val func = SMTFunction0(name, sort, null)
+    context.addFun(func)
 
-  fun declareFun() {}
+    _commands.add(DeclareConst(name, sort))
+
+    return func
+  }
+
+  fun declareFun(func: SMTFunction<Sort>) {
+    context.addFun(func)
+
+    _commands.add(DeclareFun(func.symbol, func.parameters, func.sort))
+  }
+
+  fun declareFun(name: Symbol, parameter : List<Sort>, sort: Sort) {
+    declareFun(SMTFunctionN(name, sort, parameter, null))
+  }
+
+  fun setOption(option : SetOption) {
+    _commands.add(option)
+  }
 
   /**
    * Inserts all [commands] at the end of the program
    *
    * For each command checks if it is legal w.r.t. the [context]
    */
+  @Deprecated(
+    "Prefer usage of specialized functions (e.g. assert)", level = DeprecationLevel.WARNING)
   fun addAll(commands: List<Command>) = commands.forEach { add(it) }
 
   // conflicting jvm signature with setter of property logic
@@ -128,13 +150,7 @@ class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
     }
 
     this.logic = logic
-  }
-
-  private fun updateContext(command: Command) {
-    when (command) {
-      is SetLogic -> setLogic(command.logic)
-      else -> return
-    }
+    context.setLogic(logic)
   }
 }
 

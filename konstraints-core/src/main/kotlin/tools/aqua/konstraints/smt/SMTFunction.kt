@@ -39,9 +39,9 @@ abstract class SMTFunction<T : Sort> : ContextFunction<Sort> {
     require((args zipWithSameLength parameters).all { (par, sort) -> par.sort == sort })
 
     return if (definition == null) {
-      UserDeclaredExpression(symbol, sort, args)
+      UserDeclaredExpression(symbol, sort, args, this)
     } else {
-      UserDefinedExpression(symbol, sort, emptyList(), definition!!)
+      UserDefinedExpression(symbol, sort, emptyList(), definition!!, this)
     }
   }
 

@@ -74,18 +74,7 @@ class Context {
     }
   }
 
-  fun contains(expression: Expression<*>): Boolean {
-    // check if any function matching the name exists
-    if (!functionNameLookup.containsKey(expression.name.toString())) {
-      return false
-    }
-
-    // TODO this should be optimized
-    // check if any function matches name and parameters
-    return assertionStack.any { level ->
-      level.contains(expression.name.toString(), expression.children)
-    }
-  }
+  fun contains(expression: Expression<*>): Boolean = functionLevelLookup[expression.func] != null
 
   fun contains(sort: Sort): Boolean {
     // check if any function matching the name exists
