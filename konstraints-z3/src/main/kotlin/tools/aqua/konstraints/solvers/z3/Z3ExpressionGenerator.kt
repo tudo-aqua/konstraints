@@ -600,7 +600,7 @@ fun BVNOr.z3ify(context: Z3Context): Expr<BitVecSort> =
     context.context.mkBVNOR(lhs.z3ify(context), rhs.z3ify(context))
 
 fun BVXOr.z3ify(context: Z3Context): Expr<BitVecSort> =
-    disjuncts.slice(2 ..< disjuncts.size).fold(
+    disjuncts.slice(2..<disjuncts.size).fold(
         context.context.mkBVXOR(disjuncts[0].z3ify(context), disjuncts[1].z3ify(context))) {
             xor,
             expr ->

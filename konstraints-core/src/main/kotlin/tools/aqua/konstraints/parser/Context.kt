@@ -89,7 +89,7 @@ abstract class SortDecl<T : Sort>(
   }
 
   fun push(n: Int) {
-    (0 ..< n).forEach { _ -> assertionLevels.push(AssertionLevel()) }
+    (0..<n).forEach { _ -> assertionLevels.push(AssertionLevel()) }
   }
 
   fun pop(n: Int) {
@@ -97,7 +97,7 @@ abstract class SortDecl<T : Sort>(
         throw IllegalArgumentException(
             "Tried to pop $n assertion levels, but only ${assertionLevels.size} were on the stack!")
 
-    (0 ..< n).forEach { _ ->
+    (0..<n).forEach { _ ->
       if (assertionLevels.peek() is Theory) {
         throw IllegalStateException("Tried to pop theory assertion level!")
       }
