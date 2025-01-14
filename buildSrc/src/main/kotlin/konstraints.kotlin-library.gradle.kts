@@ -25,6 +25,7 @@ plugins {
   kotlin("jvm")
 
   id("org.jetbrains.dokka")
+  id("org.jetbrains.dokka-javadoc")
 }
 
 val libs = the<LibrariesForLibs>()
@@ -41,7 +42,7 @@ val kdocJar: TaskProvider<Jar> by
     tasks.registering(Jar::class) {
       group = DOCUMENTATION_GROUP
       archiveClassifier = "kdoc"
-      from(tasks.dokkaHtml.flatMap { it.outputDirectory })
+      from(tasks.dokkaGeneratePublicationHtml.flatMap { it.outputDirectory })
     }
 
 val kdoc: Configuration by
@@ -55,7 +56,7 @@ artifacts { add(kdoc.name, kdocJar) }
 tasks.register("javadocJar", Jar::class) {
   group = DOCUMENTATION_GROUP
   archiveClassifier = "javadoc"
-  from(tasks.dokkaJavadoc.flatMap { it.outputDirectory })
+  from(tasks.dokkaGeneratePublicationJavadoc.flatMap { it.outputDirectory })
 }
 
 java {
