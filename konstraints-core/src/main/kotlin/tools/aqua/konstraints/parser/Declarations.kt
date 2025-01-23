@@ -824,7 +824,8 @@ internal object IntNegSubDecl :
         emptySet(),
         emptySet(),
         IntSort,
-        Associativity.NONE) {
+        Associativity.NONE,
+        null) {
   override fun buildExpression(
       args: List<Expression<*>>,
       functionIndices: List<NumeralIndex>
@@ -1000,7 +1001,8 @@ internal object RealNegSubDecl :
         emptySet(),
         emptySet(),
         RealSort,
-        Associativity.NONE) {
+        Associativity.NONE,
+        null) {
   override fun buildExpression(
       args: List<Expression<*>>,
       functionIndices: List<NumeralIndex>

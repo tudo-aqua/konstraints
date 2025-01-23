@@ -48,13 +48,16 @@ abstract class SMTFunction<T : Sort> : ContextFunction<Sort> {
   override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other !is SMTFunction<*>) return false
-    else if (
-      symbol == other.symbol && // symbol equality
-      sort == other.sort && // same sort
-      parameters.size == other.parameters.size && // same number of parameters
-      (parameters zip other.parameters).all {(s1, s2) -> s1 == s2} // pairwise equal parameters
-      ) return true
+    else if (symbol == other.symbol && // symbol equality
+        sort == other.sort && // same sort
+        parameters.size == other.parameters.size && // same number of parameters
+        (parameters zip other.parameters).all { (s1, s2) -> s1 == s2 } // pairwise equal parameters
+    ) return true
     return false
+
+    // does not consider definition for equality because two functions
+    // with the exact same signature (name, sort and parameters) can not be
+    // overloaded by a differing definition
   }
 
   override fun hashCode(): Int {
@@ -65,4 +68,15 @@ abstract class SMTFunction<T : Sort> : ContextFunction<Sort> {
     result = 31 * result + (definition?.hashCode() ?: 0)
     return result
   }
+
+  infix fun <T : Sort> castTo(to: T): SMTFunction<T> {
+    if (sort != to) {
+      throw FunctionCastException(sort, to.toString())
+    }
+
+    @Suppress("UNCHECKED_CAST") return this as SMTFunction<T>
+  }
 }
+
+class FunctionCastException(from: Sort, to: String) :
+    ClassCastException("Can not cast expression from $from to $to")

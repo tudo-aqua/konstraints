@@ -31,7 +31,7 @@ import tools.aqua.konstraints.util.SimpleDelegate
  * @return [Declare0]
  */
 fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T) =
-    Declare0(sort, this, "|const!$sort!${UUID.randomUUID()}|")
+    Const(sort, this, "|const!$sort!${UUID.randomUUID()}|")
 
 /**
  * Declares an SMT constant: (declare-const [name] [sort])
@@ -40,7 +40,7 @@ fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T) =
  *
  * @return [Declare0]
  */
-fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T, name: String) = Declare0(sort, this, name)
+fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T, name: String) = Const(sort, this, name)
 
 /**
  * Declares an SMT function without any parameters: (declare-fun symbol () [sort])
@@ -255,19 +255,34 @@ class Declare<T : Sort>(
  *
  * @return [SMTFunction]
  */
-class Declare0<T : Sort>(
-    val sort: T,
-    val program: SMTProgramBuilder,
-    val name: String = ""
-) {
-    operator fun provideDelegate(
-        thisRef: Any?,
-        property: KProperty<*>
-    ): SimpleDelegate<SMTFunction0<T>> {
-        val n = name.ifEmpty { "|$thisRef|" }
+class Const<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: String = "") {
+  operator fun provideDelegate(
+      thisRef: Any?,
+      property: KProperty<*>
+  ): SimpleDelegate<Expression<T>> {
+    val n = name.ifEmpty { "|$thisRef|" }
 
-        return SimpleDelegate(program.registerFun(SMTFunction0(n.symbol(), sort, null)))
-    }
+    return SimpleDelegate(program.registerFun(SMTFunction0(n.symbol(), sort, null)).invoke())
+  }
+}
+
+/**
+ * Delegate provider class for declaring SMT functions: (declare-fun [name] () [sort]).
+ *
+ * Registers the function in the given [program]. If [name] is empty, the name register will be the
+ * same as the variable.
+ *
+ * @return [SMTFunction]
+ */
+class Declare0<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: String = "") {
+  operator fun provideDelegate(
+      thisRef: Any?,
+      property: KProperty<*>
+  ): SimpleDelegate<SMTFunction0<T>> {
+    val n = name.ifEmpty { "|$thisRef|" }
+
+    return SimpleDelegate(program.registerFun(SMTFunction0(n.symbol(), sort, null)))
+  }
 }
 
 /**
@@ -342,7 +357,8 @@ class Declare3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
   ): SimpleDelegate<SMTFunction3<T, S1, S2, S3>> {
     val n = name.ifEmpty { "|$thisRef|" }
 
-    return SimpleDelegate(program.registerFun(SMTFunction3(n.symbol(), sort, par1, par2, par3, null)))
+    return SimpleDelegate(
+        program.registerFun(SMTFunction3(n.symbol(), sort, par1, par2, par3, null)))
   }
 }
 
@@ -369,7 +385,8 @@ class Declare4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
       property: KProperty<*>
   ): SimpleDelegate<SMTFunction4<T, S1, S2, S3, S4>> {
     val n = name.ifEmpty { "|$thisRef|" }
-    return SimpleDelegate(program.registerFun(SMTFunction4(n.symbol(), sort, par1, par2, par3, par4, null)))
+    return SimpleDelegate(
+        program.registerFun(SMTFunction4(n.symbol(), sort, par1, par2, par3, par4, null)))
   }
 }
 
@@ -398,7 +415,8 @@ class Declare5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
   ): SimpleDelegate<SMTFunction5<T, S1, S2, S3, S4, S5>> {
     val n = name.ifEmpty { "|$thisRef|" }
 
-    return SimpleDelegate(program.registerFun(SMTFunction5(n.symbol(), sort, par1, par2, par3, par4, par5, null)))
+    return SimpleDelegate(
+        program.registerFun(SMTFunction5(n.symbol(), sort, par1, par2, par3, par4, par5, null)))
   }
 }
 
@@ -427,7 +445,10 @@ class Define<T : Sort>(
         parameters.mapIndexed { id, sort -> SortedVar("|$thisRef!local!$sort!$id|".symbol(), sort) }
     val term = block(sortedVars.map { it.instance })
 
-    return SimpleDelegate(program.registerFun(SMTFunctionN(n.symbol(), sort, parameters, FunctionDef(n.symbol(), emptyList(), sort, term))))
+    return SimpleDelegate(
+        program.registerFun(
+            SMTFunctionN(
+                n.symbol(), sort, parameters, FunctionDef(n.symbol(), emptyList(), sort, term))))
   }
 }
 
@@ -454,7 +475,10 @@ class Define1<T : Sort, S : Sort>(
     val sortedVar = SortedVar("|$thisRef!local!$par!1|".symbol(), par)
     val term = block(sortedVar.instance)
 
-    return SimpleDelegate(program.registerFun(SMTFunction1(n.symbol(), sort, par, FunctionDef(n.symbol(), listOf(sortedVar), sort, term))))
+    return SimpleDelegate(
+        program.registerFun(
+            SMTFunction1(
+                n.symbol(), sort, par, FunctionDef(n.symbol(), listOf(sortedVar), sort, term))))
   }
 }
 
@@ -524,13 +548,14 @@ class Define3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val term = block(sortedVar1.instance, sortedVar2.instance, sortedVar3.instance)
 
     return SimpleDelegate(
-        program.registerFun(SMTFunction3(
-            n.symbol(),
-            sort,
-            par1,
-            par2,
-            par3,
-            FunctionDef(n.symbol(), listOf(sortedVar1, sortedVar2, sortedVar3), sort, term))))
+        program.registerFun(
+            SMTFunction3(
+                n.symbol(),
+                sort,
+                par1,
+                par2,
+                par3,
+                FunctionDef(n.symbol(), listOf(sortedVar1, sortedVar2, sortedVar3), sort, term))))
   }
 }
 
@@ -566,15 +591,19 @@ class Define4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
         block(sortedVar1.instance, sortedVar2.instance, sortedVar3.instance, sortedVar4.instance)
 
     return SimpleDelegate(
-        program.registerFun(SMTFunction4(
-            n.symbol(),
-            sort,
-            par1,
-            par2,
-            par3,
-            par4,
-            FunctionDef(
-                n.symbol(), listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4), sort, term))))
+        program.registerFun(
+            SMTFunction4(
+                n.symbol(),
+                sort,
+                par1,
+                par2,
+                par3,
+                par4,
+                FunctionDef(
+                    n.symbol(),
+                    listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4),
+                    sort,
+                    term))))
   }
 }
 
@@ -623,19 +652,20 @@ class Define5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
             sortedVar5.instance)
 
     return SimpleDelegate(
-        program.registerFun(SMTFunction5(
-            n.symbol(),
-            sort,
-            par1,
-            par2,
-            par3,
-            par4,
-            par5,
-            FunctionDef(
+        program.registerFun(
+            SMTFunction5(
                 n.symbol(),
-                listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4, sortedVar5),
                 sort,
-                term))))
+                par1,
+                par2,
+                par3,
+                par4,
+                par5,
+                FunctionDef(
+                    n.symbol(),
+                    listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4, sortedVar5),
+                    sort,
+                    term))))
   }
 }
 
@@ -656,15 +686,15 @@ data class SMTFunction0<T : Sort>(
     override val sort: T,
     override val definition: FunctionDef<T>?
 ) : SMTFunction<T>() {
-    override val parameters = emptyList<Sort>()
+  override val parameters = emptyList<Sort>()
 
-    operator fun invoke(): Expression<T> {
-        return if (definition == null) {
-            UserDeclaredExpression(symbol, sort, this)
-        } else {
-            UserDefinedExpression(symbol, sort, emptyList(), definition, this)
-        }
+  operator fun invoke(): Expression<T> {
+    return if (definition == null) {
+      UserDeclaredExpression(symbol, sort, this)
+    } else {
+      UserDefinedExpression(symbol, sort, emptyList(), definition, this)
     }
+  }
 }
 
 /**

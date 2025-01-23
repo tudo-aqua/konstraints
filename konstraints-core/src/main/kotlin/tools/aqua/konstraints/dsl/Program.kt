@@ -45,18 +45,21 @@ class SMTProgramBuilder(logic: Logic) {
   fun setOptions(init: OptionsBuilder.() -> OptionsBuilder) {
     val options = OptionsBuilder().init()
 
-        options.stringOptions.map { (option, value) ->
-          program.setOption(SetOption(option, StringOptionValue(value)))
-        }
+    options.stringOptions.map { (option, value) ->
+      program.setOption(SetOption(option, StringOptionValue(value)))
+    }
 
-        options.numeralOptions.map { (option, value) ->
-          program.setOption(SetOption(option, NumeralOptionValue(value)))
-        }
-    
-        options.boolOptions.map { (option, value) -> program.setOption(SetOption(option, BooleanOptionValue(value))) }
+    options.numeralOptions.map { (option, value) ->
+      program.setOption(SetOption(option, NumeralOptionValue(value)))
+    }
+
+    options.boolOptions.map { (option, value) ->
+      program.setOption(SetOption(option, BooleanOptionValue(value)))
+    }
   }
 
-  internal fun<T : SMTFunction<S>, S : Sort> registerFun(func: T): T {
+  internal fun <T : SMTFunction<S>, S : Sort> registerFun(func: T): T {
+    // TODO remove cast if possible
     program.declareFun(func as SMTFunction<Sort>)
 
     return func
@@ -66,13 +69,17 @@ class SMTProgramBuilder(logic: Logic) {
   fun <T : Sort> const(sort: T) = const("|const!${UUID.randomUUID()}|", sort)
 
   /** Registers a new constant smt function with the given [name] and [sort] */
-  fun <T : Sort> const(name: String, sort: T): Expression<T> {
+  fun <T : Sort> const(name: String, sort: T): UserDeclaredExpression<T> {
     val func = program.declareConst(name.symbol(), sort)
-    return UserDeclaredExpression(name.symbol(), sort, func)
+    return UserDeclaredExpression(name.symbol(), sort, func) as UserDeclaredExpression<T>
   }
 
   /** Converts this [SMTProgramBuilder] to a finished [DefaultSMTProgram] */
-  fun finalize() = program
+  fun finalize(): SMTProgram {
+    program.add(CheckSat)
+
+    return program
+  }
 }
 
 /** Builds an [SMTProgram] based on the given [logic] */

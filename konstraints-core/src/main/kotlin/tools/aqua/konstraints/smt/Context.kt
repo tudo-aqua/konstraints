@@ -18,63 +18,59 @@
 
 package tools.aqua.konstraints.smt
 
+import tools.aqua.konstraints.dsl.SMTFunctionN
 import tools.aqua.konstraints.theories.Theories
 import tools.aqua.konstraints.util.Stack
 import tools.aqua.konstraints.util.zipWithSameLength
 
 class Context {
-    // lookup smt functions by name
-  private val functionNameLookup = mutableMapOf<String, MutableSet<SMTFunction<Sort>>>()
+  // lookup smt functions by name
+  private val functionNameLookup = mutableMapOf<String, MutableSet<SMTFunction<*>>>()
 
-    // lookup assertion level by smt function
-    private val functionLevelLookup = mutableMapOf<SMTFunction<Sort>, MutableSet<AssertionLevel<SMTFunction<Sort>, Sort>>>()
+  // lookup assertion level by smt function
+  private val functionLevelLookup =
+      mutableMapOf<SMTFunction<*>, MutableSet<AssertionLevel<SMTFunction<*>, Sort>>>()
   private val sortNameLookup = mutableMapOf<String, Int>()
-  private val assertionStack = Stack<AssertionLevel<SMTFunction<Sort>, Sort>>()
+  private val assertionStack = Stack<AssertionLevel<SMTFunction<*>, Sort>>()
   private val forbiddenNames = mutableSetOf<String>()
 
-  fun addFunOrNull(func: SMTFunction<Sort>): SMTFunction<Sort>? {
+  init {
+    assertionStack.push(MutableAssertionLevel())
+  }
+
+  fun <T : Sort> addFunOrNull(func: SMTFunction<T>): SMTFunction<T>? {
     try {
       addFun(func)
       return func
-    } catch (e: Exception) {
+    } catch (_: IllegalArgumentException) {
+      return null
+    } catch (_: IllegalStateException) {
       return null
     }
   }
 
-  fun addFun(func: SMTFunction<Sort>) {
-    if (forbiddenNames.contains(func.name)) {
-      throw IllegalStateException("Can not shadow theory symbol ${func.name}!")
+  fun <T : Sort> addFun(func: SMTFunction<T>) {
+    require(func.name !in forbiddenNames) { "Can not shadow theory symbol ${func.name}!" }
+
+    functionNameLookup[func.name]?.let { _ ->
+      require(assertionStack.peek() !in functionLevelLookup[func]!!) {
+        "Can not overload function ${func.name}!"
+      }
     }
 
-    if (functionNameLookup.containsKey(func.name) && functionNameLookup[func.name]!!.contains(func)) {
-      // possible name conflict
-        // check if the function is in the top stack level
-        if(functionLevelLookup[func]!!.contains(assertionStack.peek())) {
-            throw IllegalStateException("Can not overload function ${func.name}!")
-        }
-    }
+    assertionStack.peek().let { top ->
+      check(top is MutableAssertionLevel) { "Can not add $func to none mutable stack level!" }
 
-    val top = assertionStack.peek()
-
-    if (top is MutableAssertionLevel) {
       top.addFun(func)
-        if(functionNameLookup[func.name] == null) {
-            functionNameLookup[func.name] = mutableSetOf()
-        }
 
-        functionNameLookup[func.name]?.add(func)
-
-        if (functionLevelLookup[func] == null) {
-            functionLevelLookup[func] = mutableSetOf()
-        }
-
-        functionLevelLookup[func]?.add(top)
-    } else {
-      throw IllegalStateException("Can not add $func to none mutable stack level!")
+      functionNameLookup.computeIfAbsent(func.name) { mutableSetOf() }.add(func)
+      functionLevelLookup.computeIfAbsent(func) { mutableSetOf() }.add(top)
     }
   }
 
-  fun contains(expression: Expression<*>): Boolean = functionLevelLookup[expression.func] != null
+  fun contains(func: String) = functionNameLookup[func] != null
+
+  fun contains(expression: Expression<*>) = functionLevelLookup[expression.func] != null
 
   fun contains(sort: Sort): Boolean {
     // check if any function matching the name exists
@@ -85,6 +81,25 @@ class Context {
     // TODO this should be optimized
     // check if any function matches name and parameters
     return assertionStack.any { level -> level.contains(sort) }
+  }
+
+  fun <T : Sort> getFuncOrNull(name: String, sort: T, parameters: List<Sort>): SMTFunction<T>? {
+    return try {
+      getFunc(name, sort, parameters)
+    } catch (_: FunctionNotFoundException) {
+      null
+    }
+  }
+
+  fun <T : Sort> getFunc(name: String, sort: T, parameters: List<Sort>): SMTFunction<T> {
+    functionNameLookup[name]?.let { set ->
+      set.find { it == SMTFunctionN<T>(name.symbol(), sort, parameters, null) }
+          ?.let { func ->
+            return func.castTo(sort)
+          }
+    }
+
+    throw FunctionNotFoundException(name, sort, parameters)
   }
 
   fun setLogic(logic: Logic) {
@@ -273,11 +288,14 @@ interface ContextSort {
   val arity: Int
 }
 
-class MutableAssertionLevel : AssertionLevel<ContextFunction<Sort>, ContextSort> {
-  override val functions: MutableMap<String, ContextFunction<Sort>> = mutableMapOf()
-  override val sorts: MutableMap<String, ContextSort> = mutableMapOf()
+class MutableAssertionLevel : AssertionLevel<SMTFunction<*>, Sort> {
+  override val functions: MutableMap<String, SMTFunction<*>> = mutableMapOf()
+  override val sorts: MutableMap<String, Sort> = mutableMapOf()
 
-  fun addFun(func: ContextFunction<Sort>) = functions.put(func.name.toString(), func)
+  fun <T : Sort> addFun(func: SMTFunction<T>) = functions.put(func.name.toString(), func)
 
-  fun addSort(func: ContextSort) = sorts.put(func.name.toString(), func)
+  fun addSort(func: Sort) = sorts.put(func.name.toString(), func)
 }
+
+class FunctionNotFoundException(name: String, sort: Sort, parameters: List<Sort>) :
+    NoSuchElementException("Function ($name (${parameters.joinToString(" ")}) $sort) not found")

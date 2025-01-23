@@ -105,7 +105,7 @@ class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
     _commands.add(Assert(expr))
   }
 
-  fun declareConst(name: Symbol, sort: Sort) : SMTFunction0<Sort> {
+  fun <T : Sort> declareConst(name: Symbol, sort: T): SMTFunction0<T> {
     val func = SMTFunction0(name, sort, null)
     context.addFun(func)
 
@@ -114,17 +114,17 @@ class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
     return func
   }
 
-  fun declareFun(func: SMTFunction<Sort>) {
+  fun <T : Sort> declareFun(func: SMTFunction<T>) {
     context.addFun(func)
 
     _commands.add(DeclareFun(func.symbol, func.parameters, func.sort))
   }
 
-  fun declareFun(name: Symbol, parameter : List<Sort>, sort: Sort) {
+  fun declareFun(name: Symbol, parameter: List<Sort>, sort: Sort) {
     declareFun(SMTFunctionN(name, sort, parameter, null))
   }
 
-  fun setOption(option : SetOption) {
+  fun setOption(option: SetOption) {
     _commands.add(option)
   }
 
@@ -134,7 +134,7 @@ class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
    * For each command checks if it is legal w.r.t. the [context]
    */
   @Deprecated(
-    "Prefer usage of specialized functions (e.g. assert)", level = DeprecationLevel.WARNING)
+      "Prefer usage of specialized functions (e.g. assert)", level = DeprecationLevel.WARNING)
   fun addAll(commands: List<Command>) = commands.forEach { add(it) }
 
   // conflicting jvm signature with setter of property logic

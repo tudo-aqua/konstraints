@@ -140,7 +140,8 @@ abstract class SortDecl<T : Sort>(
             emptySet(),
             emptySet(),
             function.sort,
-            Associativity.NONE))
+            Associativity.NONE,
+            null))
   }
 
   fun registerFunction(function: DeclareFun) {
@@ -152,7 +153,8 @@ abstract class SortDecl<T : Sort>(
             emptySet(),
             emptySet(),
             function.sort,
-            Associativity.NONE))
+            Associativity.NONE,
+            null))
   }
 
   fun registerFunction(def: FunctionDef<*>) {
@@ -185,7 +187,8 @@ abstract class SortDecl<T : Sort>(
             emptySet(),
             emptySet(),
             sort,
-            Associativity.NONE))
+            Associativity.NONE,
+            null))
   }
 
   internal fun registerFunction(function: ProtoDeclareFun, parameters: List<Sort>, sort: Sort) {
@@ -199,7 +202,14 @@ abstract class SortDecl<T : Sort>(
   fun registerFunction(name: String, params: List<Sort>, sort: Sort) {
     this.registerFunction(
         FunctionDecl(
-            name.symbol(), emptySet(), params, emptySet(), emptySet(), sort, Associativity.NONE))
+            name.symbol(),
+            emptySet(),
+            params,
+            emptySet(),
+            emptySet(),
+            sort,
+            Associativity.NONE,
+            null))
   }
 
   fun registerSort(sort: DeclareSort) {

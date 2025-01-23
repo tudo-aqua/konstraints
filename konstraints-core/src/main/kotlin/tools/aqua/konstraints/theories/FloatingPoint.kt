@@ -521,7 +521,7 @@ class FPFma(
     val multiplicand: Expression<FPSort>,
     val summand: Expression<FPSort>
 ) : NAryExpression<FPSort>("fp.fma".symbol(), multiplier.sort) {
-    override val func = null
+  override val func = null
 
   companion object {
     private val theoriesSet = setOf(Theories.FLOATING_POINT)
