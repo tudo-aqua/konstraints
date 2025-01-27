@@ -175,8 +175,8 @@ class Equals<T : Sort>(val statements: List<Expression<T>>) :
  *
  * @param statements multiple [Expression] of [BoolSort] to be checked in distinct statement
  */
-class Distinct(val statements: List<Expression<*>>) :
-    HomogenousExpression<BoolSort, Sort>("distinct".symbol(), BoolSort) {
+class Distinct<T : Sort>(val statements: List<Expression<T>>) :
+    HomogenousExpression<BoolSort, T>("distinct".symbol(), BoolSort) {
   companion object {
     private val theoriesSet = setOf(Theories.CORE)
   }
@@ -184,9 +184,9 @@ class Distinct(val statements: List<Expression<*>>) :
   override val theories: Set<Theories>
     get() = theoriesSet
 
-  constructor(vararg statements: Expression<*>) : this(statements.toList())
+  constructor(vararg statements: Expression<T>) : this(statements.toList())
 
-  override val children: List<Expression<Sort>> = statements as List<Expression<Sort>>
+  override val children: List<Expression<T>> = statements
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       DistinctDecl.buildExpression(children, emptyList())

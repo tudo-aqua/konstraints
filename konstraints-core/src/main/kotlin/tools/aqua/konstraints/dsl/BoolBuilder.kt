@@ -177,9 +177,9 @@ infix fun <T : Sort> (() -> Expression<T>).eq(other: Expression<T>) = this() eq 
 infix fun <T : Sort> (() -> Expression<T>).eq(other: () -> Expression<T>) = this() eq other()
 
 /** Creates a distinct: [this] distinct [other]. */
-infix fun <T : Sort> Expression<T>.distinct(other: Expression<T>): Distinct = Distinct(this, other)
+infix fun <T : Sort> Expression<T>.distinct(other: Expression<T>): Distinct<T> = Distinct(this, other)
 
-infix fun <T : Sort> Distinct.distinct(other: Expression<T>): Distinct =
+infix fun <T : Sort> Distinct<T>.distinct(other: Expression<T>): Distinct<T> =
     Distinct(this.children + other)
 
 private fun makeBoolOperator(
@@ -230,7 +230,7 @@ fun <T : Sort> eq(init: Builder<T>.() -> Unit): Equals<T> {
  *
  * Use [Builder.unaryPlus] inside [init] to add [Expression]s to the 'Distinct' expression.
  */
-fun <T : Sort> distinct(init: Builder<T>.() -> Unit): Distinct {
+fun <T : Sort> distinct(init: Builder<T>.() -> Unit): Distinct<T> {
   val builder = Builder<T>()
   builder.init()
 

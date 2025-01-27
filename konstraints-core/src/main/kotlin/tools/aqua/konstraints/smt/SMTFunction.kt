@@ -25,7 +25,7 @@ import tools.aqua.konstraints.util.zipWithSameLength
  *
  * Use [invoke] to generate an expression with the given parameters applied.
  */
-abstract class SMTFunction<T : Sort> : ContextFunction<Sort> {
+abstract class SMTFunction<out T : Sort> : ContextFunction<Sort> {
   abstract val symbol: Symbol
   override val name: String
     get() = symbol.toString()

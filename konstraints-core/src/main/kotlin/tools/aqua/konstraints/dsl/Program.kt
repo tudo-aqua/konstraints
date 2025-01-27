@@ -59,8 +59,7 @@ class SMTProgramBuilder(logic: Logic) {
   }
 
   internal fun <T : SMTFunction<S>, S : Sort> registerFun(func: T): T {
-    // TODO remove cast if possible
-    program.declareFun(func as SMTFunction<Sort>)
+    program.declareFun(func)
 
     return func
   }
@@ -71,7 +70,7 @@ class SMTProgramBuilder(logic: Logic) {
   /** Registers a new constant smt function with the given [name] and [sort] */
   fun <T : Sort> const(name: String, sort: T): UserDeclaredExpression<T> {
     val func = program.declareConst(name.symbol(), sort)
-    return UserDeclaredExpression(name.symbol(), sort, func) as UserDeclaredExpression<T>
+    return func() as UserDeclaredExpression<T>
   }
 
   /** Converts this [SMTProgramBuilder] to a finished [DefaultSMTProgram] */

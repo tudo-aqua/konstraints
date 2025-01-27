@@ -116,7 +116,7 @@ data class DefineFun(val functionDef: FunctionDef<*>) : Command("define-fun $fun
  * Function definition object holding, [name], [parameters], [sort] and [term] of a function defined
  * via [DefineFun]
  */
-data class FunctionDef<S : Sort>(
+data class FunctionDef<out S : Sort>(
     val name: Symbol,
     val parameters: List<SortedVar<*>>,
     val sort: S,
