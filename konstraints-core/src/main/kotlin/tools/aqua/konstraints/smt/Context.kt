@@ -23,15 +23,16 @@ import tools.aqua.konstraints.theories.Theories
 import tools.aqua.konstraints.util.Stack
 import tools.aqua.konstraints.util.zipWithSameLength
 
+typealias StackLevel = AssertionLevel<SMTFunction<*>, Sort>
+
 class Context {
   // lookup smt functions by name
   private val functionNameLookup = mutableMapOf<String, MutableSet<SMTFunction<*>>>()
 
   // lookup assertion level by smt function
-  private val functionLevelLookup =
-      mutableMapOf<SMTFunction<*>, MutableSet<AssertionLevel<SMTFunction<*>, Sort>>>()
-  private val sortNameLookup = mutableMapOf<String, Int>()
-  private val assertionStack = Stack<AssertionLevel<SMTFunction<*>, Sort>>()
+  private val functionLevelLookup = mutableMapOf<SMTFunction<*>, MutableSet<StackLevel>>()
+  private val sortNameLookup = mutableSetOf<String>()
+  private val assertionStack = Stack<StackLevel>()
   private val forbiddenNames = mutableSetOf<String>()
 
   init {
@@ -52,8 +53,9 @@ class Context {
   fun <T : Sort> addFun(func: SMTFunction<T>) {
     require(func.name !in forbiddenNames) { "Can not shadow theory symbol ${func.name}!" }
 
-    functionNameLookup[func.name]?.let { _ ->
-      require(assertionStack.peek() !in functionLevelLookup[func]!!) {
+      // TODO check if require(functionNameLookup[func.name] == null) works
+    functionNameLookup[func.name]?.let { funcs ->
+      require(!funcs.any { function -> assertionStack.peek().contains(function.name) }) {
         "Can not overload function ${func.name}!"
       }
     }
@@ -68,18 +70,19 @@ class Context {
     }
   }
 
+    // TODO this should consider more than just the name
   fun contains(func: String) = functionNameLookup[func] != null
 
   fun contains(expression: Expression<*>) = functionLevelLookup[expression.func] != null
 
   fun contains(sort: Sort): Boolean {
-    // check if any function matching the name exists
-    if (!sortNameLookup.containsKey(sort.name.toString())) {
+    // check if any sort matching the name exists
+    if (!sortNameLookup.contains(sort.name)) {
       return false
     }
 
-    // TODO this should be optimized
-    // check if any function matches name and parameters
+    // TODO this should be optimized (maybe even removed)
+    // check if any sort matches name and parameters
     return assertionStack.any { level -> level.contains(sort) }
   }
 
@@ -93,7 +96,7 @@ class Context {
 
   fun <T : Sort> getFunc(name: String, sort: T, parameters: List<Sort>): SMTFunction<T> {
     functionNameLookup[name]?.let { set ->
-      set.find { it == SMTFunctionN<T>(name.symbol(), sort, parameters, null) }
+      set.find { it == SMTFunctionN(name.symbol(), sort, parameters, null) }
           ?.let { func ->
             return func.castTo(sort)
           }
@@ -101,6 +104,31 @@ class Context {
 
     throw FunctionNotFoundException(name, sort, parameters)
   }
+
+    fun push(block: Context.() -> Unit) {
+        assertionStack.push(MutableAssertionLevel())
+        block()
+        pop(1)
+    }
+
+    fun pop(n: Int) {
+        require(n < assertionStack.size)
+
+        (0..<n).forEach { _ ->
+            assertionStack.peek().functions.forEach { _, function ->
+                functionNameLookup[function.name]?.remove(function)
+                functionNameLookup.entries.removeIf { (_, set) -> set.isEmpty() }
+
+                functionLevelLookup.remove(function)
+            }
+
+            assertionStack.peek().sorts.forEach { _, sort ->
+                sortNameLookup.remove(sort.name)
+            }
+
+            assertionStack.pop()
+        }
+    }
 
   fun setLogic(logic: Logic) {
     logic.theories.forEach {
