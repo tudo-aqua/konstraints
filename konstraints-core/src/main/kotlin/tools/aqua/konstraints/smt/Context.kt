@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.smt
 
+import tools.aqua.konstraints.parser.Theory
 import tools.aqua.konstraints.theories.Theories
 import tools.aqua.konstraints.util.Stack
 import tools.aqua.konstraints.util.zipWithSameLength
@@ -34,6 +35,7 @@ class Context {
   private val currentContext = CurrentContext()
   private val shadowingMap = Stack<MutableMap<SMTFunction<*>, SMTFunction<*>>>()
   private val undoStack = Stack<MutableSet<SMTFunction<*>>>()
+    private var logic : Logic? = null
 
   // true if we are currently in any binder (let/exists/forall/par/match)
   private var activeBinderState = false
@@ -112,152 +114,10 @@ class Context {
   }
 
   fun setLogic(logic: Logic) {
-    logic.theories.forEach {
-      when (it) {
-        Theories.ARRAYS_EX -> forbiddenNames.addAll(listOf("select", "store"))
-        Theories.FIXED_SIZE_BIT_VECTORS ->
-            forbiddenNames.addAll(
-                listOf(
-                    "bvult",
-                    "concat",
-                    "bvand",
-                    "bvneg",
-                    "bvnot",
-                    "bvor",
-                    "bvadd",
-                    "bvmul",
-                    "bvudiv",
-                    "bvurem",
-                    "bvshl",
-                    "bvlshr",
-                    "extract",
-                    "bvnand",
-                    "bvnor",
-                    "bvxor",
-                    "bvxnor",
-                    "bvcomp",
-                    "bvsub",
-                    "bvsdiv",
-                    "bvsrem",
-                    "bvsmod",
-                    "bvashr",
-                    "repeat",
-                    "zero_extend",
-                    "sign_extend",
-                    "rotate_left",
-                    "rotate_right",
-                    "bvule",
-                    "bvugt",
-                    "bvuge",
-                    "bvslt",
-                    "bvsle",
-                    "bvsgt",
-                    "bvsge"))
-        Theories.CORE ->
-            forbiddenNames.addAll(
-                listOf("false", "true", "not", "and", "or", "xor", "=", "distinct", "ite", "=>"))
-        Theories.FLOATING_POINT ->
-            forbiddenNames.addAll(
-                listOf(
-                    "roundNearestTiesToEven",
-                    "RNE",
-                    "roundNearestTiesToAway",
-                    "RNA",
-                    "roundTowardPositive",
-                    "RTP",
-                    "RoundTowardNegative",
-                    "RTN",
-                    "RoundTowardZero",
-                    "RTZ",
-                    "fp",
-                    "+oo",
-                    "-oo",
-                    "+zero",
-                    "-zero",
-                    "NaN",
-                    "fp.abs",
-                    "fp.neg",
-                    "fp.add",
-                    "fp.sub",
-                    "fp.mul",
-                    "fp.div",
-                    "fp.fma",
-                    "fp.sqrt",
-                    "fp.rem",
-                    "fp.roundToIntegral",
-                    "fp.min",
-                    "fp.max",
-                    "fp.leq",
-                    "fp.lt",
-                    "fp.geq",
-                    "fp.gt",
-                    "fp.eq",
-                    "fp.isNormal",
-                    "fp.isSubormal",
-                    "fp.isZero",
-                    "fp.isInfinite",
-                    "fp.isNan",
-                    "fp.isNegative",
-                    "fp.isPositive",
-                    "to_fp",
-                    "to_fp_unsigned",
-                    "fp.to_ubv",
-                    "fp.to_real"))
-        Theories.INTS ->
-            forbiddenNames.addAll(
-                listOf("-", "+", "*", "div", "mod", "abs", "<=", "<", ">=", ">", "divisible"))
-        Theories.REALS -> forbiddenNames.addAll(listOf("-", "+", "*", "/", "<=", "<", ">=", ">"))
-        Theories.REALS_INTS ->
-            forbiddenNames.addAll(
-                listOf(
-                    "-",
-                    "+",
-                    "*",
-                    "div",
-                    "mod",
-                    "abs",
-                    "<=",
-                    "<",
-                    ">=",
-                    ">",
-                    "divisible",
-                    "/",
-                    "to_real"))
-        Theories.STRINGS ->
-            forbiddenNames.addAll(
-                listOf(
-                    "char",
-                    "str.++",
-                    "str.len",
-                    "str.<",
-                    "str.<=",
-                    "str.at",
-                    "str.substr",
-                    "str.prefixof",
-                    "str.suffixof",
-                    "str.contains",
-                    "str.indexof",
-                    "str.replace",
-                    "str.replace_re",
-                    "str.is_digit",
-                    "str.to_code",
-                    "str.from_code",
-                    "re.none",
-                    "re.all",
-                    "re.allchar",
-                    "re.++",
-                    "re.union",
-                    "re.inter",
-                    "re.*",
-                    "re.comp",
-                    "re.diff",
-                    "re.+",
-                    "re.opt",
-                    "re.range",
-                    "re.^",
-                    "re.loop"))
-      }
-    }
+      this.logic = logic
+      forbiddenNames.addAll(
+          logic.theories.flatMap { theory -> Theory.logicLookup[theory]!!.functions.map { (name, _) -> name } }
+      )
   }
 }
 

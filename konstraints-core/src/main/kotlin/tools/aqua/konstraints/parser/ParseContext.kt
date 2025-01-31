@@ -312,6 +312,19 @@ internal class LocalLevel(localVars: List<SortedVarDecl<*>>) :
 }
 
 internal interface Theory : AssertionLevel<FunctionDecl<*>, SortDecl<*>> {
+    companion object {
+        val logicLookup =
+        mapOf(
+        Pair(Theories.CORE, CoreTheory),
+        Pair(Theories.FIXED_SIZE_BIT_VECTORS, BitVectorExpressionTheory),
+        Pair(Theories.INTS, IntsTheory),
+        Pair(Theories.REALS, RealsTheory),
+        Pair(Theories.REALS_INTS, RealsIntsTheory),
+        Pair(Theories.FLOATING_POINT, FloatingPointTheory),
+        Pair(Theories.ARRAYS_EX, ArrayExTheory),
+        Pair(Theories.STRINGS, StringsTheory))
+    }
+
   override fun get(function: String, args: List<Expression<*>>): FunctionDecl<*>? =
       functions[function]?.takeIf { it.acceptsExpressions(args, emptyList()) }
 
