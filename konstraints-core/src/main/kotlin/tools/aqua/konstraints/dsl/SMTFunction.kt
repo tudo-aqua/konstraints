@@ -741,7 +741,7 @@ data class SMTFunction2<T : Sort, S1 : Sort, S2 : Sort>(
     }
   }
 
-    override fun equals(other: Any?) = super.equals(other)
+  override fun equals(other: Any?) = super.equals(other)
 }
 
 /**

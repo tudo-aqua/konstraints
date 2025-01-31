@@ -193,7 +193,7 @@ abstract class HomogenousExpression<out T : Sort, out S : Sort>(
     override val sort: T
 ) : Expression<T> {
   override val func = null
-    abstract override val children: List<Expression<S>>
+  abstract override val children: List<Expression<S>>
 
   override fun toString() =
       if (children.isNotEmpty()) "($name ${children.joinToString(" ")})" else name.toSMTString()

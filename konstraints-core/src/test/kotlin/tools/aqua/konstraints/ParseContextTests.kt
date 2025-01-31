@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints
 
+import java.util.stream.Stream
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.params.ParameterizedTest
@@ -28,8 +29,6 @@ import tools.aqua.konstraints.dsl.SMTFunction0
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
-import java.util.stream.Stream
-
 
 /*
  * TestInstance per class is needed for parameterized tests

@@ -177,7 +177,8 @@ infix fun <T : Sort> (() -> Expression<T>).eq(other: Expression<T>) = this() eq 
 infix fun <T : Sort> (() -> Expression<T>).eq(other: () -> Expression<T>) = this() eq other()
 
 /** Creates a distinct: [this] distinct [other]. */
-infix fun <T : Sort> Expression<T>.distinct(other: Expression<T>): Distinct<T> = Distinct(this, other)
+infix fun <T : Sort> Expression<T>.distinct(other: Expression<T>): Distinct<T> =
+    Distinct(this, other)
 
 infix fun <T : Sort> Distinct<T>.distinct(other: Expression<T>): Distinct<T> =
     Distinct(this.children + other)
