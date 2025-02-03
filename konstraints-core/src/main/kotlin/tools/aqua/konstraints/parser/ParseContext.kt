@@ -298,7 +298,7 @@ internal class LetLevel(varBindings: List<VarBindingDecl<*>>) :
 
 /** This class allows the context to use [SortedVar] as [FunctionDecl0]. */
 internal class SortedVarDecl<T : Sort>(val sortedVar: SortedVar<T>) :
-    FunctionDecl0<T>(sortedVar.name, emptySet(), emptySet(), sortedVar.sort) {
+    FunctionDecl0<T>(sortedVar.symbol, emptySet(), emptySet(), sortedVar.sort) {
   override fun toString(): String = "($symbol $sort)"
 
   override fun buildExpression(bindings: Bindings): Expression<T> = sortedVar.instance
@@ -312,18 +312,18 @@ internal class LocalLevel(localVars: List<SortedVarDecl<*>>) :
 }
 
 internal interface Theory : AssertionLevel<FunctionDecl<*>, SortDecl<*>> {
-    companion object {
-        val logicLookup =
+  companion object {
+    val logicLookup =
         mapOf(
-        Pair(Theories.CORE, CoreTheory),
-        Pair(Theories.FIXED_SIZE_BIT_VECTORS, BitVectorExpressionTheory),
-        Pair(Theories.INTS, IntsTheory),
-        Pair(Theories.REALS, RealsTheory),
-        Pair(Theories.REALS_INTS, RealsIntsTheory),
-        Pair(Theories.FLOATING_POINT, FloatingPointTheory),
-        Pair(Theories.ARRAYS_EX, ArrayExTheory),
-        Pair(Theories.STRINGS, StringsTheory))
-    }
+            Pair(Theories.CORE, CoreTheory),
+            Pair(Theories.FIXED_SIZE_BIT_VECTORS, BitVectorExpressionTheory),
+            Pair(Theories.INTS, IntsTheory),
+            Pair(Theories.REALS, RealsTheory),
+            Pair(Theories.REALS_INTS, RealsIntsTheory),
+            Pair(Theories.FLOATING_POINT, FloatingPointTheory),
+            Pair(Theories.ARRAYS_EX, ArrayExTheory),
+            Pair(Theories.STRINGS, StringsTheory))
+  }
 
   override fun get(function: String, args: List<Expression<*>>): FunctionDecl<*>? =
       functions[function]?.takeIf { it.acceptsExpressions(args, emptyList()) }

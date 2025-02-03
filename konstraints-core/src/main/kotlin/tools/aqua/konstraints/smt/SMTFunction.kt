@@ -34,7 +34,7 @@ abstract class SMTFunction<out T : Sort> : ContextFunction<Sort> {
   abstract override val parameters: List<Sort>
   abstract val definition: FunctionDef<T>?
 
-  operator fun invoke(args: List<Expression<*>>): Expression<T> {
+  open operator fun invoke(args: List<Expression<*>>): Expression<T> {
     require(args.size == parameters.size)
     require((args zipWithSameLength parameters).all { (par, sort) -> par.sort == sort })
 

@@ -19,7 +19,7 @@
 package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.Theory
-import tools.aqua.konstraints.theories.Theories
+import tools.aqua.konstraints.theories.BoolSort
 import tools.aqua.konstraints.util.Stack
 import tools.aqua.konstraints.util.zipWithSameLength
 
@@ -35,7 +35,7 @@ class Context {
   private val currentContext = CurrentContext()
   private val shadowingMap = Stack<MutableMap<SMTFunction<*>, SMTFunction<*>>>()
   private val undoStack = Stack<MutableSet<SMTFunction<*>>>()
-    private var logic : Logic? = null
+  private var logic: Logic? = null
 
   // true if we are currently in any binder (let/exists/forall/par/match)
   private var activeBinderState = false
@@ -108,16 +108,110 @@ class Context {
     check(n <= undoStack.size)
     check(!activeBinderState) { "Can not pop inside binder!" }
 
-    (0 ..< n).forEach { _ ->
-      currentContext.functions.values.removeAll(undoStack.pop())
+    (0 ..< n).forEach { _ -> currentContext.functions.values.removeAll(undoStack.pop()) }
+  }
+
+  @JvmName("letWithExpression")
+  fun <T : Sort> let(
+      varBindings: List<Expression<*>>,
+      block: (Context, List<Expression<*>>) -> Expression<T>
+  ) =
+      let(
+          varBindings.mapIndexed { idx, expr ->
+            VarBinding("local${expr.sort}${idx}".symbol(), expr)
+          },
+          block)
+
+  fun <T : Sort> let(
+      varBindings: List<VarBinding<*>>,
+      block: (Context, List<Expression<*>>) -> Expression<T>
+  ): LetExpression<T> {
+    bindVariables(varBindings)
+    val term = block(this, varBindings.map { binding -> binding.instance })
+    unbindVariables(varBindings)
+
+    return LetExpression(varBindings, term)
+  }
+
+  fun <T : Sort, S : Sort> let(
+      varBinding: VarBinding<T>,
+      block: (Context, Expression<T>) -> Expression<S>
+  ): LetExpression<S> {
+    bindVariables(listOf(varBinding))
+    val term = block(this, varBinding.instance)
+    unbindVariables(listOf(varBinding))
+
+    return LetExpression(listOf(varBinding), term)
+  }
+
+  private fun bindVariables(varBindings: List<VarBinding<*>>) {
+    require(varBindings.distinctBy { it.name }.size == varBindings.size) {
+      "VarBindings in let must be distinct!"
+    }
+    require(varBindings.all { it.name !in forbiddenNames }) {
+      "VarBindings can not shadow theory function symbols!"
+    }
+
+    shadowingMap.push(mutableMapOf<SMTFunction<*>, SMTFunction<*>>())
+
+    // add all bindings to undoStack first, remove all binding that shadow from undoStack later
+    undoStack.push(mutableSetOf<SMTFunction<*>>())
+    undoStack.peek().addAll(varBindings)
+
+    varBindings.forEach { binding ->
+      currentContext.functions.put(binding.name, binding)?.let { old ->
+        shadowingMap.peek().put(binding, old)
+        undoStack.peek().remove(binding)
+      }
     }
   }
 
+  private fun unbindVariables(varBindings: List<VarBinding<*>>) {
+    // add all shadowed elements back first, then remove all remaining bindings
+    shadowingMap.pop().forEach { (local, shadowed) ->
+      currentContext.functions[local.name] = shadowed
+    }
+    currentContext.functions.values.removeAll(undoStack.pop())
+  }
+
+  fun exists(
+      sortedVars: List<SortedVar<*>>,
+      block: (List<Expression<*>>, Context) -> Expression<BoolSort>
+  ): ExistsExpression {
+    require(sortedVars.all { it.name !in forbiddenNames }) {
+      "VarBindings can not shadow theory function symbols!"
+    }
+
+    shadowingMap.push(mutableMapOf<SMTFunction<*>, SMTFunction<*>>())
+
+    // add all bindings to undoStack first, remove all binding that shadow from undoStack later
+    undoStack.push(mutableSetOf<SMTFunction<*>>())
+    undoStack.peek().addAll(sortedVars)
+
+    sortedVars.forEach { binding ->
+      currentContext.functions.put(binding.name, binding)?.let { old ->
+        shadowingMap.peek().put(binding, old)
+        undoStack.peek().remove(binding)
+      }
+    }
+
+    val term = block(sortedVars.map { it.instance }, this)
+
+    // add all shadowed elements back first, then remove all remaining bindings
+    shadowingMap.pop().forEach { (local, shadowed) ->
+      currentContext.functions[local.name] = shadowed
+    }
+    currentContext.functions.values.removeAll(undoStack.pop())
+
+    return ExistsExpression(sortedVars, term)
+  }
+
   fun setLogic(logic: Logic) {
-      this.logic = logic
-      forbiddenNames.addAll(
-          logic.theories.flatMap { theory -> Theory.logicLookup[theory]!!.functions.map { (name, _) -> name } }
-      )
+    this.logic = logic
+    forbiddenNames.addAll(
+        logic.theories.flatMap { theory ->
+          Theory.logicLookup[theory]!!.functions.map { (name, _) -> name }
+        })
   }
 }
 

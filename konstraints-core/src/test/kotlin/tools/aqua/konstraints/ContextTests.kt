@@ -52,9 +52,7 @@ class ContextTests {
   }
 
   private fun getContextAndFunctions(): Stream<Arguments> =
-      Stream.of(
-          arguments(createContext(), boolFunc1),
-          arguments(createContext(), boolFunc2))
+      Stream.of(arguments(createContext(), boolFunc1), arguments(createContext(), boolFunc2))
 
   @ParameterizedTest
   @MethodSource("getContextAndIllegalFunctions")
@@ -105,6 +103,49 @@ class ContextTests {
   private fun getContextAndNewFunction() =
       Stream.of(
           arguments(createContext(), SMTFunction0("C".symbol(), BoolSort, null)),
+      )
+
+  @ParameterizedTest
+  @MethodSource("getContextAndBindings")
+  fun testBindingsAreRemovedAfterLet(context: Context, bindings: List<VarBinding<*>>) {
+    context.let(bindings) { context, bindings -> True }
+
+    assertFalse(context.contains(bindings[0].name))
+  }
+
+  private fun getContextAndBindings() =
+      Stream.of(
+          arguments(createContext(), listOf(VarBinding("binding".symbol(), True))),
+      )
+
+  @ParameterizedTest
+  @MethodSource("getContextAndShadowingBindings")
+  fun testShadowedFunctionsAreInsertedBackCorrectly(
+      context: Context,
+      bindings: List<VarBinding<*>>
+  ) {
+    val function = context.getFunc(bindings[0].name)
+
+    context.let(bindings) { context, bindings -> True }
+
+    assertTrue(context.getFunc(function.name) == function)
+  }
+
+  @ParameterizedTest
+  @MethodSource("getContextAndShadowingBindings")
+  fun testFunctionsAreShadowedCorrectly(context: Context, bindings: List<VarBinding<*>>) {
+    val function = context.getFunc(bindings[0].name)
+
+    context.let(bindings) { context, bindings ->
+      val inserted = context.getFunc(function.name)
+      assertFalse(context.getFunc(function.name) == function)
+      True
+    }
+  }
+
+  private fun getContextAndShadowingBindings() =
+      Stream.of(
+          arguments(createContext(), listOf(VarBinding("A".symbol(), True))),
       )
 
   private fun createContext(): Context {

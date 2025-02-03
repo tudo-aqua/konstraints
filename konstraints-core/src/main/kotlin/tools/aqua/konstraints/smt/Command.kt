@@ -135,7 +135,7 @@ data class FunctionDef<out S : Sort>(
       // its probably better to implement some form of Decl.isInstanceOf(Expression) or
       // Expression.isInstanceOf(Decl)
       if (expr.children.isEmpty()) {
-        bindings.find { (param, _) -> param.name == expr.name }?.second ?: expr
+        bindings.find { (param, _) -> param.symbol == expr.name }?.second ?: expr
       } else {
         expr
       }

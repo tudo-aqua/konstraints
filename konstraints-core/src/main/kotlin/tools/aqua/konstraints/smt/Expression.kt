@@ -394,15 +394,24 @@ class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: Lis
 class ExpressionCastException(from: Sort, to: String) :
     ClassCastException("Can not cast expression from $from to $to")
 
-class VarBinding<T : Sort>(val symbol: Symbol, val term: Expression<T>) {
+class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>) :
+    SMTFunction<T>() {
 
-  val sort: T = term.sort
+  override operator fun invoke(args: List<Expression<*>>) = instance
+
+  override val name = symbol.toString()
+  override val sort: T = term.sort
+  override val parameters = emptyList<Sort>()
+  override val definition: FunctionDef<T>? = null
 
   val instance = LocalExpression(symbol, sort, term)
 }
 
-class SortedVar<out T : Sort>(val name: Symbol, val sort: T) {
-  override fun toString(): String = "($name $sort)"
+class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T) :
+    SMTFunction<T>() {
+  override fun toString(): String = "($symbol $sort)"
 
-  val instance = BoundVariable(name, sort)
+  val instance = BoundVariable(symbol, sort)
+  override val parameters: List<Sort> = emptyList()
+  override val definition: FunctionDef<T>? = null
 }
