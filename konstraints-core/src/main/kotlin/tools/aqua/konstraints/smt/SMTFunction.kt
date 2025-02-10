@@ -19,6 +19,7 @@
 package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.util.zipWithSameLength
+import java.util.*
 
 /**
  * SMTFunction of any arity.
@@ -45,7 +46,7 @@ abstract class SMTFunction<out T : Sort> : ContextFunction<Sort> {
     }
   }
 
-  override fun equals(other: Any?): Boolean {
+  final override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other !is SMTFunction<*>) return false
     else if (symbol == other.symbol && // symbol equality
@@ -60,14 +61,7 @@ abstract class SMTFunction<out T : Sort> : ContextFunction<Sort> {
     // overloaded by a differing definition
   }
 
-  override fun hashCode(): Int {
-    var result = symbol.hashCode()
-    result = 31 * result + name.hashCode()
-    result = 31 * result + sort.hashCode()
-    result = 31 * result + parameters.hashCode()
-    result = 31 * result + (definition?.hashCode() ?: 0)
-    return result
-  }
+  final override fun hashCode(): Int = Objects.hash(symbol, name, sort, parameters, definition)
 
   infix fun <T : Sort> castTo(to: T): SMTFunction<T> {
     if (sort != to) {

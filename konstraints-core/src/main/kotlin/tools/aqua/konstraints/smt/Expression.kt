@@ -409,6 +409,7 @@ class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>)
 
 class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T) :
     SMTFunction<T>() {
+    override operator fun invoke(args: List<Expression<*>>) = instance
   override fun toString(): String = "($symbol $sort)"
 
   val instance = BoundVariable(symbol, sort)

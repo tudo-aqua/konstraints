@@ -138,6 +138,7 @@ class ContextTests {
 
     context.let(bindings) { context, bindings ->
       val inserted = context.getFunc(function.name)
+        println(context.getFunc(function.name) == function)
       assertFalse(context.getFunc(function.name) == function)
       True
     }

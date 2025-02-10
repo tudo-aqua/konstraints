@@ -128,7 +128,7 @@ class Context {
   ): LetExpression<T> {
     bindVariables(varBindings)
     val term = block(this, varBindings.map { binding -> binding.instance })
-    unbindVariables(varBindings)
+    unbindVariables()
 
     return LetExpression(varBindings, term)
   }
@@ -139,11 +139,17 @@ class Context {
   ): LetExpression<S> {
     bindVariables(listOf(varBinding))
     val term = block(this, varBinding.instance)
-    unbindVariables(listOf(varBinding))
+    unbindVariables()
 
     return LetExpression(listOf(varBinding), term)
   }
 
+  /**
+   * Bind local variables by
+   * - adding all bindings that shadow a function in the current context to the shadowing map
+   * - adding all remaining functions to the undo stack
+   * all bindings must be distinct by name
+   */
   private fun bindVariables(varBindings: List<VarBinding<*>>) {
     require(varBindings.distinctBy { it.name }.size == varBindings.size) {
       "VarBindings in let must be distinct!"
@@ -152,10 +158,10 @@ class Context {
       "VarBindings can not shadow theory function symbols!"
     }
 
-    shadowingMap.push(mutableMapOf<SMTFunction<*>, SMTFunction<*>>())
+    shadowingMap.push(mutableMapOf())
 
     // add all bindings to undoStack first, remove all binding that shadow from undoStack later
-    undoStack.push(mutableSetOf<SMTFunction<*>>())
+    undoStack.push(mutableSetOf())
     undoStack.peek().addAll(varBindings)
 
     varBindings.forEach { binding ->
@@ -166,13 +172,23 @@ class Context {
     }
   }
 
-  private fun unbindVariables(varBindings: List<VarBinding<*>>) {
+  /**
+   * Reverse the last binder operation by
+   * - reversing all shadowing on the current context
+   * - removing all local variable from the current context
+   * Pops the top level of the shadowingMap and undo stack
+   */
+  private fun unbindVariables() {
     // add all shadowed elements back first, then remove all remaining bindings
     shadowingMap.pop().forEach { (local, shadowed) ->
       currentContext.functions[local.name] = shadowed
     }
     currentContext.functions.values.removeAll(undoStack.pop())
   }
+
+  @JvmName("existsWithSorts")
+  fun exists(sortedVars : List<Sort>, block: (List<Expression<*>>, Context) -> Expression<BoolSort>) =
+    exists(sortedVars.mapIndexed { idx, sort -> SortedVar("local!${sort}${idx}".symbol(), sort) }, block)
 
   fun exists(
       sortedVars: List<SortedVar<*>>,
@@ -182,13 +198,18 @@ class Context {
       "VarBindings can not shadow theory function symbols!"
     }
 
-    shadowingMap.push(mutableMapOf<SMTFunction<*>, SMTFunction<*>>())
+    // remove all shadowing bindings keep only the !last! instance on each conflict
+    val vars = sortedVars.reversed().distinctBy { it.name }.reversed()
 
-    // add all bindings to undoStack first, remove all binding that shadow from undoStack later
-    undoStack.push(mutableSetOf<SMTFunction<*>>())
-    undoStack.peek().addAll(sortedVars)
+    shadowingMap.push(mutableMapOf())
 
-    sortedVars.forEach { binding ->
+    // add all bindings to undoStack first,
+    // remove all binding that shadow from undoStack later
+    // undoStack and shadowingMap top level must be disjunctive
+    undoStack.push(mutableSetOf())
+    undoStack.peek().addAll(vars)
+
+    vars.forEach { binding ->
       currentContext.functions.put(binding.name, binding)?.let { old ->
         shadowingMap.peek().put(binding, old)
         undoStack.peek().remove(binding)
@@ -197,11 +218,7 @@ class Context {
 
     val term = block(sortedVars.map { it.instance }, this)
 
-    // add all shadowed elements back first, then remove all remaining bindings
-    shadowingMap.pop().forEach { (local, shadowed) ->
-      currentContext.functions[local.name] = shadowed
-    }
-    currentContext.functions.values.removeAll(undoStack.pop())
+    unbindVariables()
 
     return ExistsExpression(sortedVars, term)
   }
