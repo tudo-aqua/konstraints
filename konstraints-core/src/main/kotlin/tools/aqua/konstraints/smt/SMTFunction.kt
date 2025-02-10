@@ -18,8 +18,8 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.util.zipWithSameLength
 import java.util.*
+import tools.aqua.konstraints.util.zipWithSameLength
 
 /**
  * SMTFunction of any arity.
