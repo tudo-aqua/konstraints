@@ -62,11 +62,11 @@ enum class Associativity {
   open fun bindParametersTo(args: List<Sort>, indices: List<NumeralIndex>) =
       when (associativity) {
         Associativity.LEFT_ASSOC -> {
-          args.slice(2 ..< args.size).forEach { require(args[0] == it) }
+          args.slice(2..<args.size).forEach { require(args[0] == it) }
           signature.bindParameters(args.slice(0..1), indices)
         }
         Associativity.RIGHT_ASSOC -> {
-          args.slice(2 ..< args.size).forEach { require(args[1] == it) }
+          args.slice(2..<args.size).forEach { require(args[1] == it) }
           signature.bindParameters(args.slice(0..1), indices)
         }
         Associativity.PAIRWISE -> {
@@ -318,7 +318,7 @@ internal abstract class FunctionDeclLeftAssociative<P1 : Sort, P2 : Sort, S : So
     return buildExpression(
         args[0] as Expression<P1>,
         args[1] as Expression<P2>,
-        args.slice(2 ..< args.size) as List<Expression<P1>>,
+        args.slice(2..<args.size) as List<Expression<P1>>,
         bindings)
   }
 
@@ -357,7 +357,7 @@ internal abstract class FunctionDeclRightAssociative<P1 : Sort, P2 : Sort, S : S
     return buildExpression(
         args[0] as Expression<P1>,
         args[1] as Expression<P2>,
-        args.slice(2 ..< args.size) as List<Expression<P2>>,
+        args.slice(2..<args.size) as List<Expression<P2>>,
         bindings)
   }
 

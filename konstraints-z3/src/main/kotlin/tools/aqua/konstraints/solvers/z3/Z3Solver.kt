@@ -178,7 +178,7 @@ operator fun Model.Companion.invoke(model: Z3Model): Model {
       model.funcDecls.map { decl ->
         FunctionDef(
             decl.name.toString().symbol(),
-            (decl.domain zip 0 ..< decl.domainSize).map { (sort, index) ->
+            (decl.domain zip 0..<decl.domainSize).map { (sort, index) ->
               SortedVar("x$index".symbol(), sort.aquaify())
             },
             decl.range.aquaify(),

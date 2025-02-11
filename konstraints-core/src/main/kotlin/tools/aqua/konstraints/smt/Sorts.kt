@@ -86,7 +86,7 @@ class UserDefinedSort(name: Symbol, arity: Int) :
 
 internal class UserDefinedSortDecl(name: Symbol, override val arity: Int) :
     SortDecl<Sort>(
-        name, (0 ..< arity).map { index -> SortParameter("sort$index") }.toSet(), emptySet()) {
+        name, (0..<arity).map { index -> SortParameter("sort$index") }.toSet(), emptySet()) {
 
   // FIXME parameter order is assume to be right in the bindings map
   override fun getSort(bindings: Bindings): Sort = UserDefinedSort(symbol, arity)

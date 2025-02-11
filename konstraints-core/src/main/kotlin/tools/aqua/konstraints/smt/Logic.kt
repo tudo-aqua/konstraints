@@ -47,6 +47,7 @@ data object BVFP : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Linear arithmetic
@@ -65,6 +66,7 @@ data object NRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -89,6 +91,7 @@ data object QF_AUFBVFP : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -112,6 +115,7 @@ data object AUFBVFP : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * Closed formulas built over an arbitrary expansion of the Ints signature with free sort and
  * function symbols.
@@ -125,6 +129,7 @@ data object UFNIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -145,6 +150,7 @@ data object QF_UFNIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * Closed quantifier-free formulas with atoms of the form:
  * - p
@@ -167,6 +173,7 @@ data object QF_RDL : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * Closed quantifier-free formulas built over an arbitrary expansion of the Ints signature with free
  * constant symbols, but whose terms of sort Int are all linear, that is, have no occurrences of the
@@ -182,6 +189,7 @@ data object QF_LIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
@@ -200,6 +208,7 @@ data object QF_BVFP : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * Closed formulas built over arbitrary expansions of the Ints and ArraysEx signatures with free
  * sort and function symbols, but with the following restrictions:
@@ -216,6 +225,7 @@ data object AUFLIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * Closed quantifier-free formulas built over an arbitrary expansion of the Ints signature with free
  * constant symbols.
@@ -229,6 +239,7 @@ data object QF_NIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -249,6 +260,7 @@ data object QF_UFDTLIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -266,6 +278,7 @@ data object UFBVDT : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -282,6 +295,7 @@ data object UFBV : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * Closed quantifier-free formulas built over arbitrary expansions of the Reals signature with free
  * sort and function symbols, but containing only linear atoms, that is, atoms with no occurrences
@@ -296,6 +310,7 @@ data object QF_UFLRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
@@ -312,6 +327,7 @@ data object QF_FP : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
@@ -332,6 +348,7 @@ data object QF_SNIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -353,6 +370,7 @@ data object QF_UFDTNIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
@@ -374,6 +392,7 @@ data object QF_BVFPLRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  *
@@ -390,6 +409,7 @@ data object ABV : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * Closed formulas built over arbitrary expansions of the Reals signature with free constant
  * symbols, but containing only linear atoms, that is, atoms with no occurrences of the function
@@ -404,6 +424,7 @@ data object LRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -423,6 +444,7 @@ data object UFNIRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -440,6 +462,7 @@ data object QF_UFFP : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -459,6 +482,7 @@ data object UFDTLIRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -477,6 +501,7 @@ data object UFLIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * Closed formulas built over arbitrary expansions of the Reals_Ints and ArraysEx signatures with
  * free sort and function symbols, but with the following restrictions:
@@ -495,6 +520,7 @@ data object AUFLIRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * Closed formulas built over an arbitrary expansion of the Ints signature with free constant
  * symbols, but whose terms of sort Int are all linear, that is, have no occurrences of the function
@@ -509,6 +535,7 @@ data object LIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * Closed quantifier-free formulas built over the FixedSizeBitVectors and ArraysEx signatures, with
  * the restriction that all array terms have sort of the form (Array (_ BitVec i) (_ BitVec j)) for
@@ -523,6 +550,7 @@ data object QF_ABV : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * Closed quantifier-free formulas built over an arbitrary expansion of the FixedSizeBitVectors and
  * ArraysEx signatures with free sort and function symbols, but with the restriction that all array
@@ -537,6 +565,7 @@ data object QF_AUFBV : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * Closed quantifier-free formulas built over an arbitrary expansion of the FixedSizeBitVectors
  * signature with free constant symbols over the sorts (_ BitVec m) for 0 < m. Formulas in ite terms
@@ -552,6 +581,7 @@ data object QF_BV : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * Closed quantifier-free formulas built over arbitrary expansions of the Reals signature with free
  * constant symbols.
@@ -565,6 +595,7 @@ data object QF_NRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -582,6 +613,7 @@ data object QF_UFDT : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  *
@@ -597,6 +629,7 @@ data object BV : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -617,6 +650,7 @@ data object QF_UFDTLIRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -640,6 +674,7 @@ data object AUFBVDTNIRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
@@ -667,6 +702,7 @@ data object QF_ABVFPLRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
@@ -686,6 +722,7 @@ data object QF_ALIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  *
@@ -708,6 +745,7 @@ data object ABVFP : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -729,6 +767,7 @@ data object QF_AUFNIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -748,6 +787,7 @@ data object UFDTLIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * Closed formulas built over arbitrary expansions of the Reals signature with free sort and
  * function symbols, but containing only linear atoms, that is, atoms with no occurrences of the
@@ -762,6 +802,7 @@ data object UFLRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Linear arithmetic
@@ -781,6 +822,7 @@ data object ANIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -804,6 +846,7 @@ data object AUFFPDTNIRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -826,6 +869,7 @@ data object AUFBVDTLIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -849,6 +893,7 @@ data object AUFBVDTNIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Linear arithmetic
@@ -875,6 +920,7 @@ data object ABVFPLRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Linear arithmetic
@@ -893,6 +939,7 @@ data object ALIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -914,6 +961,7 @@ data object AUFDTNIRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -934,6 +982,7 @@ data object AUFDTLIRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * Closed formulas built over arbitrary expansions of the Reals_Ints and ArraysEx signatures with
  * free sort and function symbols.
@@ -947,6 +996,7 @@ data object AUFNIRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Linear arithmetic
@@ -967,6 +1017,7 @@ data object BVFPLRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Linear arithmetic
@@ -985,6 +1036,7 @@ data object FPLRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * Closed quantifier-free formulas built over arbitrary expansions of the Ints and ArraysEx
  * signatures with free sort and function symbols, but with the following restrictions:
@@ -1001,6 +1053,7 @@ data object QF_AUFLIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
@@ -1020,6 +1073,7 @@ data object QF_NIRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  *
@@ -1035,6 +1089,7 @@ data object FP : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
@@ -1058,6 +1113,7 @@ data object QF_ABVFP : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Linear arithmetic
@@ -1076,6 +1132,7 @@ data object NIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
@@ -1092,6 +1149,7 @@ data object QF_S : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -1113,6 +1171,7 @@ data object UFFPDTNIRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
@@ -1133,6 +1192,7 @@ data object QF_ANIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * Closed quantifier-free formulas built over an arbitrary expansion of the ArraysEx signature with
  * free sort and constant symbols.
@@ -1146,6 +1206,7 @@ data object QF_AX : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -1163,6 +1224,7 @@ data object AUFBV : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -1183,6 +1245,7 @@ data object AUFDTLIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -1202,6 +1265,7 @@ data object UFBVLIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -1218,6 +1282,7 @@ data object UFDT : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Datatype support
@@ -1234,6 +1299,7 @@ data object QF_DT : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
@@ -1253,6 +1319,7 @@ data object QF_SLIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * Closed quantifier-free formulas built over an arbitrary expansion of the Core signature with free
  * sort and function symbols.
@@ -1266,6 +1333,7 @@ data object QF_UF : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * Closed quantifier-free formulas built over arbitrary expansions of the FixedSizeBitVectors
  * signature with free sort and function symbols.
@@ -1279,6 +1347,7 @@ data object QF_UFBV : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -1299,6 +1368,7 @@ data object UFDTNIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * Closed quantifier-free formulas with atoms of the form:
  * - q
@@ -1321,6 +1391,7 @@ data object QF_IDL : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -1341,6 +1412,7 @@ data object AUFNIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -1359,6 +1431,7 @@ data object UFBVFP : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -1379,6 +1452,7 @@ data object UFDTNIRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -1395,6 +1469,7 @@ data object UFIDL : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * Closed quantifier-free formulas built over arbitrary expansions of the Reals signature with free
  * constant symbols, but containing only linear atoms, that is, atoms with no occurrences of the
@@ -1409,6 +1484,7 @@ data object QF_LRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -1427,6 +1503,7 @@ data object QF_UFBVDT : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -1449,6 +1526,7 @@ data object QF_UFFPDTNIRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * Closed quantifier-free formulas built over arbitrary expansions of the Ints signatures with free
  * sort and function symbols, but with the following restrictions:
@@ -1464,6 +1542,7 @@ data object QF_UFLIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
@@ -1479,6 +1558,7 @@ data object UF : Logic {
   override val differentialArithmetic = false
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * Closed quantifier-free formulas built over an arbitrary expansion with free sort and function
  * symbols of the signature consisting of
@@ -1507,6 +1587,7 @@ data object QF_UFIDL : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * Closed quantifier-free formulas built over arbitrary expansions of the Reals signature with free
  * sort and function symbols.
@@ -1520,6 +1601,7 @@ data object QF_UFNRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = true
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
@@ -1539,6 +1621,7 @@ data object QF_FPLRA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free

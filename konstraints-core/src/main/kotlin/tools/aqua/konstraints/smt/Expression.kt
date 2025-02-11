@@ -48,7 +48,8 @@ sealed interface Expression<out T : Sort> {
       throw ExpressionCastException(sort, to.toString())
     }
 
-    @Suppress("UNCHECKED_CAST") return this as Expression<S>
+    @Suppress("UNCHECKED_CAST")
+    return this as Expression<S>
   }
 
   fun all(predicate: (Expression<*>) -> Boolean): Boolean =

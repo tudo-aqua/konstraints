@@ -31,30 +31,35 @@ import tools.aqua.konstraints.theories.*
  * Uses default rounding mode 'round to nearest even'.
  */
 infix fun Expression<FPSort>.fpadd(summand: Expression<FPSort>) = this fpadd_rne summand
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
  * Uses rounding mode 'round to nearest even'.
  */
 infix fun Expression<FPSort>.fpadd_rne(summand: Expression<FPSort>) = FPAdd(RNE, this, summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
  * Uses rounding mode 'round to nearest away'.
  */
 infix fun Expression<FPSort>.fpadd_rna(summand: Expression<FPSort>) = FPAdd(RNA, this, summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
  * Uses rounding mode 'round toward positive'.
  */
 infix fun Expression<FPSort>.fpadd_rtp(summand: Expression<FPSort>) = FPAdd(RTP, this, summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
  * Uses rounding mode 'round toward negative'.
  */
 infix fun Expression<FPSort>.fpadd_rtn(summand: Expression<FPSort>) = FPAdd(RTN, this, summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -68,6 +73,7 @@ infix fun Expression<FPSort>.fpadd_rtz(summand: Expression<FPSort>) = FPAdd(RTZ,
  * Uses default rounding mode 'round to nearest even'.
  */
 infix fun Expression<FPSort>.fpadd(summand: () -> Expression<FPSort>) = this fpadd_rne summand()
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -75,6 +81,7 @@ infix fun Expression<FPSort>.fpadd(summand: () -> Expression<FPSort>) = this fpa
  */
 infix fun Expression<FPSort>.fpadd_rne(summand: () -> Expression<FPSort>) =
     FPAdd(RNE, this, summand())
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -82,6 +89,7 @@ infix fun Expression<FPSort>.fpadd_rne(summand: () -> Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpadd_rna(summand: () -> Expression<FPSort>) =
     FPAdd(RNA, this, summand())
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -89,6 +97,7 @@ infix fun Expression<FPSort>.fpadd_rna(summand: () -> Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpadd_rtp(summand: () -> Expression<FPSort>) =
     FPAdd(RTP, this, summand())
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -96,6 +105,7 @@ infix fun Expression<FPSort>.fpadd_rtp(summand: () -> Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpadd_rtn(summand: () -> Expression<FPSort>) =
     FPAdd(RTN, this, summand())
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -110,6 +120,7 @@ infix fun Expression<FPSort>.fpadd_rtz(summand: () -> Expression<FPSort>) =
  * Uses default rounding mode 'round to nearest even'.
  */
 infix fun (() -> Expression<FPSort>).fpadd(summand: Expression<FPSort>) = this() fpadd_rne summand
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -117,6 +128,7 @@ infix fun (() -> Expression<FPSort>).fpadd(summand: Expression<FPSort>) = this()
  */
 infix fun (() -> Expression<FPSort>).fpadd_rne(summand: Expression<FPSort>) =
     FPAdd(RNE, this(), summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -124,6 +136,7 @@ infix fun (() -> Expression<FPSort>).fpadd_rne(summand: Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpadd_rna(summand: Expression<FPSort>) =
     FPAdd(RNA, this(), summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -131,6 +144,7 @@ infix fun (() -> Expression<FPSort>).fpadd_rna(summand: Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpadd_rtp(summand: Expression<FPSort>) =
     FPAdd(RTP, this(), summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -138,6 +152,7 @@ infix fun (() -> Expression<FPSort>).fpadd_rtp(summand: Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpadd_rtn(summand: Expression<FPSort>) =
     FPAdd(RTN, this(), summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -153,6 +168,7 @@ infix fun (() -> Expression<FPSort>).fpadd_rtz(summand: Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpadd(summand: () -> Expression<FPSort>) =
     this() fpadd_rne summand()
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -160,6 +176,7 @@ infix fun (() -> Expression<FPSort>).fpadd(summand: () -> Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpadd_rne(summand: () -> Expression<FPSort>) =
     FPAdd(RNE, this(), summand())
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -167,6 +184,7 @@ infix fun (() -> Expression<FPSort>).fpadd_rne(summand: () -> Expression<FPSort>
  */
 infix fun (() -> Expression<FPSort>).fpadd_rna(summand: () -> Expression<FPSort>) =
     FPAdd(RNA, this(), summand())
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -174,6 +192,7 @@ infix fun (() -> Expression<FPSort>).fpadd_rna(summand: () -> Expression<FPSort>
  */
 infix fun (() -> Expression<FPSort>).fpadd_rtp(summand: () -> Expression<FPSort>) =
     FPAdd(RTP, this(), summand())
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -181,6 +200,7 @@ infix fun (() -> Expression<FPSort>).fpadd_rtp(summand: () -> Expression<FPSort>
  */
 infix fun (() -> Expression<FPSort>).fpadd_rtn(summand: () -> Expression<FPSort>) =
     FPAdd(RTN, this(), summand())
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -196,6 +216,7 @@ infix fun (() -> Expression<FPSort>).fpadd_rtz(summand: () -> Expression<FPSort>
  * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpadd(summand: Float) = this fpadd_rne FPLiteral(summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -203,6 +224,7 @@ infix fun Expression<FPSort>.fpadd(summand: Float) = this fpadd_rne FPLiteral(su
  * sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpadd_rne(summand: Float) = FPAdd(RNE, this, FPLiteral(summand))
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -210,6 +232,7 @@ infix fun Expression<FPSort>.fpadd_rne(summand: Float) = FPAdd(RNE, this, FPLite
  * sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpadd_rna(summand: Float) = FPAdd(RNA, this, FPLiteral(summand))
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -217,6 +240,7 @@ infix fun Expression<FPSort>.fpadd_rna(summand: Float) = FPAdd(RNA, this, FPLite
  * sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpadd_rtp(summand: Float) = FPAdd(RTP, this, FPLiteral(summand))
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -224,6 +248,7 @@ infix fun Expression<FPSort>.fpadd_rtp(summand: Float) = FPAdd(RTP, this, FPLite
  * sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpadd_rtn(summand: Float) = FPAdd(RTN, this, FPLiteral(summand))
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -239,6 +264,7 @@ infix fun Expression<FPSort>.fpadd_rtz(summand: Float) = FPAdd(RTZ, this, FPLite
  * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpadd(summand: Float) = this() fpadd_rne FPLiteral(summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -247,6 +273,7 @@ infix fun (() -> Expression<FPSort>).fpadd(summand: Float) = this() fpadd_rne FP
  */
 infix fun (() -> Expression<FPSort>).fpadd_rne(summand: Float) =
     FPAdd(RNE, this(), FPLiteral(summand))
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -255,6 +282,7 @@ infix fun (() -> Expression<FPSort>).fpadd_rne(summand: Float) =
  */
 infix fun (() -> Expression<FPSort>).fpadd_rna(summand: Float) =
     FPAdd(RNA, this(), FPLiteral(summand))
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -263,6 +291,7 @@ infix fun (() -> Expression<FPSort>).fpadd_rna(summand: Float) =
  */
 infix fun (() -> Expression<FPSort>).fpadd_rtp(summand: Float) =
     FPAdd(RTP, this(), FPLiteral(summand))
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -271,6 +300,7 @@ infix fun (() -> Expression<FPSort>).fpadd_rtp(summand: Float) =
  */
 infix fun (() -> Expression<FPSort>).fpadd_rtn(summand: Float) =
     FPAdd(RTN, this(), FPLiteral(summand))
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -287,6 +317,7 @@ infix fun (() -> Expression<FPSort>).fpadd_rtz(summand: Float) =
  * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpadd(summand: Expression<FPSort>) = FPLiteral(this) fpadd_rne summand
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -294,6 +325,7 @@ infix fun Float.fpadd(summand: Expression<FPSort>) = FPLiteral(this) fpadd_rne s
  * sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpadd_rne(summand: Expression<FPSort>) = FPAdd(RNE, FPLiteral(this), summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -301,6 +333,7 @@ infix fun Float.fpadd_rne(summand: Expression<FPSort>) = FPAdd(RNE, FPLiteral(th
  * sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpadd_rna(summand: Expression<FPSort>) = FPAdd(RNA, FPLiteral(this), summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -308,6 +341,7 @@ infix fun Float.fpadd_rna(summand: Expression<FPSort>) = FPAdd(RNA, FPLiteral(th
  * sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpadd_rtp(summand: Expression<FPSort>) = FPAdd(RTP, FPLiteral(this), summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -315,6 +349,7 @@ infix fun Float.fpadd_rtp(summand: Expression<FPSort>) = FPAdd(RTP, FPLiteral(th
  * sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpadd_rtn(summand: Expression<FPSort>) = FPAdd(RTN, FPLiteral(this), summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -330,6 +365,7 @@ infix fun Float.fpadd_rtz(summand: Expression<FPSort>) = FPAdd(RTZ, FPLiteral(th
  * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpadd(summand: () -> Expression<FPSort>) = FPLiteral(this) fpadd_rne summand()
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -338,6 +374,7 @@ infix fun Float.fpadd(summand: () -> Expression<FPSort>) = FPLiteral(this) fpadd
  */
 infix fun Float.fpadd_rne(summand: () -> Expression<FPSort>) =
     FPAdd(RNE, FPLiteral(this), summand())
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -346,6 +383,7 @@ infix fun Float.fpadd_rne(summand: () -> Expression<FPSort>) =
  */
 infix fun Float.fpadd_rna(summand: () -> Expression<FPSort>) =
     FPAdd(RNA, FPLiteral(this), summand())
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -354,6 +392,7 @@ infix fun Float.fpadd_rna(summand: () -> Expression<FPSort>) =
  */
 infix fun Float.fpadd_rtp(summand: () -> Expression<FPSort>) =
     FPAdd(RTP, FPLiteral(this), summand())
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -362,6 +401,7 @@ infix fun Float.fpadd_rtp(summand: () -> Expression<FPSort>) =
  */
 infix fun Float.fpadd_rtn(summand: () -> Expression<FPSort>) =
     FPAdd(RTN, FPLiteral(this), summand())
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -378,6 +418,7 @@ infix fun Float.fpadd_rtz(summand: () -> Expression<FPSort>) =
  * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpadd(summand: Double) = this fpadd_rne FPLiteral(summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -385,6 +426,7 @@ infix fun Expression<FPSort>.fpadd(summand: Double) = this fpadd_rne FPLiteral(s
  * sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpadd_rne(summand: Double) = FPAdd(RNE, this, FPLiteral(summand))
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -392,6 +434,7 @@ infix fun Expression<FPSort>.fpadd_rne(summand: Double) = FPAdd(RNE, this, FPLit
  * sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpadd_rna(summand: Double) = FPAdd(RNA, this, FPLiteral(summand))
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -399,6 +442,7 @@ infix fun Expression<FPSort>.fpadd_rna(summand: Double) = FPAdd(RNA, this, FPLit
  * sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpadd_rtp(summand: Double) = FPAdd(RTP, this, FPLiteral(summand))
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -406,6 +450,7 @@ infix fun Expression<FPSort>.fpadd_rtp(summand: Double) = FPAdd(RTP, this, FPLit
  * sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpadd_rtn(summand: Double) = FPAdd(RTN, this, FPLiteral(summand))
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -421,6 +466,7 @@ infix fun Expression<FPSort>.fpadd_rtz(summand: Double) = FPAdd(RTZ, this, FPLit
  * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpadd(summand: Double) = this() fpadd_rne FPLiteral(summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -429,6 +475,7 @@ infix fun (() -> Expression<FPSort>).fpadd(summand: Double) = this() fpadd_rne F
  */
 infix fun (() -> Expression<FPSort>).fpadd_rne(summand: Double) =
     FPAdd(RNE, this(), FPLiteral(summand))
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -437,6 +484,7 @@ infix fun (() -> Expression<FPSort>).fpadd_rne(summand: Double) =
  */
 infix fun (() -> Expression<FPSort>).fpadd_rna(summand: Double) =
     FPAdd(RNA, this(), FPLiteral(summand))
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -445,6 +493,7 @@ infix fun (() -> Expression<FPSort>).fpadd_rna(summand: Double) =
  */
 infix fun (() -> Expression<FPSort>).fpadd_rtp(summand: Double) =
     FPAdd(RTP, this(), FPLiteral(summand))
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -453,6 +502,7 @@ infix fun (() -> Expression<FPSort>).fpadd_rtp(summand: Double) =
  */
 infix fun (() -> Expression<FPSort>).fpadd_rtn(summand: Double) =
     FPAdd(RTN, this(), FPLiteral(summand))
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -469,6 +519,7 @@ infix fun (() -> Expression<FPSort>).fpadd_rtz(summand: Double) =
  * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpadd(summand: Expression<FPSort>) = FPLiteral(this) fpadd_rne summand
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -476,6 +527,7 @@ infix fun Double.fpadd(summand: Expression<FPSort>) = FPLiteral(this) fpadd_rne 
  * sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpadd_rne(summand: Expression<FPSort>) = FPAdd(RNE, FPLiteral(this), summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -483,6 +535,7 @@ infix fun Double.fpadd_rne(summand: Expression<FPSort>) = FPAdd(RNE, FPLiteral(t
  * sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpadd_rna(summand: Expression<FPSort>) = FPAdd(RNA, FPLiteral(this), summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -490,6 +543,7 @@ infix fun Double.fpadd_rna(summand: Expression<FPSort>) = FPAdd(RNA, FPLiteral(t
  * sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpadd_rtp(summand: Expression<FPSort>) = FPAdd(RTP, FPLiteral(this), summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -497,6 +551,7 @@ infix fun Double.fpadd_rtp(summand: Expression<FPSort>) = FPAdd(RTP, FPLiteral(t
  * sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpadd_rtn(summand: Expression<FPSort>) = FPAdd(RTN, FPLiteral(this), summand)
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -512,6 +567,7 @@ infix fun Double.fpadd_rtz(summand: Expression<FPSort>) = FPAdd(RTZ, FPLiteral(t
  * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpadd(summand: () -> Expression<FPSort>) = FPLiteral(this) fpadd_rne summand()
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -520,6 +576,7 @@ infix fun Double.fpadd(summand: () -> Expression<FPSort>) = FPLiteral(this) fpad
  */
 infix fun Double.fpadd_rne(summand: () -> Expression<FPSort>) =
     FPAdd(RNE, FPLiteral(this), summand())
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -528,6 +585,7 @@ infix fun Double.fpadd_rne(summand: () -> Expression<FPSort>) =
  */
 infix fun Double.fpadd_rna(summand: () -> Expression<FPSort>) =
     FPAdd(RNA, FPLiteral(this), summand())
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -536,6 +594,7 @@ infix fun Double.fpadd_rna(summand: () -> Expression<FPSort>) =
  */
 infix fun Double.fpadd_rtp(summand: () -> Expression<FPSort>) =
     FPAdd(RTP, FPLiteral(this), summand())
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -544,6 +603,7 @@ infix fun Double.fpadd_rtp(summand: () -> Expression<FPSort>) =
  */
 infix fun Double.fpadd_rtn(summand: () -> Expression<FPSort>) =
     FPAdd(RTN, FPLiteral(this), summand())
+
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
@@ -559,6 +619,7 @@ infix fun Double.fpadd_rtz(summand: () -> Expression<FPSort>) =
  * Uses default rounding mode 'round to nearest even'.
  */
 infix fun Expression<FPSort>.fpsub(subtrahend: Expression<FPSort>) = this fpsub_rne subtrahend
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -566,6 +627,7 @@ infix fun Expression<FPSort>.fpsub(subtrahend: Expression<FPSort>) = this fpsub_
  */
 infix fun Expression<FPSort>.fpsub_rne(subtrahend: Expression<FPSort>) =
     FPSub(RNE, this, subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -573,6 +635,7 @@ infix fun Expression<FPSort>.fpsub_rne(subtrahend: Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpsub_rna(subtrahend: Expression<FPSort>) =
     FPSub(RNA, this, subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -580,6 +643,7 @@ infix fun Expression<FPSort>.fpsub_rna(subtrahend: Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpsub_rtp(subtrahend: Expression<FPSort>) =
     FPSub(RTP, this, subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -587,6 +651,7 @@ infix fun Expression<FPSort>.fpsub_rtp(subtrahend: Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpsub_rtn(subtrahend: Expression<FPSort>) =
     FPSub(RTN, this, subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -602,6 +667,7 @@ infix fun Expression<FPSort>.fpsub_rtz(subtrahend: Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpsub(subtrahend: () -> Expression<FPSort>) =
     this fpsub_rne subtrahend()
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -609,6 +675,7 @@ infix fun Expression<FPSort>.fpsub(subtrahend: () -> Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpsub_rne(subtrahend: () -> Expression<FPSort>) =
     FPSub(RNE, this, subtrahend())
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -616,6 +683,7 @@ infix fun Expression<FPSort>.fpsub_rne(subtrahend: () -> Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpsub_rna(subtrahend: () -> Expression<FPSort>) =
     FPSub(RNA, this, subtrahend())
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -623,6 +691,7 @@ infix fun Expression<FPSort>.fpsub_rna(subtrahend: () -> Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpsub_rtp(subtrahend: () -> Expression<FPSort>) =
     FPSub(RTP, this, subtrahend())
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -630,6 +699,7 @@ infix fun Expression<FPSort>.fpsub_rtp(subtrahend: () -> Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpsub_rtn(subtrahend: () -> Expression<FPSort>) =
     FPSub(RTN, this, subtrahend())
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -645,6 +715,7 @@ infix fun Expression<FPSort>.fpsub_rtz(subtrahend: () -> Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpsub(subtrahend: Expression<FPSort>) =
     this() fpsub_rne subtrahend
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -652,6 +723,7 @@ infix fun (() -> Expression<FPSort>).fpsub(subtrahend: Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpsub_rne(subtrahend: Expression<FPSort>) =
     FPSub(RNE, this(), subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -659,6 +731,7 @@ infix fun (() -> Expression<FPSort>).fpsub_rne(subtrahend: Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpsub_rna(subtrahend: Expression<FPSort>) =
     FPSub(RNA, this(), subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -666,6 +739,7 @@ infix fun (() -> Expression<FPSort>).fpsub_rna(subtrahend: Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpsub_rtp(subtrahend: Expression<FPSort>) =
     FPSub(RTP, this(), subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -673,6 +747,7 @@ infix fun (() -> Expression<FPSort>).fpsub_rtp(subtrahend: Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpsub_rtn(subtrahend: Expression<FPSort>) =
     FPSub(RTN, this(), subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -688,6 +763,7 @@ infix fun (() -> Expression<FPSort>).fpsub_rtz(subtrahend: Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpsub(subtrahend: () -> Expression<FPSort>) =
     this() fpsub_rne subtrahend()
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -695,6 +771,7 @@ infix fun (() -> Expression<FPSort>).fpsub(subtrahend: () -> Expression<FPSort>)
  */
 infix fun (() -> Expression<FPSort>).fpsub_rne(subtrahend: () -> Expression<FPSort>) =
     FPSub(RNE, this(), subtrahend())
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -702,6 +779,7 @@ infix fun (() -> Expression<FPSort>).fpsub_rne(subtrahend: () -> Expression<FPSo
  */
 infix fun (() -> Expression<FPSort>).fpsub_rna(subtrahend: () -> Expression<FPSort>) =
     FPSub(RNA, this(), subtrahend())
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -709,6 +787,7 @@ infix fun (() -> Expression<FPSort>).fpsub_rna(subtrahend: () -> Expression<FPSo
  */
 infix fun (() -> Expression<FPSort>).fpsub_rtp(subtrahend: () -> Expression<FPSort>) =
     FPSub(RTP, this(), subtrahend())
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -716,6 +795,7 @@ infix fun (() -> Expression<FPSort>).fpsub_rtp(subtrahend: () -> Expression<FPSo
  */
 infix fun (() -> Expression<FPSort>).fpsub_rtn(subtrahend: () -> Expression<FPSort>) =
     FPSub(RTN, this(), subtrahend())
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -731,6 +811,7 @@ infix fun (() -> Expression<FPSort>).fpsub_rtz(subtrahend: () -> Expression<FPSo
  * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpsub(subtrahend: Float) = this fpsub_rne FPLiteral(subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -738,6 +819,7 @@ infix fun Expression<FPSort>.fpsub(subtrahend: Float) = this fpsub_rne FPLiteral
  * with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpsub_rne(subtrahend: Float) = FPSub(RNE, this, FPLiteral(subtrahend))
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -745,6 +827,7 @@ infix fun Expression<FPSort>.fpsub_rne(subtrahend: Float) = FPSub(RNE, this, FPL
  * with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpsub_rna(subtrahend: Float) = FPSub(RNA, this, FPLiteral(subtrahend))
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -752,6 +835,7 @@ infix fun Expression<FPSort>.fpsub_rna(subtrahend: Float) = FPSub(RNA, this, FPL
  * with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpsub_rtp(subtrahend: Float) = FPSub(RTP, this, FPLiteral(subtrahend))
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -759,6 +843,7 @@ infix fun Expression<FPSort>.fpsub_rtp(subtrahend: Float) = FPSub(RTP, this, FPL
  * with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpsub_rtn(subtrahend: Float) = FPSub(RTN, this, FPLiteral(subtrahend))
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -775,6 +860,7 @@ infix fun Expression<FPSort>.fpsub_rtz(subtrahend: Float) = FPSub(RTZ, this, FPL
  */
 infix fun (() -> Expression<FPSort>).fpsub(subtrahend: Float) =
     this() fpsub_rne FPLiteral(subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -783,6 +869,7 @@ infix fun (() -> Expression<FPSort>).fpsub(subtrahend: Float) =
  */
 infix fun (() -> Expression<FPSort>).fpsub_rne(subtrahend: Float) =
     FPSub(RNE, this(), FPLiteral(subtrahend))
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -791,6 +878,7 @@ infix fun (() -> Expression<FPSort>).fpsub_rne(subtrahend: Float) =
  */
 infix fun (() -> Expression<FPSort>).fpsub_rna(subtrahend: Float) =
     FPSub(RNA, this(), FPLiteral(subtrahend))
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -799,6 +887,7 @@ infix fun (() -> Expression<FPSort>).fpsub_rna(subtrahend: Float) =
  */
 infix fun (() -> Expression<FPSort>).fpsub_rtp(subtrahend: Float) =
     FPSub(RTP, this(), FPLiteral(subtrahend))
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -807,6 +896,7 @@ infix fun (() -> Expression<FPSort>).fpsub_rtp(subtrahend: Float) =
  */
 infix fun (() -> Expression<FPSort>).fpsub_rtn(subtrahend: Float) =
     FPSub(RTN, this(), FPLiteral(subtrahend))
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -823,6 +913,7 @@ infix fun (() -> Expression<FPSort>).fpsub_rtz(subtrahend: Float) =
  * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpsub(subtrahend: Expression<FPSort>) = FPLiteral(this) fpsub_rne subtrahend
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -830,6 +921,7 @@ infix fun Float.fpsub(subtrahend: Expression<FPSort>) = FPLiteral(this) fpsub_rn
  * with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpsub_rne(subtrahend: Expression<FPSort>) = FPSub(RNE, FPLiteral(this), subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -837,6 +929,7 @@ infix fun Float.fpsub_rne(subtrahend: Expression<FPSort>) = FPSub(RNE, FPLiteral
  * with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpsub_rna(subtrahend: Expression<FPSort>) = FPSub(RNA, FPLiteral(this), subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -844,6 +937,7 @@ infix fun Float.fpsub_rna(subtrahend: Expression<FPSort>) = FPSub(RNA, FPLiteral
  * with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpsub_rtp(subtrahend: Expression<FPSort>) = FPSub(RTP, FPLiteral(this), subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -851,6 +945,7 @@ infix fun Float.fpsub_rtp(subtrahend: Expression<FPSort>) = FPSub(RTP, FPLiteral
  * with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpsub_rtn(subtrahend: Expression<FPSort>) = FPSub(RTN, FPLiteral(this), subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -866,6 +961,7 @@ infix fun Float.fpsub_rtz(subtrahend: Expression<FPSort>) = FPSub(RTZ, FPLiteral
  * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpsub(subtrahend: () -> Expression<FPSort>) = FPLiteral(this) fpsub_rne subtrahend()
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -874,6 +970,7 @@ infix fun Float.fpsub(subtrahend: () -> Expression<FPSort>) = FPLiteral(this) fp
  */
 infix fun Float.fpsub_rne(subtrahend: () -> Expression<FPSort>) =
     FPSub(RNE, FPLiteral(this), subtrahend())
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -882,6 +979,7 @@ infix fun Float.fpsub_rne(subtrahend: () -> Expression<FPSort>) =
  */
 infix fun Float.fpsub_rna(subtrahend: () -> Expression<FPSort>) =
     FPSub(RNA, FPLiteral(this), subtrahend())
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -890,6 +988,7 @@ infix fun Float.fpsub_rna(subtrahend: () -> Expression<FPSort>) =
  */
 infix fun Float.fpsub_rtp(subtrahend: () -> Expression<FPSort>) =
     FPSub(RTP, FPLiteral(this), subtrahend())
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -898,6 +997,7 @@ infix fun Float.fpsub_rtp(subtrahend: () -> Expression<FPSort>) =
  */
 infix fun Float.fpsub_rtn(subtrahend: () -> Expression<FPSort>) =
     FPSub(RTN, FPLiteral(this), subtrahend())
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -914,6 +1014,7 @@ infix fun Float.fpsub_rtz(subtrahend: () -> Expression<FPSort>) =
  * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpsub(subtrahend: Double) = this fpsub_rne FPLiteral(subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -921,6 +1022,7 @@ infix fun Expression<FPSort>.fpsub(subtrahend: Double) = this fpsub_rne FPLitera
  * with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpsub_rne(subtrahend: Double) = FPSub(RNE, this, FPLiteral(subtrahend))
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -928,6 +1030,7 @@ infix fun Expression<FPSort>.fpsub_rne(subtrahend: Double) = FPSub(RNE, this, FP
  * with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpsub_rna(subtrahend: Double) = FPSub(RNA, this, FPLiteral(subtrahend))
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -935,6 +1038,7 @@ infix fun Expression<FPSort>.fpsub_rna(subtrahend: Double) = FPSub(RNA, this, FP
  * with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpsub_rtp(subtrahend: Double) = FPSub(RTP, this, FPLiteral(subtrahend))
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -942,6 +1046,7 @@ infix fun Expression<FPSort>.fpsub_rtp(subtrahend: Double) = FPSub(RTP, this, FP
  * with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpsub_rtn(subtrahend: Double) = FPSub(RTN, this, FPLiteral(subtrahend))
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -958,6 +1063,7 @@ infix fun Expression<FPSort>.fpsub_rtz(subtrahend: Double) = FPSub(RTZ, this, FP
  */
 infix fun (() -> Expression<FPSort>).fpsub(subtrahend: Double) =
     this() fpsub_rne FPLiteral(subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -966,6 +1072,7 @@ infix fun (() -> Expression<FPSort>).fpsub(subtrahend: Double) =
  */
 infix fun (() -> Expression<FPSort>).fpsub_rne(subtrahend: Double) =
     FPSub(RNE, this(), FPLiteral(subtrahend))
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -974,6 +1081,7 @@ infix fun (() -> Expression<FPSort>).fpsub_rne(subtrahend: Double) =
  */
 infix fun (() -> Expression<FPSort>).fpsub_rna(subtrahend: Double) =
     FPSub(RNA, this(), FPLiteral(subtrahend))
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -982,6 +1090,7 @@ infix fun (() -> Expression<FPSort>).fpsub_rna(subtrahend: Double) =
  */
 infix fun (() -> Expression<FPSort>).fpsub_rtp(subtrahend: Double) =
     FPSub(RTP, this(), FPLiteral(subtrahend))
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -990,6 +1099,7 @@ infix fun (() -> Expression<FPSort>).fpsub_rtp(subtrahend: Double) =
  */
 infix fun (() -> Expression<FPSort>).fpsub_rtn(subtrahend: Double) =
     FPSub(RTN, this(), FPLiteral(subtrahend))
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -1006,6 +1116,7 @@ infix fun (() -> Expression<FPSort>).fpsub_rtz(subtrahend: Double) =
  * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpsub(subtrahend: Expression<FPSort>) = FPLiteral(this) fpsub_rne subtrahend
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -1013,6 +1124,7 @@ infix fun Double.fpsub(subtrahend: Expression<FPSort>) = FPLiteral(this) fpsub_r
  * with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpsub_rne(subtrahend: Expression<FPSort>) = FPSub(RNE, FPLiteral(this), subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -1020,6 +1132,7 @@ infix fun Double.fpsub_rne(subtrahend: Expression<FPSort>) = FPSub(RNE, FPLitera
  * with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpsub_rna(subtrahend: Expression<FPSort>) = FPSub(RNA, FPLiteral(this), subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -1027,6 +1140,7 @@ infix fun Double.fpsub_rna(subtrahend: Expression<FPSort>) = FPSub(RNA, FPLitera
  * with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpsub_rtp(subtrahend: Expression<FPSort>) = FPSub(RTP, FPLiteral(this), subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -1034,6 +1148,7 @@ infix fun Double.fpsub_rtp(subtrahend: Expression<FPSort>) = FPSub(RTP, FPLitera
  * with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpsub_rtn(subtrahend: Expression<FPSort>) = FPSub(RTN, FPLiteral(this), subtrahend)
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -1050,6 +1165,7 @@ infix fun Double.fpsub_rtz(subtrahend: Expression<FPSort>) = FPSub(RTZ, FPLitera
  */
 infix fun Double.fpsub(subtrahend: () -> Expression<FPSort>) =
     FPLiteral(this) fpsub_rne subtrahend()
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -1058,6 +1174,7 @@ infix fun Double.fpsub(subtrahend: () -> Expression<FPSort>) =
  */
 infix fun Double.fpsub_rne(subtrahend: () -> Expression<FPSort>) =
     FPSub(RNE, FPLiteral(this), subtrahend())
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -1066,6 +1183,7 @@ infix fun Double.fpsub_rne(subtrahend: () -> Expression<FPSort>) =
  */
 infix fun Double.fpsub_rna(subtrahend: () -> Expression<FPSort>) =
     FPSub(RNA, FPLiteral(this), subtrahend())
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -1074,6 +1192,7 @@ infix fun Double.fpsub_rna(subtrahend: () -> Expression<FPSort>) =
  */
 infix fun Double.fpsub_rtp(subtrahend: () -> Expression<FPSort>) =
     FPSub(RTP, FPLiteral(this), subtrahend())
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -1082,6 +1201,7 @@ infix fun Double.fpsub_rtp(subtrahend: () -> Expression<FPSort>) =
  */
 infix fun Double.fpsub_rtn(subtrahend: () -> Expression<FPSort>) =
     FPSub(RTN, FPLiteral(this), subtrahend())
+
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
@@ -1097,6 +1217,7 @@ infix fun Double.fpsub_rtz(subtrahend: () -> Expression<FPSort>) =
  * Uses default rounding mode 'round to nearest even'.
  */
 infix fun Expression<FPSort>.fpmul(multiplicant: Expression<FPSort>) = this fpmul_rne multiplicant
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1104,6 +1225,7 @@ infix fun Expression<FPSort>.fpmul(multiplicant: Expression<FPSort>) = this fpmu
  */
 infix fun Expression<FPSort>.fpmul_rne(multiplicant: Expression<FPSort>) =
     FPMul(RNE, this, multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1111,6 +1233,7 @@ infix fun Expression<FPSort>.fpmul_rne(multiplicant: Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpmul_rna(multiplicant: Expression<FPSort>) =
     FPMul(RNA, this, multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1118,6 +1241,7 @@ infix fun Expression<FPSort>.fpmul_rna(multiplicant: Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpmul_rtp(multiplicant: Expression<FPSort>) =
     FPMul(RTP, this, multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1125,6 +1249,7 @@ infix fun Expression<FPSort>.fpmul_rtp(multiplicant: Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpmul_rtn(multiplicant: Expression<FPSort>) =
     FPMul(RTN, this, multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1140,6 +1265,7 @@ infix fun Expression<FPSort>.fpmul_rtz(multiplicant: Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpmul(multiplicant: () -> Expression<FPSort>) =
     this fpmul_rne multiplicant()
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1147,6 +1273,7 @@ infix fun Expression<FPSort>.fpmul(multiplicant: () -> Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpmul_rne(multiplicant: () -> Expression<FPSort>) =
     FPMul(RNE, this, multiplicant())
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1154,6 +1281,7 @@ infix fun Expression<FPSort>.fpmul_rne(multiplicant: () -> Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpmul_rna(multiplicant: () -> Expression<FPSort>) =
     FPMul(RNA, this, multiplicant())
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1161,6 +1289,7 @@ infix fun Expression<FPSort>.fpmul_rna(multiplicant: () -> Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpmul_rtp(multiplicant: () -> Expression<FPSort>) =
     FPMul(RTP, this, multiplicant())
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1168,6 +1297,7 @@ infix fun Expression<FPSort>.fpmul_rtp(multiplicant: () -> Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpmul_rtn(multiplicant: () -> Expression<FPSort>) =
     FPMul(RTN, this, multiplicant())
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1183,6 +1313,7 @@ infix fun Expression<FPSort>.fpmul_rtz(multiplicant: () -> Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpmul(multiplicant: Expression<FPSort>) =
     this() fpmul_rne multiplicant
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1190,6 +1321,7 @@ infix fun (() -> Expression<FPSort>).fpmul(multiplicant: Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpmul_rne(multiplicant: Expression<FPSort>) =
     FPMul(RNE, this(), multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1197,6 +1329,7 @@ infix fun (() -> Expression<FPSort>).fpmul_rne(multiplicant: Expression<FPSort>)
  */
 infix fun (() -> Expression<FPSort>).fpmul_rna(multiplicant: Expression<FPSort>) =
     FPMul(RNA, this(), multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1204,6 +1337,7 @@ infix fun (() -> Expression<FPSort>).fpmul_rna(multiplicant: Expression<FPSort>)
  */
 infix fun (() -> Expression<FPSort>).fpmul_rtp(multiplicant: Expression<FPSort>) =
     FPMul(RTP, this(), multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1211,6 +1345,7 @@ infix fun (() -> Expression<FPSort>).fpmul_rtp(multiplicant: Expression<FPSort>)
  */
 infix fun (() -> Expression<FPSort>).fpmul_rtn(multiplicant: Expression<FPSort>) =
     FPMul(RTN, this(), multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1226,6 +1361,7 @@ infix fun (() -> Expression<FPSort>).fpmul_rtz(multiplicant: Expression<FPSort>)
  */
 infix fun (() -> Expression<FPSort>).fpmul(multiplicant: () -> Expression<FPSort>) =
     this() fpmul_rne multiplicant()
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1233,6 +1369,7 @@ infix fun (() -> Expression<FPSort>).fpmul(multiplicant: () -> Expression<FPSort
  */
 infix fun (() -> Expression<FPSort>).fpmul_rne(multiplicant: () -> Expression<FPSort>) =
     FPMul(RNE, this(), multiplicant())
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1240,6 +1377,7 @@ infix fun (() -> Expression<FPSort>).fpmul_rne(multiplicant: () -> Expression<FP
  */
 infix fun (() -> Expression<FPSort>).fpmul_rna(multiplicant: () -> Expression<FPSort>) =
     FPMul(RNA, this(), multiplicant())
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1247,6 +1385,7 @@ infix fun (() -> Expression<FPSort>).fpmul_rna(multiplicant: () -> Expression<FP
  */
 infix fun (() -> Expression<FPSort>).fpmul_rtp(multiplicant: () -> Expression<FPSort>) =
     FPMul(RTP, this(), multiplicant())
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1254,6 +1393,7 @@ infix fun (() -> Expression<FPSort>).fpmul_rtp(multiplicant: () -> Expression<FP
  */
 infix fun (() -> Expression<FPSort>).fpmul_rtn(multiplicant: () -> Expression<FPSort>) =
     FPMul(RTN, this(), multiplicant())
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1269,6 +1409,7 @@ infix fun (() -> Expression<FPSort>).fpmul_rtz(multiplicant: () -> Expression<FP
  * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpmul(multiplicant: Float) = this fpmul_rne FPLiteral(multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1277,6 +1418,7 @@ infix fun Expression<FPSort>.fpmul(multiplicant: Float) = this fpmul_rne FPLiter
  */
 infix fun Expression<FPSort>.fpmul_rne(multiplicant: Float) =
     FPMul(RNE, this, FPLiteral(multiplicant))
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1285,6 +1427,7 @@ infix fun Expression<FPSort>.fpmul_rne(multiplicant: Float) =
  */
 infix fun Expression<FPSort>.fpmul_rna(multiplicant: Float) =
     FPMul(RNA, this, FPLiteral(multiplicant))
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1293,6 +1436,7 @@ infix fun Expression<FPSort>.fpmul_rna(multiplicant: Float) =
  */
 infix fun Expression<FPSort>.fpmul_rtp(multiplicant: Float) =
     FPMul(RTP, this, FPLiteral(multiplicant))
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1301,6 +1445,7 @@ infix fun Expression<FPSort>.fpmul_rtp(multiplicant: Float) =
  */
 infix fun Expression<FPSort>.fpmul_rtn(multiplicant: Float) =
     FPMul(RTN, this, FPLiteral(multiplicant))
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1318,6 +1463,7 @@ infix fun Expression<FPSort>.fpmul_rtz(multiplicant: Float) =
  */
 infix fun (() -> Expression<FPSort>).fpmul(multiplicant: Float) =
     this() fpmul_rne FPLiteral(multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1326,6 +1472,7 @@ infix fun (() -> Expression<FPSort>).fpmul(multiplicant: Float) =
  */
 infix fun (() -> Expression<FPSort>).fpmul_rne(multiplicant: Float) =
     FPMul(RNE, this(), FPLiteral(multiplicant))
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1334,6 +1481,7 @@ infix fun (() -> Expression<FPSort>).fpmul_rne(multiplicant: Float) =
  */
 infix fun (() -> Expression<FPSort>).fpmul_rna(multiplicant: Float) =
     FPMul(RNA, this(), FPLiteral(multiplicant))
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1342,6 +1490,7 @@ infix fun (() -> Expression<FPSort>).fpmul_rna(multiplicant: Float) =
  */
 infix fun (() -> Expression<FPSort>).fpmul_rtp(multiplicant: Float) =
     FPMul(RTP, this(), FPLiteral(multiplicant))
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1350,6 +1499,7 @@ infix fun (() -> Expression<FPSort>).fpmul_rtp(multiplicant: Float) =
  */
 infix fun (() -> Expression<FPSort>).fpmul_rtn(multiplicant: Float) =
     FPMul(RTN, this(), FPLiteral(multiplicant))
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1366,6 +1516,7 @@ infix fun (() -> Expression<FPSort>).fpmul_rtz(multiplicant: Float) =
  * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpmul(multiplicant: Expression<FPSort>) = FPLiteral(this) fpmul_rne multiplicant
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1374,6 +1525,7 @@ infix fun Float.fpmul(multiplicant: Expression<FPSort>) = FPLiteral(this) fpmul_
  */
 infix fun Float.fpmul_rne(multiplicant: Expression<FPSort>) =
     FPMul(RNE, FPLiteral(this), multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1382,6 +1534,7 @@ infix fun Float.fpmul_rne(multiplicant: Expression<FPSort>) =
  */
 infix fun Float.fpmul_rna(multiplicant: Expression<FPSort>) =
     FPMul(RNA, FPLiteral(this), multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1390,6 +1543,7 @@ infix fun Float.fpmul_rna(multiplicant: Expression<FPSort>) =
  */
 infix fun Float.fpmul_rtp(multiplicant: Expression<FPSort>) =
     FPMul(RTP, FPLiteral(this), multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1398,6 +1552,7 @@ infix fun Float.fpmul_rtp(multiplicant: Expression<FPSort>) =
  */
 infix fun Float.fpmul_rtn(multiplicant: Expression<FPSort>) =
     FPMul(RTN, FPLiteral(this), multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1415,6 +1570,7 @@ infix fun Float.fpmul_rtz(multiplicant: Expression<FPSort>) =
  */
 infix fun Float.fpmul(multiplicant: () -> Expression<FPSort>) =
     FPLiteral(this) fpmul_rne multiplicant()
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1423,6 +1579,7 @@ infix fun Float.fpmul(multiplicant: () -> Expression<FPSort>) =
  */
 infix fun Float.fpmul_rne(multiplicant: () -> Expression<FPSort>) =
     FPMul(RNE, FPLiteral(this), multiplicant())
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1431,6 +1588,7 @@ infix fun Float.fpmul_rne(multiplicant: () -> Expression<FPSort>) =
  */
 infix fun Float.fpmul_rna(multiplicant: () -> Expression<FPSort>) =
     FPMul(RNA, FPLiteral(this), multiplicant())
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1439,6 +1597,7 @@ infix fun Float.fpmul_rna(multiplicant: () -> Expression<FPSort>) =
  */
 infix fun Float.fpmul_rtp(multiplicant: () -> Expression<FPSort>) =
     FPMul(RTP, FPLiteral(this), multiplicant())
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1447,6 +1606,7 @@ infix fun Float.fpmul_rtp(multiplicant: () -> Expression<FPSort>) =
  */
 infix fun Float.fpmul_rtn(multiplicant: () -> Expression<FPSort>) =
     FPMul(RTN, FPLiteral(this), multiplicant())
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1463,6 +1623,7 @@ infix fun Float.fpmul_rtz(multiplicant: () -> Expression<FPSort>) =
  * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpmul(multiplicant: Double) = this fpmul_rne FPLiteral(multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1471,6 +1632,7 @@ infix fun Expression<FPSort>.fpmul(multiplicant: Double) = this fpmul_rne FPLite
  */
 infix fun Expression<FPSort>.fpmul_rne(multiplicant: Double) =
     FPMul(RNE, this, FPLiteral(multiplicant))
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1479,6 +1641,7 @@ infix fun Expression<FPSort>.fpmul_rne(multiplicant: Double) =
  */
 infix fun Expression<FPSort>.fpmul_rna(multiplicant: Double) =
     FPMul(RNA, this, FPLiteral(multiplicant))
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1487,6 +1650,7 @@ infix fun Expression<FPSort>.fpmul_rna(multiplicant: Double) =
  */
 infix fun Expression<FPSort>.fpmul_rtp(multiplicant: Double) =
     FPMul(RTP, this, FPLiteral(multiplicant))
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1495,6 +1659,7 @@ infix fun Expression<FPSort>.fpmul_rtp(multiplicant: Double) =
  */
 infix fun Expression<FPSort>.fpmul_rtn(multiplicant: Double) =
     FPMul(RTN, this, FPLiteral(multiplicant))
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1512,6 +1677,7 @@ infix fun Expression<FPSort>.fpmul_rtz(multiplicant: Double) =
  */
 infix fun (() -> Expression<FPSort>).fpmul(multiplicant: Double) =
     this() fpmul_rne FPLiteral(multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1520,6 +1686,7 @@ infix fun (() -> Expression<FPSort>).fpmul(multiplicant: Double) =
  */
 infix fun (() -> Expression<FPSort>).fpmul_rne(multiplicant: Double) =
     FPMul(RNE, this(), FPLiteral(multiplicant))
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1528,6 +1695,7 @@ infix fun (() -> Expression<FPSort>).fpmul_rne(multiplicant: Double) =
  */
 infix fun (() -> Expression<FPSort>).fpmul_rna(multiplicant: Double) =
     FPMul(RNA, this(), FPLiteral(multiplicant))
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1536,6 +1704,7 @@ infix fun (() -> Expression<FPSort>).fpmul_rna(multiplicant: Double) =
  */
 infix fun (() -> Expression<FPSort>).fpmul_rtp(multiplicant: Double) =
     FPMul(RTP, this(), FPLiteral(multiplicant))
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1544,6 +1713,7 @@ infix fun (() -> Expression<FPSort>).fpmul_rtp(multiplicant: Double) =
  */
 infix fun (() -> Expression<FPSort>).fpmul_rtn(multiplicant: Double) =
     FPMul(RTN, this(), FPLiteral(multiplicant))
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1560,6 +1730,7 @@ infix fun (() -> Expression<FPSort>).fpmul_rtz(multiplicant: Double) =
  * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpmul(multiplicant: Expression<FPSort>) = FPLiteral(this) fpmul_rne multiplicant
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1568,6 +1739,7 @@ infix fun Double.fpmul(multiplicant: Expression<FPSort>) = FPLiteral(this) fpmul
  */
 infix fun Double.fpmul_rne(multiplicant: Expression<FPSort>) =
     FPMul(RNE, FPLiteral(this), multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1576,6 +1748,7 @@ infix fun Double.fpmul_rne(multiplicant: Expression<FPSort>) =
  */
 infix fun Double.fpmul_rna(multiplicant: Expression<FPSort>) =
     FPMul(RNA, FPLiteral(this), multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1584,6 +1757,7 @@ infix fun Double.fpmul_rna(multiplicant: Expression<FPSort>) =
  */
 infix fun Double.fpmul_rtp(multiplicant: Expression<FPSort>) =
     FPMul(RTP, FPLiteral(this), multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1592,6 +1766,7 @@ infix fun Double.fpmul_rtp(multiplicant: Expression<FPSort>) =
  */
 infix fun Double.fpmul_rtn(multiplicant: Expression<FPSort>) =
     FPMul(RTN, FPLiteral(this), multiplicant)
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1609,6 +1784,7 @@ infix fun Double.fpmul_rtz(multiplicant: Expression<FPSort>) =
  */
 infix fun Double.fpmul(multiplicant: () -> Expression<FPSort>) =
     FPLiteral(this) fpmul_rne multiplicant()
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1617,6 +1793,7 @@ infix fun Double.fpmul(multiplicant: () -> Expression<FPSort>) =
  */
 infix fun Double.fpmul_rne(multiplicant: () -> Expression<FPSort>) =
     FPMul(RNE, FPLiteral(this), multiplicant())
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1625,6 +1802,7 @@ infix fun Double.fpmul_rne(multiplicant: () -> Expression<FPSort>) =
  */
 infix fun Double.fpmul_rna(multiplicant: () -> Expression<FPSort>) =
     FPMul(RNA, FPLiteral(this), multiplicant())
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1633,6 +1811,7 @@ infix fun Double.fpmul_rna(multiplicant: () -> Expression<FPSort>) =
  */
 infix fun Double.fpmul_rtp(multiplicant: () -> Expression<FPSort>) =
     FPMul(RTP, FPLiteral(this), multiplicant())
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1641,6 +1820,7 @@ infix fun Double.fpmul_rtp(multiplicant: () -> Expression<FPSort>) =
  */
 infix fun Double.fpmul_rtn(multiplicant: () -> Expression<FPSort>) =
     FPMul(RTN, FPLiteral(this), multiplicant())
+
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
@@ -1656,30 +1836,35 @@ infix fun Double.fpmul_rtz(multiplicant: () -> Expression<FPSort>) =
  * Uses default rounding mode 'round to nearest even'.
  */
 infix fun Expression<FPSort>.fpdiv(divisor: Expression<FPSort>) = this fpdiv_rne divisor
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
  * Uses rounding mode 'round to nearest even'.
  */
 infix fun Expression<FPSort>.fpdiv_rne(divisor: Expression<FPSort>) = FPDiv(RNE, this, divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
  * Uses rounding mode 'round to nearest away'.
  */
 infix fun Expression<FPSort>.fpdiv_rna(divisor: Expression<FPSort>) = FPDiv(RNA, this, divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
  * Uses rounding mode 'round toward positive'.
  */
 infix fun Expression<FPSort>.fpdiv_rtp(divisor: Expression<FPSort>) = FPDiv(RTP, this, divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
  * Uses rounding mode 'round toward negative'.
  */
 infix fun Expression<FPSort>.fpdiv_rtn(divisor: Expression<FPSort>) = FPDiv(RTN, this, divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1693,6 +1878,7 @@ infix fun Expression<FPSort>.fpdiv_rtz(divisor: Expression<FPSort>) = FPDiv(RTZ,
  * Uses default rounding mode 'round to nearest even'.
  */
 infix fun Expression<FPSort>.fpdiv(divisor: () -> Expression<FPSort>) = this fpdiv_rne divisor()
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1700,6 +1886,7 @@ infix fun Expression<FPSort>.fpdiv(divisor: () -> Expression<FPSort>) = this fpd
  */
 infix fun Expression<FPSort>.fpdiv_rne(divisor: () -> Expression<FPSort>) =
     FPDiv(RNE, this, divisor())
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1707,6 +1894,7 @@ infix fun Expression<FPSort>.fpdiv_rne(divisor: () -> Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpdiv_rna(divisor: () -> Expression<FPSort>) =
     FPDiv(RNA, this, divisor())
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1714,6 +1902,7 @@ infix fun Expression<FPSort>.fpdiv_rna(divisor: () -> Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpdiv_rtp(divisor: () -> Expression<FPSort>) =
     FPDiv(RTP, this, divisor())
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1721,6 +1910,7 @@ infix fun Expression<FPSort>.fpdiv_rtp(divisor: () -> Expression<FPSort>) =
  */
 infix fun Expression<FPSort>.fpdiv_rtn(divisor: () -> Expression<FPSort>) =
     FPDiv(RTN, this, divisor())
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1735,6 +1925,7 @@ infix fun Expression<FPSort>.fpdiv_rtz(divisor: () -> Expression<FPSort>) =
  * Uses default rounding mode 'round to nearest even'.
  */
 infix fun (() -> Expression<FPSort>).fpdiv(divisor: Expression<FPSort>) = this() fpdiv_rne divisor
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1742,6 +1933,7 @@ infix fun (() -> Expression<FPSort>).fpdiv(divisor: Expression<FPSort>) = this()
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rne(divisor: Expression<FPSort>) =
     FPDiv(RNE, this(), divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1749,6 +1941,7 @@ infix fun (() -> Expression<FPSort>).fpdiv_rne(divisor: Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rna(divisor: Expression<FPSort>) =
     FPDiv(RNA, this(), divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1756,6 +1949,7 @@ infix fun (() -> Expression<FPSort>).fpdiv_rna(divisor: Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rtp(divisor: Expression<FPSort>) =
     FPDiv(RTP, this(), divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1763,6 +1957,7 @@ infix fun (() -> Expression<FPSort>).fpdiv_rtp(divisor: Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rtn(divisor: Expression<FPSort>) =
     FPDiv(RTN, this(), divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1778,6 +1973,7 @@ infix fun (() -> Expression<FPSort>).fpdiv_rtz(divisor: Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpdiv(divisor: () -> Expression<FPSort>) =
     this() fpdiv_rne divisor()
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1785,6 +1981,7 @@ infix fun (() -> Expression<FPSort>).fpdiv(divisor: () -> Expression<FPSort>) =
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rne(divisor: () -> Expression<FPSort>) =
     FPDiv(RNE, this(), divisor())
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1792,6 +1989,7 @@ infix fun (() -> Expression<FPSort>).fpdiv_rne(divisor: () -> Expression<FPSort>
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rna(divisor: () -> Expression<FPSort>) =
     FPDiv(RNA, this(), divisor())
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1799,6 +1997,7 @@ infix fun (() -> Expression<FPSort>).fpdiv_rna(divisor: () -> Expression<FPSort>
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rtp(divisor: () -> Expression<FPSort>) =
     FPDiv(RTP, this(), divisor())
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1806,6 +2005,7 @@ infix fun (() -> Expression<FPSort>).fpdiv_rtp(divisor: () -> Expression<FPSort>
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rtn(divisor: () -> Expression<FPSort>) =
     FPDiv(RTN, this(), divisor())
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1821,6 +2021,7 @@ infix fun (() -> Expression<FPSort>).fpdiv_rtz(divisor: () -> Expression<FPSort>
  * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpdiv(divisor: Float) = this fpdiv_rne FPLiteral(divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1828,6 +2029,7 @@ infix fun Expression<FPSort>.fpdiv(divisor: Float) = this fpdiv_rne FPLiteral(di
  * sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpdiv_rne(divisor: Float) = FPDiv(RNE, this, FPLiteral(divisor))
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1835,6 +2037,7 @@ infix fun Expression<FPSort>.fpdiv_rne(divisor: Float) = FPDiv(RNE, this, FPLite
  * sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpdiv_rna(divisor: Float) = FPDiv(RNA, this, FPLiteral(divisor))
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1842,6 +2045,7 @@ infix fun Expression<FPSort>.fpdiv_rna(divisor: Float) = FPDiv(RNA, this, FPLite
  * sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpdiv_rtp(divisor: Float) = FPDiv(RTP, this, FPLiteral(divisor))
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1849,6 +2053,7 @@ infix fun Expression<FPSort>.fpdiv_rtp(divisor: Float) = FPDiv(RTP, this, FPLite
  * sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpdiv_rtn(divisor: Float) = FPDiv(RTN, this, FPLiteral(divisor))
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1864,6 +2069,7 @@ infix fun Expression<FPSort>.fpdiv_rtz(divisor: Float) = FPDiv(RTZ, this, FPLite
  * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpdiv(divisor: Float) = this() fpdiv_rne FPLiteral(divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1872,6 +2078,7 @@ infix fun (() -> Expression<FPSort>).fpdiv(divisor: Float) = this() fpdiv_rne FP
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rne(divisor: Float) =
     FPDiv(RNE, this(), FPLiteral(divisor))
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1880,6 +2087,7 @@ infix fun (() -> Expression<FPSort>).fpdiv_rne(divisor: Float) =
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rna(divisor: Float) =
     FPDiv(RNA, this(), FPLiteral(divisor))
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1888,6 +2096,7 @@ infix fun (() -> Expression<FPSort>).fpdiv_rna(divisor: Float) =
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rtp(divisor: Float) =
     FPDiv(RTP, this(), FPLiteral(divisor))
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1896,6 +2105,7 @@ infix fun (() -> Expression<FPSort>).fpdiv_rtp(divisor: Float) =
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rtn(divisor: Float) =
     FPDiv(RTN, this(), FPLiteral(divisor))
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1912,6 +2122,7 @@ infix fun (() -> Expression<FPSort>).fpdiv_rtz(divisor: Float) =
  * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpdiv(divisor: Expression<FPSort>) = FPLiteral(this) fpdiv_rne divisor
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1919,6 +2130,7 @@ infix fun Float.fpdiv(divisor: Expression<FPSort>) = FPLiteral(this) fpdiv_rne d
  * sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpdiv_rne(divisor: Expression<FPSort>) = FPDiv(RNE, FPLiteral(this), divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1926,6 +2138,7 @@ infix fun Float.fpdiv_rne(divisor: Expression<FPSort>) = FPDiv(RNE, FPLiteral(th
  * sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpdiv_rna(divisor: Expression<FPSort>) = FPDiv(RNA, FPLiteral(this), divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1933,6 +2146,7 @@ infix fun Float.fpdiv_rna(divisor: Expression<FPSort>) = FPDiv(RNA, FPLiteral(th
  * sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpdiv_rtp(divisor: Expression<FPSort>) = FPDiv(RTP, FPLiteral(this), divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1940,6 +2154,7 @@ infix fun Float.fpdiv_rtp(divisor: Expression<FPSort>) = FPDiv(RTP, FPLiteral(th
  * sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpdiv_rtn(divisor: Expression<FPSort>) = FPDiv(RTN, FPLiteral(this), divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1955,6 +2170,7 @@ infix fun Float.fpdiv_rtz(divisor: Expression<FPSort>) = FPDiv(RTZ, FPLiteral(th
  * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpdiv(divisor: () -> Expression<FPSort>) = FPLiteral(this) fpdiv_rne divisor()
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1963,6 +2179,7 @@ infix fun Float.fpdiv(divisor: () -> Expression<FPSort>) = FPLiteral(this) fpdiv
  */
 infix fun Float.fpdiv_rne(divisor: () -> Expression<FPSort>) =
     FPDiv(RNE, FPLiteral(this), divisor())
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1971,6 +2188,7 @@ infix fun Float.fpdiv_rne(divisor: () -> Expression<FPSort>) =
  */
 infix fun Float.fpdiv_rna(divisor: () -> Expression<FPSort>) =
     FPDiv(RNA, FPLiteral(this), divisor())
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1979,6 +2197,7 @@ infix fun Float.fpdiv_rna(divisor: () -> Expression<FPSort>) =
  */
 infix fun Float.fpdiv_rtp(divisor: () -> Expression<FPSort>) =
     FPDiv(RTP, FPLiteral(this), divisor())
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -1987,6 +2206,7 @@ infix fun Float.fpdiv_rtp(divisor: () -> Expression<FPSort>) =
  */
 infix fun Float.fpdiv_rtn(divisor: () -> Expression<FPSort>) =
     FPDiv(RTN, FPLiteral(this), divisor())
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2003,6 +2223,7 @@ infix fun Float.fpdiv_rtz(divisor: () -> Expression<FPSort>) =
  * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpdiv(divisor: Double) = this fpdiv_rne FPLiteral(divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2010,6 +2231,7 @@ infix fun Expression<FPSort>.fpdiv(divisor: Double) = this fpdiv_rne FPLiteral(d
  * sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpdiv_rne(divisor: Double) = FPDiv(RNE, this, FPLiteral(divisor))
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2017,6 +2239,7 @@ infix fun Expression<FPSort>.fpdiv_rne(divisor: Double) = FPDiv(RNE, this, FPLit
  * sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpdiv_rna(divisor: Double) = FPDiv(RNA, this, FPLiteral(divisor))
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2024,6 +2247,7 @@ infix fun Expression<FPSort>.fpdiv_rna(divisor: Double) = FPDiv(RNA, this, FPLit
  * sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpdiv_rtp(divisor: Double) = FPDiv(RTP, this, FPLiteral(divisor))
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2031,6 +2255,7 @@ infix fun Expression<FPSort>.fpdiv_rtp(divisor: Double) = FPDiv(RTP, this, FPLit
  * sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpdiv_rtn(divisor: Double) = FPDiv(RTN, this, FPLiteral(divisor))
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2046,6 +2271,7 @@ infix fun Expression<FPSort>.fpdiv_rtz(divisor: Double) = FPDiv(RTZ, this, FPLit
  * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpdiv(divisor: Double) = this() fpdiv_rne FPLiteral(divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2054,6 +2280,7 @@ infix fun (() -> Expression<FPSort>).fpdiv(divisor: Double) = this() fpdiv_rne F
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rne(divisor: Double) =
     FPDiv(RNE, this(), FPLiteral(divisor))
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2062,6 +2289,7 @@ infix fun (() -> Expression<FPSort>).fpdiv_rne(divisor: Double) =
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rna(divisor: Double) =
     FPDiv(RNA, this(), FPLiteral(divisor))
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2070,6 +2298,7 @@ infix fun (() -> Expression<FPSort>).fpdiv_rna(divisor: Double) =
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rtp(divisor: Double) =
     FPDiv(RTP, this(), FPLiteral(divisor))
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2078,6 +2307,7 @@ infix fun (() -> Expression<FPSort>).fpdiv_rtp(divisor: Double) =
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rtn(divisor: Double) =
     FPDiv(RTN, this(), FPLiteral(divisor))
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2094,6 +2324,7 @@ infix fun (() -> Expression<FPSort>).fpdiv_rtz(divisor: Double) =
  * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpdiv(divisor: Expression<FPSort>) = FPLiteral(this) fpdiv_rne divisor
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2101,6 +2332,7 @@ infix fun Double.fpdiv(divisor: Expression<FPSort>) = FPLiteral(this) fpdiv_rne 
  * sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpdiv_rne(divisor: Expression<FPSort>) = FPDiv(RNE, FPLiteral(this), divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2108,6 +2340,7 @@ infix fun Double.fpdiv_rne(divisor: Expression<FPSort>) = FPDiv(RNE, FPLiteral(t
  * sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpdiv_rna(divisor: Expression<FPSort>) = FPDiv(RNA, FPLiteral(this), divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2115,6 +2348,7 @@ infix fun Double.fpdiv_rna(divisor: Expression<FPSort>) = FPDiv(RNA, FPLiteral(t
  * sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpdiv_rtp(divisor: Expression<FPSort>) = FPDiv(RTP, FPLiteral(this), divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2122,6 +2356,7 @@ infix fun Double.fpdiv_rtp(divisor: Expression<FPSort>) = FPDiv(RTP, FPLiteral(t
  * sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpdiv_rtn(divisor: Expression<FPSort>) = FPDiv(RTN, FPLiteral(this), divisor)
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2137,6 +2372,7 @@ infix fun Double.fpdiv_rtz(divisor: Expression<FPSort>) = FPDiv(RTZ, FPLiteral(t
  * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpdiv(divisor: () -> Expression<FPSort>) = FPLiteral(this) fpdiv_rne divisor()
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2145,6 +2381,7 @@ infix fun Double.fpdiv(divisor: () -> Expression<FPSort>) = FPLiteral(this) fpdi
  */
 infix fun Double.fpdiv_rne(divisor: () -> Expression<FPSort>) =
     FPDiv(RNE, FPLiteral(this), divisor())
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2153,6 +2390,7 @@ infix fun Double.fpdiv_rne(divisor: () -> Expression<FPSort>) =
  */
 infix fun Double.fpdiv_rna(divisor: () -> Expression<FPSort>) =
     FPDiv(RNA, FPLiteral(this), divisor())
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2161,6 +2399,7 @@ infix fun Double.fpdiv_rna(divisor: () -> Expression<FPSort>) =
  */
 infix fun Double.fpdiv_rtp(divisor: () -> Expression<FPSort>) =
     FPDiv(RTP, FPLiteral(this), divisor())
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2169,6 +2408,7 @@ infix fun Double.fpdiv_rtp(divisor: () -> Expression<FPSort>) =
  */
 infix fun Double.fpdiv_rtn(divisor: () -> Expression<FPSort>) =
     FPDiv(RTN, FPLiteral(this), divisor())
+
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
@@ -2407,38 +2647,50 @@ fun fpmax(lhs: Double, rhs: Expression<FPSort>) = FPMax(FPLiteral(lhs), rhs)
 
 /** Less equals operator for FPSort expressions: [this] <= [rhs]. */
 infix fun Expression<FPSort>.fpleq(rhs: Expression<FPSort>) = FPLeq(this, rhs)
+
 /** Less than operator for FPSort expressions: [this] < [rhs]. */
 infix fun Expression<FPSort>.fplt(rhs: Expression<FPSort>) = FPLt(this, rhs)
+
 /** Greater equals operator for FPSort expressions: [this] >= [rhs]. */
 infix fun Expression<FPSort>.fpgeq(rhs: Expression<FPSort>) = FPGeq(this, rhs)
+
 /** Greater than operator for FPSort expressions: [this] > [rhs]. */
 infix fun Expression<FPSort>.fpgt(rhs: Expression<FPSort>) = FPGt(this, rhs)
+
 /** Equals operator for FPSort expressions: [this] = [rhs]. */
 infix fun Expression<FPSort>.fpeq(rhs: Expression<FPSort>) = FPEq(this, rhs)
 
 /** Less equals operator for FPSort expressions: [this] <= [rhs]. */
 infix fun Expression<FPSort>.fpleq(rhs: () -> Expression<FPSort>) = FPLeq(this, rhs())
+
 /** Less than operator for FPSort expressions: [this] < [rhs]. */
 infix fun Expression<FPSort>.fplt(rhs: () -> Expression<FPSort>) = FPLt(this, rhs())
+
 /** Greater equals operator for FPSort expressions: [this] >= [rhs]. */
 infix fun Expression<FPSort>.fpgeq(rhs: () -> Expression<FPSort>) = FPGeq(this, rhs())
+
 /** Greater than operator for FPSort expressions: [this] > [rhs]. */
 infix fun Expression<FPSort>.fpgt(rhs: () -> Expression<FPSort>) = FPGt(this, rhs())
+
 /** Equals operator for FPSort expressions: [this] = [rhs]. */
 infix fun Expression<FPSort>.fpeq(rhs: () -> Expression<FPSort>) = FPEq(this, rhs())
 
 /** Less equals operator for FPSort expressions: [this] <= [rhs]. */
 @JvmName("fpleq_expr")
 infix fun (() -> Expression<FPSort>).fpleq(rhs: Expression<FPSort>) = FPLeq(this(), rhs)
+
 /** Less than operator for FPSort expressions: [this] < [rhs]. */
 @JvmName("fplt_expr")
 infix fun (() -> Expression<FPSort>).fplt(rhs: Expression<FPSort>) = FPLt(this(), rhs)
+
 /** Greater equals operator for FPSort expressions: [this] >= [rhs]. */
 @JvmName("fpgeq_expr")
 infix fun (() -> Expression<FPSort>).fpgeq(rhs: Expression<FPSort>) = FPGeq(this(), rhs)
+
 /** Greater than operator for FPSort expressions: [this] > [rhs]. */
 @JvmName("fpgt_expr")
 infix fun (() -> Expression<FPSort>).fpgt(rhs: Expression<FPSort>) = FPGt(this(), rhs)
+
 /** Equals operator for FPSort expressions: [this] = [rhs]. */
 @JvmName("fpeq_expr")
 infix fun (() -> Expression<FPSort>).fpeq(rhs: Expression<FPSort>) = FPEq(this(), rhs)
@@ -2446,60 +2698,80 @@ infix fun (() -> Expression<FPSort>).fpeq(rhs: Expression<FPSort>) = FPEq(this()
 /** Less equals operator for FPSort expressions: [this] <= [rhs]. */
 @JvmName("fpleq_lambda")
 infix fun (() -> Expression<FPSort>).fpleq(rhs: () -> Expression<FPSort>) = FPLeq(this(), rhs())
+
 /** Less than operator for FPSort expressions: [this] < [rhs]. */
 @JvmName("fplt_lambda")
 infix fun (() -> Expression<FPSort>).fplt(rhs: () -> Expression<FPSort>) = FPLt(this(), rhs())
+
 /** Greater equals operator for FPSort expressions: [this] >= [rhs]. */
 @JvmName("fpgeq_lambda")
 infix fun (() -> Expression<FPSort>).fpgeq(rhs: () -> Expression<FPSort>) = FPGeq(this(), rhs())
+
 /** Greater than operator for FPSort expressions: [this] > [rhs]. */
 @JvmName("fpgt_lambda")
 infix fun (() -> Expression<FPSort>).fpgt(rhs: () -> Expression<FPSort>) = FPGt(this(), rhs())
+
 /** Equals operator for FPSort expressions: [this] = [rhs]. */
 @JvmName("fpeq_lambda")
 infix fun (() -> Expression<FPSort>).fpeq(rhs: () -> Expression<FPSort>) = FPEq(this(), rhs())
 
 /** Less equals operator for FPSort expressions: [this] <= [rhs]. */
 infix fun FPLeq.fpleq(rhs: Expression<FPSort>) = FPLeq(this.children + rhs)
+
 /** Less than operator for FPSort expressions: [this] < [rhs]. */
 infix fun FPLt.fplt(rhs: Expression<FPSort>) = FPLt(this.children + rhs)
+
 /** Greater equals operator for FPSort expressions: [this] >= [rhs]. */
 infix fun FPGeq.fpgeq(rhs: Expression<FPSort>) = FPGeq(this.children + rhs)
+
 /** Greater than operator for FPSort expressions: [this] > [rhs]. */
 infix fun FPGt.fpgt(rhs: Expression<FPSort>) = FPGt(this.children + rhs)
+
 /** Equals operator for FPSort expressions: [this] = [rhs]. */
 infix fun FPEq.fpeq(rhs: Expression<FPSort>) = FPEq(this.children + rhs)
 
 /** Less equals operator for FPSort expressions: [this] <= [rhs]. */
 infix fun FPLeq.fpleq(rhs: () -> Expression<FPSort>) = FPLeq(this.children + rhs())
+
 /** Less than operator for FPSort expressions: [this] < [rhs]. */
 infix fun FPLt.fplt(rhs: () -> Expression<FPSort>) = FPLt(this.children + rhs())
+
 /** Greater equals operator for FPSort expressions: [this] >= [rhs]. */
 infix fun FPGeq.fpgeq(rhs: () -> Expression<FPSort>) = FPGeq(this.children + rhs())
+
 /** Greater than operator for FPSort expressions: [this] > [rhs]. */
 infix fun FPGt.fpgt(rhs: () -> Expression<FPSort>) = FPGt(this.children + rhs())
+
 /** Equals operator for FPSort expressions: [this] = [rhs]. */
 infix fun FPEq.fpeq(rhs: () -> Expression<FPSort>) = FPEq(this.children + rhs())
 
 /** Less equals operator for FPSort expressions: [this] <= [rhs]. */
 infix fun (() -> FPLeq).fpleq(rhs: Expression<FPSort>) = FPLeq(this().children + rhs)
+
 /** Less than operator for FPSort expressions: [this] < [rhs]. */
 infix fun (() -> FPLt).fplt(rhs: Expression<FPSort>) = FPLt(this().children + rhs)
+
 /** Greater equals operator for FPSort expressions: [this] >= [rhs]. */
 infix fun (() -> FPGeq).fpgeq(rhs: Expression<FPSort>) = FPGeq(this().children + rhs)
+
 /** Greater than operator for FPSort expressions: [this] > [rhs]. */
 infix fun (() -> FPGt).fpgt(rhs: Expression<FPSort>) = FPGt(this().children + rhs)
+
 /** Equals operator for FPSort expressions: [this] = [rhs]. */
 infix fun (() -> FPEq).fpeq(rhs: Expression<FPSort>) = FPEq(this().children + rhs)
 
 /** Less equals operator for FPSort expressions: [this] <= [rhs]. */
 infix fun (() -> FPLeq).fpleq(rhs: () -> Expression<FPSort>) = FPLeq(this().children + rhs())
+
 /** Less than operator for FPSort expressions: [this] < [rhs]. */
 infix fun (() -> FPLt).fplt(rhs: () -> Expression<FPSort>) = FPLt(this().children + rhs())
+
 /** Greater equals operator for FPSort expressions: [this] >= [rhs]. */
 infix fun (() -> FPGeq).fpgeq(rhs: () -> Expression<FPSort>) = FPGeq(this().children + rhs())
+
 /** Greater than operator for FPSort expressions: [this] > [rhs]. */
 infix fun (() -> FPGt).fpgt(rhs: () -> Expression<FPSort>) = FPGt(this().children + rhs())
+
 /** Equals operator for FPSort expressions: [this] = [rhs]. */
 infix fun (() -> FPEq).fpeq(rhs: () -> Expression<FPSort>) = FPEq(this().children + rhs())
 
@@ -2509,6 +2781,7 @@ infix fun (() -> FPEq).fpeq(rhs: () -> Expression<FPSort>) = FPEq(this().childre
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Expression<FPSort>.fpleq(rhs: Float) = FPLeq(this, FPLiteral(rhs))
+
 /**
  * Less equals operator for FPSort expressions: [this] <= [rhs].
  *
@@ -2522,6 +2795,7 @@ infix fun Expression<FPSort>.fpleq(rhs: Double) = FPLeq(this, FPLiteral(rhs))
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Expression<FPSort>.fplt(rhs: Float) = FPLt(this, FPLiteral(rhs))
+
 /**
  * Less than operator for FPSort expressions: [this] < [rhs].
  *
@@ -2535,6 +2809,7 @@ infix fun Expression<FPSort>.fplt(rhs: Double) = FPLt(this, FPLiteral(rhs))
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Expression<FPSort>.fpgeq(rhs: Float) = FPGeq(this, FPLiteral(rhs))
+
 /**
  * Greater equals operator for FPSort expressions: [this] >= [rhs].
  *
@@ -2548,6 +2823,7 @@ infix fun Expression<FPSort>.fpgeq(rhs: Double) = FPGeq(this, FPLiteral(rhs))
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Expression<FPSort>.fpgt(rhs: Float) = FPGt(this, FPLiteral(rhs))
+
 /**
  * Greater than operator for FPSort expressions: [this] > [rhs].
  *
@@ -2561,6 +2837,7 @@ infix fun Expression<FPSort>.fpgt(rhs: Double) = FPGt(this, FPLiteral(rhs))
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Expression<FPSort>.fpeq(rhs: Float) = FPEq(this, FPLiteral(rhs))
+
 /**
  * Equals operator for FPSort expressions: [this] = [rhs].
  *
@@ -2574,6 +2851,7 @@ infix fun Expression<FPSort>.fpeq(rhs: Double) = FPEq(this, FPLiteral(rhs))
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun (() -> Expression<FPSort>).fpleq(rhs: Float) = FPLeq(this(), FPLiteral(rhs))
+
 /**
  * Less equals operator for FPSort expressions: [this] <= [rhs].
  *
@@ -2587,6 +2865,7 @@ infix fun (() -> Expression<FPSort>).fpleq(rhs: Double) = FPLeq(this(), FPLitera
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun (() -> Expression<FPSort>).fplt(rhs: Float) = FPLt(this(), FPLiteral(rhs))
+
 /**
  * Less than operator for FPSort expressions: [this] < [rhs].
  *
@@ -2600,6 +2879,7 @@ infix fun (() -> Expression<FPSort>).fplt(rhs: Double) = FPLt(this(), FPLiteral(
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun (() -> Expression<FPSort>).fpgeq(rhs: Float) = FPGeq(this(), FPLiteral(rhs))
+
 /**
  * Greater equals operator for FPSort expressions: [this] >= [rhs].
  *
@@ -2613,6 +2893,7 @@ infix fun (() -> Expression<FPSort>).fpgeq(rhs: Double) = FPGeq(this(), FPLitera
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun (() -> Expression<FPSort>).fpgt(rhs: Float) = FPGt(this(), FPLiteral(rhs))
+
 /**
  * Greater than operator for FPSort expressions: [this] > [rhs].
  *
@@ -2626,6 +2907,7 @@ infix fun (() -> Expression<FPSort>).fpgt(rhs: Double) = FPGt(this(), FPLiteral(
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun (() -> Expression<FPSort>).fpeq(rhs: Float) = FPEq(this(), FPLiteral(rhs))
+
 /**
  * Equals operator for FPSort expressions: [this] = [rhs].
  *
@@ -2639,6 +2921,7 @@ infix fun (() -> Expression<FPSort>).fpeq(rhs: Double) = FPEq(this(), FPLiteral(
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fpleq(rhs: Expression<FPSort>) = FPLeq(FPLiteral(this), rhs)
+
 /**
  * Less equals operator for FPSort expressions: [this] <= [rhs].
  *
@@ -2652,6 +2935,7 @@ infix fun Double.fpleq(rhs: Expression<FPSort>) = FPLeq(FPLiteral(this), rhs)
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fplt(rhs: Expression<FPSort>) = FPLt(FPLiteral(this), rhs)
+
 /**
  * Less than operator for FPSort expressions: [this] < [rhs].
  *
@@ -2665,6 +2949,7 @@ infix fun Double.fplt(rhs: Expression<FPSort>) = FPLt(FPLiteral(this), rhs)
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fpgeq(rhs: Expression<FPSort>) = FPGeq(FPLiteral(this), rhs)
+
 /**
  * Greater equals operator for FPSort expressions: [this] >= [rhs].
  *
@@ -2678,6 +2963,7 @@ infix fun Double.fpgeq(rhs: Expression<FPSort>) = FPGeq(FPLiteral(this), rhs)
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fpgt(rhs: Expression<FPSort>) = FPGt(FPLiteral(this), rhs)
+
 /**
  * Greater than operator for FPSort expressions: [this] > [rhs].
  *
@@ -2691,6 +2977,7 @@ infix fun Double.fpgt(rhs: Expression<FPSort>) = FPGt(FPLiteral(this), rhs)
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fpeq(rhs: Expression<FPSort>) = FPEq(FPLiteral(this), rhs)
+
 /**
  * Equals operator for FPSort expressions: [this] = [rhs].
  *
@@ -2704,6 +2991,7 @@ infix fun Double.fpeq(rhs: Expression<FPSort>) = FPEq(FPLiteral(this), rhs)
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fpleq(rhs: () -> Expression<FPSort>) = FPLeq(FPLiteral(this), rhs())
+
 /**
  * Less equals operator for FPSort expressions: [this] <= [rhs].
  *
@@ -2717,6 +3005,7 @@ infix fun Double.fpleq(rhs: () -> Expression<FPSort>) = FPLeq(FPLiteral(this), r
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fplt(rhs: () -> Expression<FPSort>) = FPLt(FPLiteral(this), rhs())
+
 /**
  * Less than operator for FPSort expressions: [this] < [rhs].
  *
@@ -2730,6 +3019,7 @@ infix fun Double.fplt(rhs: () -> Expression<FPSort>) = FPLt(FPLiteral(this), rhs
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fpgeq(rhs: () -> Expression<FPSort>) = FPGeq(FPLiteral(this), rhs())
+
 /**
  * Greater equals operator for FPSort expressions: [this] >= [rhs].
  *
@@ -2743,6 +3033,7 @@ infix fun Double.fpgeq(rhs: () -> Expression<FPSort>) = FPGeq(FPLiteral(this), r
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fpgt(rhs: () -> Expression<FPSort>) = FPGt(FPLiteral(this), rhs())
+
 /**
  * Greater than operator for FPSort expressions: [this] > [rhs].
  *
@@ -2756,6 +3047,7 @@ infix fun Double.fpgt(rhs: () -> Expression<FPSort>) = FPGt(FPLiteral(this), rhs
  * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
  */
 infix fun Float.fpeq(rhs: () -> Expression<FPSort>) = FPEq(FPLiteral(this), rhs())
+
 /**
  * Equals operator for FPSort expressions: [this] = [rhs].
  *

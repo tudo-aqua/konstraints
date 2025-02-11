@@ -89,7 +89,8 @@ class Z3Context {
             "Local variable $symbol had unexpected sort: expected $sort but was ${localVar.sort}")
 
     // conversion should not fail as we checked the sort for localVar matches expected sort
-    @Suppress("UNCHECKED_CAST") return localVar as Expr<T>
+    @Suppress("UNCHECKED_CAST")
+    return localVar as Expr<T>
   }
 
   fun <T : Z3Sort> boundVariable(symbol: Symbol, sort: T): Expr<T> {
@@ -106,7 +107,8 @@ class Z3Context {
             "Bound variable $symbol had unexpected sort: expected $sort but was ${boundVar.sort}")
 
     // conversion should not fail as we checked the sort for localVar matches expected sort
-    @Suppress("UNCHECKED_CAST") return boundVar as Expr<T>
+    @Suppress("UNCHECKED_CAST")
+    return boundVar as Expr<T>
   }
 
   fun <T : Z3Sort> getConstant(symbol: Symbol, sort: T): Expr<T> {
@@ -117,7 +119,8 @@ class Z3Context {
           "Constant $symbol had unexpected sort: expected $sort but was ${constant.sort}")
     }
 
-    @Suppress("UNCHECKED_CAST") return constant as Expr<T>
+    @Suppress("UNCHECKED_CAST")
+    return constant as Expr<T>
   }
 
   fun <T : Z3Sort> getConstantOrNull(symbol: Symbol, sort: T): Expr<T>? =
@@ -140,7 +143,8 @@ class Z3Context {
           "Function $symbol had unexpected sort: expected $sort but was ${function.sort}")
     }
 
-    @Suppress("UNCHECKED_CAST") return function as Expr<T>
+    @Suppress("UNCHECKED_CAST")
+    return function as Expr<T>
   }
 
   fun <T : Z3Sort> getFunctionOrNull(symbol: Symbol, args: List<Expr<*>>, sort: T): Expr<T>? =

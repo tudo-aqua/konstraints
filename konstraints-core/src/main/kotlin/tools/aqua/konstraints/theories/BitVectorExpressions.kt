@@ -551,7 +551,7 @@ class BVXOr(val disjuncts: List<Expression<BVSort>>) :
    * (bvxor (bvor (bvand (bvor (bvand s_1 (bvnot s_2)) (bvand (bvnot s_1) s_2)) (bvnot s_3)) (bvand (bvnot (bvor (bvand s_1 (bvnot s_2)) (bvand (bvnot s_1) s_2))) s_3)) s_4)
    */
   fun expand() =
-      disjuncts.slice(2 ..< disjuncts.size).fold(
+      disjuncts.slice(2..<disjuncts.size).fold(
           BVOr(
               BVAnd(disjuncts[0], BVNot(disjuncts[1])),
               BVAnd(BVNot(disjuncts[0]), disjuncts[1]))) { xnor, expr ->
