@@ -49,10 +49,10 @@ abstract class SMTFunction<out T : Sort> : ContextFunction<Sort> {
   final override fun equals(other: Any?): Boolean {
     if (this === other) return true
     if (other !is SMTFunction<*>) return false
-    if(this is VarBinding && other !is VarBinding<*>) return false
-    if(this !is VarBinding && other is VarBinding<*>) return false
-    if(this is SortedVar && other !is SortedVar<*>) return false
-    if(this !is SortedVar && other is SortedVar<*>) return false
+    if (this is VarBinding && other !is VarBinding<*>) return false
+    if (this !is VarBinding && other is VarBinding<*>) return false
+    if (this is SortedVar && other !is SortedVar<*>) return false
+    if (this !is SortedVar && other is SortedVar<*>) return false
     else if (symbol == other.symbol && // symbol equality
         sort == other.sort && // same sort
         parameters.size == other.parameters.size && // same number of parameters

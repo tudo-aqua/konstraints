@@ -147,20 +147,21 @@ class ContextTests {
           arguments(createContext(), listOf(VarBinding("A".symbol(), True))),
       )
 
-    @ParameterizedTest
-    @MethodSource("getContextAndQuotedFunctions")
-    fun testQuotedFunctionLookup(context : Context, func: SMTFunction<*>, lookupName: String) {
-        context.addFun(func)
+  @ParameterizedTest
+  @MethodSource("getContextAndQuotedFunctions")
+  fun testQuotedFunctionLookup(context: Context, func: SMTFunction<*>, lookupName: String) {
+    context.addFun(func)
 
-        assertTrue(context.contains(lookupName))
-    }
+    assertTrue(context.contains(lookupName))
+  }
 
-    private fun getContextAndQuotedFunctions() =
-        Stream.of(
-            arguments(createContext(), SMTFunction0("|Quoted|".symbol(), BoolSort, null), "Quoted"),
-            arguments(createContext(), SMTFunction0("|Quoted|".symbol(), BoolSort, null), "|Quoted|"),
-            arguments(createContext(), SMTFunction0("Unquoted".symbol(), BoolSort, null), "|Unquoted|"),
-        )
+  private fun getContextAndQuotedFunctions() =
+      Stream.of(
+          arguments(createContext(), SMTFunction0("|Quoted|".symbol(), BoolSort, null), "Quoted"),
+          arguments(createContext(), SMTFunction0("|Quoted|".symbol(), BoolSort, null), "|Quoted|"),
+          arguments(
+              createContext(), SMTFunction0("Unquoted".symbol(), BoolSort, null), "|Unquoted|"),
+      )
 
   private fun createContext(): Context {
     val context = Context()
