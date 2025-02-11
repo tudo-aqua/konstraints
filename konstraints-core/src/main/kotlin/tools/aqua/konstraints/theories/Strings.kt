@@ -64,6 +64,7 @@ class StringLiteral(val value: String) : Literal<StringSort>(LiteralString(value
 
   override val theories: Set<Theories>
     get() = theoriesSet
+
   // TODO the symbol needs a different value, probably should not be a symbol here
 
   // use symbol.toString here to get the unquoted string literal

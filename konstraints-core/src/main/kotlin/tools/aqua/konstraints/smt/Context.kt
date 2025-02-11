@@ -106,7 +106,7 @@ class Context {
     check(n <= undoStack.size)
     check(!activeBinderState) { "Can not pop inside binder!" }
 
-    (0 ..< n).forEach { _ -> currentContext.functions.values.removeAll(undoStack.pop()) }
+    (0..<n).forEach { _ -> currentContext.functions.values.removeAll(undoStack.pop()) }
   }
 
   @JvmName("letWithExpression")

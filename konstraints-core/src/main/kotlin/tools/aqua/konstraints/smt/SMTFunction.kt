@@ -72,7 +72,8 @@ abstract class SMTFunction<out T : Sort> : ContextFunction<Sort> {
       throw FunctionCastException(sort, to.toString())
     }
 
-    @Suppress("UNCHECKED_CAST") return this as SMTFunction<T>
+    @Suppress("UNCHECKED_CAST")
+    return this as SMTFunction<T>
   }
 }
 

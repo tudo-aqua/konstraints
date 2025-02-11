@@ -192,6 +192,7 @@ class BVAnd(val conjuncts: List<Expression<BVSort>>) :
 
   override val theories: Set<Theories>
     get() = theoriesSet
+
   /**
    * Bitwise and operation on bitvectors
    *
@@ -267,6 +268,7 @@ class BVAdd(val summands: List<Expression<BVSort>>) :
 
   override val theories: Set<Theories>
     get() = theoriesSet
+
   /**
    * Addition operation on bitvectors
    *
@@ -303,6 +305,7 @@ class BVMul(val factors: List<Expression<BVSort>>) :
 
   override val theories: Set<Theories>
     get() = theoriesSet
+
   /**
    * Multiplication operation on bitvectors
    *
