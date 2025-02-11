@@ -740,8 +740,6 @@ data class SMTFunction2<T : Sort, S1 : Sort, S2 : Sort>(
       UserDefinedExpression(symbol, sort, listOf(arg1, arg2), definition, this)
     }
   }
-
-  override fun equals(other: Any?) = super.equals(other)
 }
 
 /**

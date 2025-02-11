@@ -136,9 +136,7 @@ class ContextTests {
   fun testFunctionsAreShadowedCorrectly(context: Context, bindings: List<VarBinding<*>>) {
     val function = context.getFunc(bindings[0].name)
 
-    context.let(bindings) { context, bindings ->
-      val inserted = context.getFunc(function.name)
-      println(context.getFunc(function.name) == function)
+    context.let(bindings) { bindings, context ->
       assertFalse(context.getFunc(function.name) == function)
       True
     }
@@ -148,6 +146,21 @@ class ContextTests {
       Stream.of(
           arguments(createContext(), listOf(VarBinding("A".symbol(), True))),
       )
+
+    @ParameterizedTest
+    @MethodSource("getContextAndQuotedFunctions")
+    fun testQuotedFunctionLookup(context : Context, func: SMTFunction<*>, lookupName: String) {
+        context.addFun(func)
+
+        assertTrue(context.contains(lookupName))
+    }
+
+    private fun getContextAndQuotedFunctions() =
+        Stream.of(
+            arguments(createContext(), SMTFunction0("|Quoted|".symbol(), BoolSort, null), "Quoted"),
+            arguments(createContext(), SMTFunction0("|Quoted|".symbol(), BoolSort, null), "|Quoted|"),
+            arguments(createContext(), SMTFunction0("Unquoted".symbol(), BoolSort, null), "|Unquoted|"),
+        )
 
   private fun createContext(): Context {
     val context = Context()

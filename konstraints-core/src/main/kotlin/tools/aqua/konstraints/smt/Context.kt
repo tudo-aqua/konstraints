@@ -23,8 +23,6 @@ import tools.aqua.konstraints.theories.BoolSort
 import tools.aqua.konstraints.util.Stack
 import tools.aqua.konstraints.util.zipWithSameLength
 
-typealias StackLevel = AssertionLevel<SMTFunction<*>, Sort>
-
 private class CurrentContext {
   val functions = mutableMapOf<String, SMTFunction<*>>()
   val sorts = mutableMapOf<String, Sort>()
@@ -70,8 +68,7 @@ class Context {
     return func
   }
 
-  // TODO this should consider more than just the name
-  fun contains(func: String) = currentContext.functions[func] != null
+  fun contains(func: String) = currentContext.functions[func.trim('|')] != null
 
   fun contains(expression: Expression<*>) = expression.func in currentContext.functions.values
 
@@ -85,7 +82,7 @@ class Context {
       }
 
   fun <T : Sort> getFunc(name: String, sort: T) =
-      currentContext.functions[name]?.castTo(sort) ?: throw FunctionNotFoundException(name)
+      currentContext.functions[name.trim('|')]?.castTo(sort) ?: throw FunctionNotFoundException(name)
 
   fun getFuncOrNull(name: String): SMTFunction<*>? {
     return try {
@@ -96,7 +93,7 @@ class Context {
   }
 
   fun getFunc(name: String) =
-      currentContext.functions[name] ?: throw FunctionNotFoundException(name)
+      currentContext.functions[name.trim('|')] ?: throw FunctionNotFoundException(name)
 
   fun push(block: Context.() -> Unit) {
     undoStack.push(mutableSetOf<SMTFunction<*>>())
@@ -710,15 +707,6 @@ interface ContextFunction<S> {
 interface ContextSort {
   val name: String
   val arity: Int
-}
-
-class MutableAssertionLevel : AssertionLevel<SMTFunction<*>, Sort> {
-  override val functions: MutableMap<String, SMTFunction<*>> = mutableMapOf()
-  override val sorts: MutableMap<String, Sort> = mutableMapOf()
-
-  fun <T : Sort> addFun(func: SMTFunction<T>) = functions.put(func.name.toString(), func)
-
-  fun addSort(func: Sort) = sorts.put(func.name.toString(), func)
 }
 
 class FunctionNotFoundException(name: String) : NoSuchElementException("Function $name not found")

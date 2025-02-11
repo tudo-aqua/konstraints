@@ -90,16 +90,6 @@ enum class Associativity {
     return true
   }
 
-  override fun equals(other: Any?): Boolean =
-      when {
-        this === other -> true
-        other !is FunctionDecl<*> -> false
-        else -> (symbol == other.symbol) && (parameters == other.parameters) && (sort == other.sort)
-      }
-
-  override fun hashCode(): Int =
-      symbol.hashCode() * 961 + parameters.hashCode() * 31 + sort.hashCode()
-
   override fun toString() = "($symbol (${parameters.joinToString(" ")}) $sort)"
 }
 
