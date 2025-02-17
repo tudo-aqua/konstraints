@@ -120,12 +120,8 @@ open class Symbol internal constructor(symbol: String, rule: QuotingRule) : SMTS
       when {
         this === other -> true
         other !is Symbol -> false
-        else -> symbolEquality(other)
+        else -> value == other.value
       }
-
-  private fun symbolEquality(other: Symbol): Boolean {
-    return value == other.value
-  }
 
   /** Returns the internal representation of the symbol without any quotes */
   override fun toString() = value
