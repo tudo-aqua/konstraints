@@ -82,8 +82,7 @@ class Context {
       }
 
   fun <T : Sort> getFunc(name: Symbol, sort: T) =
-      currentContext.functions[name]?.castTo(sort)
-          ?: throw FunctionNotFoundException(name)
+      currentContext.functions[name]?.castTo(sort) ?: throw FunctionNotFoundException(name)
 
   fun getFuncOrNull(name: Symbol): SMTFunction<*>? {
     return try {
@@ -109,38 +108,38 @@ class Context {
     (0..<n).forEach { _ -> currentContext.functions.values.removeAll(undoStack.pop()) }
   }
 
-    internal fun <T : Sort> let(
-        varBindings: List<VarBinding<*>>,
-        block: () -> Expression<T>
-    ): LetExpression<T> {
-        bindVariables(varBindings)
-        val term = block()
-        unbindVariables()
+  internal fun <T : Sort> let(
+      varBindings: List<VarBinding<*>>,
+      block: () -> Expression<T>
+  ): LetExpression<T> {
+    bindVariables(varBindings)
+    val term = block()
+    unbindVariables()
 
-        return LetExpression(varBindings, term)
-    }
+    return LetExpression(varBindings, term)
+  }
 
-    internal fun exists(
-        sortedVars: List<SortedVar<*>>,
-        block: () -> Expression<BoolSort>
-    ): ExistsExpression {
-        bindVariables(sortedVars)
-        val term = block()
-        unbindVariables()
+  internal fun exists(
+      sortedVars: List<SortedVar<*>>,
+      block: () -> Expression<BoolSort>
+  ): ExistsExpression {
+    bindVariables(sortedVars)
+    val term = block()
+    unbindVariables()
 
-        return ExistsExpression(sortedVars, term)
-    }
+    return ExistsExpression(sortedVars, term)
+  }
 
-    internal fun forall(
-        sortedVars: List<SortedVar<*>>,
-        block: () -> Expression<BoolSort>
-    ): ForallExpression {
-        bindVariables(sortedVars)
-        val term = block()
-        unbindVariables()
+  internal fun forall(
+      sortedVars: List<SortedVar<*>>,
+      block: () -> Expression<BoolSort>
+  ): ForallExpression {
+    bindVariables(sortedVars)
+    val term = block()
+    unbindVariables()
 
-        return ForallExpression(sortedVars, term)
-    }
+    return ForallExpression(sortedVars, term)
+  }
 
   /**
    * Bind local variables by
@@ -243,14 +242,20 @@ fun <T1 : Sort, T2 : Sort, S : Sort> Context.let(
     varBinding1: VarBinding<T1>,
     varBinding2: VarBinding<T2>,
     block: (Expression<T1>, Expression<T2>, Context) -> Expression<S>
-) = let(listOf(varBinding1, varBinding2)) { block(varBinding1.instance, varBinding2.instance, this) }
+) =
+    let(listOf(varBinding1, varBinding2)) {
+      block(varBinding1.instance, varBinding2.instance, this)
+    }
 
 fun <T1 : Sort, T2 : Sort, T3 : Sort, S : Sort> Context.let(
     varBinding1: VarBinding<T1>,
     varBinding2: VarBinding<T2>,
     varBinding3: VarBinding<T3>,
     block: (Expression<T1>, Expression<T2>, Expression<T3>, Context) -> Expression<S>
-) = let(listOf(varBinding1, varBinding2, varBinding3)) { block(varBinding1.instance, varBinding2.instance, varBinding3.instance, this) }
+) =
+    let(listOf(varBinding1, varBinding2, varBinding3)) {
+      block(varBinding1.instance, varBinding2.instance, varBinding3.instance, this)
+    }
 
 fun <T1 : Sort, T2 : Sort, T3 : Sort, T4 : Sort, S : Sort> Context.let(
     varBinding1: VarBinding<T1>,
@@ -259,7 +264,15 @@ fun <T1 : Sort, T2 : Sort, T3 : Sort, T4 : Sort, S : Sort> Context.let(
     varBinding4: VarBinding<T4>,
     block:
         (Expression<T1>, Expression<T2>, Expression<T3>, Expression<T4>, Context) -> Expression<S>
-) = let(listOf(varBinding1, varBinding2, varBinding3, varBinding4)) { block(varBinding1.instance, varBinding2.instance, varBinding3.instance, varBinding4.instance, this) }
+) =
+    let(listOf(varBinding1, varBinding2, varBinding3, varBinding4)) {
+      block(
+          varBinding1.instance,
+          varBinding2.instance,
+          varBinding3.instance,
+          varBinding4.instance,
+          this)
+    }
 
 fun <T1 : Sort, T2 : Sort, T3 : Sort, T4 : Sort, T5 : Sort, S : Sort> Context.let(
     varBinding1: VarBinding<T1>,
@@ -269,13 +282,22 @@ fun <T1 : Sort, T2 : Sort, T3 : Sort, T4 : Sort, T5 : Sort, S : Sort> Context.le
     varBinding5: VarBinding<T5>,
     block:
         (
-        Expression<T1>,
-        Expression<T2>,
-        Expression<T3>,
-        Expression<T4>,
-        Expression<T5>,
-        Context) -> Expression<S>
-) = let(listOf(varBinding1, varBinding2, varBinding3, varBinding4, varBinding5)) { block(varBinding1.instance, varBinding2.instance, varBinding3.instance, varBinding4.instance, varBinding5.instance, this) }
+            Expression<T1>,
+            Expression<T2>,
+            Expression<T3>,
+            Expression<T4>,
+            Expression<T5>,
+            Context) -> Expression<S>
+) =
+    let(listOf(varBinding1, varBinding2, varBinding3, varBinding4, varBinding5)) {
+      block(
+          varBinding1.instance,
+          varBinding2.instance,
+          varBinding3.instance,
+          varBinding4.instance,
+          varBinding5.instance,
+          this)
+    }
 
 @JvmName("letWithExpression")
 fun <T : Sort> Context.let(
@@ -284,7 +306,7 @@ fun <T : Sort> Context.let(
 ) =
     let(
         varBindings.mapIndexed { idx, expr ->
-            VarBinding("local${expr.sort}${idx}".symbol(), expr)
+          VarBinding("local${expr.sort}${idx}".symbol(), expr)
         },
         block)
 
@@ -338,12 +360,12 @@ fun <T1 : Sort, T2 : Sort, T3 : Sort, T4 : Sort, T5 : Sort, S : Sort> Context.le
     term5: Expression<T5>,
     block:
         (
-        Expression<T1>,
-        Expression<T2>,
-        Expression<T3>,
-        Expression<T4>,
-        Expression<T5>,
-        Context) -> Expression<S>
+            Expression<T1>,
+            Expression<T2>,
+            Expression<T3>,
+            Expression<T4>,
+            Expression<T5>,
+            Context) -> Expression<S>
 ) =
     let(
         VarBinding("local${term1.sort}1".symbol(), term1),
@@ -356,25 +378,28 @@ fun <T1 : Sort, T2 : Sort, T3 : Sort, T4 : Sort, T5 : Sort, S : Sort> Context.le
 fun Context.exists(
     sortedVars: List<SortedVar<*>>,
     block: (List<Expression<*>>, Context) -> Expression<BoolSort>
-) = exists(sortedVars) { block(sortedVars.map { it.instance }, this)}
+) = exists(sortedVars) { block(sortedVars.map { it.instance }, this) }
 
 fun <S : Sort> Context.exists(
     sortedVar: SortedVar<S>,
     block: (Expression<S>, Context) -> Expression<BoolSort>
-) = exists(listOf(sortedVar)) { block(sortedVar.instance, this)}
+) = exists(listOf(sortedVar)) { block(sortedVar.instance, this) }
 
 fun <S1 : Sort, S2 : Sort> Context.exists(
     sortedVar1: SortedVar<S1>,
     sortedVar2: SortedVar<S2>,
     block: (Expression<S1>, Expression<S2>, Context) -> Expression<BoolSort>
-) = exists(listOf(sortedVar1, sortedVar2)) { block(sortedVar1.instance, sortedVar2.instance, this)}
+) = exists(listOf(sortedVar1, sortedVar2)) { block(sortedVar1.instance, sortedVar2.instance, this) }
 
 fun <S1 : Sort, S2 : Sort, S3 : Sort> Context.exists(
     sortedVar1: SortedVar<S1>,
     sortedVar2: SortedVar<S2>,
     sortedVar3: SortedVar<S3>,
     block: (Expression<S1>, Expression<S2>, Expression<S3>, Context) -> Expression<BoolSort>
-) = exists(listOf(sortedVar1, sortedVar2, sortedVar3)) { block(sortedVar1.instance, sortedVar2.instance, sortedVar3.instance, this )}
+) =
+    exists(listOf(sortedVar1, sortedVar2, sortedVar3)) {
+      block(sortedVar1.instance, sortedVar2.instance, sortedVar3.instance, this)
+    }
 
 fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> Context.exists(
     sortedVar1: SortedVar<S1>,
@@ -383,8 +408,12 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> Context.exists(
     sortedVar4: SortedVar<S4>,
     block:
         (Expression<S1>, Expression<S2>, Expression<S3>, Expression<S4>, Context) -> Expression<
-            BoolSort>
-) = exists(listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4)) { block(sortedVar1.instance, sortedVar2.instance, sortedVar3.instance, sortedVar4.instance, this )}
+                BoolSort>
+) =
+    exists(listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4)) {
+      block(
+          sortedVar1.instance, sortedVar2.instance, sortedVar3.instance, sortedVar4.instance, this)
+    }
 
 fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Context.exists(
     sortedVar1: SortedVar<S1>,
@@ -394,13 +423,22 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Context.exists(
     sortedVar5: SortedVar<S5>,
     block:
         (
-        Expression<S1>,
-        Expression<S2>,
-        Expression<S3>,
-        Expression<S4>,
-        Expression<S5>,
-        Context) -> Expression<BoolSort>
-) = exists(listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4, sortedVar5)) { block(sortedVar1.instance, sortedVar2.instance, sortedVar3.instance, sortedVar4.instance, sortedVar5.instance, this ) }
+            Expression<S1>,
+            Expression<S2>,
+            Expression<S3>,
+            Expression<S4>,
+            Expression<S5>,
+            Context) -> Expression<BoolSort>
+) =
+    exists(listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4, sortedVar5)) {
+      block(
+          sortedVar1.instance,
+          sortedVar2.instance,
+          sortedVar3.instance,
+          sortedVar4.instance,
+          sortedVar5.instance,
+          this)
+    }
 
 @JvmName("existsWithSorts")
 fun Context.exists(
@@ -443,7 +481,7 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> Context.exists(
     sort4: S4,
     block:
         (Expression<S1>, Expression<S2>, Expression<S3>, Expression<S4>, Context) -> Expression<
-            BoolSort>
+                BoolSort>
 ) =
     exists(
         SortedVar("local!${sort1}1".symbol(), sort1),
@@ -460,12 +498,12 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Context.exists(
     sort5: S5,
     block:
         (
-        Expression<S1>,
-        Expression<S2>,
-        Expression<S3>,
-        Expression<S4>,
-        Expression<S5>,
-        Context) -> Expression<BoolSort>
+            Expression<S1>,
+            Expression<S2>,
+            Expression<S3>,
+            Expression<S4>,
+            Expression<S5>,
+            Context) -> Expression<BoolSort>
 ) =
     exists(
         SortedVar("local!${sort1}1".symbol(), sort1),
@@ -478,25 +516,28 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Context.exists(
 fun Context.forall(
     sortedVars: List<SortedVar<*>>,
     block: (List<Expression<*>>, Context) -> Expression<BoolSort>
-) = forall(sortedVars) { block(sortedVars.map { it.instance }, this)}
+) = forall(sortedVars) { block(sortedVars.map { it.instance }, this) }
 
 fun <S : Sort> Context.forall(
     sortedVar: SortedVar<S>,
     block: (Expression<S>, Context) -> Expression<BoolSort>
-) = forall(listOf(sortedVar)) { block(sortedVar.instance, this)}
+) = forall(listOf(sortedVar)) { block(sortedVar.instance, this) }
 
 fun <S1 : Sort, S2 : Sort> Context.forall(
     sortedVar1: SortedVar<S1>,
     sortedVar2: SortedVar<S2>,
     block: (Expression<S1>, Expression<S2>, Context) -> Expression<BoolSort>
-) = forall(listOf(sortedVar1, sortedVar2)) { block(sortedVar1.instance, sortedVar2.instance, this)}
+) = forall(listOf(sortedVar1, sortedVar2)) { block(sortedVar1.instance, sortedVar2.instance, this) }
 
 fun <S1 : Sort, S2 : Sort, S3 : Sort> Context.forall(
     sortedVar1: SortedVar<S1>,
     sortedVar2: SortedVar<S2>,
     sortedVar3: SortedVar<S3>,
     block: (Expression<S1>, Expression<S2>, Expression<S3>, Context) -> Expression<BoolSort>
-) = forall(listOf(sortedVar1, sortedVar2, sortedVar3)) { block(sortedVar1.instance, sortedVar2.instance, sortedVar3.instance, this )}
+) =
+    forall(listOf(sortedVar1, sortedVar2, sortedVar3)) {
+      block(sortedVar1.instance, sortedVar2.instance, sortedVar3.instance, this)
+    }
 
 fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> Context.forall(
     sortedVar1: SortedVar<S1>,
@@ -505,8 +546,12 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> Context.forall(
     sortedVar4: SortedVar<S4>,
     block:
         (Expression<S1>, Expression<S2>, Expression<S3>, Expression<S4>, Context) -> Expression<
-            BoolSort>
-) = forall(listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4)) { block(sortedVar1.instance, sortedVar2.instance, sortedVar3.instance, sortedVar4.instance, this )}
+                BoolSort>
+) =
+    forall(listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4)) {
+      block(
+          sortedVar1.instance, sortedVar2.instance, sortedVar3.instance, sortedVar4.instance, this)
+    }
 
 fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Context.forall(
     sortedVar1: SortedVar<S1>,
@@ -516,13 +561,22 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Context.forall(
     sortedVar5: SortedVar<S5>,
     block:
         (
-        Expression<S1>,
-        Expression<S2>,
-        Expression<S3>,
-        Expression<S4>,
-        Expression<S5>,
-        Context) -> Expression<BoolSort>
-) = forall(listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4, sortedVar5)) { block(sortedVar1.instance, sortedVar2.instance, sortedVar3.instance, sortedVar4.instance, sortedVar5.instance, this ) }
+            Expression<S1>,
+            Expression<S2>,
+            Expression<S3>,
+            Expression<S4>,
+            Expression<S5>,
+            Context) -> Expression<BoolSort>
+) =
+    forall(listOf(sortedVar1, sortedVar2, sortedVar3, sortedVar4, sortedVar5)) {
+      block(
+          sortedVar1.instance,
+          sortedVar2.instance,
+          sortedVar3.instance,
+          sortedVar4.instance,
+          sortedVar5.instance,
+          this)
+    }
 
 @JvmName("existsWithSorts")
 fun Context.forall(
@@ -565,7 +619,7 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> Context.forall(
     sort4: S4,
     block:
         (Expression<S1>, Expression<S2>, Expression<S3>, Expression<S4>, Context) -> Expression<
-            BoolSort>
+                BoolSort>
 ) =
     forall(
         SortedVar("local!${sort1}1".symbol(), sort1),
@@ -582,12 +636,12 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Context.forall(
     sort5: S5,
     block:
         (
-        Expression<S1>,
-        Expression<S2>,
-        Expression<S3>,
-        Expression<S4>,
-        Expression<S5>,
-        Context) -> Expression<BoolSort>
+            Expression<S1>,
+            Expression<S2>,
+            Expression<S3>,
+            Expression<S4>,
+            Expression<S5>,
+            Context) -> Expression<BoolSort>
 ) =
     forall(
         SortedVar("local!${sort1}1".symbol(), sort1),
