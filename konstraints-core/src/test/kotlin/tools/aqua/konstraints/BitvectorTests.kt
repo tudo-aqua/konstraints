@@ -29,8 +29,8 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
+import tools.aqua.konstraints.dsl.SMTFunction0
 import tools.aqua.konstraints.smt.Expression
-import tools.aqua.konstraints.smt.UserDeclaredExpression
 import tools.aqua.konstraints.smt.symbol
 import tools.aqua.konstraints.theories.*
 import tools.aqua.konstraints.theories.BVSort
@@ -41,12 +41,12 @@ import tools.aqua.konstraints.theories.BVSort
  */
 @TestInstance(Lifecycle.PER_CLASS)
 class BitvectorTests {
-  private val A = UserDeclaredExpression("A".symbol(), BVSort(8))
-  private val B = UserDeclaredExpression("B".symbol(), BVSort(8))
-  private val C = UserDeclaredExpression("C".symbol(), BVSort(8))
-  private val D = UserDeclaredExpression("D".symbol(), BVSort(16))
-  private val symbolicE = UserDeclaredExpression("E".symbol(), BVSort.fromSymbol("a"))
-  private val symbolicF = UserDeclaredExpression("F".symbol(), BVSort.fromSymbol("b"))
+  private val A = SMTFunction0("A".symbol(), BVSort(8), null)()
+  private val B = SMTFunction0("B".symbol(), BVSort(8), null)()
+  private val C = SMTFunction0("C".symbol(), BVSort(8), null)()
+  private val D = SMTFunction0("D".symbol(), BVSort(16), null)()
+  private val symbolicE = SMTFunction0("E".symbol(), BVSort.fromSymbol("a"), null)()
+  private val symbolicF = SMTFunction0("F".symbol(), BVSort.fromSymbol("b"), null)()
 
   @ParameterizedTest
   @MethodSource("getBVExpressionsAndSerialization")

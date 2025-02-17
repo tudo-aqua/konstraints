@@ -236,7 +236,7 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
       is Or -> this.z3ify(context)
       is XOr -> this.z3ify(context)
       is Equals<*> -> this.z3ify(context)
-      is Distinct -> this.z3ify(context)
+      is Distinct<*> -> this.z3ify(context)
       is BVUlt -> this.z3ify(context)
       is BVULe -> this.z3ify(context)
       is BVUGt -> this.z3ify(context)
@@ -319,7 +319,7 @@ fun Equals<*>.z3ify(context: Z3Context): Expr<Z3BoolSort> {
   return if (inner.size == 1) inner.single() else context.context.mkAnd(*inner.toTypedArray())
 }
 
-fun Distinct.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+fun Distinct<*>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkDistinct(*this.statements.map { it.z3ify(context) }.toTypedArray())
 
 fun BVUlt.z3ify(context: Z3Context): Expr<Z3BoolSort> =
@@ -1191,7 +1191,7 @@ fun RegLan.z3ify(context: Z3Context): ReSort<SeqSort<CharSort>> =
     context.context.mkReSort(context.context.mkSeqSort(context.context.mkCharSort()))
 
 fun UserDefinedSort.z3ify(context: Z3Context): UninterpretedSort =
-    context.context.mkUninterpretedSort(this.name.toSMTString())
+    context.context.mkUninterpretedSort(this.symbol.toSMTString())
 
 fun ArraySort<*, *>.z3ify(context: Z3Context): Z3ArraySort<*, *> =
     context.context.mkArraySort(this.x.z3ify(context), this.y.z3ify(context))

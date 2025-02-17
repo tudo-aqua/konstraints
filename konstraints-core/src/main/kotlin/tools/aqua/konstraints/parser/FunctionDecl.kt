@@ -30,15 +30,18 @@ enum class Associativity {
 }
 
 /*internal*/ open class FunctionDecl<S : Sort>(
-    val name: Symbol,
+    override val symbol: Symbol,
     val parametricSorts: Set<Sort>,
-    val params: List<Sort>,
+    override val parameters: List<Sort>,
     val functionIndices: Set<SymbolIndex>,
     val paramIndices: Set<SymbolIndex>,
-    val sort: S,
-    val associativity: Associativity
-) {
-  val signature = Signature(parametricSorts, functionIndices, paramIndices, params, sort)
+    override val sort: S,
+    val associativity: Associativity,
+    override val definition: FunctionDef<S>?
+) : SMTFunction<S>() {
+
+  override val name = symbol.toString()
+  val signature = Signature(parametricSorts, functionIndices, paramIndices, parameters, sort)
 
   open fun buildExpression(
       args: List<Expression<*>>,
@@ -46,7 +49,7 @@ enum class Associativity {
   ): Expression<S> {
     bindParametersToExpressions(args, functionIndices)
 
-    return UserDeclaredExpression(name, sort, args)
+    return UserDeclaredExpression(symbol, sort, args, this)
   }
 
   fun bindParametersToExpressions(args: List<Expression<*>>, indices: List<NumeralIndex>) =
@@ -87,19 +90,10 @@ enum class Associativity {
     return true
   }
 
-  override fun equals(other: Any?): Boolean =
-      when {
-        this === other -> true
-        other !is FunctionDecl<*> -> false
-        else -> (name == other.name) && (params == other.params) && (sort == other.sort)
-      }
-
-  override fun hashCode(): Int = name.hashCode() * 961 + params.hashCode() * 31 + sort.hashCode()
-
-  override fun toString() = "($name (${params.joinToString(" ")}) $sort)"
+  override fun toString() = "($symbol (${parameters.joinToString(" ")}) $sort)"
 }
 
-internal class FunctionDefinition<S : Sort>(val definition: FunctionDef<S>) :
+internal class FunctionDefinition<S : Sort>(override val definition: FunctionDef<S>) :
     FunctionDecl<S>(
         definition.name,
         emptySet(),
@@ -107,12 +101,13 @@ internal class FunctionDefinition<S : Sort>(val definition: FunctionDef<S>) :
         emptySet(),
         emptySet(),
         definition.sort,
-        Associativity.NONE) {
+        Associativity.NONE,
+        definition) {
 
   override fun buildExpression(
       args: List<Expression<*>>,
       functionIndices: List<NumeralIndex>
-  ): Expression<S> = UserDefinedExpression(name, sort, args, definition)
+  ): Expression<S> = UserDefinedExpression(symbol, sort, args, definition, this)
 }
 
 /*internal*/ abstract class FunctionDecl0<S : Sort>(
@@ -122,7 +117,14 @@ internal class FunctionDefinition<S : Sort>(val definition: FunctionDef<S>) :
     sort: S
 ) :
     FunctionDecl<S>(
-        name, parametricSorts, emptyList(), functionIndices, emptySet(), sort, Associativity.NONE) {
+        name,
+        parametricSorts,
+        emptyList(),
+        functionIndices,
+        emptySet(),
+        sort,
+        Associativity.NONE,
+        null) {
 
   override fun buildExpression(
       args: List<Expression<*>>,
@@ -147,7 +149,14 @@ internal abstract class FunctionDecl1<P : Sort, S : Sort>(
     sort: S
 ) :
     FunctionDecl<S>(
-        name, parametricSorts, listOf(param), functionIndices, indices, sort, Associativity.NONE) {
+        name,
+        parametricSorts,
+        listOf(param),
+        functionIndices,
+        indices,
+        sort,
+        Associativity.NONE,
+        null) {
 
   override fun buildExpression(
       args: List<Expression<*>>,
@@ -178,7 +187,8 @@ internal abstract class FunctionDecl2<P1 : Sort, P2 : Sort, S : Sort>(
         functionIndices,
         indices,
         sort,
-        Associativity.NONE) {
+        Associativity.NONE,
+        null) {
   override fun buildExpression(
       args: List<Expression<*>>,
       functionIndices: List<NumeralIndex>
@@ -214,7 +224,8 @@ internal abstract class FunctionDecl3<P1 : Sort, P2 : Sort, P3 : Sort, S : Sort>
         functionIndices,
         indices,
         sort,
-        Associativity.NONE) {
+        Associativity.NONE,
+        null) {
   override fun buildExpression(
       args: List<Expression<*>>,
       functionIndices: List<NumeralIndex>
@@ -253,12 +264,13 @@ internal abstract class FunctionDecl4<P1 : Sort, P2 : Sort, P3 : Sort, P4 : Sort
         functionIndices,
         indices,
         sort,
-        Associativity.NONE) {
+        Associativity.NONE,
+        null) {
   override fun buildExpression(
       args: List<Expression<*>>,
       functionIndices: List<NumeralIndex>
   ): Expression<S> {
-    require(args.size == 4) { "$name expected 4 arguments but got ${args.size}: $args" }
+    require(args.size == 4) { "$symbol expected 4 arguments but got ${args.size}: $args" }
     val bindings = bindParametersToExpressions(args, functionIndices)
 
     // TODO suppress unchecked cast warning
@@ -295,7 +307,8 @@ internal abstract class FunctionDeclLeftAssociative<P1 : Sort, P2 : Sort, S : So
         functionIndices,
         indices,
         sort,
-        Associativity.LEFT_ASSOC) {
+        Associativity.LEFT_ASSOC,
+        null) {
   override fun buildExpression(
       args: List<Expression<*>>,
       functionIndices: List<NumeralIndex>
@@ -333,7 +346,8 @@ internal abstract class FunctionDeclRightAssociative<P1 : Sort, P2 : Sort, S : S
         functionIndices,
         indices,
         sort,
-        Associativity.RIGHT_ASSOC) {
+        Associativity.RIGHT_ASSOC,
+        null) {
   override fun buildExpression(
       args: List<Expression<*>>,
       functionIndices: List<NumeralIndex>
@@ -370,7 +384,8 @@ internal abstract class FunctionDeclChainable<P : Sort>(
         functionIndices,
         indices,
         BoolSort,
-        Associativity.CHAINABLE) {
+        Associativity.CHAINABLE,
+        null) {
   override fun buildExpression(
       args: List<Expression<*>>,
       functionIndices: List<NumeralIndex>
@@ -401,7 +416,8 @@ internal abstract class FunctionDeclPairwise<P : Sort>(
         functionIndices,
         indices,
         BoolSort,
-        Associativity.PAIRWISE) {
+        Associativity.PAIRWISE,
+        null) {
   override fun buildExpression(
       args: List<Expression<*>>,
       functionIndices: List<NumeralIndex>

@@ -57,8 +57,8 @@ class Z3Context {
         mapOf(
             *sortedVars
                 .map { sortedVar ->
-                  sortedVar.name.toString() to
-                      context.mkConst(sortedVar.name.toSMTString(), sortedVar.sort.z3ify(this))
+                  sortedVar.symbol.toString() to
+                      context.mkConst(sortedVar.symbol.toSMTString(), sortedVar.sort.z3ify(this))
                 }
                 .toTypedArray()))
 

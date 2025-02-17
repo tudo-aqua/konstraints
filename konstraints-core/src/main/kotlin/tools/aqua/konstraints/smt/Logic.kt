@@ -18,10 +18,10 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.*
+import tools.aqua.konstraints.theories.Theories
 
 interface Logic {
-  val theories: List<Theory>
+  val theories: Set<Theories>
   val datatypes: Boolean
   val quantifierFree: Boolean
   val linearArithmetic: Boolean
@@ -31,14 +31,15 @@ interface Logic {
 }
 
 /**
- * This logic does not yet provide an offical documentation, but has the the following properties:
+ * This logic does not yet provide an offical documentation, but has the following properties:
  *
  * This logic includes the following theories:
  * - FixedSizeBitVectors
  * - FloatingPoint
  */
 data object BVFP : Logic {
-  override val theories = listOf(CoreTheory, BitVectorExpressionTheory, FloatingPointTheory)
+  override val theories =
+      setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS, Theories.FLOATING_POINT)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = false
@@ -51,11 +52,13 @@ data object BVFP : Logic {
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - Reals
  */
 data object NRA : Logic {
-  override val theories = listOf(CoreTheory, RealsTheory)
+  override val theories = setOf(Theories.CORE, Theories.REALS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -67,14 +70,20 @@ data object NRA : Logic {
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
- * - Quantifier free This logic includes the following theories:
+ * - Quantifier free
+ *
+ * This logic includes the following theories:
  * - FixedSizeBitVectors
  * - FloatingPoint
  * - ArraysEx
  */
 data object QF_AUFBVFP : Logic {
   override val theories =
-      listOf(CoreTheory, BitVectorExpressionTheory, FloatingPointTheory, ArrayExTheory)
+      setOf(
+          Theories.CORE,
+          Theories.FIXED_SIZE_BIT_VECTORS,
+          Theories.FLOATING_POINT,
+          Theories.ARRAYS_EX)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -85,14 +94,20 @@ data object QF_AUFBVFP : Logic {
 
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
- * - Free sort and function symbols This logic includes the following theories:
+ * - Free sort and function symbols
+ *
+ * This logic includes the following theories:
  * - FixedSizeBitVectors
  * - FloatingPoint
  * - ArraysEx
  */
 data object AUFBVFP : Logic {
   override val theories =
-      listOf(CoreTheory, BitVectorExpressionTheory, FloatingPointTheory, ArrayExTheory)
+      setOf(
+          Theories.CORE,
+          Theories.FIXED_SIZE_BIT_VECTORS,
+          Theories.FLOATING_POINT,
+          Theories.ARRAYS_EX)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = false
@@ -106,7 +121,7 @@ data object AUFBVFP : Logic {
  * function symbols.
  */
 data object UFNIA : Logic {
-  override val theories = listOf(CoreTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -121,11 +136,13 @@ data object UFNIA : Logic {
  * - Quantifier free
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - Ints
  */
 data object QF_UFNIA : Logic {
-  override val theories = listOf(CoreTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -148,7 +165,7 @@ data object QF_UFNIA : Logic {
  * - x, y are free constant symbols of sort Real.
  */
 data object QF_RDL : Logic {
-  override val theories = listOf(CoreTheory, RealsTheory)
+  override val theories = setOf(Theories.CORE, Theories.REALS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -164,7 +181,7 @@ data object QF_RDL : Logic {
  * specified in the :extensions attribute.
  */
 data object QF_LIA : Logic {
-  override val theories = listOf(CoreTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -175,12 +192,15 @@ data object QF_LIA : Logic {
 
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
- * - Quantifier free This logic includes the following theories:
+ * - Quantifier free
+ *
+ * This logic includes the following theories:
  * - FixedSizeBitVectors
  * - FloatingPoint
  */
 data object QF_BVFP : Logic {
-  override val theories = listOf(CoreTheory, BitVectorExpressionTheory, FloatingPointTheory)
+  override val theories =
+      setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS, Theories.FLOATING_POINT)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -197,7 +217,7 @@ data object QF_BVFP : Logic {
  * - all array terms have sort (Array Int Int).
  */
 data object AUFLIA : Logic {
-  override val theories = listOf(CoreTheory, ArrayExTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.ARRAYS_EX, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -211,7 +231,7 @@ data object AUFLIA : Logic {
  * constant symbols.
  */
 data object QF_NIA : Logic {
-  override val theories = listOf(CoreTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -226,11 +246,13 @@ data object QF_NIA : Logic {
  * - Datatype support
  * - Quantifier free
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - Ints
  */
 data object QF_UFDTLIA : Logic {
-  override val theories = listOf(CoreTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.INTS)
   override val datatypes = true
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -242,11 +264,13 @@ data object QF_UFDTLIA : Logic {
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
- * - Datatype support This logic includes the following theories:
+ * - Datatype support
+ *
+ * This logic includes the following theories:
  * - FixedSizeBitVectors
  */
 data object UFBVDT : Logic {
-  override val theories = listOf(CoreTheory, BitVectorExpressionTheory)
+  override val theories = setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS)
   override val datatypes = true
   override val quantifierFree = false
   override val linearArithmetic = false
@@ -257,11 +281,13 @@ data object UFBVDT : Logic {
 
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
- * - Free sort and function symbols This logic includes the following theories:
+ * - Free sort and function symbols
+ *
+ * This logic includes the following theories:
  * - FixedSizeBitVectors
  */
 data object UFBV : Logic {
-  override val theories = listOf(CoreTheory, BitVectorExpressionTheory)
+  override val theories = setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = false
@@ -276,7 +302,7 @@ data object UFBV : Logic {
  * of the function symbols * and /, except as specified the :extensions attribute.
  */
 data object QF_UFLRA : Logic {
-  override val theories = listOf(CoreTheory, RealsTheory)
+  override val theories = setOf(Theories.CORE, Theories.REALS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -287,11 +313,13 @@ data object QF_UFLRA : Logic {
 
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
- * - Quantifier free This logic includes the following theories:
+ * - Quantifier free
+ *
+ * This logic includes the following theories:
  * - FloatingPoint
  */
 data object QF_FP : Logic {
-  override val theories = listOf(CoreTheory, FloatingPointTheory)
+  override val theories = setOf(Theories.CORE, Theories.FLOATING_POINT)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -305,12 +333,14 @@ data object QF_FP : Logic {
  * - Quantifier free
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - Ints
  * - Strings
  */
 data object QF_SNIA : Logic {
-  override val theories = listOf(CoreTheory, IntsTheory, StringsTheory)
+  override val theories = setOf(Theories.CORE, Theories.INTS, Theories.STRINGS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -326,11 +356,13 @@ data object QF_SNIA : Logic {
  * - Quantifier free
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - Ints
  */
 data object QF_UFDTNIA : Logic {
-  override val theories = listOf(CoreTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.INTS)
   override val datatypes = true
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -343,14 +375,16 @@ data object QF_UFDTNIA : Logic {
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - FixedSizeBitVectors
  * - FloatingPoint
  * - Reals
  */
 data object QF_BVFPLRA : Logic {
   override val theories =
-      listOf(CoreTheory, BitVectorExpressionTheory, FloatingPointTheory, RealsTheory)
+      setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS, Theories.FLOATING_POINT, Theories.REALS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -367,7 +401,7 @@ data object QF_BVFPLRA : Logic {
  * - ArraysEx
  */
 data object ABV : Logic {
-  override val theories = listOf(CoreTheory, BitVectorExpressionTheory, ArrayExTheory)
+  override val theories = setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS, Theories.ARRAYS_EX)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = false
@@ -382,7 +416,7 @@ data object ABV : Logic {
  * symbols * and /, except as specified the :extensions attribute.
  */
 data object LRA : Logic {
-  override val theories = listOf(CoreTheory, RealsTheory)
+  override val theories = setOf(Theories.CORE, Theories.REALS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -396,11 +430,13 @@ data object LRA : Logic {
  * - Free sort and function symbols
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - Reals_Ints
  */
 data object UFNIRA : Logic {
-  override val theories = listOf(CoreTheory, RealsIntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.REALS_INTS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -412,11 +448,13 @@ data object UFNIRA : Logic {
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
- * - Quantifier free This logic includes the following theories:
+ * - Quantifier free
+ *
+ * This logic includes the following theories:
  * - FloatingPoint
  */
 data object QF_UFFP : Logic {
-  override val theories = listOf(CoreTheory, FloatingPointTheory)
+  override val theories = setOf(Theories.CORE, Theories.FLOATING_POINT)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -430,11 +468,13 @@ data object QF_UFFP : Logic {
  * - Free sort and function symbols
  * - Datatype support
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - Reals_Ints
  */
 data object UFDTLIRA : Logic {
-  override val theories = listOf(CoreTheory, RealsIntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.REALS_INTS)
   override val datatypes = true
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -447,11 +487,13 @@ data object UFDTLIRA : Logic {
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - Ints
  */
 data object UFLIA : Logic {
-  override val theories = listOf(CoreTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -470,7 +512,7 @@ data object UFLIA : Logic {
  * - all array terms have sort (Array Int Real) or (Array Int (Array Int Real)).
  */
 data object AUFLIRA : Logic {
-  override val theories = listOf(CoreTheory, ArrayExTheory, RealsIntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.ARRAYS_EX, Theories.REALS_INTS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -485,7 +527,7 @@ data object AUFLIRA : Logic {
  * symbols *, /, div, mod, and abs, except as specified the :extensions attribute.
  */
 data object LIA : Logic {
-  override val theories = listOf(CoreTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -500,7 +542,7 @@ data object LIA : Logic {
  * some i, j > 0.
  */
 data object QF_ABV : Logic {
-  override val theories = listOf(CoreTheory, BitVectorExpressionTheory, ArrayExTheory)
+  override val theories = setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS, Theories.ARRAYS_EX)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -515,7 +557,7 @@ data object QF_ABV : Logic {
  * terms have sort of the form (Array (_ BitVec i) (_ BitVec j)) for some i, j > 0.
  */
 data object QF_AUFBV : Logic {
-  override val theories = listOf(CoreTheory, BitVectorExpressionTheory, ArrayExTheory)
+  override val theories = setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS, Theories.ARRAYS_EX)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -531,7 +573,7 @@ data object QF_AUFBV : Logic {
  * (because they may be in the scope of a let binder).
  */
 data object QF_BV : Logic {
-  override val theories = listOf(CoreTheory, BitVectorExpressionTheory)
+  override val theories = setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -545,7 +587,7 @@ data object QF_BV : Logic {
  * constant symbols.
  */
 data object QF_NRA : Logic {
-  override val theories = listOf(CoreTheory, RealsTheory)
+  override val theories = setOf(Theories.CORE, Theories.REALS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -558,10 +600,12 @@ data object QF_NRA : Logic {
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
  * - Datatype support
- * - Quantifier free This logic includes the following theories:
+ * - Quantifier free
+ *
+ * This logic includes the following theories:
  */
 data object QF_UFDT : Logic {
-  override val theories = listOf(CoreTheory)
+  override val theories = setOf(Theories.CORE)
   override val datatypes = true
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -577,7 +621,7 @@ data object QF_UFDT : Logic {
  * - FixedSizeBitVectors
  */
 data object BV : Logic {
-  override val theories = listOf(CoreTheory, BitVectorExpressionTheory)
+  override val theories = setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = false
@@ -592,11 +636,13 @@ data object BV : Logic {
  * - Datatype support
  * - Quantifier free
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - Reals_Ints
  */
 data object QF_UFDTLIRA : Logic {
-  override val theories = listOf(CoreTheory, RealsIntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.REALS_INTS)
   override val datatypes = true
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -611,14 +657,16 @@ data object QF_UFDTLIRA : Logic {
  * - Datatype support
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - FixedSizeBitVectors
  * - ArraysEx
  * - Reals_Ints
  */
 data object AUFBVDTNIRA : Logic {
   override val theories =
-      listOf(CoreTheory, BitVectorExpressionTheory, ArrayExTheory, RealsIntsTheory)
+      setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS, Theories.ARRAYS_EX, Theories.REALS_INTS)
   override val datatypes = true
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -631,7 +679,9 @@ data object AUFBVDTNIRA : Logic {
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - FixedSizeBitVectors
  * - FloatingPoint
  * - ArraysEx
@@ -639,7 +689,12 @@ data object AUFBVDTNIRA : Logic {
  */
 data object QF_ABVFPLRA : Logic {
   override val theories =
-      listOf(CoreTheory, BitVectorExpressionTheory, FloatingPointTheory, ArrayExTheory, RealsTheory)
+      setOf(
+          Theories.CORE,
+          Theories.FIXED_SIZE_BIT_VECTORS,
+          Theories.FLOATING_POINT,
+          Theories.ARRAYS_EX,
+          Theories.REALS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -652,12 +707,14 @@ data object QF_ABVFPLRA : Logic {
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - ArraysEx
  * - Ints
  */
 data object QF_ALIA : Logic {
-  override val theories = listOf(CoreTheory, ArrayExTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.ARRAYS_EX, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -676,7 +733,11 @@ data object QF_ALIA : Logic {
  */
 data object ABVFP : Logic {
   override val theories =
-      listOf(CoreTheory, BitVectorExpressionTheory, FloatingPointTheory, ArrayExTheory)
+      setOf(
+          Theories.CORE,
+          Theories.FIXED_SIZE_BIT_VECTORS,
+          Theories.FLOATING_POINT,
+          Theories.ARRAYS_EX)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = false
@@ -691,12 +752,14 @@ data object ABVFP : Logic {
  * - Quantifier free
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - ArraysEx
  * - Ints
  */
 data object QF_AUFNIA : Logic {
-  override val theories = listOf(CoreTheory, ArrayExTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.ARRAYS_EX, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -710,11 +773,13 @@ data object QF_AUFNIA : Logic {
  * - Free sort and function symbols
  * - Datatype support
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - Ints
  */
 data object UFDTLIA : Logic {
-  override val theories = listOf(CoreTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.INTS)
   override val datatypes = true
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -729,7 +794,7 @@ data object UFDTLIA : Logic {
  * function symbols * and /, except as specified the :extensions attribute.
  */
 data object UFLRA : Logic {
-  override val theories = listOf(CoreTheory, RealsTheory)
+  override val theories = setOf(Theories.CORE, Theories.REALS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -742,12 +807,14 @@ data object UFLRA : Logic {
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - ArraysEx
  * - Ints
  */
 data object ANIA : Logic {
-  override val theories = listOf(CoreTheory, ArrayExTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.ARRAYS_EX, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -762,13 +829,16 @@ data object ANIA : Logic {
  * - Datatype support
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - FloatingPoint
  * - ArraysEx
  * - Reals_Ints
  */
 data object AUFFPDTNIRA : Logic {
-  override val theories = listOf(CoreTheory, FloatingPointTheory, ArrayExTheory, RealsIntsTheory)
+  override val theories =
+      setOf(Theories.CORE, Theories.FLOATING_POINT, Theories.ARRAYS_EX, Theories.REALS_INTS)
   override val datatypes = true
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -782,13 +852,16 @@ data object AUFFPDTNIRA : Logic {
  * - Free sort and function symbols
  * - Datatype support
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - FixedSizeBitVectors
  * - ArraysEx
  * - Ints
  */
 data object AUFBVDTLIA : Logic {
-  override val theories = listOf(CoreTheory, BitVectorExpressionTheory, ArrayExTheory, IntsTheory)
+  override val theories =
+      setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS, Theories.ARRAYS_EX, Theories.INTS)
   override val datatypes = true
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -803,13 +876,16 @@ data object AUFBVDTLIA : Logic {
  * - Datatype support
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - FixedSizeBitVectors
  * - ArraysEx
  * - Ints
  */
 data object AUFBVDTNIA : Logic {
-  override val theories = listOf(CoreTheory, BitVectorExpressionTheory, ArrayExTheory, IntsTheory)
+  override val theories =
+      setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS, Theories.ARRAYS_EX, Theories.INTS)
   override val datatypes = true
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -821,7 +897,9 @@ data object AUFBVDTNIA : Logic {
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - FixedSizeBitVectors
  * - FloatingPoint
  * - ArraysEx
@@ -829,7 +907,12 @@ data object AUFBVDTNIA : Logic {
  */
 data object ABVFPLRA : Logic {
   override val theories =
-      listOf(CoreTheory, BitVectorExpressionTheory, FloatingPointTheory, ArrayExTheory, RealsTheory)
+      setOf(
+          Theories.CORE,
+          Theories.FIXED_SIZE_BIT_VECTORS,
+          Theories.FLOATING_POINT,
+          Theories.ARRAYS_EX,
+          Theories.REALS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -841,12 +924,14 @@ data object ABVFPLRA : Logic {
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - ArraysEx
  * - Ints
  */
 data object ALIA : Logic {
-  override val theories = listOf(CoreTheory, ArrayExTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.ARRAYS_EX, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -861,12 +946,14 @@ data object ALIA : Logic {
  * - Datatype support
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - ArraysEx
  * - Reals_Ints
  */
 data object AUFDTNIRA : Logic {
-  override val theories = listOf(CoreTheory, ArrayExTheory, RealsIntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.ARRAYS_EX, Theories.REALS_INTS)
   override val datatypes = true
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -880,12 +967,14 @@ data object AUFDTNIRA : Logic {
  * - Free sort and function symbols
  * - Datatype support
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - ArraysEx
  * - Reals_Ints
  */
 data object AUFDTLIRA : Logic {
-  override val theories = listOf(CoreTheory, ArrayExTheory, RealsIntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.ARRAYS_EX, Theories.REALS_INTS)
   override val datatypes = true
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -899,7 +988,7 @@ data object AUFDTLIRA : Logic {
  * free sort and function symbols.
  */
 data object AUFNIRA : Logic {
-  override val theories = listOf(CoreTheory, ArrayExTheory, RealsIntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.ARRAYS_EX, Theories.REALS_INTS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -911,14 +1000,16 @@ data object AUFNIRA : Logic {
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - FixedSizeBitVectors
  * - FloatingPoint
  * - Reals
  */
 data object BVFPLRA : Logic {
   override val theories =
-      listOf(CoreTheory, BitVectorExpressionTheory, FloatingPointTheory, RealsTheory)
+      setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS, Theories.FLOATING_POINT, Theories.REALS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -930,12 +1021,14 @@ data object BVFPLRA : Logic {
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - FloatingPoint
  * - Reals
  */
 data object FPLRA : Logic {
-  override val theories = listOf(CoreTheory, FloatingPointTheory, RealsTheory)
+  override val theories = setOf(Theories.CORE, Theories.FLOATING_POINT, Theories.REALS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -952,7 +1045,7 @@ data object FPLRA : Logic {
  * - all array terms have sort (Array Int Int).
  */
 data object QF_AUFLIA : Logic {
-  override val theories = listOf(CoreTheory, ArrayExTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.ARRAYS_EX, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -966,11 +1059,13 @@ data object QF_AUFLIA : Logic {
  * - Quantifier free
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - Reals_Ints
  */
 data object QF_NIRA : Logic {
-  override val theories = listOf(CoreTheory, RealsIntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.REALS_INTS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -986,7 +1081,7 @@ data object QF_NIRA : Logic {
  * - FloatingPoint
  */
 data object FP : Logic {
-  override val theories = listOf(CoreTheory, FloatingPointTheory)
+  override val theories = setOf(Theories.CORE, Theories.FLOATING_POINT)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = false
@@ -997,14 +1092,20 @@ data object FP : Logic {
 
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
- * - Quantifier free This logic includes the following theories:
+ * - Quantifier free
+ *
+ * This logic includes the following theories:
  * - FixedSizeBitVectors
  * - FloatingPoint
  * - ArraysEx
  */
 data object QF_ABVFP : Logic {
   override val theories =
-      listOf(CoreTheory, BitVectorExpressionTheory, FloatingPointTheory, ArrayExTheory)
+      setOf(
+          Theories.CORE,
+          Theories.FIXED_SIZE_BIT_VECTORS,
+          Theories.FLOATING_POINT,
+          Theories.ARRAYS_EX)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -1017,11 +1118,13 @@ data object QF_ABVFP : Logic {
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - Ints
  */
 data object NIA : Logic {
-  override val theories = listOf(CoreTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -1032,11 +1135,13 @@ data object NIA : Logic {
 
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
- * - Quantifier free This logic includes the following theories:
+ * - Quantifier free
+ *
+ * This logic includes the following theories:
  * - Strings
  */
 data object QF_S : Logic {
-  override val theories = listOf(CoreTheory, StringsTheory)
+  override val theories = setOf(Theories.CORE, Theories.STRINGS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -1051,12 +1156,14 @@ data object QF_S : Logic {
  * - Datatype support
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - FloatingPoint
  * - Reals_Ints
  */
 data object UFFPDTNIRA : Logic {
-  override val theories = listOf(CoreTheory, FloatingPointTheory, RealsIntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.FLOATING_POINT, Theories.REALS_INTS)
   override val datatypes = true
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -1070,12 +1177,14 @@ data object UFFPDTNIRA : Logic {
  * - Quantifier free
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - ArraysEx
  * - Ints
  */
 data object QF_ANIA : Logic {
-  override val theories = listOf(CoreTheory, ArrayExTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.ARRAYS_EX, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -1089,7 +1198,7 @@ data object QF_ANIA : Logic {
  * free sort and constant symbols.
  */
 data object QF_AX : Logic {
-  override val theories = listOf(CoreTheory, ArrayExTheory)
+  override val theories = setOf(Theories.CORE, Theories.ARRAYS_EX)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -1100,12 +1209,14 @@ data object QF_AX : Logic {
 
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
- * - Free sort and function symbols This logic includes the following theories:
+ * - Free sort and function symbols
+ *
+ * This logic includes the following theories:
  * - FixedSizeBitVectors
  * - ArraysEx
  */
 data object AUFBV : Logic {
-  override val theories = listOf(CoreTheory, BitVectorExpressionTheory, ArrayExTheory)
+  override val theories = setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS, Theories.ARRAYS_EX)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = false
@@ -1119,12 +1230,14 @@ data object AUFBV : Logic {
  * - Free sort and function symbols
  * - Datatype support
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - ArraysEx
  * - Ints
  */
 data object AUFDTLIA : Logic {
-  override val theories = listOf(CoreTheory, ArrayExTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.ARRAYS_EX, Theories.INTS)
   override val datatypes = true
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -1137,12 +1250,14 @@ data object AUFDTLIA : Logic {
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - FixedSizeBitVectors
  * - Ints
  */
 data object UFBVLIA : Logic {
-  override val theories = listOf(CoreTheory, BitVectorExpressionTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -1154,10 +1269,12 @@ data object UFBVLIA : Logic {
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
- * - Datatype support This logic includes the following theories:
+ * - Datatype support
+ *
+ * This logic includes the following theories:
  */
 data object UFDT : Logic {
-  override val theories = listOf(CoreTheory)
+  override val theories = setOf(Theories.CORE)
   override val datatypes = true
   override val quantifierFree = false
   override val linearArithmetic = false
@@ -1169,10 +1286,12 @@ data object UFDT : Logic {
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Datatype support
- * - Quantifier free This logic includes the following theories:
+ * - Quantifier free
+ *
+ * This logic includes the following theories:
  */
 data object QF_DT : Logic {
-  override val theories = listOf(CoreTheory)
+  override val theories = setOf(Theories.CORE)
   override val datatypes = true
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -1185,12 +1304,14 @@ data object QF_DT : Logic {
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - Ints
  * - Strings
  */
 data object QF_SLIA : Logic {
-  override val theories = listOf(CoreTheory, IntsTheory, StringsTheory)
+  override val theories = setOf(Theories.CORE, Theories.INTS, Theories.STRINGS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -1204,7 +1325,7 @@ data object QF_SLIA : Logic {
  * sort and function symbols.
  */
 data object QF_UF : Logic {
-  override val theories = listOf(CoreTheory)
+  override val theories = setOf(Theories.CORE)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -1218,7 +1339,7 @@ data object QF_UF : Logic {
  * signature with free sort and function symbols.
  */
 data object QF_UFBV : Logic {
-  override val theories = listOf(CoreTheory, BitVectorExpressionTheory)
+  override val theories = setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -1233,11 +1354,13 @@ data object QF_UFBV : Logic {
  * - Datatype support
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - Ints
  */
 data object UFDTNIA : Logic {
-  override val theories = listOf(CoreTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.INTS)
   override val datatypes = true
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -1260,7 +1383,7 @@ data object UFDTNIA : Logic {
  * - n is a numeral.
  */
 data object QF_IDL : Logic {
-  override val theories = listOf(CoreTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -1274,12 +1397,14 @@ data object QF_IDL : Logic {
  * - Free sort and function symbols
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - ArraysEx
  * - Ints
  */
 data object AUFNIA : Logic {
-  override val theories = listOf(CoreTheory, ArrayExTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.ARRAYS_EX, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -1290,12 +1415,15 @@ data object AUFNIA : Logic {
 
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
- * - Free sort and function symbols This logic includes the following theories:
+ * - Free sort and function symbols
+ *
+ * This logic includes the following theories:
  * - FixedSizeBitVectors
  * - FloatingPoint
  */
 data object UFBVFP : Logic {
-  override val theories = listOf(CoreTheory, BitVectorExpressionTheory, FloatingPointTheory)
+  override val theories =
+      setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS, Theories.FLOATING_POINT)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = false
@@ -1310,11 +1438,13 @@ data object UFBVFP : Logic {
  * - Datatype support
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - Reals_Ints
  */
 data object UFDTNIRA : Logic {
-  override val theories = listOf(CoreTheory, RealsIntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.REALS_INTS)
   override val datatypes = true
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -1326,10 +1456,12 @@ data object UFDTNIRA : Logic {
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  */
 data object UFIDL : Logic {
-  override val theories = listOf(CoreTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = false
@@ -1344,7 +1476,7 @@ data object UFIDL : Logic {
  * function symbols * and /, except as specified the :extensions attribute.
  */
 data object QF_LRA : Logic {
-  override val theories = listOf(CoreTheory, RealsTheory)
+  override val theories = setOf(Theories.CORE, Theories.REALS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -1357,11 +1489,13 @@ data object QF_LRA : Logic {
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Free sort and function symbols
  * - Datatype support
- * - Quantifier free This logic includes the following theories:
+ * - Quantifier free
+ *
+ * This logic includes the following theories:
  * - FixedSizeBitVectors
  */
 data object QF_UFBVDT : Logic {
-  override val theories = listOf(CoreTheory, BitVectorExpressionTheory)
+  override val theories = setOf(Theories.CORE, Theories.FIXED_SIZE_BIT_VECTORS)
   override val datatypes = true
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -1377,12 +1511,14 @@ data object QF_UFBVDT : Logic {
  * - Quantifier free
  * - Linear arithmetic
  * - Nonlinear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - FloatingPoint
  * - Reals_Ints
  */
 data object QF_UFFPDTNIRA : Logic {
-  override val theories = listOf(CoreTheory, FloatingPointTheory, RealsIntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.FLOATING_POINT, Theories.REALS_INTS)
   override val datatypes = true
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -1398,7 +1534,7 @@ data object QF_UFFPDTNIRA : Logic {
  *   div, mod, and abs, except as specified in the :extensions attributes;
  */
 data object QF_UFLIA : Logic {
-  override val theories = listOf(CoreTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -1409,10 +1545,12 @@ data object QF_UFLIA : Logic {
 
 /**
  * This logic does not yet provide an offical documentation, but has the following properties:
- * - Free sort and function symbols This logic includes the following theories:
+ * - Free sort and function symbols
+ *
+ * This logic includes the following theories:
  */
 data object UF : Logic {
-  override val theories = listOf(CoreTheory)
+  override val theories = setOf(Theories.CORE)
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = false
@@ -1441,7 +1579,7 @@ data object UF : Logic {
  * is a numeral.
  */
 data object QF_UFIDL : Logic {
-  override val theories = listOf(CoreTheory, IntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -1455,7 +1593,7 @@ data object QF_UFIDL : Logic {
  * sort and function symbols.
  */
 data object QF_UFNRA : Logic {
-  override val theories = listOf(CoreTheory, RealsTheory)
+  override val theories = setOf(Theories.CORE, Theories.REALS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -1468,12 +1606,14 @@ data object QF_UFNRA : Logic {
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - FloatingPoint
  * - Reals
  */
 data object QF_FPLRA : Logic {
-  override val theories = listOf(CoreTheory, FloatingPointTheory, RealsTheory)
+  override val theories = setOf(Theories.CORE, Theories.FLOATING_POINT, Theories.REALS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -1486,11 +1626,13 @@ data object QF_FPLRA : Logic {
  * This logic does not yet provide an offical documentation, but has the following properties:
  * - Quantifier free
  * - Linear arithmetic
- * - Differential logics This logic includes the following theories:
+ * - Differential logics
+ *
+ * This logic includes the following theories:
  * - Reals_Ints
  */
 data object QF_LIRA : Logic {
-  override val theories = listOf(CoreTheory, RealsIntsTheory)
+  override val theories = setOf(Theories.CORE, Theories.REALS_INTS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true

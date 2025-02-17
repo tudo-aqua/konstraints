@@ -25,6 +25,8 @@ import tools.aqua.konstraints.smt.*
 class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) :
     Sort("Array".symbol(), emptyList(), listOf(x, y)) {
   override fun toString(): String = "(Array $x $y)"
+
+  override val theories = setOf(Theories.ARRAYS_EX)
 }
 
 /**
@@ -36,6 +38,13 @@ class ArraySelect<X : Sort, Y : Sort>(
     val array: Expression<ArraySort<X, Y>>,
     val index: Expression<X>
 ) : BinaryExpression<Y, ArraySort<X, Y>, X>("select".symbol(), array.sort.y) {
+  companion object {
+    private val theoriesSet = setOf(Theories.ARRAYS_EX)
+  }
+
+  override val theories: Set<Theories>
+    get() = theoriesSet
+
   init {
     require(array.sort.x == index.sort)
   }
@@ -58,6 +67,13 @@ class ArrayStore<X : Sort, Y : Sort>(
     val index: Expression<X>,
     val value: Expression<Y>
 ) : TernaryExpression<ArraySort<X, Y>, ArraySort<X, Y>, X, Y>("store".symbol(), array.sort) {
+  companion object {
+    private val theoriesSet = setOf(Theories.ARRAYS_EX)
+  }
+
+  override val theories: Set<Theories>
+    get() = theoriesSet
+
   init {
     require(array.sort.x == index.sort)
     require(array.sort.y == value.sort)

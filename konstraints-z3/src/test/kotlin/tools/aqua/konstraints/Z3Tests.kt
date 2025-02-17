@@ -323,9 +323,10 @@ class Z3Tests {
   }
 
   fun getTerms(): Stream<Arguments> {
+    val program = MutableSMTProgram()
     val sort = BVSort(16)
-    val lhs = UserDeclaredExpression("A".symbol(), sort)
-    val rhs = UserDeclaredExpression("A".symbol(), sort)
+    val lhs = program.declareConst("lhs".symbol(), sort)()
+    val rhs = program.declareConst("rhs".symbol(), sort)()
     val msb_s = VarBinding("?msb_s".symbol(), BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs))
     val msb_t = VarBinding("?msb_t".symbol(), BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, rhs))
     val abs_s =
@@ -336,8 +337,8 @@ class Z3Tests {
             "?abs_t".symbol(), Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)))
     val u = VarBinding("u".symbol(), BVURem(abs_s.instance, abs_t.instance))
 
-    val A = UserDeclaredExpression("A".symbol(), IntSort)
-    val B = UserDeclaredExpression("B".symbol(), IntSort)
+    val A = program.declareConst("A".symbol(), IntSort)()
+    val B = program.declareConst("B".symbol(), IntSort)()
 
     return Stream.of(
         Arguments.arguments(listOf(And(IntGreaterEq(A, B), IntLessEq(A, B)))),
