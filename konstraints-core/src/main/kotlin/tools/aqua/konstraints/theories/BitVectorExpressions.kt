@@ -32,10 +32,13 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
     Literal<BVSort>(LiteralString(vector), BVSort(bits)) {
   companion object {
     operator fun invoke(vector: String): BVLiteral =
-        if (vector[1] == 'b') {
+        if (vector.matches(Regex("#b[0-1]+"))) {
           BVLiteral(vector, vector.length - 2)
-        } else if (vector[1] == 'x') {
+        } else if (vector.matches(Regex("#x([0-9]|[A-E])+"))) {
           BVLiteral(vector, (vector.length - 2) * 4)
+        } else if(vector.matches(Regex("\\(_ bv[0-9]+ [1-9][0-9]*\\)"))) {
+          val tokens = vector.split(' ')
+          BVLiteral(tokens[1], tokens[2].trim(')').toInt())
         } else {
           throw IllegalArgumentException("$vector is not a valid bitvector literal.")
         }
@@ -51,6 +54,8 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
             "BitVec literal $vector can not fit into request number of $bits bits"
           }
           BVLiteral(vector, bits, false, vector.substring(2).toBigInteger(16))
+        } else if (vector.startsWith("bv")) {
+          BVLiteral("(_ $vector $bits)", bits, false, vector.substring(2).toBigInteger(10))
         } else {
           throw IllegalArgumentException("$vector is not a valid bitvector literal.")
         }
