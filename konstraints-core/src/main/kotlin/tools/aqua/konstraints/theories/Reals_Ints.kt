@@ -28,12 +28,7 @@ import tools.aqua.konstraints.smt.*
  */
 class ToReal(override val inner: Expression<IntSort>) :
     UnaryExpression<RealSort, IntSort>("to_real".symbol(), RealSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.REALS_INTS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
       ToRealDecl.buildExpression(children, emptyList())
@@ -46,12 +41,7 @@ class ToReal(override val inner: Expression<IntSort>) :
  */
 class ToInt(override val inner: Expression<RealSort>) :
     UnaryExpression<IntSort, RealSort>("to_int".symbol(), IntSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.REALS_INTS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
       ToIntDecl.buildExpression(children, emptyList())
@@ -60,12 +50,7 @@ class ToInt(override val inner: Expression<RealSort>) :
 /** (is_int Real Bool) */
 class IsInt(override val inner: Expression<RealSort>) :
     UnaryExpression<BoolSort, RealSort>("is_int".symbol(), BoolSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.REALS_INTS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       IsIntDecl.buildExpression(children, emptyList())

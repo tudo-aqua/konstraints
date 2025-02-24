@@ -84,15 +84,8 @@ fun String.bitvec(bits: Int) = BVLiteral(this, bits)
  * @param [rhs] right [Expression]
  */
 class BVConcat(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("concat".symbol(), BVSort(1)) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
-
-  override val sort: BVSort = BVSort(lhs.sort.bits + rhs.sort.bits)
+    BinaryExpression<BVSort, BVSort, BVSort>("concat".symbol(), BVSort(lhs.sort.bits + rhs.sort.bits)) {
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   override val name: Symbol = "concat".symbol()
 
@@ -115,15 +108,8 @@ class BVConcat(override val lhs: Expression<BVSort>, override val rhs: Expressio
  *   number of bits in [inner]
  */
 class BVExtract(val i: Int, val j: Int, override val inner: Expression<BVSort>) :
-    UnaryExpression<BVSort, BVSort>("extract".symbol(), BVSort(1)) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
-
-  override val sort: BVSort = BVSort(i - j + 1)
+    UnaryExpression<BVSort, BVSort>("extract".symbol(), BVSort(i - j + 1)) {
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(j >= 0) { "j needs to be greater or equal to 0, but was $j" }
@@ -146,12 +132,7 @@ class BVExtract(val i: Int, val j: Int, override val inner: Expression<BVSort>) 
  */
 class BVNot(override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("bvnot".symbol(), inner.sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(!inner.sort.isSymbolic())
@@ -168,12 +149,7 @@ class BVNot(override val inner: Expression<BVSort>) :
  */
 class BVNeg(override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("bvneg".symbol(), inner.sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(!inner.sort.isSymbolic())
@@ -191,12 +167,7 @@ class BVNeg(override val inner: Expression<BVSort>) :
  */
 class BVAnd(val conjuncts: List<Expression<BVSort>>) :
     HomogenousExpression<BVSort, BVSort>("bvand".symbol(), conjuncts.first().sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   /**
    * Bitwise and operation on bitvectors
@@ -228,12 +199,7 @@ class BVAnd(val conjuncts: List<Expression<BVSort>>) :
  */
 class BVOr(val disjuncts: List<Expression<BVSort>>) :
     HomogenousExpression<BVSort, BVSort>("bvor".symbol(), disjuncts.first().sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   /**
    * Bitwise or operation on bitvectors
@@ -267,12 +233,7 @@ class BVOr(val disjuncts: List<Expression<BVSort>>) :
  */
 class BVAdd(val summands: List<Expression<BVSort>>) :
     HomogenousExpression<BVSort, BVSort>("bvadd".symbol(), summands.first().sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   /**
    * Addition operation on bitvectors
@@ -304,12 +265,7 @@ class BVAdd(val summands: List<Expression<BVSort>>) :
  */
 class BVMul(val factors: List<Expression<BVSort>>) :
     HomogenousExpression<BVSort, BVSort>("bvmul".symbol(), factors.first().sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   /**
    * Multiplication operation on bitvectors
@@ -343,12 +299,7 @@ class BVMul(val factors: List<Expression<BVSort>>) :
  */
 class BVUDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("bvudiv".symbol(), numerator.sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(numerator.sort.bits == denominator.sort.bits) {
@@ -375,12 +326,7 @@ class BVUDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
  */
 class BVURem(val numerator: Expression<BVSort>, val denominator: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("bvurem".symbol(), numerator.sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(numerator.sort.bits == denominator.sort.bits)
@@ -405,12 +351,7 @@ class BVURem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
  */
 class BVShl(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("bvshl".symbol(), value.sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(value.sort.bits == distance.sort.bits) {
@@ -437,12 +378,7 @@ class BVShl(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
  */
 class BVLShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("bvlshr".symbol(), value.sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(value.sort.bits == distance.sort.bits) {
@@ -469,12 +405,7 @@ class BVLShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
  */
 class BVUlt(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BoolSort, BVSort, BVSort>("bvult".symbol(), BoolSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(lhs.sort.bits == rhs.sort.bits) {
@@ -490,12 +421,7 @@ class BVUlt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 
 class BVNAnd(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("bvnand".symbol(), lhs.sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(lhs.sort.bits == rhs.sort.bits)
@@ -509,12 +435,7 @@ class BVNAnd(override val lhs: Expression<BVSort>, override val rhs: Expression<
 
 class BVNOr(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("bvnor".symbol(), lhs.sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(lhs.sort.bits == rhs.sort.bits)
@@ -528,12 +449,7 @@ class BVNOr(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 
 class BVXOr(val disjuncts: List<Expression<BVSort>>) :
     HomogenousExpression<BVSort, BVSort>("bvxor".symbol(), disjuncts[0].sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(disjuncts.size > 1)
@@ -569,12 +485,7 @@ class BVXOr(val disjuncts: List<Expression<BVSort>>) :
 
 class BVXNOr(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("bvxnor".symbol(), lhs.sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(lhs.sort.bits == rhs.sort.bits)
@@ -588,12 +499,7 @@ class BVXNOr(override val lhs: Expression<BVSort>, override val rhs: Expression<
 
 class BVComp(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("bvcomp".symbol(), BVSort(1)) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
       BVCompDecl.buildExpression(children, emptyList())
@@ -614,12 +520,7 @@ class BVComp(override val lhs: Expression<BVSort>, override val rhs: Expression<
 
 class BVSub(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("bvsub".symbol(), lhs.sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(lhs.sort.bits == rhs.sort.bits)
@@ -633,13 +534,7 @@ class BVSub(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 
 class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("bvsub".symbol(), numerator.sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
-
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
   init {
     require(numerator.sort.bits == denominator.sort.bits)
   }
@@ -675,12 +570,7 @@ class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
 
 class BVSRem(val numerator: Expression<BVSort>, val denominator: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("bvsub".symbol(), numerator.sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(numerator.sort.bits == denominator.sort.bits)
@@ -717,12 +607,7 @@ class BVSRem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
 
 class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("bvsmod".symbol(), lhs.sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(lhs.sort.bits == rhs.sort.bits)
@@ -772,12 +657,7 @@ class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<
 
 class BVULe(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BoolSort, BVSort, BVSort>("bvule".symbol(), BoolSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(lhs.sort.bits == rhs.sort.bits)
@@ -810,12 +690,7 @@ class BVUGt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 
 class BVUGe(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BoolSort, BVSort, BVSort>("bvuge".symbol(), BoolSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(lhs.sort.bits == rhs.sort.bits)
@@ -829,12 +704,7 @@ class BVUGe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 
 class BVSLt(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BoolSort, BVSort, BVSort>("bvslt".symbol(), BoolSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(lhs.sort.bits == rhs.sort.bits)
@@ -857,13 +727,7 @@ class BVSLt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 
 class BVSLe(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BoolSort, BVSort, BVSort>("bvsle".symbol(), BoolSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
-
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
   init {
     require(lhs.sort.bits == rhs.sort.bits)
   }
@@ -885,12 +749,7 @@ class BVSLe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 
 class BVSGt(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BoolSort, BVSort, BVSort>("bvsgt".symbol(), BoolSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(lhs.sort.bits == rhs.sort.bits)
@@ -904,12 +763,7 @@ class BVSGt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 
 class BVSGe(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BoolSort, BVSort, BVSort>("bvsge".symbol(), BoolSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(lhs.sort.bits == rhs.sort.bits)
@@ -923,12 +777,7 @@ class BVSGe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 
 class BVAShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("bvashr".symbol(), value.sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(value.sort.bits == distance.sort.bits)
@@ -949,12 +798,7 @@ class BVAShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
 
 class Repeat(val j: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("repeat".symbol(), BVSort(inner.sort.bits * j)) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(j > 0)
@@ -975,12 +819,7 @@ class Repeat(val j: Int, override val inner: Expression<BVSort>) :
 
 class ZeroExtend(val i: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("zero_extend".symbol(), BVSort(inner.sort.bits + i)) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(i >= 0)
@@ -999,12 +838,7 @@ class ZeroExtend(val i: Int, override val inner: Expression<BVSort>) :
 
 class SignExtend(val i: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("sign_extend".symbol(), BVSort(inner.sort.bits + i)) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(i >= 0)
@@ -1023,12 +857,7 @@ class SignExtend(val i: Int, override val inner: Expression<BVSort>) :
 
 class RotateLeft(val i: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("rotate_left".symbol(), inner.sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(i >= 0)
@@ -1051,12 +880,7 @@ class RotateLeft(val i: Int, override val inner: Expression<BVSort>) :
 
 class RotateRight(val i: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("rotate_right".symbol(), inner.sort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
     require(i >= 0)

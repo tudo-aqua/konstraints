@@ -34,12 +34,7 @@ object IntSort : Sort("Int") {
  */
 class IntLiteral(val value: BigInteger) :
     Literal<IntSort>(LiteralString(value.toString()), IntSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.INTS, Theories.REALS_INTS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = INTS_REALS_INTS_MARKER_SET
 
   constructor(value: Byte) : this(value.toInt().toBigInteger())
 
@@ -61,12 +56,7 @@ class IntLiteral(val value: BigInteger) :
  */
 class IntNeg(override val inner: Expression<IntSort>) :
     UnaryExpression<IntSort, IntSort>("-".symbol(), IntSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.INTS, Theories.REALS_INTS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = INTS_REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
       IntNegDecl.buildExpression(children, emptyList())
@@ -79,12 +69,7 @@ class IntNeg(override val inner: Expression<IntSort>) :
  */
 class IntSub(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<IntSort, IntSort>("-".symbol(), IntSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.INTS, Theories.REALS_INTS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = INTS_REALS_INTS_MARKER_SET
 
   init {
     require(terms.size > 1) {
@@ -107,12 +92,7 @@ class IntSub(val terms: List<Expression<IntSort>>) :
  */
 class IntAdd(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<IntSort, IntSort>("+".symbol(), IntSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.INTS, Theories.REALS_INTS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = INTS_REALS_INTS_MARKER_SET
 
   init {
     require(terms.size > 1) {
@@ -135,12 +115,7 @@ class IntAdd(val terms: List<Expression<IntSort>>) :
  */
 class IntMul(val factors: List<Expression<IntSort>>) :
     HomogenousExpression<IntSort, IntSort>("*".symbol(), IntSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.INTS, Theories.REALS_INTS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = INTS_REALS_INTS_MARKER_SET
 
   init {
     require(factors.size > 1) {
@@ -163,12 +138,7 @@ class IntMul(val factors: List<Expression<IntSort>>) :
  */
 class IntDiv(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<IntSort, IntSort>("/".symbol(), IntSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.INTS, Theories.REALS_INTS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = INTS_REALS_INTS_MARKER_SET
 
   init {
     require(terms.size > 1) {
@@ -191,12 +161,7 @@ class IntDiv(val terms: List<Expression<IntSort>>) :
  */
 class Mod(val dividend: Expression<IntSort>, val divisor: Expression<IntSort>) :
     BinaryExpression<IntSort, IntSort, IntSort>("mod".symbol(), IntSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.INTS, Theories.REALS_INTS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = INTS_REALS_INTS_MARKER_SET
 
   override val lhs: Expression<IntSort> = dividend
 
@@ -213,12 +178,7 @@ class Mod(val dividend: Expression<IntSort>, val divisor: Expression<IntSort>) :
  */
 class Abs(override val inner: Expression<IntSort>) :
     UnaryExpression<IntSort, IntSort>("abs".symbol(), IntSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.INTS, Theories.REALS_INTS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = INTS_REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
       AbsDecl.buildExpression(children, emptyList())
@@ -231,12 +191,7 @@ class Abs(override val inner: Expression<IntSort>) :
  */
 class IntLessEq(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<BoolSort, IntSort>("<=".symbol(), BoolSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.INTS, Theories.REALS_INTS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = INTS_REALS_INTS_MARKER_SET
 
   constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
 
@@ -259,12 +214,7 @@ class IntLessEq(val terms: List<Expression<IntSort>>) :
  */
 class IntLess(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<BoolSort, IntSort>("<".symbol(), BoolSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.INTS, Theories.REALS_INTS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = INTS_REALS_INTS_MARKER_SET
 
   constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
 
@@ -287,12 +237,7 @@ class IntLess(val terms: List<Expression<IntSort>>) :
  */
 class IntGreaterEq(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<BoolSort, IntSort>(">=".symbol(), BoolSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.INTS, Theories.REALS_INTS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = INTS_REALS_INTS_MARKER_SET
 
   constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
 
@@ -315,12 +260,7 @@ class IntGreaterEq(val terms: List<Expression<IntSort>>) :
  */
 class IntGreater(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<BoolSort, IntSort>(">".symbol(), BoolSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.INTS, Theories.REALS_INTS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = INTS_REALS_INTS_MARKER_SET
 
   constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
 
@@ -345,12 +285,7 @@ class IntGreater(val terms: List<Expression<IntSort>>) :
  */
 class Divisible(val n: Int, override val inner: Expression<IntSort>) :
     UnaryExpression<BoolSort, IntSort>("divisible".symbol(), BoolSort) {
-  companion object {
-    private val theoriesSet = setOf(Theories.INTS, Theories.REALS_INTS)
-  }
-
-  override val theories: Set<Theories>
-    get() = theoriesSet
+  override val theories = INTS_REALS_INTS_MARKER_SET
 
   init {
     require(n > 0)
