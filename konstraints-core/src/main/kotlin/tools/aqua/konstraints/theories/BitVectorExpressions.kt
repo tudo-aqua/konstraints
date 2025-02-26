@@ -54,7 +54,7 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
             "BitVec literal $vector can not fit into request number of $bits bits"
           }
           BVLiteral(vector, bits, false, vector.substring(2).toBigInteger(16))
-        } else if (vector.isSMTBitvecShorthand()) {
+        } else if (vector.startsWith("bv") && vector.substring(2).all { it.isDigit() }) {
           BVLiteral("(_ $vector $bits)", bits, false, vector.substring(2).toBigInteger(10))
         } else {
           throw IllegalArgumentException("$vector is not a valid bitvector literal.")
@@ -80,7 +80,7 @@ fun String.bitvec(bits: Int) = BVLiteral(this, bits)
 fun String.isSMTBinary() = this.startsWith("#b") && this.substring(2).all { ch -> ch in "01" }
 
 fun String.isSMTHex() =
-    this.startsWith("#x") && this.substring(2).all { ch -> ch in "0123456789ABCDEF" }
+    this.startsWith("#x") && this.substring(2).all { ch -> ch in "0123456789abcdefABCDEF" }
 
 fun String.isSMTBitvecShorthand(): Boolean {
   if (!this.startsWith("(_ bv")) return false
