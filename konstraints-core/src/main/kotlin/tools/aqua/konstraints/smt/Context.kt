@@ -105,7 +105,7 @@ class Context {
     check(n <= undoStack.size)
     check(!activeBinderState) { "Can not pop inside binder!" }
 
-    (0..<n).forEach { _ -> currentContext.functions.values.removeAll(undoStack.pop()) }
+    repeat(n) { _ -> currentContext.functions.values.removeAll(undoStack.pop()) }
   }
 
   internal fun <T : Sort> let(
@@ -654,18 +654,18 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Context.forall(
 interface AssertionLevel<out FuncType : ContextFunction<*>, out SortType : ContextSort> {
   fun contains(function: String, args: List<Expression<*>>) = get(function, args) != null
 
-  fun contains(function: Symbol) = functions.contains(function.toString())
+  operator fun contains(function: Symbol) = functions.contains(function.toString())
 
-  fun contains(function: String) = functions.contains(function)
+  operator fun contains(function: String) = functions.contains(function)
 
-  fun get(function: String, args: List<Expression<*>>) =
+  operator fun get(function: String, args: List<Expression<*>>) =
       functions[function]?.takeIf { func ->
         (func.parameters zipWithSameLength args.map { it.sort }).all { (param, actual) ->
           param == actual
         }
       }
 
-  fun contains(sort: Sort) = sorts.containsKey(sort.symbol.toString())
+  operator fun contains(sort: Sort) = sorts.containsKey(sort.symbol.toString())
 
   fun containsSort(sort: String) = sorts.containsKey(sort)
 

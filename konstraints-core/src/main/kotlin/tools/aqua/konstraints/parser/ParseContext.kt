@@ -67,14 +67,14 @@ abstract class SortDecl<T : Sort>(
 
   private val logicLookup =
       mapOf(
-          Pair(Theories.CORE, CoreTheory),
-          Pair(Theories.FIXED_SIZE_BIT_VECTORS, BitVectorExpressionTheory),
-          Pair(Theories.INTS, IntsTheory),
-          Pair(Theories.REALS, RealsTheory),
-          Pair(Theories.REALS_INTS, RealsIntsTheory),
-          Pair(Theories.FLOATING_POINT, FloatingPointTheory),
-          Pair(Theories.ARRAYS_EX, ArrayExTheory),
-          Pair(Theories.STRINGS, StringsTheory))
+          Theories.CORE to CoreTheory,
+          Theories.FIXED_SIZE_BIT_VECTORS to BitVectorExpressionTheory,
+          Theories.INTS to IntsTheory,
+          Theories.REALS to RealsTheory,
+          Theories.REALS_INTS to RealsIntsTheory,
+          Theories.FLOATING_POINT to FloatingPointTheory,
+          Theories.ARRAYS_EX to ArrayExTheory,
+          Theories.STRINGS to StringsTheory)
 
   init {
     logic.theories.forEach { assertionLevels.push(logicLookup[it]!!) }
@@ -315,14 +315,14 @@ internal interface Theory : AssertionLevel<FunctionDecl<*>, SortDecl<*>> {
   companion object {
     val logicLookup =
         mapOf(
-            Pair(Theories.CORE, CoreTheory),
-            Pair(Theories.FIXED_SIZE_BIT_VECTORS, BitVectorExpressionTheory),
-            Pair(Theories.INTS, IntsTheory),
-            Pair(Theories.REALS, RealsTheory),
-            Pair(Theories.REALS_INTS, RealsIntsTheory),
-            Pair(Theories.FLOATING_POINT, FloatingPointTheory),
-            Pair(Theories.ARRAYS_EX, ArrayExTheory),
-            Pair(Theories.STRINGS, StringsTheory))
+            Theories.CORE to CoreTheory,
+            Theories.FIXED_SIZE_BIT_VECTORS to BitVectorExpressionTheory,
+            Theories.INTS to IntsTheory,
+            Theories.REALS to RealsTheory,
+            Theories.REALS_INTS to RealsIntsTheory,
+            Theories.FLOATING_POINT to FloatingPointTheory,
+            Theories.ARRAYS_EX to ArrayExTheory,
+            Theories.STRINGS to StringsTheory)
   }
 
   override fun get(function: String, args: List<Expression<*>>): FunctionDecl<*>? =

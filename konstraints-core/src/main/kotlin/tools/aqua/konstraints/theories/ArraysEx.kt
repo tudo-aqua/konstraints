@@ -26,7 +26,7 @@ class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) :
     Sort("Array".symbol(), emptyList(), listOf(x, y)) {
   override fun toString(): String = "(Array $x $y)"
 
-    override val theories = ARRAYS_EX_MARKER_SET
+  override val theories = ARRAYS_EX_MARKER_SET
 }
 
 /**
@@ -38,7 +38,7 @@ class ArraySelect<X : Sort, Y : Sort>(
     val array: Expression<ArraySort<X, Y>>,
     val index: Expression<X>
 ) : BinaryExpression<Y, ArraySort<X, Y>, X>("select".symbol(), array.sort.y) {
-    override val theories = ARRAYS_EX_MARKER_SET
+  override val theories = ARRAYS_EX_MARKER_SET
 
   init {
     require(array.sort.x == index.sort)
@@ -62,7 +62,7 @@ class ArrayStore<X : Sort, Y : Sort>(
     val index: Expression<X>,
     val value: Expression<Y>
 ) : TernaryExpression<ArraySort<X, Y>, ArraySort<X, Y>, X, Y>("store".symbol(), array.sort) {
-    override val theories = ARRAYS_EX_MARKER_SET
+  override val theories = ARRAYS_EX_MARKER_SET
 
   init {
     require(array.sort.x == index.sort)

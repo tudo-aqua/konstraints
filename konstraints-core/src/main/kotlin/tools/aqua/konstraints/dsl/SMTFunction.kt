@@ -28,7 +28,7 @@ import tools.aqua.konstraints.util.SimpleDelegate
  *
  * The name of the constant is automatically generated as '|const!sort!UUID|'
  *
- * @return [Declare0]
+ * @return [SMTFunction0]
  */
 fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T) =
     Const(sort, this, "|const!$sort!${UUID.randomUUID()}|")
@@ -38,7 +38,7 @@ fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T) =
  *
  * If the name is empty, the function automatically generates a name as '|const!sort!UUID|'
  *
- * @return [Declare0]
+ * @return [SMTFunction0]
  */
 fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T, name: String) = Const(sort, this, name)
 
@@ -226,122 +226,113 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> SMTProgram
  * Delegate provider class for declaring SMT functions of any arity: (declare-fun [name]
  * ([parameters]) [sort]).
  *
- * Registers the function in the given [program]. If [name] is empty, the name register will be the
- * same as the variable.
+ * Registers the function in the given [program]. If [name] is null, the name register will be
+ * `|thisRef|`.
  *
- * @return [SMTFunction]
+ * @return [SMTFunctionN]
  */
 class Declare<T : Sort>(
     val sort: T,
     val program: SMTProgramBuilder,
     val parameters: List<Sort> = emptyList(),
-    val name: String = ""
+    val name: String? = null
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
       property: KProperty<*>
-  ): SimpleDelegate<SMTFunction<T>> {
-    val n = name.ifEmpty { "|$thisRef|" }
-
-    return SimpleDelegate(program.registerFun(SMTFunctionN(n.symbol(), sort, parameters, null)))
-  }
+  ): SimpleDelegate<SMTFunction<T>> =
+      SimpleDelegate(
+          program.registerFun(
+              SMTFunctionN((name ?: "|$thisRef|").symbol(), sort, parameters, null)))
 }
 
 /**
  * Delegate provider class for declaring SMT functions: (declare-fun [name] () [sort]).
  *
- * Registers the function in the given [program]. If [name] is empty, the name register will be the
- * same as the variable.
+ * Registers the function in the given [program]. If [name] is null, the name register will be
+ * `|thisRef|`.
  *
- * @return [SMTFunction]
+ * @return [SMTFunction0]
  */
-class Const<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: String = "") {
+class Const<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: String? = null) {
   operator fun provideDelegate(
       thisRef: Any?,
       property: KProperty<*>
-  ): SimpleDelegate<Expression<T>> {
-    val n = name.ifEmpty { "|$thisRef|" }
-
-    return SimpleDelegate(program.registerFun(SMTFunction0(n.symbol(), sort, null)).invoke())
-  }
+  ): SimpleDelegate<Expression<T>> =
+      SimpleDelegate(
+          program.registerFun(SMTFunction0((name ?: "|$thisRef|").symbol(), sort, null)).invoke())
 }
 
 /**
  * Delegate provider class for declaring SMT functions: (declare-fun [name] () [sort]).
  *
- * Registers the function in the given [program]. If [name] is empty, the name register will be the
- * same as the variable.
+ * Registers the function in the given [program]. If [name] is null, the name register will be
+ * `|thisRef|`.
  *
- * @return [SMTFunction]
+ * @return [SMTFunction0]
  */
-class Declare0<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: String = "") {
+class Declare0<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: String? = null) {
   operator fun provideDelegate(
       thisRef: Any?,
       property: KProperty<*>
-  ): SimpleDelegate<SMTFunction0<T>> {
-    val n = name.ifEmpty { "|$thisRef|" }
-
-    return SimpleDelegate(program.registerFun(SMTFunction0(n.symbol(), sort, null)))
-  }
+  ): SimpleDelegate<SMTFunction0<T>> =
+      SimpleDelegate(program.registerFun(SMTFunction0((name ?: "|$thisRef|").symbol(), sort, null)))
 }
 
 /**
  * Delegate provider class for declaring SMT functions: (declare-fun [name] ([par]) [sort]).
  *
- * Registers the function in the given [program]. If [name] is empty, the name register will be the
- * same as the variable.
+ * Registers the function in the given [program]. If [name] is null, the name register will be
+ * `|thisRef|`.
  *
- * @return [SMTFunction]
+ * @return [SMTFunction1]
  */
 class Declare1<T : Sort, S : Sort>(
     val sort: T,
     val par: S,
     val program: SMTProgramBuilder,
-    val name: String = ""
+    val name: String? = null
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
       property: KProperty<*>
-  ): SimpleDelegate<SMTFunction1<T, S>> {
-    val n = name.ifEmpty { "|$thisRef|" }
-
-    return SimpleDelegate(program.registerFun(SMTFunction1(n.symbol(), sort, par, null)))
-  }
+  ): SimpleDelegate<SMTFunction1<T, S>> =
+      SimpleDelegate(
+          program.registerFun(SMTFunction1((name ?: "|$thisRef|").symbol(), sort, par, null)))
 }
 
 /**
  * Delegate provider class for declaring SMT functions: (declare-fun [name] ([par1] [par2]) [sort]).
  *
- * Registers the function in the given [program]. If [name] is empty, the name register will be the
- * same as the variable.
+ * Registers the function in the given [program]. If [name] is null, the name register will be
+ * `|thisRef|`.
  *
- * @return [SMTFunction]
+ * @return [SMTFunction2]
  */
 class Declare2<T : Sort, S1 : Sort, S2 : Sort>(
     val sort: T,
     val par1: S1,
     val par2: S2,
     val program: SMTProgramBuilder,
-    val name: String = ""
+    val name: String? = null
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
       property: KProperty<*>
-  ): SimpleDelegate<SMTFunction2<T, S1, S2>> {
-    val n = name.ifEmpty { "|$thisRef|" }
-
-    return SimpleDelegate(program.registerFun(SMTFunction2(n.symbol(), sort, par1, par2, null)))
-  }
+  ): SimpleDelegate<SMTFunction2<T, S1, S2>> =
+      SimpleDelegate(
+          program.registerFun(
+              SMTFunction2((name ?: "|$thisRef|").symbol(), sort, par1, par2, null)))
 }
 
 /**
  * Delegate provider class for declaring SMT functions: (declare-fun [name] ([par1] [par2] [par3])
  * [sort]).
  *
- * Registers the function in the given [program]. If [name] is empty, the name register will be the
- * same as the variable.
+ * Registers the function in the given [program]. If [name] is null, the name register will be
+ * `|thisRef|`.
  *
- * @return [SMTFunction]
+ * @return [SMTFunction3]
  */
 class Declare3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val sort: T,
@@ -349,27 +340,25 @@ class Declare3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val par2: S2,
     val par3: S3,
     val program: SMTProgramBuilder,
-    val name: String = ""
+    val name: String? = null
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
       property: KProperty<*>
-  ): SimpleDelegate<SMTFunction3<T, S1, S2, S3>> {
-    val n = name.ifEmpty { "|$thisRef|" }
-
-    return SimpleDelegate(
-        program.registerFun(SMTFunction3(n.symbol(), sort, par1, par2, par3, null)))
-  }
+  ): SimpleDelegate<SMTFunction3<T, S1, S2, S3>> =
+      SimpleDelegate(
+          program.registerFun(
+              SMTFunction3((name ?: "|$thisRef|").symbol(), sort, par1, par2, par3, null)))
 }
 
 /**
  * Delegate provider class for declaring SMT functions: (declare-fun [name] ([par1] [par2] [par3]
  * [par4]) [sort]).
  *
- * Registers the function in the given [program]. If [name] is empty, the name register will be the
- * same as the variable.
+ * Registers the function in the given [program]. If [name] is null, the name register will be
+ * `|thisRef|`.
  *
- * @return [SMTFunction]
+ * @return [SMTFunction4]
  */
 class Declare4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val sort: T,
@@ -378,26 +367,25 @@ class Declare4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val par3: S3,
     val par4: S4,
     val program: SMTProgramBuilder,
-    val name: String = ""
+    val name: String? = null
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
       property: KProperty<*>
-  ): SimpleDelegate<SMTFunction4<T, S1, S2, S3, S4>> {
-    val n = name.ifEmpty { "|$thisRef|" }
-    return SimpleDelegate(
-        program.registerFun(SMTFunction4(n.symbol(), sort, par1, par2, par3, par4, null)))
-  }
+  ): SimpleDelegate<SMTFunction4<T, S1, S2, S3, S4>> =
+      SimpleDelegate(
+          program.registerFun(
+              SMTFunction4((name ?: "|$thisRef|").symbol(), sort, par1, par2, par3, par4, null)))
 }
 
 /**
  * Delegate provider class for declaring SMT functions: (declare-fun [name] ([par1] [par2] [par3]
  * [par4] [par5]) [sort]).
  *
- * Registers the function in the given [program]. If [name] is empty, the name register will be the
- * same as the variable.
+ * Registers the function in the given [program]. If [name] is null, the name register will be
+ * `|thisRef|`.
  *
- * @return [SMTFunction]
+ * @return [SMTFunction5]
  */
 class Declare5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
     val sort: T,
@@ -407,40 +395,39 @@ class Declare5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
     val par4: S4,
     val par5: S5,
     val program: SMTProgramBuilder,
-    val name: String = ""
+    val name: String? = null
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
       property: KProperty<*>
-  ): SimpleDelegate<SMTFunction5<T, S1, S2, S3, S4, S5>> {
-    val n = name.ifEmpty { "|$thisRef|" }
-
-    return SimpleDelegate(
-        program.registerFun(SMTFunction5(n.symbol(), sort, par1, par2, par3, par4, par5, null)))
-  }
+  ): SimpleDelegate<SMTFunction5<T, S1, S2, S3, S4, S5>> =
+      SimpleDelegate(
+          program.registerFun(
+              SMTFunction5(
+                  (name ?: "|$thisRef|").symbol(), sort, par1, par2, par3, par4, par5, null)))
 }
 
 /**
  * Delegate provider class for defining SMT functions of any arity: (define-fun [name]
  * ([parameters]) [sort] [block]).
  *
- * Registers the function in the given [program]. If [name] is empty, the name register will be the
- * same as the variable.
+ * Registers the function in the given [program]. If [name] is null, the name register will be
+ * `|thisRef|`.
  *
- * @return [SMTFunction]
+ * @return [SMTFunctionN]
  */
 class Define<T : Sort>(
     val sort: T,
     val block: (List<Expression<Sort>>) -> Expression<T>,
     val program: SMTProgramBuilder,
     val parameters: List<Sort> = emptyList(),
-    val name: String = ""
+    val name: String? = null
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
       property: KProperty<*>
   ): SimpleDelegate<SMTFunction<T>> {
-    val n = name.ifEmpty { "|$thisRef|" }
+    val n = name ?: "|$thisRef|"
     val sortedVars =
         parameters.mapIndexed { id, sort -> SortedVar("|$thisRef!local!$sort!$id|".symbol(), sort) }
     val term = block(sortedVars.map { it.instance })
@@ -455,23 +442,23 @@ class Define<T : Sort>(
 /**
  * Delegate provider class for defining SMT functions: (define-fun [name] ([par]) [sort] [block]).
  *
- * Registers the function in the given [program]. If [name] is empty, the name register will be the
- * same as the variable.
+ * Registers the function in the given [program]. If [name] is null, the name register will be
+ * `|thisRef|`.
  *
- * @return [SMTFunction]
+ * @return [SMTFunction1]
  */
 class Define1<T : Sort, S : Sort>(
     val sort: T,
     val block: (Expression<S>) -> Expression<T>,
     val par: S,
     val program: SMTProgramBuilder,
-    val name: String = ""
+    val name: String? = null
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
       property: KProperty<*>
   ): SimpleDelegate<SMTFunction1<T, S>> {
-    val n = name.ifEmpty { "|$thisRef|" }
+    val n = name ?: "|$thisRef|"
     val sortedVar = SortedVar("|$thisRef!local!$par!1|".symbol(), par)
     val term = block(sortedVar.instance)
 
@@ -486,10 +473,10 @@ class Define1<T : Sort, S : Sort>(
  * Delegate provider class for defining SMT functions: (define-fun [name] ([par1] [par2]) [sort]
  * [block]).
  *
- * Registers the function in the given [program]. If [name] is empty, the name register will be the
- * same as the variable.
+ * Registers the function in the given [program]. If [name] is null, the name register will be
+ * `|thisRef|`.
  *
- * @return [SMTFunction]
+ * @return [SMTFunction2]
  */
 class Define2<T : Sort, S1 : Sort, S2 : Sort>(
     val sort: T,
@@ -497,13 +484,13 @@ class Define2<T : Sort, S1 : Sort, S2 : Sort>(
     val par1: S1,
     val par2: S2,
     val program: SMTProgramBuilder,
-    val name: String = ""
+    val name: String? = null
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
       property: KProperty<*>
   ): SimpleDelegate<SMTFunction2<T, S1, S2>> {
-    val n = name.ifEmpty { "|$thisRef|" }
+    val n = name ?: "|$thisRef|"
     val sortedVar1 = SortedVar("|$thisRef!local!$par1!1|".symbol(), par1)
     val sortedVar2 = SortedVar("|$thisRef!local!$par2!2|".symbol(), par2)
     val term = block(sortedVar1.instance, sortedVar2.instance)
@@ -523,10 +510,10 @@ class Define2<T : Sort, S1 : Sort, S2 : Sort>(
  * Delegate provider class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3])
  * [sort] [block]).
  *
- * Registers the function in the given [program]. If [name] is empty, the name register will be the
- * same as the variable.
+ * Registers the function in the given [program]. If [name] is null, the name register will be
+ * `|thisRef|`.
  *
- * @return [SMTFunction]
+ * @return [SMTFunction3]
  */
 class Define3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val sort: T,
@@ -535,13 +522,13 @@ class Define3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val par2: S2,
     val par3: S3,
     val program: SMTProgramBuilder,
-    val name: String = ""
+    val name: String? = null
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
       property: KProperty<*>
   ): SimpleDelegate<SMTFunction3<T, S1, S2, S3>> {
-    val n = name.ifEmpty { "|$thisRef|" }
+    val n = name ?: "|$thisRef|"
     val sortedVar1 = SortedVar("|$thisRef!local!$par1!1|".symbol(), par1)
     val sortedVar2 = SortedVar("|$thisRef!local!$par2!2|".symbol(), par2)
     val sortedVar3 = SortedVar("|$thisRef!local!$par3!3|".symbol(), par3)
@@ -563,10 +550,10 @@ class Define3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
  * Delegate provider class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3]
  * [par4]) [sort] [block]).
  *
- * Registers the function in the given [program]. If [name] is empty, the name register will be the
- * same as the variable.
+ * Registers the function in the given [program]. If [name] is null, the name register will be
+ * `|thisRef|`.
  *
- * @return [SMTFunction]
+ * @return [SMTFunction4]
  */
 class Define4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val sort: T,
@@ -576,13 +563,13 @@ class Define4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val par3: S3,
     val par4: S4,
     val program: SMTProgramBuilder,
-    val name: String = ""
+    val name: String? = null
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
       property: KProperty<*>
   ): SimpleDelegate<SMTFunction4<T, S1, S2, S3, S4>> {
-    val n = name.ifEmpty { "|$thisRef|" }
+    val n = name ?: "|$thisRef|"
     val sortedVar1 = SortedVar("|$thisRef!local!$par1!1|".symbol(), par1)
     val sortedVar2 = SortedVar("|$thisRef!local!$par2!2|".symbol(), par2)
     val sortedVar3 = SortedVar("|$thisRef!local!$par3!3|".symbol(), par3)
@@ -611,10 +598,10 @@ class Define4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
  * Delegate provider class for defining SMT functions: (define-fun [name] ([par1] [par2] [par3]
  * [par4] [par5]) [sort] [block]).
  *
- * Registers the function in the given [program]. If [name] is empty, the name register will be the
- * same as the variable.
+ * Registers the function in the given [program]. If [name] is null, the name register will be
+ * `|thisRef|`.
  *
- * @return [SMTFunction]
+ * @return [SMTFunction5]
  */
 class Define5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
     val sort: T,
@@ -631,13 +618,13 @@ class Define5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
     val par4: S4,
     val par5: S5,
     val program: SMTProgramBuilder,
-    val name: String = ""
+    val name: String? = null
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
       property: KProperty<*>
   ): SimpleDelegate<SMTFunction5<T, S1, S2, S3, S4, S5>> {
-    val n = name.ifEmpty { "|$thisRef|" }
+    val n = name ?: "|$thisRef|"
     val sortedVar1 = SortedVar("|$thisRef!local!$par1!1|".symbol(), par1)
     val sortedVar2 = SortedVar("|$thisRef!local!$par2!2|".symbol(), par2)
     val sortedVar3 = SortedVar("|$thisRef!local!$par3!3|".symbol(), par3)

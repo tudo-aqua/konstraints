@@ -36,7 +36,7 @@ class Stack<E>(private val stack: MutableList<E> = mutableListOf()) : List<E> by
    */
   fun peek() = stack.first()
 
-  /** Retrieve the top element of the stack or null if no such element exists */
+  /** Retrieve the top element of the stack or `null` if no such element exists */
   fun peekOrNull() = stack.firstOrNull()
 
   /**
@@ -46,7 +46,7 @@ class Stack<E>(private val stack: MutableList<E> = mutableListOf()) : List<E> by
    */
   fun bottom() = stack.last()
 
-  /** Retrieve tje bottom element of the stack or null if no such element exists */
+  /** Retrieve the bottom element of the stack or `null` if no such element exists */
   fun bottomOrNull() = stack.lastOrNull()
 
   /**
@@ -56,7 +56,7 @@ class Stack<E>(private val stack: MutableList<E> = mutableListOf()) : List<E> by
    */
   fun pop() = stack.removeFirst()
 
-  /** Removes and returns the top element from the stack or null if no such element exists */
+  /** Removes and returns the top element from the stack or `null` if no such element exists */
   fun popOrNull() = stack.removeFirstOrNull()
 
   /** Pushes new element on top of the stack */

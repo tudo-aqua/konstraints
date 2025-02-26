@@ -55,39 +55,31 @@ sealed interface Expression<out T : Sort> {
   fun all(predicate: (Expression<*>) -> Boolean): Boolean =
       when (this) {
         is ConstantExpression -> predicate(this)
-        is UnaryExpression<*, *> -> predicate(this) and this.inner.all(predicate)
+        is UnaryExpression<*, *> -> predicate(this) and inner.all(predicate)
         is BinaryExpression<*, *, *> ->
-            predicate(this) and this.lhs.all(predicate) and this.rhs.all(predicate)
+            predicate(this) and lhs.all(predicate) and rhs.all(predicate)
         is HomogenousExpression<*, *> ->
             predicate(this) and
-                this.children
-                    .map { it.all(predicate) }
-                    .reduceOrDefault(true) { t1, t2 -> t1 and t2 }
+                children.map { it.all(predicate) }.reduceOrDefault(true) { t1, t2 -> t1 and t2 }
         is Ite ->
-            predicate(this.statement) and
-                predicate(this.then) and
-                predicate(this.otherwise) and
-                this.statement.all(predicate) and
-                this.then.all(predicate) and
-                this.otherwise.all(predicate)
+            predicate(statement) and
+                predicate(then) and
+                predicate(otherwise) and
+                statement.all(predicate) and
+                then.all(predicate) and
+                otherwise.all(predicate)
         is Literal -> predicate(this)
         is NAryExpression ->
             predicate(this) and
-                this.children
-                    .map { it.all(predicate) }
-                    .reduceOrDefault(true) { t1, t2 -> t1 and t2 }
+                children.map { it.all(predicate) }.reduceOrDefault(true) { t1, t2 -> t1 and t2 }
         is TernaryExpression<*, *, *, *> ->
-            predicate(this) and
-                this.lhs.all(predicate) and
-                this.mid.all(predicate) and
-                this.lhs.all(predicate)
-        is LetExpression ->
-            this.inner.all(predicate) // TODO maybe this should also check all bindings
+            predicate(this) and lhs.all(predicate) and mid.all(predicate) and lhs.all(predicate)
+        is LetExpression -> inner.all(predicate) // TODO maybe this should also check all bindings
         is LocalExpression -> predicate(this)
         is BoundVariable -> predicate(this)
-        is ExistsExpression -> this.term.all(predicate)
-        is ForallExpression -> this.term.all(predicate)
-        is AnnotatedExpression -> predicate(this) and this.term.all(predicate)
+        is ExistsExpression -> term.all(predicate)
+        is ForallExpression -> term.all(predicate)
+        is AnnotatedExpression -> predicate(this) and term.all(predicate)
       }
 
   fun asSequence(): Sequence<Expression<*>> = sequence {

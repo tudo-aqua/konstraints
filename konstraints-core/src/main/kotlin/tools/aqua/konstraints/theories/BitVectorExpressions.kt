@@ -32,11 +32,11 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
     Literal<BVSort>(LiteralString(vector), BVSort(bits)) {
   companion object {
     operator fun invoke(vector: String): BVLiteral =
-        if (vector.matches(Regex("#b[0-1]+"))) {
+        if (vector.isSMTBinary()) {
           BVLiteral(vector, vector.length - 2)
-        } else if (vector.matches(Regex("#x([0-9]|[A-E])+"))) {
+        } else if (vector.isSMTHex()) {
           BVLiteral(vector, (vector.length - 2) * 4)
-        } else if(vector.matches(Regex("\\(_ bv[0-9]+ [1-9][0-9]*\\)"))) {
+        } else if (vector.isSMTBitvecShorthand()) {
           val tokens = vector.split(' ')
           BVLiteral(tokens[1], tokens[2].trim(')').toInt())
         } else {
@@ -44,17 +44,17 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
         }
 
     operator fun invoke(vector: String, bits: Int) =
-        if (vector[1] == 'b') {
+        if (vector.isSMTBinary()) {
           require(vector.length - 2 <= bits) {
             "BitVec literal $vector can not fit into request number of $bits bits"
           }
           BVLiteral(vector, bits, true, vector.substring(2).toBigInteger(2))
-        } else if (vector[1] == 'x') {
+        } else if (vector.isSMTHex()) {
           require((vector.length - 2) * 4 <= bits) {
             "BitVec literal $vector can not fit into request number of $bits bits"
           }
           BVLiteral(vector, bits, false, vector.substring(2).toBigInteger(16))
-        } else if (vector.startsWith("bv")) {
+        } else if (vector.isSMTBitvecShorthand()) {
           BVLiteral("(_ $vector $bits)", bits, false, vector.substring(2).toBigInteger(10))
         } else {
           throw IllegalArgumentException("$vector is not a valid bitvector literal.")
@@ -77,6 +77,22 @@ fun String.bitvec() = BVLiteral(this)
 
 fun String.bitvec(bits: Int) = BVLiteral(this, bits)
 
+fun String.isSMTBinary() = this.startsWith("#b") && this.substring(2).all { ch -> ch in "01" }
+
+fun String.isSMTHex() =
+    this.startsWith("#x") && this.substring(2).all { ch -> ch in "0123456789ABCDEF" }
+
+fun String.isSMTBitvecShorthand(): Boolean {
+  if (!this.startsWith("(_ bv")) return false
+  val token = this.split(' ')
+
+  return token[1].substring(2).all { ch -> ch.isDigit() } &&
+      token[2].all { ch -> ch.isDigit() } &&
+      token[2][0] != '0'
+}
+
+fun String.isBitvecLiteral() = this.isSMTBinary() || this.isSMTHex()
+
 /**
  * Concatenation of two [Expression]s of [BVSort]
  *
@@ -84,7 +100,8 @@ fun String.bitvec(bits: Int) = BVLiteral(this, bits)
  * @param [rhs] right [Expression]
  */
 class BVConcat(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("concat".symbol(), BVSort(lhs.sort.bits + rhs.sort.bits)) {
+    BinaryExpression<BVSort, BVSort, BVSort>(
+        "concat".symbol(), BVSort(lhs.sort.bits + rhs.sort.bits)) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   override val name: Symbol = "concat".symbol()
@@ -535,6 +552,7 @@ class BVSub(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>("bvsub".symbol(), numerator.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+
   init {
     require(numerator.sort.bits == denominator.sort.bits)
   }
@@ -728,6 +746,7 @@ class BVSLt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 class BVSLe(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BoolSort, BVSort, BVSort>("bvsle".symbol(), BoolSort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+
   init {
     require(lhs.sort.bits == rhs.sort.bits)
   }

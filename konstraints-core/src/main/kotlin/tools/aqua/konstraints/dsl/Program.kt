@@ -74,11 +74,7 @@ class SMTProgramBuilder(logic: Logic) {
   }
 
   /** Converts this [SMTProgramBuilder] to a finished [DefaultSMTProgram] */
-  fun finalize(): SMTProgram {
-    program.add(CheckSat)
-
-    return program
-  }
+  fun finalize() = program.apply { add(CheckSat) }
 }
 
 /** Builds an [SMTProgram] based on the given [logic] */
