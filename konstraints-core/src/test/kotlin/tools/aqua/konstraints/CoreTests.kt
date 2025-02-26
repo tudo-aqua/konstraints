@@ -26,7 +26,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
-import tools.aqua.konstraints.dsl.SMTFunction0
+import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 
@@ -36,9 +36,9 @@ import tools.aqua.konstraints.theories.*
  */
 @TestInstance(Lifecycle.PER_CLASS)
 class CoreTests {
-  private val A = SMTFunction0("A".symbol(), BoolSort, null)()
-  private val B = SMTFunction0("B".symbol(), BoolSort, null)()
-  private val C = SMTFunction0("C".symbol(), BoolSort, null)()
+  private val A = UserDeclaredSMTFunction0("A".symbol(), BoolSort)()
+  private val B = UserDeclaredSMTFunction0("B".symbol(), BoolSort)()
+  private val C = UserDeclaredSMTFunction0("C".symbol(), BoolSort)()
 
   @ParameterizedTest
   @MethodSource("getCoreTheoryExpressionsAndTheirSerialization")

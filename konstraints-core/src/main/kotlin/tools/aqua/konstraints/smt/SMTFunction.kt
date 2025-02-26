@@ -35,6 +35,12 @@ abstract class SMTFunction<out T : Sort> : ContextFunction<Sort> {
   abstract override val parameters: List<Sort>
   abstract val definition: FunctionDef<T>?
 
+  /*
+   * 1. this operator will be overwritten by every implementation of a specific smt theory function (e.g and, bvadd, fpmul etc.)
+   * 2. it should also be overwritten if a specific expression type that isnt a UserDeclaredExpression or UserDefinedExpression
+   * is needed as return type.
+   * 3. lastly this operator can be overwritten to enforce other constraints on the parameters if needed.
+   */
   open operator fun invoke(args: List<Expression<*>>): Expression<T> {
     require(args.size == parameters.size)
     require((args zipWithSameLength parameters).all { (par, sort) -> par.sort == sort })

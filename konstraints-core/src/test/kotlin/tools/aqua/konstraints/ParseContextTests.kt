@@ -25,7 +25,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
-import tools.aqua.konstraints.dsl.SMTFunction0
+import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
@@ -43,9 +43,9 @@ import tools.aqua.konstraints.theories.*
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class ParseContextTests {
   private val context = ParseContext(QF_BV)
-  private val boolExpression = SMTFunction0("A".symbol(), BoolSort, null)()
-  private val bv32Expression = SMTFunction0("B".symbol(), BVSort(32), null)()
-  private val bv16Expression = SMTFunction0("B".symbol(), BVSort(16), null)()
+  private val boolExpression = UserDeclaredSMTFunction0("A".symbol(), BoolSort)()
+  private val bv32Expression = UserDeclaredSMTFunction0("B".symbol(), BVSort(32))()
+  private val bv16Expression = UserDeclaredSMTFunction0("B".symbol(), BVSort(16))()
 
   // this function has no indices as it is not infinitary, BVSort(32) here means actually only
   // bitvectors of length 32
@@ -299,8 +299,8 @@ class ParseContextTests {
   fun testTransform() {
     val expr =
         Or(
-            SMTFunction0("A".symbol(), BoolSort, null)(),
-            SMTFunction0("B".symbol(), BoolSort, null)())
+            UserDeclaredSMTFunction0("A".symbol(), BoolSort)(),
+            UserDeclaredSMTFunction0("B".symbol(), BoolSort)())
     val transformed =
         expr.transform { expression ->
           if (expression is Or) {

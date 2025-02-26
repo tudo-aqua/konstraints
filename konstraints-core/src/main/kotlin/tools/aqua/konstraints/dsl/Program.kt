@@ -69,8 +69,7 @@ class SMTProgramBuilder(logic: Logic) {
 
   /** Registers a new constant smt function with the given [name] and [sort] */
   fun <T : Sort> const(name: String, sort: T): UserDeclaredExpression<T> {
-    val func = program.declareConst(name.symbol(), sort)
-    return func() as UserDeclaredExpression<T>
+    return program.declareConst(name.symbol(), sort)()
   }
 
   /** Converts this [SMTProgramBuilder] to a finished [DefaultSMTProgram] */

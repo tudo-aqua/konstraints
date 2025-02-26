@@ -18,8 +18,8 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.dsl.SMTFunction0
-import tools.aqua.konstraints.dsl.SMTFunctionN
+import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
+import tools.aqua.konstraints.dsl.UserDeclaredSMTFunctionN
 import tools.aqua.konstraints.parser.ParseContext
 import tools.aqua.konstraints.theories.BoolSort
 
@@ -105,8 +105,8 @@ class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
     _commands.add(Assert(expr))
   }
 
-  fun <T : Sort> declareConst(name: Symbol, sort: T): SMTFunction0<T> {
-    val func = SMTFunction0(name, sort, null)
+  fun <T : Sort> declareConst(name: Symbol, sort: T): UserDeclaredSMTFunction0<T> {
+    val func = UserDeclaredSMTFunction0(name, sort)
     context.addFun(func)
 
     _commands.add(DeclareConst(name, sort))
@@ -121,7 +121,7 @@ class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
   }
 
   fun declareFun(name: Symbol, parameter: List<Sort>, sort: Sort) {
-    declareFun(SMTFunctionN(name, sort, parameter, null))
+    declareFun(UserDeclaredSMTFunctionN(name, sort, parameter))
   }
 
   fun setOption(option: SetOption) {
