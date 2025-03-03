@@ -23,8 +23,10 @@ import tools.aqua.konstraints.smt.*
 
 /** Array sort */
 class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) :
-    Sort("Array".symbol(), emptyList(), listOf(x, y)) {
+    Sort("Array".toSymbolWithQuotes(), emptyList(), listOf(x, y)) {
   override fun toString(): String = "(Array $x $y)"
+
+  override val theories = ARRAYS_EX_MARKER_SET
 }
 
 /**
@@ -35,7 +37,9 @@ class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) :
 class ArraySelect<X : Sort, Y : Sort>(
     val array: Expression<ArraySort<X, Y>>,
     val index: Expression<X>
-) : BinaryExpression<Y, ArraySort<X, Y>, X>("select".symbol(), array.sort.y) {
+) : BinaryExpression<Y, ArraySort<X, Y>, X>("select".toSymbolWithQuotes(), array.sort.y) {
+  override val theories = ARRAYS_EX_MARKER_SET
+
   init {
     require(array.sort.x == index.sort)
   }
@@ -57,7 +61,11 @@ class ArrayStore<X : Sort, Y : Sort>(
     val array: Expression<ArraySort<X, Y>>,
     val index: Expression<X>,
     val value: Expression<Y>
-) : TernaryExpression<ArraySort<X, Y>, ArraySort<X, Y>, X, Y>("store".symbol(), array.sort) {
+) :
+    TernaryExpression<ArraySort<X, Y>, ArraySort<X, Y>, X, Y>(
+        "store".toSymbolWithQuotes(), array.sort) {
+  override val theories = ARRAYS_EX_MARKER_SET
+
   init {
     require(array.sort.x == index.sort)
     require(array.sort.y == value.sort)

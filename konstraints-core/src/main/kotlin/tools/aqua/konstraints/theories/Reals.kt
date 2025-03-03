@@ -24,7 +24,9 @@ import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
 /** Real sort */
-object RealSort : Sort("Real")
+object RealSort : Sort("Real") {
+  override val theories = REALS_REALS_INTS_MARKER_SET
+}
 
 /**
  * Real literal
@@ -33,6 +35,8 @@ object RealSort : Sort("Real")
  */
 class RealLiteral(val value: BigDecimal) :
     Literal<RealSort>(LiteralString(value.toString()), RealSort) {
+  override val theories = REALS_REALS_INTS_MARKER_SET
+
   constructor(value: Byte) : this(value.toInt().toBigDecimal())
 
   constructor(value: Short) : this(value.toInt().toBigDecimal())
@@ -60,7 +64,9 @@ class RealLiteral(val value: BigDecimal) :
  * (- Real Real)
  */
 class RealNeg(override val inner: Expression<RealSort>) :
-    UnaryExpression<RealSort, RealSort>("-".symbol(), RealSort) {
+    UnaryExpression<RealSort, RealSort>("-".toSymbolWithQuotes(), RealSort) {
+  override val theories = REALS_REALS_INTS_MARKER_SET
+
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
       RealNegDecl.buildExpression(children, emptyList())
 }
@@ -71,7 +77,9 @@ class RealNeg(override val inner: Expression<RealSort>) :
  * (- Real Real Real :left-assoc)
  */
 class RealSub(val terms: List<Expression<RealSort>>) :
-    HomogenousExpression<RealSort, RealSort>("-".symbol(), RealSort) {
+    HomogenousExpression<RealSort, RealSort>("-".toSymbolWithQuotes(), RealSort) {
+  override val theories = REALS_REALS_INTS_MARKER_SET
+
   init {
     require(terms.size > 1) {
       "Integer subtraction needs at least 2 terms but ${terms.size} were provided"
@@ -92,7 +100,9 @@ class RealSub(val terms: List<Expression<RealSort>>) :
  * (+ Real Real Real :left-assoc)
  */
 class RealAdd(val terms: List<Expression<RealSort>>) :
-    HomogenousExpression<RealSort, RealSort>("+".symbol(), RealSort) {
+    HomogenousExpression<RealSort, RealSort>("+".toSymbolWithQuotes(), RealSort) {
+  override val theories = REALS_REALS_INTS_MARKER_SET
+
   init {
     require(terms.size > 1) {
       "Integer addition needs at least 2 terms but ${terms.size} were provided"
@@ -113,7 +123,9 @@ class RealAdd(val terms: List<Expression<RealSort>>) :
  * (* Real Real Real :left-assoc)
  */
 class RealMul(val factors: List<Expression<RealSort>>) :
-    HomogenousExpression<RealSort, RealSort>("*".symbol(), RealSort) {
+    HomogenousExpression<RealSort, RealSort>("*".toSymbolWithQuotes(), RealSort) {
+  override val theories = REALS_REALS_INTS_MARKER_SET
+
   init {
     require(factors.size > 1) {
       "Integer multiplication needs at least 2 factors but ${factors.size} were provided"
@@ -134,7 +146,9 @@ class RealMul(val factors: List<Expression<RealSort>>) :
  * (/ Real Real Real :left-assoc)
  */
 class RealDiv(val terms: List<Expression<RealSort>>) :
-    HomogenousExpression<RealSort, RealSort>("/".symbol(), RealSort) {
+    HomogenousExpression<RealSort, RealSort>("/".toSymbolWithQuotes(), RealSort) {
+  override val theories = REALS_REALS_INTS_MARKER_SET
+
   init {
     require(terms.size > 1) {
       "Integer division needs at least 2 terms but ${terms.size} were provided"
@@ -155,7 +169,9 @@ class RealDiv(val terms: List<Expression<RealSort>>) :
  * (<= Real Real Bool :chainable)
  */
 class RealLessEq(val terms: List<Expression<RealSort>>) :
-    HomogenousExpression<BoolSort, RealSort>("<=".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, RealSort>("<=".toSymbolWithQuotes(), BoolSort) {
+  override val theories = REALS_REALS_INTS_MARKER_SET
+
   init {
     require(terms.size > 1) {
       "Integer comparison needs at least 2 terms but ${terms.size} were provided"
@@ -176,7 +192,9 @@ class RealLessEq(val terms: List<Expression<RealSort>>) :
  * (<= Real Real Bool :chainable)
  */
 class RealLess(val terms: List<Expression<RealSort>>) :
-    HomogenousExpression<BoolSort, RealSort>("<".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, RealSort>("<".toSymbolWithQuotes(), BoolSort) {
+  override val theories = REALS_REALS_INTS_MARKER_SET
+
   init {
     require(terms.size > 1) {
       "Integer comparison needs at least 2 terms but ${terms.size} were provided"
@@ -197,7 +215,9 @@ class RealLess(val terms: List<Expression<RealSort>>) :
  * (<= Real Real Bool :chainable)
  */
 class RealGreaterEq(val terms: List<Expression<RealSort>>) :
-    HomogenousExpression<BoolSort, RealSort>(">=".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, RealSort>(">=".toSymbolWithQuotes(), BoolSort) {
+  override val theories = REALS_REALS_INTS_MARKER_SET
+
   init {
     require(terms.size > 1) {
       "Integer comparison needs at least 2 terms but ${terms.size} were provided"
@@ -218,7 +238,9 @@ class RealGreaterEq(val terms: List<Expression<RealSort>>) :
  * (<= Real Real Bool :chainable)
  */
 class RealGreater(val terms: List<Expression<RealSort>>) :
-    HomogenousExpression<BoolSort, RealSort>(">".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, RealSort>(">".toSymbolWithQuotes(), BoolSort) {
+  override val theories = REALS_REALS_INTS_MARKER_SET
+
   init {
     require(terms.size > 1) {
       "Integer comparison needs at least 2 terms but ${terms.size} were provided"

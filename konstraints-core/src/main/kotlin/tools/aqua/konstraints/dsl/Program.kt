@@ -19,7 +19,6 @@
 package tools.aqua.konstraints.dsl
 
 import java.util.UUID
-import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.BoolSort
 
@@ -27,15 +26,14 @@ import tools.aqua.konstraints.theories.BoolSort
 
 @SMTDSL
 class SMTProgramBuilder(logic: Logic) {
-  private val commands = mutableListOf<Command>()
-  private val context = Context(logic)
+  private val program = MutableSMTProgram()
 
   /** Adds a new assertion: (assert [block]) */
   fun assert(block: () -> Expression<BoolSort>) = assert(block())
 
   /** Adds a new assertion: (assert [expr]) */
   fun assert(expr: Expression<BoolSort>) {
-    commands.add(Assert(expr))
+    program.assert(expr)
   }
 
   /**
@@ -46,49 +44,35 @@ class SMTProgramBuilder(logic: Logic) {
   fun setOptions(init: OptionsBuilder.() -> OptionsBuilder) {
     val options = OptionsBuilder().init()
 
-    commands.addAll(
-        options.stringOptions.map { (option, value) ->
-          SetOption(option, StringOptionValue(value))
-        })
+    options.stringOptions.map { (option, value) ->
+      program.setOption(SetOption(option, StringOptionValue(value)))
+    }
 
-    commands.addAll(
-        options.numeralOptions.map { (option, value) ->
-          SetOption(option, NumeralOptionValue(value))
-        })
+    options.numeralOptions.map { (option, value) ->
+      program.setOption(SetOption(option, NumeralOptionValue(value)))
+    }
 
-    commands.addAll(
-        options.boolOptions.map { (option, value) -> SetOption(option, BooleanOptionValue(value)) })
+    options.boolOptions.map { (option, value) ->
+      program.setOption(SetOption(option, BooleanOptionValue(value)))
+    }
   }
 
-  internal fun registerFun(name: String, sort: Sort, parameters: List<Sort>) {
-    context.registerFunction(name, parameters, sort)
-    commands.add(DeclareFun(name.symbol(), parameters, sort))
-  }
+  internal fun <T : SMTFunction<S>, S : Sort> registerFun(func: T): T {
+    program.declareFun(func)
 
-  internal fun <T : Sort> registerFun(
-      name: String,
-      sort: T,
-      parameters: List<SortedVar<*>>,
-      term: Expression<T>
-  ) {
-    val def = FunctionDef(name.symbol(), parameters, sort, term)
-
-    context.registerFunction(def)
-    commands.add(DefineFun(def))
+    return func
   }
 
   /** Registers a new constant smt function with the given [sort] and auto generated name. */
   fun <T : Sort> const(sort: T) = const("|const!${UUID.randomUUID()}|", sort)
 
   /** Registers a new constant smt function with the given [name] and [sort] */
-  fun <T : Sort> const(name: String, sort: T): Expression<T> {
-    registerFun(name, sort, emptyList())
-
-    return UserDeclaredExpression(name.symbol(), sort)
+  fun <T : Sort> const(name: String, sort: T): UserDeclaredExpression<T> {
+    return program.declareConst(name.toSymbolWithQuotes(), sort)()
   }
 
   /** Converts this [SMTProgramBuilder] to a finished [DefaultSMTProgram] */
-  fun finalize() = DefaultSMTProgram(commands.also { it.add(CheckSat) }.toList(), context)
+  fun finalize() = program.apply { add(CheckSat) }
 }
 
 /** Builds an [SMTProgram] based on the given [logic] */

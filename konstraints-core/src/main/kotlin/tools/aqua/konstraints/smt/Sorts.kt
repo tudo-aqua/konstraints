@@ -20,24 +20,30 @@ package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.Bindings
 import tools.aqua.konstraints.parser.SortDecl
+import tools.aqua.konstraints.theories.Theories
 
 /**
  * Base class for each SMT sort
  *
- * @param name sort name
+ * @param symbol sort name
  * @param indices indices of indexed sorts (e.g. (_ BitVec m))
  * @param parameters parameters of parameterized sorts (e.g. (Array 2))
  */
-open class Sort(
-    val name: Symbol,
+abstract class Sort(
+    val symbol: Symbol,
     val indices: List<Index> = emptyList(),
     val parameters: List<Sort> = emptyList()
-) {
+) : ContextSort {
   constructor(
       name: String,
       indices: List<Index> = emptyList(),
       parameters: List<Sort> = emptyList()
-  ) : this(Symbol(name), indices, parameters)
+  ) : this(name.toSymbolWithQuotes(), indices, parameters)
+
+  override val name: String = symbol.toString()
+  override val arity = parameters.size
+
+  abstract val theories: Set<Theories>
 
   constructor(name: String, vararg indices: Index) : this(name, indices.toList())
 
@@ -51,33 +57,37 @@ open class Sort(
       }
 
   private fun sortEquality(other: Sort): Boolean {
-    return if (name != other.name) false
+    return if (symbol != other.symbol) false
     else if (!(indices zip other.indices).all { (lhs, rhs) -> lhs == rhs }) false
     else if (!(parameters zip other.parameters).all { (lhs, rhs) -> lhs == rhs }) false else true
   }
 
   override fun hashCode(): Int =
-      name.hashCode() * 961 + indices.hashCode() * 31 + parameters.hashCode()
+      symbol.hashCode() * 961 + indices.hashCode() * 31 + parameters.hashCode()
 
   override fun toString() =
       if (this.isIndexed()) {
-        "(_ $name ${indices.joinToString(" ")})"
+        "(_ $symbol ${indices.joinToString(" ")})"
       } else {
-        name.toString()
+        symbol.toString()
       }
 
-  fun toSMTString() = name.toSMTString()
+  fun toSMTString() = symbol.toSMTString(QuotingRule.SAME_AS_INPUT)
 }
 
-class SortParameter(name: String) : Sort(name, emptyList(), emptyList())
+class SortParameter(name: String) : Sort(name, emptyList(), emptyList()) {
+  override val theories = emptySet<Theories>()
+}
 
 class UserDefinedSort(name: Symbol, arity: Int) :
-    Sort(name, emptyList(), (0..arity).map { index -> SortParameter("sort$index") })
+    Sort(name, emptyList(), (0..arity).map { index -> SortParameter("sort$index") }) {
+  override val theories = emptySet<Theories>()
+}
 
-internal class UserDefinedSortDecl(name: Symbol, val arity: Int) :
+internal class UserDefinedSortDecl(name: Symbol, override val arity: Int) :
     SortDecl<Sort>(
         name, (0..<arity).map { index -> SortParameter("sort$index") }.toSet(), emptySet()) {
 
   // FIXME parameter order is assume to be right in the bindings map
-  override fun getSort(bindings: Bindings): Sort = UserDefinedSort(name, arity)
+  override fun getSort(bindings: Bindings): Sort = UserDefinedSort(symbol, arity)
 }

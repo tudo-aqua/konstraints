@@ -116,7 +116,7 @@ data class DefineFun(val functionDef: FunctionDef<*>) : Command("define-fun $fun
  * Function definition object holding, [name], [parameters], [sort] and [term] of a function defined
  * via [DefineFun]
  */
-data class FunctionDef<S : Sort>(
+data class FunctionDef<out S : Sort>(
     val name: Symbol,
     val parameters: List<SortedVar<*>>,
     val sort: S,
@@ -135,7 +135,7 @@ data class FunctionDef<S : Sort>(
       // its probably better to implement some form of Decl.isInstanceOf(Expression) or
       // Expression.isInstanceOf(Decl)
       if (expr.children.isEmpty()) {
-        bindings.find { (param, _) -> param.name == expr.name }?.second ?: expr
+        bindings.find { (param, _) -> param.symbol == expr.name }?.second ?: expr
       } else {
         expr
       }

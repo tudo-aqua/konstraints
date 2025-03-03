@@ -23,10 +23,13 @@ import tools.aqua.konstraints.theories.*
 import tools.aqua.konstraints.util.Stack
 
 abstract class SortDecl<T : Sort>(
-    val name: Symbol,
+    val symbol: Symbol,
     sortParameters: Set<SortParameter>,
     indices: Set<SymbolIndex>,
-) {
+) : ContextSort {
+  override val name = symbol.toString()
+  override val arity: Int = sortParameters.size
+
   val signature = SortSignature(sortParameters, indices)
 
   open fun buildSort(identifier: Identifier, parameters: List<Sort>): T {
@@ -48,28 +51,47 @@ abstract class SortDecl<T : Sort>(
  * Context class manages the currently loaded logic/theory and all the Assertion-Levels (including
  * global eventually but this option is currently not supported)
  */
-/*internal*/ class Context(val logic: Logic) {
-  val assertionLevels = Stack<Subcontext>()
+/*internal*/ class ParseContext(val logic: Logic) {
+  val assertionLevels = Stack<AssertionLevel<FunctionDecl<*>, SortDecl<*>>>()
+
+  // the sort of numeral literals depends on the theory
+  // if only INTS is loaded numerals are of sort Int
+  // if REALS or REALS_INTS is loaded numerals are of sort Real
   val numeralSort: Sort? =
       when {
-        logic.theories.contains(IntsTheory) -> IntSort
-        logic.theories.contains(RealsTheory) || logic.theories.contains(RealsIntsTheory) -> RealSort
+        logic.theories.contains(Theories.INTS) -> IntSort
+        logic.theories.contains(Theories.REALS) || logic.theories.contains(Theories.REALS_INTS) ->
+            RealSort
         else -> null
       }
 
+  private val logicLookup =
+      mapOf(
+          Theories.CORE to CoreTheory,
+          Theories.FIXED_SIZE_BIT_VECTORS to BitVectorExpressionTheory,
+          Theories.INTS to IntsTheory,
+          Theories.REALS to RealsTheory,
+          Theories.REALS_INTS to RealsIntsTheory,
+          Theories.FLOATING_POINT to FloatingPointTheory,
+          Theories.ARRAYS_EX to ArrayExTheory,
+          Theories.STRINGS to StringsTheory)
+
   init {
-    logic.theories.forEach { assertionLevels.push(it) }
-    assertionLevels.push(AssertionLevel())
+    logic.theories.forEach { assertionLevels.push(logicLookup[it]!!) }
+    assertionLevels.push(ParseAssertionLevel())
   }
 
-  fun <T> let(varBindings: List<VarBinding<*>>, block: (Context) -> T): T {
-    logic.theories.forEach { theory ->
-      varBindings.forEach {
-        if (theory.contains(it.symbol))
-            throw IllegalFunctionOverloadException(
-                it.symbol.toString(), "Can not override theory symbol ${it.symbol}")
-      }
-    }
+  fun <T> let(varBindings: List<VarBinding<*>>, block: (ParseContext) -> T): T {
+    // disallow name shadowing of theory functions
+    logic.theories
+        .map { logicLookup[it]!! }
+        .forEach { theory ->
+          varBindings.forEach {
+            if (theory.contains(it.symbol))
+                throw IllegalFunctionOverloadException(
+                    it.symbol.toString(), "Can not override theory symbol ${it.symbol}")
+          }
+        }
 
     assert(varBindings.distinctBy { it.symbol }.size == varBindings.size)
 
@@ -80,7 +102,7 @@ abstract class SortDecl<T : Sort>(
     return result
   }
 
-  fun <T> bindVars(sortedVars: List<SortedVar<*>>, block: (Context) -> T): T {
+  fun <T> bindVars(sortedVars: List<SortedVar<*>>, block: (ParseContext) -> T): T {
     assertionLevels.push(LocalLevel(sortedVars.map { SortedVarDecl(it) }))
     val result = block(this)
     assertionLevels.pop()
@@ -89,7 +111,7 @@ abstract class SortDecl<T : Sort>(
   }
 
   fun push(n: Int) {
-    (0..<n).forEach { _ -> assertionLevels.push(AssertionLevel()) }
+    (0..<n).forEach { _ -> assertionLevels.push(ParseAssertionLevel()) }
   }
 
   fun pop(n: Int) {
@@ -118,7 +140,8 @@ abstract class SortDecl<T : Sort>(
             emptySet(),
             emptySet(),
             function.sort,
-            Associativity.NONE))
+            Associativity.NONE,
+            null))
   }
 
   fun registerFunction(function: DeclareFun) {
@@ -130,7 +153,8 @@ abstract class SortDecl<T : Sort>(
             emptySet(),
             emptySet(),
             function.sort,
-            Associativity.NONE))
+            Associativity.NONE,
+            null))
   }
 
   fun registerFunction(def: FunctionDef<*>) {
@@ -139,25 +163,32 @@ abstract class SortDecl<T : Sort>(
 
   fun registerFunction(function: FunctionDecl<*>) {
     assertionLevels.forEach { level ->
-      if (level.contains(function.name)) {
+      if (level.contains(function.symbol)) {
         throw IllegalFunctionOverloadException(
-            function.name.toString(), "Can not override symbol ${function.name}")
+            function.symbol.toString(), "Can not override symbol ${function.symbol}")
       }
     }
 
-    assertionLevels.peek().add(function)
+    val level = assertionLevels.peek()
+    if (level is ParseAssertionLevel) {
+      level.add(function)
+    } else {
+      throw IllegalStateException(
+          "Tried to register function on assertion level that does not support mutability: ${function.symbol}")
+    }
   }
 
   internal fun registerFunction(const: ProtoDeclareConst, sort: Sort) {
     registerFunction(
         FunctionDecl(
-            const.name.symbol(),
+            const.name.toSymbolWithQuotes(),
             emptySet(),
             listOf(),
             emptySet(),
             emptySet(),
             sort,
-            Associativity.NONE))
+            Associativity.NONE,
+            null))
   }
 
   internal fun registerFunction(function: ProtoDeclareFun, parameters: List<Sort>, sort: Sort) {
@@ -171,7 +202,14 @@ abstract class SortDecl<T : Sort>(
   fun registerFunction(name: String, params: List<Sort>, sort: Sort) {
     this.registerFunction(
         FunctionDecl(
-            name.symbol(), emptySet(), params, emptySet(), emptySet(), sort, Associativity.NONE))
+            name.toSymbolWithQuotes(),
+            emptySet(),
+            params,
+            emptySet(),
+            emptySet(),
+            sort,
+            Associativity.NONE,
+            null))
   }
 
   fun registerSort(sort: DeclareSort) {
@@ -179,14 +217,21 @@ abstract class SortDecl<T : Sort>(
   }
 
   fun registerSort(sort: SortDecl<*>) {
-    logic.theories.forEach { theory ->
-      if (theory.contains(sort)) {
-        throw SortAlreadyDeclaredException(sort.name, sort.signature.sortParameter.size)
-      }
-    }
+    logic.theories
+        .map { logicLookup[it]!! }
+        .forEach { theory ->
+          if (theory.contains(sort)) {
+            throw SortAlreadyDeclaredException(sort.symbol, sort.signature.sortParameter.size)
+          }
+        }
 
-    // TODO enforce all overloading/shadowing rules
-    assertionLevels.peek().add(sort)
+    val level = assertionLevels.peek()
+    if (level is ParseAssertionLevel) {
+      level.add(sort)
+    } else {
+      throw IllegalStateException(
+          "Tried to register sort on assertion level that does not support mutability: ${sort.symbol}")
+    }
   }
 
   fun registerSort(name: Symbol, arity: Int) {
@@ -224,40 +269,14 @@ abstract class SortDecl<T : Sort>(
   }
 }
 
-/**
- * Parent class of all assertion levels (this includes the default assertion levels and binder
- * assertion levels, as well as theory objects)
- */
-/*internal*/ interface Subcontext {
-  fun contains(function: FunctionDecl<*>) = functions.contains(function.name.toString())
-
-  fun contains(function: String, args: List<Expression<*>>) = get(function, args) != null
-
-  fun contains(function: Symbol) = functions.contains(function.toString())
-
-  fun get(function: String, args: List<Expression<*>>) =
+/** Represents a single assertion level */
+internal class ParseAssertionLevel : AssertionLevel<FunctionDecl<*>, SortDecl<*>> {
+  override fun get(function: String, args: List<Expression<*>>): FunctionDecl<*>? =
       functions[function]?.takeIf { it.acceptsExpressions(args, emptyList()) }
 
-  fun contains(sort: SortDecl<*>) = sorts.containsKey(sort.name.toString())
+  fun add(function: FunctionDecl<*>) = functions.put(function.symbol.toString(), function)
 
-  fun contains(sort: Sort) = sorts.containsKey(sort.name.toString())
-
-  fun containsSort(sort: String) = sorts.containsKey(sort)
-
-  fun add(function: FunctionDecl<*>): Boolean
-
-  fun add(sort: SortDecl<*>): SortDecl<*>?
-
-  val functions: Map<String, FunctionDecl<*>>
-  val sorts: Map<String, SortDecl<*>>
-}
-
-/** Represents a single assertion level */
-internal class AssertionLevel : Subcontext {
-  override fun add(function: FunctionDecl<*>) =
-      functions.put(function.name.toString(), function) != null
-
-  override fun add(sort: SortDecl<*>) = sorts.put(sort.name.toString(), sort)
+  fun add(sort: SortDecl<*>) = sorts.put(sort.symbol.toString(), sort)
 
   override val functions: MutableMap<String, FunctionDecl<*>> = mutableMapOf()
   override val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf()
@@ -270,48 +289,44 @@ internal class VarBindingDecl<T : Sort>(val binding: VarBinding<T>) :
   override fun buildExpression(bindings: Bindings): Expression<T> = binding.instance
 }
 
-internal class LetLevel(varBindings: List<VarBindingDecl<*>>) : Subcontext {
-  override fun add(function: FunctionDecl<*>): Boolean =
-      throw IllegalOperationException(
-          "LetLevel.add", "Can not add new functions to let assertion level")
-
-  override fun add(sort: SortDecl<*>): SortDecl<*> =
-      throw IllegalOperationException(
-          "LetLevel.add", "Can not add new sorts to let assertion level")
-
-  override val functions: Map<String, FunctionDecl<*>> =
-      varBindings.associateBy { it.name.toString() }
+internal class LetLevel(varBindings: List<VarBindingDecl<*>>) :
+    AssertionLevel<VarBindingDecl<*>, SortDecl<*>> {
+  override val functions: Map<String, VarBindingDecl<*>> =
+      varBindings.associateBy { it.symbol.toString() }
   override val sorts: Map<String, SortDecl<*>> = emptyMap()
 }
 
 /** This class allows the context to use [SortedVar] as [FunctionDecl0]. */
-/*internal*/ class SortedVarDecl<T : Sort>(val sortedVar: SortedVar<T>) :
-    FunctionDecl0<T>(sortedVar.name, emptySet(), emptySet(), sortedVar.sort) {
-  override fun toString(): String = "($name $sort)"
+internal class SortedVarDecl<T : Sort>(val sortedVar: SortedVar<T>) :
+    FunctionDecl0<T>(sortedVar.symbol, emptySet(), emptySet(), sortedVar.sort) {
+  override fun toString(): String = "($symbol $sort)"
 
   override fun buildExpression(bindings: Bindings): Expression<T> = sortedVar.instance
 }
 
-internal class LocalLevel(localVars: List<SortedVarDecl<*>>) : Subcontext {
-  override fun add(function: FunctionDecl<*>): Boolean =
-      throw IllegalOperationException(
-          "LocalLevel.add", "Can not add new functions to local assertion level")
-
-  override fun add(sort: SortDecl<*>): SortDecl<*> =
-      throw IllegalOperationException(
-          "LocalLevel.add", "Can not add new sorts to local assertion level")
-
-  override val functions: Map<String, FunctionDecl<*>> =
-      localVars.associateBy { it.name.toString() }
+internal class LocalLevel(localVars: List<SortedVarDecl<*>>) :
+    AssertionLevel<SortedVarDecl<*>, SortDecl<*>> {
+  override val functions: Map<String, SortedVarDecl<*>> =
+      localVars.associateBy { it.symbol.toString() }
   override val sorts: Map<String, SortDecl<*>> = emptyMap()
 }
 
-/*internal*/ interface Theory : Subcontext {
-  override fun add(function: FunctionDecl<*>) =
-      throw IllegalOperationException("Theory.add", "Can not add new functions to SMT theories")
+internal interface Theory : AssertionLevel<FunctionDecl<*>, SortDecl<*>> {
+  companion object {
+    val logicLookup =
+        mapOf(
+            Theories.CORE to CoreTheory,
+            Theories.FIXED_SIZE_BIT_VECTORS to BitVectorExpressionTheory,
+            Theories.INTS to IntsTheory,
+            Theories.REALS to RealsTheory,
+            Theories.REALS_INTS to RealsIntsTheory,
+            Theories.FLOATING_POINT to FloatingPointTheory,
+            Theories.ARRAYS_EX to ArrayExTheory,
+            Theories.STRINGS to StringsTheory)
+  }
 
-  override fun add(sort: SortDecl<*>) =
-      throw IllegalOperationException("Theory.add", "Can not add new sorts to SMT theories")
+  override fun get(function: String, args: List<Expression<*>>): FunctionDecl<*>? =
+      functions[function]?.takeIf { it.acceptsExpressions(args, emptyList()) }
 
   override val functions: Map<String, FunctionDecl<*>>
   override val sorts: Map<String, SortDecl<*>>

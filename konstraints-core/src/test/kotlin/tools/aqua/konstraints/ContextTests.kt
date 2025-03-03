@@ -25,292 +25,166 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
-import tools.aqua.konstraints.parser.*
+import tools.aqua.konstraints.dsl.*
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
 
-/*
- * TestInstance per class is needed for parameterized tests
- * It is important to note that the class will not be reinitialized for each test,
- * so we need to make sure the test does not modify the context in an unpredictable way
- */
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-
-/*
- * Test order will be fixed here to modify context in later tests without breaking other tests
- */
-@TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class ContextTests {
-  private val context = Context(QF_BV)
-  private val boolExpression = UserDeclaredExpression("A".symbol(), BoolSort)
-  private val bv32Expression = UserDeclaredExpression("B".symbol(), BVSort(32))
-  private val bv16Expression = UserDeclaredExpression("B".symbol(), BVSort(16))
-
-  // this function has no indices as it is not infinitary, BVSort(32) here means actually only
-  // bitvectors of length 32
-  private val overloadedBV =
-      FunctionDecl(
-          "O".symbol(),
-          emptySet(),
-          listOf(BVSort(32), BVSort(32)),
-          emptySet(),
-          emptySet(),
-          BVSort(32),
-          Associativity.NONE)
-
-  init {
-    context.registerFunction("O", listOf(BoolSort, BoolSort), BoolSort)
-  }
+  val boolFunc1 = UserDeclaredSMTFunction0("A".toSymbolWithQuotes(), BoolSort)
+  val boolFunc2 = UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), BoolSort, BVSort(8), BVSort(8))
+  val boolFunc2Copy =
+      UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), BoolSort, BVSort(8), BVSort(8))
+  val boolFunc2Overloaded =
+      UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), BoolSort, BVSort(16), BVSort(16))
 
   @ParameterizedTest
-  @MethodSource("getFunctionNameAndArgs")
-  @Order(1)
-  fun `Check that Context returns none null function`(
-      name: String,
-      args: List<Expression<*>>,
-      sort: Sort
-  ) {
-    val function = context.getFunction(name, args)
-
-    assertNotNull(function)
+  @MethodSource("getContextAndNames")
+  fun testContains(context: Context, func: String) {
+    assertTrue(context.contains(func))
   }
+
+  private fun getContextAndNames(): Stream<Arguments> =
+      Stream.of(arguments(createContext(), "A"), arguments(createContext(), "B"))
 
   @ParameterizedTest
-  @MethodSource("getFunctionNameAndArgs")
-  @Order(2)
-  fun `Check that Context returns function with correct name`(
-      name: String,
-      args: List<Expression<*>>,
-      sort: Sort
-  ) {
-    val function = context.getFunction(name, args)
-
-    assertEquals(name.symbol(), function?.name)
+  @MethodSource("getContextAndFunctions")
+  fun testGetFunction(context: Context, func: SMTFunction<*>) {
+    assertTrue(context.getFunc(func.name) == func)
   }
+
+  private fun getContextAndFunctions(): Stream<Arguments> =
+      Stream.of(arguments(createContext(), boolFunc1), arguments(createContext(), boolFunc2))
 
   @ParameterizedTest
-  @MethodSource("getFunctionNameAndArgs")
-  @Order(3)
-  fun `Check that Context returns function with correct sort`(
-      name: String,
-      args: List<Expression<*>>,
-      sort: Sort
-  ) {
-    val function = context.getFunction(name, args)
-
-    assertEquals(sort, function?.sort)
+  @MethodSource("getContextAndIllegalFunctions")
+  fun testAddFails(context: Context, func: SMTFunction<*>) {
+    assertThrows<IllegalArgumentException> { context.addFun(func) }
   }
+
+  private fun getContextAndIllegalFunctions(): Stream<Arguments> =
+      Stream.of(
+          arguments(createContext(), boolFunc1),
+          arguments(createContext(), boolFunc2),
+          arguments(createContext(), boolFunc2Overloaded),
+      )
 
   @ParameterizedTest
-  @MethodSource("getFunctionNameAndArgs")
-  @Order(4)
-  fun `Check that Function accepts parameters`(
-      name: String,
-      args: List<Expression<*>>,
-      sort: Sort
-  ) {
-    val function = context.getFunction(name, args)
-
-    requireNotNull(function)
-    assert(function.acceptsExpressions(args, emptyList()))
+  @MethodSource("getContextAndIllegalNameFunctions")
+  fun testAddIllegalNameFails(context: Context, func: SMTFunction<*>) {
+    assertThrows<IllegalArgumentException> { context.addFun(func) }
   }
 
-  private fun getFunctionNameAndArgs(): Stream<Arguments> {
-    return Stream.of(arguments("O", listOf(boolExpression, boolExpression), BoolSort))
-  }
-
-  @ParameterizedTest
-  @MethodSource("getFunctionNameAndIncorrectArgs")
-  @Order(5)
-  fun `Check that Function rejects incorrect parameters`(
-      function: FunctionDecl<*>,
-      args: List<Expression<*>>
-  ) {
-    assertFalse(function.acceptsExpressions(args, emptyList()))
-  }
-
-  @ParameterizedTest
-  @MethodSource("getFunctionNameAndIncorrectArgs")
-  @Order(6)
-  fun `Check that Expression generation fails for incorrect parameters`(
-      function: FunctionDecl<*>,
-      args: List<Expression<*>>
-  ) {
-    assertThrows<Exception> { function.buildExpression(args, emptyList()) }
-  }
-
-  private fun getFunctionNameAndIncorrectArgs(): Stream<Arguments> {
-    return Stream.of(
-        arguments(AndDecl, listOf(boolExpression, boolExpression, bv16Expression)),
-        arguments(OrDecl, listOf(boolExpression, boolExpression, bv16Expression)),
-        arguments(XOrDecl, listOf(boolExpression, boolExpression, bv16Expression)),
-        arguments(BVUltDecl, listOf(bv16Expression)),
-        arguments(BVUltDecl, listOf(boolExpression, boolExpression)),
-        arguments(BVUltDecl, listOf(bv16Expression, boolExpression)),
-        arguments(BVUltDecl, listOf(bv16Expression, bv32Expression)),
-        arguments(BVUltDecl, listOf(bv32Expression, bv16Expression)),
-        arguments(overloadedBV, listOf(bv16Expression, bv16Expression)),
-        arguments(EqualsDecl, listOf(boolExpression, bv16Expression)),
-        arguments(EqualsDecl, listOf(boolExpression, boolExpression, bv16Expression)),
-        arguments(EqualsDecl, listOf(boolExpression, bv16Expression, boolExpression)))
-  }
-
-  /*
-   * This test must be executed after all of the above tests, as the function symbol "and" will become ambiguous
-   * making it illegal to use outside "match" and "as"
-   */
-  @ParameterizedTest
-  @MethodSource("getFunctionDeclarations")
-  @Order(7)
-  fun `test that legal functions can be registered`(func: FunctionDecl<*>) {
-    context.registerFunction(func)
-  }
-
-  private fun getFunctionDeclarations(): Stream<Arguments> {
-    return Stream.of(
-        /* No conflict */
-        arguments(
-            FunctionDecl(
-                "foo".symbol(),
-                emptySet(),
-                listOf(BoolSort, BoolSort),
-                emptySet(),
-                emptySet(),
-                BoolSort,
-                Associativity.NONE)))
-  }
+  private fun getContextAndIllegalNameFunctions(): Stream<Arguments> =
+      Stream.of(
+          arguments(
+              createContext(), UserDeclaredSMTFunction0("and".toSymbolWithQuotes(), BoolSort)),
+          arguments(
+              createContext(), UserDeclaredSMTFunction0("true".toSymbolWithQuotes(), BoolSort)),
+          arguments(
+              createContext(), UserDeclaredSMTFunction0("distinct".toSymbolWithQuotes(), BoolSort)),
+          arguments(
+              createContext(), UserDeclaredSMTFunction0("bvadd".toSymbolWithQuotes(), BoolSort)),
+          arguments(
+              createContext(), UserDeclaredSMTFunction0("extract".toSymbolWithQuotes(), BoolSort)))
 
   @Test
-  fun testLetShadowingOfLet() {
-    context.let(listOf(VarBinding("A".symbol(), And(True, True)))) {
-      context.let(listOf(VarBinding("A".symbol(), Or(True, True)))) {
-        assert(
-            (context.getFunction("A", emptyList()) as VarBindingDecl)
-                .binding
-                .term
-                .name
-                .toString() == "or")
-      }
+  fun testPopFailsOnContextWithOnlyOneLevel() {
+    val context = createContext()
+
+    assertThrows<IllegalStateException> { context.pop(1) }
+  }
+
+  @ParameterizedTest
+  @MethodSource("getContextAndNewFunction")
+  fun testPopRemovesFunction(context: Context, func: SMTFunction<*>) {
+    context.push {
+      addFun(func)
+
+      assertTrue(context.contains(func.name))
+    }
+
+    assertFalse(context.contains(func.name))
+  }
+
+  private fun getContextAndNewFunction() =
+      Stream.of(
+          arguments(createContext(), UserDeclaredSMTFunction0("C".toSymbolWithQuotes(), BoolSort)),
+      )
+
+  @ParameterizedTest
+  @MethodSource("getContextAndBindings")
+  fun testBindingsAreRemovedAfterLet(context: Context, bindings: List<VarBinding<*>>) {
+    context.let(bindings) { context, bindings -> True }
+
+    assertFalse(context.contains(bindings[0].name))
+  }
+
+  private fun getContextAndBindings() =
+      Stream.of(
+          arguments(createContext(), listOf(VarBinding("binding".toSymbolWithQuotes(), True))),
+      )
+
+  @ParameterizedTest
+  @MethodSource("getContextAndShadowingBindings")
+  fun testShadowedFunctionsAreInsertedBackCorrectly(
+      context: Context,
+      bindings: List<VarBinding<*>>
+  ) {
+    val function = context.getFunc(bindings[0].name)
+
+    context.let(bindings) { context, bindings -> True }
+
+    assertTrue(context.getFunc(function.name) == function)
+  }
+
+  @ParameterizedTest
+  @MethodSource("getContextAndShadowingBindings")
+  fun testFunctionsAreShadowedCorrectly(context: Context, bindings: List<VarBinding<*>>) {
+    val function = context.getFunc(bindings[0].name)
+
+    context.let(bindings) { bindings, context ->
+      assertFalse(context.getFunc(function.name) == function)
+      True
     }
   }
 
+  private fun getContextAndShadowingBindings() =
+      Stream.of(
+          arguments(createContext(), listOf(VarBinding("A".toSymbolWithQuotes(), True))),
+      )
+
   @ParameterizedTest
-  @MethodSource("getIllegalFunctionDeclarations")
-  @Order(8)
-  fun `test that redeclaration of functions throws FunctionAlreadyDeclaredException`(
-      func: FunctionDecl<*>
-  ) {
-    assertThrows<IllegalFunctionOverloadException> { context.registerFunction(func) }
+  @MethodSource("getContextAndQuotedFunctions")
+  fun testQuotedFunctionLookup(context: Context, func: SMTFunction<*>, lookupName: String) {
+    context.addFun(func)
+
+    assertTrue(context.contains(lookupName))
   }
 
-  private fun getIllegalFunctionDeclarations(): Stream<Arguments> {
-    return Stream.of(
-        /* Illegal */
-        arguments(
-            FunctionDecl(
-                "and".symbol(),
-                emptySet(),
-                listOf(BoolSort, BoolSort, BoolSort),
-                emptySet(),
-                emptySet(),
-                BoolSort,
-                Associativity.NONE)),
-        /* Illegal */
-        arguments(
-            FunctionDecl(
-                "bvult".symbol(),
-                emptySet(),
-                listOf(BVSort(16), BVSort(16)),
-                emptySet(),
-                emptySet(),
-                BoolSort,
-                Associativity.NONE)),
-        /* New overloaded */
-        arguments(
-            FunctionDecl(
-                "and".symbol(),
-                emptySet(),
-                listOf(BVSort(16), BVSort(16)),
-                emptySet(),
-                emptySet(),
-                BoolSort,
-                Associativity.NONE)),
-        /* New ambiguous */
-        arguments(
-            FunctionDecl(
-                "and".symbol(),
-                emptySet(),
-                listOf(BoolSort, BoolSort, BoolSort),
-                emptySet(),
-                emptySet(),
-                BVSort(16),
-                Associativity.NONE)),
-        /* New ambiguous */
-        arguments(
-            FunctionDecl(
-                "bvult".symbol(),
-                emptySet(),
-                listOf(BVSort(16), BVSort(16)),
-                emptySet(),
-                emptySet(),
-                BVSort(16),
-                Associativity.NONE)),
-        /* ??? */
-        arguments(
-            FunctionDecl(
-                "bvult".symbol(),
-                emptySet(),
-                listOf(BVSort(16), BVSort(32)),
-                emptySet(),
-                emptySet(),
-                BoolSort,
-                Associativity.NONE)))
-  }
+  private fun getContextAndQuotedFunctions() =
+      Stream.of(
+          arguments(
+              createContext(),
+              UserDeclaredSMTFunction0("|Quoted|".toSymbolWithQuotes(), BoolSort),
+              "Quoted"),
+          arguments(
+              createContext(),
+              UserDeclaredSMTFunction0("|Quoted|".toSymbolWithQuotes(), BoolSort),
+              "|Quoted|"),
+          arguments(
+              createContext(),
+              UserDeclaredSMTFunction0("Unquoted".toSymbolWithQuotes(), BoolSort),
+              "|Unquoted|"),
+      )
 
-  @Test
-  fun testPushPopFails() {
-    val context = Context(QF_UF)
-    val funA = DeclareFun("A".symbol(), emptyList(), BoolSort)
-    val funB = DeclareFun("B".symbol(), emptyList(), BoolSort)
+  private fun createContext(): Context {
+    val context = Context()
+    context.setLogic(QF_BV)
 
-    context.registerFunction(funA)
-    context.push(1)
-    context.registerFunction(funB)
+    context.addFun(boolFunc1)
+    context.addFun(boolFunc2)
 
-    assertNotNull(context.getFunction("A", emptyList()))
-    assertNotNull(context.getFunction("B", emptyList()))
-
-    context.pop(1)
-
-    assertNotNull(context.getFunction("A", emptyList()))
-    assertNull(context.getFunction("B", emptyList()))
-  }
-
-  @Test
-  fun testTransform() {
-    val expr =
-        Or(
-            UserDeclaredExpression("A".symbol(), BoolSort),
-            UserDeclaredExpression("B".symbol(), BoolSort))
-    val transformed =
-        expr.transform { expression ->
-          if (expression is Or) {
-            And(expression.children.map { Not(it castTo BoolSort) })
-          } else {
-            expression
-          }
-        }
-
-    assertTrue(transformed is And)
-    assertTrue(transformed.children.size == 2)
-    assertTrue(transformed.children.all { it is Not })
-    assertTrue(
-        (transformed.children.flatMap { it.children } zip expr.children).all { (new, old) ->
-          new.name == old.name
-        })
-    assertTrue(
-        (transformed.children.flatMap { it.children } zip expr.children).all { (new, old) ->
-          new === old
-        })
+    return context
   }
 }

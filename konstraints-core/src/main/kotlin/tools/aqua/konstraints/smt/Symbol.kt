@@ -28,88 +28,59 @@ import tools.aqua.konstraints.parser.Parser
  * @property FORCED quotes the string if it is not already quoted
  */
 enum class QuotingRule {
+  /**
+   * No Symbol will be quoted, note this will result in exceptions if symbols must be quoted to be
+   * valid
+   */
+  NEVER,
+
   /** No modification will be done */
-  NONE,
+  SAME_AS_INPUT,
 
   /** Automatically determines whether the string needs quoting or not */
-  SMART,
+  WHEN_NEEDED,
 
   /** Quotes the string if it is not already quoted */
-  FORCED
+  ALWAYS
 }
 
 /**
  * Representation of an SMT Symbol
  *
- * @param symbol String containing the SMT Symbol
- * @param rule [QuotingRule] applied to the Symbol
- * @throws IllegalSymbolException if [symbol] is not a valid SMT Symbol
+ * @param raw String containing the SMT Symbol
+ * @throws IllegalSymbolException if [raw] is not a valid SMT Symbol
  */
 // constructor is internal to prevent external subclassing of Symbol
-open class Symbol internal constructor(symbol: String, rule: QuotingRule) : SMTSerializable {
-  /** If true the Symbol was explicitly quoted when constructed */
-  val isQuoted: Boolean
-
+open class Symbol internal constructor(raw: String, val wasQuoted: Boolean) : SMTSerializable {
   /** If true the Symbol is only a valid SMT Symbol if it is quoted */
-  val mustQuote: Boolean
+  // Parser must consume the entire string so .end() is needed
+  val mustQuote: Boolean =
+      // check if we have a simple symbol (that is a symbol that is valid without quotes)
+      if (Parser.simpleSymbol.end().accept(raw) && !Parser.reserved.end().accept(raw)) {
+        false
+      }
+      // check if we have a quoted symbol that is already quoted (raw is of the form "|symbol|" and
+      // is not a simple symbol)
+      else if (Parser.quotedSymbol.end().accept(raw)) {
+        true
+      }
+      // check if we have a quoted symbol that is not already quoted (raw is of the form "symbol"
+      // and is not a simple symbol)
+      else if (Parser.quotedSymbol.end().accept("|$raw|")) {
+        true
+      } else {
+        throw IllegalSymbolException(raw)
+      }
 
   /**
    * Internal representation of the symbol without quotes, quoting will be reconstructed by
    * [toSMTString] before giving the symbol to a solver
    */
-  val value: String
+  val value: String = raw.trim('|')
 
   companion object {
     /** public substitute for constructor */
-    operator fun invoke(symbol: String, rule: QuotingRule): Symbol = this(symbol, rule)
-  }
-
-  /**
-   * Construct a Symbol from String with [QuotingRule.NONE]
-   *
-   * @throws IllegalSymbolException if [symbol] is not a valid SMT Symbol
-   */
-  constructor(symbol: String) : this(symbol, QuotingRule.NONE)
-
-  init {
-    when (rule) {
-      QuotingRule.NONE -> {
-        // Parser must consume the entire string so .end() is needed
-        if (Parser.simpleSymbol.end().accept(symbol) && !Parser.reserved.end().accept(symbol)) {
-          isQuoted = false
-          mustQuote = false
-        } else if (Parser.quotedSymbol.end().accept(symbol)) {
-          isQuoted = true
-          mustQuote = true
-        } else {
-          throw IllegalSymbolException(symbol)
-        }
-      }
-      QuotingRule.SMART -> {
-        if (Parser.simpleSymbol.end().accept(symbol)) {
-          isQuoted = false
-          mustQuote = false
-        } else if (Parser.quotedSymbol.end().accept(symbol)) {
-          isQuoted = false
-          mustQuote = true
-        } else {
-          throw IllegalSymbolException(symbol)
-        }
-      }
-      QuotingRule.FORCED -> {
-        if (Parser.quotedSymbol.end().accept(symbol)) {
-          isQuoted = true
-          mustQuote = true
-        } else if (Parser.simpleSymbol.end().accept(symbol)) {
-          isQuoted = true
-          mustQuote = true
-        } else {
-          throw IllegalSymbolException(symbol)
-        }
-      }
-    }
-
-    value = symbol.trim('|')
+    operator fun invoke(symbol: String, wasQuoted: Boolean): Symbol = this(symbol, wasQuoted)
   }
 
   // TODO fun createSimilar replaces all illegal chars and marks with uuid to prevent name conflicts
@@ -120,21 +91,25 @@ open class Symbol internal constructor(symbol: String, rule: QuotingRule) : SMTS
       when {
         this === other -> true
         other !is Symbol -> false
-        else -> symbolEquality(other)
+        else -> value == other.value
       }
-
-  private fun symbolEquality(other: Symbol): Boolean {
-    return value == other.value
-  }
 
   /** Returns the internal representation of the symbol without any quotes */
   override fun toString() = value
 
   /** Returns a valid SMT String with reconstructed quoting */
-  fun toSMTString() = if (mustQuote) "|$value|" else value
+  fun toSMTString(rule: QuotingRule = QuotingRule.SAME_AS_INPUT) =
+      when (rule) {
+        QuotingRule.NEVER -> if (mustQuote) throw IllegalSymbolException(value) else value
+        QuotingRule.SAME_AS_INPUT -> if (wasQuoted) "|$value|" else value
+        QuotingRule.WHEN_NEEDED -> if (wasQuoted || mustQuote) "|$value|" else value
+        QuotingRule.ALWAYS -> "|$value|"
+      }
 }
 
 class IllegalSymbolException(val symbol: String) :
     RuntimeException("$symbol is not a legal SMT symbol")
 
-fun String.symbol() = Symbol(this)
+fun String.toSymbolWithQuotes() = Symbol(this, this.startsWith("|") && this.endsWith("|"))
+
+fun String.toSymbolAsIs(wasQuoted: Boolean = false) = Symbol(this, wasQuoted)

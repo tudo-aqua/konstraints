@@ -35,29 +35,30 @@ import tools.aqua.konstraints.theories.*
               DistinctDecl,
               IteDecl,
               ImpliesDecl)
-          .associateBy { it.name.toString() }
+          .associateBy { it.symbol.toString() }
   override val sorts = mapOf(Pair("Bool", BoolSortDecl))
 }
 
 /** Declaration internal object for Bool sort */
-/*internal*/ object BoolSortDecl : SortDecl<BoolSort>("Bool".symbol(), emptySet(), emptySet()) {
+/*internal*/ object BoolSortDecl :
+    SortDecl<BoolSort>("Bool".toSymbolWithQuotes(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): BoolSort = BoolSort
 }
 
 internal object TrueDecl :
-    FunctionDecl0<BoolSort>("true".symbol(), emptySet(), emptySet(), BoolSort) {
+    FunctionDecl0<BoolSort>("true".toSymbolWithQuotes(), emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(bindings: Bindings): Expression<BoolSort> = True
 }
 
 internal object FalseDecl :
-    FunctionDecl0<BoolSort>("false".symbol(), emptySet(), emptySet(), BoolSort) {
+    FunctionDecl0<BoolSort>("false".toSymbolWithQuotes(), emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(bindings: Bindings): Expression<BoolSort> = False
 }
 
 /** Not declaration internal object */
 internal object NotDecl :
     FunctionDecl1<BoolSort, BoolSort>(
-        "not".symbol(), emptySet(), BoolSort, emptySet(), emptySet(), BoolSort) {
+        "not".toSymbolWithQuotes(), emptySet(), BoolSort, emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(
       param: Expression<BoolSort>,
       bindings: Bindings
@@ -67,7 +68,13 @@ internal object NotDecl :
 /** Implies declaration internal object */
 internal object ImpliesDecl :
     FunctionDeclRightAssociative<BoolSort, BoolSort, BoolSort>(
-        "=>".symbol(), emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
+        "=>".toSymbolWithQuotes(),
+        emptySet(),
+        BoolSort,
+        BoolSort,
+        emptySet(),
+        emptySet(),
+        BoolSort) {
   override fun buildExpression(
       param1: Expression<BoolSort>,
       param2: Expression<BoolSort>,
@@ -79,7 +86,13 @@ internal object ImpliesDecl :
 /** And declaration internal object */
 internal object AndDecl :
     FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
-        "and".symbol(), emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
+        "and".toSymbolWithQuotes(),
+        emptySet(),
+        BoolSort,
+        BoolSort,
+        emptySet(),
+        emptySet(),
+        BoolSort) {
   override fun buildExpression(
       param1: Expression<BoolSort>,
       param2: Expression<BoolSort>,
@@ -91,7 +104,13 @@ internal object AndDecl :
 /** Or declaration internal object */
 internal object OrDecl :
     FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
-        "or".symbol(), emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
+        "or".toSymbolWithQuotes(),
+        emptySet(),
+        BoolSort,
+        BoolSort,
+        emptySet(),
+        emptySet(),
+        BoolSort) {
   override fun buildExpression(
       param1: Expression<BoolSort>,
       param2: Expression<BoolSort>,
@@ -103,7 +122,13 @@ internal object OrDecl :
 /** Xor declaration internal object */
 internal object XOrDecl :
     FunctionDeclLeftAssociative<BoolSort, BoolSort, BoolSort>(
-        "xor".symbol(), emptySet(), BoolSort, BoolSort, emptySet(), emptySet(), BoolSort) {
+        "xor".toSymbolWithQuotes(),
+        emptySet(),
+        BoolSort,
+        BoolSort,
+        emptySet(),
+        emptySet(),
+        BoolSort) {
   override fun buildExpression(
       param1: Expression<BoolSort>,
       param2: Expression<BoolSort>,
@@ -115,7 +140,7 @@ internal object XOrDecl :
 /** Equals declaration internal object */
 internal object EqualsDecl :
     FunctionDeclChainable<Sort>(
-        "=".symbol(),
+        "=".toSymbolWithQuotes(),
         setOf(SortParameter("A")),
         SortParameter("A"),
         SortParameter("A"),
@@ -131,7 +156,7 @@ internal object EqualsDecl :
 /** Distinct declaration internal object */
 internal object DistinctDecl :
     FunctionDeclPairwise<Sort>(
-        "distinct".symbol(),
+        "distinct".toSymbolWithQuotes(),
         setOf(SortParameter("A")),
         SortParameter("A"),
         SortParameter("A"),
@@ -156,7 +181,7 @@ internal object DistinctDecl :
 /** Ite declaration internal object */
 internal object IteDecl :
     FunctionDecl3<BoolSort, Sort, Sort, Sort>(
-        "ite".symbol(),
+        "ite".toSymbolWithQuotes(),
         setOf(SortParameter("A")),
         BoolSort,
         SortParameter("A"),
@@ -211,7 +236,7 @@ internal object BitVectorExpressionTheory : Theory {
               BVSLeDecl,
               BVSGtDecl,
               BVSGeDecl)
-          .associateBy { it.name.toString() }
+          .associateBy { it.symbol.toString() }
   override val sorts = mapOf(Pair("BitVec", BVSortDecl))
 }
 
@@ -220,13 +245,14 @@ internal object BitVectorExpressionTheory : Theory {
  *
  * (_ BitVec m)
  */
-internal object BVSortDecl : SortDecl<BVSort>("BitVec".symbol(), emptySet(), setOf("m".idx())) {
+internal object BVSortDecl :
+    SortDecl<BVSort>("BitVec".toSymbolWithQuotes(), emptySet(), setOf("m".idx())) {
   override fun getSort(bindings: Bindings): BVSort = BVSort(bindings["m"].numeral)
 }
 
 internal object BVConcatDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "concat".symbol(),
+        "concat".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("i"),
         BVSort.fromSymbol("j"),
@@ -244,7 +270,7 @@ internal object BVConcatDecl :
 
 internal object ExtractDecl :
     FunctionDecl1<BVSort, BVSort>(
-        "extract".symbol(),
+        "extract".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         setOf(SymbolIndex("i"), SymbolIndex("j")),
@@ -268,7 +294,7 @@ internal object ExtractDecl :
 
 internal object BVNotDecl :
     FunctionDecl1<BVSort, BVSort>(
-        "bvnot".symbol(),
+        "bvnot".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         emptySet(),
@@ -280,7 +306,7 @@ internal object BVNotDecl :
 
 internal object BVNegDecl :
     FunctionDecl1<BVSort, BVSort>(
-        "bvneg".symbol(),
+        "bvneg".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         emptySet(),
@@ -292,7 +318,7 @@ internal object BVNegDecl :
 
 internal object BVAndDecl :
     FunctionDeclLeftAssociative<BVSort, BVSort, BVSort>(
-        "bvand".symbol(),
+        "bvand".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -309,7 +335,7 @@ internal object BVAndDecl :
 
 internal object BVOrDecl :
     FunctionDeclLeftAssociative<BVSort, BVSort, BVSort>(
-        "bvor".symbol(),
+        "bvor".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -326,7 +352,7 @@ internal object BVOrDecl :
 
 internal object BVAddDecl :
     FunctionDeclLeftAssociative<BVSort, BVSort, BVSort>(
-        "bvadd".symbol(),
+        "bvadd".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -343,7 +369,7 @@ internal object BVAddDecl :
 
 internal object BVMulDecl :
     FunctionDeclLeftAssociative<BVSort, BVSort, BVSort>(
-        "bvmul".symbol(),
+        "bvmul".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -360,7 +386,7 @@ internal object BVMulDecl :
 
 internal object BVUDivDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "bvudiv".symbol(),
+        "bvudiv".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -376,7 +402,7 @@ internal object BVUDivDecl :
 
 internal object BVURemDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "bvurem".symbol(),
+        "bvurem".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -392,7 +418,7 @@ internal object BVURemDecl :
 
 internal object BVShlDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "bvshl".symbol(),
+        "bvshl".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -408,7 +434,7 @@ internal object BVShlDecl :
 
 internal object BVLShrDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "bvlshr".symbol(),
+        "bvlshr".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -424,7 +450,7 @@ internal object BVLShrDecl :
 
 internal object BVUltDecl :
     FunctionDecl2<BVSort, BVSort, BoolSort>(
-        "bvult".symbol(),
+        "bvult".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -440,7 +466,7 @@ internal object BVUltDecl :
 
 internal object BVNAndDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "bvnand".symbol(),
+        "bvnand".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -456,7 +482,7 @@ internal object BVNAndDecl :
 
 internal object BVNOrDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "bvnor".symbol(),
+        "bvnor".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -472,7 +498,7 @@ internal object BVNOrDecl :
 
 internal object BVXOrDecl :
     FunctionDeclLeftAssociative<BVSort, BVSort, BVSort>(
-        "bvxor".symbol(),
+        "bvxor".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -489,7 +515,7 @@ internal object BVXOrDecl :
 
 internal object BVXNOrDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "bvxnor".symbol(),
+        "bvxnor".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -505,7 +531,7 @@ internal object BVXNOrDecl :
 
 internal object BVCompDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "bvcomp".symbol(),
+        "bvcomp".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -521,7 +547,7 @@ internal object BVCompDecl :
 
 internal object BVSubDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "bvsub".symbol(),
+        "bvsub".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -537,7 +563,7 @@ internal object BVSubDecl :
 
 internal object BVSDivDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "bvsdiv".symbol(),
+        "bvsdiv".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -553,7 +579,7 @@ internal object BVSDivDecl :
 
 internal object BVSRemDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "bvsrem".symbol(),
+        "bvsrem".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -569,7 +595,7 @@ internal object BVSRemDecl :
 
 internal object BVSModDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "bvsmod".symbol(),
+        "bvsmod".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -585,7 +611,7 @@ internal object BVSModDecl :
 
 internal object BVULeDecl :
     FunctionDecl2<BVSort, BVSort, BoolSort>(
-        "bvule".symbol(),
+        "bvule".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -601,7 +627,7 @@ internal object BVULeDecl :
 
 internal object BVUGtDecl :
     FunctionDecl2<BVSort, BVSort, BoolSort>(
-        "bvugt".symbol(),
+        "bvugt".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -617,7 +643,7 @@ internal object BVUGtDecl :
 
 internal object BVUGeDecl :
     FunctionDecl2<BVSort, BVSort, BoolSort>(
-        "bvuge".symbol(),
+        "bvuge".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -633,7 +659,7 @@ internal object BVUGeDecl :
 
 internal object BVSLtDecl :
     FunctionDecl2<BVSort, BVSort, BoolSort>(
-        "bvslt".symbol(),
+        "bvslt".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -649,7 +675,7 @@ internal object BVSLtDecl :
 
 internal object BVSLeDecl :
     FunctionDecl2<BVSort, BVSort, BoolSort>(
-        "bvsle".symbol(),
+        "bvsle".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -665,7 +691,7 @@ internal object BVSLeDecl :
 
 internal object BVSGtDecl :
     FunctionDecl2<BVSort, BVSort, BoolSort>(
-        "bvsgt".symbol(),
+        "bvsgt".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -681,7 +707,7 @@ internal object BVSGtDecl :
 
 internal object BVSGeDecl :
     FunctionDecl2<BVSort, BVSort, BoolSort>(
-        "bvsge".symbol(),
+        "bvsge".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -697,7 +723,7 @@ internal object BVSGeDecl :
 
 internal object BVAShrDecl :
     FunctionDecl2<BVSort, BVSort, BVSort>(
-        "bvashr".symbol(),
+        "bvashr".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         BVSort.fromSymbol("m"),
@@ -713,7 +739,7 @@ internal object BVAShrDecl :
 
 internal object RepeatDecl :
     FunctionDecl1<BVSort, BVSort>(
-        "repeat".symbol(),
+        "repeat".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         setOf(SymbolIndex("j")),
@@ -725,7 +751,7 @@ internal object RepeatDecl :
 
 internal object ZeroExtendDecl :
     FunctionDecl1<BVSort, BVSort>(
-        "zero_extend".symbol(),
+        "zero_extend".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         setOf(SymbolIndex("i")),
@@ -737,7 +763,7 @@ internal object ZeroExtendDecl :
 
 internal object SignExtendDecl :
     FunctionDecl1<BVSort, BVSort>(
-        "sign_extend".symbol(),
+        "sign_extend".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         setOf(SymbolIndex("i")),
@@ -749,7 +775,7 @@ internal object SignExtendDecl :
 
 internal object RotateLeftDecl :
     FunctionDecl1<BVSort, BVSort>(
-        "rotate_left".symbol(),
+        "rotate_left".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         setOf(SymbolIndex("i")),
@@ -761,7 +787,7 @@ internal object RotateLeftDecl :
 
 internal object RotateRightDecl :
     FunctionDecl1<BVSort, BVSort>(
-        "rotate_right".symbol(),
+        "rotate_right".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         setOf(SymbolIndex("i")),
@@ -786,18 +812,19 @@ internal object IntsTheory : Theory {
               IntGreaterEqDecl,
               IntGreaterDecl,
               DivisibleDecl)
-          .associateBy { it.name.toString() }
+          .associateBy { it.symbol.toString() }
 
   override val sorts: Map<String, SortDecl<*>> = mapOf(Pair("Int", IntSortDecl))
 }
 
-internal object IntSortDecl : SortDecl<IntSort>("Int".symbol(), emptySet(), emptySet()) {
+internal object IntSortDecl :
+    SortDecl<IntSort>("Int".toSymbolWithQuotes(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): IntSort = IntSort
 }
 
 internal object IntNegDecl :
     FunctionDecl1<IntSort, IntSort>(
-        "-".symbol(), emptySet(), IntSort, emptySet(), emptySet(), IntSort) {
+        "-".toSymbolWithQuotes(), emptySet(), IntSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param: Expression<IntSort>,
       bindings: Bindings
@@ -806,7 +833,7 @@ internal object IntNegDecl :
 
 internal object IntSubDecl :
     FunctionDeclLeftAssociative<IntSort, IntSort, IntSort>(
-        "-".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
+        "-".toSymbolWithQuotes(), emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param1: Expression<IntSort>,
       param2: Expression<IntSort>,
@@ -818,13 +845,14 @@ internal object IntSubDecl :
 /** Combined function declaration for overloaded '-' operator */
 internal object IntNegSubDecl :
     FunctionDecl<IntSort>(
-        "-".symbol(),
+        "-".toSymbolWithQuotes(),
         emptySet(),
         listOf(IntSort),
         emptySet(),
         emptySet(),
         IntSort,
-        Associativity.NONE) {
+        Associativity.NONE,
+        null) {
   override fun buildExpression(
       args: List<Expression<*>>,
       functionIndices: List<NumeralIndex>
@@ -855,7 +883,7 @@ internal object IntNegSubDecl :
 
 internal object IntAddDecl :
     FunctionDeclLeftAssociative<IntSort, IntSort, IntSort>(
-        "+".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
+        "+".toSymbolWithQuotes(), emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param1: Expression<IntSort>,
       param2: Expression<IntSort>,
@@ -866,7 +894,7 @@ internal object IntAddDecl :
 
 internal object IntMulDecl :
     FunctionDeclLeftAssociative<IntSort, IntSort, IntSort>(
-        "*".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
+        "*".toSymbolWithQuotes(), emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param1: Expression<IntSort>,
       param2: Expression<IntSort>,
@@ -877,7 +905,7 @@ internal object IntMulDecl :
 
 internal object IntDivDecl :
     FunctionDeclLeftAssociative<IntSort, IntSort, IntSort>(
-        "div".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
+        "div".toSymbolWithQuotes(), emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param1: Expression<IntSort>,
       param2: Expression<IntSort>,
@@ -888,7 +916,7 @@ internal object IntDivDecl :
 
 internal object ModDecl :
     FunctionDecl2<IntSort, IntSort, IntSort>(
-        "mod".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
+        "mod".toSymbolWithQuotes(), emptySet(), IntSort, IntSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param1: Expression<IntSort>,
       param2: Expression<IntSort>,
@@ -898,7 +926,7 @@ internal object ModDecl :
 
 internal object AbsDecl :
     FunctionDecl1<IntSort, IntSort>(
-        "abs".symbol(), emptySet(), IntSort, emptySet(), emptySet(), IntSort) {
+        "abs".toSymbolWithQuotes(), emptySet(), IntSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param: Expression<IntSort>,
       bindings: Bindings
@@ -907,7 +935,7 @@ internal object AbsDecl :
 
 internal object IntLessEqDecl :
     FunctionDeclChainable<IntSort>(
-        "<=".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
+        "<=".toSymbolWithQuotes(), emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
@@ -916,7 +944,7 @@ internal object IntLessEqDecl :
 
 internal object IntLessDecl :
     FunctionDeclChainable<IntSort>(
-        "<".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
+        "<".toSymbolWithQuotes(), emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
@@ -925,7 +953,7 @@ internal object IntLessDecl :
 
 internal object IntGreaterEqDecl :
     FunctionDeclChainable<IntSort>(
-        ">=".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
+        ">=".toSymbolWithQuotes(), emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
@@ -934,7 +962,7 @@ internal object IntGreaterEqDecl :
 
 internal object IntGreaterDecl :
     FunctionDeclChainable<IntSort>(
-        ">".symbol(), emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
+        ">".toSymbolWithQuotes(), emptySet(), IntSort, IntSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
@@ -943,7 +971,12 @@ internal object IntGreaterDecl :
 
 internal object DivisibleDecl :
     FunctionDecl1<IntSort, BoolSort>(
-        "divisible".symbol(), emptySet(), IntSort, setOf(SymbolIndex("n")), emptySet(), BoolSort) {
+        "divisible".toSymbolWithQuotes(),
+        emptySet(),
+        IntSort,
+        setOf(SymbolIndex("n")),
+        emptySet(),
+        BoolSort) {
   override fun buildExpression(
       param: Expression<IntSort>,
       bindings: Bindings
@@ -962,18 +995,19 @@ internal object RealsTheory : Theory {
               RealLessDecl,
               RealGreaterEqDecl,
               RealGreaterDecl)
-          .associateBy { it.name.toString() }
+          .associateBy { it.symbol.toString() }
 
   override val sorts: Map<String, SortDecl<*>> = mapOf(Pair("Real", RealSortDecl))
 }
 
-internal object RealSortDecl : SortDecl<RealSort>("Real".symbol(), emptySet(), emptySet()) {
+internal object RealSortDecl :
+    SortDecl<RealSort>("Real".toSymbolWithQuotes(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): RealSort = RealSort
 }
 
 internal object RealNegDecl :
     FunctionDecl1<RealSort, RealSort>(
-        "-".symbol(), emptySet(), RealSort, emptySet(), emptySet(), RealSort) {
+        "-".toSymbolWithQuotes(), emptySet(), RealSort, emptySet(), emptySet(), RealSort) {
   override fun buildExpression(
       param: Expression<RealSort>,
       bindings: Bindings
@@ -982,7 +1016,13 @@ internal object RealNegDecl :
 
 internal object RealSubDecl :
     FunctionDeclLeftAssociative<RealSort, RealSort, RealSort>(
-        "-".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
+        "-".toSymbolWithQuotes(),
+        emptySet(),
+        RealSort,
+        RealSort,
+        emptySet(),
+        emptySet(),
+        RealSort) {
   override fun buildExpression(
       param1: Expression<RealSort>,
       param2: Expression<RealSort>,
@@ -994,13 +1034,14 @@ internal object RealSubDecl :
 /** Combined function declaration for overloaded '-' operator */
 internal object RealNegSubDecl :
     FunctionDecl<RealSort>(
-        "-".symbol(),
+        "-".toSymbolWithQuotes(),
         emptySet(),
         listOf(RealSort),
         emptySet(),
         emptySet(),
         RealSort,
-        Associativity.NONE) {
+        Associativity.NONE,
+        null) {
   override fun buildExpression(
       args: List<Expression<*>>,
       functionIndices: List<NumeralIndex>
@@ -1031,7 +1072,13 @@ internal object RealNegSubDecl :
 
 internal object RealAddDecl :
     FunctionDeclLeftAssociative<RealSort, RealSort, RealSort>(
-        "+".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
+        "+".toSymbolWithQuotes(),
+        emptySet(),
+        RealSort,
+        RealSort,
+        emptySet(),
+        emptySet(),
+        RealSort) {
   override fun buildExpression(
       param1: Expression<RealSort>,
       param2: Expression<RealSort>,
@@ -1042,7 +1089,13 @@ internal object RealAddDecl :
 
 internal object RealMulDecl :
     FunctionDeclLeftAssociative<RealSort, RealSort, RealSort>(
-        "*".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
+        "*".toSymbolWithQuotes(),
+        emptySet(),
+        RealSort,
+        RealSort,
+        emptySet(),
+        emptySet(),
+        RealSort) {
   override fun buildExpression(
       param1: Expression<RealSort>,
       param2: Expression<RealSort>,
@@ -1053,7 +1106,13 @@ internal object RealMulDecl :
 
 internal object RealDivDecl :
     FunctionDeclLeftAssociative<RealSort, RealSort, RealSort>(
-        "/".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet(), RealSort) {
+        "/".toSymbolWithQuotes(),
+        emptySet(),
+        RealSort,
+        RealSort,
+        emptySet(),
+        emptySet(),
+        RealSort) {
   override fun buildExpression(
       param1: Expression<RealSort>,
       param2: Expression<RealSort>,
@@ -1064,7 +1123,7 @@ internal object RealDivDecl :
 
 internal object RealLessEqDecl :
     FunctionDeclChainable<RealSort>(
-        "<=".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
+        "<=".toSymbolWithQuotes(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
@@ -1073,7 +1132,7 @@ internal object RealLessEqDecl :
 
 internal object RealLessDecl :
     FunctionDeclChainable<RealSort>(
-        "<".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
+        "<".toSymbolWithQuotes(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
@@ -1082,7 +1141,7 @@ internal object RealLessDecl :
 
 internal object RealGreaterEqDecl :
     FunctionDeclChainable<RealSort>(
-        ">=".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
+        ">=".toSymbolWithQuotes(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
@@ -1091,7 +1150,7 @@ internal object RealGreaterEqDecl :
 
 internal object RealGreaterDecl :
     FunctionDeclChainable<RealSort>(
-        ">".symbol(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
+        ">".toSymbolWithQuotes(), emptySet(), RealSort, RealSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
@@ -1124,7 +1183,7 @@ internal object RealsIntsTheory : Theory {
               ToRealDecl,
               ToIntDecl,
               IsIntDecl)
-          .associateBy { it.name.toString() }
+          .associateBy { it.symbol.toString() }
 
   override val sorts: Map<String, SortDecl<*>> =
       mapOf(Pair("Int", IntSortDecl), Pair("Real", RealSortDecl))
@@ -1132,7 +1191,7 @@ internal object RealsIntsTheory : Theory {
 
 internal object ToRealDecl :
     FunctionDecl1<IntSort, RealSort>(
-        "to_real".symbol(), emptySet(), IntSort, emptySet(), emptySet(), RealSort) {
+        "to_real".toSymbolWithQuotes(), emptySet(), IntSort, emptySet(), emptySet(), RealSort) {
   override fun buildExpression(
       param: Expression<IntSort>,
       bindings: Bindings
@@ -1141,7 +1200,7 @@ internal object ToRealDecl :
 
 internal object ToIntDecl :
     FunctionDecl1<RealSort, IntSort>(
-        "to_real".symbol(), emptySet(), RealSort, emptySet(), emptySet(), IntSort) {
+        "to_real".toSymbolWithQuotes(), emptySet(), RealSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param: Expression<RealSort>,
       bindings: Bindings
@@ -1150,7 +1209,7 @@ internal object ToIntDecl :
 
 internal object IsIntDecl :
     FunctionDecl1<RealSort, BoolSort>(
-        "to_real".symbol(), emptySet(), RealSort, emptySet(), emptySet(), BoolSort) {
+        "to_real".toSymbolWithQuotes(), emptySet(), RealSort, emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(
       param: Expression<RealSort>,
       bindings: Bindings
@@ -1209,7 +1268,7 @@ internal object FloatingPointTheory : Theory {
               FPToUBitVecDecl,
               FPToSBitVecDecl,
               FPToRealDecl)
-          .associateBy { it.name.toString() }
+          .associateBy { it.symbol.toString() }
 
   override val sorts: Map<String, SortDecl<*>> =
       mapOf(
@@ -1225,96 +1284,102 @@ internal object FloatingPointTheory : Theory {
 
 /** RoundíngMode sort declaration internal object */
 internal object RoundingModeDecl :
-    SortDecl<RoundingMode>("RoundingMode".symbol(), emptySet(), emptySet()) {
+    SortDecl<RoundingMode>("RoundingMode".toSymbolWithQuotes(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): RoundingMode = RoundingMode
 }
 
 /** FloatingPoint sort declaration internal object */
 internal object FPSortDecl :
-    SortDecl<FPSort>("FloatingPoint".symbol(), emptySet(), setOf("eb".idx(), "sb".idx())) {
+    SortDecl<FPSort>(
+        "FloatingPoint".toSymbolWithQuotes(), emptySet(), setOf("eb".idx(), "sb".idx())) {
   override fun getSort(bindings: Bindings): FPSort =
       FPSort(bindings["eb"].numeral, bindings["sb"].numeral)
 }
 
 /** 16-bit FloatingPoint declaration internal object */
-internal object FP16Decl : SortDecl<FPSort>("Float16".symbol(), emptySet(), emptySet()) {
+internal object FP16Decl :
+    SortDecl<FPSort>("Float16".toSymbolWithQuotes(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): FPSort = FPSort(5, 11)
 }
 
 /** 32-bit FloatingPoint declaration internal object */
-internal object FP32Decl : SortDecl<FPSort>("Float32".symbol(), emptySet(), emptySet()) {
+internal object FP32Decl :
+    SortDecl<FPSort>("Float32".toSymbolWithQuotes(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): FPSort = FPSort(8, 24)
 }
 
 /** 64-bit FloatingPoint declaration internal object */
-internal object FP64Decl : SortDecl<FPSort>("Float64".symbol(), emptySet(), emptySet()) {
+internal object FP64Decl :
+    SortDecl<FPSort>("Float64".toSymbolWithQuotes(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): FPSort = FPSort(11, 53)
 }
 
 /** 128-bit FloatingPoint declaration internal object */
-internal object FP128Decl : SortDecl<FPSort>("Float128".symbol(), emptySet(), emptySet()) {
+internal object FP128Decl :
+    SortDecl<FPSort>("Float128".toSymbolWithQuotes(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): FPSort = FPSort(15, 113)
 }
 
 internal object RoundNearestTiesToEvenDecl :
     FunctionDecl0<RoundingMode>(
-        "roundNearestTiesToEven".symbol(), emptySet(), emptySet(), RoundingMode) {
+        "roundNearestTiesToEven".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> =
       RoundNearestTiesToEven
 }
 
 internal object RNEDecl :
-    FunctionDecl0<RoundingMode>("RNE".symbol(), emptySet(), emptySet(), RoundingMode) {
+    FunctionDecl0<RoundingMode>("RNE".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RNE
 }
 
 internal object RoundNearestTiesToAwayDecl :
     FunctionDecl0<RoundingMode>(
-        "roundNearestTiesToAway".symbol(), emptySet(), emptySet(), RoundingMode) {
+        "roundNearestTiesToAway".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> =
       RoundNearestTiesToAway
 }
 
 internal object RNADecl :
-    FunctionDecl0<RoundingMode>("RNA".symbol(), emptySet(), emptySet(), RoundingMode) {
+    FunctionDecl0<RoundingMode>("RNA".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RNA
 }
 
 internal object RoundTowardPositiveDecl :
     FunctionDecl0<RoundingMode>(
-        "roundTowardPositive".symbol(), emptySet(), emptySet(), RoundingMode) {
+        "roundTowardPositive".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RoundTowardPositive
 }
 
 internal object RTPDecl :
-    FunctionDecl0<RoundingMode>("RTP".symbol(), emptySet(), emptySet(), RoundingMode) {
+    FunctionDecl0<RoundingMode>("RTP".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RTP
 }
 
 internal object RoundTowardNegativeDecl :
     FunctionDecl0<RoundingMode>(
-        "RoundTowardNegative".symbol(), emptySet(), emptySet(), RoundingMode) {
+        "RoundTowardNegative".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RoundTowardNegative
 }
 
 internal object RTNDecl :
-    FunctionDecl0<RoundingMode>("RTN".symbol(), emptySet(), emptySet(), RoundingMode) {
+    FunctionDecl0<RoundingMode>("RTN".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RTN
 }
 
 internal object RoundTowardZeroDecl :
-    FunctionDecl0<RoundingMode>("RoundTowardZero".symbol(), emptySet(), emptySet(), RoundingMode) {
+    FunctionDecl0<RoundingMode>(
+        "RoundTowardZero".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RoundTowardZero
 }
 
 internal object RTZDecl :
-    FunctionDecl0<RoundingMode>("RTZ".symbol(), emptySet(), emptySet(), RoundingMode) {
+    FunctionDecl0<RoundingMode>("RTZ".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RTZ
 }
 
 internal object FPLiteralDecl :
     FunctionDecl3<BVSort, BVSort, BVSort, FPSort>(
-        "fp".symbol(),
+        "fp".toSymbolWithQuotes(),
         emptySet(),
         BVSort(1),
         BVSort.fromSymbol("eb"),
@@ -1335,7 +1400,10 @@ internal object FPLiteralDecl :
 /** Plus infinity declaration internal object */
 internal object FPInfinityDecl :
     FunctionDecl0<FPSort>(
-        "+oo".symbol(), emptySet(), setOf("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())) {
+        "+oo".toSymbolWithQuotes(),
+        emptySet(),
+        setOf("eb".idx(), "sb".idx()),
+        FPSort("eb".idx(), "sb".idx())) {
   override fun buildExpression(bindings: Bindings): Expression<FPSort> =
       FPInfinity(bindings["eb"].numeral, bindings["sb"].numeral)
 }
@@ -1343,7 +1411,10 @@ internal object FPInfinityDecl :
 /** Minus infinity declaration internal object */
 internal object FPMinusInfinityDecl :
     FunctionDecl0<FPSort>(
-        "-oo".symbol(), emptySet(), setOf("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())) {
+        "-oo".toSymbolWithQuotes(),
+        emptySet(),
+        setOf("eb".idx(), "sb".idx()),
+        FPSort("eb".idx(), "sb".idx())) {
   override fun buildExpression(bindings: Bindings): Expression<FPSort> =
       FPMinusInfinity(bindings["eb"].numeral, bindings["sb"].numeral)
 }
@@ -1351,7 +1422,7 @@ internal object FPMinusInfinityDecl :
 /** Plus zero declaration internal object */
 internal object FPZeroDecl :
     FunctionDecl0<FPSort>(
-        "+zero".symbol(),
+        "+zero".toSymbolWithQuotes(),
         emptySet(),
         setOf("eb".idx(), "sb".idx()),
         FPSort("eb".idx(), "sb".idx())) {
@@ -1362,7 +1433,7 @@ internal object FPZeroDecl :
 /** Minus zero declaration internal object */
 internal object FPMinusZeroDecl :
     FunctionDecl0<FPSort>(
-        "-zero".symbol(),
+        "-zero".toSymbolWithQuotes(),
         emptySet(),
         setOf("eb".idx(), "sb".idx()),
         FPSort("eb".idx(), "sb".idx())) {
@@ -1373,7 +1444,10 @@ internal object FPMinusZeroDecl :
 /** NaN declaration internal object */
 internal object FPNaNDecl :
     FunctionDecl0<FPSort>(
-        "NaN".symbol(), emptySet(), setOf("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())) {
+        "NaN".toSymbolWithQuotes(),
+        emptySet(),
+        setOf("eb".idx(), "sb".idx()),
+        FPSort("eb".idx(), "sb".idx())) {
   override fun buildExpression(bindings: Bindings): Expression<FPSort> =
       FPNaN(bindings["eb"].numeral, bindings["sb"].numeral)
 }
@@ -1381,7 +1455,7 @@ internal object FPNaNDecl :
 /** Absolute value declaration internal object */
 internal object FPAbsDecl :
     FunctionDecl1<FPSort, FPSort>(
-        "fp.abs".symbol(),
+        "fp.abs".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         emptySet(),
@@ -1394,7 +1468,7 @@ internal object FPAbsDecl :
 /** Negation declaration internal object */
 internal object FPNegDecl :
     FunctionDecl1<FPSort, FPSort>(
-        "fp.neg".symbol(),
+        "fp.neg".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         emptySet(),
@@ -1407,7 +1481,7 @@ internal object FPNegDecl :
 /** Addition declaration internal object */
 internal object FPAddDecl :
     FunctionDecl3<RoundingMode, FPSort, FPSort, FPSort>(
-        "fp.add".symbol(),
+        "fp.add".toSymbolWithQuotes(),
         emptySet(),
         RoundingMode,
         FPSort("eb".idx(), "sb".idx()),
@@ -1426,7 +1500,7 @@ internal object FPAddDecl :
 /** Subtraction declaration internal object */
 internal object FPSubDecl :
     FunctionDecl3<RoundingMode, FPSort, FPSort, FPSort>(
-        "fp.sub".symbol(),
+        "fp.sub".toSymbolWithQuotes(),
         emptySet(),
         RoundingMode,
         FPSort("eb".idx(), "sb".idx()),
@@ -1444,7 +1518,7 @@ internal object FPSubDecl :
 
 internal object FPMulDecl :
     FunctionDecl3<RoundingMode, FPSort, FPSort, FPSort>(
-        "fp.mul".symbol(),
+        "fp.mul".toSymbolWithQuotes(),
         emptySet(),
         RoundingMode,
         FPSort("eb".idx(), "sb".idx()),
@@ -1462,7 +1536,7 @@ internal object FPMulDecl :
 
 internal object FPDivDecl :
     FunctionDecl3<RoundingMode, FPSort, FPSort, FPSort>(
-        "fp.div".symbol(),
+        "fp.div".toSymbolWithQuotes(),
         emptySet(),
         RoundingMode,
         FPSort("eb".idx(), "sb".idx()),
@@ -1480,7 +1554,7 @@ internal object FPDivDecl :
 
 internal object FPFmaDecl :
     FunctionDecl4<RoundingMode, FPSort, FPSort, FPSort, FPSort>(
-        "fp.fma".symbol(),
+        "fp.fma".toSymbolWithQuotes(),
         emptySet(),
         RoundingMode,
         FPSort("eb".idx(), "sb".idx()),
@@ -1500,7 +1574,7 @@ internal object FPFmaDecl :
 
 internal object FPSqrtDecl :
     FunctionDecl2<RoundingMode, FPSort, FPSort>(
-        "fp.sqrt".symbol(),
+        "fp.sqrt".toSymbolWithQuotes(),
         emptySet(),
         RoundingMode,
         FPSort("eb".idx(), "sb".idx()),
@@ -1516,7 +1590,7 @@ internal object FPSqrtDecl :
 
 internal object FPRemDecl :
     FunctionDecl2<FPSort, FPSort, FPSort>(
-        "fp.rem".symbol(),
+        "fp.rem".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         FPSort("eb".idx(), "sb".idx()),
@@ -1532,7 +1606,7 @@ internal object FPRemDecl :
 
 internal object FPRoundToIntegralDecl :
     FunctionDecl2<RoundingMode, FPSort, FPSort>(
-        "fp.roundToIntegral".symbol(),
+        "fp.roundToIntegral".toSymbolWithQuotes(),
         emptySet(),
         RoundingMode,
         FPSort("eb".idx(), "sb".idx()),
@@ -1548,7 +1622,7 @@ internal object FPRoundToIntegralDecl :
 
 internal object FPMinDecl :
     FunctionDecl2<FPSort, FPSort, FPSort>(
-        "fp.min".symbol(),
+        "fp.min".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         FPSort("eb".idx(), "sb".idx()),
@@ -1564,7 +1638,7 @@ internal object FPMinDecl :
 
 internal object FPMaxDecl :
     FunctionDecl2<FPSort, FPSort, FPSort>(
-        "fp.max".symbol(),
+        "fp.max".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         FPSort("eb".idx(), "sb".idx()),
@@ -1580,7 +1654,7 @@ internal object FPMaxDecl :
 
 internal object FPLeqDecl :
     FunctionDeclChainable<FPSort>(
-        "fp.leq".symbol(),
+        "fp.leq".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         FPSort("eb".idx(), "sb".idx()),
@@ -1594,7 +1668,7 @@ internal object FPLeqDecl :
 
 internal object FPLtDecl :
     FunctionDeclChainable<FPSort>(
-        "fp.lt".symbol(),
+        "fp.lt".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         FPSort("eb".idx(), "sb".idx()),
@@ -1608,7 +1682,7 @@ internal object FPLtDecl :
 
 internal object FPGeqDecl :
     FunctionDeclChainable<FPSort>(
-        "fp.geq".symbol(),
+        "fp.geq".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         FPSort("eb".idx(), "sb".idx()),
@@ -1622,7 +1696,7 @@ internal object FPGeqDecl :
 
 internal object FPGtDecl :
     FunctionDeclChainable<FPSort>(
-        "fp.gt".symbol(),
+        "fp.gt".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         FPSort("eb".idx(), "sb".idx()),
@@ -1636,7 +1710,7 @@ internal object FPGtDecl :
 
 internal object FPEqDecl :
     FunctionDeclChainable<FPSort>(
-        "fp.eq".symbol(),
+        "fp.eq".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         FPSort("eb".idx(), "sb".idx()),
@@ -1650,7 +1724,7 @@ internal object FPEqDecl :
 
 internal object FPIsNormalDecl :
     FunctionDecl1<FPSort, BoolSort>(
-        "fp.isNormal".symbol(),
+        "fp.isNormal".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         emptySet(),
@@ -1664,7 +1738,7 @@ internal object FPIsNormalDecl :
 
 internal object FPIsSubormalDecl :
     FunctionDecl1<FPSort, BoolSort>(
-        "fp.isSubormal".symbol(),
+        "fp.isSubormal".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         emptySet(),
@@ -1678,7 +1752,7 @@ internal object FPIsSubormalDecl :
 
 internal object FPIsZeroDecl :
     FunctionDecl1<FPSort, BoolSort>(
-        "fp.isZero".symbol(),
+        "fp.isZero".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         emptySet(),
@@ -1692,7 +1766,7 @@ internal object FPIsZeroDecl :
 
 internal object FPIsInfiniteDecl :
     FunctionDecl1<FPSort, BoolSort>(
-        "fp.isInfinite".symbol(),
+        "fp.isInfinite".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         emptySet(),
@@ -1706,7 +1780,7 @@ internal object FPIsInfiniteDecl :
 
 internal object FPIsNaNDecl :
     FunctionDecl1<FPSort, BoolSort>(
-        "fp.isNan".symbol(),
+        "fp.isNan".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         emptySet(),
@@ -1720,7 +1794,7 @@ internal object FPIsNaNDecl :
 
 internal object FPIsNegativeDecl :
     FunctionDecl1<FPSort, BoolSort>(
-        "fp.isNegative".symbol(),
+        "fp.isNegative".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         emptySet(),
@@ -1734,7 +1808,7 @@ internal object FPIsNegativeDecl :
 
 internal object FPIsPositiveDecl :
     FunctionDecl1<FPSort, BoolSort>(
-        "fp.isPositive".symbol(),
+        "fp.isPositive".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         emptySet(),
@@ -1748,7 +1822,7 @@ internal object FPIsPositiveDecl :
 
 internal object BitVecToFPDecl :
     FunctionDecl1<BVSort, FPSort>(
-        "to_fp".symbol(),
+        "to_fp".toSymbolWithQuotes(),
         emptySet(),
         BVSort.fromSymbol("m"),
         setOf("eb".idx(), "sb".idx()),
@@ -1760,7 +1834,7 @@ internal object BitVecToFPDecl :
 
 internal object FPToFPDecl :
     FunctionDecl2<RoundingMode, FPSort, FPSort>(
-        "to_fp".symbol(),
+        "to_fp".toSymbolWithQuotes(),
         emptySet(),
         RoundingMode,
         FPSort("mb".idx(), "nb".idx()),
@@ -1776,7 +1850,7 @@ internal object FPToFPDecl :
 
 internal object RealToFPDecl :
     FunctionDecl2<RoundingMode, RealSort, FPSort>(
-        "to_fp".symbol(),
+        "to_fp".toSymbolWithQuotes(),
         emptySet(),
         RoundingMode,
         RealSort,
@@ -1792,7 +1866,7 @@ internal object RealToFPDecl :
 
 internal object SBitVecToFPDecl :
     FunctionDecl2<RoundingMode, BVSort, FPSort>(
-        "to_fp".symbol(),
+        "to_fp".toSymbolWithQuotes(),
         emptySet(),
         RoundingMode,
         BVSort.fromSymbol("m"),
@@ -1809,7 +1883,7 @@ internal object SBitVecToFPDecl :
 
 internal object UBitVecToFPDecl :
     FunctionDecl2<RoundingMode, BVSort, FPSort>(
-        "to_fp_unsigned".symbol(),
+        "to_fp_unsigned".toSymbolWithQuotes(),
         emptySet(),
         RoundingMode,
         BVSort.fromSymbol("m"),
@@ -1826,7 +1900,7 @@ internal object UBitVecToFPDecl :
 
 internal object FPToUBitVecDecl :
     FunctionDecl2<RoundingMode, FPSort, BVSort>(
-        "fp.to_ubv".symbol(),
+        "fp.to_ubv".toSymbolWithQuotes(),
         emptySet(),
         RoundingMode,
         FPSort("eb".idx(), "sb".idx()),
@@ -1842,7 +1916,7 @@ internal object FPToUBitVecDecl :
 
 internal object FPToSBitVecDecl :
     FunctionDecl2<RoundingMode, FPSort, BVSort>(
-        "fp.to_ubv".symbol(),
+        "fp.to_ubv".toSymbolWithQuotes(),
         emptySet(),
         RoundingMode,
         FPSort("eb".idx(), "sb".idx()),
@@ -1858,7 +1932,7 @@ internal object FPToSBitVecDecl :
 
 internal object FPToRealDecl :
     FunctionDecl1<FPSort, RealSort>(
-        "fp.to_real".symbol(),
+        "fp.to_real".toSymbolWithQuotes(),
         emptySet(),
         FPSort("eb".idx(), "sb".idx()),
         emptySet(),
@@ -1873,7 +1947,7 @@ internal object FPToRealDecl :
 /** Array extension theory internal object */
 internal object ArrayExTheory : Theory {
   override val functions: Map<String, FunctionDecl<*>> =
-      listOf(ArraySelectDecl, ArrayStoreDecl).associateBy { it.name.toString() }
+      listOf(ArraySelectDecl, ArrayStoreDecl).associateBy { it.symbol.toString() }
 
   override val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf(Pair("Array", ArraySortDecl))
 }
@@ -1881,7 +1955,7 @@ internal object ArrayExTheory : Theory {
 /** Sort declaration internal object for array sort */
 internal object ArraySortDecl :
     SortDecl<ArraySort<Sort, Sort>>(
-        "Array".symbol(), setOf(SortParameter("X"), SortParameter("Y")), emptySet()) {
+        "Array".toSymbolWithQuotes(), setOf(SortParameter("X"), SortParameter("Y")), emptySet()) {
   override fun getSort(bindings: Bindings): ArraySort<Sort, Sort> =
       ArraySort(bindings[SortParameter("X")], bindings[SortParameter("Y")])
 }
@@ -1889,7 +1963,7 @@ internal object ArraySortDecl :
 /** Array selection declaration internal object */
 internal object ArraySelectDecl :
     FunctionDecl2<ArraySort<Sort, Sort>, Sort, Sort>(
-        "select".symbol(),
+        "select".toSymbolWithQuotes(),
         setOf(SortParameter("X"), SortParameter("Y")),
         ArraySort(SortParameter("X"), SortParameter("Y")),
         SortParameter("X"),
@@ -1906,7 +1980,7 @@ internal object ArraySelectDecl :
 /** Array store declaration internal object */
 internal object ArrayStoreDecl :
     FunctionDecl3<ArraySort<Sort, Sort>, Sort, Sort, ArraySort<Sort, Sort>>(
-        "store".symbol(),
+        "store".toSymbolWithQuotes(),
         setOf(SortParameter("X"), SortParameter("Y")),
         ArraySort(SortParameter("X"), SortParameter("Y")),
         SortParameter("X"),
@@ -1959,28 +2033,37 @@ internal object StringsTheory : Theory {
               RegexRangeDecl,
               RegexPowerDecl,
               RegexLoopDecl)
-          .associateBy { it.name.toString() }
+          .associateBy { it.symbol.toString() }
 
   override val sorts: Map<String, SortDecl<*>> =
       mapOf(Pair("String", StringSortDecl), Pair("RegLan", RegLanDecl), Pair("Int", IntSortDecl))
 }
 
-internal object StringSortDecl : SortDecl<StringSort>("String".symbol(), emptySet(), emptySet()) {
+internal object StringSortDecl :
+    SortDecl<StringSort>("String".toSymbolWithQuotes(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): StringSort = StringSort
 }
 
-internal object RegLanDecl : SortDecl<RegLan>("RegLan".symbol(), emptySet(), emptySet()) {
+internal object RegLanDecl :
+    SortDecl<RegLan>("RegLan".toSymbolWithQuotes(), emptySet(), emptySet()) {
   override fun getSort(bindings: Bindings): RegLan = RegLan
 }
 
 internal object CharDecl :
-    FunctionDecl0<StringSort>("char".symbol(), emptySet(), setOf("H".idx()), StringSort) {
+    FunctionDecl0<StringSort>(
+        "char".toSymbolWithQuotes(), emptySet(), setOf("H".idx()), StringSort) {
   override fun buildExpression(bindings: Bindings): Expression<StringSort> = TODO()
 }
 
 internal object StrConcatDecl :
     FunctionDeclLeftAssociative<StringSort, StringSort, StringSort>(
-        "str.++".symbol(), emptySet(), StringSort, StringSort, emptySet(), emptySet(), StringSort) {
+        "str.++".toSymbolWithQuotes(),
+        emptySet(),
+        StringSort,
+        StringSort,
+        emptySet(),
+        emptySet(),
+        StringSort) {
   override fun buildExpression(
       param1: Expression<StringSort>,
       param2: Expression<StringSort>,
@@ -1991,7 +2074,7 @@ internal object StrConcatDecl :
 
 internal object StrLengthDecl :
     FunctionDecl1<StringSort, IntSort>(
-        "str.len".symbol(), emptySet(), StringSort, emptySet(), emptySet(), IntSort) {
+        "str.len".toSymbolWithQuotes(), emptySet(), StringSort, emptySet(), emptySet(), IntSort) {
   override fun buildExpression(
       param: Expression<StringSort>,
       bindings: Bindings
@@ -2000,7 +2083,7 @@ internal object StrLengthDecl :
 
 internal object StrLexOrderDecl :
     FunctionDeclChainable<StringSort>(
-        "str.<".symbol(), emptySet(), StringSort, StringSort, emptySet(), emptySet()) {
+        "str.<".toSymbolWithQuotes(), emptySet(), StringSort, StringSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<StringSort>>,
       bindings: Bindings
@@ -2009,7 +2092,7 @@ internal object StrLexOrderDecl :
 
 internal object ToRegexDecl :
     FunctionDecl1<StringSort, RegLan>(
-        "str.to_reg".symbol(), emptySet(), StringSort, emptySet(), emptySet(), RegLan) {
+        "str.to_reg".toSymbolWithQuotes(), emptySet(), StringSort, emptySet(), emptySet(), RegLan) {
   override fun buildExpression(
       param: Expression<StringSort>,
       bindings: Bindings
@@ -2018,7 +2101,13 @@ internal object ToRegexDecl :
 
 internal object InRegexDecl :
     FunctionDecl2<StringSort, RegLan, BoolSort>(
-        "str.in_reg".symbol(), emptySet(), StringSort, RegLan, emptySet(), emptySet(), BoolSort) {
+        "str.in_reg".toSymbolWithQuotes(),
+        emptySet(),
+        StringSort,
+        RegLan,
+        emptySet(),
+        emptySet(),
+        BoolSort) {
   override fun buildExpression(
       param1: Expression<StringSort>,
       param2: Expression<RegLan>,
@@ -2027,23 +2116,23 @@ internal object InRegexDecl :
 }
 
 internal object RegexNoneDecl :
-    FunctionDecl0<RegLan>("re.none".symbol(), emptySet(), emptySet(), RegLan) {
+    FunctionDecl0<RegLan>("re.none".toSymbolWithQuotes(), emptySet(), emptySet(), RegLan) {
   override fun buildExpression(bindings: Bindings): Expression<RegLan> = RegexNone
 }
 
 internal object RegexAllDecl :
-    FunctionDecl0<RegLan>("re.all".symbol(), emptySet(), emptySet(), RegLan) {
+    FunctionDecl0<RegLan>("re.all".toSymbolWithQuotes(), emptySet(), emptySet(), RegLan) {
   override fun buildExpression(bindings: Bindings): Expression<RegLan> = RegexAll
 }
 
 internal object RegexAllCharDecl :
-    FunctionDecl0<RegLan>("re.allchar".symbol(), emptySet(), emptySet(), RegLan) {
+    FunctionDecl0<RegLan>("re.allchar".toSymbolWithQuotes(), emptySet(), emptySet(), RegLan) {
   override fun buildExpression(bindings: Bindings): Expression<RegLan> = RegexAllChar
 }
 
 internal object RegexConcatDecl :
     FunctionDeclLeftAssociative<RegLan, RegLan, RegLan>(
-        "re.++".symbol(), emptySet(), RegLan, RegLan, emptySet(), emptySet(), RegLan) {
+        "re.++".toSymbolWithQuotes(), emptySet(), RegLan, RegLan, emptySet(), emptySet(), RegLan) {
   override fun buildExpression(
       param1: Expression<RegLan>,
       param2: Expression<RegLan>,
@@ -2054,7 +2143,13 @@ internal object RegexConcatDecl :
 
 internal object RegexUnionDecl :
     FunctionDeclLeftAssociative<RegLan, RegLan, RegLan>(
-        "re.union".symbol(), emptySet(), RegLan, RegLan, emptySet(), emptySet(), RegLan) {
+        "re.union".toSymbolWithQuotes(),
+        emptySet(),
+        RegLan,
+        RegLan,
+        emptySet(),
+        emptySet(),
+        RegLan) {
   override fun buildExpression(
       param1: Expression<RegLan>,
       param2: Expression<RegLan>,
@@ -2065,7 +2160,13 @@ internal object RegexUnionDecl :
 
 internal object RegexIntersecDecl :
     FunctionDeclLeftAssociative<RegLan, RegLan, RegLan>(
-        "re.inter".symbol(), emptySet(), RegLan, RegLan, emptySet(), emptySet(), RegLan) {
+        "re.inter".toSymbolWithQuotes(),
+        emptySet(),
+        RegLan,
+        RegLan,
+        emptySet(),
+        emptySet(),
+        RegLan) {
   override fun buildExpression(
       param1: Expression<RegLan>,
       param2: Expression<RegLan>,
@@ -2076,14 +2177,14 @@ internal object RegexIntersecDecl :
 
 internal object RegexStarDecl :
     FunctionDecl1<RegLan, RegLan>(
-        "re.*".symbol(), emptySet(), RegLan, emptySet(), emptySet(), RegLan) {
+        "re.*".toSymbolWithQuotes(), emptySet(), RegLan, emptySet(), emptySet(), RegLan) {
   override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
       RegexStar(param)
 }
 
 internal object StrRefLexOrderDecl :
     FunctionDeclChainable<StringSort>(
-        "str.<=".symbol(), emptySet(), StringSort, StringSort, emptySet(), emptySet()) {
+        "str.<=".toSymbolWithQuotes(), emptySet(), StringSort, StringSort, emptySet(), emptySet()) {
   override fun buildExpression(
       varargs: List<Expression<StringSort>>,
       bindings: Bindings
@@ -2092,7 +2193,13 @@ internal object StrRefLexOrderDecl :
 
 internal object StrAtDecl :
     FunctionDecl2<StringSort, IntSort, StringSort>(
-        "str.at".symbol(), emptySet(), StringSort, IntSort, emptySet(), emptySet(), StringSort) {
+        "str.at".toSymbolWithQuotes(),
+        emptySet(),
+        StringSort,
+        IntSort,
+        emptySet(),
+        emptySet(),
+        StringSort) {
   override fun buildExpression(
       param1: Expression<StringSort>,
       param2: Expression<IntSort>,
@@ -2102,7 +2209,7 @@ internal object StrAtDecl :
 
 internal object StrSubstringDecl :
     FunctionDecl3<StringSort, IntSort, IntSort, StringSort>(
-        "str.substr".symbol(),
+        "str.substr".toSymbolWithQuotes(),
         emptySet(),
         StringSort,
         IntSort,
@@ -2120,7 +2227,7 @@ internal object StrSubstringDecl :
 
 internal object StrPrefixOfDecl :
     FunctionDecl2<StringSort, StringSort, BoolSort>(
-        "str.prefixof".symbol(),
+        "str.prefixof".toSymbolWithQuotes(),
         emptySet(),
         StringSort,
         StringSort,
@@ -2136,7 +2243,7 @@ internal object StrPrefixOfDecl :
 
 internal object StrSuffixOfDecl :
     FunctionDecl2<StringSort, StringSort, BoolSort>(
-        "str.suffixof".symbol(),
+        "str.suffixof".toSymbolWithQuotes(),
         emptySet(),
         StringSort,
         StringSort,
@@ -2152,7 +2259,7 @@ internal object StrSuffixOfDecl :
 
 internal object StrContainsDecl :
     FunctionDecl2<StringSort, StringSort, BoolSort>(
-        "str.contains".symbol(),
+        "str.contains".toSymbolWithQuotes(),
         emptySet(),
         StringSort,
         StringSort,
@@ -2168,7 +2275,7 @@ internal object StrContainsDecl :
 
 internal object StrIndexOfDecl :
     FunctionDecl3<StringSort, StringSort, IntSort, IntSort>(
-        "str.indexof".symbol(),
+        "str.indexof".toSymbolWithQuotes(),
         emptySet(),
         StringSort,
         StringSort,
@@ -2186,7 +2293,7 @@ internal object StrIndexOfDecl :
 
 internal object StrReplaceDecl :
     FunctionDecl3<StringSort, StringSort, StringSort, StringSort>(
-        "str.replace".symbol(),
+        "str.replace".toSymbolWithQuotes(),
         emptySet(),
         StringSort,
         StringSort,
@@ -2204,7 +2311,7 @@ internal object StrReplaceDecl :
 
 internal object StrReplaceAllDecl :
     FunctionDecl3<StringSort, StringSort, StringSort, StringSort>(
-        "str.replace".symbol(),
+        "str.replace".toSymbolWithQuotes(),
         emptySet(),
         StringSort,
         StringSort,
@@ -2222,7 +2329,7 @@ internal object StrReplaceAllDecl :
 
 internal object StrReplaceRegexDecl :
     FunctionDecl3<StringSort, RegLan, StringSort, StringSort>(
-        "str.replace_re".symbol(),
+        "str.replace_re".toSymbolWithQuotes(),
         emptySet(),
         StringSort,
         RegLan,
@@ -2240,7 +2347,7 @@ internal object StrReplaceRegexDecl :
 
 internal object StrReplaceAllRegexDecl :
     FunctionDecl3<StringSort, RegLan, StringSort, StringSort>(
-        "str.replace_re_all".symbol(),
+        "str.replace_re_all".toSymbolWithQuotes(),
         emptySet(),
         StringSort,
         RegLan,
@@ -2258,14 +2365,20 @@ internal object StrReplaceAllRegexDecl :
 
 internal object RegexCompDecl :
     FunctionDecl1<RegLan, RegLan>(
-        "re.comp".symbol(), emptySet(), RegLan, emptySet(), emptySet(), RegLan) {
+        "re.comp".toSymbolWithQuotes(), emptySet(), RegLan, emptySet(), emptySet(), RegLan) {
   override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
       RegexComp(param)
 }
 
 internal object RegexDiffDecl :
     FunctionDeclLeftAssociative<RegLan, RegLan, RegLan>(
-        "re.diff".symbol(), emptySet(), RegLan, RegLan, emptySet(), emptySet(), RegLan) {
+        "re.diff".toSymbolWithQuotes(),
+        emptySet(),
+        RegLan,
+        RegLan,
+        emptySet(),
+        emptySet(),
+        RegLan) {
   override fun buildExpression(
       param1: Expression<RegLan>,
       param2: Expression<RegLan>,
@@ -2276,21 +2389,27 @@ internal object RegexDiffDecl :
 
 internal object RegexPlusDecl :
     FunctionDecl1<RegLan, RegLan>(
-        "re.+".symbol(), emptySet(), RegLan, emptySet(), emptySet(), RegLan) {
+        "re.+".toSymbolWithQuotes(), emptySet(), RegLan, emptySet(), emptySet(), RegLan) {
   override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
       RegexPlus(param)
 }
 
 internal object RegexOptionDecl :
     FunctionDecl1<RegLan, RegLan>(
-        "re.opt".symbol(), emptySet(), RegLan, emptySet(), emptySet(), RegLan) {
+        "re.opt".toSymbolWithQuotes(), emptySet(), RegLan, emptySet(), emptySet(), RegLan) {
   override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
       RegexOption(param)
 }
 
 internal object RegexRangeDecl :
     FunctionDecl2<StringSort, StringSort, RegLan>(
-        "re.range".symbol(), emptySet(), StringSort, StringSort, emptySet(), emptySet(), RegLan) {
+        "re.range".toSymbolWithQuotes(),
+        emptySet(),
+        StringSort,
+        StringSort,
+        emptySet(),
+        emptySet(),
+        RegLan) {
   override fun buildExpression(
       param1: Expression<StringSort>,
       param2: Expression<StringSort>,
@@ -2300,21 +2419,31 @@ internal object RegexRangeDecl :
 
 internal object RegexPowerDecl :
     FunctionDecl1<RegLan, RegLan>(
-        "re.^".symbol(), emptySet(), RegLan, setOf("n".idx()), emptySet(), RegLan) {
+        "re.^".toSymbolWithQuotes(), emptySet(), RegLan, setOf("n".idx()), emptySet(), RegLan) {
   override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
       RegexPower(param, bindings["n"].numeral)
 }
 
 internal object RegexLoopDecl :
     FunctionDecl1<RegLan, RegLan>(
-        "re.loop".symbol(), emptySet(), RegLan, setOf("n1".idx(), "n2".idx()), emptySet(), RegLan) {
+        "re.loop".toSymbolWithQuotes(),
+        emptySet(),
+        RegLan,
+        setOf("n1".idx(), "n2".idx()),
+        emptySet(),
+        RegLan) {
   override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
       RegexLoop(param, bindings["n1"].numeral, bindings["n2"].numeral)
 }
 
 internal object StrIsDigitDecl :
     FunctionDecl1<StringSort, BoolSort>(
-        "str.is_digit".symbol(), emptySet(), StringSort, emptySet(), emptySet(), BoolSort) {
+        "str.is_digit".toSymbolWithQuotes(),
+        emptySet(),
+        StringSort,
+        emptySet(),
+        emptySet(),
+        BoolSort) {
   override fun buildExpression(
       param: Expression<StringSort>,
       bindings: Bindings
@@ -2323,7 +2452,12 @@ internal object StrIsDigitDecl :
 
 internal object StrToCodeDecl :
     FunctionDecl1<StringSort, IntSort>(
-        "str.to_code".symbol(), emptySet(), StringSort, emptySet(), emptySet(), IntSort) {
+        "str.to_code".toSymbolWithQuotes(),
+        emptySet(),
+        StringSort,
+        emptySet(),
+        emptySet(),
+        IntSort) {
   override fun buildExpression(
       param: Expression<StringSort>,
       bindings: Bindings
@@ -2332,7 +2466,12 @@ internal object StrToCodeDecl :
 
 internal object StrFromCodeDecl :
     FunctionDecl1<IntSort, StringSort>(
-        "str.from_code".symbol(), emptySet(), IntSort, emptySet(), emptySet(), StringSort) {
+        "str.from_code".toSymbolWithQuotes(),
+        emptySet(),
+        IntSort,
+        emptySet(),
+        emptySet(),
+        StringSort) {
   override fun buildExpression(
       param: Expression<IntSort>,
       bindings: Bindings
@@ -2341,7 +2480,12 @@ internal object StrFromCodeDecl :
 
 internal object StrToIntDecl :
     FunctionDecl1<StringSort, IntSort>(
-        "str.to_code".symbol(), emptySet(), StringSort, emptySet(), emptySet(), IntSort) {
+        "str.to_code".toSymbolWithQuotes(),
+        emptySet(),
+        StringSort,
+        emptySet(),
+        emptySet(),
+        IntSort) {
   override fun buildExpression(
       param: Expression<StringSort>,
       bindings: Bindings
@@ -2350,7 +2494,12 @@ internal object StrToIntDecl :
 
 internal object StrFromIntDecl :
     FunctionDecl1<IntSort, StringSort>(
-        "str.from_code".symbol(), emptySet(), IntSort, emptySet(), emptySet(), StringSort) {
+        "str.from_code".toSymbolWithQuotes(),
+        emptySet(),
+        IntSort,
+        emptySet(),
+        emptySet(),
+        StringSort) {
   override fun buildExpression(
       param: Expression<IntSort>,
       bindings: Bindings

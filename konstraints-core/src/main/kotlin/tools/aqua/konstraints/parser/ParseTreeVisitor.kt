@@ -26,7 +26,7 @@ import tools.aqua.konstraints.theories.*
 internal class ParseTreeVisitor :
     ProtoCommandVisitor, ProtoTermVisitor, ProtoSortVisitor, SpecConstantVisitor {
 
-  var context: Context? = null
+  var context: ParseContext? = null
 
   override fun visit(protoAssert: ProtoAssert): Assert {
     val term = visit(protoAssert.term)
@@ -41,7 +41,7 @@ internal class ParseTreeVisitor :
 
     context?.registerFunction(protoDeclareConst, sort)
 
-    return DeclareConst(Symbol(protoDeclareConst.name), sort)
+    return DeclareConst(protoDeclareConst.name.toSymbolWithQuotes(), sort)
   }
 
   override fun visit(protoDeclareFun: ProtoDeclareFun): DeclareFun {
@@ -50,11 +50,11 @@ internal class ParseTreeVisitor :
 
     context?.registerFunction(protoDeclareFun, parameters, sort)
 
-    return DeclareFun(protoDeclareFun.name.symbol(), parameters, sort)
+    return DeclareFun(protoDeclareFun.name.toSymbolWithQuotes(), parameters, sort)
   }
 
   override fun visit(protoSetLogic: ProtoSetLogic): SetLogic {
-    context = Context(protoSetLogic.logic)
+    context = ParseContext(protoSetLogic.logic)
 
     return SetLogic(protoSetLogic.logic)
   }
@@ -122,8 +122,7 @@ internal class ParseTreeVisitor :
       // temporary code for (_ bvX n) as context can not handle it right now
       // convert X into binary
       return BVLiteral(
-          "#b${simpleQualIdentifier.identifier.symbol.toString().substring(2).toBigInteger().toString(2)}",
-          functionIndices.single().numeral)
+          simpleQualIdentifier.identifier.symbol.toString(), functionIndices.single().numeral)
     } else {
       throw IllegalStateException("Unknown fun ${simpleQualIdentifier.identifier.symbol}")
       // TODO UnknownFunctionException
