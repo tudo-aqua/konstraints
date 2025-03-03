@@ -27,14 +27,14 @@ import tools.aqua.konstraints.smt.*
  */
 
 /** Object for SMT true */
-object True : ConstantExpression<BoolSort>("true".symbol(), BoolSort) {
+object True : ConstantExpression<BoolSort>("true".toSymbolWithQuotes(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
 }
 
 /** Object for SMT false */
-object False : ConstantExpression<BoolSort>("false".symbol(), BoolSort) {
+object False : ConstantExpression<BoolSort>("false".toSymbolWithQuotes(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
@@ -46,7 +46,7 @@ object False : ConstantExpression<BoolSort>("false".symbol(), BoolSort) {
  * @param inner [Expression] of [BoolSort] to be negated
  */
 class Not(override val inner: Expression<BoolSort>) :
-    UnaryExpression<BoolSort, BoolSort>("not".symbol(), BoolSort) {
+    UnaryExpression<BoolSort, BoolSort>("not".toSymbolWithQuotes(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
   override fun toString(): String = "(not $inner)"
@@ -61,7 +61,7 @@ class Not(override val inner: Expression<BoolSort>) :
  * @param statements multiple [Expression] of [BoolSort] to be checked in implies statement
  */
 class Implies(val statements: List<Expression<BoolSort>>) :
-    HomogenousExpression<BoolSort, BoolSort>("=>".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, BoolSort>("=>".toSymbolWithQuotes(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg statements: Expression<BoolSort>) : this(statements.toList())
@@ -78,7 +78,7 @@ class Implies(val statements: List<Expression<BoolSort>>) :
  * @param conjuncts multiple [Expression] of [BoolSort] to be joined in and statement
  */
 class And(val conjuncts: List<Expression<BoolSort>>) :
-    HomogenousExpression<BoolSort, BoolSort>("and".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, BoolSort>("and".toSymbolWithQuotes(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg conjuncts: Expression<BoolSort>) : this(conjuncts.toList())
@@ -95,7 +95,7 @@ class And(val conjuncts: List<Expression<BoolSort>>) :
  * @param disjuncts multiple [Expression] of [BoolSort] to be joined in or statement
  */
 class Or(val disjuncts: List<Expression<BoolSort>>) :
-    HomogenousExpression<BoolSort, BoolSort>("or".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, BoolSort>("or".toSymbolWithQuotes(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
@@ -112,7 +112,7 @@ class Or(val disjuncts: List<Expression<BoolSort>>) :
  * @param disjuncts multiple [Expression] of [BoolSort] to be joined in xor statement
  */
 class XOr(val disjuncts: List<Expression<BoolSort>>) :
-    HomogenousExpression<BoolSort, BoolSort>("xor".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, BoolSort>("xor".toSymbolWithQuotes(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
@@ -129,7 +129,7 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) :
  * @param statements multiple [Expression] of [BoolSort] to be checked in equals statement
  */
 class Equals<T : Sort>(val statements: List<Expression<T>>) :
-    HomogenousExpression<BoolSort, Sort>("=".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, Sort>("=".toSymbolWithQuotes(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg statements: Expression<T>) : this(statements.toList())
@@ -146,7 +146,7 @@ class Equals<T : Sort>(val statements: List<Expression<T>>) :
  * @param statements multiple [Expression] of [BoolSort] to be checked in distinct statement
  */
 class Distinct<T : Sort>(val statements: List<Expression<T>>) :
-    HomogenousExpression<BoolSort, T>("distinct".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, T>("distinct".toSymbolWithQuotes(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg statements: Expression<T>) : this(statements.toList())

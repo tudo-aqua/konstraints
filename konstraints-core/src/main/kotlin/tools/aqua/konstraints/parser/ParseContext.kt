@@ -181,7 +181,7 @@ abstract class SortDecl<T : Sort>(
   internal fun registerFunction(const: ProtoDeclareConst, sort: Sort) {
     registerFunction(
         FunctionDecl(
-            const.name.symbol(),
+            const.name.toSymbolWithQuotes(),
             emptySet(),
             listOf(),
             emptySet(),
@@ -202,7 +202,7 @@ abstract class SortDecl<T : Sort>(
   fun registerFunction(name: String, params: List<Sort>, sort: Sort) {
     this.registerFunction(
         FunctionDecl(
-            name.symbol(),
+            name.toSymbolWithQuotes(),
             emptySet(),
             params,
             emptySet(),

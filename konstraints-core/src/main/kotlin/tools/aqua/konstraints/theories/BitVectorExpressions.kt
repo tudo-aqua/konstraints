@@ -101,10 +101,10 @@ fun String.isBitvecLiteral() = this.isSMTBinary() || this.isSMTHex()
  */
 class BVConcat(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>(
-        "concat".symbol(), BVSort(lhs.sort.bits + rhs.sort.bits)) {
+        "concat".toSymbolWithQuotes(), BVSort(lhs.sort.bits + rhs.sort.bits)) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
-  override val name: Symbol = "concat".symbol()
+  override val name: Symbol = "concat".toSymbolWithQuotes()
 
   init {
     require(!lhs.sort.isSymbolic())
@@ -125,7 +125,7 @@ class BVConcat(override val lhs: Expression<BVSort>, override val rhs: Expressio
  *   number of bits in [inner]
  */
 class BVExtract(val i: Int, val j: Int, override val inner: Expression<BVSort>) :
-    UnaryExpression<BVSort, BVSort>("extract".symbol(), BVSort(i - j + 1)) {
+    UnaryExpression<BVSort, BVSort>("extract".toSymbolWithQuotes(), BVSort(i - j + 1)) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -148,7 +148,7 @@ class BVExtract(val i: Int, val j: Int, override val inner: Expression<BVSort>) 
  * @param [inner] [Expression] to be inverted
  */
 class BVNot(override val inner: Expression<BVSort>) :
-    UnaryExpression<BVSort, BVSort>("bvnot".symbol(), inner.sort) {
+    UnaryExpression<BVSort, BVSort>("bvnot".toSymbolWithQuotes(), inner.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -165,7 +165,7 @@ class BVNot(override val inner: Expression<BVSort>) :
  * @param [inner] [Expression] to be negated
  */
 class BVNeg(override val inner: Expression<BVSort>) :
-    UnaryExpression<BVSort, BVSort>("bvneg".symbol(), inner.sort) {
+    UnaryExpression<BVSort, BVSort>("bvneg".toSymbolWithQuotes(), inner.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -183,7 +183,7 @@ class BVNeg(override val inner: Expression<BVSort>) :
  * @throws [IllegalArgumentException] if two [conjuncts] do not have the same number of bits
  */
 class BVAnd(val conjuncts: List<Expression<BVSort>>) :
-    HomogenousExpression<BVSort, BVSort>("bvand".symbol(), conjuncts.first().sort) {
+    HomogenousExpression<BVSort, BVSort>("bvand".toSymbolWithQuotes(), conjuncts.first().sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   /**
@@ -215,7 +215,7 @@ class BVAnd(val conjuncts: List<Expression<BVSort>>) :
  * @throws [IllegalArgumentException] if two [disjuncts] do not have the same number of bits
  */
 class BVOr(val disjuncts: List<Expression<BVSort>>) :
-    HomogenousExpression<BVSort, BVSort>("bvor".symbol(), disjuncts.first().sort) {
+    HomogenousExpression<BVSort, BVSort>("bvor".toSymbolWithQuotes(), disjuncts.first().sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   /**
@@ -249,7 +249,7 @@ class BVOr(val disjuncts: List<Expression<BVSort>>) :
  * @throws [IllegalArgumentException] if two [summands] do not have the same number of bits
  */
 class BVAdd(val summands: List<Expression<BVSort>>) :
-    HomogenousExpression<BVSort, BVSort>("bvadd".symbol(), summands.first().sort) {
+    HomogenousExpression<BVSort, BVSort>("bvadd".toSymbolWithQuotes(), summands.first().sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   /**
@@ -281,7 +281,7 @@ class BVAdd(val summands: List<Expression<BVSort>>) :
  * @throws [IllegalArgumentException] if two [factors] do not have the same number of bits
  */
 class BVMul(val factors: List<Expression<BVSort>>) :
-    HomogenousExpression<BVSort, BVSort>("bvmul".symbol(), factors.first().sort) {
+    HomogenousExpression<BVSort, BVSort>("bvmul".toSymbolWithQuotes(), factors.first().sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   /**
@@ -315,7 +315,7 @@ class BVMul(val factors: List<Expression<BVSort>>) :
  *   of bits
  */
 class BVUDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("bvudiv".symbol(), numerator.sort) {
+    BinaryExpression<BVSort, BVSort, BVSort>("bvudiv".toSymbolWithQuotes(), numerator.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -342,7 +342,7 @@ class BVUDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
  *   of bits
  */
 class BVURem(val numerator: Expression<BVSort>, val denominator: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("bvurem".symbol(), numerator.sort) {
+    BinaryExpression<BVSort, BVSort, BVSort>("bvurem".toSymbolWithQuotes(), numerator.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -367,7 +367,7 @@ class BVURem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
  * @throws [IllegalArgumentException] if [value] and [distance] do not have the same number of bits
  */
 class BVShl(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("bvshl".symbol(), value.sort) {
+    BinaryExpression<BVSort, BVSort, BVSort>("bvshl".toSymbolWithQuotes(), value.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -394,7 +394,7 @@ class BVShl(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
  * @throws [IllegalArgumentException] if [value] and [distance] do not have the same number of bits
  */
 class BVLShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("bvlshr".symbol(), value.sort) {
+    BinaryExpression<BVSort, BVSort, BVSort>("bvlshr".toSymbolWithQuotes(), value.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -421,7 +421,7 @@ class BVLShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
 class BVUlt(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
-    BinaryExpression<BoolSort, BVSort, BVSort>("bvult".symbol(), BoolSort) {
+    BinaryExpression<BoolSort, BVSort, BVSort>("bvult".toSymbolWithQuotes(), BoolSort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -437,7 +437,7 @@ class BVUlt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 }
 
 class BVNAnd(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("bvnand".symbol(), lhs.sort) {
+    BinaryExpression<BVSort, BVSort, BVSort>("bvnand".toSymbolWithQuotes(), lhs.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -451,7 +451,7 @@ class BVNAnd(override val lhs: Expression<BVSort>, override val rhs: Expression<
 }
 
 class BVNOr(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("bvnor".symbol(), lhs.sort) {
+    BinaryExpression<BVSort, BVSort, BVSort>("bvnor".toSymbolWithQuotes(), lhs.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -465,7 +465,7 @@ class BVNOr(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 }
 
 class BVXOr(val disjuncts: List<Expression<BVSort>>) :
-    HomogenousExpression<BVSort, BVSort>("bvxor".symbol(), disjuncts[0].sort) {
+    HomogenousExpression<BVSort, BVSort>("bvxor".toSymbolWithQuotes(), disjuncts[0].sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -501,7 +501,7 @@ class BVXOr(val disjuncts: List<Expression<BVSort>>) :
 }
 
 class BVXNOr(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("bvxnor".symbol(), lhs.sort) {
+    BinaryExpression<BVSort, BVSort, BVSort>("bvxnor".toSymbolWithQuotes(), lhs.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -515,7 +515,7 @@ class BVXNOr(override val lhs: Expression<BVSort>, override val rhs: Expression<
 }
 
 class BVComp(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("bvcomp".symbol(), BVSort(1)) {
+    BinaryExpression<BVSort, BVSort, BVSort>("bvcomp".toSymbolWithQuotes(), BVSort(1)) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
@@ -536,7 +536,7 @@ class BVComp(override val lhs: Expression<BVSort>, override val rhs: Expression<
 }
 
 class BVSub(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("bvsub".symbol(), lhs.sort) {
+    BinaryExpression<BVSort, BVSort, BVSort>("bvsub".toSymbolWithQuotes(), lhs.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -550,7 +550,7 @@ class BVSub(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 }
 
 class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("bvsub".symbol(), numerator.sort) {
+    BinaryExpression<BVSort, BVSort, BVSort>("bvsub".toSymbolWithQuotes(), numerator.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -564,8 +564,10 @@ class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
       BVSDivDecl.buildExpression(children, emptyList())
 
   fun expand(): Expression<BVSort> {
-    val msb_s = VarBinding("?msb_s".symbol(), BVExtract(sort.bits - 1, sort.bits - 1, numerator))
-    val msb_t = VarBinding("?msb_t".symbol(), BVExtract(sort.bits - 1, sort.bits - 1, denominator))
+    val msb_s =
+        VarBinding("?msb_s".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, numerator))
+    val msb_t =
+        VarBinding("?msb_t".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, denominator))
     return LetExpression(
         listOf(msb_s, msb_t),
         Ite(
@@ -587,7 +589,7 @@ class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
 }
 
 class BVSRem(val numerator: Expression<BVSort>, val denominator: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("bvsub".symbol(), numerator.sort) {
+    BinaryExpression<BVSort, BVSort, BVSort>("bvsub".toSymbolWithQuotes(), numerator.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -601,8 +603,10 @@ class BVSRem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
       BVSRemDecl.buildExpression(children, emptyList())
 
   fun expand(): Expression<BVSort> {
-    val msb_s = VarBinding("?msb_s".symbol(), BVExtract(sort.bits - 1, sort.bits - 1, numerator))
-    val msb_t = VarBinding("?msb_t".symbol(), BVExtract(sort.bits - 1, sort.bits - 1, denominator))
+    val msb_s =
+        VarBinding("?msb_s".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, numerator))
+    val msb_t =
+        VarBinding("?msb_t".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, denominator))
     return LetExpression(
         listOf(msb_s, msb_t),
         Ite(
@@ -624,7 +628,7 @@ class BVSRem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
 }
 
 class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("bvsmod".symbol(), lhs.sort) {
+    BinaryExpression<BVSort, BVSort, BVSort>("bvsmod".toSymbolWithQuotes(), lhs.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -635,15 +639,15 @@ class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<
       BVSModDecl.buildExpression(children, emptyList())
 
   fun expand(): Expression<BVSort> {
-    val msb_s = VarBinding("?msb_s".symbol(), BVExtract(sort.bits - 1, sort.bits - 1, lhs))
-    val msb_t = VarBinding("?msb_t".symbol(), BVExtract(sort.bits - 1, sort.bits - 1, rhs))
+    val msb_s = VarBinding("?msb_s".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, lhs))
+    val msb_t = VarBinding("?msb_t".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, rhs))
     val abs_s =
         VarBinding(
-            "?abs_s".symbol(), Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)))
+            "?abs_s".toSymbolWithQuotes(), Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)))
     val abs_t =
         VarBinding(
-            "?abs_t".symbol(), Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)))
-    val u = VarBinding("u".symbol(), BVURem(abs_s.instance, abs_t.instance))
+            "?abs_t".toSymbolWithQuotes(), Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)))
+    val u = VarBinding("u".toSymbolWithQuotes(), BVURem(abs_s.instance, abs_t.instance))
 
     return LetExpression(
         listOf(msb_s, msb_t),
@@ -674,7 +678,7 @@ class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<
 }
 
 class BVULe(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
-    BinaryExpression<BoolSort, BVSort, BVSort>("bvule".symbol(), BoolSort) {
+    BinaryExpression<BoolSort, BVSort, BVSort>("bvule".toSymbolWithQuotes(), BoolSort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -688,7 +692,7 @@ class BVULe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 }
 
 class BVUGt(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
-    BinaryExpression<BoolSort, BVSort, BVSort>("bvugt".symbol(), BoolSort) {
+    BinaryExpression<BoolSort, BVSort, BVSort>("bvugt".toSymbolWithQuotes(), BoolSort) {
   companion object {
     private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
   }
@@ -707,7 +711,7 @@ class BVUGt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 }
 
 class BVUGe(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
-    BinaryExpression<BoolSort, BVSort, BVSort>("bvuge".symbol(), BoolSort) {
+    BinaryExpression<BoolSort, BVSort, BVSort>("bvuge".toSymbolWithQuotes(), BoolSort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -721,7 +725,7 @@ class BVUGe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 }
 
 class BVSLt(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
-    BinaryExpression<BoolSort, BVSort, BVSort>("bvslt".symbol(), BoolSort) {
+    BinaryExpression<BoolSort, BVSort, BVSort>("bvslt".toSymbolWithQuotes(), BoolSort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -744,7 +748,7 @@ class BVSLt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 }
 
 class BVSLe(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
-    BinaryExpression<BoolSort, BVSort, BVSort>("bvsle".symbol(), BoolSort) {
+    BinaryExpression<BoolSort, BVSort, BVSort>("bvsle".toSymbolWithQuotes(), BoolSort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -767,7 +771,7 @@ class BVSLe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 }
 
 class BVSGt(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
-    BinaryExpression<BoolSort, BVSort, BVSort>("bvsgt".symbol(), BoolSort) {
+    BinaryExpression<BoolSort, BVSort, BVSort>("bvsgt".toSymbolWithQuotes(), BoolSort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -781,7 +785,7 @@ class BVSGt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 }
 
 class BVSGe(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
-    BinaryExpression<BoolSort, BVSort, BVSort>("bvsge".symbol(), BoolSort) {
+    BinaryExpression<BoolSort, BVSort, BVSort>("bvsge".toSymbolWithQuotes(), BoolSort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -795,7 +799,7 @@ class BVSGe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 }
 
 class BVAShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("bvashr".symbol(), value.sort) {
+    BinaryExpression<BVSort, BVSort, BVSort>("bvashr".toSymbolWithQuotes(), value.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -816,7 +820,7 @@ class BVAShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
 }
 
 class Repeat(val j: Int, override val inner: Expression<BVSort>) :
-    UnaryExpression<BVSort, BVSort>("repeat".symbol(), BVSort(inner.sort.bits * j)) {
+    UnaryExpression<BVSort, BVSort>("repeat".toSymbolWithQuotes(), BVSort(inner.sort.bits * j)) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -837,7 +841,7 @@ class Repeat(val j: Int, override val inner: Expression<BVSort>) :
 }
 
 class ZeroExtend(val i: Int, override val inner: Expression<BVSort>) :
-    UnaryExpression<BVSort, BVSort>("zero_extend".symbol(), BVSort(inner.sort.bits + i)) {
+    UnaryExpression<BVSort, BVSort>("zero_extend".toSymbolWithQuotes(), BVSort(inner.sort.bits + i)) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -856,7 +860,7 @@ class ZeroExtend(val i: Int, override val inner: Expression<BVSort>) :
 }
 
 class SignExtend(val i: Int, override val inner: Expression<BVSort>) :
-    UnaryExpression<BVSort, BVSort>("sign_extend".symbol(), BVSort(inner.sort.bits + i)) {
+    UnaryExpression<BVSort, BVSort>("sign_extend".toSymbolWithQuotes(), BVSort(inner.sort.bits + i)) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -875,7 +879,7 @@ class SignExtend(val i: Int, override val inner: Expression<BVSort>) :
 }
 
 class RotateLeft(val i: Int, override val inner: Expression<BVSort>) :
-    UnaryExpression<BVSort, BVSort>("rotate_left".symbol(), inner.sort) {
+    UnaryExpression<BVSort, BVSort>("rotate_left".toSymbolWithQuotes(), inner.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -898,7 +902,7 @@ class RotateLeft(val i: Int, override val inner: Expression<BVSort>) :
 }
 
 class RotateRight(val i: Int, override val inner: Expression<BVSort>) :
-    UnaryExpression<BVSort, BVSort>("rotate_right".symbol(), inner.sort) {
+    UnaryExpression<BVSort, BVSort>("rotate_right".toSymbolWithQuotes(), inner.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {

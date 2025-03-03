@@ -168,7 +168,7 @@ operator fun Model.Companion.invoke(model: Z3Model): Model {
   temp.addAll(
       model.constDecls.map { decl ->
         FunctionDef(
-            decl.name.toString().symbol(),
+            decl.name.toString().toSymbolWithQuotes(),
             emptyList(),
             decl.range.aquaify(),
             model.getConstInterp(decl).aquaify() castTo decl.range.aquaify())
@@ -177,9 +177,9 @@ operator fun Model.Companion.invoke(model: Z3Model): Model {
   temp.addAll(
       model.funcDecls.map { decl ->
         FunctionDef(
-            decl.name.toString().symbol(),
+            decl.name.toString().toSymbolWithQuotes(),
             (decl.domain zip 0..<decl.domainSize).map { (sort, index) ->
-              SortedVar("x$index".symbol(), sort.aquaify())
+              SortedVar("x$index".toSymbolWithQuotes(), sort.aquaify())
             },
             decl.range.aquaify(),
             model.getFuncInterp(decl).`else`.aquaify() castTo decl.range.aquaify())

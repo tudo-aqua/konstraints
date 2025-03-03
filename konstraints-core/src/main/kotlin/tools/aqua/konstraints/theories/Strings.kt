@@ -73,7 +73,7 @@ class StringLiteral(val value: String) : Literal<StringSort>(LiteralString(value
  * (str.++ String String String :left-assoc)
  */
 class StrConcat(val strings: List<Expression<StringSort>>) :
-    HomogenousExpression<StringSort, StringSort>("str.++".symbol(), StringSort) {
+    HomogenousExpression<StringSort, StringSort>("str.++".toSymbolWithQuotes(), StringSort) {
   override val theories = STRINGS_MARKER_SET
 
   constructor(vararg strings: Expression<StringSort>) : this(strings.toList())
@@ -90,7 +90,7 @@ class StrConcat(val strings: List<Expression<StringSort>>) :
  * (str.len String Int)
  */
 class StrLength(override val inner: Expression<StringSort>) :
-    UnaryExpression<IntSort, StringSort>("str.len".symbol(), IntSort) {
+    UnaryExpression<IntSort, StringSort>("str.len".toSymbolWithQuotes(), IntSort) {
   override val theories = STRINGS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
@@ -103,7 +103,7 @@ class StrLength(override val inner: Expression<StringSort>) :
  * (str.< String String Bool :chainable)
  */
 class StrLexOrder(val strings: List<Expression<StringSort>>) :
-    HomogenousExpression<BoolSort, StringSort>("str.<".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, StringSort>("str.<".toSymbolWithQuotes(), BoolSort) {
   override val theories = STRINGS_MARKER_SET
 
   constructor(vararg strings: Expression<StringSort>) : this(strings.toList())
@@ -130,7 +130,7 @@ class StrLexOrder(val strings: List<Expression<StringSort>>) :
  * (str.to_re String RegLan)
  */
 class ToRegex(override val inner: Expression<StringSort>) :
-    UnaryExpression<RegLan, StringSort>("str.to_reg".symbol(), RegLan) {
+    UnaryExpression<RegLan, StringSort>("str.to_reg".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RegLan> =
@@ -143,7 +143,7 @@ class ToRegex(override val inner: Expression<StringSort>) :
  * (str.in_re String RegLan Bool)
  */
 class InRegex(val inner: Expression<StringSort>, val regex: Expression<RegLan>) :
-    BinaryExpression<BoolSort, StringSort, RegLan>("str.in_reg".symbol(), BoolSort) {
+    BinaryExpression<BoolSort, StringSort, RegLan>("str.in_reg".toSymbolWithQuotes(), BoolSort) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = inner
@@ -159,7 +159,7 @@ class InRegex(val inner: Expression<StringSort>, val regex: Expression<RegLan>) 
  *
  * (re.none RegLan)
  */
-object RegexNone : ConstantExpression<RegLan>("re.none".symbol(), RegLan) {
+object RegexNone : ConstantExpression<RegLan>("re.none".toSymbolWithQuotes(), RegLan) {
   override val theories = setOf(Theories.STRINGS)
 
   override fun copy(children: List<Expression<*>>): Expression<RegLan> = this
@@ -170,7 +170,7 @@ object RegexNone : ConstantExpression<RegLan>("re.none".symbol(), RegLan) {
  *
  * (re.all RegLan)
  */
-object RegexAll : ConstantExpression<RegLan>("re.all".symbol(), RegLan) {
+object RegexAll : ConstantExpression<RegLan>("re.all".toSymbolWithQuotes(), RegLan) {
   override val theories = setOf(Theories.STRINGS)
 
   override fun copy(children: List<Expression<*>>): Expression<RegLan> = this
@@ -181,7 +181,7 @@ object RegexAll : ConstantExpression<RegLan>("re.all".symbol(), RegLan) {
  *
  * (re.allchar RegLan)
  */
-object RegexAllChar : ConstantExpression<RegLan>("re.allchar".symbol(), RegLan) {
+object RegexAllChar : ConstantExpression<RegLan>("re.allchar".toSymbolWithQuotes(), RegLan) {
   override val theories = setOf(Theories.STRINGS)
 
   override fun copy(children: List<Expression<*>>): Expression<RegLan> = this
@@ -193,7 +193,7 @@ object RegexAllChar : ConstantExpression<RegLan>("re.allchar".symbol(), RegLan) 
  * (re.++ RegLan RegLan RegLan :left-assoc)
  */
 class RegexConcat(val regex: List<Expression<RegLan>>) :
-    HomogenousExpression<RegLan, RegLan>("re.++".symbol(), RegLan) {
+    HomogenousExpression<RegLan, RegLan>("re.++".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
 
   constructor(vararg regex: Expression<RegLan>) : this(regex.toList())
@@ -210,7 +210,7 @@ class RegexConcat(val regex: List<Expression<RegLan>>) :
  * (re.union RegLan RegLan RegLan :left-assoc)
  */
 class RegexUnion(val regex: List<Expression<RegLan>>) :
-    HomogenousExpression<RegLan, RegLan>("re.union".symbol(), RegLan) {
+    HomogenousExpression<RegLan, RegLan>("re.union".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
 
   constructor(vararg regex: Expression<RegLan>) : this(regex.toList())
@@ -227,7 +227,7 @@ class RegexUnion(val regex: List<Expression<RegLan>>) :
  * (re.inter RegLan RegLan RegLan :left-assoc)
  */
 class RegexIntersec(val regex: List<Expression<RegLan>>) :
-    HomogenousExpression<RegLan, RegLan>("re.inter".symbol(), RegLan) {
+    HomogenousExpression<RegLan, RegLan>("re.inter".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
 
   constructor(vararg regex: Expression<RegLan>) : this(regex.toList())
@@ -244,7 +244,7 @@ class RegexIntersec(val regex: List<Expression<RegLan>>) :
  * (re.* RegLan RegLan)
  */
 class RegexStar(override val inner: Expression<RegLan>) :
-    UnaryExpression<RegLan, RegLan>("re.*".symbol(), RegLan) {
+    UnaryExpression<RegLan, RegLan>("re.*".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RegLan> =
@@ -261,7 +261,7 @@ class RegexStar(override val inner: Expression<RegLan>) :
  * (str.<= String String Bool :chainable)
  */
 class StrRefLexOrder(val strings: List<Expression<StringSort>>) :
-    HomogenousExpression<BoolSort, StringSort>("str.<=".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, StringSort>("str.<=".toSymbolWithQuotes(), BoolSort) {
   override val theories = STRINGS_MARKER_SET
 
   constructor(vararg strings: Expression<StringSort>) : this(strings.toList())
@@ -279,7 +279,7 @@ class StrRefLexOrder(val strings: List<Expression<StringSort>>) :
  * (str.at String Int String)
  */
 class StrAt(val inner: Expression<StringSort>, val position: Expression<IntSort>) :
-    BinaryExpression<StringSort, StringSort, IntSort>("str.at".symbol(), StringSort) {
+    BinaryExpression<StringSort, StringSort, IntSort>("str.at".toSymbolWithQuotes(), StringSort) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = inner
@@ -299,7 +299,9 @@ class StrSubstring(
     val inner: Expression<StringSort>,
     val start: Expression<IntSort>,
     val length: Expression<IntSort>
-) : TernaryExpression<StringSort, StringSort, IntSort, IntSort>("str.substr".symbol(), StringSort) {
+) :
+    TernaryExpression<StringSort, StringSort, IntSort, IntSort>(
+        "str.substr".toSymbolWithQuotes(), StringSort) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = inner
@@ -318,7 +320,7 @@ class StrSubstring(
  * (str.prefixof String String Bool)
  */
 class StrPrefixOf(val prefix: Expression<StringSort>, val inner: Expression<StringSort>) :
-    BinaryExpression<BoolSort, StringSort, StringSort>("str.prefixof".symbol(), BoolSort) {
+    BinaryExpression<BoolSort, StringSort, StringSort>("str.prefixof".toSymbolWithQuotes(), BoolSort) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = prefix
@@ -335,7 +337,7 @@ class StrPrefixOf(val prefix: Expression<StringSort>, val inner: Expression<Stri
  * (str.suffixof String String Bool)
  */
 class StrSuffixOf(val suffix: Expression<StringSort>, val inner: Expression<StringSort>) :
-    BinaryExpression<BoolSort, StringSort, StringSort>("str.suffixof".symbol(), BoolSort) {
+    BinaryExpression<BoolSort, StringSort, StringSort>("str.suffixof".toSymbolWithQuotes(), BoolSort) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = suffix
@@ -352,7 +354,7 @@ class StrSuffixOf(val suffix: Expression<StringSort>, val inner: Expression<Stri
  * (str.contains String String Bool)
  */
 class StrContains(val string: Expression<StringSort>, val substring: Expression<StringSort>) :
-    BinaryExpression<BoolSort, StringSort, StringSort>("str.contains".symbol(), BoolSort) {
+    BinaryExpression<BoolSort, StringSort, StringSort>("str.contains".toSymbolWithQuotes(), BoolSort) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = string
@@ -372,7 +374,9 @@ class StrIndexOf(
     val string: Expression<StringSort>,
     val substring: Expression<StringSort>,
     val start: Expression<IntSort>
-) : TernaryExpression<IntSort, StringSort, StringSort, IntSort>("str.indexof".symbol(), IntSort) {
+) :
+    TernaryExpression<IntSort, StringSort, StringSort, IntSort>(
+        "str.indexof".toSymbolWithQuotes(), IntSort) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = string
@@ -396,7 +400,7 @@ class StrReplace(
     val new: Expression<StringSort>
 ) :
     TernaryExpression<StringSort, StringSort, StringSort, StringSort>(
-        "str.replace".symbol(), StringSort) {
+        "str.replace".toSymbolWithQuotes(), StringSort) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = inner
@@ -420,7 +424,7 @@ class StrReplaceAll(
     val new: Expression<StringSort>
 ) :
     TernaryExpression<StringSort, StringSort, StringSort, StringSort>(
-        "str.replace_all".symbol(), StringSort) {
+        "str.replace_all".toSymbolWithQuotes(), StringSort) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = inner
@@ -440,7 +444,7 @@ class StrReplaceRegex(
     val new: Expression<StringSort>
 ) :
     TernaryExpression<StringSort, StringSort, RegLan, StringSort>(
-        "str.replace_re".symbol(), StringSort) {
+        "str.replace_re".toSymbolWithQuotes(), StringSort) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = inner
@@ -460,7 +464,7 @@ class StrReplaceAllRegex(
     val new: Expression<StringSort>
 ) :
     TernaryExpression<StringSort, StringSort, RegLan, StringSort>(
-        "str.replace_re_all".symbol(), StringSort) {
+        "str.replace_re_all".toSymbolWithQuotes(), StringSort) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = inner
@@ -479,7 +483,7 @@ class StrReplaceAllRegex(
  * (re.comp RegLan RegLan)
  */
 class RegexComp(override val inner: Expression<RegLan>) :
-    UnaryExpression<RegLan, RegLan>("re.comp".symbol(), RegLan) {
+    UnaryExpression<RegLan, RegLan>("re.comp".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RegLan> =
@@ -492,7 +496,7 @@ class RegexComp(override val inner: Expression<RegLan>) :
  * (re.diff RegLan RegLan RegLan :left-assoc)
  */
 class RegexDiff(val regex: List<Expression<RegLan>>) :
-    HomogenousExpression<RegLan, RegLan>("re.diff".symbol(), RegLan) {
+    HomogenousExpression<RegLan, RegLan>("re.diff".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
 
   constructor(vararg regex: Expression<RegLan>) : this(regex.toList())
@@ -509,7 +513,7 @@ class RegexDiff(val regex: List<Expression<RegLan>>) :
  * (re.+ RegLan RegLan)
  */
 class RegexPlus(override val inner: Expression<RegLan>) :
-    UnaryExpression<RegLan, RegLan>("re.+".symbol(), RegLan) {
+    UnaryExpression<RegLan, RegLan>("re.+".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RegLan> =
@@ -522,7 +526,7 @@ class RegexPlus(override val inner: Expression<RegLan>) :
  * (re.opt RegLan RegLan)
  */
 class RegexOption(override val inner: Expression<RegLan>) :
-    UnaryExpression<RegLan, RegLan>("re.opt".symbol(), RegLan) {
+    UnaryExpression<RegLan, RegLan>("re.opt".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RegLan> =
@@ -537,7 +541,7 @@ class RegexOption(override val inner: Expression<RegLan>) :
 class RegexRange(
     override val lhs: Expression<StringSort>,
     override val rhs: Expression<StringSort>
-) : BinaryExpression<RegLan, StringSort, StringSort>("re.range".symbol(), RegLan) {
+) : BinaryExpression<RegLan, StringSort, StringSort>("re.range".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RegLan> =
@@ -546,7 +550,7 @@ class RegexRange(
 
 /** ((_ re.^ n) RegLan RegLan) */
 class RegexPower(override val inner: Expression<RegLan>, val n: Int) :
-    UnaryExpression<RegLan, RegLan>("re.^".symbol(), RegLan) {
+    UnaryExpression<RegLan, RegLan>("re.^".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
 
   override fun toString(): String = "((_ re.^ $n) $inner)"
@@ -557,7 +561,7 @@ class RegexPower(override val inner: Expression<RegLan>, val n: Int) :
 
 /** ((_ re.loop n₁ n₂) RegLan RegLan) */
 class RegexLoop(override val inner: Expression<RegLan>, val n: Int, val m: Int) :
-    UnaryExpression<RegLan, RegLan>("re.loop".symbol(), RegLan) {
+    UnaryExpression<RegLan, RegLan>("re.loop".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
 
   override fun toString(): String = "((_ re.loop $n $m) $inner)"
@@ -577,7 +581,7 @@ class RegexLoop(override val inner: Expression<RegLan>, val n: Int, val m: Int) 
  * (str.is_digit String Bool)
  */
 class StrIsDigit(override val inner: Expression<StringSort>) :
-    UnaryExpression<BoolSort, StringSort>("str.is_digit".symbol(), BoolSort) {
+    UnaryExpression<BoolSort, StringSort>("str.is_digit".toSymbolWithQuotes(), BoolSort) {
   override val theories = STRINGS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
@@ -586,7 +590,7 @@ class StrIsDigit(override val inner: Expression<StringSort>) :
 
 /** (str.to_code String Int) */
 class StrToCode(override val inner: Expression<StringSort>) :
-    UnaryExpression<IntSort, StringSort>("str.to_code".symbol(), IntSort) {
+    UnaryExpression<IntSort, StringSort>("str.to_code".toSymbolWithQuotes(), IntSort) {
   override val theories = STRINGS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
@@ -595,7 +599,7 @@ class StrToCode(override val inner: Expression<StringSort>) :
 
 /** (str.from_code Int String) */
 class StrFromCode(override val inner: Expression<IntSort>) :
-    UnaryExpression<StringSort, IntSort>("str.from_code".symbol(), StringSort) {
+    UnaryExpression<StringSort, IntSort>("str.from_code".toSymbolWithQuotes(), StringSort) {
   override val theories = STRINGS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<StringSort> =
@@ -608,7 +612,7 @@ class StrFromCode(override val inner: Expression<IntSort>) :
  * (str.to_int String Int)
  */
 class StrToInt(override val inner: Expression<StringSort>) :
-    UnaryExpression<IntSort, StringSort>("str.to_int".symbol(), IntSort) {
+    UnaryExpression<IntSort, StringSort>("str.to_int".toSymbolWithQuotes(), IntSort) {
   override val theories = STRINGS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
@@ -621,7 +625,7 @@ class StrToInt(override val inner: Expression<StringSort>) :
  * (str.from_int Int String)
  */
 class StrFromInt(override val inner: Expression<IntSort>) :
-    UnaryExpression<StringSort, IntSort>("str.from_int".symbol(), StringSort) {
+    UnaryExpression<StringSort, IntSort>("str.from_int".toSymbolWithQuotes(), StringSort) {
   override val theories = STRINGS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<StringSort> =

@@ -31,10 +31,11 @@ import tools.aqua.konstraints.theories.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ContextTests {
-  val boolFunc1 = UserDeclaredSMTFunction0("A".symbol(), BoolSort)
-  val boolFunc2 = UserDeclaredSMTFunction2("B".symbol(), BoolSort, BVSort(8), BVSort(8))
-  val boolFunc2Copy = UserDeclaredSMTFunction2("B".symbol(), BoolSort, BVSort(8), BVSort(8))
-  val boolFunc2Overloaded = UserDeclaredSMTFunction2("B".symbol(), BoolSort, BVSort(16), BVSort(16))
+  val boolFunc1 = UserDeclaredSMTFunction0("A".toSymbolWithQuotes(), BoolSort)
+  val boolFunc2 = UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), BoolSort, BVSort(8), BVSort(8))
+  val boolFunc2Copy = UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), BoolSort, BVSort(8), BVSort(8))
+  val boolFunc2Overloaded =
+      UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), BoolSort, BVSort(16), BVSort(16))
 
   @ParameterizedTest
   @MethodSource("getContextAndNames")
@@ -75,11 +76,11 @@ class ContextTests {
 
   private fun getContextAndIllegalNameFunctions(): Stream<Arguments> =
       Stream.of(
-          arguments(createContext(), UserDeclaredSMTFunction0("and".symbol(), BoolSort)),
-          arguments(createContext(), UserDeclaredSMTFunction0("true".symbol(), BoolSort)),
-          arguments(createContext(), UserDeclaredSMTFunction0("distinct".symbol(), BoolSort)),
-          arguments(createContext(), UserDeclaredSMTFunction0("bvadd".symbol(), BoolSort)),
-          arguments(createContext(), UserDeclaredSMTFunction0("extract".symbol(), BoolSort)))
+          arguments(createContext(), UserDeclaredSMTFunction0("and".toSymbolWithQuotes(), BoolSort)),
+          arguments(createContext(), UserDeclaredSMTFunction0("true".toSymbolWithQuotes(), BoolSort)),
+          arguments(createContext(), UserDeclaredSMTFunction0("distinct".toSymbolWithQuotes(), BoolSort)),
+          arguments(createContext(), UserDeclaredSMTFunction0("bvadd".toSymbolWithQuotes(), BoolSort)),
+          arguments(createContext(), UserDeclaredSMTFunction0("extract".toSymbolWithQuotes(), BoolSort)))
 
   @Test
   fun testPopFailsOnContextWithOnlyOneLevel() {
@@ -102,7 +103,7 @@ class ContextTests {
 
   private fun getContextAndNewFunction() =
       Stream.of(
-          arguments(createContext(), UserDeclaredSMTFunction0("C".symbol(), BoolSort)),
+          arguments(createContext(), UserDeclaredSMTFunction0("C".toSymbolWithQuotes(), BoolSort)),
       )
 
   @ParameterizedTest
@@ -115,7 +116,7 @@ class ContextTests {
 
   private fun getContextAndBindings() =
       Stream.of(
-          arguments(createContext(), listOf(VarBinding("binding".symbol(), True))),
+          arguments(createContext(), listOf(VarBinding("binding".toSymbolWithQuotes(), True))),
       )
 
   @ParameterizedTest
@@ -144,7 +145,7 @@ class ContextTests {
 
   private fun getContextAndShadowingBindings() =
       Stream.of(
-          arguments(createContext(), listOf(VarBinding("A".symbol(), True))),
+          arguments(createContext(), listOf(VarBinding("A".toSymbolWithQuotes(), True))),
       )
 
   @ParameterizedTest
@@ -158,12 +159,16 @@ class ContextTests {
   private fun getContextAndQuotedFunctions() =
       Stream.of(
           arguments(
-              createContext(), UserDeclaredSMTFunction0("|Quoted|".symbol(), BoolSort), "Quoted"),
-          arguments(
-              createContext(), UserDeclaredSMTFunction0("|Quoted|".symbol(), BoolSort), "|Quoted|"),
+              createContext(),
+              UserDeclaredSMTFunction0("|Quoted|".toSymbolWithQuotes(), BoolSort),
+              "Quoted"),
           arguments(
               createContext(),
-              UserDeclaredSMTFunction0("Unquoted".symbol(), BoolSort),
+              UserDeclaredSMTFunction0("|Quoted|".toSymbolWithQuotes(), BoolSort),
+              "|Quoted|"),
+          arguments(
+              createContext(),
+              UserDeclaredSMTFunction0("Unquoted".toSymbolWithQuotes(), BoolSort),
               "|Unquoted|"),
       )
 

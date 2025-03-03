@@ -220,13 +220,14 @@ class Context {
   }
 }
 
-fun Context.contains(func: String) = contains(func.symbol())
+fun Context.contains(func: String) = contains(func.toSymbolWithQuotes())
 
-fun <T : Sort> Context.getFuncOrNull(name: String, sort: T) = getFuncOrNull(name.symbol(), sort)
+fun <T : Sort> Context.getFuncOrNull(name: String, sort: T) =
+    getFuncOrNull(name.toSymbolWithQuotes(), sort)
 
-fun Context.getFuncOrNull(name: String) = getFuncOrNull(name.symbol())
+fun Context.getFuncOrNull(name: String) = getFuncOrNull(name.toSymbolWithQuotes())
 
-fun Context.getFunc(name: String) = getFunc(name.symbol())
+fun Context.getFunc(name: String) = getFunc(name.toSymbolWithQuotes())
 
 fun <T : Sort> Context.let(
     varBindings: List<VarBinding<*>>,
@@ -306,14 +307,14 @@ fun <T : Sort> Context.let(
 ) =
     let(
         varBindings.mapIndexed { idx, expr ->
-          VarBinding("local${expr.sort}${idx}".symbol(), expr)
+          VarBinding("local${expr.sort}${idx}".toSymbolWithQuotes(), expr)
         },
         block)
 
 fun <T : Sort, S : Sort> Context.let(
     term: Expression<T>,
     block: (Expression<T>, Context) -> Expression<S>
-) = let(VarBinding("local${term.sort}".symbol(), term), block)
+) = let(VarBinding("local${term.sort}".toSymbolWithQuotes(), term), block)
 
 fun <T1 : Sort, T2 : Sort, S : Sort> Context.let(
     term1: Expression<T1>,
@@ -321,8 +322,8 @@ fun <T1 : Sort, T2 : Sort, S : Sort> Context.let(
     block: (Expression<T1>, Expression<T2>, Context) -> Expression<S>
 ) =
     let(
-        VarBinding("local${term1.sort}1".symbol(), term1),
-        VarBinding("local${term2.sort}2".symbol(), term2),
+        VarBinding("local${term1.sort}1".toSymbolWithQuotes(), term1),
+        VarBinding("local${term2.sort}2".toSymbolWithQuotes(), term2),
         block)
 
 fun <T1 : Sort, T2 : Sort, T3 : Sort, S : Sort> Context.let(
@@ -332,9 +333,9 @@ fun <T1 : Sort, T2 : Sort, T3 : Sort, S : Sort> Context.let(
     block: (Expression<T1>, Expression<T2>, Expression<T3>, Context) -> Expression<S>
 ) =
     let(
-        VarBinding("local${term1.sort}1".symbol(), term1),
-        VarBinding("local${term2.sort}2".symbol(), term2),
-        VarBinding("local${term3.sort}3".symbol(), term3),
+        VarBinding("local${term1.sort}1".toSymbolWithQuotes(), term1),
+        VarBinding("local${term2.sort}2".toSymbolWithQuotes(), term2),
+        VarBinding("local${term3.sort}3".toSymbolWithQuotes(), term3),
         block)
 
 fun <T1 : Sort, T2 : Sort, T3 : Sort, T4 : Sort, S : Sort> Context.let(
@@ -346,10 +347,10 @@ fun <T1 : Sort, T2 : Sort, T3 : Sort, T4 : Sort, S : Sort> Context.let(
         (Expression<T1>, Expression<T2>, Expression<T3>, Expression<T4>, Context) -> Expression<S>
 ) =
     let(
-        VarBinding("local${term1.sort}1".symbol(), term1),
-        VarBinding("local${term2.sort}2".symbol(), term2),
-        VarBinding("local${term3.sort}3".symbol(), term3),
-        VarBinding("local${term4.sort}4".symbol(), term4),
+        VarBinding("local${term1.sort}1".toSymbolWithQuotes(), term1),
+        VarBinding("local${term2.sort}2".toSymbolWithQuotes(), term2),
+        VarBinding("local${term3.sort}3".toSymbolWithQuotes(), term3),
+        VarBinding("local${term4.sort}4".toSymbolWithQuotes(), term4),
         block)
 
 fun <T1 : Sort, T2 : Sort, T3 : Sort, T4 : Sort, T5 : Sort, S : Sort> Context.let(
@@ -368,11 +369,11 @@ fun <T1 : Sort, T2 : Sort, T3 : Sort, T4 : Sort, T5 : Sort, S : Sort> Context.le
             Context) -> Expression<S>
 ) =
     let(
-        VarBinding("local${term1.sort}1".symbol(), term1),
-        VarBinding("local${term2.sort}2".symbol(), term2),
-        VarBinding("local${term3.sort}3".symbol(), term3),
-        VarBinding("local${term4.sort}4".symbol(), term4),
-        VarBinding("local${term5.sort}5".symbol(), term5),
+        VarBinding("local${term1.sort}1".toSymbolWithQuotes(), term1),
+        VarBinding("local${term2.sort}2".toSymbolWithQuotes(), term2),
+        VarBinding("local${term3.sort}3".toSymbolWithQuotes(), term3),
+        VarBinding("local${term4.sort}4".toSymbolWithQuotes(), term4),
+        VarBinding("local${term5.sort}5".toSymbolWithQuotes(), term5),
         block)
 
 fun Context.exists(
@@ -446,11 +447,13 @@ fun Context.exists(
     block: (List<Expression<*>>, Context) -> Expression<BoolSort>
 ) =
     exists(
-        sortedVars.mapIndexed { idx, sort -> SortedVar("local!${sort}${idx}".symbol(), sort) },
+        sortedVars.mapIndexed { idx, sort ->
+          SortedVar("local!${sort}${idx}".toSymbolWithQuotes(), sort)
+        },
         block)
 
 fun <S : Sort> Context.exists(sort: S, block: (Expression<S>, Context) -> Expression<BoolSort>) =
-    exists(SortedVar("local!${sort}".symbol(), sort), block)
+    exists(SortedVar("local!${sort}".toSymbolWithQuotes(), sort), block)
 
 fun <S1 : Sort, S2 : Sort> Context.exists(
     sort1: S1,
@@ -458,8 +461,8 @@ fun <S1 : Sort, S2 : Sort> Context.exists(
     block: (Expression<S1>, Expression<S2>, Context) -> Expression<BoolSort>
 ) =
     exists(
-        SortedVar("local!${sort1}1".symbol(), sort1),
-        SortedVar("local!${sort2}2".symbol(), sort2),
+        SortedVar("local!${sort1}1".toSymbolWithQuotes(), sort1),
+        SortedVar("local!${sort2}2".toSymbolWithQuotes(), sort2),
         block)
 
 fun <S1 : Sort, S2 : Sort, S3 : Sort> Context.exists(
@@ -469,9 +472,9 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort> Context.exists(
     block: (Expression<S1>, Expression<S2>, Expression<S3>, Context) -> Expression<BoolSort>
 ) =
     exists(
-        SortedVar("local!${sort1}1".symbol(), sort1),
-        SortedVar("local!${sort2}2".symbol(), sort2),
-        SortedVar("local!${sort3}3".symbol(), sort3),
+        SortedVar("local!${sort1}1".toSymbolWithQuotes(), sort1),
+        SortedVar("local!${sort2}2".toSymbolWithQuotes(), sort2),
+        SortedVar("local!${sort3}3".toSymbolWithQuotes(), sort3),
         block)
 
 fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> Context.exists(
@@ -484,10 +487,10 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> Context.exists(
                 BoolSort>
 ) =
     exists(
-        SortedVar("local!${sort1}1".symbol(), sort1),
-        SortedVar("local!${sort2}2".symbol(), sort2),
-        SortedVar("local!${sort3}3".symbol(), sort3),
-        SortedVar("local!${sort4}4".symbol(), sort4),
+        SortedVar("local!${sort1}1".toSymbolWithQuotes(), sort1),
+        SortedVar("local!${sort2}2".toSymbolWithQuotes(), sort2),
+        SortedVar("local!${sort3}3".toSymbolWithQuotes(), sort3),
+        SortedVar("local!${sort4}4".toSymbolWithQuotes(), sort4),
         block)
 
 fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Context.exists(
@@ -506,11 +509,11 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Context.exists(
             Context) -> Expression<BoolSort>
 ) =
     exists(
-        SortedVar("local!${sort1}1".symbol(), sort1),
-        SortedVar("local!${sort2}2".symbol(), sort2),
-        SortedVar("local!${sort3}3".symbol(), sort3),
-        SortedVar("local!${sort4}4".symbol(), sort4),
-        SortedVar("local!${sort5}5".symbol(), sort5),
+        SortedVar("local!${sort1}1".toSymbolWithQuotes(), sort1),
+        SortedVar("local!${sort2}2".toSymbolWithQuotes(), sort2),
+        SortedVar("local!${sort3}3".toSymbolWithQuotes(), sort3),
+        SortedVar("local!${sort4}4".toSymbolWithQuotes(), sort4),
+        SortedVar("local!${sort5}5".toSymbolWithQuotes(), sort5),
         block)
 
 fun Context.forall(
@@ -584,11 +587,13 @@ fun Context.forall(
     block: (List<Expression<*>>, Context) -> Expression<BoolSort>
 ) =
     forall(
-        sortedVars.mapIndexed { idx, sort -> SortedVar("local!${sort}${idx}".symbol(), sort) },
+        sortedVars.mapIndexed { idx, sort ->
+          SortedVar("local!${sort}${idx}".toSymbolWithQuotes(), sort)
+        },
         block)
 
 fun <S : Sort> Context.forall(sort: S, block: (Expression<S>, Context) -> Expression<BoolSort>) =
-    forall(SortedVar("local!${sort}".symbol(), sort), block)
+    forall(SortedVar("local!${sort}".toSymbolWithQuotes(), sort), block)
 
 fun <S1 : Sort, S2 : Sort> Context.forall(
     sort1: S1,
@@ -596,8 +601,8 @@ fun <S1 : Sort, S2 : Sort> Context.forall(
     block: (Expression<S1>, Expression<S2>, Context) -> Expression<BoolSort>
 ) =
     forall(
-        SortedVar("local!${sort1}1".symbol(), sort1),
-        SortedVar("local!${sort2}2".symbol(), sort2),
+        SortedVar("local!${sort1}1".toSymbolWithQuotes(), sort1),
+        SortedVar("local!${sort2}2".toSymbolWithQuotes(), sort2),
         block)
 
 fun <S1 : Sort, S2 : Sort, S3 : Sort> Context.forall(
@@ -607,9 +612,9 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort> Context.forall(
     block: (Expression<S1>, Expression<S2>, Expression<S3>, Context) -> Expression<BoolSort>
 ) =
     forall(
-        SortedVar("local!${sort1}1".symbol(), sort1),
-        SortedVar("local!${sort2}2".symbol(), sort2),
-        SortedVar("local!${sort3}3".symbol(), sort3),
+        SortedVar("local!${sort1}1".toSymbolWithQuotes(), sort1),
+        SortedVar("local!${sort2}2".toSymbolWithQuotes(), sort2),
+        SortedVar("local!${sort3}3".toSymbolWithQuotes(), sort3),
         block)
 
 fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> Context.forall(
@@ -622,10 +627,10 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> Context.forall(
                 BoolSort>
 ) =
     forall(
-        SortedVar("local!${sort1}1".symbol(), sort1),
-        SortedVar("local!${sort2}2".symbol(), sort2),
-        SortedVar("local!${sort3}3".symbol(), sort3),
-        SortedVar("local!${sort4}4".symbol(), sort4),
+        SortedVar("local!${sort1}1".toSymbolWithQuotes(), sort1),
+        SortedVar("local!${sort2}2".toSymbolWithQuotes(), sort2),
+        SortedVar("local!${sort3}3".toSymbolWithQuotes(), sort3),
+        SortedVar("local!${sort4}4".toSymbolWithQuotes(), sort4),
         block)
 
 fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Context.forall(
@@ -644,11 +649,11 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Context.forall(
             Context) -> Expression<BoolSort>
 ) =
     forall(
-        SortedVar("local!${sort1}1".symbol(), sort1),
-        SortedVar("local!${sort2}2".symbol(), sort2),
-        SortedVar("local!${sort3}3".symbol(), sort3),
-        SortedVar("local!${sort4}4".symbol(), sort4),
-        SortedVar("local!${sort5}5".symbol(), sort5),
+        SortedVar("local!${sort1}1".toSymbolWithQuotes(), sort1),
+        SortedVar("local!${sort2}2".toSymbolWithQuotes(), sort2),
+        SortedVar("local!${sort3}3".toSymbolWithQuotes(), sort3),
+        SortedVar("local!${sort4}4".toSymbolWithQuotes(), sort4),
+        SortedVar("local!${sort5}5".toSymbolWithQuotes(), sort5),
         block)
 
 interface AssertionLevel<out FuncType : ContextFunction<*>, out SortType : ContextSort> {

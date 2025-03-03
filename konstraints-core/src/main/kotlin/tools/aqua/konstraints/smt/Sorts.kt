@@ -38,7 +38,7 @@ abstract class Sort(
       name: String,
       indices: List<Index> = emptyList(),
       parameters: List<Sort> = emptyList()
-  ) : this(Symbol(name), indices, parameters)
+  ) : this(name.toSymbolWithQuotes(), indices, parameters)
 
   override val name: String = symbol.toString()
   override val arity = parameters.size
@@ -72,7 +72,7 @@ abstract class Sort(
         symbol.toString()
       }
 
-  fun toSMTString() = symbol.toSMTString()
+  fun toSMTString() = symbol.toSMTString(QuotingRule.SAME_AS_INPUT)
 }
 
 class SortParameter(name: String) : Sort(name, emptyList(), emptyList()) {

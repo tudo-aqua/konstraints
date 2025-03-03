@@ -43,15 +43,15 @@ import tools.aqua.konstraints.theories.*
 @TestMethodOrder(MethodOrderer.OrderAnnotation::class)
 class ParseContextTests {
   private val context = ParseContext(QF_BV)
-  private val boolExpression = UserDeclaredSMTFunction0("A".symbol(), BoolSort)()
-  private val bv32Expression = UserDeclaredSMTFunction0("B".symbol(), BVSort(32))()
-  private val bv16Expression = UserDeclaredSMTFunction0("B".symbol(), BVSort(16))()
+  private val boolExpression = UserDeclaredSMTFunction0("A".toSymbolWithQuotes(), BoolSort)()
+  private val bv32Expression = UserDeclaredSMTFunction0("B".toSymbolWithQuotes(), BVSort(32))()
+  private val bv16Expression = UserDeclaredSMTFunction0("B".toSymbolWithQuotes(), BVSort(16))()
 
   // this function has no indices as it is not infinitary, BVSort(32) here means actually only
   // bitvectors of length 32
   private val overloadedBV =
       FunctionDecl(
-          "O".symbol(),
+          "O".toSymbolWithQuotes(),
           emptySet(),
           listOf(BVSort(32), BVSort(32)),
           emptySet(),
@@ -87,7 +87,7 @@ class ParseContextTests {
   ) {
     val function = context.getFunction(name, args)
 
-    assertEquals(name.symbol(), function?.symbol)
+    assertEquals(name.toSymbolWithQuotes(), function?.symbol)
   }
 
   @ParameterizedTest
@@ -173,7 +173,7 @@ class ParseContextTests {
         /* No conflict */
         arguments(
             FunctionDecl(
-                "foo".symbol(),
+                "foo".toSymbolWithQuotes(),
                 emptySet(),
                 listOf(BoolSort, BoolSort),
                 emptySet(),
@@ -185,8 +185,8 @@ class ParseContextTests {
 
   @Test
   fun testLetShadowingOfLet() {
-    context.let(listOf(VarBinding("A".symbol(), And(True, True)))) {
-      context.let(listOf(VarBinding("A".symbol(), Or(True, True)))) {
+    context.let(listOf(VarBinding("A".toSymbolWithQuotes(), And(True, True)))) {
+      context.let(listOf(VarBinding("A".toSymbolWithQuotes(), Or(True, True)))) {
         assert(
             (context.getFunction("A", emptyList()) as VarBindingDecl)
                 .binding
@@ -211,7 +211,7 @@ class ParseContextTests {
         /* Illegal */
         arguments(
             FunctionDecl(
-                "and".symbol(),
+                "and".toSymbolWithQuotes(),
                 emptySet(),
                 listOf(BoolSort, BoolSort, BoolSort),
                 emptySet(),
@@ -222,7 +222,7 @@ class ParseContextTests {
         /* Illegal */
         arguments(
             FunctionDecl(
-                "bvult".symbol(),
+                "bvult".toSymbolWithQuotes(),
                 emptySet(),
                 listOf(BVSort(16), BVSort(16)),
                 emptySet(),
@@ -233,7 +233,7 @@ class ParseContextTests {
         /* New overloaded */
         arguments(
             FunctionDecl(
-                "and".symbol(),
+                "and".toSymbolWithQuotes(),
                 emptySet(),
                 listOf(BVSort(16), BVSort(16)),
                 emptySet(),
@@ -244,7 +244,7 @@ class ParseContextTests {
         /* New ambiguous */
         arguments(
             FunctionDecl(
-                "and".symbol(),
+                "and".toSymbolWithQuotes(),
                 emptySet(),
                 listOf(BoolSort, BoolSort, BoolSort),
                 emptySet(),
@@ -255,7 +255,7 @@ class ParseContextTests {
         /* New ambiguous */
         arguments(
             FunctionDecl(
-                "bvult".symbol(),
+                "bvult".toSymbolWithQuotes(),
                 emptySet(),
                 listOf(BVSort(16), BVSort(16)),
                 emptySet(),
@@ -266,7 +266,7 @@ class ParseContextTests {
         /* ??? */
         arguments(
             FunctionDecl(
-                "bvult".symbol(),
+                "bvult".toSymbolWithQuotes(),
                 emptySet(),
                 listOf(BVSort(16), BVSort(32)),
                 emptySet(),
@@ -279,8 +279,8 @@ class ParseContextTests {
   @Test
   fun testPushPopFails() {
     val context = ParseContext(QF_UF)
-    val funA = DeclareFun("A".symbol(), emptyList(), BoolSort)
-    val funB = DeclareFun("B".symbol(), emptyList(), BoolSort)
+    val funA = DeclareFun("A".toSymbolWithQuotes(), emptyList(), BoolSort)
+    val funB = DeclareFun("B".toSymbolWithQuotes(), emptyList(), BoolSort)
 
     context.registerFunction(funA)
     context.push(1)
@@ -299,8 +299,8 @@ class ParseContextTests {
   fun testTransform() {
     val expr =
         Or(
-            UserDeclaredSMTFunction0("A".symbol(), BoolSort)(),
-            UserDeclaredSMTFunction0("B".symbol(), BoolSort)())
+            UserDeclaredSMTFunction0("A".toSymbolWithQuotes(), BoolSort)(),
+            UserDeclaredSMTFunction0("B".toSymbolWithQuotes(), BoolSort)())
     val transformed =
         expr.transform { expression ->
           if (expression is Or) {

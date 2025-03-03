@@ -118,65 +118,65 @@ object FP128 : FPBase(15.idx(), 113.idx())
  */
 
 object RoundNearestTiesToEven :
-    ConstantExpression<RoundingMode>("roundNearestTiesToEven".symbol(), RoundingMode) {
+    ConstantExpression<RoundingMode>("roundNearestTiesToEven".toSymbolWithQuotes(), RoundingMode) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
-object RNE : ConstantExpression<RoundingMode>("RNE".symbol(), RoundingMode) {
+object RNE : ConstantExpression<RoundingMode>("RNE".toSymbolWithQuotes(), RoundingMode) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
 object RoundNearestTiesToAway :
-    ConstantExpression<RoundingMode>("roundNearestTiesToAway".symbol(), RoundingMode) {
+    ConstantExpression<RoundingMode>("roundNearestTiesToAway".toSymbolWithQuotes(), RoundingMode) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
-object RNA : ConstantExpression<RoundingMode>("RNA".symbol(), RoundingMode) {
+object RNA : ConstantExpression<RoundingMode>("RNA".toSymbolWithQuotes(), RoundingMode) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
 object RoundTowardPositive :
-    ConstantExpression<RoundingMode>("roundTowardPositive".symbol(), RoundingMode) {
+    ConstantExpression<RoundingMode>("roundTowardPositive".toSymbolWithQuotes(), RoundingMode) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
-object RTP : ConstantExpression<RoundingMode>("RTP".symbol(), RoundingMode) {
+object RTP : ConstantExpression<RoundingMode>("RTP".toSymbolWithQuotes(), RoundingMode) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
 object RoundTowardNegative :
-    ConstantExpression<RoundingMode>("roundTowardNegative".symbol(), RoundingMode) {
+    ConstantExpression<RoundingMode>("roundTowardNegative".toSymbolWithQuotes(), RoundingMode) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
-object RTN : ConstantExpression<RoundingMode>("RTN".symbol(), RoundingMode) {
+object RTN : ConstantExpression<RoundingMode>("RTN".toSymbolWithQuotes(), RoundingMode) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
 object RoundTowardZero :
-    ConstantExpression<RoundingMode>("roundTowardZero".symbol(), RoundingMode) {
+    ConstantExpression<RoundingMode>("roundTowardZero".toSymbolWithQuotes(), RoundingMode) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
 }
 
-object RTZ : ConstantExpression<RoundingMode>("RTZ".symbol(), RoundingMode) {
+object RTZ : ConstantExpression<RoundingMode>("RTZ".toSymbolWithQuotes(), RoundingMode) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RoundingMode> = this
@@ -242,7 +242,7 @@ data class FPLiteral(
  * ((_ +oo [eb] [sb]) (_ FloatingPoint [eb] [sb]))
  */
 class FPInfinity(val eb: Int, val sb: Int) :
-    ConstantExpression<FPSort>("+oo".symbol(), FPSort(eb, sb)) {
+    ConstantExpression<FPSort>("+oo".toSymbolWithQuotes(), FPSort(eb, sb)) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun toString(): String = "(_ +oo $eb $sb)"
@@ -256,7 +256,7 @@ class FPInfinity(val eb: Int, val sb: Int) :
  * ((_ -oo [eb] [sb]) (_ FloatingPoint [eb] [sb]))
  */
 class FPMinusInfinity(val eb: Int, val sb: Int) :
-    ConstantExpression<FPSort>("-oo".symbol(), FPSort(eb, sb)) {
+    ConstantExpression<FPSort>("-oo".toSymbolWithQuotes(), FPSort(eb, sb)) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun toString(): String = "(_ -oo $eb $sb)"
@@ -270,7 +270,7 @@ class FPMinusInfinity(val eb: Int, val sb: Int) :
  * ((_ +zero [eb] [sb]) (_ FloatingPoint [eb] [sb]))
  */
 class FPZero(val eb: Int, val sb: Int) :
-    ConstantExpression<FPSort>("+zero".symbol(), FPSort(eb, sb)) {
+    ConstantExpression<FPSort>("+zero".toSymbolWithQuotes(), FPSort(eb, sb)) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun toString(): String = "(_ +zero $eb $sb)"
@@ -284,7 +284,7 @@ class FPZero(val eb: Int, val sb: Int) :
  * ((_ -zero [eb] [sb]) (_ FloatingPoint [eb] [sb]))
  */
 class FPMinusZero(val eb: Int, val sb: Int) :
-    ConstantExpression<FPSort>("-zero".symbol(), FPSort(eb, sb)) {
+    ConstantExpression<FPSort>("-zero".toSymbolWithQuotes(), FPSort(eb, sb)) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun toString(): String = "(_ -zero $eb $sb)"
@@ -297,7 +297,8 @@ class FPMinusZero(val eb: Int, val sb: Int) :
  *
  * ((_ NaN [eb] [sb]) (_ FloatingPoint [eb] [sb]))
  */
-class FPNaN(val eb: Int, val sb: Int) : ConstantExpression<FPSort>("NaN".symbol(), FPSort(eb, sb)) {
+class FPNaN(val eb: Int, val sb: Int) :
+    ConstantExpression<FPSort>("NaN".toSymbolWithQuotes(), FPSort(eb, sb)) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun toString(): String = "(_ NaN $eb $sb)"
@@ -315,7 +316,7 @@ class FPNaN(val eb: Int, val sb: Int) : ConstantExpression<FPSort>("NaN".symbol(
  * (fp.abs (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
  */
 class FPAbs(override val inner: Expression<FPSort>) :
-    UnaryExpression<FPSort, FPSort>("fp.abs".symbol(), inner.sort) {
+    UnaryExpression<FPSort, FPSort>("fp.abs".toSymbolWithQuotes(), inner.sort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
@@ -328,7 +329,7 @@ class FPAbs(override val inner: Expression<FPSort>) :
  * (fp.neg (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
  */
 class FPNeg(override val inner: Expression<FPSort>) :
-    UnaryExpression<FPSort, FPSort>("fp.neg".symbol(), inner.sort) {
+    UnaryExpression<FPSort, FPSort>("fp.neg".toSymbolWithQuotes(), inner.sort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
@@ -346,7 +347,9 @@ class FPAdd(
     val roundingMode: Expression<RoundingMode>,
     val leftTerm: Expression<FPSort>,
     val rightTerm: Expression<FPSort>
-) : TernaryExpression<FPSort, RoundingMode, FPSort, FPSort>("fp.add".symbol(), leftTerm.sort) {
+) :
+    TernaryExpression<FPSort, RoundingMode, FPSort, FPSort>(
+        "fp.add".toSymbolWithQuotes(), leftTerm.sort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override val lhs: Expression<RoundingMode> = roundingMode
@@ -375,7 +378,7 @@ class FPSub(
     val roundingMode: Expression<RoundingMode>,
     val minuend: Expression<FPSort>,
     val subtrahend: Expression<FPSort>
-) : TernaryExpression<FPSort, RoundingMode, FPSort, FPSort>("fp.sub".symbol(), minuend.sort) {
+) : TernaryExpression<FPSort, RoundingMode, FPSort, FPSort>("fp.sub".toSymbolWithQuotes(), minuend.sort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override val lhs: Expression<RoundingMode> = roundingMode
@@ -404,7 +407,9 @@ class FPMul(
     val roundingMode: Expression<RoundingMode>,
     val multiplier: Expression<FPSort>,
     val multiplicand: Expression<FPSort>
-) : TernaryExpression<FPSort, RoundingMode, FPSort, FPSort>("fp.mul".symbol(), multiplier.sort) {
+) :
+    TernaryExpression<FPSort, RoundingMode, FPSort, FPSort>(
+        "fp.mul".toSymbolWithQuotes(), multiplier.sort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override val lhs: Expression<RoundingMode> = roundingMode
@@ -433,7 +438,9 @@ class FPDiv(
     val roundingMode: Expression<RoundingMode>,
     val dividend: Expression<FPSort>,
     val divisor: Expression<FPSort>
-) : TernaryExpression<FPSort, RoundingMode, FPSort, FPSort>("fp.div".symbol(), dividend.sort) {
+) :
+    TernaryExpression<FPSort, RoundingMode, FPSort, FPSort>(
+        "fp.div".toSymbolWithQuotes(), dividend.sort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override val lhs: Expression<RoundingMode> = roundingMode
@@ -465,7 +472,7 @@ class FPFma(
     val multiplier: Expression<FPSort>,
     val multiplicand: Expression<FPSort>,
     val summand: Expression<FPSort>
-) : NAryExpression<FPSort>("fp.fma".symbol(), multiplier.sort) {
+) : NAryExpression<FPSort>("fp.fma".toSymbolWithQuotes(), multiplier.sort) {
   override val func = null
 
   override val theories = FLOATING_POINT_MARKER_SET
@@ -488,7 +495,7 @@ class FPFma(
  * (fp.sqrt RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
  */
 class FPSqrt(val roundingMode: Expression<RoundingMode>, val inner: Expression<FPSort>) :
-    BinaryExpression<FPSort, RoundingMode, FPSort>("fp.sqrt".symbol(), inner.sort) {
+    BinaryExpression<FPSort, RoundingMode, FPSort>("fp.sqrt".toSymbolWithQuotes(), inner.sort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override val lhs: Expression<RoundingMode> = roundingMode
@@ -508,7 +515,7 @@ class FPSqrt(val roundingMode: Expression<RoundingMode>, val inner: Expression<F
  * (fp.rem (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
  */
 class FPRem(val dividend: Expression<FPSort>, val divisor: Expression<FPSort>) :
-    BinaryExpression<FPSort, FPSort, FPSort>("fp.rem".symbol(), dividend.sort) {
+    BinaryExpression<FPSort, FPSort, FPSort>("fp.rem".toSymbolWithQuotes(), dividend.sort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override val lhs: Expression<FPSort> = dividend
@@ -531,7 +538,8 @@ class FPRem(val dividend: Expression<FPSort>, val divisor: Expression<FPSort>) :
  * (fp.roundToIntegral RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
  */
 class FPRoundToIntegral(val roundingMode: Expression<RoundingMode>, val inner: Expression<FPSort>) :
-    BinaryExpression<FPSort, RoundingMode, FPSort>("fp.roundToIntegral".symbol(), inner.sort) {
+    BinaryExpression<FPSort, RoundingMode, FPSort>(
+        "fp.roundToIntegral".toSymbolWithQuotes(), inner.sort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override val lhs: Expression<RoundingMode> = roundingMode
@@ -550,7 +558,7 @@ class FPRoundToIntegral(val roundingMode: Expression<RoundingMode>, val inner: E
  * (fp.min (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
  */
 class FPMin(override val lhs: Expression<FPSort>, override val rhs: Expression<FPSort>) :
-    BinaryExpression<FPSort, FPSort, FPSort>("fp.min".symbol(), lhs.sort) {
+    BinaryExpression<FPSort, FPSort, FPSort>("fp.min".toSymbolWithQuotes(), lhs.sort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   init {
@@ -569,7 +577,7 @@ class FPMin(override val lhs: Expression<FPSort>, override val rhs: Expression<F
  * (fp.max (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
  */
 class FPMax(override val lhs: Expression<FPSort>, override val rhs: Expression<FPSort>) :
-    BinaryExpression<FPSort, FPSort, FPSort>("fp.max".symbol(), lhs.sort) {
+    BinaryExpression<FPSort, FPSort, FPSort>("fp.max".toSymbolWithQuotes(), lhs.sort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   init {
@@ -589,7 +597,7 @@ class FPMax(override val lhs: Expression<FPSort>, override val rhs: Expression<F
  * (fp.leq (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)
  */
 class FPLeq(val terms: List<Expression<FPSort>>) :
-    HomogenousExpression<BoolSort, FPSort>("fp.leq".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, FPSort>("fp.leq".toSymbolWithQuotes(), BoolSort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
@@ -616,7 +624,7 @@ class FPLeq(val terms: List<Expression<FPSort>>) :
  * (fp.lt (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)
  */
 class FPLt(val terms: List<Expression<FPSort>>) :
-    HomogenousExpression<BoolSort, FPSort>("fp.lt".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, FPSort>("fp.lt".toSymbolWithQuotes(), BoolSort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
@@ -643,7 +651,7 @@ class FPLt(val terms: List<Expression<FPSort>>) :
  * (fp.geq (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)
  */
 class FPGeq(val terms: List<Expression<FPSort>>) :
-    HomogenousExpression<BoolSort, FPSort>("fp.geq".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, FPSort>("fp.geq".toSymbolWithQuotes(), BoolSort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
@@ -670,7 +678,7 @@ class FPGeq(val terms: List<Expression<FPSort>>) :
  * (fp.gt (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)
  */
 class FPGt(val terms: List<Expression<FPSort>>) :
-    HomogenousExpression<BoolSort, FPSort>("fp.gt".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, FPSort>("fp.gt".toSymbolWithQuotes(), BoolSort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
@@ -697,7 +705,7 @@ class FPGt(val terms: List<Expression<FPSort>>) :
  * (fp.eq (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)
  */
 class FPEq(val terms: List<Expression<FPSort>>) :
-    HomogenousExpression<BoolSort, FPSort>("fp.eq".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, FPSort>("fp.eq".toSymbolWithQuotes(), BoolSort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   constructor(vararg terms: Expression<FPSort>) : this(terms.toList())
@@ -715,7 +723,7 @@ class FPEq(val terms: List<Expression<FPSort>>) :
 
 /** (fp.isNormal (_ FloatingPoint eb sb) Bool) */
 class FPIsNormal(override val inner: Expression<FPSort>) :
-    UnaryExpression<BoolSort, FPSort>("fp.isNormal".symbol(), BoolSort) {
+    UnaryExpression<BoolSort, FPSort>("fp.isNormal".toSymbolWithQuotes(), BoolSort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
@@ -724,7 +732,7 @@ class FPIsNormal(override val inner: Expression<FPSort>) :
 
 /** (fp.isSubnormal (_ FloatingPoint eb sb) Bool) */
 class FPIsSubnormal(override val inner: Expression<FPSort>) :
-    UnaryExpression<BoolSort, FPSort>("fp.isSubnormal".symbol(), BoolSort) {
+    UnaryExpression<BoolSort, FPSort>("fp.isSubnormal".toSymbolWithQuotes(), BoolSort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
@@ -733,7 +741,7 @@ class FPIsSubnormal(override val inner: Expression<FPSort>) :
 
 /** (fp.isZero (_ FloatingPoint eb sb) Bool) */
 class FPIsZero(override val inner: Expression<FPSort>) :
-    UnaryExpression<BoolSort, FPSort>("fp.isZero".symbol(), BoolSort) {
+    UnaryExpression<BoolSort, FPSort>("fp.isZero".toSymbolWithQuotes(), BoolSort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
@@ -742,7 +750,7 @@ class FPIsZero(override val inner: Expression<FPSort>) :
 
 /** (fp.isInfinite (_ FloatingPoint eb sb) Bool) */
 class FPIsInfinite(override val inner: Expression<FPSort>) :
-    UnaryExpression<BoolSort, FPSort>("fp.isInfinite".symbol(), BoolSort) {
+    UnaryExpression<BoolSort, FPSort>("fp.isInfinite".toSymbolWithQuotes(), BoolSort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
@@ -751,7 +759,7 @@ class FPIsInfinite(override val inner: Expression<FPSort>) :
 
 /** (fp.isNaN (_ FloatingPoint eb sb) Bool) */
 class FPIsNaN(override val inner: Expression<FPSort>) :
-    UnaryExpression<BoolSort, FPSort>("fp.isNaN".symbol(), BoolSort) {
+    UnaryExpression<BoolSort, FPSort>("fp.isNaN".toSymbolWithQuotes(), BoolSort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
@@ -760,7 +768,7 @@ class FPIsNaN(override val inner: Expression<FPSort>) :
 
 /** (fp.isNegative (_ FloatingPoint eb sb) Bool) */
 class FPIsNegative(override val inner: Expression<FPSort>) :
-    UnaryExpression<BoolSort, FPSort>("fp.isNegative".symbol(), BoolSort) {
+    UnaryExpression<BoolSort, FPSort>("fp.isNegative".toSymbolWithQuotes(), BoolSort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
@@ -769,7 +777,7 @@ class FPIsNegative(override val inner: Expression<FPSort>) :
 
 /** (fp.isPositive (_ FloatingPoint eb sb) Bool) */
 class FPIsPositive(override val inner: Expression<FPSort>) :
-    UnaryExpression<BoolSort, FPSort>("fp.isPositive".symbol(), BoolSort) {
+    UnaryExpression<BoolSort, FPSort>("fp.isPositive".toSymbolWithQuotes(), BoolSort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
@@ -788,7 +796,7 @@ class FPIsPositive(override val inner: Expression<FPSort>) :
  * ((_ to_fp eb sb) (_ BitVec m) (_ FloatingPoint eb sb)), with m = eb + sb
  */
 class BitVecToFP(override val inner: Expression<BVSort>, sort: FPSort) :
-    UnaryExpression<FPSort, BVSort>("to_fp".symbol(), sort) {
+    UnaryExpression<FPSort, BVSort>("to_fp".toSymbolWithQuotes(), sort) {
   constructor(inner: Expression<BVSort>, eb: Int, sb: Int) : this(inner, FPSort(eb, sb))
 
   override val theories = FLOATING_POINT_MARKER_SET
@@ -811,7 +819,7 @@ class FPToFP(
     val roundingMode: Expression<RoundingMode>,
     val inner: Expression<FPSort>,
     sort: FPSort
-) : BinaryExpression<FPSort, RoundingMode, FPSort>("to_fp".symbol(), sort) {
+) : BinaryExpression<FPSort, RoundingMode, FPSort>("to_fp".toSymbolWithQuotes(), sort) {
   constructor(
       roundingMode: Expression<RoundingMode>,
       inner: Expression<FPSort>,
@@ -841,7 +849,7 @@ class RealToFP(
     val roundingMode: Expression<RoundingMode>,
     val inner: Expression<RealSort>,
     sort: FPSort
-) : BinaryExpression<FPSort, RoundingMode, RealSort>("to_fp".symbol(), sort) {
+) : BinaryExpression<FPSort, RoundingMode, RealSort>("to_fp".toSymbolWithQuotes(), sort) {
   constructor(
       roundingMode: Expression<RoundingMode>,
       inner: Expression<RealSort>,
@@ -872,7 +880,7 @@ class SBitVecToFP(
     val roundingMode: Expression<RoundingMode>,
     val inner: Expression<BVSort>,
     sort: FPSort
-) : BinaryExpression<FPSort, RoundingMode, BVSort>("to_fp".symbol(), sort) {
+) : BinaryExpression<FPSort, RoundingMode, BVSort>("to_fp".toSymbolWithQuotes(), sort) {
   constructor(
       roundingMode: Expression<RoundingMode>,
       inner: Expression<BVSort>,
@@ -903,7 +911,7 @@ class UBitVecToFP(
     val roundingMode: Expression<RoundingMode>,
     val inner: Expression<BVSort>,
     sort: FPSort
-) : BinaryExpression<FPSort, RoundingMode, BVSort>("to_fp_unsigned".symbol(), sort) {
+) : BinaryExpression<FPSort, RoundingMode, BVSort>("to_fp_unsigned".toSymbolWithQuotes(), sort) {
   constructor(
       roundingMode: Expression<RoundingMode>,
       inner: Expression<BVSort>,
@@ -938,7 +946,7 @@ class FPToUBitVec(
     val roundingMode: Expression<RoundingMode>,
     val inner: Expression<FPSort>,
     val m: Int
-) : BinaryExpression<BVSort, RoundingMode, FPSort>("fp.to_ubv".symbol(), BVSort(m)) {
+) : BinaryExpression<BVSort, RoundingMode, FPSort>("fp.to_ubv".toSymbolWithQuotes(), BVSort(m)) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override val lhs: Expression<RoundingMode> = roundingMode
@@ -961,7 +969,7 @@ class FPToSBitVec(
     val roundingMode: Expression<RoundingMode>,
     val inner: Expression<FPSort>,
     val m: Int
-) : BinaryExpression<BVSort, RoundingMode, FPSort>("fp.to_sbv".symbol(), BVSort(m)) {
+) : BinaryExpression<BVSort, RoundingMode, FPSort>("fp.to_sbv".toSymbolWithQuotes(), BVSort(m)) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override val lhs: Expression<RoundingMode> = roundingMode
@@ -980,7 +988,7 @@ class FPToSBitVec(
  * (fp.to_real (_ FloatingPoint eb sb) Real)
  */
 class FPToReal(override val inner: Expression<FPSort>) :
-    UnaryExpression<RealSort, FPSort>("fp.to_real".symbol(), RealSort) {
+    UnaryExpression<RealSort, FPSort>("fp.to_real".toSymbolWithQuotes(), RealSort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =

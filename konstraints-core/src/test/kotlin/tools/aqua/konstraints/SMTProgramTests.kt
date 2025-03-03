@@ -37,17 +37,17 @@ import tools.aqua.konstraints.theories.bitvec
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SMTProgramTests {
   // test basic expressions
-  val coreFunA = UserDeclaredSMTFunction0<BoolSort>("A".symbol(), BoolSort)()
-  val coreFunB = UserDeclaredSMTFunction0<BoolSort>("B".symbol(), BoolSort)()
+  val coreFunA = UserDeclaredSMTFunction0<BoolSort>("A".toSymbolWithQuotes(), BoolSort)()
+  val coreFunB = UserDeclaredSMTFunction0<BoolSort>("B".toSymbolWithQuotes(), BoolSort)()
   val coreExpressionA = (not { coreFunB and coreFunA }) eq (not(coreFunA) and not(coreFunB))
 
-  val bvFunA = UserDeclaredSMTFunction0<BVSort>("A".symbol(), BVSort(8))()
-  val bvFunB = UserDeclaredSMTFunction0<BVSort>("B".symbol(), BVSort(8))()
+  val bvFunA = UserDeclaredSMTFunction0<BVSort>("A".toSymbolWithQuotes(), BVSort(8))()
+  val bvFunB = UserDeclaredSMTFunction0<BVSort>("B".toSymbolWithQuotes(), BVSort(8))()
   val bvExpressionA = (bvFunA bvadd bvFunB) eq bvneg((bvneg(bvFunA) bvadd bvneg(bvFunB)))
   val bvExpressionB = ite { coreFunA } then { bvFunA } otherwise { bvFunB } eq bvFunA
 
-  val fpFunA = UserDeclaredSMTFunction0<FPSort>("A".symbol(), FPSort(3, 5))()
-  val fpFunB = UserDeclaredSMTFunction0<FPSort>("B".symbol(), FPSort(3, 5))()
+  val fpFunA = UserDeclaredSMTFunction0<FPSort>("A".toSymbolWithQuotes(), FPSort(3, 5))()
+  val fpFunB = UserDeclaredSMTFunction0<FPSort>("B".toSymbolWithQuotes(), FPSort(3, 5))()
   val fpExpressionA = (fpFunA fpadd fpFunB) eq (fpFunB fpadd fpFunA)
 
   val bvfpExpressionA =

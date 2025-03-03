@@ -64,7 +64,7 @@ class RealLiteral(val value: BigDecimal) :
  * (- Real Real)
  */
 class RealNeg(override val inner: Expression<RealSort>) :
-    UnaryExpression<RealSort, RealSort>("-".symbol(), RealSort) {
+    UnaryExpression<RealSort, RealSort>("-".toSymbolWithQuotes(), RealSort) {
   override val theories = REALS_REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
@@ -77,7 +77,7 @@ class RealNeg(override val inner: Expression<RealSort>) :
  * (- Real Real Real :left-assoc)
  */
 class RealSub(val terms: List<Expression<RealSort>>) :
-    HomogenousExpression<RealSort, RealSort>("-".symbol(), RealSort) {
+    HomogenousExpression<RealSort, RealSort>("-".toSymbolWithQuotes(), RealSort) {
   override val theories = REALS_REALS_INTS_MARKER_SET
 
   init {
@@ -100,7 +100,7 @@ class RealSub(val terms: List<Expression<RealSort>>) :
  * (+ Real Real Real :left-assoc)
  */
 class RealAdd(val terms: List<Expression<RealSort>>) :
-    HomogenousExpression<RealSort, RealSort>("+".symbol(), RealSort) {
+    HomogenousExpression<RealSort, RealSort>("+".toSymbolWithQuotes(), RealSort) {
   override val theories = REALS_REALS_INTS_MARKER_SET
 
   init {
@@ -123,7 +123,7 @@ class RealAdd(val terms: List<Expression<RealSort>>) :
  * (* Real Real Real :left-assoc)
  */
 class RealMul(val factors: List<Expression<RealSort>>) :
-    HomogenousExpression<RealSort, RealSort>("*".symbol(), RealSort) {
+    HomogenousExpression<RealSort, RealSort>("*".toSymbolWithQuotes(), RealSort) {
   override val theories = REALS_REALS_INTS_MARKER_SET
 
   init {
@@ -146,7 +146,7 @@ class RealMul(val factors: List<Expression<RealSort>>) :
  * (/ Real Real Real :left-assoc)
  */
 class RealDiv(val terms: List<Expression<RealSort>>) :
-    HomogenousExpression<RealSort, RealSort>("/".symbol(), RealSort) {
+    HomogenousExpression<RealSort, RealSort>("/".toSymbolWithQuotes(), RealSort) {
   override val theories = REALS_REALS_INTS_MARKER_SET
 
   init {
@@ -169,7 +169,7 @@ class RealDiv(val terms: List<Expression<RealSort>>) :
  * (<= Real Real Bool :chainable)
  */
 class RealLessEq(val terms: List<Expression<RealSort>>) :
-    HomogenousExpression<BoolSort, RealSort>("<=".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, RealSort>("<=".toSymbolWithQuotes(), BoolSort) {
   override val theories = REALS_REALS_INTS_MARKER_SET
 
   init {
@@ -192,7 +192,7 @@ class RealLessEq(val terms: List<Expression<RealSort>>) :
  * (<= Real Real Bool :chainable)
  */
 class RealLess(val terms: List<Expression<RealSort>>) :
-    HomogenousExpression<BoolSort, RealSort>("<".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, RealSort>("<".toSymbolWithQuotes(), BoolSort) {
   override val theories = REALS_REALS_INTS_MARKER_SET
 
   init {
@@ -215,7 +215,7 @@ class RealLess(val terms: List<Expression<RealSort>>) :
  * (<= Real Real Bool :chainable)
  */
 class RealGreaterEq(val terms: List<Expression<RealSort>>) :
-    HomogenousExpression<BoolSort, RealSort>(">=".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, RealSort>(">=".toSymbolWithQuotes(), BoolSort) {
   override val theories = REALS_REALS_INTS_MARKER_SET
 
   init {
@@ -238,7 +238,7 @@ class RealGreaterEq(val terms: List<Expression<RealSort>>) :
  * (<= Real Real Bool :chainable)
  */
 class RealGreater(val terms: List<Expression<RealSort>>) :
-    HomogenousExpression<BoolSort, RealSort>(">".symbol(), BoolSort) {
+    HomogenousExpression<BoolSort, RealSort>(">".toSymbolWithQuotes(), BoolSort) {
   override val theories = REALS_REALS_INTS_MARKER_SET
 
   init {

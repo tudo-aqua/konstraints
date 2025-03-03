@@ -36,9 +36,9 @@ import tools.aqua.konstraints.theories.*
  */
 @TestInstance(Lifecycle.PER_CLASS)
 class CoreTests {
-  private val A = UserDeclaredSMTFunction0("A".symbol(), BoolSort)()
-  private val B = UserDeclaredSMTFunction0("B".symbol(), BoolSort)()
-  private val C = UserDeclaredSMTFunction0("C".symbol(), BoolSort)()
+  private val A = UserDeclaredSMTFunction0("A".toSymbolWithQuotes(), BoolSort)()
+  private val B = UserDeclaredSMTFunction0("B".toSymbolWithQuotes(), BoolSort)()
+  private val C = UserDeclaredSMTFunction0("C".toSymbolWithQuotes(), BoolSort)()
 
   @ParameterizedTest
   @MethodSource("getCoreTheoryExpressionsAndTheirSerialization")

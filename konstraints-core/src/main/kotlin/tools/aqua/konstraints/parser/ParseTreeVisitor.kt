@@ -41,7 +41,7 @@ internal class ParseTreeVisitor :
 
     context?.registerFunction(protoDeclareConst, sort)
 
-    return DeclareConst(Symbol(protoDeclareConst.name), sort)
+    return DeclareConst(protoDeclareConst.name.toSymbolWithQuotes(), sort)
   }
 
   override fun visit(protoDeclareFun: ProtoDeclareFun): DeclareFun {
@@ -50,7 +50,7 @@ internal class ParseTreeVisitor :
 
     context?.registerFunction(protoDeclareFun, parameters, sort)
 
-    return DeclareFun(protoDeclareFun.name.symbol(), parameters, sort)
+    return DeclareFun(protoDeclareFun.name.toSymbolWithQuotes(), parameters, sort)
   }
 
   override fun visit(protoSetLogic: ProtoSetLogic): SetLogic {

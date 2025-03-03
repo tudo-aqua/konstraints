@@ -189,7 +189,7 @@ abstract class HomogenousExpression<out T : Sort, out S : Sort>(
   abstract override val children: List<Expression<S>>
 
   override fun toString() =
-      if (children.isNotEmpty()) "($name ${children.joinToString(" ")})" else name.toSMTString()
+      if (children.isNotEmpty()) "($name ${children.joinToString(" ")})" else name.toSMTString(QuotingRule.SAME_AS_INPUT)
 }
 
 /**
@@ -215,7 +215,7 @@ class Ite<out T : Sort>(
   override fun copy(children: List<Expression<*>>): Expression<T> =
       IteDecl.buildExpression(children, emptyList()) castTo sort
 
-  override val name: Symbol = "ite".symbol()
+  override val name: Symbol = "ite".toSymbolWithQuotes()
 
   override val children: List<Expression<*>> = listOf(statement, then, otherwise)
 
@@ -227,7 +227,7 @@ abstract class NAryExpression<out T : Sort>(override val name: Symbol, override 
     Expression<T> {
 
   override fun toString() =
-      if (children.isNotEmpty()) "($name ${children.joinToString(" ")})" else name.toSMTString()
+      if (children.isNotEmpty()) "($name ${children.joinToString(" ")})" else name.toSMTString(QuotingRule.SAME_AS_INPUT)
 }
 
 /** Let expression */

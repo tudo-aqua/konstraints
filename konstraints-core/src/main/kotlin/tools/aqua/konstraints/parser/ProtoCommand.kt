@@ -57,7 +57,7 @@ data class ProtoPush(val n: Int) : ProtoCommand
 
 data class ProtoPop(val n: Int) : ProtoCommand
 
-class ParseSymbol(val token: Token) : Symbol(token.getValue(), QuotingRule.NONE) {
+class ParseSymbol(val token: Token) : Symbol(token.getValue(), token.getValue<String>().startsWith('|') && token.getValue<String>().endsWith('|')) {
   val symbol: String = token.getValue()
 }
 
