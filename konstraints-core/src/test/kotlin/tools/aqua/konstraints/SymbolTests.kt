@@ -100,11 +100,9 @@ class SymbolTests {
 
   @ParameterizedTest
   @ValueSource(strings = ["32", "3bitvec", "assert", "(check-sat)"])
-  fun `test that symbol sets must quote for symbols that must be quoted`(
-      symbol: String
-  ) {
+  fun `test that symbol sets must quote for symbols that must be quoted`(symbol: String) {
     val test = symbol.toSymbolWithQuotes()
-      assertTrue(test.mustQuote)
+    assertTrue(test.mustQuote)
   }
 
   @ParameterizedTest
@@ -159,7 +157,9 @@ class SymbolTests {
   }
 
   private fun getEqualSymbols(): Stream<Arguments> {
-    return Stream.of(arguments("A".toSymbolWithQuotes(), "A".toSymbolWithQuotes()), arguments("A".toSymbolWithQuotes(), "|A|".toSymbolWithQuotes()))
+    return Stream.of(
+        arguments("A".toSymbolWithQuotes(), "A".toSymbolWithQuotes()),
+        arguments("A".toSymbolWithQuotes(), "|A|".toSymbolWithQuotes()))
   }
 
   @ParameterizedTest

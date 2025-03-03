@@ -189,7 +189,8 @@ abstract class HomogenousExpression<out T : Sort, out S : Sort>(
   abstract override val children: List<Expression<S>>
 
   override fun toString() =
-      if (children.isNotEmpty()) "($name ${children.joinToString(" ")})" else name.toSMTString(QuotingRule.SAME_AS_INPUT)
+      if (children.isNotEmpty()) "($name ${children.joinToString(" ")})"
+      else name.toSMTString(QuotingRule.SAME_AS_INPUT)
 }
 
 /**
@@ -227,7 +228,8 @@ abstract class NAryExpression<out T : Sort>(override val name: Symbol, override 
     Expression<T> {
 
   override fun toString() =
-      if (children.isNotEmpty()) "($name ${children.joinToString(" ")})" else name.toSMTString(QuotingRule.SAME_AS_INPUT)
+      if (children.isNotEmpty()) "($name ${children.joinToString(" ")})"
+      else name.toSMTString(QuotingRule.SAME_AS_INPUT)
 }
 
 /** Let expression */

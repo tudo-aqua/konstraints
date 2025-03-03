@@ -19,7 +19,6 @@
 package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.Parser
-import tools.aqua.konstraints.theories.False
 
 /**
  * Quoting rules for SMT String
@@ -60,11 +59,13 @@ open class Symbol internal constructor(raw: String, val wasQuoted: Boolean) : SM
       if (Parser.simpleSymbol.end().accept(raw) && !Parser.reserved.end().accept(raw)) {
         false
       }
-      // check if we have a quoted symbol that is already quoted (raw is of the form "|symbol|" and is not a simple symbol)
+      // check if we have a quoted symbol that is already quoted (raw is of the form "|symbol|" and
+      // is not a simple symbol)
       else if (Parser.quotedSymbol.end().accept(raw)) {
-          true
+        true
       }
-      // check if we have a quoted symbol that is not already quoted (raw is of the form "symbol" and is not a simple symbol)
+      // check if we have a quoted symbol that is not already quoted (raw is of the form "symbol"
+      // and is not a simple symbol)
       else if (Parser.quotedSymbol.end().accept("|$raw|")) {
         true
       } else {
@@ -110,4 +111,5 @@ class IllegalSymbolException(val symbol: String) :
     RuntimeException("$symbol is not a legal SMT symbol")
 
 fun String.toSymbolWithQuotes() = Symbol(this, this.startsWith("|") && this.endsWith("|"))
-fun String.toSymbolAsIs(wasQuoted : Boolean = false) = Symbol(this, wasQuoted)
+
+fun String.toSymbolAsIs(wasQuoted: Boolean = false) = Symbol(this, wasQuoted)

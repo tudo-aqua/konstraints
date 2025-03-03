@@ -378,7 +378,9 @@ class FPSub(
     val roundingMode: Expression<RoundingMode>,
     val minuend: Expression<FPSort>,
     val subtrahend: Expression<FPSort>
-) : TernaryExpression<FPSort, RoundingMode, FPSort, FPSort>("fp.sub".toSymbolWithQuotes(), minuend.sort) {
+) :
+    TernaryExpression<FPSort, RoundingMode, FPSort, FPSort>(
+        "fp.sub".toSymbolWithQuotes(), minuend.sort) {
   override val theories = FLOATING_POINT_MARKER_SET
 
   override val lhs: Expression<RoundingMode> = roundingMode

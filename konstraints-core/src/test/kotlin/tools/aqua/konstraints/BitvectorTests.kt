@@ -45,8 +45,10 @@ class BitvectorTests {
   private val B = UserDeclaredSMTFunction0("B".toSymbolWithQuotes(), BVSort(8))()
   private val C = UserDeclaredSMTFunction0("C".toSymbolWithQuotes(), BVSort(8))()
   private val D = UserDeclaredSMTFunction0("D".toSymbolWithQuotes(), BVSort(16))()
-  private val symbolicE = UserDeclaredSMTFunction0("E".toSymbolWithQuotes(), BVSort.fromSymbol("a"))()
-  private val symbolicF = UserDeclaredSMTFunction0("F".toSymbolWithQuotes(), BVSort.fromSymbol("b"))()
+  private val symbolicE =
+      UserDeclaredSMTFunction0("E".toSymbolWithQuotes(), BVSort.fromSymbol("a"))()
+  private val symbolicF =
+      UserDeclaredSMTFunction0("F".toSymbolWithQuotes(), BVSort.fromSymbol("b"))()
 
   @ParameterizedTest
   @MethodSource("getBVExpressionsAndSerialization")

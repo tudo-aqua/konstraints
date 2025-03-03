@@ -320,7 +320,8 @@ class StrSubstring(
  * (str.prefixof String String Bool)
  */
 class StrPrefixOf(val prefix: Expression<StringSort>, val inner: Expression<StringSort>) :
-    BinaryExpression<BoolSort, StringSort, StringSort>("str.prefixof".toSymbolWithQuotes(), BoolSort) {
+    BinaryExpression<BoolSort, StringSort, StringSort>(
+        "str.prefixof".toSymbolWithQuotes(), BoolSort) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = prefix
@@ -337,7 +338,8 @@ class StrPrefixOf(val prefix: Expression<StringSort>, val inner: Expression<Stri
  * (str.suffixof String String Bool)
  */
 class StrSuffixOf(val suffix: Expression<StringSort>, val inner: Expression<StringSort>) :
-    BinaryExpression<BoolSort, StringSort, StringSort>("str.suffixof".toSymbolWithQuotes(), BoolSort) {
+    BinaryExpression<BoolSort, StringSort, StringSort>(
+        "str.suffixof".toSymbolWithQuotes(), BoolSort) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = suffix
@@ -354,7 +356,8 @@ class StrSuffixOf(val suffix: Expression<StringSort>, val inner: Expression<Stri
  * (str.contains String String Bool)
  */
 class StrContains(val string: Expression<StringSort>, val substring: Expression<StringSort>) :
-    BinaryExpression<BoolSort, StringSort, StringSort>("str.contains".toSymbolWithQuotes(), BoolSort) {
+    BinaryExpression<BoolSort, StringSort, StringSort>(
+        "str.contains".toSymbolWithQuotes(), BoolSort) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = string

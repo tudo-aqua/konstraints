@@ -243,7 +243,8 @@ class Declare<T : Sort>(
   ): SimpleDelegate<SMTFunction<T>> =
       SimpleDelegate(
           program.registerFun(
-              UserDeclaredSMTFunctionN((name ?: "|${property.name}|").toSymbolWithQuotes(), sort, parameters)))
+              UserDeclaredSMTFunctionN(
+                  (name ?: "|${property.name}|").toSymbolWithQuotes(), sort, parameters)))
 }
 
 /**
@@ -261,7 +262,9 @@ class Const<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: Str
   ): SimpleDelegate<Expression<T>> =
       SimpleDelegate(
           program
-              .registerFun(UserDeclaredSMTFunction0((name ?: "|${property.name}|").toSymbolWithQuotes(), sort))
+              .registerFun(
+                  UserDeclaredSMTFunction0(
+                      (name ?: "|${property.name}|").toSymbolWithQuotes(), sort))
               .invoke())
 }
 
@@ -303,7 +306,8 @@ class Declare1<T : Sort, S : Sort>(
   ): SimpleDelegate<UserDeclaredSMTFunction1<T, S>> =
       SimpleDelegate(
           program.registerFun(
-              UserDeclaredSMTFunction1((name ?: "|${property.name}|").toSymbolWithQuotes(), sort, par)))
+              UserDeclaredSMTFunction1(
+                  (name ?: "|${property.name}|").toSymbolWithQuotes(), sort, par)))
 }
 
 /**
@@ -327,7 +331,8 @@ class Declare2<T : Sort, S1 : Sort, S2 : Sort>(
   ): SimpleDelegate<UserDeclaredSMTFunction2<T, S1, S2>> =
       SimpleDelegate(
           program.registerFun(
-              UserDeclaredSMTFunction2((name ?: "|${property.name}|").toSymbolWithQuotes(), sort, par1, par2)))
+              UserDeclaredSMTFunction2(
+                  (name ?: "|${property.name}|").toSymbolWithQuotes(), sort, par1, par2)))
 }
 
 /**
@@ -382,7 +387,12 @@ class Declare4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
       SimpleDelegate(
           program.registerFun(
               UserDeclaredSMTFunction4(
-                  (name ?: "|${property.name}|").toSymbolWithQuotes(), sort, par1, par2, par3, par4)))
+                  (name ?: "|${property.name}|").toSymbolWithQuotes(),
+                  sort,
+                  par1,
+                  par2,
+                  par3,
+                  par4)))
 }
 
 /**
@@ -411,7 +421,13 @@ class Declare5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
       SimpleDelegate(
           program.registerFun(
               UserDeclaredSMTFunction5(
-                  (name ?: "|${property.name}|").toSymbolWithQuotes(), sort, par1, par2, par3, par4, par5)))
+                  (name ?: "|${property.name}|").toSymbolWithQuotes(),
+                  sort,
+                  par1,
+                  par2,
+                  par3,
+                  par4,
+                  par5)))
 }
 
 /**
@@ -558,7 +574,10 @@ class Define3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
                 par2,
                 par3,
                 FunctionDef(
-                    n.toSymbolWithQuotes(), listOf(sortedVar1, sortedVar2, sortedVar3), sort, term))))
+                    n.toSymbolWithQuotes(),
+                    listOf(sortedVar1, sortedVar2, sortedVar3),
+                    sort,
+                    term))))
   }
 }
 

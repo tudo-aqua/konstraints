@@ -61,7 +61,9 @@ class ArrayStore<X : Sort, Y : Sort>(
     val array: Expression<ArraySort<X, Y>>,
     val index: Expression<X>,
     val value: Expression<Y>
-) : TernaryExpression<ArraySort<X, Y>, ArraySort<X, Y>, X, Y>("store".toSymbolWithQuotes(), array.sort) {
+) :
+    TernaryExpression<ArraySort<X, Y>, ArraySort<X, Y>, X, Y>(
+        "store".toSymbolWithQuotes(), array.sort) {
   override val theories = ARRAYS_EX_MARKER_SET
 
   init {

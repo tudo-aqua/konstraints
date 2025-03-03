@@ -328,15 +328,19 @@ class Z3Tests {
     val lhs = program.declareConst("lhs".toSymbolWithQuotes(), sort)()
     val rhs = program.declareConst("rhs".toSymbolWithQuotes(), sort)()
     val msb_s =
-        VarBinding("?msb_s".toSymbolWithQuotes(), BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs))
+        VarBinding(
+            "?msb_s".toSymbolWithQuotes(), BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs))
     val msb_t =
-        VarBinding("?msb_t".toSymbolWithQuotes(), BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, rhs))
+        VarBinding(
+            "?msb_t".toSymbolWithQuotes(), BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, rhs))
     val abs_s =
         VarBinding(
-            "?abs_s".toSymbolWithQuotes(), Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)))
+            "?abs_s".toSymbolWithQuotes(),
+            Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)))
     val abs_t =
         VarBinding(
-            "?abs_t".toSymbolWithQuotes(), Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)))
+            "?abs_t".toSymbolWithQuotes(),
+            Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)))
     val u = VarBinding("u".toSymbolWithQuotes(), BVURem(abs_s.instance, abs_t.instance))
 
     val A = program.declareConst("A".toSymbolWithQuotes(), IntSort)()

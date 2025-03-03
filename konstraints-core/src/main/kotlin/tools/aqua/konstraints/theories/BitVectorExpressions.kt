@@ -565,9 +565,11 @@ class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
 
   fun expand(): Expression<BVSort> {
     val msb_s =
-        VarBinding("?msb_s".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, numerator))
+        VarBinding(
+            "?msb_s".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, numerator))
     val msb_t =
-        VarBinding("?msb_t".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, denominator))
+        VarBinding(
+            "?msb_t".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, denominator))
     return LetExpression(
         listOf(msb_s, msb_t),
         Ite(
@@ -604,9 +606,11 @@ class BVSRem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
 
   fun expand(): Expression<BVSort> {
     val msb_s =
-        VarBinding("?msb_s".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, numerator))
+        VarBinding(
+            "?msb_s".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, numerator))
     val msb_t =
-        VarBinding("?msb_t".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, denominator))
+        VarBinding(
+            "?msb_t".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, denominator))
     return LetExpression(
         listOf(msb_s, msb_t),
         Ite(
@@ -639,14 +643,18 @@ class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<
       BVSModDecl.buildExpression(children, emptyList())
 
   fun expand(): Expression<BVSort> {
-    val msb_s = VarBinding("?msb_s".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, lhs))
-    val msb_t = VarBinding("?msb_t".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, rhs))
+    val msb_s =
+        VarBinding("?msb_s".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, lhs))
+    val msb_t =
+        VarBinding("?msb_t".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, rhs))
     val abs_s =
         VarBinding(
-            "?abs_s".toSymbolWithQuotes(), Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)))
+            "?abs_s".toSymbolWithQuotes(),
+            Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)))
     val abs_t =
         VarBinding(
-            "?abs_t".toSymbolWithQuotes(), Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)))
+            "?abs_t".toSymbolWithQuotes(),
+            Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)))
     val u = VarBinding("u".toSymbolWithQuotes(), BVURem(abs_s.instance, abs_t.instance))
 
     return LetExpression(
@@ -841,7 +849,8 @@ class Repeat(val j: Int, override val inner: Expression<BVSort>) :
 }
 
 class ZeroExtend(val i: Int, override val inner: Expression<BVSort>) :
-    UnaryExpression<BVSort, BVSort>("zero_extend".toSymbolWithQuotes(), BVSort(inner.sort.bits + i)) {
+    UnaryExpression<BVSort, BVSort>(
+        "zero_extend".toSymbolWithQuotes(), BVSort(inner.sort.bits + i)) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -860,7 +869,8 @@ class ZeroExtend(val i: Int, override val inner: Expression<BVSort>) :
 }
 
 class SignExtend(val i: Int, override val inner: Expression<BVSort>) :
-    UnaryExpression<BVSort, BVSort>("sign_extend".toSymbolWithQuotes(), BVSort(inner.sort.bits + i)) {
+    UnaryExpression<BVSort, BVSort>(
+        "sign_extend".toSymbolWithQuotes(), BVSort(inner.sort.bits + i)) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {

@@ -33,7 +33,8 @@ import tools.aqua.konstraints.theories.*
 class ContextTests {
   val boolFunc1 = UserDeclaredSMTFunction0("A".toSymbolWithQuotes(), BoolSort)
   val boolFunc2 = UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), BoolSort, BVSort(8), BVSort(8))
-  val boolFunc2Copy = UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), BoolSort, BVSort(8), BVSort(8))
+  val boolFunc2Copy =
+      UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), BoolSort, BVSort(8), BVSort(8))
   val boolFunc2Overloaded =
       UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), BoolSort, BVSort(16), BVSort(16))
 
@@ -76,11 +77,16 @@ class ContextTests {
 
   private fun getContextAndIllegalNameFunctions(): Stream<Arguments> =
       Stream.of(
-          arguments(createContext(), UserDeclaredSMTFunction0("and".toSymbolWithQuotes(), BoolSort)),
-          arguments(createContext(), UserDeclaredSMTFunction0("true".toSymbolWithQuotes(), BoolSort)),
-          arguments(createContext(), UserDeclaredSMTFunction0("distinct".toSymbolWithQuotes(), BoolSort)),
-          arguments(createContext(), UserDeclaredSMTFunction0("bvadd".toSymbolWithQuotes(), BoolSort)),
-          arguments(createContext(), UserDeclaredSMTFunction0("extract".toSymbolWithQuotes(), BoolSort)))
+          arguments(
+              createContext(), UserDeclaredSMTFunction0("and".toSymbolWithQuotes(), BoolSort)),
+          arguments(
+              createContext(), UserDeclaredSMTFunction0("true".toSymbolWithQuotes(), BoolSort)),
+          arguments(
+              createContext(), UserDeclaredSMTFunction0("distinct".toSymbolWithQuotes(), BoolSort)),
+          arguments(
+              createContext(), UserDeclaredSMTFunction0("bvadd".toSymbolWithQuotes(), BoolSort)),
+          arguments(
+              createContext(), UserDeclaredSMTFunction0("extract".toSymbolWithQuotes(), BoolSort)))
 
   @Test
   fun testPopFailsOnContextWithOnlyOneLevel() {
