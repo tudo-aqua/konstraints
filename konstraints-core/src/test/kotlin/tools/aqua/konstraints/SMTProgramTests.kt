@@ -37,19 +37,34 @@ import tools.aqua.konstraints.theories.bitvec
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SMTProgramTests {
   // test basic expressions
-  val coreFunA = UserDeclaredSMTFunction0<BoolSort>("A".toSymbolWithQuotes(), BoolSort)()
-  val coreFunB = UserDeclaredSMTFunction0<BoolSort>("B".toSymbolWithQuotes(), BoolSort)()
+  val coreProgram = MutableSMTProgram().apply { setLogic(UF) }
+  val coreFunA = coreProgram.declareConst("A!bool".toSymbolWithQuotes(), BoolSort)()
+  val coreFunB = coreProgram.declareConst("B!bool".toSymbolWithQuotes(), BoolSort)()
   val coreExpressionA = (not { coreFunB and coreFunA }) eq (not(coreFunA) and not(coreFunB))
 
-  val bvFunA = UserDeclaredSMTFunction0<BVSort>("A".toSymbolWithQuotes(), BVSort(8))()
-  val bvFunB = UserDeclaredSMTFunction0<BVSort>("B".toSymbolWithQuotes(), BVSort(8))()
+  val bvProgram =
+      MutableSMTProgram().apply {
+        setLogic(BV)
+        declareFun(coreFunA.func)
+      }
+  val bvFunA = bvProgram.declareConst("A!bitvec".toSymbolWithQuotes(), BVSort(8))()
+  val bvFunB = bvProgram.declareConst("B!bitvec".toSymbolWithQuotes(), BVSort(8))()
   val bvExpressionA = (bvFunA bvadd bvFunB) eq bvneg((bvneg(bvFunA) bvadd bvneg(bvFunB)))
   val bvExpressionB = ite { coreFunA } then { bvFunA } otherwise { bvFunB } eq bvFunA
 
-  val fpFunA = UserDeclaredSMTFunction0<FPSort>("A".toSymbolWithQuotes(), FPSort(3, 5))()
-  val fpFunB = UserDeclaredSMTFunction0<FPSort>("B".toSymbolWithQuotes(), FPSort(3, 5))()
+  val fpProgram = MutableSMTProgram().apply { setLogic(FP) }
+  val fpFunA = fpProgram.declareConst("A!fp".toSymbolWithQuotes(), FPSort(3, 5))()
+  val fpFunB = fpProgram.declareConst("B!fp".toSymbolWithQuotes(), FPSort(3, 5))()
   val fpExpressionA = (fpFunA fpadd fpFunB) eq (fpFunB fpadd fpFunA)
 
+  val bvfpProgram =
+      MutableSMTProgram().apply {
+        setLogic(QF_BVFP)
+        declareFun(fpFunA.func)
+        declareFun(fpFunB.func)
+        declareFun(bvFunA.func)
+        declareFun(bvFunB.func)
+      }
   val bvfpExpressionA =
       (fpFunA.toUBV(8) concat fpFunB.toUBV(8)) eq (bvneg(bvFunA) concat bvneg(bvFunB))
 
@@ -58,21 +73,22 @@ class SMTProgramTests {
 
   @ParameterizedTest
   @MethodSource("getExpressionsPositiv")
-  fun testLogicConstaintsPositiv(logic: Logic, expr: Expression<BoolSort>) {
-    val program = MutableSMTProgram()
-
-    program.setLogic(logic)
+  fun testLogicConstaintsPositiv(program: MutableSMTProgram, expr: Expression<BoolSort>) {
     assertDoesNotThrow { program.assert(expr) }
   }
 
   private fun getExpressionsPositiv(): Stream<Arguments> {
     return Stream.of(
-        arguments(QF_UF, coreExpressionA),
-        arguments(QF_BV, bvExpressionA),
-        arguments(QF_FP, fpExpressionA),
-        arguments(QF_BVFP, bvfpExpressionA),
-        arguments(QF_BV, bvExpressionB),
-        arguments(QF_BV, bvExpressionC))
+        arguments(coreProgram, coreExpressionA),
+        arguments(bvProgram, bvExpressionA),
+        arguments(fpProgram, fpExpressionA),
+        arguments(bvfpProgram, bvfpExpressionA),
+        arguments(bvProgram, bvExpressionB),
+        arguments(bvProgram, bvExpressionC),
+        arguments(
+            coreProgram, exists(BoolSort) { local -> (local eq coreFunA) and (local eq coreFunB) }),
+        arguments(
+            coreProgram, forall(BoolSort) { local -> (local eq coreFunA) and (local eq coreFunB) }))
   }
 
   @ParameterizedTest
@@ -86,5 +102,21 @@ class SMTProgramTests {
 
   private fun getExpressionsNegativ(): Stream<Arguments> {
     return Stream.of(arguments(QF_UF, bvExpressionA), arguments(QF_UF, bvExpressionB))
+  }
+
+  @ParameterizedTest
+  @MethodSource("getUnregisteredExpressions")
+  fun testUnregisteredFunctionsThrowInAssert(
+      program: MutableSMTProgram,
+      expr: Expression<BoolSort>
+  ) {
+    assertThrows<IllegalArgumentException> { program.assert(expr) }
+  }
+
+  private fun getUnregisteredExpressions(): Stream<Arguments> {
+    return Stream.of(
+        arguments(
+            coreProgram,
+            UserDeclaredSMTFunction0("Unregistered!bool".toSymbolWithQuotes(), BoolSort)()))
   }
 }

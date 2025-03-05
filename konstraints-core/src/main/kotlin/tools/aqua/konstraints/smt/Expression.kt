@@ -20,6 +20,7 @@ package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.IteDecl
 import tools.aqua.konstraints.theories.BoolSort
+import tools.aqua.konstraints.theories.CORE_MARKER_SET
 import tools.aqua.konstraints.theories.Theories
 import tools.aqua.konstraints.util.reduceOrDefault
 
@@ -210,7 +211,7 @@ class Ite<out T : Sort>(
   }
 
   override val sort: T = then.sort
-  override val theories = emptySet<Theories>()
+  override val theories = CORE_MARKER_SET
   override val func = null
 
   override fun copy(children: List<Expression<*>>): Expression<T> =
@@ -309,18 +310,18 @@ class UserDefinedExpression<out T : Sort>(
 }
 
 /** Expression with a local variable */
-class LocalExpression<out T : Sort>(
+class LocalExpression<T : Sort>(
     override val name: Symbol,
     override val sort: T,
     val term: Expression<T>,
+    override val func: VarBinding<T>
 ) : Expression<T> {
   override val theories = emptySet<Theories>()
-  override val func = null
 
   override fun copy(children: List<Expression<*>>): Expression<T> {
     require(children.size == 1)
 
-    return LocalExpression(name, sort, children.single() castTo sort) castTo sort
+    return LocalExpression(name, sort, children.single() castTo sort, func) castTo sort
   }
 
   override val children: List<Expression<*>> = emptyList()
@@ -360,13 +361,16 @@ class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
   }
 }
 
-class BoundVariable<out T : Sort>(override val name: Symbol, override val sort: T) : Expression<T> {
+class BoundVariable<out T : Sort>(
+    override val name: Symbol,
+    override val sort: T,
+    override val func: SortedVar<T>
+) : Expression<T> {
   override val theories = emptySet<Theories>()
-  override val func = null
 
   override val children: List<Expression<*>> = emptyList()
 
-  override fun copy(children: List<Expression<*>>): Expression<T> = BoundVariable(name, sort)
+  override fun copy(children: List<Expression<*>>): Expression<T> = BoundVariable(name, sort, func)
 }
 
 class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: List<Attribute>) :
@@ -399,7 +403,7 @@ class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>)
   override val parameters = emptyList<Sort>()
   override val definition: FunctionDef<T>? = null
 
-  val instance = LocalExpression(symbol, sort, term)
+  val instance = LocalExpression(symbol, sort, term, this)
 }
 
 class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T) :
@@ -408,7 +412,7 @@ class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T)
 
   override fun toString(): String = "($symbol $sort)"
 
-  val instance = BoundVariable(symbol, sort)
+  val instance = BoundVariable(symbol, sort, this)
   override val parameters: List<Sort> = emptyList()
   override val definition: FunctionDef<T>? = null
 }

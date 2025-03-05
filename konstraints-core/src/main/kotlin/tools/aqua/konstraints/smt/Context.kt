@@ -68,11 +68,12 @@ class Context {
     return func
   }
 
-  fun contains(func: Symbol) = currentContext.functions[func] != null
+  operator fun contains(func: Symbol) = currentContext.functions[func] != null
 
-  fun contains(expression: Expression<*>) = expression.func in currentContext.functions.values
+  operator fun contains(expression: Expression<*>) =
+      expression.func in currentContext.functions.values
 
-  fun contains(sort: Sort): Boolean = sort in currentContext.sorts.values
+  operator fun contains(sort: Sort): Boolean = sort in currentContext.sorts.values
 
   fun <T : Sort> getFuncOrNull(name: Symbol, sort: T) =
       try {
@@ -108,37 +109,28 @@ class Context {
     repeat(n) { _ -> currentContext.functions.values.removeAll(undoStack.pop()) }
   }
 
-  internal fun <T : Sort> let(
-      varBindings: List<VarBinding<*>>,
-      block: () -> Expression<T>
-  ): LetExpression<T> {
+  internal fun <T> let(varBindings: List<VarBinding<*>>, block: () -> T): T {
     bindVariables(varBindings)
-    val term = block()
+    val result = block()
     unbindVariables()
 
-    return LetExpression(varBindings, term)
+    return result
   }
 
-  internal fun exists(
-      sortedVars: List<SortedVar<*>>,
-      block: () -> Expression<BoolSort>
-  ): ExistsExpression {
+  internal fun <T> exists(sortedVars: List<SortedVar<*>>, block: () -> T): T {
     bindVariables(sortedVars)
-    val term = block()
+    val result = block()
     unbindVariables()
 
-    return ExistsExpression(sortedVars, term)
+    return result
   }
 
-  internal fun forall(
-      sortedVars: List<SortedVar<*>>,
-      block: () -> Expression<BoolSort>
-  ): ForallExpression {
+  internal fun <T> forall(sortedVars: List<SortedVar<*>>, block: () -> T): T {
     bindVariables(sortedVars)
-    val term = block()
+    val result = block()
     unbindVariables()
 
-    return ForallExpression(sortedVars, term)
+    return result
   }
 
   /**
@@ -581,7 +573,7 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Context.forall(
           this)
     }
 
-@JvmName("existsWithSorts")
+@JvmName("forallWithSorts")
 fun Context.forall(
     sortedVars: List<Sort>,
     block: (List<Expression<*>>, Context) -> Expression<BoolSort>

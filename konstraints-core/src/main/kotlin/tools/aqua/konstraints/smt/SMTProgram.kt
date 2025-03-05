@@ -93,16 +93,33 @@ class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
     if (logic != null) {
       require(
           expr.all {
-            (it.theories.isEmpty() or it.theories.any { it in logic!!.theories }) and
-                (it.sort.theories.isEmpty() or it.sort.theories.any { it in logic!!.theories })
+            (it.theories.isEmpty() || it.theories.any { it in logic!!.theories }) &&
+                (it.sort.theories.isEmpty() || it.sort.theories.any { it in logic!!.theories })
           }) {
             "Expression not in boundaries of logic"
           }
     }
 
     // check all symbols are known
+    require(checkContext(expr))
 
     _commands.add(Assert(expr))
+  }
+
+  private fun checkContext(expr: Expression<*>): Boolean {
+    return if (expr is ExistsExpression) {
+      context.exists(expr.vars) {
+        expr.term
+        checkContext(expr.term)
+      }
+    } else if (expr is ForallExpression) {
+      context.exists(expr.vars) {
+        expr.term
+        checkContext(expr.term)
+      }
+    } else {
+      (expr.theories.isNotEmpty() || expr in context) && expr.children.all { checkContext(it) }
+    }
   }
 
   fun <T : Sort> declareConst(name: Symbol, sort: T): UserDeclaredSMTFunction0<T> {
@@ -114,10 +131,12 @@ class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
     return func
   }
 
-  fun <T : Sort> declareFun(func: SMTFunction<T>) {
+  fun <T : Sort> declareFun(func: SMTFunction<T>): SMTFunction<T> {
     context.addFun(func)
 
     _commands.add(DeclareFun(func.symbol, func.parameters, func.sort))
+
+    return func
   }
 
   fun declareFun(name: Symbol, parameter: List<Sort>, sort: Sort) {
