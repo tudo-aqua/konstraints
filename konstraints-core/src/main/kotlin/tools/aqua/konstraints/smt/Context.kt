@@ -50,10 +50,10 @@ class Context {
 
   fun <T : Sort> addFun(func: SMTFunction<T>): SMTFunction<T> {
     require(func.symbol !in forbiddenNames) {
-      "Can not overload or shadow theory symbol ${func.name}!"
+      "Can not overload or shadow theory symbol ${func.symbol}!"
     }
     require(func.symbol !in currentContext.functions) {
-      "Can not overload or shadow user defined symbol ${func.name}!"
+      "Can not overload or shadow user defined symbol ${func.symbol}!"
     }
     check(!activeBinderState) { "Can not add functions to the current context in this state!" }
 

@@ -398,10 +398,10 @@ class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>)
 
   override operator fun invoke(args: List<Expression<*>>) = instance
 
-  override val name = symbol.toString()
+  val name = symbol.toString()
   override val sort: T = term.sort
   override val parameters = emptyList<Sort>()
-  override val definition: FunctionDef<T>? = null
+  val definition: FunctionDef<T>? = null
 
   val instance = LocalExpression(symbol, sort, term, this)
 }

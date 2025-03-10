@@ -26,7 +26,7 @@ import tools.aqua.konstraints.theories.BoolSort
 
 @SMTDSL
 class SMTProgramBuilder(logic: Logic) {
-  private val program = MutableSMTProgram()
+  private val program = MutableSMTProgram(emptyList())
 
   /** Adds a new assertion: (assert [block]) */
   fun assert(block: () -> Expression<BoolSort>) = assert(block())
@@ -57,8 +57,14 @@ class SMTProgramBuilder(logic: Logic) {
     }
   }
 
-  internal fun <T : SMTFunction<S>, S : Sort> registerFun(func: T): T {
+  internal fun <T : DeclaredSMTFunction<S>, S : Sort> declareFun(func: T): T {
     program.declareFun(func)
+
+    return func
+  }
+
+  internal fun <T : DefinedSMTFunction<S>, S : Sort> defineFun(func: T): T {
+    program.defineFun(func)
 
     return func
   }
@@ -67,9 +73,8 @@ class SMTProgramBuilder(logic: Logic) {
   fun <T : Sort> const(sort: T) = const("|const!${UUID.randomUUID()}|", sort)
 
   /** Registers a new constant smt function with the given [name] and [sort] */
-  fun <T : Sort> const(name: String, sort: T): UserDeclaredExpression<T> {
-    return program.declareConst(name.toSymbolWithQuotes(), sort)()
-  }
+  fun <T : Sort> const(name: String, sort: T) =
+      program.declareConst(name.toSymbolWithQuotes(), sort)()
 
   /** Converts this [SMTProgramBuilder] to a finished [DefaultSMTProgram] */
   fun finalize() = program.apply { add(CheckSat) }

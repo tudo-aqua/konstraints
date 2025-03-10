@@ -36,7 +36,7 @@ object Exit : Command("exit")
 object GetModel : Command("get-model")
 
 /** SMT (assert) command */
-data class Assert(val expression: Expression<BoolSort>) : Command("assert $expression") {
+data class Assert(val expr: Expression<BoolSort>) : Command("assert $expr") {
   override fun toString(): String = super.toString()
 }
 
@@ -96,6 +96,10 @@ data class AttributeOptionValue(val attribute: Attribute) : OptionValue
 
 /** SMT (set-logic [logic]) command */
 data class SetLogic(val logic: Logic) : Command("set-logic $logic")
+
+/** SMT (define-const [name] [sort] [term]) command */
+data class DefineConst(val name: Symbol, val sort: Sort, val term: Expression<Sort>) :
+    Command("define-const $name $sort $term")
 
 /** SMT (define-fun [functionDef]) command */
 data class DefineFun(val functionDef: FunctionDef<*>) : Command("define-fun $functionDef") {

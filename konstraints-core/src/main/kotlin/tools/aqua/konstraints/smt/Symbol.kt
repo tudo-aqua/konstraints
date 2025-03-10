@@ -72,6 +72,8 @@ open class Symbol internal constructor(raw: String, val wasQuoted: Boolean) : SM
         throw IllegalSymbolException(raw)
       }
 
+  val isSimple = !mustQuote
+
   /**
    * Internal representation of the symbol without quotes, quoting will be reconstructed by
    * [toSMTString] before giving the symbol to a solver

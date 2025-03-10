@@ -65,7 +65,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     get() = z3model != null
 
   override fun visit(assert: Assert) {
-    val assertion = assert.expression.z3ify(context)
+    val assertion = assert.expr.z3ify(context)
 
     solver.add(assertion)
   }

@@ -26,31 +26,12 @@ import tools.aqua.konstraints.util.zipWithSameLength
  *
  * Use [invoke] to generate an expression with the given parameters applied.
  */
-abstract class SMTFunction<out T : Sort> : ContextFunction<Sort> {
+abstract class SMTFunction<out T : Sort> {
   abstract val symbol: Symbol
-  override val name: String
-    get() = symbol.toString()
+  abstract val sort: T
+  abstract val parameters: List<Sort>
 
-  abstract override val sort: T
-  abstract override val parameters: List<Sort>
-  abstract val definition: FunctionDef<T>?
-
-  /*
-   * 1. this operator will be overwritten by every implementation of a specific smt theory function (e.g and, bvadd, fpmul etc.)
-   * 2. it should also be overwritten if a specific expression type that isnt a UserDeclaredExpression or UserDefinedExpression
-   * is needed as return type.
-   * 3. lastly this operator can be overwritten to enforce other constraints on the parameters if needed.
-   */
-  open operator fun invoke(args: List<Expression<*>>): Expression<T> {
-    require(args.size == parameters.size)
-    require((args zipWithSameLength parameters).all { (par, sort) -> par.sort == sort })
-
-    return if (definition == null) {
-      UserDeclaredExpression(symbol, sort, args, this)
-    } else {
-      UserDefinedExpression(symbol, sort, emptyList(), definition!!, this)
-    }
-  }
+  abstract operator fun invoke(args: List<Expression<*>>): Expression<T>
 
   final override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -71,7 +52,7 @@ abstract class SMTFunction<out T : Sort> : ContextFunction<Sort> {
     // overloaded by a differing definition
   }
 
-  final override fun hashCode(): Int = Objects.hash(symbol, name, sort, parameters, definition)
+  final override fun hashCode(): Int = Objects.hash(symbol, sort, parameters)
 
   infix fun <T : Sort> castTo(to: T): SMTFunction<T> {
     if (sort != to) {
@@ -80,6 +61,29 @@ abstract class SMTFunction<out T : Sort> : ContextFunction<Sort> {
 
     @Suppress("UNCHECKED_CAST")
     return this as SMTFunction<T>
+  }
+}
+
+abstract class DeclaredSMTFunction<T : Sort> : SMTFunction<T>() {
+
+  override operator fun invoke(args: List<Expression<*>>): Expression<T> {
+    require(args.size == parameters.size)
+    require((args zipWithSameLength parameters).all { (par, sort) -> par.sort == sort })
+
+    return UserDeclaredExpression(symbol, sort, args, this)
+  }
+}
+
+abstract class DefinedSMTFunction<T : Sort> : SMTFunction<T>() {
+  abstract val term: Expression<T>
+  abstract val sortedVars: List<SortedVar<*>>
+
+  override operator fun invoke(args: List<Expression<*>>): Expression<T> {
+    require(args.size == parameters.size)
+    require((args zipWithSameLength parameters).all { (par, sort) -> par.sort == sort })
+
+    return UserDefinedExpression(
+        symbol, sort, emptyList(), FunctionDef(symbol, sortedVars, sort, term), this)
   }
 }
 
