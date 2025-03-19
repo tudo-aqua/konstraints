@@ -75,6 +75,8 @@ class Context {
 
   operator fun contains(sort: Sort): Boolean = sort in currentContext.sorts.values
 
+  fun containsSort(sort: Symbol): Boolean = currentContext.sorts[sort] != null
+
   fun <T : Sort> getFuncOrNull(name: Symbol, sort: T) =
       try {
         getFunc(name, sort)
@@ -95,6 +97,9 @@ class Context {
 
   fun getFunc(name: Symbol) =
       currentContext.functions[name] ?: throw FunctionNotFoundException(name)
+
+    fun getSort(name: Symbol) =
+        currentContext.sorts[name] ?: throw FunctionNotFoundException(name)
 
   fun push(block: Context.() -> Unit) {
     undoStack.push(mutableSetOf<SMTFunction<*>>())

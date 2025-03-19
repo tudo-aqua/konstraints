@@ -48,7 +48,7 @@ abstract class SMTProgram(commands: List<Command>) {
   var logic: Logic? = null
     protected set
 
-  protected val context = Context()
+  val context = Context()
 
   protected val _commands: MutableList<Command> = commands.toMutableList()
   val commands: List<Command>
@@ -159,6 +159,11 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     _commands.add(info)
   }
 
+    fun declareSort(decl: DeclareSort) {
+        context.addSort()
+        _commands.add(decl)
+    }
+
   /**
    * Inserts all [commands] at the end of the program
    *
@@ -198,6 +203,9 @@ fun <T : Sort> MutableSMTProgram.defineFun(
     sort: T,
     term: Expression<T>
 ) = defineFun(UserDefinedSMTFunctionN(name, sort, parameters, term))
+
+fun <T : Sort> MutableSMTProgram.defineFun(def : FunctionDef<T>) =
+    defineFun(UserDefinedSMTFunctionN(def.name, def.sort, def.parameters, def.term))
 
 fun MutableSMTProgram.setOption(name: String, value: Boolean) =
     setOption(SetOption(name, BooleanOptionValue(value)))

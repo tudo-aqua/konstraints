@@ -41,8 +41,9 @@ sealed interface Expression<out T : Sort> {
   // etc.
 
   /**
-   * Safely cast this expression to an Expression of Sort S, if this.sort is S Avoids unchecked cast
-   * warnings when casting Expression<*> after binding
+   * Safely cast this expression to an Expression of Sort S.
+   *
+   * @throws [ExpressionCastException] if [sort] is not [S]
    */
   infix fun <S : Sort> castTo(to: S): Expression<S> {
     if (sort != to) {
@@ -401,7 +402,6 @@ class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>)
   val name = symbol.toString()
   override val sort: T = term.sort
   override val parameters = emptyList<Sort>()
-  val definition: FunctionDef<T>? = null
 
   val instance = LocalExpression(symbol, sort, term, this)
 }
@@ -414,5 +414,4 @@ class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T)
 
   val instance = BoundVariable(symbol, sort, this)
   override val parameters: List<Sort> = emptyList()
-  override val definition: FunctionDef<T>? = null
 }

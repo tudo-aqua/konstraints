@@ -564,7 +564,7 @@ class Define3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
  * Registers the function in the given [program]. If [name] is null, the name register will be
  * `|property.name|`.
  *
- * @return [SMTFunction4]
+ * @return [UserDefinedSMTFunction4]
  */
 class Define4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val sort: T,

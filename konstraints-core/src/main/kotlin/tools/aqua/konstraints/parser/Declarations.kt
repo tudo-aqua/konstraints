@@ -48,11 +48,20 @@ import tools.aqua.konstraints.theories.*
 internal object TrueDecl :
     FunctionDecl0<BoolSort>("true".toSymbolWithQuotes(), emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(bindings: Bindings): Expression<BoolSort> = True
+    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.isEmpty())
+        return True
+    }
 }
 
 internal object FalseDecl :
     FunctionDecl0<BoolSort>("false".toSymbolWithQuotes(), emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(bindings: Bindings): Expression<BoolSort> = False
+
+    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.isEmpty())
+        return False
+    }
 }
 
 /** Not declaration internal object */
@@ -63,6 +72,11 @@ internal object NotDecl :
       param: Expression<BoolSort>,
       bindings: Bindings
   ): Expression<BoolSort> = Not(param)
+
+    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size == 1)
+        return Not(args.single() castTo BoolSort)
+    }
 }
 
 /** Implies declaration internal object */
@@ -81,6 +95,11 @@ internal object ImpliesDecl :
       varargs: List<Expression<BoolSort>>,
       bindings: Bindings
   ) = Implies(listOf(param1, param2).plus(varargs))
+
+    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size >= 2)
+        return Implies(args.map { it castTo BoolSort })
+    }
 }
 
 /** And declaration internal object */
@@ -99,6 +118,11 @@ internal object AndDecl :
       varargs: List<Expression<BoolSort>>,
       bindings: Bindings
   ) = And(listOf(param1, param2).plus(varargs))
+
+    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size >= 2)
+        return And(args.map { it castTo BoolSort })
+    }
 }
 
 /** Or declaration internal object */
@@ -117,6 +141,11 @@ internal object OrDecl :
       varargs: List<Expression<BoolSort>>,
       bindings: Bindings
   ) = Or(listOf(param1, param2).plus(varargs))
+
+    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size >= 2)
+        return Or(args.map { it castTo BoolSort })
+    }
 }
 
 /** Xor declaration internal object */
@@ -135,6 +164,11 @@ internal object XOrDecl :
       varargs: List<Expression<BoolSort>>,
       bindings: Bindings
   ) = XOr(listOf(param1, param2).plus(varargs))
+
+    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size >= 2)
+        return XOr(args.map { it castTo BoolSort })
+    }
 }
 
 /** Equals declaration internal object */
@@ -151,6 +185,11 @@ internal object EqualsDecl :
       varargs: List<Expression<Sort>>,
       bindings: Bindings
   ): Expression<BoolSort> = Equals(varargs)
+
+    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size >= 2)
+        return Equals(args)
+    }
 }
 
 /** Distinct declaration internal object */
@@ -176,6 +215,11 @@ internal object DistinctDecl :
       varargs: List<Expression<Sort>>,
       bindings: Bindings
   ): Expression<BoolSort> = Distinct(varargs)
+
+    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size >= 2)
+        return Distinct(args)
+    }
 }
 
 /** Ite declaration internal object */
@@ -195,6 +239,11 @@ internal object IteDecl :
       param3: Expression<Sort>,
       bindings: Bindings
   ): Expression<Sort> = Ite(param1, param2, param3)
+
+    override fun invoke(args: List<Expression<*>>): Ite<*> {
+        require(args.size == 3)
+        return Ite(args[0] castTo BoolSort, args[1], args[2])
+    }
 }
 
 /** FixedSizeBitVectors theory internal object */
@@ -266,6 +315,14 @@ internal object BVConcatDecl :
   ): Expression<BVSort> {
     return BVConcat(param1, param2)
   }
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVConcat(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object ExtractDecl :
@@ -302,6 +359,14 @@ internal object BVNotDecl :
         BVSort.fromSymbol("m")) {
   override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
       BVNot(param)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size == 1)
+        require(args.single().sort is BVSort)
+
+        return BVNot(args.single() as Expression<BVSort>)
+    }
 }
 
 internal object BVNegDecl :
@@ -314,6 +379,14 @@ internal object BVNegDecl :
         BVSort.fromSymbol("m")) {
   override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
       BVNeg(param)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size == 1)
+        require(args.single().sort is BVSort)
+
+        return BVNeg(args.single() as Expression<BVSort>)
+    }
 }
 
 internal object BVAndDecl :
@@ -331,6 +404,14 @@ internal object BVAndDecl :
       varargs: List<Expression<BVSort>>,
       bindings: Bindings
   ): Expression<BVSort> = BVAnd(listOf(param1, param2))
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size >= 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVAnd(args.map { expression -> expression as Expression<BVSort> })
+    }
 }
 
 internal object BVOrDecl :
@@ -348,6 +429,14 @@ internal object BVOrDecl :
       varargs: List<Expression<BVSort>>,
       bindings: Bindings
   ): Expression<BVSort> = BVOr(listOf(param1, param2))
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size >= 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVOr(args.map { expression -> expression as Expression<BVSort> })
+    }
 }
 
 internal object BVAddDecl :
@@ -365,6 +454,14 @@ internal object BVAddDecl :
       varargs: List<Expression<BVSort>>,
       bindings: Bindings
   ): Expression<BVSort> = BVAdd(listOf(param1, param2))
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size >= 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVAdd(args.map { expression -> expression as Expression<BVSort> })
+    }
 }
 
 internal object BVMulDecl :
@@ -382,6 +479,14 @@ internal object BVMulDecl :
       varargs: List<Expression<BVSort>>,
       bindings: Bindings
   ): Expression<BVSort> = BVMul(listOf(param1, param2))
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size >= 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVMul(args.map { expression -> expression as Expression<BVSort> })
+    }
 }
 
 internal object BVUDivDecl :
@@ -398,6 +503,14 @@ internal object BVUDivDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ) = BVUDiv(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVUDiv(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVURemDecl :
@@ -414,6 +527,14 @@ internal object BVURemDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ) = BVURem(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVURem(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVShlDecl :
@@ -430,6 +551,14 @@ internal object BVShlDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ) = BVShl(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVShl(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVLShrDecl :
@@ -446,6 +575,14 @@ internal object BVLShrDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ) = BVLShr(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVLShr(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVUltDecl :
@@ -462,6 +599,14 @@ internal object BVUltDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BoolSort> = BVUlt(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVUlt(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVNAndDecl :
@@ -478,6 +623,14 @@ internal object BVNAndDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BVSort> = BVNAnd(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVNAnd(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVNOrDecl :
@@ -494,6 +647,14 @@ internal object BVNOrDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BVSort> = BVNOr(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVNOr(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVXOrDecl :
@@ -511,6 +672,14 @@ internal object BVXOrDecl :
       varargs: List<Expression<BVSort>>,
       bindings: Bindings
   ): Expression<BVSort> = BVXOr(param1, param2, *varargs.toTypedArray())
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVXOr(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVXNOrDecl :
@@ -527,6 +696,14 @@ internal object BVXNOrDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BVSort> = BVXNOr(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVXNOr(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVCompDecl :
@@ -543,6 +720,14 @@ internal object BVCompDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BVSort> = BVComp(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVComp(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVSubDecl :
@@ -559,6 +744,14 @@ internal object BVSubDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BVSort> = BVSub(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVSub(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVSDivDecl :
@@ -575,6 +768,14 @@ internal object BVSDivDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BVSort> = BVSDiv(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVSDiv(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVSRemDecl :
@@ -591,6 +792,14 @@ internal object BVSRemDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BVSort> = BVSRem(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVSRem(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVSModDecl :
@@ -607,6 +816,14 @@ internal object BVSModDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BVSort> = BVSMod(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVSMod(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVULeDecl :
@@ -623,6 +840,14 @@ internal object BVULeDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BoolSort> = BVULe(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVULe(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVUGtDecl :
@@ -639,6 +864,14 @@ internal object BVUGtDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BoolSort> = BVUGt(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVUGt(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVUGeDecl :
@@ -655,6 +888,14 @@ internal object BVUGeDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BoolSort> = BVUGe(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVUGe(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVSLtDecl :
@@ -671,6 +912,14 @@ internal object BVSLtDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BoolSort> = BVSLt(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVSLt(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVSLeDecl :
@@ -687,6 +936,14 @@ internal object BVSLeDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BoolSort> = BVSLe(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVSLe(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVSGtDecl :
@@ -703,6 +960,14 @@ internal object BVSGtDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BoolSort> = BVSGt(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVSGt(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVSGeDecl :
@@ -719,6 +984,14 @@ internal object BVSGeDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BoolSort> = BVSGe(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVSGe(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object BVAShrDecl :
@@ -735,6 +1008,14 @@ internal object BVAShrDecl :
       param2: Expression<BVSort>,
       bindings: Bindings
   ): Expression<BVSort> = BVAShr(param1, param2)
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+        require(args.size == 2)
+        require(args.all { expression -> expression.sort is BVSort })
+
+        return BVAShr(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    }
 }
 
 internal object RepeatDecl :
@@ -829,6 +1110,11 @@ internal object IntNegDecl :
       param: Expression<IntSort>,
       bindings: Bindings
   ): Expression<IntSort> = IntNeg(param)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<IntSort> {
+        require(args.size == 1)
+        return IntNeg(args.single() castTo IntSort)
+    }
 }
 
 internal object IntSubDecl :
@@ -840,6 +1126,11 @@ internal object IntSubDecl :
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
   ): Expression<IntSort> = IntSub(listOf(param1, param2) + varargs)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<IntSort> {
+        require(args.size >= 2)
+        return IntSub(args.map { expr -> expr castTo IntSort })
+    }
 }
 
 /** Combined function declaration for overloaded '-' operator */
@@ -890,6 +1181,11 @@ internal object IntAddDecl :
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
   ): Expression<IntSort> = IntAdd(listOf(param1, param2) + varargs)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<IntSort> {
+        require(args.size >= 2)
+        return IntAdd(args.map { expr -> expr castTo IntSort })
+    }
 }
 
 internal object IntMulDecl :
@@ -901,6 +1197,11 @@ internal object IntMulDecl :
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
   ): Expression<IntSort> = IntMul(listOf(param1, param2) + varargs)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<IntSort> {
+        require(args.size >= 2)
+        return IntMul(args.map { expr -> expr castTo IntSort })
+    }
 }
 
 internal object IntDivDecl :
@@ -912,6 +1213,11 @@ internal object IntDivDecl :
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
   ): Expression<IntSort> = IntDiv(listOf(param1, param2) + varargs)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<IntSort> {
+        require(args.size >= 2)
+        return IntDiv(args.map { expr -> expr castTo IntSort })
+    }
 }
 
 internal object ModDecl :
@@ -922,6 +1228,11 @@ internal object ModDecl :
       param2: Expression<IntSort>,
       bindings: Bindings
   ): Expression<IntSort> = Mod(param1, param2)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<IntSort> {
+        require(args.size == 2)
+        return Mod(args[0] castTo IntSort, args[1] castTo IntSort)
+    }
 }
 
 internal object AbsDecl :
@@ -931,6 +1242,11 @@ internal object AbsDecl :
       param: Expression<IntSort>,
       bindings: Bindings
   ): Expression<IntSort> = Abs(param)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<IntSort> {
+        require(args.size == 1)
+        return IntNeg(args.single() castTo IntSort)
+    }
 }
 
 internal object IntLessEqDecl :
@@ -940,6 +1256,11 @@ internal object IntLessEqDecl :
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
   ): Expression<BoolSort> = IntLessEq(varargs)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size >= 2)
+        return IntLessEq(args.map { expr -> expr castTo IntSort })
+    }
 }
 
 internal object IntLessDecl :
@@ -949,6 +1270,11 @@ internal object IntLessDecl :
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
   ): Expression<BoolSort> = IntLess(varargs)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size >= 2)
+        return IntLess(args.map { expr -> expr castTo IntSort })
+    }
 }
 
 internal object IntGreaterEqDecl :
@@ -958,6 +1284,11 @@ internal object IntGreaterEqDecl :
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
   ): Expression<BoolSort> = IntGreaterEq(varargs)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size >= 2)
+        return IntGreaterEq(args.map { expr -> expr castTo IntSort })
+    }
 }
 
 internal object IntGreaterDecl :
@@ -967,6 +1298,11 @@ internal object IntGreaterDecl :
       varargs: List<Expression<IntSort>>,
       bindings: Bindings
   ): Expression<BoolSort> = IntGreater(varargs)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size >= 2)
+        return IntGreater(args.map { expr -> expr castTo IntSort })
+    }
 }
 
 internal object DivisibleDecl :
@@ -1012,6 +1348,11 @@ internal object RealNegDecl :
       param: Expression<RealSort>,
       bindings: Bindings
   ): Expression<RealSort> = RealNeg(param)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<RealSort> {
+        require(args.size == 1)
+        return RealNeg(args.single() castTo RealSort)
+    }
 }
 
 internal object RealSubDecl :
@@ -1029,6 +1370,11 @@ internal object RealSubDecl :
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
   ): Expression<RealSort> = RealSub(listOf(param1, param2) + varargs)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<RealSort> {
+        require(args.size >= 2)
+        return RealSub(args.map { expr -> expr castTo RealSort })
+    }
 }
 
 /** Combined function declaration for overloaded '-' operator */
@@ -1085,6 +1431,11 @@ internal object RealAddDecl :
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
   ): Expression<RealSort> = RealAdd(listOf(param1, param2) + varargs)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<RealSort> {
+        require(args.size >= 2)
+        return RealAdd(args.map { expr -> expr castTo RealSort })
+    }
 }
 
 internal object RealMulDecl :
@@ -1102,6 +1453,11 @@ internal object RealMulDecl :
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
   ): Expression<RealSort> = RealMul(listOf(param1, param2) + varargs)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<RealSort> {
+        require(args.size >= 2)
+        return RealMul(args.map { expr -> expr castTo RealSort })
+    }
 }
 
 internal object RealDivDecl :
@@ -1119,6 +1475,11 @@ internal object RealDivDecl :
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
   ): Expression<RealSort> = RealDiv(listOf(param1, param2) + varargs)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<RealSort> {
+        require(args.size >= 2)
+        return RealDiv(args.map { expr -> expr castTo RealSort })
+    }
 }
 
 internal object RealLessEqDecl :
@@ -1128,6 +1489,11 @@ internal object RealLessEqDecl :
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
   ): Expression<BoolSort> = RealLessEq(varargs)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size >= 2)
+        return RealLessEq(args.map { expr -> expr castTo RealSort })
+    }
 }
 
 internal object RealLessDecl :
@@ -1137,6 +1503,11 @@ internal object RealLessDecl :
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
   ): Expression<BoolSort> = RealLess(varargs)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size >= 2)
+        return RealLess(args.map { expr -> expr castTo RealSort })
+    }
 }
 
 internal object RealGreaterEqDecl :
@@ -1146,6 +1517,11 @@ internal object RealGreaterEqDecl :
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
   ): Expression<BoolSort> = RealGreaterEq(varargs)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size >= 2)
+        return RealGreaterEq(args.map { expr -> expr castTo RealSort })
+    }
 }
 
 internal object RealGreaterDecl :
@@ -1155,6 +1531,11 @@ internal object RealGreaterDecl :
       varargs: List<Expression<RealSort>>,
       bindings: Bindings
   ): Expression<BoolSort> = RealGreater(varargs)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size >= 2)
+        return RealGreater(args.map { expr -> expr castTo RealSort })
+    }
 }
 
 /** Reals Ints theory context */
@@ -1196,6 +1577,11 @@ internal object ToRealDecl :
       param: Expression<IntSort>,
       bindings: Bindings
   ): Expression<RealSort> = ToReal(param)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<RealSort> {
+        require(args.size == 1)
+        return ToReal(args.single() castTo IntSort)
+    }
 }
 
 internal object ToIntDecl :
@@ -1205,6 +1591,11 @@ internal object ToIntDecl :
       param: Expression<RealSort>,
       bindings: Bindings
   ): Expression<IntSort> = ToInt(param)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<IntSort> {
+        require(args.size == 1)
+        return ToInt(args.single() castTo RealSort)
+    }
 }
 
 internal object IsIntDecl :
@@ -1214,6 +1605,11 @@ internal object IsIntDecl :
       param: Expression<RealSort>,
       bindings: Bindings
   ): Expression<BoolSort> = IsInt(param)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+        require(args.size == 1)
+        return IsInt(args.single() castTo RealSort)
+    }
 }
 
 /** FloatingPoint theory internal object */
@@ -1325,11 +1721,21 @@ internal object RoundNearestTiesToEvenDecl :
         "roundNearestTiesToEven".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> =
       RoundNearestTiesToEven
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+        require(args.isEmpty())
+        return RoundNearestTiesToEven
+    }
 }
 
 internal object RNEDecl :
     FunctionDecl0<RoundingMode>("RNE".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RNE
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+        require(args.isEmpty())
+        return RNE
+    }
 }
 
 internal object RoundNearestTiesToAwayDecl :
@@ -1337,44 +1743,84 @@ internal object RoundNearestTiesToAwayDecl :
         "roundNearestTiesToAway".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> =
       RoundNearestTiesToAway
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+        require(args.isEmpty())
+        return RoundNearestTiesToAway
+    }
 }
 
 internal object RNADecl :
     FunctionDecl0<RoundingMode>("RNA".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RNA
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+        require(args.isEmpty())
+        return RNA
+    }
 }
 
 internal object RoundTowardPositiveDecl :
     FunctionDecl0<RoundingMode>(
         "roundTowardPositive".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RoundTowardPositive
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+        require(args.isEmpty())
+        return RoundTowardPositive
+    }
 }
 
 internal object RTPDecl :
     FunctionDecl0<RoundingMode>("RTP".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RTP
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+        require(args.isEmpty())
+        return RTP
+    }
 }
 
 internal object RoundTowardNegativeDecl :
     FunctionDecl0<RoundingMode>(
         "RoundTowardNegative".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RoundTowardNegative
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+        require(args.isEmpty())
+        return RoundTowardNegative
+    }
 }
 
 internal object RTNDecl :
     FunctionDecl0<RoundingMode>("RTN".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RTN
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+        require(args.isEmpty())
+        return RTN
+    }
 }
 
 internal object RoundTowardZeroDecl :
     FunctionDecl0<RoundingMode>(
         "RoundTowardZero".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RoundTowardZero
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+        require(args.isEmpty())
+        return RoundTowardZero
+    }
 }
 
 internal object RTZDecl :
     FunctionDecl0<RoundingMode>("RTZ".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RTZ
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+        require(args.isEmpty())
+        return RTZ
+    }
 }
 
 internal object FPLiteralDecl :
@@ -1395,6 +1841,13 @@ internal object FPLiteralDecl :
   ): Expression<FPSort> {
     return FPLiteral(param1 as BVLiteral, param2 as BVLiteral, param3 as BVLiteral)
   }
+
+    @Suppress("UNCHECKED_CAST")
+    override operator fun invoke(args: List<Expression<*>>): Expression<FPSort> {
+        require(args.size == 3)
+        require(args.all { expr -> expr.sort is BVSort })
+        return FPLiteral(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>, args[2] as Expression<BVSort>)
+    }
 }
 
 /** Plus infinity declaration internal object */
@@ -1406,6 +1859,11 @@ internal object FPInfinityDecl :
         FPSort("eb".idx(), "sb".idx())) {
   override fun buildExpression(bindings: Bindings): Expression<FPSort> =
       FPInfinity(bindings["eb"].numeral, bindings["sb"].numeral)
+
+    override operator fun invoke(args: List<Expression<*>>): Expression<FPSort> {
+        require(args.isEmpty())
+        return FPInfinity()
+    }
 }
 
 /** Minus infinity declaration internal object */

@@ -29,6 +29,7 @@ import org.petitparser.parser.primitive.CharacterParser.*
 import org.petitparser.parser.primitive.StringParser.of
 import org.petitparser.utils.FailureJoiner
 import tools.aqua.konstraints.smt.*
+import tools.aqua.konstraints.theories.BoolSort
 
 operator fun Parser.plus(other: Parser): ChoiceParser = or(other)
 
@@ -38,6 +39,8 @@ infix fun Parser.trim(both: Parser): Parser = trim(both)
 
 object Parser {
   // Auxiliary Lexical Categories
+
+    val program = MutableSMTProgram(emptyList())
 
   private val whitespaceCat = anyOf(" \t\r\n", "space, tab, or newline expected")
   private val printableCat = range('\u0020', '\u007E') + range('\u0080', '\u00FF')
@@ -403,9 +406,10 @@ object Parser {
   init {
     /* maps to ProtoSort */
     sort.set(
-        identifier.map { identifier: Identifier -> ProtoSort(identifier, listOf()) } +
+        identifier.map { identifier: Identifier -> program.context.getSort(identifier.symbol) } +
             (lparen * identifier * sort.plus() * rparen).map { results: List<Any> ->
-              ProtoSort(results[1] as Identifier, results[2] as List<ProtoSort>)
+                TODO("Implement sorts with arity > 0 in context")
+              // program.context.getSort((results[1] as Identifier).symbol)
               // results[2] is guaranteed to be a none empty List of ProtoSort
             })
   }
@@ -434,23 +438,29 @@ object Parser {
 
   internal val term = undefined()
 
-  /* maps to an implementation of QualIdentifier */
+  /* maps to an instance of SMTFunction and a list of indices */
   private val qualIdentifier =
-      identifier.map { identifier: Identifier -> SimpleQualIdentifier(identifier) } +
+      identifier.map { identifier: Identifier ->
+          when(identifier) {
+              is SymbolIdentifier -> listOf(program.context.getFunc(identifier.symbol), emptyList<Index>())
+              is IndexedIdentifier -> listOf(program.context.getFunc(identifier.symbol), identifier.indices)
+          }
+      } +
           (lparen * asKW * identifier * sort * rparen).map { results: List<Any> ->
-            AsQualIdentifier(results[2] as Identifier, results[3] as ProtoSort)
+              TODO("Implement As")
+            // AsQualIdentifier(results[2] as Identifier, results[3] as ProtoSort)
           }
 
   /* maps to VarBinding */
   internal val varBinding =
       (lparen * symbol * term * rparen).map { results: List<Any> ->
-        ProtoVarBinding(results[1] as ParseSymbol, results[2] as ProtoTerm)
+        VarBinding(results[1] as Symbol, results[2] as Expression<*>)
       }
 
   /* maps to SortedVar */
   private val sortedVar =
       (lparen * symbol * sort * rparen).map { results: List<Any> ->
-        ProtoSortedVar(results[1] as ParseSymbol, results[2] as ProtoSort)
+        SortedVar(results[1] as Symbol, results[2] as Sort)
       }
 
   /* maps to pattern */
@@ -473,17 +483,17 @@ object Parser {
     term.set(
         (lparen * letKW * lparen * varBinding.plus() * rparen * term * rparen).map {
             results: List<Any> ->
-          ProtoLet(results[3] as List<ProtoVarBinding>, results[5] as ProtoTerm)
+          LetExpression(results[3] as List<VarBinding<*>>, results[5] as Expression<*>)
           // results[3] is guaranteed to be a list of VarBinding
         } + /* maps to ProtoLet */
             (lparen * forallKW * lparen * sortedVar.plus() * rparen * term * rparen).map {
                 results: List<Any> ->
-              ProtoForAll(results[3] as List<ProtoSortedVar>, results[5] as ProtoTerm)
+              ForallExpression(results[3] as List<SortedVar<*>>, results[5] as Expression<*> castTo BoolSort)
               // results[3] is guaranteed to be a list of SortedVar
             } + /* maps to ProtoForAll */
             (lparen * existsKW * lparen * sortedVar.plus() * rparen * term * rparen).map {
                 results: List<Any> ->
-              ProtoExists(results[3] as List<ProtoSortedVar>, results[5] as ProtoTerm)
+              ExistsExpression(results[3] as List<SortedVar<*>>, results[5] as Expression<*> castTo BoolSort)
               // results[3] is guaranteed to be a list of SortedVar
             } + /* maps to ProtoExists */
             (lparen * matchKW * term * lparen * matchCase.plus() * rparen * rparen).map {
@@ -492,16 +502,19 @@ object Parser {
               // results[3] is guaranteed to be a list of MatchCase
             } + /* maps to ProtoMatch */
             (lparen * exclamationKW * term * attribute.plus() * rparen).map { results: List<Any> ->
-              ProtoAnnotation(results[2] as ProtoTerm, results[3] as List<Attribute>)
+              AnnotatedExpression(results[2] as Expression<*>, results[3] as List<Attribute>)
               // results[3] is guaranteed to be a list of Attributes
             } /* maps to ProtoExclamation */ +
             specConstant.map { constant: SpecConstant ->
               SpecConstantTerm(constant)
             } + /* maps to SpecConstantTerm */
-            qualIdentifier /* Results is either SymbolTree or ProtoAs */ +
+            qualIdentifier.map { results: List<Any> ->
+                /* Results is an SMTFunction without any parameters */
+                (results[0] as SMTFunction<*>)(emptyList(), /* results[1] as List<Index> */)
+            }  +
             (lparen * qualIdentifier * term.plus() * rparen).map { results: List<Any> ->
-              /* Results contains QualIdentifier follow by list of ProtoTerm */
-              BracketedProtoTerm(results[1] as QualIdentifier, results[2] as List<ProtoTerm>)
+              /* Results contains SMTFunction follow by list of its arguments as Expressions */
+                (results[1] as SMTFunction<*>)(results[2] as List<Expression<*>>)
             } /* maps to GenericProtoTerm */)
   }
 
@@ -582,11 +595,11 @@ object Parser {
   private val functionDec = lparen * symbol * lparen * sortedVar.star() * rparen * sort * rparen
   private val functionDef =
       (symbol * lparen * sortedVar.star() * rparen * sort * term).map { result: ArrayList<Any> ->
-        ProtoFunctionDef(
+        FunctionDef(
             result[0] as ParseSymbol,
-            result[2] as List<ProtoSortedVar>,
-            result[4] as ProtoSort,
-            result[5] as ProtoTerm)
+            result[2] as List<SortedVar<*>>,
+            result[4] as Sort,
+            result[5] as Expression<*>)
       }
 
   /*
@@ -596,21 +609,20 @@ object Parser {
 
   private val assertCMD =
       (lparen * assertKW * term * rparen).map { results: List<Any> ->
-        ProtoAssert(results[2] as ProtoTerm)
+        program.assert(results[2] as Expression<*> castTo BoolSort)
       }
 
   private val checkSatCMD = (lparen * checkSatKW * rparen).map { _: Any -> CheckSat }
 
   private val declareConstCMD =
       (lparen * declareConstKW * symbol * sort * rparen).map { results: ArrayList<Any> ->
-        ProtoDeclareConst(results[2] as ParseSymbol, results[3] as ProtoSort)
+          program.declareConst(results[2] as ParseSymbol, results[3] as Sort)
       }
 
   private val declareFunCMD =
       (lparen * declareFunKW * symbol * lparen * sort.star() * rparen * sort * rparen).map {
           results: ArrayList<Any> ->
-        ProtoDeclareFun(
-            results[2] as ParseSymbol, results[4] as List<ProtoSort>, results[6] as ProtoSort)
+          program.declareFun(results[2] as ParseSymbol, results[4] as List<Sort>, results[6] as Sort)
         // results[4] is guaranteed to be a List of ProtoSort
       }
 
@@ -618,30 +630,31 @@ object Parser {
 
   private val setInfoCMD =
       (lparen * setInfoKW * attribute * rparen).map { results: ArrayList<Any> ->
-        SetInfo(results[2] as Attribute)
+          program.setInfo(SetInfo(results[2] as Attribute))
       }
 
   private val setLogicCMD =
       (lparen * setLogicKW * logic * rparen).map { results: ArrayList<Any> ->
-        ProtoSetLogic(results[2] as Logic)
+          program.setLogic(results[2] as Logic)
       }
 
   private val setOptionCMD =
       (lparen * setOptionKW * option * rparen).map { results: ArrayList<Any> ->
-        SetOption(
-            (results[2] as List<Any>)[0] as String, (results[2] as List<Any>)[0] as OptionValue)
+        program.setOption(SetOption(
+            (results[2] as List<Any>)[0] as String, (results[2] as List<Any>)[0] as OptionValue))
       }
 
   private val declareSortCMD =
       (lparen * declareSortKW * symbol * numeral * rparen).map { results: ArrayList<Any> ->
-        ProtoDeclareSort(results[2] as ParseSymbol, (results[3] as String).toInt())
+          TODO("Implement declare sort in program")
+        // ProtoDeclareSort(results[2] as ParseSymbol, (results[3] as String).toInt())
       }
 
   private val getModelCMD = (lparen * getModelKW * rparen).map { _: Any -> GetModel }
 
   private val defineFunCMD =
       (lparen * defineFunKW * functionDef * rparen).map { results: ArrayList<Any> ->
-        ProtoDefineFun(results[2] as ProtoFunctionDef)
+          program.defineFun(results[2] as FunctionDef<*>)
       }
 
   private val pushCMD =
@@ -705,8 +718,7 @@ object Parser {
                 is Command -> command
                 else -> throw IllegalStateException("Illegal type in parse tree $command!")
               }
-            },
-        parseTreeVisitor.context!!)
+            })
   }
 
   private fun splitInput(program: String): List<String> {
