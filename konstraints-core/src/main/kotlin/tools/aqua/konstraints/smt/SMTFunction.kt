@@ -31,7 +31,7 @@ abstract class SMTFunction<out T : Sort> {
   abstract val sort: T
   abstract val parameters: List<Sort>
 
-  abstract operator fun invoke(args: List<Expression<*>>): Expression<T>
+  abstract fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<T>
 
   final override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -66,7 +66,7 @@ abstract class SMTFunction<out T : Sort> {
 
 abstract class DeclaredSMTFunction<T : Sort> : SMTFunction<T>() {
 
-  override operator fun invoke(args: List<Expression<*>>): Expression<T> {
+  override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<T> {
     require(args.size == parameters.size)
     require((args zipWithSameLength parameters).all { (par, sort) -> par.sort == sort })
 
@@ -78,7 +78,7 @@ abstract class DefinedSMTFunction<T : Sort> : SMTFunction<T>() {
   abstract val term: Expression<T>
   abstract val sortedVars: List<SortedVar<*>>
 
-  override operator fun invoke(args: List<Expression<*>>): Expression<T> {
+  override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<T> {
     require(args.size == parameters.size)
     require((args zipWithSameLength parameters).all { (par, sort) -> par.sort == sort })
 

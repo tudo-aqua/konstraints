@@ -48,8 +48,10 @@ import tools.aqua.konstraints.theories.*
 internal object TrueDecl :
     FunctionDecl0<BoolSort>("true".toSymbolWithQuotes(), emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(bindings: Bindings): Expression<BoolSort> = True
-    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.isEmpty())
+        require(indices.isEmpty())
+
         return True
     }
 }
@@ -58,8 +60,10 @@ internal object FalseDecl :
     FunctionDecl0<BoolSort>("false".toSymbolWithQuotes(), emptySet(), emptySet(), BoolSort) {
   override fun buildExpression(bindings: Bindings): Expression<BoolSort> = False
 
-    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.isEmpty())
+        require(indices.isEmpty())
+
         return False
     }
 }
@@ -73,8 +77,10 @@ internal object NotDecl :
       bindings: Bindings
   ): Expression<BoolSort> = Not(param)
 
-    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size == 1)
+        require(indices.isEmpty())
+
         return Not(args.single() castTo BoolSort)
     }
 }
@@ -96,8 +102,10 @@ internal object ImpliesDecl :
       bindings: Bindings
   ) = Implies(listOf(param1, param2).plus(varargs))
 
-    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size >= 2)
+        require(indices.isEmpty())
+
         return Implies(args.map { it castTo BoolSort })
     }
 }
@@ -119,8 +127,10 @@ internal object AndDecl :
       bindings: Bindings
   ) = And(listOf(param1, param2).plus(varargs))
 
-    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size >= 2)
+        require(indices.isEmpty())
+
         return And(args.map { it castTo BoolSort })
     }
 }
@@ -142,8 +152,10 @@ internal object OrDecl :
       bindings: Bindings
   ) = Or(listOf(param1, param2).plus(varargs))
 
-    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size >= 2)
+        require(indices.isEmpty())
+
         return Or(args.map { it castTo BoolSort })
     }
 }
@@ -165,8 +177,10 @@ internal object XOrDecl :
       bindings: Bindings
   ) = XOr(listOf(param1, param2).plus(varargs))
 
-    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size >= 2)
+        require(indices.isEmpty())
+
         return XOr(args.map { it castTo BoolSort })
     }
 }
@@ -186,8 +200,11 @@ internal object EqualsDecl :
       bindings: Bindings
   ): Expression<BoolSort> = Equals(varargs)
 
-    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size >= 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort == args[0].sort })
+
         return Equals(args)
     }
 }
@@ -216,8 +233,11 @@ internal object DistinctDecl :
       bindings: Bindings
   ): Expression<BoolSort> = Distinct(varargs)
 
-    override fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size >= 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort == args[0].sort }) // TODO is this necessary?
+
         return Distinct(args)
     }
 }
@@ -240,8 +260,10 @@ internal object IteDecl :
       bindings: Bindings
   ): Expression<Sort> = Ite(param1, param2, param3)
 
-    override fun invoke(args: List<Expression<*>>): Ite<*> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Ite<*> {
         require(args.size == 3)
+        require(indices.isEmpty())
+
         return Ite(args[0] castTo BoolSort, args[1], args[2])
     }
 }
@@ -317,8 +339,9 @@ internal object BVConcatDecl :
   }
 
     @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
         return BVConcat(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -347,6 +370,16 @@ internal object ExtractDecl :
   override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> {
     return BVExtract(bindings["i"].numeral, bindings["j"].numeral, param)
   }
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
+        require(args.size == 1)
+        require(indices.size == 2)
+        require(args.single().sort is BVSort)
+        require(indices.all { index -> index is NumeralIndex })
+
+        @Suppress("UNCHECKED_CAST")
+        return BVExtract((indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral, args.single() as Expression<BVSort>)
+    }
 }
 
 internal object BVNotDecl :
@@ -360,11 +393,12 @@ internal object BVNotDecl :
   override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
       BVNot(param)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size == 1)
+        require(indices.isEmpty())
         require(args.single().sort is BVSort)
 
+        @Suppress("UNCHECKED_CAST")
         return BVNot(args.single() as Expression<BVSort>)
     }
 }
@@ -380,11 +414,12 @@ internal object BVNegDecl :
   override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
       BVNeg(param)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size == 1)
+        require(indices.isEmpty())
         require(args.single().sort is BVSort)
 
+        @Suppress("UNCHECKED_CAST")
         return BVNeg(args.single() as Expression<BVSort>)
     }
 }
@@ -405,11 +440,12 @@ internal object BVAndDecl :
       bindings: Bindings
   ): Expression<BVSort> = BVAnd(listOf(param1, param2))
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size >= 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVAnd(args.map { expression -> expression as Expression<BVSort> })
     }
 }
@@ -430,11 +466,12 @@ internal object BVOrDecl :
       bindings: Bindings
   ): Expression<BVSort> = BVOr(listOf(param1, param2))
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size >= 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVOr(args.map { expression -> expression as Expression<BVSort> })
     }
 }
@@ -455,11 +492,12 @@ internal object BVAddDecl :
       bindings: Bindings
   ): Expression<BVSort> = BVAdd(listOf(param1, param2))
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size >= 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVAdd(args.map { expression -> expression as Expression<BVSort> })
     }
 }
@@ -480,11 +518,12 @@ internal object BVMulDecl :
       bindings: Bindings
   ): Expression<BVSort> = BVMul(listOf(param1, param2))
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size >= 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVMul(args.map { expression -> expression as Expression<BVSort> })
     }
 }
@@ -504,11 +543,12 @@ internal object BVUDivDecl :
       bindings: Bindings
   ) = BVUDiv(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVUDiv(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -528,11 +568,12 @@ internal object BVURemDecl :
       bindings: Bindings
   ) = BVURem(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVURem(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -552,11 +593,12 @@ internal object BVShlDecl :
       bindings: Bindings
   ) = BVShl(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVShl(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -576,11 +618,12 @@ internal object BVLShrDecl :
       bindings: Bindings
   ) = BVLShr(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVLShr(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -600,11 +643,12 @@ internal object BVUltDecl :
       bindings: Bindings
   ): Expression<BoolSort> = BVUlt(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVUlt(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -624,11 +668,12 @@ internal object BVNAndDecl :
       bindings: Bindings
   ): Expression<BVSort> = BVNAnd(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVNAnd(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -648,11 +693,12 @@ internal object BVNOrDecl :
       bindings: Bindings
   ): Expression<BVSort> = BVNOr(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVNOr(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -673,11 +719,12 @@ internal object BVXOrDecl :
       bindings: Bindings
   ): Expression<BVSort> = BVXOr(param1, param2, *varargs.toTypedArray())
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVXOr(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -697,11 +744,12 @@ internal object BVXNOrDecl :
       bindings: Bindings
   ): Expression<BVSort> = BVXNOr(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVXNOr(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -721,11 +769,12 @@ internal object BVCompDecl :
       bindings: Bindings
   ): Expression<BVSort> = BVComp(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVComp(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -745,11 +794,12 @@ internal object BVSubDecl :
       bindings: Bindings
   ): Expression<BVSort> = BVSub(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVSub(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -769,11 +819,12 @@ internal object BVSDivDecl :
       bindings: Bindings
   ): Expression<BVSort> = BVSDiv(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVSDiv(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -793,11 +844,12 @@ internal object BVSRemDecl :
       bindings: Bindings
   ): Expression<BVSort> = BVSRem(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVSRem(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -817,11 +869,12 @@ internal object BVSModDecl :
       bindings: Bindings
   ): Expression<BVSort> = BVSMod(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVSMod(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -841,11 +894,12 @@ internal object BVULeDecl :
       bindings: Bindings
   ): Expression<BoolSort> = BVULe(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVULe(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -865,11 +919,13 @@ internal object BVUGtDecl :
       bindings: Bindings
   ): Expression<BoolSort> = BVUGt(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVUGt(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -889,11 +945,12 @@ internal object BVUGeDecl :
       bindings: Bindings
   ): Expression<BoolSort> = BVUGe(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVUGe(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -913,11 +970,13 @@ internal object BVSLtDecl :
       bindings: Bindings
   ): Expression<BoolSort> = BVSLt(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVSLt(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -937,11 +996,13 @@ internal object BVSLeDecl :
       bindings: Bindings
   ): Expression<BoolSort> = BVSLe(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVSLe(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -961,11 +1022,13 @@ internal object BVSGtDecl :
       bindings: Bindings
   ): Expression<BoolSort> = BVSGt(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVSGt(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -985,11 +1048,13 @@ internal object BVSGeDecl :
       bindings: Bindings
   ): Expression<BoolSort> = BVSGe(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVSGe(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -1009,11 +1074,13 @@ internal object BVAShrDecl :
       bindings: Bindings
   ): Expression<BVSort> = BVAShr(param1, param2)
 
-    @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<BVSort> {
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
         require(args.size == 2)
+        require(indices.isEmpty())
         require(args.all { expression -> expression.sort is BVSort })
 
+        @Suppress("UNCHECKED_CAST")
         return BVAShr(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
     }
 }
@@ -1028,6 +1095,16 @@ internal object RepeatDecl :
         BVSort.fromSymbol("n")) {
   override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
       Repeat(bindings["j"].numeral, param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
+        require(args.size == 1)
+        require(indices.size == 1)
+        require(args.single().sort is BVSort)
+        require(indices.single() is NumeralIndex)
+
+        @Suppress("UNCHECKED_CAST")
+        return Repeat((indices.single() as NumeralIndex).numeral, args.single() as Expression<BVSort>)
+    }
 }
 
 internal object ZeroExtendDecl :
@@ -1040,6 +1117,16 @@ internal object ZeroExtendDecl :
         BVSort.fromSymbol("n")) {
   override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
       ZeroExtend(bindings["i"].numeral, param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
+        require(args.size == 1)
+        require(indices.size == 1)
+        require(args.single().sort is BVSort)
+        require(indices.single() is NumeralIndex)
+
+        @Suppress("UNCHECKED_CAST")
+        return ZeroExtend((indices.single() as NumeralIndex).numeral, args.single() as Expression<BVSort>)
+    }
 }
 
 internal object SignExtendDecl :
@@ -1052,6 +1139,16 @@ internal object SignExtendDecl :
         BVSort.fromSymbol("n")) {
   override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
       ZeroExtend(bindings["i"].numeral, param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
+        require(args.size == 1)
+        require(indices.size == 1)
+        require(args.single().sort is BVSort)
+        require(indices.single() is NumeralIndex)
+
+        @Suppress("UNCHECKED_CAST")
+        return SignExtend((indices.single() as NumeralIndex).numeral, args.single() as Expression<BVSort>)
+    }
 }
 
 internal object RotateLeftDecl :
@@ -1064,6 +1161,16 @@ internal object RotateLeftDecl :
         BVSort.fromSymbol("n")) {
   override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
       RotateLeft(bindings["i"].numeral, param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
+        require(args.size == 1)
+        require(indices.size == 1)
+        require(args.single().sort is BVSort)
+        require(indices.single() is NumeralIndex)
+
+        @Suppress("UNCHECKED_CAST")
+        return RotateLeft((indices.single() as NumeralIndex).numeral, args.single() as Expression<BVSort>)
+    }
 }
 
 internal object RotateRightDecl :
@@ -1076,6 +1183,16 @@ internal object RotateRightDecl :
         BVSort.fromSymbol("n")) {
   override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<BVSort> =
       RotateRight(bindings["i"].numeral, param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
+        require(args.size == 1)
+        require(indices.size == 1)
+        require(args.single().sort is BVSort)
+        require(indices.single() is NumeralIndex)
+
+        @Suppress("UNCHECKED_CAST")
+        return RotateRight((indices.single() as NumeralIndex).numeral, args.single() as Expression<BVSort>)
+    }
 }
 
 /** Ints theory internal object */
@@ -1111,7 +1228,7 @@ internal object IntNegDecl :
       bindings: Bindings
   ): Expression<IntSort> = IntNeg(param)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<IntSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<IntSort> {
         require(args.size == 1)
         return IntNeg(args.single() castTo IntSort)
     }
@@ -1127,7 +1244,7 @@ internal object IntSubDecl :
       bindings: Bindings
   ): Expression<IntSort> = IntSub(listOf(param1, param2) + varargs)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<IntSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<IntSort> {
         require(args.size >= 2)
         return IntSub(args.map { expr -> expr castTo IntSort })
     }
@@ -1170,6 +1287,14 @@ internal object IntNegSubDecl :
       } else {
         IntSubDecl.accepts(args, indices)
       }
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<IntSort> = if(args.size == 1) {
+        IntNegDecl.constructDynamic(args, indices)
+    } else if(args.size > 1) {
+        IntSubDecl.constructDynamic(args, indices)
+    } else {
+        throw IllegalArgumentException()
+    }
 }
 
 internal object IntAddDecl :
@@ -1182,7 +1307,7 @@ internal object IntAddDecl :
       bindings: Bindings
   ): Expression<IntSort> = IntAdd(listOf(param1, param2) + varargs)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<IntSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<IntSort> {
         require(args.size >= 2)
         return IntAdd(args.map { expr -> expr castTo IntSort })
     }
@@ -1198,7 +1323,7 @@ internal object IntMulDecl :
       bindings: Bindings
   ): Expression<IntSort> = IntMul(listOf(param1, param2) + varargs)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<IntSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<IntSort> {
         require(args.size >= 2)
         return IntMul(args.map { expr -> expr castTo IntSort })
     }
@@ -1214,7 +1339,7 @@ internal object IntDivDecl :
       bindings: Bindings
   ): Expression<IntSort> = IntDiv(listOf(param1, param2) + varargs)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<IntSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<IntSort> {
         require(args.size >= 2)
         return IntDiv(args.map { expr -> expr castTo IntSort })
     }
@@ -1229,7 +1354,7 @@ internal object ModDecl :
       bindings: Bindings
   ): Expression<IntSort> = Mod(param1, param2)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<IntSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<IntSort> {
         require(args.size == 2)
         return Mod(args[0] castTo IntSort, args[1] castTo IntSort)
     }
@@ -1243,7 +1368,7 @@ internal object AbsDecl :
       bindings: Bindings
   ): Expression<IntSort> = Abs(param)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<IntSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<IntSort> {
         require(args.size == 1)
         return IntNeg(args.single() castTo IntSort)
     }
@@ -1257,7 +1382,7 @@ internal object IntLessEqDecl :
       bindings: Bindings
   ): Expression<BoolSort> = IntLessEq(varargs)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size >= 2)
         return IntLessEq(args.map { expr -> expr castTo IntSort })
     }
@@ -1271,7 +1396,7 @@ internal object IntLessDecl :
       bindings: Bindings
   ): Expression<BoolSort> = IntLess(varargs)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size >= 2)
         return IntLess(args.map { expr -> expr castTo IntSort })
     }
@@ -1285,7 +1410,7 @@ internal object IntGreaterEqDecl :
       bindings: Bindings
   ): Expression<BoolSort> = IntGreaterEq(varargs)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size >= 2)
         return IntGreaterEq(args.map { expr -> expr castTo IntSort })
     }
@@ -1299,7 +1424,7 @@ internal object IntGreaterDecl :
       bindings: Bindings
   ): Expression<BoolSort> = IntGreater(varargs)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size >= 2)
         return IntGreater(args.map { expr -> expr castTo IntSort })
     }
@@ -1317,6 +1442,16 @@ internal object DivisibleDecl :
       param: Expression<IntSort>,
       bindings: Bindings
   ): Expression<BoolSort> = Divisible(bindings["n"].numeral, param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size == 1)
+        require(indices.size == 1)
+        require(args.single().sort is IntSort)
+        require(indices.single() is NumeralIndex)
+
+        @Suppress("UNCHECKED_CAST")
+        return Divisible((indices.single() as NumeralIndex).numeral, args.single() as Expression<IntSort>)
+    }
 }
 
 /** Reals theory internal object */
@@ -1349,7 +1484,7 @@ internal object RealNegDecl :
       bindings: Bindings
   ): Expression<RealSort> = RealNeg(param)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<RealSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RealSort> {
         require(args.size == 1)
         return RealNeg(args.single() castTo RealSort)
     }
@@ -1371,7 +1506,7 @@ internal object RealSubDecl :
       bindings: Bindings
   ): Expression<RealSort> = RealSub(listOf(param1, param2) + varargs)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<RealSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RealSort> {
         require(args.size >= 2)
         return RealSub(args.map { expr -> expr castTo RealSort })
     }
@@ -1414,6 +1549,14 @@ internal object RealNegSubDecl :
       } else {
         RealSubDecl.accepts(args, indices)
       }
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RealSort> = if(args.size == 1) {
+        RealNegDecl.constructDynamic(args, indices)
+    } else if(args.size > 1) {
+        RealSubDecl.constructDynamic(args, indices)
+    } else {
+        throw IllegalArgumentException()
+    }
 }
 
 internal object RealAddDecl :
@@ -1432,7 +1575,7 @@ internal object RealAddDecl :
       bindings: Bindings
   ): Expression<RealSort> = RealAdd(listOf(param1, param2) + varargs)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<RealSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RealSort> {
         require(args.size >= 2)
         return RealAdd(args.map { expr -> expr castTo RealSort })
     }
@@ -1454,7 +1597,7 @@ internal object RealMulDecl :
       bindings: Bindings
   ): Expression<RealSort> = RealMul(listOf(param1, param2) + varargs)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<RealSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RealSort> {
         require(args.size >= 2)
         return RealMul(args.map { expr -> expr castTo RealSort })
     }
@@ -1476,7 +1619,7 @@ internal object RealDivDecl :
       bindings: Bindings
   ): Expression<RealSort> = RealDiv(listOf(param1, param2) + varargs)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<RealSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RealSort> {
         require(args.size >= 2)
         return RealDiv(args.map { expr -> expr castTo RealSort })
     }
@@ -1490,7 +1633,7 @@ internal object RealLessEqDecl :
       bindings: Bindings
   ): Expression<BoolSort> = RealLessEq(varargs)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size >= 2)
         return RealLessEq(args.map { expr -> expr castTo RealSort })
     }
@@ -1504,7 +1647,7 @@ internal object RealLessDecl :
       bindings: Bindings
   ): Expression<BoolSort> = RealLess(varargs)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size >= 2)
         return RealLess(args.map { expr -> expr castTo RealSort })
     }
@@ -1518,7 +1661,7 @@ internal object RealGreaterEqDecl :
       bindings: Bindings
   ): Expression<BoolSort> = RealGreaterEq(varargs)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size >= 2)
         return RealGreaterEq(args.map { expr -> expr castTo RealSort })
     }
@@ -1532,7 +1675,7 @@ internal object RealGreaterDecl :
       bindings: Bindings
   ): Expression<BoolSort> = RealGreater(varargs)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size >= 2)
         return RealGreater(args.map { expr -> expr castTo RealSort })
     }
@@ -1578,7 +1721,7 @@ internal object ToRealDecl :
       bindings: Bindings
   ): Expression<RealSort> = ToReal(param)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<RealSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RealSort> {
         require(args.size == 1)
         return ToReal(args.single() castTo IntSort)
     }
@@ -1592,7 +1735,7 @@ internal object ToIntDecl :
       bindings: Bindings
   ): Expression<IntSort> = ToInt(param)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<IntSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<IntSort> {
         require(args.size == 1)
         return ToInt(args.single() castTo RealSort)
     }
@@ -1606,7 +1749,7 @@ internal object IsIntDecl :
       bindings: Bindings
   ): Expression<BoolSort> = IsInt(param)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<BoolSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
         require(args.size == 1)
         return IsInt(args.single() castTo RealSort)
     }
@@ -1722,7 +1865,7 @@ internal object RoundNearestTiesToEvenDecl :
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> =
       RoundNearestTiesToEven
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RoundingMode> {
         require(args.isEmpty())
         return RoundNearestTiesToEven
     }
@@ -1732,7 +1875,7 @@ internal object RNEDecl :
     FunctionDecl0<RoundingMode>("RNE".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RNE
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RoundingMode> {
         require(args.isEmpty())
         return RNE
     }
@@ -1744,7 +1887,7 @@ internal object RoundNearestTiesToAwayDecl :
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> =
       RoundNearestTiesToAway
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RoundingMode> {
         require(args.isEmpty())
         return RoundNearestTiesToAway
     }
@@ -1754,7 +1897,7 @@ internal object RNADecl :
     FunctionDecl0<RoundingMode>("RNA".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RNA
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RoundingMode> {
         require(args.isEmpty())
         return RNA
     }
@@ -1765,7 +1908,7 @@ internal object RoundTowardPositiveDecl :
         "roundTowardPositive".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RoundTowardPositive
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RoundingMode> {
         require(args.isEmpty())
         return RoundTowardPositive
     }
@@ -1775,7 +1918,7 @@ internal object RTPDecl :
     FunctionDecl0<RoundingMode>("RTP".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RTP
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RoundingMode> {
         require(args.isEmpty())
         return RTP
     }
@@ -1786,7 +1929,7 @@ internal object RoundTowardNegativeDecl :
         "RoundTowardNegative".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RoundTowardNegative
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RoundingMode> {
         require(args.isEmpty())
         return RoundTowardNegative
     }
@@ -1796,7 +1939,7 @@ internal object RTNDecl :
     FunctionDecl0<RoundingMode>("RTN".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RTN
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RoundingMode> {
         require(args.isEmpty())
         return RTN
     }
@@ -1807,7 +1950,7 @@ internal object RoundTowardZeroDecl :
         "RoundTowardZero".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RoundTowardZero
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RoundingMode> {
         require(args.isEmpty())
         return RoundTowardZero
     }
@@ -1817,7 +1960,7 @@ internal object RTZDecl :
     FunctionDecl0<RoundingMode>("RTZ".toSymbolWithQuotes(), emptySet(), emptySet(), RoundingMode) {
   override fun buildExpression(bindings: Bindings): Expression<RoundingMode> = RTZ
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<RoundingMode> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RoundingMode> {
         require(args.isEmpty())
         return RTZ
     }
@@ -1843,7 +1986,7 @@ internal object FPLiteralDecl :
   }
 
     @Suppress("UNCHECKED_CAST")
-    override operator fun invoke(args: List<Expression<*>>): Expression<FPSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
         require(args.size == 3)
         require(args.all { expr -> expr.sort is BVSort })
         return FPLiteral(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>, args[2] as Expression<BVSort>)
@@ -1860,9 +2003,12 @@ internal object FPInfinityDecl :
   override fun buildExpression(bindings: Bindings): Expression<FPSort> =
       FPInfinity(bindings["eb"].numeral, bindings["sb"].numeral)
 
-    override operator fun invoke(args: List<Expression<*>>): Expression<FPSort> {
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
         require(args.isEmpty())
-        return FPInfinity()
+        require(indices.size == 2)
+        require(indices.all { index -> index is NumeralIndex })
+
+        return FPInfinity((indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
     }
 }
 
@@ -1875,6 +2021,14 @@ internal object FPMinusInfinityDecl :
         FPSort("eb".idx(), "sb".idx())) {
   override fun buildExpression(bindings: Bindings): Expression<FPSort> =
       FPMinusInfinity(bindings["eb"].numeral, bindings["sb"].numeral)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.isEmpty())
+        require(indices.size == 2)
+        require(indices.all { index -> index is NumeralIndex })
+
+        return FPMinusInfinity((indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
+    }
 }
 
 /** Plus zero declaration internal object */
@@ -1886,6 +2040,14 @@ internal object FPZeroDecl :
         FPSort("eb".idx(), "sb".idx())) {
   override fun buildExpression(bindings: Bindings): Expression<FPSort> =
       FPZero(bindings["eb"].numeral, bindings["sb"].numeral)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.isEmpty())
+        require(indices.size == 2)
+        require(indices.all { index -> index is NumeralIndex })
+
+        return FPZero((indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
+    }
 }
 
 /** Minus zero declaration internal object */
@@ -1897,6 +2059,14 @@ internal object FPMinusZeroDecl :
         FPSort("eb".idx(), "sb".idx())) {
   override fun buildExpression(bindings: Bindings): Expression<FPSort> =
       FPMinusZero(bindings["eb"].numeral, bindings["sb"].numeral)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.isEmpty())
+        require(indices.size == 2)
+        require(indices.all { index -> index is NumeralIndex })
+
+        return FPMinusZero((indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
+    }
 }
 
 /** NaN declaration internal object */
@@ -1908,6 +2078,14 @@ internal object FPNaNDecl :
         FPSort("eb".idx(), "sb".idx())) {
   override fun buildExpression(bindings: Bindings): Expression<FPSort> =
       FPNaN(bindings["eb"].numeral, bindings["sb"].numeral)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.isEmpty())
+        require(indices.size == 2)
+        require(indices.all { index -> index is NumeralIndex })
+
+        return FPNaN((indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
+    }
 }
 
 /** Absolute value declaration internal object */
@@ -1921,6 +2099,15 @@ internal object FPAbsDecl :
         FPSort("eb".idx(), "sb".idx())) {
   override fun buildExpression(param: Expression<FPSort>, bindings: Bindings): Expression<FPSort> =
       FPAbs(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is FPSort)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPAbs(args.single() as Expression<FPSort>)
+    }
 }
 
 /** Negation declaration internal object */
@@ -1934,6 +2121,15 @@ internal object FPNegDecl :
         FPSort("eb".idx(), "sb".idx())) {
   override fun buildExpression(param: Expression<FPSort>, bindings: Bindings): Expression<FPSort> =
       FPNeg(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is FPSort)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPNeg(args.single() as Expression<FPSort>)
+    }
 }
 
 /** Addition declaration internal object */
@@ -1953,6 +2149,17 @@ internal object FPAddDecl :
       param3: Expression<FPSort>,
       bindings: Bindings
   ): Expression<FPSort> = FPAdd(param1, param2, param3)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.size == 3)
+        require(indices.isEmpty())
+        require(args[0].sort is RoundingMode)
+        require(args[1].sort is FPSort)
+        require(args[2].sort is FPSort)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPAdd(args[0] castTo RoundingMode, args[1] as Expression<FPSort>, args[2] as Expression<FPSort>)
+    }
 }
 
 /** Subtraction declaration internal object */
@@ -1972,6 +2179,17 @@ internal object FPSubDecl :
       param3: Expression<FPSort>,
       bindings: Bindings
   ): Expression<FPSort> = FPSub(param1, param2, param3)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.size == 3)
+        require(indices.isEmpty())
+        require(args[0].sort is RoundingMode)
+        require(args[1].sort is FPSort)
+        require(args[2].sort is FPSort)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPSub(args[0] castTo RoundingMode, args[1] as Expression<FPSort>, args[2] as Expression<FPSort>)
+    }
 }
 
 internal object FPMulDecl :
@@ -1990,6 +2208,17 @@ internal object FPMulDecl :
       param3: Expression<FPSort>,
       bindings: Bindings
   ): Expression<FPSort> = FPMul(param1, param2, param3)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.size == 3)
+        require(indices.isEmpty())
+        require(args[0].sort is RoundingMode)
+        require(args[1].sort is FPSort)
+        require(args[2].sort is FPSort)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPMul(args[0] castTo RoundingMode, args[1] as Expression<FPSort>, args[2] as Expression<FPSort>)
+    }
 }
 
 internal object FPDivDecl :
@@ -2008,6 +2237,17 @@ internal object FPDivDecl :
       param3: Expression<FPSort>,
       bindings: Bindings
   ): Expression<FPSort> = FPDiv(param1, param2, param3)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.size == 3)
+        require(indices.isEmpty())
+        require(args[0].sort is RoundingMode)
+        require(args[1].sort is FPSort)
+        require(args[2].sort is FPSort)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPDiv(args[0] castTo RoundingMode, args[1] as Expression<FPSort>, args[2] as Expression<FPSort>)
+    }
 }
 
 internal object FPFmaDecl :
@@ -2028,6 +2268,18 @@ internal object FPFmaDecl :
       param4: Expression<FPSort>,
       bindings: Bindings
   ): Expression<FPSort> = FPFma(param1, param2, param3, param4)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.size == 4)
+        require(indices.isEmpty())
+        require(args[0].sort is RoundingMode)
+        require(args[1].sort is FPSort)
+        require(args[2].sort is FPSort)
+        require(args[3].sort is FPSort)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPFma(args[0] castTo RoundingMode, args[1] as Expression<FPSort>, args[2] as Expression<FPSort>, args[3] as Expression<FPSort>)
+    }
 }
 
 internal object FPSqrtDecl :
@@ -2044,6 +2296,16 @@ internal object FPSqrtDecl :
       param2: Expression<FPSort>,
       bindings: Bindings
   ): Expression<FPSort> = FPSqrt(param1, param2)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.size == 2)
+        require(indices.isEmpty())
+        require(args[0].sort is RoundingMode)
+        require(args[1].sort is FPSort)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPSqrt(args[0] castTo RoundingMode, args[1] as Expression<FPSort>)
+    }
 }
 
 internal object FPRemDecl :
@@ -2060,6 +2322,15 @@ internal object FPRemDecl :
       param2: Expression<FPSort>,
       bindings: Bindings
   ): Expression<FPSort> = FPRem(param1, param2)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.size == 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is FPSort })
+
+        @Suppress("UNCHECKED_CAST")
+        return FPRem(args[0] as Expression<FPSort>, args[1] as Expression<FPSort>)
+    }
 }
 
 internal object FPRoundToIntegralDecl :
@@ -2076,6 +2347,16 @@ internal object FPRoundToIntegralDecl :
       param2: Expression<FPSort>,
       bindings: Bindings
   ): Expression<FPSort> = FPRoundToIntegral(param1, param2)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.size == 2)
+        require(indices.isEmpty())
+        require(args[0].sort is RoundingMode)
+        require(args[1].sort is FPSort)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPRoundToIntegral(args[0] castTo RoundingMode, args[1] as Expression<FPSort>)
+    }
 }
 
 internal object FPMinDecl :
@@ -2092,6 +2373,15 @@ internal object FPMinDecl :
       param2: Expression<FPSort>,
       bindings: Bindings
   ): Expression<FPSort> = FPMin(param1, param2)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.size == 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is FPSort })
+
+        @Suppress("UNCHECKED_CAST")
+        return FPMin(args[0] as Expression<FPSort>, args[1] as Expression<FPSort>)
+    }
 }
 
 internal object FPMaxDecl :
@@ -2108,6 +2398,15 @@ internal object FPMaxDecl :
       param2: Expression<FPSort>,
       bindings: Bindings
   ): Expression<FPSort> = FPMin(param1, param2)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.size == 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is FPSort })
+
+        @Suppress("UNCHECKED_CAST")
+        return FPMax(args[0] as Expression<FPSort>, args[1] as Expression<FPSort>)
+    }
 }
 
 internal object FPLeqDecl :
@@ -2122,6 +2421,15 @@ internal object FPLeqDecl :
       varargs: List<Expression<FPSort>>,
       bindings: Bindings
   ): Expression<BoolSort> = FPLeq(varargs)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size >= 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is FPSort })
+
+        @Suppress("UNCHECKED_CAST")
+        return FPLeq(args as List<Expression<FPSort>>)
+    }
 }
 
 internal object FPLtDecl :
@@ -2136,6 +2444,15 @@ internal object FPLtDecl :
       varargs: List<Expression<FPSort>>,
       bindings: Bindings
   ): Expression<BoolSort> = FPLt(varargs)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size >= 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is FPSort })
+
+        @Suppress("UNCHECKED_CAST")
+        return FPLt(args as List<Expression<FPSort>>)
+    }
 }
 
 internal object FPGeqDecl :
@@ -2150,6 +2467,15 @@ internal object FPGeqDecl :
       varargs: List<Expression<FPSort>>,
       bindings: Bindings
   ): Expression<BoolSort> = FPGeq(varargs)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size >= 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is FPSort })
+
+        @Suppress("UNCHECKED_CAST")
+        return FPGeq(args as List<Expression<FPSort>>)
+    }
 }
 
 internal object FPGtDecl :
@@ -2164,6 +2490,15 @@ internal object FPGtDecl :
       varargs: List<Expression<FPSort>>,
       bindings: Bindings
   ): Expression<BoolSort> = FPGt(varargs)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size >= 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is FPSort })
+
+        @Suppress("UNCHECKED_CAST")
+        return FPGt(args as List<Expression<FPSort>>)
+    }
 }
 
 internal object FPEqDecl :
@@ -2178,6 +2513,15 @@ internal object FPEqDecl :
       varargs: List<Expression<FPSort>>,
       bindings: Bindings
   ): Expression<BoolSort> = FPEq(varargs)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size >= 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is FPSort })
+
+        @Suppress("UNCHECKED_CAST")
+        return FPEq(args as List<Expression<FPSort>>)
+    }
 }
 
 internal object FPIsNormalDecl :
@@ -2192,6 +2536,15 @@ internal object FPIsNormalDecl :
       param: Expression<FPSort>,
       bindings: Bindings
   ): Expression<BoolSort> = FPIsNormal(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is FPSort)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPIsNormal(args.single() as Expression<FPSort>)
+    }
 }
 
 internal object FPIsSubormalDecl :
@@ -2206,6 +2559,15 @@ internal object FPIsSubormalDecl :
       param: Expression<FPSort>,
       bindings: Bindings
   ): Expression<BoolSort> = FPIsSubnormal(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is FPSort)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPIsSubnormal(args.single() as Expression<FPSort>)
+    }
 }
 
 internal object FPIsZeroDecl :
@@ -2220,6 +2582,15 @@ internal object FPIsZeroDecl :
       param: Expression<FPSort>,
       bindings: Bindings
   ): Expression<BoolSort> = FPIsZero(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is FPSort)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPIsZero(args.single() as Expression<FPSort>)
+    }
 }
 
 internal object FPIsInfiniteDecl :
@@ -2234,6 +2605,15 @@ internal object FPIsInfiniteDecl :
       param: Expression<FPSort>,
       bindings: Bindings
   ): Expression<BoolSort> = FPIsInfinite(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is FPSort)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPIsInfinite(args.single() as Expression<FPSort>)
+    }
 }
 
 internal object FPIsNaNDecl :
@@ -2248,6 +2628,15 @@ internal object FPIsNaNDecl :
       param: Expression<FPSort>,
       bindings: Bindings
   ): Expression<BoolSort> = FPIsNaN(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is FPSort)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPIsNaN(args.single() as Expression<FPSort>)
+    }
 }
 
 internal object FPIsNegativeDecl :
@@ -2262,6 +2651,15 @@ internal object FPIsNegativeDecl :
       param: Expression<FPSort>,
       bindings: Bindings
   ): Expression<BoolSort> = FPIsNegative(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is FPSort)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPIsNegative(args.single() as Expression<FPSort>)
+    }
 }
 
 internal object FPIsPositiveDecl :
@@ -2276,6 +2674,15 @@ internal object FPIsPositiveDecl :
       param: Expression<FPSort>,
       bindings: Bindings
   ): Expression<BoolSort> = FPIsPositive(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is FPSort)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPIsPositive(args.single() as Expression<FPSort>)
+    }
 }
 
 internal object BitVecToFPDecl :
@@ -2288,6 +2695,16 @@ internal object BitVecToFPDecl :
         FPSort("eb".idx(), "sb".idx())) {
   override fun buildExpression(param: Expression<BVSort>, bindings: Bindings): Expression<FPSort> =
       BitVecToFP(param, bindings["eb"].numeral, bindings["sb"].numeral)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.size == 1)
+        require(indices.size == 2)
+        require(args.single().sort is BVSort)
+        require(indices.all { index -> index is NumeralIndex})
+
+        @Suppress("UNCHECKED_CAST")
+        return BitVecToFP(args.single() as Expression<BVSort>, (indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
+    }
 }
 
 internal object FPToFPDecl :
@@ -2304,6 +2721,17 @@ internal object FPToFPDecl :
       param2: Expression<FPSort>,
       bindings: Bindings
   ): Expression<FPSort> = FPToFP(param1, param2, bindings["eb"].numeral, bindings["sb"].numeral)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.size == 2)
+        require(indices.size == 2)
+        require(args[0].sort is RoundingMode)
+        require(args[1].sort is FPSort)
+        require(indices.all { index -> index is NumeralIndex})
+
+        @Suppress("UNCHECKED_CAST")
+        return FPToFP(args[0] castTo RoundingMode, args[1] as Expression<FPSort>, (indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
+    }
 }
 
 internal object RealToFPDecl :
@@ -2320,6 +2748,17 @@ internal object RealToFPDecl :
       param2: Expression<RealSort>,
       bindings: Bindings
   ): Expression<FPSort> = RealToFP(param1, param2, bindings["eb"].numeral, bindings["sb"].numeral)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.size == 2)
+        require(indices.size == 2)
+        require(args[0].sort is RoundingMode)
+        require(args[1].sort is RealSort)
+        require(indices.all { index -> index is NumeralIndex})
+
+        @Suppress("UNCHECKED_CAST")
+        return RealToFP(args[0] castTo RoundingMode, args[1] as Expression<RealSort>, (indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
+    }
 }
 
 internal object SBitVecToFPDecl :
@@ -2337,6 +2776,17 @@ internal object SBitVecToFPDecl :
       bindings: Bindings
   ): Expression<FPSort> =
       SBitVecToFP(param1, param2, bindings["eb"].numeral, bindings["sb"].numeral)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.size == 2)
+        require(indices.size == 2)
+        require(args[0].sort is RoundingMode)
+        require(args[1].sort is BVSort)
+        require(indices.all { index -> index is NumeralIndex})
+
+        @Suppress("UNCHECKED_CAST")
+        return SBitVecToFP(args[0] castTo RoundingMode, args[1] as Expression<BVSort>, (indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
+    }
 }
 
 internal object UBitVecToFPDecl :
@@ -2354,6 +2804,17 @@ internal object UBitVecToFPDecl :
       bindings: Bindings
   ): Expression<FPSort> =
       UBitVecToFP(param1, param2, bindings["eb"].numeral, bindings["sb"].numeral)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<FPSort> {
+        require(args.size == 2)
+        require(indices.size == 2)
+        require(args[0].sort is RoundingMode)
+        require(args[1].sort is BVSort)
+        require(indices.all { index -> index is NumeralIndex})
+
+        @Suppress("UNCHECKED_CAST")
+        return UBitVecToFP(args[0] castTo RoundingMode, args[1] as Expression<BVSort>, (indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
+    }
 }
 
 internal object FPToUBitVecDecl :
@@ -2370,6 +2831,17 @@ internal object FPToUBitVecDecl :
       param2: Expression<FPSort>,
       bindings: Bindings
   ): Expression<BVSort> = FPToUBitVec(param1, param2, bindings["m"].numeral)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
+        require(args.size == 2)
+        require(indices.size == 1)
+        require(args[0].sort is RoundingMode)
+        require(args[1].sort is FPSort)
+        require(indices.single() is NumeralIndex)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPToUBitVec(args[0] castTo RoundingMode, args[1] as Expression<FPSort>, (indices.single() as NumeralIndex).numeral)
+    }
 }
 
 internal object FPToSBitVecDecl :
@@ -2386,6 +2858,17 @@ internal object FPToSBitVecDecl :
       param2: Expression<FPSort>,
       bindings: Bindings
   ): Expression<BVSort> = FPToSBitVec(param1, param2, bindings["m"].numeral)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BVSort> {
+        require(args.size == 2)
+        require(indices.size == 1)
+        require(args[0].sort is RoundingMode)
+        require(args[1].sort is FPSort)
+        require(indices.single() is NumeralIndex)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPToSBitVec(args[0] castTo RoundingMode, args[1] as Expression<FPSort>, (indices.single() as NumeralIndex).numeral)
+    }
 }
 
 internal object FPToRealDecl :
@@ -2400,6 +2883,15 @@ internal object FPToRealDecl :
       param: Expression<FPSort>,
       bindings: Bindings
   ): Expression<RealSort> = FPToReal(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RealSort> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is FPSort)
+
+        @Suppress("UNCHECKED_CAST")
+        return FPToReal(args.single() as Expression<FPSort>)
+    }
 }
 
 /** Array extension theory internal object */
@@ -2433,6 +2925,17 @@ internal object ArraySelectDecl :
       param2: Expression<Sort>,
       bindings: Bindings
   ): Expression<Sort> = ArraySelect(param1, param2)
+
+    // TODO can this be improved (maybe make this generic)?
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<Sort> {
+        require(args.size == 2)
+        require(indices.isEmpty())
+        require(args[0].sort is ArraySort<*, *>)
+        require(args[1].sort == (args[0].sort as ArraySort<*, *>).x)
+
+        @Suppress("UNCHECKED_CAST")
+        return ArraySelect(args[0] as Expression<ArraySort<Sort, Sort>>, args[1] castTo (args[0].sort as ArraySort<*, *>).x)
+    }
 }
 
 /** Array store declaration internal object */
@@ -2452,6 +2955,19 @@ internal object ArrayStoreDecl :
       param3: Expression<Sort>,
       bindings: Bindings
   ): Expression<ArraySort<Sort, Sort>> = ArrayStore(param1, param2, param3)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<ArraySort<Sort, Sort>> {
+        require(args.size == 3)
+        require(indices.isEmpty())
+        require(args[0].sort is ArraySort<*, *>)
+
+        // TODO these can probably be removed (castTo) checks the same requirement
+        require(args[1].sort == (args[0].sort as ArraySort<*, *>).x)
+        require(args[2].sort == (args[0].sort as ArraySort<*, *>).y)
+
+        @Suppress("UNCHECKED_CAST")
+        return ArrayStore(args[0] as Expression<ArraySort<Sort, Sort>>, args[1] castTo (args[0].sort as ArraySort<*, *>).x, args[2] castTo (args[0].sort as ArraySort<*, *>).y)
+    }
 }
 
 /** Strings theory internal object */
