@@ -3027,6 +3027,14 @@ internal object CharDecl :
     FunctionDecl0<StringSort>(
         "char".toSymbolWithQuotes(), emptySet(), setOf("H".idx()), StringSort) {
   override fun buildExpression(bindings: Bindings): Expression<StringSort> = TODO()
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<StringSort> {
+        require(args.isEmpty())
+        require(indices.size == 1)
+        require(indices.single() is NumeralIndex)
+
+        return TODO("SMT-Lib char not implemented yet!")
+    }
 }
 
 internal object StrConcatDecl :
@@ -3044,6 +3052,15 @@ internal object StrConcatDecl :
       varargs: List<Expression<StringSort>>,
       bindings: Bindings
   ): Expression<StringSort> = StrConcat(param1, param2, *varargs.toTypedArray())
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<StringSort> {
+        require(args.size >= 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is StringSort })
+
+        @Suppress("UNCHECKED_CAST")
+        return StrConcat(args as List<Expression<StringSort>>)
+    }
 }
 
 internal object StrLengthDecl :
@@ -3053,6 +3070,14 @@ internal object StrLengthDecl :
       param: Expression<StringSort>,
       bindings: Bindings
   ): Expression<IntSort> = StrLength(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<IntSort> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is StringSort)
+
+        return StrLength(args.single() castTo StringSort)
+    }
 }
 
 internal object StrLexOrderDecl :
@@ -3062,6 +3087,15 @@ internal object StrLexOrderDecl :
       varargs: List<Expression<StringSort>>,
       bindings: Bindings
   ): Expression<BoolSort> = StrLexOrder(varargs)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size >= 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is StringSort })
+
+        @Suppress("UNCHECKED_CAST")
+        return StrLexOrder(args as List<Expression<StringSort>>)
+    }
 }
 
 internal object ToRegexDecl :
@@ -3071,6 +3105,14 @@ internal object ToRegexDecl :
       param: Expression<StringSort>,
       bindings: Bindings
   ): Expression<RegLan> = ToRegex(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RegLan> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is StringSort)
+
+        return ToRegex(args.single() castTo StringSort)
+    }
 }
 
 internal object InRegexDecl :
@@ -3087,21 +3129,51 @@ internal object InRegexDecl :
       param2: Expression<RegLan>,
       bindings: Bindings
   ): Expression<BoolSort> = InRegex(param1, param2)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size == 2)
+        require(indices.isEmpty())
+        require(args[0].sort is StringSort)
+        require(args[1].sort is RegLan)
+
+        return InRegex(args[0] castTo StringSort, args[1] castTo RegLan)
+    }
 }
 
 internal object RegexNoneDecl :
     FunctionDecl0<RegLan>("re.none".toSymbolWithQuotes(), emptySet(), emptySet(), RegLan) {
   override fun buildExpression(bindings: Bindings): Expression<RegLan> = RegexNone
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RegLan> {
+        require(args.isEmpty())
+        require(indices.isEmpty())
+
+        return RegexNone
+    }
 }
 
 internal object RegexAllDecl :
     FunctionDecl0<RegLan>("re.all".toSymbolWithQuotes(), emptySet(), emptySet(), RegLan) {
   override fun buildExpression(bindings: Bindings): Expression<RegLan> = RegexAll
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RegLan> {
+        require(args.isEmpty())
+        require(indices.isEmpty())
+
+        return RegexAll
+    }
+
 }
 
 internal object RegexAllCharDecl :
     FunctionDecl0<RegLan>("re.allchar".toSymbolWithQuotes(), emptySet(), emptySet(), RegLan) {
   override fun buildExpression(bindings: Bindings): Expression<RegLan> = RegexAllChar
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RegLan> {
+        require(args.isEmpty())
+        require(indices.isEmpty())
+
+        return RegexAllChar
+    }
 }
 
 internal object RegexConcatDecl :
@@ -3113,6 +3185,15 @@ internal object RegexConcatDecl :
       varargs: List<Expression<RegLan>>,
       bindings: Bindings
   ): Expression<RegLan> = RegexConcat(param1, param2, *varargs.toTypedArray())
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RegLan> {
+        require(args.size >= 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is RegLan })
+
+        @Suppress("UNCHECKED_CAST")
+        return RegexConcat(args as List<Expression<RegLan>>)
+    }
 }
 
 internal object RegexUnionDecl :
@@ -3130,6 +3211,15 @@ internal object RegexUnionDecl :
       varargs: List<Expression<RegLan>>,
       bindings: Bindings
   ): Expression<RegLan> = RegexUnion(param1, param2, *varargs.toTypedArray())
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RegLan> {
+        require(args.size >= 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is RegLan })
+
+        @Suppress("UNCHECKED_CAST")
+        return RegexUnion(args as List<Expression<RegLan>>)
+    }
 }
 
 internal object RegexIntersecDecl :
@@ -3147,6 +3237,15 @@ internal object RegexIntersecDecl :
       varargs: List<Expression<RegLan>>,
       bindings: Bindings
   ): Expression<RegLan> = RegexIntersec(param1, param2, *varargs.toTypedArray())
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RegLan> {
+        require(args.size >= 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is RegLan })
+
+        @Suppress("UNCHECKED_CAST")
+        return RegexIntersec(args as List<Expression<RegLan>>)
+    }
 }
 
 internal object RegexStarDecl :
@@ -3154,6 +3253,15 @@ internal object RegexStarDecl :
         "re.*".toSymbolWithQuotes(), emptySet(), RegLan, emptySet(), emptySet(), RegLan) {
   override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
       RegexStar(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RegLan> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is RegLan)
+
+        @Suppress("UNCHECKED_CAST")
+        return RegexStar(args.single() castTo RegLan)
+    }
 }
 
 internal object StrRefLexOrderDecl :
@@ -3163,6 +3271,15 @@ internal object StrRefLexOrderDecl :
       varargs: List<Expression<StringSort>>,
       bindings: Bindings
   ): Expression<BoolSort> = StrRefLexOrder(varargs)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size >= 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is StringSort })
+
+        @Suppress("UNCHECKED_CAST")
+        return StrRefLexOrder(args as List<Expression<StringSort>>)
+    }
 }
 
 internal object StrAtDecl :
@@ -3179,6 +3296,15 @@ internal object StrAtDecl :
       param2: Expression<IntSort>,
       bindings: Bindings
   ): Expression<StringSort> = StrAt(param1, param2)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<StringSort> {
+        require(args.size == 2)
+        require(indices.isEmpty())
+        require(args[0].sort is StringSort)
+        require(args[1].sort is IntSort)
+
+        return StrAt(args[0] castTo StringSort, args[1] castTo IntSort)
+    }
 }
 
 internal object StrSubstringDecl :
@@ -3197,6 +3323,16 @@ internal object StrSubstringDecl :
       param3: Expression<IntSort>,
       bindings: Bindings
   ): Expression<StringSort> = StrSubstring(param1, param2, param3)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<StringSort> {
+        require(args.size == 3)
+        require(indices.isEmpty())
+        require(args[0].sort is StringSort)
+        require(args[1].sort is IntSort)
+        require(args[2].sort is IntSort)
+
+        return StrSubstring(args[0] castTo StringSort, args[1] castTo IntSort, args[2] castTo IntSort)
+    }
 }
 
 internal object StrPrefixOfDecl :
@@ -3213,6 +3349,14 @@ internal object StrPrefixOfDecl :
       param2: Expression<StringSort>,
       bindings: Bindings
   ): Expression<BoolSort> = StrPrefixOf(param1, param2)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size == 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is StringSort })
+
+        return StrPrefixOf(args[0] castTo StringSort, args[1] castTo StringSort)
+    }
 }
 
 internal object StrSuffixOfDecl :
@@ -3229,6 +3373,14 @@ internal object StrSuffixOfDecl :
       param2: Expression<StringSort>,
       bindings: Bindings
   ): Expression<BoolSort> = StrSuffixOf(param1, param2)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size == 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is StringSort })
+
+        return StrSuffixOf(args[0] castTo StringSort, args[1] castTo StringSort)
+    }
 }
 
 internal object StrContainsDecl :
@@ -3245,6 +3397,14 @@ internal object StrContainsDecl :
       param2: Expression<StringSort>,
       bindings: Bindings
   ): Expression<BoolSort> = StrContains(param1, param2)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size == 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is StringSort })
+
+        return StrContains(args[0] castTo StringSort, args[1] castTo StringSort)
+    }
 }
 
 internal object StrIndexOfDecl :
@@ -3263,6 +3423,16 @@ internal object StrIndexOfDecl :
       param3: Expression<IntSort>,
       bindings: Bindings
   ): Expression<IntSort> = StrIndexOf(param1, param2, param3)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<IntSort> {
+        require(args.size == 3)
+        require(indices.isEmpty())
+        require(args[0].sort is StringSort)
+        require(args[1].sort is StringSort)
+        require(args[2].sort is IntSort)
+
+        return StrIndexOf(args[0] castTo StringSort, args[1] castTo StringSort, args[2] castTo IntSort)
+    }
 }
 
 internal object StrReplaceDecl :
@@ -3281,6 +3451,14 @@ internal object StrReplaceDecl :
       param3: Expression<StringSort>,
       bindings: Bindings
   ): Expression<StringSort> = StrReplace(param1, param2, param3)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<StringSort> {
+        require(args.size == 3)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is StringSort })
+
+        return StrReplace(args[0] castTo StringSort, args[1] castTo StringSort, args[2] castTo StringSort)
+    }
 }
 
 internal object StrReplaceAllDecl :
@@ -3299,6 +3477,14 @@ internal object StrReplaceAllDecl :
       param3: Expression<StringSort>,
       bindings: Bindings
   ): Expression<StringSort> = StrReplaceAll(param1, param2, param3)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<StringSort> {
+        require(args.size == 3)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is StringSort })
+
+        return StrReplaceAll(args[0] castTo StringSort, args[1] castTo StringSort, args[2] castTo StringSort)
+    }
 }
 
 internal object StrReplaceRegexDecl :
@@ -3317,6 +3503,16 @@ internal object StrReplaceRegexDecl :
       param3: Expression<StringSort>,
       bindings: Bindings
   ): Expression<StringSort> = StrReplaceRegex(param1, param2, param3)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<StringSort> {
+        require(args.size == 3)
+        require(indices.isEmpty())
+        require(args[0].sort is StringSort)
+        require(args[1].sort is RegLan)
+        require(args[2].sort is StringSort)
+
+        return StrReplaceRegex(args[0] castTo StringSort, args[1] castTo RegLan, args[2] castTo StringSort)
+    }
 }
 
 internal object StrReplaceAllRegexDecl :
@@ -3335,6 +3531,16 @@ internal object StrReplaceAllRegexDecl :
       param3: Expression<StringSort>,
       bindings: Bindings
   ): Expression<StringSort> = StrReplaceRegex(param1, param2, param3)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<StringSort> {
+        require(args.size == 3)
+        require(indices.isEmpty())
+        require(args[0].sort is StringSort)
+        require(args[1].sort is RegLan)
+        require(args[2].sort is StringSort)
+
+        return StrReplaceAllRegex(args[0] castTo StringSort, args[1] castTo RegLan, args[2] castTo StringSort)
+    }
 }
 
 internal object RegexCompDecl :
@@ -3342,6 +3548,14 @@ internal object RegexCompDecl :
         "re.comp".toSymbolWithQuotes(), emptySet(), RegLan, emptySet(), emptySet(), RegLan) {
   override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
       RegexComp(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RegLan> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is RegLan)
+
+        return RegexComp(args.single() castTo RegLan)
+    }
 }
 
 internal object RegexDiffDecl :
@@ -3359,6 +3573,15 @@ internal object RegexDiffDecl :
       varargs: List<Expression<RegLan>>,
       bindings: Bindings
   ): Expression<RegLan> = RegexDiff(param1, param2, *varargs.toTypedArray())
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RegLan> {
+        require(args.size >= 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is RegLan })
+
+        @Suppress("UNCHECKED_CAST")
+        return RegexDiff(args as List<Expression<RegLan>>)
+    }
 }
 
 internal object RegexPlusDecl :
@@ -3366,6 +3589,14 @@ internal object RegexPlusDecl :
         "re.+".toSymbolWithQuotes(), emptySet(), RegLan, emptySet(), emptySet(), RegLan) {
   override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
       RegexPlus(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RegLan> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is RegLan)
+
+        return RegexPlus(args.single() castTo RegLan)
+    }
 }
 
 internal object RegexOptionDecl :
@@ -3373,6 +3604,14 @@ internal object RegexOptionDecl :
         "re.opt".toSymbolWithQuotes(), emptySet(), RegLan, emptySet(), emptySet(), RegLan) {
   override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
       RegexOption(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RegLan> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is RegLan)
+
+        return RegexOption(args.single() castTo RegLan)
+    }
 }
 
 internal object RegexRangeDecl :
@@ -3389,6 +3628,14 @@ internal object RegexRangeDecl :
       param2: Expression<StringSort>,
       bindings: Bindings
   ): Expression<RegLan> = RegexRange(param1, param2)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RegLan> {
+        require(args.size == 2)
+        require(indices.isEmpty())
+        require(args.all { expr -> expr.sort is StringSort })
+
+        return RegexRange(args[0] castTo StringSort, args[1] castTo StringSort)
+    }
 }
 
 internal object RegexPowerDecl :
@@ -3396,6 +3643,15 @@ internal object RegexPowerDecl :
         "re.^".toSymbolWithQuotes(), emptySet(), RegLan, setOf("n".idx()), emptySet(), RegLan) {
   override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
       RegexPower(param, bindings["n"].numeral)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RegLan> {
+        require(args.size == 1)
+        require(indices.size == 1)
+        require(args.single().sort is RegLan)
+        require(indices.single() is NumeralIndex)
+
+        return RegexPower(args[0] castTo RegLan, (indices.single() as NumeralIndex).numeral)
+    }
 }
 
 internal object RegexLoopDecl :
@@ -3408,6 +3664,15 @@ internal object RegexLoopDecl :
         RegLan) {
   override fun buildExpression(param: Expression<RegLan>, bindings: Bindings): Expression<RegLan> =
       RegexLoop(param, bindings["n1"].numeral, bindings["n2"].numeral)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<RegLan> {
+        require(args.size == 1)
+        require(indices.size == 2)
+        require(args.single().sort is RegLan)
+        require(indices.all { index -> index is NumeralIndex })
+
+        return RegexLoop(args[0] castTo RegLan, (indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
+    }
 }
 
 internal object StrIsDigitDecl :
@@ -3422,6 +3687,14 @@ internal object StrIsDigitDecl :
       param: Expression<StringSort>,
       bindings: Bindings
   ): Expression<BoolSort> = StrIsDigit(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<BoolSort> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is StringSort)
+
+        return StrIsDigit(args.single() castTo StringSort)
+    }
 }
 
 internal object StrToCodeDecl :
@@ -3436,6 +3709,14 @@ internal object StrToCodeDecl :
       param: Expression<StringSort>,
       bindings: Bindings
   ): Expression<IntSort> = StrToCode(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<IntSort> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is StringSort)
+
+        return StrToCode(args.single() castTo StringSort)
+    }
 }
 
 internal object StrFromCodeDecl :
@@ -3450,6 +3731,14 @@ internal object StrFromCodeDecl :
       param: Expression<IntSort>,
       bindings: Bindings
   ): Expression<StringSort> = StrFromCode(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<StringSort> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is IntSort)
+
+        return StrFromCode(args.single() castTo IntSort)
+    }
 }
 
 internal object StrToIntDecl :
@@ -3464,6 +3753,14 @@ internal object StrToIntDecl :
       param: Expression<StringSort>,
       bindings: Bindings
   ): Expression<IntSort> = StrToInt(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<IntSort> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is StringSort)
+
+        return StrToInt(args.single() castTo StringSort)
+    }
 }
 
 internal object StrFromIntDecl :
@@ -3478,4 +3775,12 @@ internal object StrFromIntDecl :
       param: Expression<IntSort>,
       bindings: Bindings
   ): Expression<StringSort> = StrFromInt(param)
+
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<StringSort> {
+        require(args.size == 1)
+        require(indices.isEmpty())
+        require(args.single().sort is IntSort)
+
+        return StrFromInt(args.single() castTo IntSort)
+    }
 }
