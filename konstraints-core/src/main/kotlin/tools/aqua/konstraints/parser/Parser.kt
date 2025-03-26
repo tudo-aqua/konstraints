@@ -29,7 +29,12 @@ import org.petitparser.parser.primitive.CharacterParser.*
 import org.petitparser.parser.primitive.StringParser.of
 import org.petitparser.utils.FailureJoiner
 import tools.aqua.konstraints.smt.*
+import tools.aqua.konstraints.theories.BVLiteral
+import tools.aqua.konstraints.theories.BVLiteral.Companion.invoke
 import tools.aqua.konstraints.theories.BoolSort
+import tools.aqua.konstraints.theories.IntLiteral
+import tools.aqua.konstraints.theories.RealLiteral
+import tools.aqua.konstraints.theories.Theories
 
 operator fun Parser.plus(other: Parser): ChoiceParser = or(other)
 
@@ -476,7 +481,7 @@ object Parser {
   /* maps to match case */
   private val matchCase =
       (lparen * pattern * term * rparen).map { results: List<Any> ->
-        MatchCase(results[1] as Pattern, results[2] as ProtoTerm)
+          TODO("Match case not implemented yet!")
       }
 
   init {
@@ -498,7 +503,7 @@ object Parser {
             } + /* maps to ProtoExists */
             (lparen * matchKW * term * lparen * matchCase.plus() * rparen * rparen).map {
                 results: List<Any> ->
-              ProtoMatch(results[2] as ProtoTerm, results[3] as List<MatchCase>)
+              TODO("Match not implemented yet!")
               // results[3] is guaranteed to be a list of MatchCase
             } + /* maps to ProtoMatch */
             (lparen * exclamationKW * term * attribute.plus() * rparen).map { results: List<Any> ->
@@ -506,15 +511,23 @@ object Parser {
               // results[3] is guaranteed to be a list of Attributes
             } /* maps to ProtoExclamation */ +
             specConstant.map { constant: SpecConstant ->
-              SpecConstantTerm(constant)
+              when(constant) {
+                  is BinaryConstant -> BVLiteral(constant.binary)
+                  is DecimalConstant -> RealLiteral(constant.decimal)
+                  is HexConstant -> BVLiteral(constant.hexadecimal)
+                  is NumeralConstant -> if(Theories.INTS in program.logic!!.theories) IntLiteral(constant.numeral)
+                  else if (Theories.REALS in program.logic!!.theories || Theories.REALS_INTS in program.logic!!.theories) RealLiteral(BigDecimal(constant.numeral))
+                  else throw RuntimeException("Unsupported numeral literal!")
+                  is StringConstant -> TODO()
+              }
             } + /* maps to SpecConstantTerm */
             qualIdentifier.map { results: List<Any> ->
                 /* Results is an SMTFunction without any parameters */
-                (results[0] as SMTFunction<*>)(emptyList(), /* results[1] as List<Index> */)
+                (results[0] as SMTFunction<*>).constructDynamic(emptyList(),  results[1] as List<Index>)
             }  +
             (lparen * qualIdentifier * term.plus() * rparen).map { results: List<Any> ->
               /* Results contains SMTFunction follow by list of its arguments as Expressions */
-                (results[1] as SMTFunction<*>)(results[2] as List<Expression<*>>)
+                (results[1] as SMTFunction<*>).constructDynamic(results[2] as List<Expression<*>>, (results[1] as List<Any>)[1] as List<Index>)
             } /* maps to GenericProtoTerm */)
   }
 
@@ -659,12 +672,12 @@ object Parser {
 
   private val pushCMD =
       (lparen * pushKW * numeral * rparen).map { results: ArrayList<Any> ->
-        ProtoPush((results[2] as String).toInt())
+        program.push((results[2] as String).toInt())
       }
 
   private val popCMD =
       (lparen * popKW * numeral * rparen).map { results: ArrayList<Any> ->
-        ProtoPop((results[2] as String).toInt())
+        program.pop((results[2] as String).toInt())
       }
 
   val command =

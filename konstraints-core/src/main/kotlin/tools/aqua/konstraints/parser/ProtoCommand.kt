@@ -23,14 +23,6 @@ import tools.aqua.konstraints.smt.*
 
 sealed interface ProtoCommand
 
-data class ProtoDeclareSort(val symbol: ParseSymbol, val arity: Int) : ProtoCommand {
-  val name = symbol.symbol
-}
-
-data class ProtoPush(val n: Int) : ProtoCommand
-
-data class ProtoPop(val n: Int) : ProtoCommand
-
 class ParseSymbol(val token: Token) :
     Symbol(
         token.getValue(),
@@ -42,10 +34,5 @@ class ParseSymbol(val token: Token) :
 
 data class Pattern(val symbols: List<ParseSymbol>)
 
-data class MatchCase(val pattern: Pattern, val term: ProtoTerm)
+data class MatchCase(val pattern: Pattern, val term: Expression<*>)
 
-sealed interface ProtoTerm
-
-data class SpecConstantTerm(val specConstant: SpecConstant) : ProtoTerm
-
-data class ProtoMatch(val term: ProtoTerm, val matchCases: List<MatchCase>) : ProtoTerm

@@ -24,7 +24,14 @@ import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.dsl.UserDeclaredSMTFunctionN
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunction0
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunctionN
+import tools.aqua.konstraints.parser.IntsTheory
+import tools.aqua.konstraints.parser.RealsIntsTheory
+import tools.aqua.konstraints.parser.RealsTheory
+import tools.aqua.konstraints.parser.StringsTheory
 import tools.aqua.konstraints.theories.BoolSort
+import tools.aqua.konstraints.theories.IntSort
+import tools.aqua.konstraints.theories.RealSort
+import tools.aqua.konstraints.theories.Theories
 
 enum class SatStatus {
   SAT, // program is satisfiable
@@ -151,6 +158,14 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     return func
   }
 
+    fun push(n : Int) = context.push(n)
+
+    fun push() = context.push()
+
+    fun push(block: (Context) -> Unit) = context.push(block)
+
+    fun pop(n : Int) = context.pop(n)
+
   fun setOption(option: SetOption) {
     _commands.add(option)
   }
@@ -160,7 +175,8 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
   }
 
     fun declareSort(decl: DeclareSort) {
-        context.addSort()
+        TODO("Implement declare-sort")
+        // context.addSort()
         _commands.add(decl)
     }
 

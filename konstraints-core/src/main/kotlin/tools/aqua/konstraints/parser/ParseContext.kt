@@ -328,7 +328,7 @@ internal interface Theory : AssertionLevel<FunctionDecl<*>, SortDecl<*>> {
   override fun get(function: String, args: List<Expression<*>>): FunctionDecl<*>? =
       functions[function]?.takeIf { it.acceptsExpressions(args, emptyList()) }
 
-  override val functions: Map<String, FunctionDecl<*>>
+  override val functions: Map<String, SMTFunction<*>>
   override val sorts: Map<String, SortDecl<*>>
 }
 

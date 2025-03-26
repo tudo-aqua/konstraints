@@ -60,7 +60,7 @@ class Context {
     currentContext.functions[func.symbol] = func
 
     // if the undoStack is not empty, and we are not currently inside any binder
-    // there was at least one push, so we save the added func to remove on the appropriate pop
+    // there was at least one push, so we save the added func to remove on the next pop operation
     if (undoStack.isNotEmpty()) {
       undoStack.peek().add(func)
     }
@@ -101,6 +101,14 @@ class Context {
     fun getSort(name: Symbol) =
         currentContext.sorts[name] ?: throw FunctionNotFoundException(name)
 
+    fun push(n : Int) = repeat(n) { _ -> push() }
+
+    // use if you have to pop manually or the operation can not be completed within the lambda passed to push
+    fun push() {
+        undoStack.push(mutableSetOf<SMTFunction<*>>())
+    }
+
+    // auto pops after block
   fun push(block: Context.() -> Unit) {
     undoStack.push(mutableSetOf<SMTFunction<*>>())
     block()
