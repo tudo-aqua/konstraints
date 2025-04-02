@@ -49,7 +49,7 @@ class ArraySelect<X : Sort, Y : Sort>(
   override val rhs: Expression<X> = index
 
   override fun copy(children: List<Expression<*>>): Expression<Y> =
-      ArraySelectDecl.buildExpression(children, emptyList()) as Expression<Y>
+      ArraySelectDecl.constructDynamic(children, emptyList()) as Expression<Y>
 }
 
 /**
@@ -78,5 +78,5 @@ class ArrayStore<X : Sort, Y : Sort>(
   override val children: List<Expression<*>> = listOf(array, index, value)
 
   override fun copy(children: List<Expression<*>>): Expression<ArraySort<X, Y>> =
-      ArrayStoreDecl.buildExpression(children, emptyList()) as Expression<ArraySort<X, Y>>
+      ArrayStoreDecl.constructDynamic(children, emptyList()) as Expression<ArraySort<X, Y>>
 }

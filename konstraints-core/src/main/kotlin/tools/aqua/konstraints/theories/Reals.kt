@@ -68,7 +68,7 @@ class RealNeg(override val inner: Expression<RealSort>) :
   override val theories = REALS_REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
-      RealNegDecl.buildExpression(children, emptyList())
+      RealNegDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -91,7 +91,7 @@ class RealSub(val terms: List<Expression<RealSort>>) :
   override val children: List<Expression<RealSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
-      RealSubDecl.buildExpression(children, emptyList())
+      RealSubDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -114,7 +114,7 @@ class RealAdd(val terms: List<Expression<RealSort>>) :
   override val children: List<Expression<RealSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
-      RealAddDecl.buildExpression(children, emptyList())
+      RealAddDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -137,7 +137,7 @@ class RealMul(val factors: List<Expression<RealSort>>) :
   override val children: List<Expression<RealSort>> = factors
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
-      RealMulDecl.buildExpression(children, emptyList())
+      RealMulDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -160,7 +160,7 @@ class RealDiv(val terms: List<Expression<RealSort>>) :
   override val children: List<Expression<RealSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
-      RealDivDecl.buildExpression(children, emptyList())
+      RealDivDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -183,7 +183,7 @@ class RealLessEq(val terms: List<Expression<RealSort>>) :
   override val children: List<Expression<RealSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      RealLessEqDecl.buildExpression(children, emptyList())
+      RealLessEqDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -206,7 +206,7 @@ class RealLess(val terms: List<Expression<RealSort>>) :
   override val children: List<Expression<RealSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      RealLessDecl.buildExpression(children, emptyList())
+      RealLessDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -229,7 +229,7 @@ class RealGreaterEq(val terms: List<Expression<RealSort>>) :
   override val children: List<Expression<RealSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      RealGreaterEqDecl.buildExpression(children, emptyList())
+      RealGreaterEqDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -252,5 +252,5 @@ class RealGreater(val terms: List<Expression<RealSort>>) :
   override val children: List<Expression<RealSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      RealGreaterDecl.buildExpression(children, emptyList())
+      RealGreaterDecl.constructDynamic(children, emptyList())
 }

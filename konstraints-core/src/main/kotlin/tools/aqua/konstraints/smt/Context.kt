@@ -25,7 +25,7 @@ import tools.aqua.konstraints.util.zipWithSameLength
 
 private class CurrentContext {
   val functions = mutableMapOf<Symbol, SMTFunction<*>>()
-  val sorts = mutableMapOf<Symbol, Sort>()
+  val sorts = mutableListOf<Symbol>()
 }
 
 class Context {
@@ -73,9 +73,9 @@ class Context {
   operator fun contains(expression: Expression<*>) =
       expression.func in currentContext.functions.values
 
-  operator fun contains(sort: Sort): Boolean = sort in currentContext.sorts.values
+  operator fun contains(sort: Sort): Boolean = sort.symbol in currentContext.sorts
 
-  fun containsSort(sort: Symbol): Boolean = currentContext.sorts[sort] != null
+  fun containsSort(sort: Symbol): Boolean = sort in currentContext.sorts
 
   fun <T : Sort> getFuncOrNull(name: Symbol, sort: T) =
       try {
@@ -97,9 +97,6 @@ class Context {
 
   fun getFunc(name: Symbol) =
       currentContext.functions[name] ?: throw FunctionNotFoundException(name)
-
-    fun getSort(name: Symbol) =
-        currentContext.sorts[name] ?: throw FunctionNotFoundException(name)
 
     fun push(n : Int) = repeat(n) { _ -> push() }
 

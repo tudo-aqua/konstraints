@@ -29,11 +29,21 @@ import org.petitparser.parser.primitive.CharacterParser.*
 import org.petitparser.parser.primitive.StringParser.of
 import org.petitparser.utils.FailureJoiner
 import tools.aqua.konstraints.smt.*
+import tools.aqua.konstraints.theories.ArraySort
 import tools.aqua.konstraints.theories.BVLiteral
 import tools.aqua.konstraints.theories.BVLiteral.Companion.invoke
+import tools.aqua.konstraints.theories.BVSort
 import tools.aqua.konstraints.theories.BoolSort
+import tools.aqua.konstraints.theories.FP128
+import tools.aqua.konstraints.theories.FP16
+import tools.aqua.konstraints.theories.FP32
+import tools.aqua.konstraints.theories.FP64
+import tools.aqua.konstraints.theories.FPSort
 import tools.aqua.konstraints.theories.IntLiteral
+import tools.aqua.konstraints.theories.IntSort
 import tools.aqua.konstraints.theories.RealLiteral
+import tools.aqua.konstraints.theories.RealSort
+import tools.aqua.konstraints.theories.RoundingMode
 import tools.aqua.konstraints.theories.Theories
 
 operator fun Parser.plus(other: Parser): ChoiceParser = or(other)
@@ -369,7 +379,7 @@ object Parser {
   /* maps to an implementation of SpecConstant */
   private val specConstant =
       (decimal.map { decimal: BigDecimal -> DecimalConstant(decimal) } +
-          numeral.map { numeral: String -> NumeralConstant(numeral) } +
+          numeral.map { numeral: String -> NumeralConstant(numeral.toBigInteger()) } +
           hexadecimal.map { hexadecimal: String -> HexConstant(hexadecimal) } +
           binary.map { binary: String -> BinaryConstant(binary) } +
           string.map { string: String -> StringConstant(string) }) trim whitespaceCat
@@ -411,7 +421,25 @@ object Parser {
   init {
     /* maps to ProtoSort */
     sort.set(
-        identifier.map { identifier: Identifier -> program.context.getSort(identifier.symbol) } +
+        identifier.map { identifier: Identifier ->
+            //check if sort is in the current context
+            require (program.context.containsSort(identifier.symbol))
+
+            when(identifier.symbol) {
+                BoolSort.symbol -> TODO()
+                "BitVec".toSymbolWithQuotes() -> TODO()
+                IntSort.symbol -> TODO()
+                RealSort.symbol -> TODO()
+                RoundingMode.symbol -> TODO()
+                "FloatingPoint".toSymbolWithQuotes() -> TODO()
+                FP16.symbol -> TODO()
+                FP32.symbol -> TODO()
+                FP64.symbol -> TODO()
+                FP128.symbol -> TODO()
+                "Array".toSymbolWithQuotes() -> TODO()
+                else -> TODO()
+            }
+        } +
             (lparen * identifier * sort.plus() * rparen).map { results: List<Any> ->
                 TODO("Implement sorts with arity > 0 in context")
               // program.context.getSort((results[1] as Identifier).symbol)
@@ -704,34 +732,17 @@ object Parser {
   // TODO
 
   fun parse(program: String): SMTProgram {
-    val parseTreeVisitor = ParseTreeVisitor()
-
     // TODO parse each command individually, fail on the first command that can not be parsed
     // this will lead to better error messages but requires some preprocessing to split the input
     // input individual commands (this may be done in linear time by searching the input from
     // left to right counting the number of opening an closing brackets)
-    val commands = splitInput(program)
-    val protoCommands =
-        commands.map {
-          val temp = command.parse(it)
-
-          if (temp.isSuccess) {
-            temp
-          } else {
+    splitInput(program).forEach { cmd -> val temp = command.parse(cmd)
+        if (!temp.isSuccess){
             throw ParseException(temp.message, temp.position, temp.buffer)
-          }
         }
+    }
 
-    return DefaultSMTProgram(
-        protoCommands
-            .map { result -> result.get<Any>() }
-            .map { command ->
-              when (command) {
-                is ProtoCommand -> parseTreeVisitor.visit(command)
-                is Command -> command
-                else -> throw IllegalStateException("Illegal type in parse tree $command!")
-              }
-            })
+    return this.program
   }
 
   private fun splitInput(program: String): List<String> {

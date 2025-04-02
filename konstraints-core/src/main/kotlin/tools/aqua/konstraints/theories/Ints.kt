@@ -59,7 +59,7 @@ class IntNeg(override val inner: Expression<IntSort>) :
   override val theories = INTS_REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
-      IntNegDecl.buildExpression(children, emptyList())
+      IntNegDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -82,7 +82,7 @@ class IntSub(val terms: List<Expression<IntSort>>) :
   override val children: List<Expression<IntSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
-      IntSubDecl.buildExpression(children, emptyList())
+      IntSubDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -105,7 +105,7 @@ class IntAdd(val terms: List<Expression<IntSort>>) :
   override val children: List<Expression<IntSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
-      IntAddDecl.buildExpression(children, emptyList())
+      IntAddDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -128,7 +128,7 @@ class IntMul(val factors: List<Expression<IntSort>>) :
   override val children: List<Expression<IntSort>> = factors
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
-      IntMulDecl.buildExpression(children, emptyList())
+      IntMulDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -151,7 +151,7 @@ class IntDiv(val terms: List<Expression<IntSort>>) :
   override val children: List<Expression<IntSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
-      IntDivDecl.buildExpression(children, emptyList())
+      IntDivDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -168,7 +168,7 @@ class Mod(val dividend: Expression<IntSort>, val divisor: Expression<IntSort>) :
   override val rhs: Expression<IntSort> = divisor
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
-      ModDecl.buildExpression(children, emptyList())
+      ModDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -181,7 +181,7 @@ class Abs(override val inner: Expression<IntSort>) :
   override val theories = INTS_REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
-      AbsDecl.buildExpression(children, emptyList())
+      AbsDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -204,7 +204,7 @@ class IntLessEq(val terms: List<Expression<IntSort>>) :
   override val children: List<Expression<IntSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      IntLessEqDecl.buildExpression(children, emptyList())
+      IntLessEqDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -227,7 +227,7 @@ class IntLess(val terms: List<Expression<IntSort>>) :
   override val children: List<Expression<IntSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      IntLessDecl.buildExpression(children, emptyList())
+      IntLessDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -250,7 +250,7 @@ class IntGreaterEq(val terms: List<Expression<IntSort>>) :
   override val children: List<Expression<IntSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      IntGreaterEqDecl.buildExpression(children, emptyList())
+      IntGreaterEqDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -273,7 +273,7 @@ class IntGreater(val terms: List<Expression<IntSort>>) :
   override val children: List<Expression<IntSort>> = terms
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      IntGreaterDecl.buildExpression(children, emptyList())
+      IntGreaterDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -292,5 +292,5 @@ class Divisible(val n: Int, override val inner: Expression<IntSort>) :
   }
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      DivisibleDecl.buildExpression(children, emptyList())
+      DivisibleDecl.constructDynamic(children, emptyList())
 }

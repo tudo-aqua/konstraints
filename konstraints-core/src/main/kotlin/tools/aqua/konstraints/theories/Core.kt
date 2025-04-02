@@ -52,7 +52,7 @@ class Not(override val inner: Expression<BoolSort>) :
   override fun toString(): String = "(not $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      NotDecl.buildExpression(children, emptyList())
+      NotDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -69,7 +69,7 @@ class Implies(val statements: List<Expression<BoolSort>>) :
   override val children: List<Expression<BoolSort>> = statements
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      ImpliesDecl.buildExpression(children, emptyList())
+      ImpliesDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -86,7 +86,7 @@ class And(val conjuncts: List<Expression<BoolSort>>) :
   override val children: List<Expression<BoolSort>> = conjuncts
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      AndDecl.buildExpression(children, emptyList())
+      AndDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -103,7 +103,7 @@ class Or(val disjuncts: List<Expression<BoolSort>>) :
   override val children: List<Expression<BoolSort>> = disjuncts
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      OrDecl.buildExpression(children, emptyList())
+      OrDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -120,7 +120,7 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) :
   override val children: List<Expression<BoolSort>> = disjuncts
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      XOrDecl.buildExpression(children, emptyList())
+      XOrDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -137,7 +137,7 @@ class Equals<T : Sort>(val statements: List<Expression<T>>) :
   override val children: List<Expression<T>> = statements
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      EqualsDecl.buildExpression(children, emptyList())
+      EqualsDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -154,7 +154,7 @@ class Distinct<T : Sort>(val statements: List<Expression<T>>) :
   override val children: List<Expression<T>> = statements
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      DistinctDecl.buildExpression(children, emptyList())
+      DistinctDecl.constructDynamic(children, emptyList())
 }
 
 /** Bool sort */

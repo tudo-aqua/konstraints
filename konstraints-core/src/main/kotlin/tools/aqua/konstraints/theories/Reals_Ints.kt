@@ -31,7 +31,7 @@ class ToReal(override val inner: Expression<IntSort>) :
   override val theories = REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
-      ToRealDecl.buildExpression(children, emptyList())
+      ToRealDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -44,7 +44,7 @@ class ToInt(override val inner: Expression<RealSort>) :
   override val theories = REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
-      ToIntDecl.buildExpression(children, emptyList())
+      ToIntDecl.constructDynamic(children, emptyList())
 }
 
 /** (is_int Real Bool) */
@@ -53,5 +53,5 @@ class IsInt(override val inner: Expression<RealSort>) :
   override val theories = REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      IsIntDecl.buildExpression(children, emptyList())
+      IsIntDecl.constructDynamic(children, emptyList())
 }

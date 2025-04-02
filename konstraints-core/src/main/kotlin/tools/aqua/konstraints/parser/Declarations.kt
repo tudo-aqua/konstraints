@@ -31,6 +31,11 @@ enum class Associativity {
 
 abstract class SMTTheoryFunction<T : Sort>(override val symbol : Symbol, override val parameters: List<Sort>, override val sort : T, val associativity: Associativity) : SMTFunction<T>()
 
+interface Theory {
+    val functions: Map<Symbol, SMTFunction<*>>
+    val sorts: List<Symbol>
+}
+
 /** Core theory internal object */
 /*internal*/ object CoreTheory : Theory {
   override val functions =
@@ -45,14 +50,8 @@ abstract class SMTTheoryFunction<T : Sort>(override val symbol : Symbol, overrid
               DistinctDecl,
               IteDecl,
               ImpliesDecl)
-          .associateBy { it.symbol.toString() }
-  override val sorts = mapOf(Pair("Bool", BoolSortDecl))
-}
-
-/** Declaration internal object for Bool sort */
-/*internal*/ object BoolSortDecl :
-    SortDecl<BoolSort>("Bool".toSymbolWithQuotes(), emptySet(), emptySet()) {
-  override fun getSort(bindings: Bindings): BoolSort = BoolSort
+          .associateBy { it.symbol }
+  override val sorts = listOf(BoolSort.symbol)
 }
 
 internal object TrueDecl :
@@ -232,18 +231,8 @@ internal object BitVectorExpressionTheory : Theory {
               BVSLeDecl,
               BVSGtDecl,
               BVSGeDecl)
-          .associateBy { it.symbol.toString() }
-  override val sorts = mapOf(Pair("BitVec", BVSortDecl))
-}
-
-/**
- * BitVec sort declaration
- *
- * (_ BitVec m)
- */
-internal object BVSortDecl :
-    SortDecl<BVSort>("BitVec".toSymbolWithQuotes(), emptySet(), setOf("m".idx())) {
-  override fun getSort(bindings: Bindings): BVSort = BVSort(bindings["m"].numeral)
+          .associateBy { it.symbol }
+  override val sorts = listOf("BitVec".toSymbolWithQuotes())
 }
 
 internal object BVConcatDecl :
@@ -925,14 +914,9 @@ internal object IntsTheory : Theory {
               IntGreaterEqDecl,
               IntGreaterDecl,
               DivisibleDecl)
-          .associateBy { it.symbol.toString() }
+          .associateBy { it.symbol }
 
-  override val sorts: Map<String, SortDecl<*>> = mapOf(Pair("Int", IntSortDecl))
-}
-
-internal object IntSortDecl :
-    SortDecl<IntSort>("Int".toSymbolWithQuotes(), emptySet(), emptySet()) {
-  override fun getSort(bindings: Bindings): IntSort = IntSort
+  override val sorts = listOf(IntSort.symbol)
 }
 
 internal object IntNegDecl :
@@ -1099,14 +1083,9 @@ internal object RealsTheory : Theory {
               RealLessDecl,
               RealGreaterEqDecl,
               RealGreaterDecl)
-          .associateBy { it.symbol.toString() }
+          .associateBy { it.symbol }
 
-  override val sorts: Map<String, SortDecl<*>> = mapOf(Pair("Real", RealSortDecl))
-}
-
-internal object RealSortDecl :
-    SortDecl<RealSort>("Real".toSymbolWithQuotes(), emptySet(), emptySet()) {
-  override fun getSort(bindings: Bindings): RealSort = RealSort
+  override val sorts = listOf(RealSort.symbol)
 }
 
 internal object RealNegDecl :
@@ -1264,10 +1243,9 @@ internal object RealsIntsTheory : Theory {
               ToRealDecl,
               ToIntDecl,
               IsIntDecl)
-          .associateBy { it.symbol.toString() }
+          .associateBy { it.symbol }
 
-  override val sorts: Map<String, SortDecl<*>> =
-      mapOf(Pair("Int", IntSortDecl), Pair("Real", RealSortDecl))
+  override val sorts = listOf(IntSort.symbol, RealSort.symbol)
 }
 
 internal object ToRealDecl :
@@ -1355,56 +1333,18 @@ internal object FloatingPointTheory : Theory {
               FPToUBitVecDecl,
               FPToSBitVecDecl,
               FPToRealDecl)
-          .associateBy { it.symbol.toString() }
+          .associateBy { it.symbol }
 
-  override val sorts: Map<String, SortDecl<*>> =
-      mapOf(
-          Pair("RoundingMode", RoundingModeDecl),
-          Pair("Real", RealSortDecl),
-          Pair("Float16", FP16Decl),
-          Pair("Float32", FP32Decl),
-          Pair("Float64", FP64Decl),
-          Pair("Float128", FP128Decl),
-          Pair("BitVec", BVSortDecl),
-          Pair("FloatingPoint", FPSortDecl))
-}
-
-/** RoundíngMode sort declaration internal object */
-internal object RoundingModeDecl :
-    SortDecl<RoundingMode>("RoundingMode".toSymbolWithQuotes(), emptySet(), emptySet()) {
-  override fun getSort(bindings: Bindings): RoundingMode = RoundingMode
-}
-
-/** FloatingPoint sort declaration internal object */
-internal object FPSortDecl :
-    SortDecl<FPSort>(
-        "FloatingPoint".toSymbolWithQuotes(), emptySet(), setOf("eb".idx(), "sb".idx())) {
-  override fun getSort(bindings: Bindings): FPSort =
-      FPSort(bindings["eb"].numeral, bindings["sb"].numeral)
-}
-
-/** 16-bit FloatingPoint declaration internal object */
-internal object FP16Decl :
-    SortDecl<FPSort>("Float16".toSymbolWithQuotes(), emptySet(), emptySet()) {
-  override fun getSort(bindings: Bindings): FPSort = FPSort(5, 11)
-}
-
-/** 32-bit FloatingPoint declaration internal object */
-internal object FP32Decl :
-    SortDecl<FPSort>("Float32".toSymbolWithQuotes(), emptySet(), emptySet()) {
-  override fun getSort(bindings: Bindings): FPSort = FPSort(8, 24)
-}
-
-/** 64-bit FloatingPoint declaration internal object */
-internal object FP64Decl :
-    SortDecl<FPSort>("Float64".toSymbolWithQuotes(), emptySet(), emptySet()) {
-  override fun getSort(bindings: Bindings): FPSort = FPSort(11, 53)
-}
-
-/** 128-bit FloatingPoint declaration internal object */
-internal object FP128Decl :
-    SortDecl<FPSort>("Float128".toSymbolWithQuotes(), emptySet(), emptySet()) {
-  override fun getSort(bindings: Bindings): FPSort = FPSort(15, 113)
+  override val sorts =
+      listOf(
+          RoundingMode.symbol,
+          RealSort.symbol,
+          FP16.symbol,
+          FP32.symbol,
+          FP64.symbol,
+          FP128.symbol,
+          "BitVec".toSymbolWithQuotes(),
+          "FloatingPoint".toSymbolWithQuotes())
 }
 
 internal object RoundNearestTiesToEvenDecl :
@@ -2269,17 +2209,9 @@ internal object FPToRealDecl :
 /** Array extension theory internal object */
 internal object ArrayExTheory : Theory {
   override val functions =
-      listOf(ArraySelectDecl, ArrayStoreDecl).associateBy { it.symbol.toString() }
+      listOf(ArraySelectDecl, ArrayStoreDecl).associateBy { it.symbol }
 
-  override val sorts: MutableMap<String, SortDecl<*>> = mutableMapOf(Pair("Array", ArraySortDecl))
-}
-
-/** Sort declaration internal object for array sort */
-internal object ArraySortDecl :
-    SortDecl<ArraySort<Sort, Sort>>(
-        "Array".toSymbolWithQuotes(), setOf(SortParameter("X"), SortParameter("Y")), emptySet()) {
-  override fun getSort(bindings: Bindings): ArraySort<Sort, Sort> =
-      ArraySort(bindings[SortParameter("X")], bindings[SortParameter("Y")])
+  override val sorts = listOf("Array".toSymbolWithQuotes())
 }
 
 /** Array selection declaration internal object */
@@ -2364,20 +2296,9 @@ internal object StringsTheory : Theory {
               RegexRangeDecl,
               RegexPowerDecl,
               RegexLoopDecl)
-          .associateBy { it.symbol.toString() }
+          .associateBy { it.symbol }
 
-  override val sorts: Map<String, SortDecl<*>> =
-      mapOf(Pair("String", StringSortDecl), Pair("RegLan", RegLanDecl), Pair("Int", IntSortDecl))
-}
-
-internal object StringSortDecl :
-    SortDecl<StringSort>("String".toSymbolWithQuotes(), emptySet(), emptySet()) {
-  override fun getSort(bindings: Bindings): StringSort = StringSort
-}
-
-internal object RegLanDecl :
-    SortDecl<RegLan>("RegLan".toSymbolWithQuotes(), emptySet(), emptySet()) {
-  override fun getSort(bindings: Bindings): RegLan = RegLan
+  override val sorts = listOf(StringSort.symbol, RegLan.symbol, IntSort.symbol)
 }
 
 internal object CharDecl :

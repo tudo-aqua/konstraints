@@ -216,7 +216,7 @@ class Ite<out T : Sort>(
   override val func = null
 
   override fun copy(children: List<Expression<*>>): Expression<T> =
-      IteDecl.buildExpression(children, emptyList()) castTo sort
+      IteDecl.constructDynamic(children, emptyList()) castTo sort
 
   override val name: Symbol = "ite".toSymbolWithQuotes()
 
@@ -397,7 +397,8 @@ class ExpressionCastException(from: Sort, to: String) :
 class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>) :
     SMTFunction<T>() {
 
-  override operator fun invoke(args: List<Expression<*>>) = instance
+  operator fun invoke(args: List<Expression<*>>) = instance
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>) = instance
 
   val name = symbol.toString()
   override val sort: T = term.sort
@@ -408,7 +409,8 @@ class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>)
 
 class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T) :
     SMTFunction<T>() {
-  override operator fun invoke(args: List<Expression<*>>) = instance
+  operator fun invoke(args: List<Expression<*>>) = instance
+    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>) = instance
 
   override fun toString(): String = "($symbol $sort)"
 
