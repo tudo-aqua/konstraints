@@ -426,18 +426,18 @@ object Parser {
             require (program.context.containsSort(identifier.symbol))
 
             when(identifier.symbol) {
-                BoolSort.symbol -> TODO()
-                "BitVec".toSymbolWithQuotes() -> TODO()
-                IntSort.symbol -> TODO()
-                RealSort.symbol -> TODO()
-                RoundingMode.symbol -> TODO()
-                "FloatingPoint".toSymbolWithQuotes() -> TODO()
+                BoolSort.symbol -> BoolFactory.build()
+                "BitVec".toSymbolWithQuotes() -> BitVecFactory.build(identifier)
+                IntSort.symbol -> IntFactory.build()
+                RealSort.symbol -> RealFactory.build()
+                RoundingMode.symbol -> RoundingModeFactory.build()
+                "FloatingPoint".toSymbolWithQuotes() -> FPSort(((identifier as IndexedIdentifier).indices[0] as NumeralIndex).numeral, (identifier.indices[1] as NumeralIndex).numeral)
                 FP16.symbol -> TODO()
                 FP32.symbol -> TODO()
                 FP64.symbol -> TODO()
                 FP128.symbol -> TODO()
-                "Array".toSymbolWithQuotes() -> TODO()
-                else -> TODO()
+                "Array".toSymbolWithQuotes() -> throw RuntimeException("Array sort without parameters was provided!")
+                else -> UserDefinedSort(identifier.symbol, 0)
             }
         } +
             (lparen * identifier * sort.plus() * rparen).map { results: List<Any> ->
@@ -792,6 +792,14 @@ object Parser {
               print(results)
             } trim whitespaceCat))
   }
+}
+
+internal fun BitVecFactory.build(identifier : Identifier) : BVSort {
+    require(identifier is IndexedIdentifier)
+    require(identifier.indices.size == 1)
+    require(identifier.indices.single() is NumeralIndex)
+
+    return build((identifier.indices.single() as NumeralIndex).numeral)
 }
 
 class ParseException(message: String, position: Int, buffer: String) :

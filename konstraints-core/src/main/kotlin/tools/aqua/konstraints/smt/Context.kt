@@ -25,7 +25,7 @@ import tools.aqua.konstraints.util.zipWithSameLength
 
 private class CurrentContext {
   val functions = mutableMapOf<Symbol, SMTFunction<*>>()
-  val sorts = mutableListOf<Symbol>()
+  val sorts = mutableMapOf<Symbol, SortFactory>()
 }
 
 class Context {

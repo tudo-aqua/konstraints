@@ -18,9 +18,124 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.Bindings
-import tools.aqua.konstraints.parser.SortDecl
-import tools.aqua.konstraints.theories.Theories
+import tools.aqua.konstraints.theories.*
+
+sealed interface SortFactory {
+    abstract fun build(parameters : List<Sort>, indices : List<NumeralIndex>) : Sort
+    abstract fun isInstanceOf(sort : Sort): Boolean
+    abstract val isIndexed: Boolean
+    abstract val numIndicies: Int
+}
+
+object BoolFactory : SortFactory {
+    override fun build(parameters : List<Sort>, indices : List<NumeralIndex>): BoolSort {
+        require(parameters.isEmpty())
+        require(indices.isEmpty())
+
+        return build()
+    }
+    fun build() = BoolSort
+
+    override fun isInstanceOf(sort : Sort) = (sort is BoolSort)
+
+    override val isIndexed = false
+    override val numIndicies = 0
+}
+
+object IntFactory : SortFactory {
+    override fun build(parameters : List<Sort>, indices : List<NumeralIndex>): IntSort {
+        require(parameters.isEmpty())
+        require(indices.isEmpty())
+
+        return build()
+    }
+    fun build() = IntSort
+
+    override fun isInstanceOf(sort : Sort) = (sort is IntSort)
+
+    override val isIndexed = false
+    override val numIndicies = 0
+}
+
+object RealFactory : SortFactory {
+    override fun build(parameters : List<Sort>, indices : List<NumeralIndex>): RealSort {
+        require(parameters.isEmpty())
+        require(indices.isEmpty())
+
+        return build()
+    }
+    fun build() = RealSort
+
+    override fun isInstanceOf(sort : Sort) = (sort is RealSort)
+
+    override val isIndexed = false
+    override val numIndicies = 0
+}
+
+object RoundingModeFactory : SortFactory {
+    override fun build(parameters : List<Sort>, indices : List<NumeralIndex>): RoundingMode {
+        require(parameters.isEmpty())
+        require(indices.isEmpty())
+
+        return build()
+    }
+    fun build() = RoundingMode
+
+    override fun isInstanceOf(sort : Sort) = (sort is RoundingMode)
+
+    override val isIndexed = false
+    override val numIndicies = 0
+}
+
+object BitVecFactory : SortFactory {
+    private val cache = arrayOf(
+        BVSort(1),
+        BVSort(2),
+        BVSort(3),
+        BVSort(4),
+        BVSort(5),
+        BVSort(6),
+        BVSort(7),
+        BVSort(8),
+        BVSort(9),
+        BVSort(10),
+        BVSort(11),
+        BVSort(12),
+        BVSort(13),
+        BVSort(14),
+        BVSort(15),
+        BVSort(16),
+        BVSort(19),
+        BVSort(24),
+        BVSort(32),
+        BVSort(53),
+        BVSort(64),
+        BVSort(113),
+        BVSort(128),
+        BVSort(237),
+        BVSort(256),
+        BVSort(512),
+        BVSort(1024),
+        BVSort(2048)
+    )
+
+    override fun build(parameters : List<Sort>, indices : List<NumeralIndex>): BVSort {
+        require(parameters.isEmpty())
+        require(indices.size == 1)
+
+        return build(indices.single().numeral)
+    }
+
+    fun build(n : Int) = when(n) {
+        1 -> cache[0]
+        else -> BVSort(n)
+    }
+
+    override fun isInstanceOf(sort : Sort) = (sort is BVSort)
+
+    override val isIndexed = true
+    override val numIndicies = 1
+}
 
 /**
  * Base class for each SMT sort
