@@ -55,7 +55,7 @@ infix fun Parser.trim(both: Parser): Parser = trim(both)
 object Parser {
   // Auxiliary Lexical Categories
 
-    val program = MutableSMTProgram(emptyList())
+    lateinit var program : MutableSMTProgram
 
   private val whitespaceCat = anyOf(" \t\r\n", "space, tab, or newline expected")
   private val printableCat = range('\u0020', '\u007E') + range('\u0080', '\u00FF')
@@ -424,26 +424,24 @@ object Parser {
         identifier.map { identifier: Identifier ->
             //check if sort is in the current context
             require (program.context.containsSort(identifier.symbol))
-
-            when(identifier.symbol) {
-                BoolSort.symbol -> BoolFactory.build()
-                "BitVec".toSymbolWithQuotes() -> BitVecFactory.build(identifier)
-                IntSort.symbol -> IntFactory.build()
-                RealSort.symbol -> RealFactory.build()
-                RoundingMode.symbol -> RoundingModeFactory.build()
-                "FloatingPoint".toSymbolWithQuotes() -> FPSort(((identifier as IndexedIdentifier).indices[0] as NumeralIndex).numeral, (identifier.indices[1] as NumeralIndex).numeral)
-                FP16.symbol -> TODO()
-                FP32.symbol -> TODO()
-                FP64.symbol -> TODO()
-                FP128.symbol -> TODO()
-                "Array".toSymbolWithQuotes() -> throw RuntimeException("Array sort without parameters was provided!")
-                else -> UserDefinedSort(identifier.symbol, 0)
+            when(identifier) {
+                is IndexedIdentifier -> program.context.getSort(identifier.symbol)
+                    .build(emptyList(), identifier.indices as List<NumeralIndex>)
+                is SymbolIdentifier -> program.context.getSort(identifier.symbol)
+                    .build(emptyList(), emptyList())
             }
         } +
             (lparen * identifier * sort.plus() * rparen).map { results: List<Any> ->
-                TODO("Implement sorts with arity > 0 in context")
-              // program.context.getSort((results[1] as Identifier).symbol)
-              // results[2] is guaranteed to be a none empty List of ProtoSort
+                val identifier = results[1] as Identifier
+                val sorts = results.subList(2, results.size - 1) as List<Sort>
+
+                require (program.context.containsSort(identifier.symbol))
+                when(identifier) {
+                    is IndexedIdentifier -> program.context.getSort(identifier.symbol)
+                        .build(sorts, identifier.indices as List<NumeralIndex>)
+                    is SymbolIdentifier -> program.context.getSort(identifier.symbol)
+                        .build(sorts, emptyList())
+                }
             })
   }
 
@@ -554,8 +552,11 @@ object Parser {
                 (results[0] as SMTFunction<*>).constructDynamic(emptyList(),  results[1] as List<Index>)
             }  +
             (lparen * qualIdentifier * term.plus() * rparen).map { results: List<Any> ->
-              /* Results contains SMTFunction follow by list of its arguments as Expressions */
-                (results[1] as SMTFunction<*>).constructDynamic(results[2] as List<Expression<*>>, (results[1] as List<Any>)[1] as List<Index>)
+              /* Results contains list of SMTFunction and indices follow by list of its arguments as Expressions */
+                val function = (results[1] as List<Any>)[0] as SMTFunction<*>
+                val indices = (results[1] as List<Any>)[1] as List<Index>
+
+                function.constructDynamic(results[2] as List<Expression<*>>, indices)
             } /* maps to GenericProtoTerm */)
   }
 

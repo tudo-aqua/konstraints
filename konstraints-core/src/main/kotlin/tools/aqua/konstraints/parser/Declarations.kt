@@ -32,8 +32,14 @@ enum class Associativity {
 abstract class SMTTheoryFunction<T : Sort>(override val symbol : Symbol, override val parameters: List<Sort>, override val sort : T, val associativity: Associativity) : SMTFunction<T>()
 
 interface Theory {
+    companion object {
+        val logicLookup = mapOf(
+            Theories.CORE to CoreTheory
+        )
+    }
+
     val functions: Map<Symbol, SMTFunction<*>>
-    val sorts: List<Symbol>
+    val sorts: Map<Symbol, SortFactory>
 }
 
 /** Core theory internal object */
@@ -51,7 +57,7 @@ interface Theory {
               IteDecl,
               ImpliesDecl)
           .associateBy { it.symbol }
-  override val sorts = listOf(BoolSort.symbol)
+  override val sorts = mapOf(BoolSort.symbol to BoolFactory)
 }
 
 internal object TrueDecl :
@@ -232,7 +238,7 @@ internal object BitVectorExpressionTheory : Theory {
               BVSGtDecl,
               BVSGeDecl)
           .associateBy { it.symbol }
-  override val sorts = listOf("BitVec".toSymbolWithQuotes())
+  override val sorts = mapOf("BitVec".toSymbolWithQuotes() to BitVecFactory)
 }
 
 internal object BVConcatDecl :
@@ -916,7 +922,7 @@ internal object IntsTheory : Theory {
               DivisibleDecl)
           .associateBy { it.symbol }
 
-  override val sorts = listOf(IntSort.symbol)
+  override val sorts = mapOf(IntSort.symbol to IntFactory)
 }
 
 internal object IntNegDecl :
@@ -1085,7 +1091,7 @@ internal object RealsTheory : Theory {
               RealGreaterDecl)
           .associateBy { it.symbol }
 
-  override val sorts = listOf(RealSort.symbol)
+  override val sorts = mapOf(RealSort.symbol to RealFactory)
 }
 
 internal object RealNegDecl :
@@ -1245,7 +1251,7 @@ internal object RealsIntsTheory : Theory {
               IsIntDecl)
           .associateBy { it.symbol }
 
-  override val sorts = listOf(IntSort.symbol, RealSort.symbol)
+  override val sorts = mapOf(IntSort.symbol to IntFactory, RealSort.symbol to RealFactory)
 }
 
 internal object ToRealDecl :
@@ -1336,15 +1342,15 @@ internal object FloatingPointTheory : Theory {
           .associateBy { it.symbol }
 
   override val sorts =
-      listOf(
-          RoundingMode.symbol,
-          RealSort.symbol,
-          FP16.symbol,
-          FP32.symbol,
-          FP64.symbol,
-          FP128.symbol,
-          "BitVec".toSymbolWithQuotes(),
-          "FloatingPoint".toSymbolWithQuotes())
+      mapOf(
+          RoundingMode.symbol to RoundingModeFactory,
+          RealSort.symbol to RealFactory,
+          //FP16.symbol,
+          //FP32.symbol,
+          //FP64.symbol,
+          //FP128.symbol,
+          "BitVec".toSymbolWithQuotes() to BitVecFactory,
+          "FloatingPoint".toSymbolWithQuotes() to FloatingPointFactory)
 }
 
 internal object RoundNearestTiesToEvenDecl :
@@ -2211,7 +2217,7 @@ internal object ArrayExTheory : Theory {
   override val functions =
       listOf(ArraySelectDecl, ArrayStoreDecl).associateBy { it.symbol }
 
-  override val sorts = listOf("Array".toSymbolWithQuotes())
+  override val sorts = mapOf("Array".toSymbolWithQuotes() to ArraySortFactory)
 }
 
 /** Array selection declaration internal object */
@@ -2298,7 +2304,7 @@ internal object StringsTheory : Theory {
               RegexLoopDecl)
           .associateBy { it.symbol }
 
-  override val sorts = listOf(StringSort.symbol, RegLan.symbol, IntSort.symbol)
+  override val sorts = mapOf(StringSort.symbol to StringFactory, RegLan.symbol to RegLanFactory, IntSort.symbol to IntFactory)
 }
 
 internal object CharDecl :

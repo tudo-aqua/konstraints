@@ -18,8 +18,17 @@
 
 package tools.aqua.konstraints.smt
 
+import tools.aqua.konstraints.parser.ArrayExTheory
+import tools.aqua.konstraints.parser.BitVectorExpressionTheory
+import tools.aqua.konstraints.parser.CoreTheory
+import tools.aqua.konstraints.parser.FloatingPointTheory
+import tools.aqua.konstraints.parser.IntsTheory
+import tools.aqua.konstraints.parser.RealsIntsTheory
+import tools.aqua.konstraints.parser.RealsTheory
+import tools.aqua.konstraints.parser.StringsTheory
 import tools.aqua.konstraints.parser.Theory
 import tools.aqua.konstraints.theories.BoolSort
+import tools.aqua.konstraints.theories.Theories
 import tools.aqua.konstraints.util.Stack
 import tools.aqua.konstraints.util.zipWithSameLength
 
@@ -104,6 +113,16 @@ class Context {
     fun push() {
         undoStack.push(mutableSetOf<SMTFunction<*>>())
     }
+
+    fun getSortOrNull(name: Symbol) : SortFactory? {
+        return try {
+            getSort(name)
+        } catch (_: FunctionNotFoundException) {
+            null
+        }
+    }
+
+    fun getSort(name: Symbol): SortFactory = currentContext.sorts[name] ?: throw SortNotFoundException(name)
 
     // auto pops after block
   fun push(block: Context.() -> Unit) {
@@ -215,10 +234,23 @@ class Context {
 
   fun setLogic(logic: Logic) {
     this.logic = logic
-    forbiddenNames.addAll(
-        logic.theories.flatMap { theory ->
-          Theory.logicLookup[theory]!!.functions.map { (_, func) -> func.symbol }
-        })
+
+    logic.theories.forEach { theory ->
+        when (theory) {
+            Theories.CORE -> CoreTheory
+            Theories.ARRAYS_EX -> ArrayExTheory
+            Theories.FIXED_SIZE_BIT_VECTORS -> BitVectorExpressionTheory
+            Theories.FLOATING_POINT -> FloatingPointTheory
+            Theories.INTS -> IntsTheory
+            Theories.REALS -> RealsTheory
+            Theories.REALS_INTS -> RealsIntsTheory
+            Theories.STRINGS -> StringsTheory
+        }.let {
+            forbiddenNames.addAll(it.functions.map { (_, func) -> func.symbol })
+            currentContext.functions.putAll(it.functions)
+            currentContext.sorts.putAll(it.sorts)
+        }
+    }
   }
 }
 
@@ -695,3 +727,4 @@ interface ContextSort {
 }
 
 class FunctionNotFoundException(name: Symbol) : NoSuchElementException("Function $name not found")
+class SortNotFoundException(name: Symbol) : NoSuchElementException("Sort $name not found")

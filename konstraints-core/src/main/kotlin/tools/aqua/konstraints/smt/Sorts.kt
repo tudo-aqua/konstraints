@@ -72,6 +72,36 @@ object RealFactory : SortFactory {
     override val numIndicies = 0
 }
 
+object StringFactory : SortFactory {
+    override fun build(parameters : List<Sort>, indices : List<NumeralIndex>): StringSort {
+        require(parameters.isEmpty())
+        require(indices.isEmpty())
+
+        return build()
+    }
+    fun build() = StringSort
+
+    override fun isInstanceOf(sort : Sort) = (sort is StringSort)
+
+    override val isIndexed = false
+    override val numIndicies = 0
+}
+
+object RegLanFactory : SortFactory {
+    override fun build(parameters : List<Sort>, indices : List<NumeralIndex>): RegLan {
+        require(parameters.isEmpty())
+        require(indices.isEmpty())
+
+        return build()
+    }
+    fun build() = RegLan
+
+    override fun isInstanceOf(sort : Sort) = (sort is RegLan)
+
+    override val isIndexed = false
+    override val numIndicies = 0
+}
+
 object RoundingModeFactory : SortFactory {
     override fun build(parameters : List<Sort>, indices : List<NumeralIndex>): RoundingMode {
         require(parameters.isEmpty())
@@ -135,6 +165,39 @@ object BitVecFactory : SortFactory {
 
     override val isIndexed = true
     override val numIndicies = 1
+}
+
+object FloatingPointFactory : SortFactory {
+
+    override fun build(parameters : List<Sort>, indices : List<NumeralIndex>): FPSort {
+        require(parameters.isEmpty())
+        require(indices.size == 2)
+
+        return build(indices[0].numeral, indices[1].numeral)
+    }
+
+    fun build(eb : Int, sb : Int) = FPSort(eb, sb)
+
+    override fun isInstanceOf(sort : Sort) = (sort is FPSort)
+
+    override val isIndexed = true
+    override val numIndicies = 2
+}
+
+object ArraySortFactory : SortFactory {
+    override fun build(parameters : List<Sort>, indices : List<NumeralIndex>): ArraySort<*, *> {
+        require(parameters.size == 2)
+        require(indices.isEmpty())
+
+        return build(parameters[0], parameters[1])
+    }
+
+    fun<A : Sort, B : Sort> build(X : A, Y : B) = ArraySort(X, Y)
+
+    override fun isInstanceOf(sort : Sort) = (sort is ArraySort<*, *>)
+
+    override val isIndexed = false
+    override val numIndicies = 0
 }
 
 /**

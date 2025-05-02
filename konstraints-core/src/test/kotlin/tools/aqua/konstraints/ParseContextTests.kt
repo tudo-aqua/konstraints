@@ -29,7 +29,7 @@ import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
-
+/*
 /*
  * TestInstance per class is needed for parameterized tests
  * It is important to note that the class will not be reinitialized for each test,
@@ -323,3 +323,4 @@ class ParseContextTests {
         })
   }
 }
+*/

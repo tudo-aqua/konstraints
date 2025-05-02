@@ -67,6 +67,8 @@ abstract class SMTProgram(commands: List<Command>) {
 }
 
 class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
+
+    constructor() : this(emptyList())
   /**
    * Inserts [command] at the end of the program
    *
