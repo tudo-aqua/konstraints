@@ -25,7 +25,7 @@ import tools.aqua.konstraints.smt.*
 
 /** Real sort */
 object RealSort : Sort("Real") {
-  override val theories = REALS_REALS_INTS_MARKER_SET
+  override val theories = REALS_REALS_INTS_MARKER_SET.plus(FLOATING_POINT_MARKER_SET)
 }
 
 /**
@@ -35,7 +35,7 @@ object RealSort : Sort("Real") {
  */
 class RealLiteral(val value: BigDecimal) :
     Literal<RealSort>(LiteralString(value.toString()), RealSort) {
-  override val theories = REALS_REALS_INTS_MARKER_SET
+  override val theories = REALS_REALS_INTS_MARKER_SET.plus(FLOATING_POINT_MARKER_SET)
 
   constructor(value: Byte) : this(value.toInt().toBigDecimal())
 

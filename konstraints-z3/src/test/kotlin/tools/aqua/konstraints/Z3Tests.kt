@@ -61,7 +61,7 @@ class Z3Tests {
         "Skipped due to unknown sat status.")
 
     solver.use {
-      result.commands.map { solver.visit(it) }
+      solver.solve(result)
 
       // verify we get the correct status for the test
       assertEquals(

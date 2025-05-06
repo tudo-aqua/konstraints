@@ -168,7 +168,7 @@ class Context {
    * - adding all remaining functions to the undo stack all bindings must be distinct by name
    */
   @JvmName("bindVariablesLet")
-  private fun bindVariables(varBindings: List<VarBinding<*>>) {
+  internal fun bindVariables(varBindings: List<VarBinding<*>>) {
     require(varBindings.distinctBy { it.name }.size == varBindings.size) {
       "VarBindings in let must be distinct!"
     }
@@ -196,7 +196,7 @@ class Context {
    * - adding all remaining functions to the undo stack
    */
   @JvmName("bindVariablesQuantifier")
-  private fun bindVariables(sortedVars: List<SortedVar<*>>) {
+  internal fun bindVariables(sortedVars: List<SortedVar<*>>) {
     require(sortedVars.all { it.symbol !in forbiddenNames }) {
       "VarBindings can not shadow theory function symbols!"
     }
@@ -224,7 +224,7 @@ class Context {
    * - removing all local variable from the current context Pops the top level of the shadowingMap
    *   and undo stack
    */
-  private fun unbindVariables() {
+  internal fun unbindVariables() {
     // add all shadowed elements back first, then remove all remaining bindings
     shadowingMap.pop().forEach { (local, shadowed) ->
       currentContext.functions[local.symbol] = shadowed

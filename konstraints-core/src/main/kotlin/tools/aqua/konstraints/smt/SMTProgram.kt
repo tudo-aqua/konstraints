@@ -51,7 +51,7 @@ enum class SatStatus {
 abstract class SMTProgram(commands: List<Command>) {
   var model: Model? = null
   var status = SatStatus.PENDING
-  val info: List<Attribute>
+  val info = mutableListOf<Attribute>()
   var logic: Logic? = null
     protected set
 
@@ -61,9 +61,6 @@ abstract class SMTProgram(commands: List<Command>) {
   val commands: List<Command>
     get() = _commands.toList()
 
-  init {
-    info = commands.filterIsInstance<SetInfo>().map { it.attribute }
-  }
 }
 
 class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
@@ -99,12 +96,14 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     check(logic != null) { "Logic must be set before adding assertions!" }
 
     // check expr is in logic
-    require(
         assertion.expr.all {
-          (it.theories.isEmpty() || it.theories.any { it in logic!!.theories }) &&
-              (it.sort.theories.isEmpty() || it.sort.theories.any { it in logic!!.theories })
-        }) {
-          "Expression not in boundaries of logic!"
+          if(!(it.theories.isEmpty() || it.theories.any { it in logic!!.theories })) {
+              throw IllegalStateException("$it was not in logic bounds: expected any of ${logic!!.theories} but was ${it.theories}")
+          }
+            else if (!(it.sort.theories.isEmpty() || it.sort.theories.any { it in logic!!.theories })) {
+              throw IllegalStateException("${it.sort} was not in logic bounds: expected any of ${logic!!.theories} but was ${it.sort.theories}")
+          }
+            true
         }
 
     // check all symbols are known
@@ -173,6 +172,8 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
   }
 
   fun setInfo(info: SetInfo) {
+      this.info.add(info.attribute)
+
     _commands.add(info)
   }
 

@@ -85,7 +85,7 @@ class ParserTests {
           [
               "(set-logic QF_UF)(set-info :status sat)(declare-fun A () Bool)(push 1)(declare-fun B () Bool)(assert (= A B))(pop 1)(assert (= A B))(check-sat)"])
   fun testPushPopFails(program: String) {
-    assertThrows<IllegalStateException> { Parser.parse(program) }
+    assertThrows<FunctionNotFoundException> { Parser.parse(program) }
   }
 
   @ParameterizedTest

@@ -45,6 +45,7 @@ import tools.aqua.konstraints.theories.RealLiteral
 import tools.aqua.konstraints.theories.RealSort
 import tools.aqua.konstraints.theories.RoundingMode
 import tools.aqua.konstraints.theories.Theories
+import tools.aqua.konstraints.theories.isSMTBitvecShorthand
 
 operator fun Parser.plus(other: Parser): ChoiceParser = or(other)
 
@@ -433,7 +434,7 @@ object Parser {
         } +
             (lparen * identifier * sort.plus() * rparen).map { results: List<Any> ->
                 val identifier = results[1] as Identifier
-                val sorts = results.subList(2, results.size - 1) as List<Sort>
+                val sorts = results[2] as List<Sort>
 
                 require (program.context.containsSort(identifier.symbol))
                 when(identifier) {
@@ -472,9 +473,33 @@ object Parser {
   /* maps to an instance of SMTFunction and a list of indices */
   private val qualIdentifier =
       identifier.map { identifier: Identifier ->
-          when(identifier) {
-              is SymbolIdentifier -> listOf(program.context.getFunc(identifier.symbol), emptyList<Index>())
-              is IndexedIdentifier -> listOf(program.context.getFunc(identifier.symbol), identifier.indices)
+          if(identifier.symbol.value.startsWith("bv") && identifier.symbol.value.substring(2).all { ch -> ch.isDigit() }) {
+              require(program.context.containsSort("BitVec".toSymbolAsIs()))
+
+              listOf(object : SMTFunction<BVSort>() {
+                  override val symbol = identifier.symbol
+                  override val sort = BVSort(((identifier as IndexedIdentifier).indices[0] as NumeralIndex).numeral)
+                  override val parameters = emptyList<Sort>()
+
+                  override fun constructDynamic(
+                      args: List<Expression<*>>,
+                      indices: List<Index>
+                  ): Expression<BVSort> {
+                      require(args.isEmpty())
+                      require(indices.size == 1)
+
+                      return BVLiteral(
+                          "#b${identifier.symbol.value.substring(2).toBigInteger().toString(2)}",
+                          sort.bits
+                      )
+                  }
+
+              }, identifier.indices)
+          } else {
+              when(identifier) {
+                  is SymbolIdentifier -> listOf(program.context.getFunc(identifier.symbol), emptyList<Index>())
+                  is IndexedIdentifier -> listOf(program.context.getFunc(identifier.symbol), identifier.indices)
+              }
           }
       } +
           (lparen * asKW * identifier * sort * rparen).map { results: List<Any> ->
@@ -512,18 +537,21 @@ object Parser {
 
   init {
     term.set(
-        (lparen * letKW * lparen * varBinding.plus() * rparen * term * rparen).map {
+        (lparen * letKW * lparen * varBinding.plus().map { bindings : List<VarBinding<*>> -> program.context.bindVariables(bindings); bindings } * rparen * term * rparen).map {
             results: List<Any> ->
-          LetExpression(results[3] as List<VarBinding<*>>, results[5] as Expression<*>)
+            program.context.unbindVariables()
+                LetExpression(results[3] as List<VarBinding<*>>, results[5] as Expression<*>)
           // results[3] is guaranteed to be a list of VarBinding
         } + /* maps to ProtoLet */
-            (lparen * forallKW * lparen * sortedVar.plus() * rparen * term * rparen).map {
+            (lparen * forallKW * lparen * sortedVar.plus().map { bindings : List<SortedVar<*>> -> program.context.bindVariables(bindings); bindings } * rparen * term * rparen).map {
                 results: List<Any> ->
+                program.context.unbindVariables()
               ForallExpression(results[3] as List<SortedVar<*>>, results[5] as Expression<*> castTo BoolSort)
               // results[3] is guaranteed to be a list of SortedVar
             } + /* maps to ProtoForAll */
-            (lparen * existsKW * lparen * sortedVar.plus() * rparen * term * rparen).map {
+            (lparen * existsKW * lparen * sortedVar.plus().map { bindings : List<SortedVar<*>> -> program.context.bindVariables(bindings); bindings } * rparen * term * rparen).map {
                 results: List<Any> ->
+                program.context.unbindVariables()
               ExistsExpression(results[3] as List<SortedVar<*>>, results[5] as Expression<*> castTo BoolSort)
               // results[3] is guaranteed to be a list of SortedVar
             } + /* maps to ProtoExists */
@@ -636,8 +664,9 @@ object Parser {
               rparen)
   private val functionDec = lparen * symbol * lparen * sortedVar.star() * rparen * sort * rparen
   private val functionDef =
-      (symbol * lparen * sortedVar.star() * rparen * sort * term).map { result: ArrayList<Any> ->
-        FunctionDef(
+      (symbol * lparen * sortedVar.star().map { bindings : List<SortedVar<*>> -> program.context.bindVariables(bindings); bindings } * rparen * sort * term).map { result: ArrayList<Any> ->
+        program.context.unbindVariables()
+          FunctionDef(
             result[0] as ParseSymbol,
             result[2] as List<SortedVar<*>>,
             result[4] as Sort,
@@ -654,7 +683,7 @@ object Parser {
         program.assert(results[2] as Expression<*> castTo BoolSort)
       }
 
-  private val checkSatCMD = (lparen * checkSatKW * rparen).map { _: Any -> CheckSat }
+  private val checkSatCMD = (lparen * checkSatKW * rparen).map { _: Any -> program.add(CheckSat) }
 
   private val declareConstCMD =
       (lparen * declareConstKW * symbol * sort * rparen).map { results: ArrayList<Any> ->
@@ -733,6 +762,8 @@ object Parser {
   // TODO
 
   fun parse(program: String): SMTProgram {
+      this.program = MutableSMTProgram()
+
     // TODO parse each command individually, fail on the first command that can not be parsed
     // this will lead to better error messages but requires some preprocessing to split the input
     // input individual commands (this may be done in linear time by searching the input from

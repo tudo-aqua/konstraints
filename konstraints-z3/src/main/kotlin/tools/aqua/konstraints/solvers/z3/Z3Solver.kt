@@ -54,6 +54,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
 
   override fun solve(program: SMTProgram): SatStatus {
     program.commands.forEach { visit(it) }
+      program.status = status
 
     return status
   }
