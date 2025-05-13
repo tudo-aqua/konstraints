@@ -97,7 +97,7 @@ class SMTProgramTests {
     val program = MutableSMTProgram()
 
     program.setLogic(logic)
-    assertThrows<IllegalArgumentException> { program.assert(expr) }
+    assertThrows<AssertionOutOfLogicBounds> { program.assert(expr) }
   }
 
   private fun getExpressionsNegativ(): Stream<Arguments> {

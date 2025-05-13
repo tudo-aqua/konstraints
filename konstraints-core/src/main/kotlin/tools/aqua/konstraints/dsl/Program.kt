@@ -26,7 +26,7 @@ import tools.aqua.konstraints.theories.BoolSort
 
 @SMTDSL
 class SMTProgramBuilder(logic: Logic) {
-  private val program = MutableSMTProgram(emptyList())
+  private val program = MutableSMTProgram(emptyList()).also { program -> program.setLogic(logic) }
 
   /** Adds a new assertion: (assert [block]) */
   fun assert(block: () -> Expression<BoolSort>) = assert(block())

@@ -98,10 +98,10 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     // check expr is in logic
         assertion.expr.all {
           if(!(it.theories.isEmpty() || it.theories.any { it in logic!!.theories })) {
-              throw IllegalStateException("$it was not in logic bounds: expected any of ${logic!!.theories} but was ${it.theories}")
+              throw AssertionOutOfLogicBounds("$it was not in logic bounds: expected any of ${logic!!.theories} but was ${it.theories}")
           }
             else if (!(it.sort.theories.isEmpty() || it.sort.theories.any { it in logic!!.theories })) {
-              throw IllegalStateException("${it.sort} was not in logic bounds: expected any of ${logic!!.theories} but was ${it.sort.theories}")
+              throw AssertionOutOfLogicBounds("${it.sort} was not in logic bounds: expected any of ${logic!!.theories} but was ${it.sort.theories}")
           }
             true
         }
@@ -178,9 +178,13 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
   }
 
     fun declareSort(decl: DeclareSort) {
-        TODO("Implement declare-sort")
-        // context.addSort()
+        context.addSort(decl)
         _commands.add(decl)
+    }
+
+    fun declareSort(name : Symbol, arity : Int) {
+        context.addSort(name, arity)
+        _commands.add(DeclareSort(name, arity))
     }
 
   /**
@@ -267,3 +271,5 @@ fun MutableSMTProgram.setInfo(name: String, value: BigDecimal) =
 
 fun MutableSMTProgram.setInfo(name: String, value: Symbol) =
     setInfo(SetInfo(Attribute(name, SymbolAttributeValue(value))))
+
+class AssertionOutOfLogicBounds(msg : String) : RuntimeException(msg)

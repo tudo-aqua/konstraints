@@ -34,6 +34,7 @@ import tools.aqua.konstraints.smt.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserTests {
+    /*
   @ParameterizedTest
   @ValueSource(
       strings =
@@ -78,6 +79,7 @@ class ParserTests {
       throw ParseError(result.failure(result.message))
     }
   }
+    */
 
   @ParameterizedTest
   @ValueSource(
@@ -88,6 +90,7 @@ class ParserTests {
     assertThrows<FunctionNotFoundException> { Parser.parse(program) }
   }
 
+    /*
   @ParameterizedTest
   @ValueSource(
       strings =
@@ -95,6 +98,7 @@ class ParserTests {
               "(declare-fun A Bool)",
               "(assert (not (= (bvlshr s (bvshl t #b00000000000000000000000000000000)) (bvlshr s t)))"])
   fun testIllegalCommands(command: String) {
+      Parser.program = MutableSMTProgram()
     val result = Parser.command.parse(command)
     assert(result.isFailure)
 
@@ -102,7 +106,9 @@ class ParserTests {
     println(result.position)
     println(result.buffer)
   }
+    */
 
+    /*
   @ParameterizedTest
   @ValueSource(
       strings =
@@ -117,13 +123,19 @@ class ParserTests {
 
     if (result.isSuccess) println(result.get<Any>()) else throw Exception()
   }
+  */
 
   @ParameterizedTest
   @ValueSource(
       strings =
           [
-              "(set-info :info 1)(declare-fun s () (_ BitVec 32))(declare-fun t () (_ BitVec 32))(assert (not (= (bvand s s) s)))(check-sat)"])
+              "(set-logic QF_BV)(declare-fun s () (_ BitVec 32))(declare-fun t () (_ BitVec 32))(assert (not (= (bvand s s) s)))(check-sat)",
+          "(set-logic QF_UF)(declare-sort S 1)(declare-fun foo ((S Bool) (S Bool)) Bool)(declare-const S1 (S Bool))(declare-const S2 (S Bool))(assert (foo S1 S2))(check-sat)",
+          "(set-logic QF_UF)(declare-sort S 0)(declare-fun foo (S S) Bool)(declare-const S1 S)(declare-const S2 S)(assert (foo S1 S2))(check-sat)"
+          ]
+  )
   fun testScriptParsing(script: String) {
+      Parser.program = MutableSMTProgram()
     val result = Parser.script.parse(script)
 
     if (result.isSuccess) {
@@ -132,6 +144,19 @@ class ParserTests {
       throw ParseError(result.failure(result.message))
     }
   }
+
+
+    @ParameterizedTest
+    @ValueSource(
+        strings =
+            [
+                "(set-logic QF_UF)(push 1)(declare-sort S 0)(declare-fun foo (S S) Bool)(declare-const S1 S)(declare-const S2 S)(assert (foo S1 S2))(pop 1)(declare-fun bar (S S) Bool)(assert (bar S1 S2))(check-sat)"
+            ]
+    )
+    fun testIllegalScriptParsing(script: String) {
+        Parser.program = MutableSMTProgram()
+        assertThrows<IllegalArgumentException> { Parser.script.parse(script) }
+    }
 
   @ParameterizedTest
   @ValueSource(

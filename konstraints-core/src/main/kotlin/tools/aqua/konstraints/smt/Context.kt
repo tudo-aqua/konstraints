@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.smt
 
+import tools.aqua.konstraints.dsl.Declare
 import tools.aqua.konstraints.parser.ArrayExTheory
 import tools.aqua.konstraints.parser.BitVectorExpressionTheory
 import tools.aqua.konstraints.parser.CoreTheory
@@ -26,7 +27,6 @@ import tools.aqua.konstraints.parser.IntsTheory
 import tools.aqua.konstraints.parser.RealsIntsTheory
 import tools.aqua.konstraints.parser.RealsTheory
 import tools.aqua.konstraints.parser.StringsTheory
-import tools.aqua.konstraints.parser.Theory
 import tools.aqua.konstraints.theories.BoolSort
 import tools.aqua.konstraints.theories.Theories
 import tools.aqua.konstraints.util.Stack
@@ -41,7 +41,8 @@ class Context {
   private val forbiddenNames = mutableSetOf<Symbol>()
   private val currentContext = CurrentContext()
   private val shadowingMap = Stack<MutableMap<SMTFunction<*>, SMTFunction<*>>>()
-  private val undoStack = Stack<MutableSet<SMTFunction<*>>>()
+  private val functionUndoStack = Stack<MutableSet<SMTFunction<*>>>()
+    private val sortUndoStack = Stack<MutableSet<Symbol>>()
   private var logic: Logic? = null
 
   // true if we are currently in any binder (let/exists/forall/par/match)
@@ -51,9 +52,9 @@ class Context {
     return try {
       addFun(func)
     } catch (_: IllegalArgumentException) {
-      return null
+      null
     } catch (_: IllegalStateException) {
-      return null
+      null
     }
   }
 
@@ -70,12 +71,42 @@ class Context {
 
     // if the undoStack is not empty, and we are not currently inside any binder
     // there was at least one push, so we save the added func to remove on the next pop operation
-    if (undoStack.isNotEmpty()) {
-      undoStack.peek().add(func)
+    if (functionUndoStack.isNotEmpty()) {
+      functionUndoStack.peek().add(func)
     }
 
     return func
   }
+
+    fun addSortOrNull(sort : UserDeclaredSortFactory): UserDeclaredSortFactory? {
+        return try {
+            addSort(sort)
+        } catch (_: IllegalArgumentException) {
+            null
+        } catch (_: IllegalStateException) {
+            null
+        }
+    }
+
+    fun addSort(decl : DeclareSort) = addSort(UserDeclaredSortFactory(decl.name, decl.arity))
+
+    fun addSort(name : Symbol, arity : Int) = addSort(UserDeclaredSortFactory(name, arity))
+
+    fun addSort(sort : UserDeclaredSortFactory) : UserDeclaredSortFactory {
+        require(sort.symbol !in currentContext.sorts) {
+            "Can not overload or shadow sort symbol ${sort.symbol}!"
+        }
+
+        check(!activeBinderState) { "Can not add sort to the current context in this state!" }
+
+        currentContext.sorts[sort.symbol] = sort
+
+        if (sortUndoStack.isNotEmpty()) {
+            sortUndoStack.peek().add(sort.symbol)
+        }
+
+        return sort
+    }
 
   operator fun contains(func: Symbol) = currentContext.functions[func] != null
 
@@ -111,7 +142,8 @@ class Context {
 
     // use if you have to pop manually or the operation can not be completed within the lambda passed to push
     fun push() {
-        undoStack.push(mutableSetOf<SMTFunction<*>>())
+        functionUndoStack.push(mutableSetOf<SMTFunction<*>>())
+        sortUndoStack.push(mutableSetOf<Symbol>())
     }
 
     fun getSortOrNull(name: Symbol) : SortFactory? {
@@ -126,16 +158,20 @@ class Context {
 
     // auto pops after block
   fun push(block: Context.() -> Unit) {
-    undoStack.push(mutableSetOf<SMTFunction<*>>())
+    functionUndoStack.push(mutableSetOf<SMTFunction<*>>())
+        sortUndoStack.push(mutableSetOf<Symbol>())
     block()
     pop(1)
   }
 
   fun pop(n: Int) {
-    check(n <= undoStack.size)
+    check(n <= functionUndoStack.size)
     check(!activeBinderState) { "Can not pop inside binder!" }
 
-    repeat(n) { _ -> currentContext.functions.values.removeAll(undoStack.pop()) }
+    repeat(n) { _ ->
+        currentContext.functions.values.removeAll(functionUndoStack.pop())
+        currentContext.sorts.keys.removeAll(sortUndoStack.pop())
+    }
   }
 
   internal fun <T> let(varBindings: List<VarBinding<*>>, block: () -> T): T {
@@ -179,13 +215,13 @@ class Context {
     shadowingMap.push(mutableMapOf())
 
     // add all bindings to undoStack first, remove all binding that shadow from undoStack later
-    undoStack.push(mutableSetOf())
-    undoStack.peek().addAll(varBindings)
+    functionUndoStack.push(mutableSetOf())
+    functionUndoStack.peek().addAll(varBindings)
 
     varBindings.forEach { binding ->
       currentContext.functions.put(binding.symbol, binding)?.let { old ->
         shadowingMap.peek().put(binding, old)
-        undoStack.peek().remove(binding)
+        functionUndoStack.peek().remove(binding)
       }
     }
   }
@@ -207,13 +243,13 @@ class Context {
     shadowingMap.push(mutableMapOf())
 
     // add all bindings to undoStack first, remove all binding that shadow from undoStack later
-    undoStack.push(mutableSetOf())
-    undoStack.peek().addAll(vars)
+    functionUndoStack.push(mutableSetOf())
+    functionUndoStack.peek().addAll(vars)
 
     vars.forEach { binding ->
       currentContext.functions.put(binding.symbol, binding)?.let { old ->
         shadowingMap.peek().put(binding, old)
-        undoStack.peek().remove(binding)
+        functionUndoStack.peek().remove(binding)
       }
     }
   }
@@ -229,7 +265,7 @@ class Context {
     shadowingMap.pop().forEach { (local, shadowed) ->
       currentContext.functions[local.symbol] = shadowed
     }
-    currentContext.functions.values.removeAll(undoStack.pop())
+    currentContext.functions.values.removeAll(functionUndoStack.pop())
   }
 
   fun setLogic(logic: Logic) {

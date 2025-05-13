@@ -19,6 +19,7 @@
 package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.theories.*
+import tools.aqua.konstraints.util.zipWithSameLength
 
 sealed interface SortFactory {
     abstract fun build(parameters : List<Sort>, indices : List<NumeralIndex>) : Sort
@@ -257,7 +258,29 @@ class SortParameter(name: String) : Sort(name, emptyList(), emptyList()) {
   override val theories = emptySet<Theories>()
 }
 
-class UserDefinedSort(name: Symbol, arity: Int) :
-    Sort(name, emptyList(), (0..arity).map { index -> SortParameter("sort$index") }) {
+class UserDeclaredSortFactory(val symbol : Symbol, val arity : Int) : SortFactory {
+    override fun build(
+        parameters: List<Sort>,
+        indices: List<NumeralIndex>
+    ): Sort {
+        require(parameters.size == arity)
+        require(indices.isEmpty())
+
+        return UserDeclaredSort(symbol, parameters)
+    }
+
+    override fun isInstanceOf(sort: Sort): Boolean {
+        require(sort is UserDeclaredSort)
+
+        return sort.symbol == symbol && sort.arity == arity
+    }
+
+    override val isIndexed = false
+    override val numIndicies = 0
+
+}
+
+class UserDeclaredSort(name: Symbol, parameters: List<Sort>) :
+    Sort(name, emptyList(), parameters) {
   override val theories = emptySet<Theories>()
 }

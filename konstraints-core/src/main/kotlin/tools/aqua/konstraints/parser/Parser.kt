@@ -717,11 +717,10 @@ object Parser {
 
   private val declareSortCMD =
       (lparen * declareSortKW * symbol * numeral * rparen).map { results: ArrayList<Any> ->
-          TODO("Implement declare sort in program")
-        // ProtoDeclareSort(results[2] as ParseSymbol, (results[3] as String).toInt())
+          program.declareSort(results[2] as Symbol, Integer.parseInt(results[3] as String))
       }
 
-  private val getModelCMD = (lparen * getModelKW * rparen).map { _: Any -> GetModel }
+  private val getModelCMD = (lparen * getModelKW * rparen).map { _: Any -> program.add(GetModel) }
 
   private val defineFunCMD =
       (lparen * defineFunKW * functionDef * rparen).map { results: ArrayList<Any> ->

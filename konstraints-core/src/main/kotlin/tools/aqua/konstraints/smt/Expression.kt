@@ -288,12 +288,12 @@ class UserDeclaredExpression<out T : Sort>(
       UserDeclaredExpression(name, sort, children, func)
 }
 
-class UserDefinedExpression<out T : Sort>(
+class UserDefinedExpression<T : Sort>(
     name: Symbol,
     sort: T,
     args: List<Expression<*>>,
     val definition: FunctionDef<T>,
-    override val func: SMTFunction<T>
+    override val func: DefinedSMTFunction<T>
 ) : NAryExpression<T>(name, sort) {
   override val theories = emptySet<Theories>()
 
