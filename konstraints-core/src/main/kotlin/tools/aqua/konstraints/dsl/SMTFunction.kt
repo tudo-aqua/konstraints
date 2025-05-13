@@ -784,10 +784,21 @@ data class UserDefinedSMTFunctionN<T : Sort>(
     override val sortedVars: List<SortedVar<*>>,
     override val term: Expression<T>
 ) : DefinedSMTFunction<T>() {
-    companion object {
-        operator fun<T : Sort> invoke(symbol: Symbol, sort: T, parameters: List<Sort>, term: Expression<T>) =
-            UserDefinedSMTFunctionN(symbol, sort, parameters.mapIndexed { index, sort -> SortedVar("|local!$sort!$index|".toSymbolWithQuotes(), sort) }, term)
-    }
+  companion object {
+    operator fun <T : Sort> invoke(
+        symbol: Symbol,
+        sort: T,
+        parameters: List<Sort>,
+        term: Expression<T>
+    ) =
+        UserDefinedSMTFunctionN(
+            symbol,
+            sort,
+            parameters.mapIndexed { index, sort ->
+              SortedVar("|local!$sort!$index|".toSymbolWithQuotes(), sort)
+            },
+            term)
+  }
 
   override val parameters = sortedVars.map { it.sort }
 }

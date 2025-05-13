@@ -24,14 +24,7 @@ import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.dsl.UserDeclaredSMTFunctionN
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunction0
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunctionN
-import tools.aqua.konstraints.parser.IntsTheory
-import tools.aqua.konstraints.parser.RealsIntsTheory
-import tools.aqua.konstraints.parser.RealsTheory
-import tools.aqua.konstraints.parser.StringsTheory
 import tools.aqua.konstraints.theories.BoolSort
-import tools.aqua.konstraints.theories.IntSort
-import tools.aqua.konstraints.theories.RealSort
-import tools.aqua.konstraints.theories.Theories
 
 enum class SatStatus {
   SAT, // program is satisfiable
@@ -60,12 +53,12 @@ abstract class SMTProgram(commands: List<Command>) {
   protected val _commands: MutableList<Command> = commands.toMutableList()
   val commands: List<Command>
     get() = _commands.toList()
-
 }
 
 class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
 
-    constructor() : this(emptyList())
+  constructor() : this(emptyList())
+
   /**
    * Inserts [command] at the end of the program
    *
@@ -96,15 +89,16 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     check(logic != null) { "Logic must be set before adding assertions!" }
 
     // check expr is in logic
-        assertion.expr.all {
-          if(!(it.theories.isEmpty() || it.theories.any { it in logic!!.theories })) {
-              throw AssertionOutOfLogicBounds("$it was not in logic bounds: expected any of ${logic!!.theories} but was ${it.theories}")
-          }
-            else if (!(it.sort.theories.isEmpty() || it.sort.theories.any { it in logic!!.theories })) {
-              throw AssertionOutOfLogicBounds("${it.sort} was not in logic bounds: expected any of ${logic!!.theories} but was ${it.sort.theories}")
-          }
-            true
-        }
+    assertion.expr.all {
+      if (!(it.theories.isEmpty() || it.theories.any { it in logic!!.theories })) {
+        throw AssertionOutOfLogicBounds(
+            "$it was not in logic bounds: expected any of ${logic!!.theories} but was ${it.theories}")
+      } else if (!(it.sort.theories.isEmpty() || it.sort.theories.any { it in logic!!.theories })) {
+        throw AssertionOutOfLogicBounds(
+            "${it.sort} was not in logic bounds: expected any of ${logic!!.theories} but was ${it.sort.theories}")
+      }
+      true
+    }
 
     // check all symbols are known
     require(checkContext(assertion.expr))
@@ -159,33 +153,33 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     return func
   }
 
-    fun push(n : Int) = context.push(n)
+  fun push(n: Int) = context.push(n)
 
-    fun push() = context.push()
+  fun push() = context.push()
 
-    fun push(block: (Context) -> Unit) = context.push(block)
+  fun push(block: (Context) -> Unit) = context.push(block)
 
-    fun pop(n : Int) = context.pop(n)
+  fun pop(n: Int) = context.pop(n)
 
   fun setOption(option: SetOption) {
     _commands.add(option)
   }
 
   fun setInfo(info: SetInfo) {
-      this.info.add(info.attribute)
+    this.info.add(info.attribute)
 
     _commands.add(info)
   }
 
-    fun declareSort(decl: DeclareSort) {
-        context.addSort(decl)
-        _commands.add(decl)
-    }
+  fun declareSort(decl: DeclareSort) {
+    context.addSort(decl)
+    _commands.add(decl)
+  }
 
-    fun declareSort(name : Symbol, arity : Int) {
-        context.addSort(name, arity)
-        _commands.add(DeclareSort(name, arity))
-    }
+  fun declareSort(name: Symbol, arity: Int) {
+    context.addSort(name, arity)
+    _commands.add(DeclareSort(name, arity))
+  }
 
   /**
    * Inserts all [commands] at the end of the program
@@ -227,7 +221,7 @@ fun <T : Sort> MutableSMTProgram.defineFun(
     term: Expression<T>
 ) = defineFun(UserDefinedSMTFunctionN(name, sort, parameters, term))
 
-fun <T : Sort> MutableSMTProgram.defineFun(def : FunctionDef<T>) =
+fun <T : Sort> MutableSMTProgram.defineFun(def: FunctionDef<T>) =
     defineFun(UserDefinedSMTFunctionN(def.name, def.sort, def.parameters, def.term))
 
 fun MutableSMTProgram.setOption(name: String, value: Boolean) =
@@ -272,4 +266,4 @@ fun MutableSMTProgram.setInfo(name: String, value: BigDecimal) =
 fun MutableSMTProgram.setInfo(name: String, value: Symbol) =
     setInfo(SetInfo(Attribute(name, SymbolAttributeValue(value))))
 
-class AssertionOutOfLogicBounds(msg : String) : RuntimeException(msg)
+class AssertionOutOfLogicBounds(msg: String) : RuntimeException(msg)

@@ -20,20 +20,17 @@ package tools.aqua.konstraints.parser
 
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
-import tools.aqua.konstraints.util.Stack
-
 
 val logicLookup =
-      mapOf(
-          Theories.CORE to CoreTheory,
-          Theories.FIXED_SIZE_BIT_VECTORS to BitVectorExpressionTheory,
-          Theories.INTS to IntsTheory,
-          Theories.REALS to RealsTheory,
-          Theories.REALS_INTS to RealsIntsTheory,
-          Theories.FLOATING_POINT to FloatingPointTheory,
-          Theories.ARRAYS_EX to ArrayExTheory,
-          Theories.STRINGS to StringsTheory)
-
+    mapOf(
+        Theories.CORE to CoreTheory,
+        Theories.FIXED_SIZE_BIT_VECTORS to BitVectorExpressionTheory,
+        Theories.INTS to IntsTheory,
+        Theories.REALS to RealsTheory,
+        Theories.REALS_INTS to RealsIntsTheory,
+        Theories.FLOATING_POINT to FloatingPointTheory,
+        Theories.ARRAYS_EX to ArrayExTheory,
+        Theories.STRINGS to StringsTheory)
 
 class IllegalFunctionOverloadException(func: String, msg: String) :
     RuntimeException("Illegal overload of $func: $msg.")

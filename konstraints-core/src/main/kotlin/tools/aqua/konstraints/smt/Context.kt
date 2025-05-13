@@ -18,7 +18,6 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.dsl.Declare
 import tools.aqua.konstraints.parser.ArrayExTheory
 import tools.aqua.konstraints.parser.BitVectorExpressionTheory
 import tools.aqua.konstraints.parser.CoreTheory
@@ -42,7 +41,7 @@ class Context {
   private val currentContext = CurrentContext()
   private val shadowingMap = Stack<MutableMap<SMTFunction<*>, SMTFunction<*>>>()
   private val functionUndoStack = Stack<MutableSet<SMTFunction<*>>>()
-    private val sortUndoStack = Stack<MutableSet<Symbol>>()
+  private val sortUndoStack = Stack<MutableSet<Symbol>>()
   private var logic: Logic? = null
 
   // true if we are currently in any binder (let/exists/forall/par/match)
@@ -78,35 +77,35 @@ class Context {
     return func
   }
 
-    fun addSortOrNull(sort : UserDeclaredSortFactory): UserDeclaredSortFactory? {
-        return try {
-            addSort(sort)
-        } catch (_: IllegalArgumentException) {
-            null
-        } catch (_: IllegalStateException) {
-            null
-        }
+  fun addSortOrNull(sort: UserDeclaredSortFactory): UserDeclaredSortFactory? {
+    return try {
+      addSort(sort)
+    } catch (_: IllegalArgumentException) {
+      null
+    } catch (_: IllegalStateException) {
+      null
+    }
+  }
+
+  fun addSort(decl: DeclareSort) = addSort(UserDeclaredSortFactory(decl.name, decl.arity))
+
+  fun addSort(name: Symbol, arity: Int) = addSort(UserDeclaredSortFactory(name, arity))
+
+  fun addSort(sort: UserDeclaredSortFactory): UserDeclaredSortFactory {
+    require(sort.symbol !in currentContext.sorts) {
+      "Can not overload or shadow sort symbol ${sort.symbol}!"
     }
 
-    fun addSort(decl : DeclareSort) = addSort(UserDeclaredSortFactory(decl.name, decl.arity))
+    check(!activeBinderState) { "Can not add sort to the current context in this state!" }
 
-    fun addSort(name : Symbol, arity : Int) = addSort(UserDeclaredSortFactory(name, arity))
+    currentContext.sorts[sort.symbol] = sort
 
-    fun addSort(sort : UserDeclaredSortFactory) : UserDeclaredSortFactory {
-        require(sort.symbol !in currentContext.sorts) {
-            "Can not overload or shadow sort symbol ${sort.symbol}!"
-        }
-
-        check(!activeBinderState) { "Can not add sort to the current context in this state!" }
-
-        currentContext.sorts[sort.symbol] = sort
-
-        if (sortUndoStack.isNotEmpty()) {
-            sortUndoStack.peek().add(sort.symbol)
-        }
-
-        return sort
+    if (sortUndoStack.isNotEmpty()) {
+      sortUndoStack.peek().add(sort.symbol)
     }
+
+    return sort
+  }
 
   operator fun contains(func: Symbol) = currentContext.functions[func] != null
 
@@ -138,28 +137,30 @@ class Context {
   fun getFunc(name: Symbol) =
       currentContext.functions[name] ?: throw FunctionNotFoundException(name)
 
-    fun push(n : Int) = repeat(n) { _ -> push() }
+  fun push(n: Int) = repeat(n) { _ -> push() }
 
-    // use if you have to pop manually or the operation can not be completed within the lambda passed to push
-    fun push() {
-        functionUndoStack.push(mutableSetOf<SMTFunction<*>>())
-        sortUndoStack.push(mutableSetOf<Symbol>())
+  // use if you have to pop manually or the operation can not be completed within the lambda passed
+  // to push
+  fun push() {
+    functionUndoStack.push(mutableSetOf<SMTFunction<*>>())
+    sortUndoStack.push(mutableSetOf<Symbol>())
+  }
+
+  fun getSortOrNull(name: Symbol): SortFactory? {
+    return try {
+      getSort(name)
+    } catch (_: FunctionNotFoundException) {
+      null
     }
+  }
 
-    fun getSortOrNull(name: Symbol) : SortFactory? {
-        return try {
-            getSort(name)
-        } catch (_: FunctionNotFoundException) {
-            null
-        }
-    }
+  fun getSort(name: Symbol): SortFactory =
+      currentContext.sorts[name] ?: throw SortNotFoundException(name)
 
-    fun getSort(name: Symbol): SortFactory = currentContext.sorts[name] ?: throw SortNotFoundException(name)
-
-    // auto pops after block
+  // auto pops after block
   fun push(block: Context.() -> Unit) {
     functionUndoStack.push(mutableSetOf<SMTFunction<*>>())
-        sortUndoStack.push(mutableSetOf<Symbol>())
+    sortUndoStack.push(mutableSetOf<Symbol>())
     block()
     pop(1)
   }
@@ -169,8 +170,8 @@ class Context {
     check(!activeBinderState) { "Can not pop inside binder!" }
 
     repeat(n) { _ ->
-        currentContext.functions.values.removeAll(functionUndoStack.pop())
-        currentContext.sorts.keys.removeAll(sortUndoStack.pop())
+      currentContext.functions.values.removeAll(functionUndoStack.pop())
+      currentContext.sorts.keys.removeAll(sortUndoStack.pop())
     }
   }
 
@@ -272,20 +273,20 @@ class Context {
     this.logic = logic
 
     logic.theories.forEach { theory ->
-        when (theory) {
-            Theories.CORE -> CoreTheory
-            Theories.ARRAYS_EX -> ArrayExTheory
-            Theories.FIXED_SIZE_BIT_VECTORS -> BitVectorExpressionTheory
-            Theories.FLOATING_POINT -> FloatingPointTheory
-            Theories.INTS -> IntsTheory
-            Theories.REALS -> RealsTheory
-            Theories.REALS_INTS -> RealsIntsTheory
-            Theories.STRINGS -> StringsTheory
-        }.let {
-            forbiddenNames.addAll(it.functions.map { (_, func) -> func.symbol })
-            currentContext.functions.putAll(it.functions)
-            currentContext.sorts.putAll(it.sorts)
-        }
+      when (theory) {
+        Theories.CORE -> CoreTheory
+        Theories.ARRAYS_EX -> ArrayExTheory
+        Theories.FIXED_SIZE_BIT_VECTORS -> BitVectorExpressionTheory
+        Theories.FLOATING_POINT -> FloatingPointTheory
+        Theories.INTS -> IntsTheory
+        Theories.REALS -> RealsTheory
+        Theories.REALS_INTS -> RealsIntsTheory
+        Theories.STRINGS -> StringsTheory
+      }.let {
+        forbiddenNames.addAll(it.functions.map { (_, func) -> func.symbol })
+        currentContext.functions.putAll(it.functions)
+        currentContext.sorts.putAll(it.sorts)
+      }
     }
   }
 }
@@ -763,4 +764,5 @@ interface ContextSort {
 }
 
 class FunctionNotFoundException(name: Symbol) : NoSuchElementException("Function $name not found")
+
 class SortNotFoundException(name: Symbol) : NoSuchElementException("Sort $name not found")

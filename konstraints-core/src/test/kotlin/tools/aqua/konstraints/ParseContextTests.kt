@@ -18,17 +18,13 @@
 
 package tools.aqua.konstraints
 
-import java.util.stream.Stream
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.Arguments.arguments
-import org.junit.jupiter.params.provider.MethodSource
-import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.theories.*
+
+
 /*
 /*
  * TestInstance per class is needed for parameterized tests

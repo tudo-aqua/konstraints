@@ -35,4 +35,3 @@ class ParseSymbol(val token: Token) :
 data class Pattern(val symbols: List<ParseSymbol>)
 
 data class MatchCase(val pattern: Pattern, val term: Expression<*>)
-

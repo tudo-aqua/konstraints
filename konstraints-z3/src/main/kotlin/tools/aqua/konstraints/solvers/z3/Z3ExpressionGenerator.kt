@@ -282,7 +282,8 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-      is UserDefinedExpression -> context.bind(this.func.sortedVars) { this.func.term.z3ify(context) as Expr<Z3BoolSort> }
+      is UserDefinedExpression ->
+          context.bind(this.func.sortedVars) { this.func.term.z3ify(context) as Expr<Z3BoolSort> }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
 

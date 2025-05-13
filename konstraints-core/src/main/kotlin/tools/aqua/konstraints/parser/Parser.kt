@@ -29,23 +29,13 @@ import org.petitparser.parser.primitive.CharacterParser.*
 import org.petitparser.parser.primitive.StringParser.of
 import org.petitparser.utils.FailureJoiner
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.theories.ArraySort
 import tools.aqua.konstraints.theories.BVLiteral
 import tools.aqua.konstraints.theories.BVLiteral.Companion.invoke
 import tools.aqua.konstraints.theories.BVSort
 import tools.aqua.konstraints.theories.BoolSort
-import tools.aqua.konstraints.theories.FP128
-import tools.aqua.konstraints.theories.FP16
-import tools.aqua.konstraints.theories.FP32
-import tools.aqua.konstraints.theories.FP64
-import tools.aqua.konstraints.theories.FPSort
 import tools.aqua.konstraints.theories.IntLiteral
-import tools.aqua.konstraints.theories.IntSort
 import tools.aqua.konstraints.theories.RealLiteral
-import tools.aqua.konstraints.theories.RealSort
-import tools.aqua.konstraints.theories.RoundingMode
 import tools.aqua.konstraints.theories.Theories
-import tools.aqua.konstraints.theories.isSMTBitvecShorthand
 
 operator fun Parser.plus(other: Parser): ChoiceParser = or(other)
 
@@ -56,7 +46,7 @@ infix fun Parser.trim(both: Parser): Parser = trim(both)
 object Parser {
   // Auxiliary Lexical Categories
 
-    lateinit var program : MutableSMTProgram
+  lateinit var program: MutableSMTProgram
 
   private val whitespaceCat = anyOf(" \t\r\n", "space, tab, or newline expected")
   private val printableCat = range('\u0020', '\u007E') + range('\u0080', '\u00FF')
@@ -423,26 +413,30 @@ object Parser {
     /* maps to ProtoSort */
     sort.set(
         identifier.map { identifier: Identifier ->
-            //check if sort is in the current context
-            require (program.context.containsSort(identifier.symbol))
-            when(identifier) {
-                is IndexedIdentifier -> program.context.getSort(identifier.symbol)
+          // check if sort is in the current context
+          require(program.context.containsSort(identifier.symbol))
+          when (identifier) {
+            is IndexedIdentifier ->
+                program.context
+                    .getSort(identifier.symbol)
                     .build(emptyList(), identifier.indices as List<NumeralIndex>)
-                is SymbolIdentifier -> program.context.getSort(identifier.symbol)
-                    .build(emptyList(), emptyList())
-            }
+            is SymbolIdentifier ->
+                program.context.getSort(identifier.symbol).build(emptyList(), emptyList())
+          }
         } +
             (lparen * identifier * sort.plus() * rparen).map { results: List<Any> ->
-                val identifier = results[1] as Identifier
-                val sorts = results[2] as List<Sort>
+              val identifier = results[1] as Identifier
+              val sorts = results[2] as List<Sort>
 
-                require (program.context.containsSort(identifier.symbol))
-                when(identifier) {
-                    is IndexedIdentifier -> program.context.getSort(identifier.symbol)
+              require(program.context.containsSort(identifier.symbol))
+              when (identifier) {
+                is IndexedIdentifier ->
+                    program.context
+                        .getSort(identifier.symbol)
                         .build(sorts, identifier.indices as List<NumeralIndex>)
-                    is SymbolIdentifier -> program.context.getSort(identifier.symbol)
-                        .build(sorts, emptyList())
-                }
+                is SymbolIdentifier ->
+                    program.context.getSort(identifier.symbol).build(sorts, emptyList())
+              }
             })
   }
 
@@ -473,37 +467,41 @@ object Parser {
   /* maps to an instance of SMTFunction and a list of indices */
   private val qualIdentifier =
       identifier.map { identifier: Identifier ->
-          if(identifier.symbol.value.startsWith("bv") && identifier.symbol.value.substring(2).all { ch -> ch.isDigit() }) {
-              require(program.context.containsSort("BitVec".toSymbolAsIs()))
+        if (identifier.symbol.value.startsWith("bv") &&
+            identifier.symbol.value.substring(2).all { ch -> ch.isDigit() }) {
+          require(program.context.containsSort("BitVec".toSymbolAsIs()))
 
-              listOf(object : SMTFunction<BVSort>() {
-                  override val symbol = identifier.symbol
-                  override val sort = BVSort(((identifier as IndexedIdentifier).indices[0] as NumeralIndex).numeral)
-                  override val parameters = emptyList<Sort>()
+          listOf(
+              object : SMTFunction<BVSort>() {
+                override val symbol = identifier.symbol
+                override val sort =
+                    BVSort(((identifier as IndexedIdentifier).indices[0] as NumeralIndex).numeral)
+                override val parameters = emptyList<Sort>()
 
-                  override fun constructDynamic(
-                      args: List<Expression<*>>,
-                      indices: List<Index>
-                  ): Expression<BVSort> {
-                      require(args.isEmpty())
-                      require(indices.size == 1)
+                override fun constructDynamic(
+                    args: List<Expression<*>>,
+                    indices: List<Index>
+                ): Expression<BVSort> {
+                  require(args.isEmpty())
+                  require(indices.size == 1)
 
-                      return BVLiteral(
-                          "#b${identifier.symbol.value.substring(2).toBigInteger().toString(2)}",
-                          sort.bits
-                      )
-                  }
-
-              }, identifier.indices)
-          } else {
-              when(identifier) {
-                  is SymbolIdentifier -> listOf(program.context.getFunc(identifier.symbol), emptyList<Index>())
-                  is IndexedIdentifier -> listOf(program.context.getFunc(identifier.symbol), identifier.indices)
-              }
+                  return BVLiteral(
+                      "#b${identifier.symbol.value.substring(2).toBigInteger().toString(2)}",
+                      sort.bits)
+                }
+              },
+              identifier.indices)
+        } else {
+          when (identifier) {
+            is SymbolIdentifier ->
+                listOf(program.context.getFunc(identifier.symbol), emptyList<Index>())
+            is IndexedIdentifier ->
+                listOf(program.context.getFunc(identifier.symbol), identifier.indices)
           }
+        }
       } +
           (lparen * asKW * identifier * sort * rparen).map { results: List<Any> ->
-              TODO("Implement As")
+            TODO("Implement As")
             // AsQualIdentifier(results[2] as Identifier, results[3] as ProtoSort)
           }
 
@@ -532,29 +530,58 @@ object Parser {
   /* maps to match case */
   private val matchCase =
       (lparen * pattern * term * rparen).map { results: List<Any> ->
-          TODO("Match case not implemented yet!")
+        TODO("Match case not implemented yet!")
       }
 
   init {
     term.set(
-        (lparen * letKW * lparen * varBinding.plus().map { bindings : List<VarBinding<*>> -> program.context.bindVariables(bindings); bindings } * rparen * term * rparen).map {
-            results: List<Any> ->
-            program.context.unbindVariables()
-                LetExpression(results[3] as List<VarBinding<*>>, results[5] as Expression<*>)
-          // results[3] is guaranteed to be a list of VarBinding
-        } + /* maps to ProtoLet */
-            (lparen * forallKW * lparen * sortedVar.plus().map { bindings : List<SortedVar<*>> -> program.context.bindVariables(bindings); bindings } * rparen * term * rparen).map {
-                results: List<Any> ->
-                program.context.unbindVariables()
-              ForallExpression(results[3] as List<SortedVar<*>>, results[5] as Expression<*> castTo BoolSort)
-              // results[3] is guaranteed to be a list of SortedVar
-            } + /* maps to ProtoForAll */
-            (lparen * existsKW * lparen * sortedVar.plus().map { bindings : List<SortedVar<*>> -> program.context.bindVariables(bindings); bindings } * rparen * term * rparen).map {
-                results: List<Any> ->
-                program.context.unbindVariables()
-              ExistsExpression(results[3] as List<SortedVar<*>>, results[5] as Expression<*> castTo BoolSort)
-              // results[3] is guaranteed to be a list of SortedVar
-            } + /* maps to ProtoExists */
+        (lparen *
+                letKW *
+                lparen *
+                varBinding.plus().map { bindings: List<VarBinding<*>> ->
+                  program.context.bindVariables(bindings)
+                  bindings
+                } *
+                rparen *
+                term *
+                rparen)
+            .map { results: List<Any> ->
+              program.context.unbindVariables()
+              LetExpression(results[3] as List<VarBinding<*>>, results[5] as Expression<*>)
+              // results[3] is guaranteed to be a list of VarBinding
+            } + /* maps to ProtoLet */
+            (lparen *
+                    forallKW *
+                    lparen *
+                    sortedVar.plus().map { bindings: List<SortedVar<*>> ->
+                      program.context.bindVariables(bindings)
+                      bindings
+                    } *
+                    rparen *
+                    term *
+                    rparen)
+                .map { results: List<Any> ->
+                  program.context.unbindVariables()
+                  ForallExpression(
+                      results[3] as List<SortedVar<*>>, results[5] as Expression<*> castTo BoolSort)
+                  // results[3] is guaranteed to be a list of SortedVar
+                } + /* maps to ProtoForAll */
+            (lparen *
+                    existsKW *
+                    lparen *
+                    sortedVar.plus().map { bindings: List<SortedVar<*>> ->
+                      program.context.bindVariables(bindings)
+                      bindings
+                    } *
+                    rparen *
+                    term *
+                    rparen)
+                .map { results: List<Any> ->
+                  program.context.unbindVariables()
+                  ExistsExpression(
+                      results[3] as List<SortedVar<*>>, results[5] as Expression<*> castTo BoolSort)
+                  // results[3] is guaranteed to be a list of SortedVar
+                } + /* maps to ProtoExists */
             (lparen * matchKW * term * lparen * matchCase.plus() * rparen * rparen).map {
                 results: List<Any> ->
               TODO("Match not implemented yet!")
@@ -565,26 +592,30 @@ object Parser {
               // results[3] is guaranteed to be a list of Attributes
             } /* maps to ProtoExclamation */ +
             specConstant.map { constant: SpecConstant ->
-              when(constant) {
-                  is BinaryConstant -> BVLiteral(constant.binary)
-                  is DecimalConstant -> RealLiteral(constant.decimal)
-                  is HexConstant -> BVLiteral(constant.hexadecimal)
-                  is NumeralConstant -> if(Theories.INTS in program.logic!!.theories) IntLiteral(constant.numeral)
-                  else if (Theories.REALS in program.logic!!.theories || Theories.REALS_INTS in program.logic!!.theories) RealLiteral(BigDecimal(constant.numeral))
-                  else throw RuntimeException("Unsupported numeral literal!")
-                  is StringConstant -> TODO()
+              when (constant) {
+                is BinaryConstant -> BVLiteral(constant.binary)
+                is DecimalConstant -> RealLiteral(constant.decimal)
+                is HexConstant -> BVLiteral(constant.hexadecimal)
+                is NumeralConstant ->
+                    if (Theories.INTS in program.logic!!.theories) IntLiteral(constant.numeral)
+                    else if (Theories.REALS in program.logic!!.theories ||
+                        Theories.REALS_INTS in program.logic!!.theories)
+                        RealLiteral(BigDecimal(constant.numeral))
+                    else throw RuntimeException("Unsupported numeral literal!")
+                is StringConstant -> TODO()
               }
             } + /* maps to SpecConstantTerm */
             qualIdentifier.map { results: List<Any> ->
-                /* Results is an SMTFunction without any parameters */
-                (results[0] as SMTFunction<*>).constructDynamic(emptyList(),  results[1] as List<Index>)
-            }  +
+              /* Results is an SMTFunction without any parameters */
+              (results[0] as SMTFunction<*>).constructDynamic(
+                  emptyList(), results[1] as List<Index>)
+            } +
             (lparen * qualIdentifier * term.plus() * rparen).map { results: List<Any> ->
               /* Results contains list of SMTFunction and indices follow by list of its arguments as Expressions */
-                val function = (results[1] as List<Any>)[0] as SMTFunction<*>
-                val indices = (results[1] as List<Any>)[1] as List<Index>
+              val function = (results[1] as List<Any>)[0] as SMTFunction<*>
+              val indices = (results[1] as List<Any>)[1] as List<Index>
 
-                function.constructDynamic(results[2] as List<Expression<*>>, indices)
+              function.constructDynamic(results[2] as List<Expression<*>>, indices)
             } /* maps to GenericProtoTerm */)
   }
 
@@ -664,14 +695,23 @@ object Parser {
               rparen)
   private val functionDec = lparen * symbol * lparen * sortedVar.star() * rparen * sort * rparen
   private val functionDef =
-      (symbol * lparen * sortedVar.star().map { bindings : List<SortedVar<*>> -> program.context.bindVariables(bindings); bindings } * rparen * sort * term).map { result: ArrayList<Any> ->
-        program.context.unbindVariables()
-          FunctionDef(
-            result[0] as ParseSymbol,
-            result[2] as List<SortedVar<*>>,
-            result[4] as Sort,
-            result[5] as Expression<*>)
-      }
+      (symbol *
+              lparen *
+              sortedVar.star().map { bindings: List<SortedVar<*>> ->
+                program.context.bindVariables(bindings)
+                bindings
+              } *
+              rparen *
+              sort *
+              term)
+          .map { result: ArrayList<Any> ->
+            program.context.unbindVariables()
+            FunctionDef(
+                result[0] as ParseSymbol,
+                result[2] as List<SortedVar<*>>,
+                result[4] as Sort,
+                result[5] as Expression<*>)
+          }
 
   /*
    * The spec lists "not" as reserved here, but it is not reserved in any other context
@@ -687,13 +727,13 @@ object Parser {
 
   private val declareConstCMD =
       (lparen * declareConstKW * symbol * sort * rparen).map { results: ArrayList<Any> ->
-          program.declareConst(results[2] as ParseSymbol, results[3] as Sort)
+        program.declareConst(results[2] as ParseSymbol, results[3] as Sort)
       }
 
   private val declareFunCMD =
       (lparen * declareFunKW * symbol * lparen * sort.star() * rparen * sort * rparen).map {
           results: ArrayList<Any> ->
-          program.declareFun(results[2] as ParseSymbol, results[4] as List<Sort>, results[6] as Sort)
+        program.declareFun(results[2] as ParseSymbol, results[4] as List<Sort>, results[6] as Sort)
         // results[4] is guaranteed to be a List of ProtoSort
       }
 
@@ -701,30 +741,32 @@ object Parser {
 
   private val setInfoCMD =
       (lparen * setInfoKW * attribute * rparen).map { results: ArrayList<Any> ->
-          program.setInfo(SetInfo(results[2] as Attribute))
+        program.setInfo(SetInfo(results[2] as Attribute))
       }
 
   private val setLogicCMD =
       (lparen * setLogicKW * logic * rparen).map { results: ArrayList<Any> ->
-          program.setLogic(results[2] as Logic)
+        program.setLogic(results[2] as Logic)
       }
 
   private val setOptionCMD =
       (lparen * setOptionKW * option * rparen).map { results: ArrayList<Any> ->
-        program.setOption(SetOption(
-            (results[2] as List<Any>)[0] as String, (results[2] as List<Any>)[0] as OptionValue))
+        program.setOption(
+            SetOption(
+                (results[2] as List<Any>)[0] as String,
+                (results[2] as List<Any>)[0] as OptionValue))
       }
 
   private val declareSortCMD =
       (lparen * declareSortKW * symbol * numeral * rparen).map { results: ArrayList<Any> ->
-          program.declareSort(results[2] as Symbol, Integer.parseInt(results[3] as String))
+        program.declareSort(results[2] as Symbol, Integer.parseInt(results[3] as String))
       }
 
   private val getModelCMD = (lparen * getModelKW * rparen).map { _: Any -> program.add(GetModel) }
 
   private val defineFunCMD =
       (lparen * defineFunKW * functionDef * rparen).map { results: ArrayList<Any> ->
-          program.defineFun(results[2] as FunctionDef<*>)
+        program.defineFun(results[2] as FunctionDef<*>)
       }
 
   private val pushCMD =
@@ -761,16 +803,17 @@ object Parser {
   // TODO
 
   fun parse(program: String): SMTProgram {
-      this.program = MutableSMTProgram()
+    this.program = MutableSMTProgram()
 
     // TODO parse each command individually, fail on the first command that can not be parsed
     // this will lead to better error messages but requires some preprocessing to split the input
     // input individual commands (this may be done in linear time by searching the input from
     // left to right counting the number of opening an closing brackets)
-    splitInput(program).forEach { cmd -> val temp = command.parse(cmd)
-        if (!temp.isSuccess){
-            throw ParseException(temp.message, temp.position, temp.buffer)
-        }
+    splitInput(program).forEach { cmd ->
+      val temp = command.parse(cmd)
+      if (!temp.isSuccess) {
+        throw ParseException(temp.message, temp.position, temp.buffer)
+      }
     }
 
     return this.program
@@ -825,12 +868,12 @@ object Parser {
   }
 }
 
-internal fun BitVecFactory.build(identifier : Identifier) : BVSort {
-    require(identifier is IndexedIdentifier)
-    require(identifier.indices.size == 1)
-    require(identifier.indices.single() is NumeralIndex)
+internal fun BitVecFactory.build(identifier: Identifier): BVSort {
+  require(identifier is IndexedIdentifier)
+  require(identifier.indices.size == 1)
+  require(identifier.indices.single() is NumeralIndex)
 
-    return build((identifier.indices.single() as NumeralIndex).numeral)
+  return build((identifier.indices.single() as NumeralIndex).numeral)
 }
 
 class ParseException(message: String, position: Int, buffer: String) :

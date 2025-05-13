@@ -398,7 +398,8 @@ class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>)
     SMTFunction<T>() {
 
   operator fun invoke(args: List<Expression<*>>) = instance
-    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>) = instance
+
+  override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>) = instance
 
   val name = symbol.toString()
   override val sort: T = term.sort
@@ -410,7 +411,8 @@ class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>)
 class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T) :
     SMTFunction<T>() {
   operator fun invoke(args: List<Expression<*>>) = instance
-    override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>) = instance
+
+  override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>) = instance
 
   override fun toString(): String = "($symbol $sort)"
 
