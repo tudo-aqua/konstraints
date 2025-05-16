@@ -1451,10 +1451,7 @@ internal object FloatingPointTheory : Theory {
               FPIsNaNDecl,
               FPIsNegativeDecl,
               FPIsPositiveDecl,
-              BitVecToFPDecl,
-              FPToFPDecl,
-              RealToFPDecl,
-              SBitVecToFPDecl,
+              ToFPDecl,
               UBitVecToFPDecl,
               FPToUBitVecDecl,
               FPToSBitVecDecl,
@@ -1470,7 +1467,11 @@ internal object FloatingPointTheory : Theory {
           // FP64.symbol,
           // FP128.symbol,
           "BitVec".toSymbolWithQuotes() to BitVecFactory,
-          "FloatingPoint".toSymbolWithQuotes() to FloatingPointFactory)
+          "FloatingPoint".toSymbolWithQuotes() to FloatingPointFactory,
+          "Float16".toSymbolWithQuotes() to Float16Factory,
+          "Float32".toSymbolWithQuotes() to Float32Factory,
+          "Float64".toSymbolWithQuotes() to Float64Factory,
+          "Float128".toSymbolWithQuotes() to Float128Factory)
 }
 
 internal object RoundNearestTiesToEvenDecl :
@@ -2234,6 +2235,37 @@ internal object FPIsPositiveDecl :
 
     @Suppress("UNCHECKED_CAST")
     return FPIsPositive(args.single() as Expression<FPSort>)
+  }
+}
+
+// "Super" SMT Function to emulate shadowing
+internal object ToFPDecl :
+    SMTTheoryFunction<FPSort>(
+        "to_fp".toSymbolWithQuotes(),
+        emptyList(),
+        FPSort("eb".idx(), "sb".idx()),
+        Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<FPSort> {
+    require(indices.size == 2)
+
+    // can only be bitvec version
+    return if (args.size == 1) {
+      BitVecToFPDecl.constructDynamic(args, indices)
+    } else if (args.size == 2) {
+      require(args[0].sort is RoundingMode)
+
+      when (args[1].sort) {
+        is FPSort -> FPToFPDecl.constructDynamic(args, indices)
+        is RealSort -> RealToFPDecl.constructDynamic(args, indices)
+        is BVSort -> SBitVecToFPDecl.constructDynamic(args, indices)
+        else -> throw IllegalArgumentException()
+      }
+    } else {
+      throw IllegalArgumentException()
+    }
   }
 }
 

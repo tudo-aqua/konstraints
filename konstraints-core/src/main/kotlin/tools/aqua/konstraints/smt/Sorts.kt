@@ -193,6 +193,78 @@ object FloatingPointFactory : SortFactory {
   override val numIndicies = 2
 }
 
+object Float16Factory : SortFactory {
+
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FPSort {
+    require(parameters.isEmpty())
+    require(indices.isEmpty())
+
+    return build()
+  }
+
+  fun build() = FPSort(5, 11)
+
+  override fun isInstanceOf(sort: Sort) =
+      (sort is FPSort) && (sort.exponentBits == 5) && (sort.significantBits == 11)
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+object Float32Factory : SortFactory {
+
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FPSort {
+    require(parameters.isEmpty())
+    require(indices.isEmpty())
+
+    return build()
+  }
+
+  fun build() = FPSort(8, 24)
+
+  override fun isInstanceOf(sort: Sort) =
+      (sort is FPSort) && (sort.exponentBits == 8) && (sort.significantBits == 24)
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+object Float64Factory : SortFactory {
+
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FPSort {
+    require(parameters.isEmpty())
+    require(indices.isEmpty())
+
+    return build()
+  }
+
+  fun build() = FPSort(11, 53)
+
+  override fun isInstanceOf(sort: Sort) =
+      (sort is FPSort) && (sort.exponentBits == 11) && (sort.significantBits == 53)
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+object Float128Factory : SortFactory {
+
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FPSort {
+    require(parameters.isEmpty())
+    require(indices.isEmpty())
+
+    return build()
+  }
+
+  fun build() = FPSort(15, 113)
+
+  override fun isInstanceOf(sort: Sort) =
+      (sort is FPSort) && (sort.exponentBits == 15) && (sort.significantBits == 113)
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
 object ArraySortFactory : SortFactory {
   override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): ArraySort<*, *> {
     require(parameters.size == 2)

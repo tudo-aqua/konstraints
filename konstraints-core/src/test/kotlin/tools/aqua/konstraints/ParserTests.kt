@@ -86,7 +86,8 @@ class ParserTests {
           [
               "(set-logic QF_UF)(set-info :status sat)(declare-fun A () Bool)(push 1)(declare-fun B () Bool)(assert (= A B))(pop 1)(assert (= A B))(check-sat)"])
   fun testPushPopFails(program: String) {
-    assertThrows<FunctionNotFoundException> { Parser.parse(program) }
+    val parser = Parser()
+    assertThrows<FunctionNotFoundException> { parser.parse(program) }
   }
 
   /*
@@ -132,8 +133,8 @@ class ParserTests {
               "(set-logic QF_UF)(declare-sort S 1)(declare-fun foo ((S Bool) (S Bool)) Bool)(declare-const S1 (S Bool))(declare-const S2 (S Bool))(assert (foo S1 S2))(check-sat)",
               "(set-logic QF_UF)(declare-sort S 0)(declare-fun foo (S S) Bool)(declare-const S1 S)(declare-const S2 S)(assert (foo S1 S2))(check-sat)"])
   fun testScriptParsing(script: String) {
-    Parser.program = MutableSMTProgram()
-    val result = Parser.script.parse(script)
+    val parser = Parser()
+    val result = parser.script.parse(script)
 
     if (result.isSuccess) {
       println(result.get<String>())
@@ -148,8 +149,8 @@ class ParserTests {
           [
               "(set-logic QF_UF)(push 1)(declare-sort S 0)(declare-fun foo (S S) Bool)(declare-const S1 S)(declare-const S2 S)(assert (foo S1 S2))(pop 1)(declare-fun bar (S S) Bool)(assert (bar S1 S2))(check-sat)"])
   fun testIllegalScriptParsing(script: String) {
-    Parser.program = MutableSMTProgram()
-    assertThrows<IllegalArgumentException> { Parser.script.parse(script) }
+    val parser = Parser()
+    assertThrows<IllegalArgumentException> { parser.script.parse(script) }
   }
 
   @ParameterizedTest

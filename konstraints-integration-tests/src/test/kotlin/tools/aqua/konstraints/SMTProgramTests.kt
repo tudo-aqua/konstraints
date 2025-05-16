@@ -41,7 +41,7 @@ class SMTProgramTests {
   @MethodSource("getQFBVModelFiles")
   @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun testModelGeneration(file: File) {
-    val program = Parser.parse(file.bufferedReader().readLines().joinToString())
+    val program = Parser().parse(file.bufferedReader().readLines().joinToString())
 
     assumeTrue(
         (program.info.find { attribute -> attribute.keyword == ":status" }?.value

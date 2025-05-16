@@ -50,8 +50,9 @@ class BVTermSmallRWNoetzliTests {
             .bufferedReader()
             .readLines()
     val input = temp.map { it.trim('\r', '\n') }
+    val parser = Parser()
 
-    assertDoesNotThrow { Parser.parse(input.joinToString("")) }
+    assertDoesNotThrow { parser.parse(input.joinToString("")) }
   }
 
   private fun getInts(): Stream<Arguments> {
