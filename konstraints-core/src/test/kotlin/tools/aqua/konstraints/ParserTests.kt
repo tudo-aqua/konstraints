@@ -18,9 +18,12 @@
 
 package tools.aqua.konstraints
 
+import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -30,6 +33,11 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.petitparser.context.ParseError
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
+import java.io.BufferedReader
+import java.io.File
+import java.util.concurrent.TimeUnit
+import kotlin.streams.asStream
+import kotlin.use
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserTests {

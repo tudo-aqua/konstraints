@@ -189,7 +189,7 @@ internal object EqualsDecl :
   ): Expression<BoolSort> {
     require(args.size >= 2)
     require(indices.isEmpty())
-    require(args.all { expr -> expr.sort == args[0].sort })
+    require(args.all { expr -> expr.sort == args[0].sort }) { "Expected all sorts in equals to be of the same sort but was: ${args.map { expr -> expr.sort }.joinToString(", ")}" }
 
     return Equals(args)
   }
@@ -1347,22 +1347,18 @@ internal object RealsIntsTheory : Theory {
               IntDivDecl,
               ModDecl,
               AbsDecl,
-              IntLessEqDecl,
-              IntLessDecl,
-              IntGreaterEqDecl,
-              IntGreaterDecl,
               DivisibleDecl,
               RealNegSubDecl,
               RealAddDecl,
               RealMulDecl,
               RealDivDecl,
-              RealLessEqDecl,
-              RealLessDecl,
-              RealGreaterEqDecl,
-              RealGreaterDecl,
               ToRealDecl,
               ToIntDecl,
-              IsIntDecl)
+              IsIntDecl,
+            IntRealLessDecl,
+            IntRealLessEqDecl,
+            IntRealGreaterDecl,
+            IntRealGreaterEqDecl)
           .associateBy { it.symbol }
 
   override val sorts = mapOf(IntSort.symbol to IntFactory, RealSort.symbol to RealFactory)
@@ -1405,6 +1401,82 @@ internal object IsIntDecl :
     require(args.size == 1)
     return IsInt(args.single() castTo RealSort)
   }
+}
+
+internal object IntRealLessDecl :
+    SMTTheoryFunction<BoolSort>(
+        "<".toSymbolWithQuotes(), listOf(RealSort, RealSort), BoolSort, Associativity.CHAINABLE) {
+
+    override fun constructDynamic(
+        args: List<Expression<*>>,
+        indices: List<Index>
+    ): Expression<BoolSort> {
+        require(args.size >= 2)
+
+        return if (args[0].sort is IntSort && args[1].sort is IntSort)
+            IntLessDecl.constructDynamic(args, indices)
+        else if (args[0].sort is RealSort && args[1].sort is RealSort)
+            RealLessDecl.constructDynamic(args, indices)
+        else
+            throw IllegalArgumentException("Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})")
+    }
+}
+
+internal object IntRealLessEqDecl :
+    SMTTheoryFunction<BoolSort>(
+        "<=".toSymbolWithQuotes(), listOf(RealSort, RealSort), BoolSort, Associativity.CHAINABLE) {
+
+    override fun constructDynamic(
+        args: List<Expression<*>>,
+        indices: List<Index>
+    ): Expression<BoolSort> {
+        require(args.size >= 2)
+
+        return if (args[0].sort is IntSort && args[1].sort is IntSort)
+            IntLessEqDecl.constructDynamic(args, indices)
+        else if (args[0].sort is RealSort && args[1].sort is RealSort)
+            RealLessEqDecl.constructDynamic(args, indices)
+        else
+            throw IllegalArgumentException("Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})")
+    }
+}
+
+internal object IntRealGreaterEqDecl :
+    SMTTheoryFunction<BoolSort>(
+        ">=".toSymbolWithQuotes(), listOf(RealSort, RealSort), BoolSort, Associativity.CHAINABLE) {
+
+    override fun constructDynamic(
+        args: List<Expression<*>>,
+        indices: List<Index>
+    ): Expression<BoolSort> {
+        require(args.size >= 2)
+
+        return if (args[0].sort is IntSort && args[1].sort is IntSort)
+            IntGreaterEqDecl.constructDynamic(args, indices)
+        else if (args[0].sort is RealSort && args[1].sort is RealSort)
+            RealGreaterEqDecl.constructDynamic(args, indices)
+        else
+            throw IllegalArgumentException("Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})")
+    }
+}
+
+internal object IntRealGreaterDecl :
+    SMTTheoryFunction<BoolSort>(
+        ">".toSymbolWithQuotes(), listOf(RealSort, RealSort), BoolSort, Associativity.CHAINABLE) {
+
+    override fun constructDynamic(
+        args: List<Expression<*>>,
+        indices: List<Index>
+    ): Expression<BoolSort> {
+        require(args.size >= 2)
+
+        return if (args[0].sort is IntSort && args[1].sort is IntSort)
+            IntGreaterDecl.constructDynamic(args, indices)
+        else if (args[0].sort is RealSort && args[1].sort is RealSort)
+            RealGreaterDecl.constructDynamic(args, indices)
+        else
+            throw IllegalArgumentException("Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})")
+    }
 }
 
 /** FloatingPoint theory internal object */
@@ -1560,7 +1632,7 @@ internal object RTPDecl :
 
 internal object RoundTowardNegativeDecl :
     SMTTheoryFunction<RoundingMode>(
-        "RoundTowardNegative".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
+        "roundTowardNegative".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -1586,7 +1658,7 @@ internal object RTNDecl :
 
 internal object RoundTowardZeroDecl :
     SMTTheoryFunction<RoundingMode>(
-        "RoundTowardZero".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
+        "roundTowardZero".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -2120,7 +2192,7 @@ internal object FPIsNormalDecl :
 
 internal object FPIsSubormalDecl :
     SMTTheoryFunction<BoolSort>(
-        "fp.isSubormal".toSymbolWithQuotes(),
+        "fp.isSubnormal".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
         BoolSort,
         Associativity.NONE) {
@@ -2180,7 +2252,7 @@ internal object FPIsInfiniteDecl :
 
 internal object FPIsNaNDecl :
     SMTTheoryFunction<BoolSort>(
-        "fp.isNan".toSymbolWithQuotes(),
+        "fp.isNaN".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
         BoolSort,
         Associativity.NONE) {
@@ -2427,7 +2499,7 @@ internal object FPToUBitVecDecl :
 
 internal object FPToSBitVecDecl :
     SMTTheoryFunction<BVSort>(
-        "fp.to_ubv".toSymbolWithQuotes(),
+        "fp.to_sbv".toSymbolWithQuotes(),
         listOf(RoundingMode, FPSort("eb".idx(), "sb".idx())),
         BVSort.fromSymbol("m"),
         Associativity.NONE) {

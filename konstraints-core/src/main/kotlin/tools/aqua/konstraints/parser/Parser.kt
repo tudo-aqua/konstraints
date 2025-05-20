@@ -160,7 +160,7 @@ class Parser {
 
     private val numeral = (of('0') + (range('1', '9') * digitCat.star())).flatten()
     private val decimal = (numeral * of('.') * numeral.plus()).flatten()
-    private val hexadecimal = of("#x") * (digitCat + range('A', 'F') + range('a', 'f')).plus()
+    private val hexadecimal = (of("#x") * (digitCat + range('A', 'F') + range('a', 'f')).plus()).flatten()
     private val binary = (of("#b") * range('0', '1').plus()).flatten()
 
     // all printable characters that are not double quotes
@@ -443,23 +443,23 @@ class Parser {
     private val b_value = of("true").flatten() + of("false").flatten()
 
     private val diagnosticOutputChannelOption =
-        (of(":diagnostic-output-channel") trim whitespaceCat).token()
-    private val globalDeclarationsOption = (of(":global-declarations") trim whitespaceCat).token()
-    private val interactiveModelOption = (of(":interactive-model") trim whitespaceCat).token()
-    private val printSuccessOption = (of(":print-success") trim whitespaceCat).token()
-    private val produceAssertionsOption = (of(":produce-assertions") trim whitespaceCat).token()
-    private val produceAssignmentsOption = (of(":produce-assignments") trim whitespaceCat).token()
-    private val produceModelsOption = (of(":produce-models") trim whitespaceCat).token()
-    private val produceProofsOption = (of(":produce-proofs") trim whitespaceCat).token()
+        (of(":diagnostic-output-channel") trim whitespaceCat).flatten()
+    private val globalDeclarationsOption = (of(":global-declarations") trim whitespaceCat).flatten()
+    private val interactiveModelOption = (of(":interactive-model") trim whitespaceCat).flatten()
+    private val printSuccessOption = (of(":print-success") trim whitespaceCat).flatten()
+    private val produceAssertionsOption = (of(":produce-assertions") trim whitespaceCat).flatten()
+    private val produceAssignmentsOption = (of(":produce-assignments") trim whitespaceCat).flatten()
+    private val produceModelsOption = (of(":produce-models") trim whitespaceCat).flatten()
+    private val produceProofsOption = (of(":produce-proofs") trim whitespaceCat).flatten()
     private val produceUnsatAssumptionsOption =
-        (of(":produce-unsat-assumptions") trim whitespaceCat).token()
-    private val produceUnsatCoresOption = (of(":produce-unsat-cores") trim whitespaceCat).token()
-    private val randomSeedOption = (of(":random-seed") trim whitespaceCat).token()
+        (of(":produce-unsat-assumptions") trim whitespaceCat).flatten()
+    private val produceUnsatCoresOption = (of(":produce-unsat-cores") trim whitespaceCat).flatten()
+    private val randomSeedOption = (of(":random-seed") trim whitespaceCat).flatten()
     private val regularOutputChannelOption =
-        (of(":regular-output-channel") trim whitespaceCat).token()
+        (of(":regular-output-channel") trim whitespaceCat).flatten()
     private val reproducibleResourceLimitOption =
-        (of(":reproducible-resource-limit") trim whitespaceCat).token()
-    private val verbosityOption = (of(":verbosity") trim whitespaceCat).token()
+        (of(":reproducible-resource-limit") trim whitespaceCat).flatten()
+    private val verbosityOption = (of(":verbosity") trim whitespaceCat).flatten()
     private val option =
         ((globalDeclarationsOption * b_value) +
                 (interactiveModelOption * b_value) +
@@ -505,7 +505,7 @@ class Parser {
     sort.set(
         identifier.map { identifier: Identifier ->
           // check if sort is in the current context
-          require(program.context.containsSort(identifier.symbol))
+          require(program.context.containsSort(identifier.symbol)) { "Unexpected sort symbol ${identifier.symbol}" }
           when (identifier) {
             is IndexedIdentifier ->
                 program.context
@@ -752,13 +752,17 @@ class Parser {
         program.setOption(
             SetOption(
                 (results[2] as List<Any>)[0] as String,
-                (results[2] as List<Any>)[0] as OptionValue))
+                (results[2] as List<Any>)[1] as OptionValue))
       }
 
   private val declareSortCMD =
       (lparen * declareSortKW * symbol * numeral * rparen).map { results: ArrayList<Any> ->
         program.declareSort(results[2] as Symbol, Integer.parseInt(results[3] as String))
       }
+
+    private val defineSortCMD = (lparen * defineSortKW * symbol * lparen * symbol.star() * rparen * sort * rparen).map { results: ArrayList<Any> ->
+        Unit
+    }
 
   private val getModelCMD = (lparen * getModelKW * rparen).map { _: Any -> program.add(GetModel) }
 
@@ -788,6 +792,7 @@ class Parser {
           setInfoCMD,
           setLogicCMD,
           declareSortCMD,
+          defineSortCMD,
           getModelCMD,
           defineFunCMD,
           setOptionCMD,
@@ -801,12 +806,16 @@ class Parser {
     // this will lead to better error messages but requires some preprocessing to split the input
     // input individual commands (this may be done in linear time by searching the input from
     // left to right counting the number of opening an closing brackets)
-    splitInput(program).forEach { cmd ->
+      // TODO split does not work for programs with comments where brackets are used in comments
+    /*
+      splitInput(program).forEach { cmd ->
       val temp = command.parse(cmd)
       if (!temp.isSuccess) {
         throw ParseException(temp.message, temp.position, temp.buffer)
       }
     }
+    */
+     script.parse(program)
 
     return this.program
   }
@@ -848,7 +857,7 @@ class Parser {
   private val commandSplitter = undefined()
   private val preprocessingParser = commandSplitter.star()
 
-  init {
+    init {
     commandSplitter.set(
         ((specConstant.map { constant: SpecConstant -> constant.toString() } +
             reserved.map { reserved: Token -> reserved.getValue<Any>() } +
