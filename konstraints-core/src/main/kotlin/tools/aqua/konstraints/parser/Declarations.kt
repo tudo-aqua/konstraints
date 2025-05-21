@@ -287,7 +287,7 @@ internal object BVConcatDecl :
   ): Expression<BVSort> {
     require(args.size == 2)
     require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.all { expression -> expression.sort is BVSort }) { "Expected all args to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})" }
 
     return BVConcat(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
   }

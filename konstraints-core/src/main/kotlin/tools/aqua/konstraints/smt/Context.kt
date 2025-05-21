@@ -79,7 +79,7 @@ class Context {
 
   fun addSortOrNull(sort: UserDeclaredSortFactory): UserDeclaredSortFactory? {
     return try {
-      addSort(sort)
+      declareSort(sort)
     } catch (_: IllegalArgumentException) {
       null
     } catch (_: IllegalStateException) {
@@ -87,11 +87,11 @@ class Context {
     }
   }
 
-  fun addSort(decl: DeclareSort) = addSort(UserDeclaredSortFactory(decl.name, decl.arity))
+  fun declareSort(decl: DeclareSort) = declareSort(UserDeclaredSortFactory(decl.name, decl.arity))
 
-  fun addSort(name: Symbol, arity: Int) = addSort(UserDeclaredSortFactory(name, arity))
+  fun declareSort(name: Symbol, arity: Int) = declareSort(UserDeclaredSortFactory(name, arity))
 
-  fun addSort(sort: UserDeclaredSortFactory): UserDeclaredSortFactory {
+  fun declareSort(sort: UserDeclaredSortFactory): UserDeclaredSortFactory {
     require(sort.symbol !in currentContext.sorts) {
       "Can not overload or shadow sort symbol ${sort.symbol}!"
     }
@@ -106,6 +106,26 @@ class Context {
 
     return sort
   }
+
+    fun defineSort(def: DefineSort) = defineSort(UserDefinedSortFactory(def.name, def.sort))
+
+    fun defineSort(name: Symbol, parameters : List<Symbol>, sort: Sort) = defineSort(UserDefinedSortFactory(name, sort))
+
+    fun defineSort(sort: UserDefinedSortFactory): UserDefinedSortFactory {
+        require(sort.symbol !in currentContext.sorts) {
+            "Can not overload or shadow sort symbol ${sort.symbol}!"
+        }
+
+        check(!activeBinderState) { "Can not add sort to the current context in this state!" }
+
+        currentContext.sorts[sort.symbol] = sort
+
+        if (sortUndoStack.isNotEmpty()) {
+            sortUndoStack.peek().add(sort.symbol)
+        }
+
+        return sort
+    }
 
   operator fun contains(func: Symbol) = currentContext.functions[func] != null
 

@@ -37,6 +37,7 @@ interface CommandVisitor<T> {
         is Pop -> visit(command)
         is Push -> visit(command)
         is DefineConst -> visit(command)
+        is DefineSort -> visit(command)
       }
 
   fun visit(assert: Assert): T
@@ -66,4 +67,6 @@ interface CommandVisitor<T> {
   fun visit(push: Push): T
 
   fun visit(pop: Pop): T
+
+  fun visit(defineSort: DefineSort): T
 }

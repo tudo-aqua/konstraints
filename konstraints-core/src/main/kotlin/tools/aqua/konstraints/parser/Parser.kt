@@ -761,7 +761,7 @@ class Parser {
       }
 
     private val defineSortCMD = (lparen * defineSortKW * symbol * lparen * symbol.star() * rparen * sort * rparen).map { results: ArrayList<Any> ->
-        Unit
+        program.defineSort(results[2] as Symbol, results[4] as List<Symbol>, results[6] as Sort)
     }
 
   private val getModelCMD = (lparen * getModelKW * rparen).map { _: Any -> program.add(GetModel) }

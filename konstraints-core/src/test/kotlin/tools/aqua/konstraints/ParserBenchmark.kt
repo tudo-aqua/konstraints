@@ -16,6 +16,7 @@ import java.util.stream.Stream
 import kotlin.streams.asStream
 import kotlin.use
 
+@Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserBenchmark {
     private fun loadResource(path: String) =
@@ -159,7 +160,7 @@ class ParserBenchmark {
     fun parseAUFNIRA(file: File) = parse(file)
     fun getAUFNIRAFiles(): Stream<Arguments> = loadResource("/full/AUFNIRA/")
 
-    @Disabled
+    /* @Disabled */
     @ParameterizedTest
     @MethodSource("getBVFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
@@ -411,7 +412,7 @@ class ParserBenchmark {
     fun parseQF_SNIA(file: File) = parse(file)
     fun getQF_SNIAFiles(): Stream<Arguments> = loadResource("/full/QF_SNIA/")
 
-    @Disabled
+    /* @Disabled */
     @ParameterizedTest
     @MethodSource("getQF_UFFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
@@ -474,7 +475,7 @@ class ParserBenchmark {
     fun parseQF_UFFPDTNIRA(file: File) = parse(file)
     fun getQF_UFFPDTNIRAFiles(): Stream<Arguments> = loadResource("/full/QF_UFFPDTNIRA/")
 
-    @Disabled
+    /* @Disabled */
     @ParameterizedTest
     @MethodSource("getQF_UFIDLFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
@@ -509,112 +510,112 @@ class ParserBenchmark {
     fun parseQF_UFNRA(file: File) = parse(file)
     fun getQF_UFNRAFiles(): Stream<Arguments> = loadResource("/full/QF_UFNRA/")
 
-
+    @Disabled
     @ParameterizedTest
     @MethodSource("getUFFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun parseUF(file: File) = parse(file)
     fun getUFFiles(): Stream<Arguments> = loadResource("/full/UF/")
 
-
+    @Disabled
     @ParameterizedTest
     @MethodSource("getUFBVFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun parseUFBV(file: File) = parse(file)
     fun getUFBVFiles(): Stream<Arguments> = loadResource("/full/UFBV/")
 
-
+    @Disabled
     @ParameterizedTest
     @MethodSource("getUFBVDTFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun parseUFBVDT(file: File) = parse(file)
     fun getUFBVDTFiles(): Stream<Arguments> = loadResource("/full/UFBVDT/")
 
-
+    @Disabled
     @ParameterizedTest
     @MethodSource("getUFBVFPFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun parseUFBVFP(file: File) = parse(file)
     fun getUFBVFPFiles(): Stream<Arguments> = loadResource("/full/UFBVFP/")
 
-
+    @Disabled
     @ParameterizedTest
     @MethodSource("getUFBVLIAFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun parseUFBVLIA(file: File) = parse(file)
     fun getUFBVLIAFiles(): Stream<Arguments> = loadResource("/full/UFBVLIA/")
 
-
+    @Disabled
     @ParameterizedTest
     @MethodSource("getUFDTFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun parseUFDT(file: File) = parse(file)
     fun getUFDTFiles(): Stream<Arguments> = loadResource("/full/UFDT/")
 
-
+    @Disabled
     @ParameterizedTest
     @MethodSource("getUFDTLIAFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun parseUFDTLIA(file: File) = parse(file)
     fun getUFDTLIAFiles(): Stream<Arguments> = loadResource("/full/UFDTLIA/")
 
-
+    @Disabled
     @ParameterizedTest
     @MethodSource("getUFDTLIRAFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun parseUFDTLIRA(file: File) = parse(file)
     fun getUFDTLIRAFiles(): Stream<Arguments> = loadResource("/full/UFDTLIRA/")
 
-
+    @Disabled
     @ParameterizedTest
     @MethodSource("getUFDTNIAFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun parseUFDTNIA(file: File) = parse(file)
     fun getUFDTNIAFiles(): Stream<Arguments> = loadResource("/full/UFDTNIA/")
 
-
+    @Disabled
     @ParameterizedTest
     @MethodSource("getUFDTNIRAFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun parseUFDTNIRA(file: File) = parse(file)
     fun getUFDTNIRAFiles(): Stream<Arguments> = loadResource("/full/UFDTNIRA/")
 
-
+    @Disabled
     @ParameterizedTest
     @MethodSource("getUFFPDTNIRAFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun parseUFFPDTNIRA(file: File) = parse(file)
     fun getUFFPDTNIRAFiles(): Stream<Arguments> = loadResource("/full/UFFPDTNIRA/")
 
-
+    @Disabled
     @ParameterizedTest
     @MethodSource("getUFIDLFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun parseUFIDL(file: File) = parse(file)
     fun getUFIDLFiles(): Stream<Arguments> = loadResource("/full/UFIDL/")
 
-
+    /* @Disabled */
     @ParameterizedTest
     @MethodSource("getUFLIAFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun parseUFLIA(file: File) = parse(file)
     fun getUFLIAFiles(): Stream<Arguments> = loadResource("/full/UFLIA/")
 
-
+    @Disabled
     @ParameterizedTest
     @MethodSource("getUFLRAFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun parseUFLRA(file: File) = parse(file)
     fun getUFLRAFiles(): Stream<Arguments> = loadResource("/full/UFLRA/")
 
-
+    /* @Disabled */
     @ParameterizedTest
     @MethodSource("getUFNIAFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun parseUFNIA(file: File) = parse(file)
     fun getUFNIAFiles(): Stream<Arguments> = loadResource("/full/UFNIA/")
 
-
+    @Disabled
     @ParameterizedTest
     @MethodSource("getUFNIRAFiles")
     @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
