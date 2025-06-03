@@ -61,13 +61,13 @@ class Parser {
 
     private val exclamationKW = of('!') trim whitespaceCat
     private val underscoreKW = of('_') trim whitespaceCat
-    private val asKW = of("as") trim whitespaceCat
+    private val asKW = (of("as") trim whitespaceCat).end()
     private val binaryKW = of("BINARY") trim whitespaceCat
     private val decimalKW = of("DECIMAL") trim whitespaceCat
     private val existsKW = of("exists") trim whitespaceCat
     private val hexadecimalKW = of("HEXADECIMAL") trim whitespaceCat
     private val forallKW = of("forall") trim whitespaceCat
-    private val letKW = of("let") trim whitespaceCat
+    private val letKW = (of("let") trim whitespaceCat)
     private val matchKW = of("match") trim whitespaceCat
     private val numeralKW = of("NUMERAL") trim whitespaceCat
     private val parKW = of("par") trim whitespaceCat
@@ -402,9 +402,13 @@ class Parser {
             symbol.map { symbol: ParseSymbol -> SymbolIndex(symbol.symbol) }) trim whitespaceCat
 
     /* maps to an implementation of Identifier */
+      /*
+      * important to parse indexed identifier as "(_ " (note the space) or otherwise names that begin
+      * with _ do get truncated
+      */
     private val identifier =
         symbol.map { symbol: ParseSymbol -> SymbolIdentifier(symbol) } +
-            (lparen * of("_") * symbol * index.plus() * rparen).map { results: List<Any> ->
+            (lparen * of("_ ") * symbol * index.plus() * rparen).map { results: List<Any> ->
               IndexedIdentifier(results[2] as ParseSymbol, results[3] as List<Index>)
               // results[3] is guaranteed to be a list of Index
             }
@@ -701,14 +705,14 @@ class Parser {
       (symbol *
               lparen *
               sortedVar.star().map { bindings: List<SortedVar<*>> ->
-                program.context.bindVariables(bindings)
+                program.context.locals = bindings
                 bindings
               } *
               rparen *
               sort *
               term)
           .map { result: ArrayList<Any> ->
-            program.context.unbindVariables()
+              program.context.locals = emptyList()
             FunctionDef(
                 result[0] as ParseSymbol,
                 result[2] as List<SortedVar<*>>,
@@ -806,16 +810,13 @@ class Parser {
     // this will lead to better error messages but requires some preprocessing to split the input
     // input individual commands (this may be done in linear time by searching the input from
     // left to right counting the number of opening an closing brackets)
-      // TODO split does not work for programs with comments where brackets are used in comments
-    /*
-      splitInput(program).forEach { cmd ->
+      // filter out all comments (all lines are truncated after ';')
+      splitInput(program.split("\n").joinToString(" ") { line -> line.substringBefore(';') }).forEach { cmd ->
       val temp = command.parse(cmd)
       if (!temp.isSuccess) {
         throw ParseException(temp.message, temp.position, temp.buffer)
       }
     }
-    */
-     script.parse(program)
 
     return this.program
   }

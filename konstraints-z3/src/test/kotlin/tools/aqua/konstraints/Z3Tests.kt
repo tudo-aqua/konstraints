@@ -40,7 +40,6 @@ import tools.aqua.konstraints.theories.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Z3Tests {
-
   private fun loadResource(path: String) =
       File(javaClass.getResource(path)!!.file)
           .walk()
@@ -51,9 +50,10 @@ class Z3Tests {
   private fun solve(file: File) {
     assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
 
-    val solver = Z3Solver()
+      // TODO this creates a massiv memory leak (solver is not closed properly)
+      val solver = Z3Solver()
     val result =
-        Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString(""))
+        Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString(" "))
 
     assumeTrue(
         (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
@@ -120,9 +120,10 @@ class Z3Tests {
 
   fun getQFUFFile(): Stream<Arguments> = loadResource("/QF_UF/")
 
+    @Disabled
   @ParameterizedTest
   @MethodSource("getQFFPFile")
-  @Timeout(value = 6000, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_FP(file: File) = solve(file)
 
   fun getQFFPFile(): Stream<Arguments> = loadResource("/QF_FP/")

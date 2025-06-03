@@ -156,6 +156,14 @@ class Z3Context {
       } catch (e: UnknownFunctionException) {
         null
       }
+
+    fun reset() {
+        constants.clear()
+        functions.clear()
+        sorts.clear()
+        letStack.clear()
+        boundVars.clear()
+    }
 }
 
 class UnexpectedSortException(msg: String) : RuntimeException(msg)

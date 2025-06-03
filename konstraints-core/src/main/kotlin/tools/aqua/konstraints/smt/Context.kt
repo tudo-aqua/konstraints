@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.smt
 
+import com.sun.tools.javac.tree.TreeInfo.symbol
 import tools.aqua.konstraints.parser.ArrayExTheory
 import tools.aqua.konstraints.parser.BitVectorExpressionTheory
 import tools.aqua.konstraints.parser.CoreTheory
@@ -40,8 +41,9 @@ class Context {
   private val forbiddenNames = mutableSetOf<Symbol>()
   private val currentContext = CurrentContext()
   private val shadowingMap = Stack<MutableMap<SMTFunction<*>, SMTFunction<*>>>()
-  private val functionUndoStack = Stack<MutableSet<SMTFunction<*>>>()
+  private val functionUndoStack = Stack<MutableSet<Symbol>>()
   private val sortUndoStack = Stack<MutableSet<Symbol>>()
+   var locals : List<SortedVar<*>> = emptyList()
   private var logic: Logic? = null
 
   // true if we are currently in any binder (let/exists/forall/par/match)
@@ -71,7 +73,7 @@ class Context {
     // if the undoStack is not empty, and we are not currently inside any binder
     // there was at least one push, so we save the added func to remove on the next pop operation
     if (functionUndoStack.isNotEmpty()) {
-      functionUndoStack.peek().add(func)
+      functionUndoStack.peek().add(func.symbol)
     }
 
     return func
@@ -129,8 +131,9 @@ class Context {
 
   operator fun contains(func: Symbol) = currentContext.functions[func] != null
 
+    // TODO this function should probably not exist look into checkContext
   operator fun contains(expression: Expression<*>) =
-      expression.func in currentContext.functions.values
+      expression.func?.symbol in currentContext.functions
 
   operator fun contains(sort: Sort): Boolean = sort.symbol in currentContext.sorts
 
@@ -154,15 +157,18 @@ class Context {
     }
   }
 
-  fun getFunc(name: Symbol) =
-      currentContext.functions[name] ?: throw FunctionNotFoundException(name)
+  fun getFunc(name: Symbol) = if(currentContext.functions[name] != null) {
+          currentContext.functions[name]!!
+      } else {
+          locals.find { it -> it.symbol == name } ?: throw FunctionNotFoundException(name)
+      }
 
   fun push(n: Int) = repeat(n) { _ -> push() }
 
   // use if you have to pop manually or the operation can not be completed within the lambda passed
   // to push
   fun push() {
-    functionUndoStack.push(mutableSetOf<SMTFunction<*>>())
+    functionUndoStack.push(mutableSetOf<Symbol>())
     sortUndoStack.push(mutableSetOf<Symbol>())
   }
 
@@ -179,7 +185,7 @@ class Context {
 
   // auto pops after block
   fun push(block: Context.() -> Unit) {
-    functionUndoStack.push(mutableSetOf<SMTFunction<*>>())
+    functionUndoStack.push(mutableSetOf<Symbol>())
     sortUndoStack.push(mutableSetOf<Symbol>())
     block()
     pop(1)
@@ -190,7 +196,7 @@ class Context {
     check(!activeBinderState) { "Can not pop inside binder!" }
 
     repeat(n) { _ ->
-      currentContext.functions.values.removeAll(functionUndoStack.pop())
+        functionUndoStack.pop().forEach { symbol -> currentContext.functions.remove(symbol) }
       currentContext.sorts.keys.removeAll(sortUndoStack.pop())
     }
   }
@@ -237,12 +243,12 @@ class Context {
 
     // add all bindings to undoStack first, remove all binding that shadow from undoStack later
     functionUndoStack.push(mutableSetOf())
-    functionUndoStack.peek().addAll(varBindings)
+    functionUndoStack.peek().addAll(varBindings.map { it.symbol })
 
     varBindings.forEach { binding ->
       currentContext.functions.put(binding.symbol, binding)?.let { old ->
         shadowingMap.peek().put(binding, old)
-        functionUndoStack.peek().remove(binding)
+        functionUndoStack.peek().remove(binding.symbol)
       }
     }
   }
@@ -265,12 +271,12 @@ class Context {
 
     // add all bindings to undoStack first, remove all binding that shadow from undoStack later
     functionUndoStack.push(mutableSetOf())
-    functionUndoStack.peek().addAll(vars)
+    functionUndoStack.peek().addAll(vars.map { it.symbol })
 
     vars.forEach { binding ->
       currentContext.functions.put(binding.symbol, binding)?.let { old ->
         shadowingMap.peek().put(binding, old)
-        functionUndoStack.peek().remove(binding)
+        functionUndoStack.peek().remove(binding.symbol)
       }
     }
   }
@@ -286,7 +292,9 @@ class Context {
     shadowingMap.pop().forEach { (local, shadowed) ->
       currentContext.functions[local.symbol] = shadowed
     }
-    currentContext.functions.values.removeAll(functionUndoStack.pop())
+    functionUndoStack.pop().forEach { symbol ->
+        currentContext.functions.remove(symbol)
+    }
   }
 
   fun setLogic(logic: Logic) {

@@ -365,7 +365,7 @@ class UserDefinedSortFactory(val symbol: Symbol, val sort : Sort) : SortFactory 
         require(parameters.isEmpty())
         require(indices.isEmpty())
 
-        return UserDefinedSort(symbol, sort)
+        return sort
     }
 
     override fun isInstanceOf(sort: Sort): Boolean {

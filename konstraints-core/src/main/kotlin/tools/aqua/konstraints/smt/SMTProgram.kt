@@ -110,7 +110,7 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     return if (expr is ExistsExpression) {
       context.exists(expr.vars) { checkContext(expr.term) }
     } else if (expr is ForallExpression) {
-      context.exists(expr.vars) { checkContext(expr.term) }
+      context.forall(expr.vars) { checkContext(expr.term) }
     } else if (expr is LetExpression) {
       context.let(expr.bindings) { checkContext(expr.inner) }
     } else if (expr is AnnotatedExpression) {

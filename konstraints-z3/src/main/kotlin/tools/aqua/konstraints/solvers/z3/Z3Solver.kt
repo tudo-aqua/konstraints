@@ -154,6 +154,15 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     solver.pop(pop.n)
   }
 
+    override fun visit(defineSort: DefineSort) {
+        // empty
+    }
+
+    fun reset() {
+        solver.reset()
+        context.reset()
+    }
+
   // this should later be part of solver interface
   override fun close() {
     solver.reset()

@@ -52,7 +52,7 @@ abstract class SMTFunction<out T : Sort> {
     // overloaded by a differing definition
   }
 
-  final override fun hashCode(): Int = Objects.hash(symbol, sort, parameters)
+  final override fun hashCode(): Int = symbol.hashCode() /* Objects.hash(symbol, sort, parameters) */
 
   infix fun <T : Sort> castTo(to: T): SMTFunction<T> {
     if (sort != to) {
