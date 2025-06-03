@@ -38,13 +38,13 @@ class DSLTests {
     val solver = Z3Solver()
 
     val program =
-        smt(QF_UF) {
+        smt(QF_FPLRA) {
           val A = const("A", BoolSort)
           val B = const("B", BoolSort)
           val C = const("C", BoolSort)
 
-          val D = const("D", IntSort)
-          val E = const("E", IntSort)
+          val D = const("D", RealSort)
+          val E = const("E", RealSort)
 
           val F = const("F", FPSort(5, 11))
 
@@ -82,7 +82,7 @@ class DSLTests {
 
           assert {
             eq {
-              intadd {
+              realadd {
                 +D
                 +E
               }
@@ -309,11 +309,11 @@ class DSLTests {
               SatStatus.SAT),
           arguments(
               smt(QF_BV) {
-                val bvugt by
+                val bvugt2 by
                     defining(BoolSort, BVSort(8), BVSort(8)) { s, t ->
                       not { s eq t } and not { s bvult t }
                     }
-                assert { bvugt("#b11111111".bitvec(), "#b01111111".bitvec()) }
+                assert { bvugt2("#b11111111".bitvec(), "#b01111111".bitvec()) }
               },
               SatStatus.SAT),
           arguments(
@@ -331,7 +331,7 @@ class DSLTests {
               },
               SatStatus.SAT),
           arguments(
-              smt(QF_UF) {
+              smt(QF_FP) {
                 val A = const(FPSort(5, 11))
                 val B = const(FPSort(5, 11))
                 val C = const(FPSort(5, 11))

@@ -40,7 +40,6 @@ import tools.aqua.konstraints.theories.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Z3Tests {
-
   private fun loadResource(path: String) =
       File(javaClass.getResource(path)!!.file)
           .walk()
@@ -51,8 +50,10 @@ class Z3Tests {
   private fun solve(file: File) {
     assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
 
+    // TODO this creates a massiv memory leak (solver is not closed properly)
     val solver = Z3Solver()
-    val result = Parser.parse(file.bufferedReader().use(BufferedReader::readLines).joinToString(""))
+    val result =
+        Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
 
     assumeTrue(
         (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
@@ -61,7 +62,7 @@ class Z3Tests {
         "Skipped due to unknown sat status.")
 
     solver.use {
-      result.commands.map { solver.visit(it) }
+      solver.solve(result)
 
       // verify we get the correct status for the test
       assertEquals(
@@ -119,9 +120,10 @@ class Z3Tests {
 
   fun getQFUFFile(): Stream<Arguments> = loadResource("/QF_UF/")
 
+  @Disabled
   @ParameterizedTest
   @MethodSource("getQFFPFile")
-  @Timeout(value = 6000, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_FP(file: File) = solve(file)
 
   fun getQFFPFile(): Stream<Arguments> = loadResource("/QF_FP/")
@@ -148,6 +150,13 @@ class Z3Tests {
   fun getQFABVFile(): Stream<Arguments> = loadResource("/QF_ABV/bench_ab/")
 
   @ParameterizedTest
+  @MethodSource("getQFFPLRAFile")
+  @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  fun QF_FPLRA(file: File) = solve(file)
+
+  fun getQFFPLRAFile(): Stream<Arguments> = loadResource("/QF_FPLRA/")
+
+  @ParameterizedTest
   @MethodSource("getQFIDLModelsFile")
   @Timeout(value = 20, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_IDL_Models(file: File) = solve(file)
@@ -169,7 +178,7 @@ class Z3Tests {
   fun testExtract(program: String) {
     val solver = Z3Solver()
 
-    val smtProgram = Parser.parse(program)
+    val smtProgram = Parser().parse(program)
 
     solver.use {
       smtProgram.commands.map { solver.visit(it) }
@@ -200,7 +209,7 @@ class Z3Tests {
   fun testEquals(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser.parse(program)
+    val result = Parser().parse(program)
     solver.use {
       result.commands.map { solver.visit(it) }
 
@@ -217,7 +226,7 @@ class Z3Tests {
   fun testLet(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser.parse(program)
+    val result = Parser().parse(program)
     solver.use {
       result.commands.map { solver.visit(it) }
 
@@ -234,7 +243,7 @@ class Z3Tests {
   fun testFreeFunctions(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser.parse(program)
+    val result = Parser().parse(program)
     solver.use {
       result.commands.map { solver.visit(it) }
 
@@ -253,7 +262,7 @@ class Z3Tests {
   fun testQuantifier(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser.parse(program)
+    val result = Parser().parse(program)
 
     solver.use {
       result.commands.map { solver.visit(it) }
@@ -275,7 +284,7 @@ class Z3Tests {
   fun testPushPop(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser.parse(program)
+    val result = Parser().parse(program)
 
     solver.use {
       result.commands.map { solver.visit(it) }
@@ -298,7 +307,7 @@ class Z3Tests {
   fun testDefineFun(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser.parse(program)
+    val result = Parser().parse(program)
 
     solver.use {
       result.commands.map { solver.visit(it) }

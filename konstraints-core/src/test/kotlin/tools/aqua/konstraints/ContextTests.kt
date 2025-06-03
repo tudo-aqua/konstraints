@@ -50,7 +50,7 @@ class ContextTests {
   @ParameterizedTest
   @MethodSource("getContextAndFunctions")
   fun testGetFunction(context: Context, func: SMTFunction<*>) {
-    assertTrue(context.getFunc(func.name) == func)
+    assertTrue(context.getFunc(func.symbol) == func)
   }
 
   private fun getContextAndFunctions(): Stream<Arguments> =
@@ -101,10 +101,10 @@ class ContextTests {
     context.push {
       addFun(func)
 
-      assertTrue(context.contains(func.name))
+      assertTrue(context.contains(func.symbol))
     }
 
-    assertFalse(context.contains(func.name))
+    assertFalse(context.contains(func.symbol))
   }
 
   private fun getContextAndNewFunction() =
@@ -135,7 +135,7 @@ class ContextTests {
 
     context.let(bindings) { context, bindings -> True }
 
-    assertTrue(context.getFunc(function.name) == function)
+    assertTrue(context.getFunc(function.symbol) == function)
   }
 
   @ParameterizedTest
@@ -144,7 +144,7 @@ class ContextTests {
     val function = context.getFunc(bindings[0].name)
 
     context.let(bindings) { bindings, context ->
-      assertFalse(context.getFunc(function.name) == function)
+      assertFalse(context.getFunc(function.symbol) == function)
       True
     }
   }

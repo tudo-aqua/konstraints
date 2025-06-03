@@ -18,9 +18,306 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.Bindings
-import tools.aqua.konstraints.parser.SortDecl
-import tools.aqua.konstraints.theories.Theories
+import tools.aqua.konstraints.theories.*
+
+sealed interface SortFactory {
+  abstract fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort
+
+  abstract fun isInstanceOf(sort: Sort): Boolean
+
+  abstract val isIndexed: Boolean
+  abstract val numIndicies: Int
+}
+
+object BoolFactory : SortFactory {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): BoolSort {
+    require(parameters.isEmpty())
+    require(indices.isEmpty())
+
+    return build()
+  }
+
+  fun build() = BoolSort
+
+  override fun isInstanceOf(sort: Sort) = (sort is BoolSort)
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+object IntFactory : SortFactory {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): IntSort {
+    require(parameters.isEmpty())
+    require(indices.isEmpty())
+
+    return build()
+  }
+
+  fun build() = IntSort
+
+  override fun isInstanceOf(sort: Sort) = (sort is IntSort)
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+object RealFactory : SortFactory {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): RealSort {
+    require(parameters.isEmpty())
+    require(indices.isEmpty())
+
+    return build()
+  }
+
+  fun build() = RealSort
+
+  override fun isInstanceOf(sort: Sort) = (sort is RealSort)
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+object StringFactory : SortFactory {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): StringSort {
+    require(parameters.isEmpty())
+    require(indices.isEmpty())
+
+    return build()
+  }
+
+  fun build() = StringSort
+
+  override fun isInstanceOf(sort: Sort) = (sort is StringSort)
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+object RegLanFactory : SortFactory {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): RegLan {
+    require(parameters.isEmpty())
+    require(indices.isEmpty())
+
+    return build()
+  }
+
+  fun build() = RegLan
+
+  override fun isInstanceOf(sort: Sort) = (sort is RegLan)
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+object RoundingModeFactory : SortFactory {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): RoundingMode {
+    require(parameters.isEmpty())
+    require(indices.isEmpty())
+
+    return build()
+  }
+
+  fun build() = RoundingMode
+
+  override fun isInstanceOf(sort: Sort) = (sort is RoundingMode)
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+object BitVecFactory : SortFactory {
+  private val cache =
+      arrayOf(
+          BVSort(1),
+          BVSort(2),
+          BVSort(3),
+          BVSort(4),
+          BVSort(5),
+          BVSort(6),
+          BVSort(7),
+          BVSort(8),
+          BVSort(9),
+          BVSort(10),
+          BVSort(11),
+          BVSort(12),
+          BVSort(13),
+          BVSort(14),
+          BVSort(15),
+          BVSort(16),
+          BVSort(19),
+          BVSort(24),
+          BVSort(32),
+          BVSort(53),
+          BVSort(64),
+          BVSort(113),
+          BVSort(128),
+          BVSort(237),
+          BVSort(256),
+          BVSort(512),
+          BVSort(1024),
+          BVSort(2048),
+          BVSort(4096),
+          BVSort(8192),
+          BVSort(16384),
+          BVSort(32786),
+          BVSort(65536),
+      )
+
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): BVSort {
+    require(parameters.isEmpty())
+    require(indices.size == 1)
+
+    return build(indices.single().numeral)
+  }
+
+  fun build(n: Int) =
+      when (n) {
+        1 -> cache[0]
+        2 -> cache[1]
+        3 -> cache[2]
+        4 -> cache[3]
+        5 -> cache[4]
+        6 -> cache[5]
+        7 -> cache[6]
+        8 -> cache[7]
+        9 -> cache[8]
+        10 -> cache[9]
+        11 -> cache[10]
+        12 -> cache[11]
+        13 -> cache[12]
+        14 -> cache[13]
+        15 -> cache[14]
+        16 -> cache[15]
+        19 -> cache[16]
+        24 -> cache[17]
+        32 -> cache[18]
+        53 -> cache[19]
+        64 -> cache[20]
+        113 -> cache[21]
+        128 -> cache[22]
+        237 -> cache[23]
+        256 -> cache[24]
+        512 -> cache[25]
+        1024 -> cache[26]
+        2048 -> cache[27]
+        4096 -> cache[28]
+        8192 -> cache[29]
+        16384 -> cache[30]
+        32786 -> cache[31]
+        65536 -> cache[32]
+        else -> BVSort(n)
+      }
+
+  override fun isInstanceOf(sort: Sort) = (sort is BVSort)
+
+  override val isIndexed = true
+  override val numIndicies = 1
+}
+
+object FloatingPointFactory : SortFactory {
+
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FPSort {
+    require(parameters.isEmpty())
+    require(indices.size == 2)
+
+    return build(indices[0].numeral, indices[1].numeral)
+  }
+
+  fun build(eb: Int, sb: Int) = FPSort(eb, sb)
+
+  override fun isInstanceOf(sort: Sort) = (sort is FPSort)
+
+  override val isIndexed = true
+  override val numIndicies = 2
+}
+
+object Float16Factory : SortFactory {
+
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FPSort {
+    require(parameters.isEmpty())
+    require(indices.isEmpty())
+
+    return build()
+  }
+
+  fun build() = FPSort(5, 11)
+
+  override fun isInstanceOf(sort: Sort) =
+      (sort is FPSort) && (sort.exponentBits == 5) && (sort.significantBits == 11)
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+object Float32Factory : SortFactory {
+
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FPSort {
+    require(parameters.isEmpty())
+    require(indices.isEmpty())
+
+    return build()
+  }
+
+  fun build() = FPSort(8, 24)
+
+  override fun isInstanceOf(sort: Sort) =
+      (sort is FPSort) && (sort.exponentBits == 8) && (sort.significantBits == 24)
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+object Float64Factory : SortFactory {
+
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FPSort {
+    require(parameters.isEmpty())
+    require(indices.isEmpty())
+
+    return build()
+  }
+
+  fun build() = FPSort(11, 53)
+
+  override fun isInstanceOf(sort: Sort) =
+      (sort is FPSort) && (sort.exponentBits == 11) && (sort.significantBits == 53)
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+object Float128Factory : SortFactory {
+
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FPSort {
+    require(parameters.isEmpty())
+    require(indices.isEmpty())
+
+    return build()
+  }
+
+  fun build() = FPSort(15, 113)
+
+  override fun isInstanceOf(sort: Sort) =
+      (sort is FPSort) && (sort.exponentBits == 15) && (sort.significantBits == 113)
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+object ArraySortFactory : SortFactory {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): ArraySort<*, *> {
+    require(parameters.size == 2)
+    require(indices.isEmpty())
+
+    return build(parameters[0], parameters[1])
+  }
+
+  fun <A : Sort, B : Sort> build(X: A, Y: B) = ArraySort(X, Y)
+
+  override fun isInstanceOf(sort: Sort) = (sort is ArraySort<*, *>)
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
 
 /**
  * Base class for each SMT sort
@@ -79,15 +376,47 @@ class SortParameter(name: String) : Sort(name, emptyList(), emptyList()) {
   override val theories = emptySet<Theories>()
 }
 
-class UserDefinedSort(name: Symbol, arity: Int) :
-    Sort(name, emptyList(), (0..arity).map { index -> SortParameter("sort$index") }) {
+class UserDeclaredSortFactory(val symbol: Symbol, val arity: Int) : SortFactory {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
+    require(parameters.size == arity)
+    require(indices.isEmpty())
+
+    return UserDeclaredSort(symbol, parameters)
+  }
+
+  override fun isInstanceOf(sort: Sort): Boolean {
+    require(sort is UserDeclaredSort)
+
+    return sort.symbol == symbol && sort.arity == arity
+  }
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+class UserDeclaredSort(name: Symbol, parameters: List<Sort>) : Sort(name, emptyList(), parameters) {
   override val theories = emptySet<Theories>()
 }
 
-internal class UserDefinedSortDecl(name: Symbol, override val arity: Int) :
-    SortDecl<Sort>(
-        name, (0..<arity).map { index -> SortParameter("sort$index") }.toSet(), emptySet()) {
+class UserDefinedSortFactory(val symbol: Symbol, val sort: Sort) : SortFactory {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
+    require(parameters.isEmpty())
+    require(indices.isEmpty())
 
-  // FIXME parameter order is assume to be right in the bindings map
-  override fun getSort(bindings: Bindings): Sort = UserDefinedSort(symbol, arity)
+    return sort
+  }
+
+  override fun isInstanceOf(sort: Sort): Boolean {
+    require(sort is UserDefinedSort)
+
+    return sort.symbol == symbol && sort.sort == sort
+  }
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+// TODO this only implements user defined sorts without sort parameters
+class UserDefinedSort(name: Symbol, val sort: Sort) : Sort(name, emptyList(), emptyList()) {
+  override val theories = emptySet<Theories>()
 }

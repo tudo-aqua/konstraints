@@ -320,7 +320,7 @@ class FPAbs(override val inner: Expression<FPSort>) :
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPAbsDecl.buildExpression(children, emptyList())
+      FPAbsDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -333,7 +333,7 @@ class FPNeg(override val inner: Expression<FPSort>) :
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPNegDecl.buildExpression(children, emptyList())
+      FPNegDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -364,7 +364,7 @@ class FPAdd(
   }
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPAddDecl.buildExpression(children, emptyList())
+      FPAddDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -395,7 +395,7 @@ class FPSub(
   }
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPSubDecl.buildExpression(children, emptyList())
+      FPSubDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -426,7 +426,7 @@ class FPMul(
   }
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPMulDecl.buildExpression(children, emptyList())
+      FPMulDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -457,7 +457,7 @@ class FPDiv(
   }
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPDivDecl.buildExpression(children, emptyList())
+      FPDivDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -488,7 +488,7 @@ class FPFma(
       listOf(roundingMode, multiplier, multiplicand, summand)
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPFmaDecl.buildExpression(children, emptyList())
+      FPFmaDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -505,7 +505,7 @@ class FPSqrt(val roundingMode: Expression<RoundingMode>, val inner: Expression<F
   override val rhs: Expression<FPSort> = inner
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPSqrtDecl.buildExpression(children, emptyList())
+      FPSqrtDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -531,7 +531,7 @@ class FPRem(val dividend: Expression<FPSort>, val divisor: Expression<FPSort>) :
   override fun toString(): String = "(fp.rem $dividend $divisor)"
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPRemDecl.buildExpression(children, emptyList())
+      FPRemDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -549,7 +549,7 @@ class FPRoundToIntegral(val roundingMode: Expression<RoundingMode>, val inner: E
   override val rhs: Expression<FPSort> = inner
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPRoundToIntegralDecl.buildExpression(children, emptyList())
+      FPRoundToIntegralDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -568,7 +568,7 @@ class FPMin(override val lhs: Expression<FPSort>, override val rhs: Expression<F
   }
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPMinDecl.buildExpression(children, emptyList())
+      FPMinDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -587,7 +587,7 @@ class FPMax(override val lhs: Expression<FPSort>, override val rhs: Expression<F
   }
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPMaxDecl.buildExpression(children, emptyList())
+      FPMaxDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -614,7 +614,7 @@ class FPLeq(val terms: List<Expression<FPSort>>) :
   override fun toString(): String = "(fp.leq ${terms.joinToString(" ")})"
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPLeqDecl.buildExpression(children, emptyList())
+      FPLeqDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -641,7 +641,7 @@ class FPLt(val terms: List<Expression<FPSort>>) :
   override fun toString(): String = "(fp.lt ${terms.joinToString(" ")})"
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPLtDecl.buildExpression(children, emptyList())
+      FPLtDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -668,7 +668,7 @@ class FPGeq(val terms: List<Expression<FPSort>>) :
   override fun toString(): String = "(fp.geq ${terms.joinToString(" ")})"
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPGeqDecl.buildExpression(children, emptyList())
+      FPGeqDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -695,7 +695,7 @@ class FPGt(val terms: List<Expression<FPSort>>) :
   override fun toString(): String = "(fp.gt ${terms.joinToString(" ")})"
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPGtDecl.buildExpression(children, emptyList())
+      FPGtDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -720,7 +720,7 @@ class FPEq(val terms: List<Expression<FPSort>>) :
   }
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPEqDecl.buildExpression(children, emptyList())
+      FPEqDecl.constructDynamic(children, emptyList())
 }
 
 /** (fp.isNormal (_ FloatingPoint eb sb) Bool) */
@@ -729,7 +729,7 @@ class FPIsNormal(override val inner: Expression<FPSort>) :
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPIsNormalDecl.buildExpression(children, emptyList())
+      FPIsNormalDecl.constructDynamic(children, emptyList())
 }
 
 /** (fp.isSubnormal (_ FloatingPoint eb sb) Bool) */
@@ -738,7 +738,7 @@ class FPIsSubnormal(override val inner: Expression<FPSort>) :
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPIsSubormalDecl.buildExpression(children, emptyList())
+      FPIsSubormalDecl.constructDynamic(children, emptyList())
 }
 
 /** (fp.isZero (_ FloatingPoint eb sb) Bool) */
@@ -747,7 +747,7 @@ class FPIsZero(override val inner: Expression<FPSort>) :
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPIsZeroDecl.buildExpression(children, emptyList())
+      FPIsZeroDecl.constructDynamic(children, emptyList())
 }
 
 /** (fp.isInfinite (_ FloatingPoint eb sb) Bool) */
@@ -756,7 +756,7 @@ class FPIsInfinite(override val inner: Expression<FPSort>) :
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPIsInfiniteDecl.buildExpression(children, emptyList())
+      FPIsInfiniteDecl.constructDynamic(children, emptyList())
 }
 
 /** (fp.isNaN (_ FloatingPoint eb sb) Bool) */
@@ -765,7 +765,7 @@ class FPIsNaN(override val inner: Expression<FPSort>) :
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPIsNaNDecl.buildExpression(children, emptyList())
+      FPIsNaNDecl.constructDynamic(children, emptyList())
 }
 
 /** (fp.isNegative (_ FloatingPoint eb sb) Bool) */
@@ -774,7 +774,7 @@ class FPIsNegative(override val inner: Expression<FPSort>) :
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPIsNegativeDecl.buildExpression(children, emptyList())
+      FPIsNegativeDecl.constructDynamic(children, emptyList())
 }
 
 /** (fp.isPositive (_ FloatingPoint eb sb) Bool) */
@@ -783,7 +783,7 @@ class FPIsPositive(override val inner: Expression<FPSort>) :
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      FPIsPositiveDecl.buildExpression(children, emptyList())
+      FPIsPositiveDecl.constructDynamic(children, emptyList())
 }
 
 /*
@@ -808,7 +808,7 @@ class BitVecToFP(override val inner: Expression<BVSort>, sort: FPSort) :
   }
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      BitVecToFPDecl.buildExpression(children, emptyList())
+      BitVecToFPDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -839,7 +839,7 @@ class FPToFP(
       "((_ to_fp ${sort.exponentBits} ${sort.significantBits}) $roundingMode $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      FPToFPDecl.buildExpression(children, emptyList())
+      FPToFPDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -869,7 +869,7 @@ class RealToFP(
       "((_ to_fp ${sort.exponentBits} ${sort.significantBits}) $roundingMode $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      RealToFPDecl.buildExpression(children, emptyList())
+      RealToFPDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -900,7 +900,7 @@ class SBitVecToFP(
       "((_ to_fp ${sort.exponentBits} ${sort.significantBits}) $roundingMode $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      SBitVecToFPDecl.buildExpression(children, emptyList())
+      SBitVecToFPDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -931,7 +931,7 @@ class UBitVecToFP(
       "((_ to_fp_unsigned ${sort.exponentBits} ${sort.significantBits}) $roundingMode $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
-      UBitVecToFPDecl.buildExpression(children, emptyList())
+      UBitVecToFPDecl.constructDynamic(children, emptyList())
 }
 
 /*
@@ -958,7 +958,7 @@ class FPToUBitVec(
   override fun toString(): String = "((_ fp.to_ubv $m) $roundingMode $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      FPToUBitVecDecl.buildExpression(children, emptyList())
+      FPToUBitVecDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -981,7 +981,7 @@ class FPToSBitVec(
   override fun toString(): String = "((_ fp.to_sbv $m) $roundingMode $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-      FPToSBitVecDecl.buildExpression(children, emptyList())
+      FPToSBitVecDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -994,5 +994,5 @@ class FPToReal(override val inner: Expression<FPSort>) :
   override val theories = FLOATING_POINT_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
-      FPToRealDecl.buildExpression(children, emptyList())
+      FPToRealDecl.constructDynamic(children, emptyList())
 }

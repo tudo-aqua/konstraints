@@ -54,6 +54,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
 
   override fun solve(program: SMTProgram): SatStatus {
     program.commands.forEach { visit(it) }
+    program.status = status
 
     return status
   }
@@ -65,7 +66,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     get() = z3model != null
 
   override fun visit(assert: Assert) {
-    val assertion = assert.expression.z3ify(context)
+    val assertion = assert.expr.z3ify(context)
 
     solver.add(assertion)
   }
@@ -135,6 +136,10 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     z3model = solver.model
   }
 
+  override fun visit(defineConst: DefineConst) {
+    TODO("Not yet implemented")
+  }
+
   override fun visit(defineFun: DefineFun) {
     // this is empty as we do not need to do any work when seeing a "defineFun"
     // Z3 has no concept of function definitions, we replace function created via define-fun
@@ -147,6 +152,15 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
 
   override fun visit(pop: Pop) {
     solver.pop(pop.n)
+  }
+
+  override fun visit(defineSort: DefineSort) {
+    // empty
+  }
+
+  fun reset() {
+    solver.reset()
+    context.reset()
   }
 
   // this should later be part of solver interface

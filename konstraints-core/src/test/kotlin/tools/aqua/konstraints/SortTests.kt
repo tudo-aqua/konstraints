@@ -28,6 +28,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
+import tools.aqua.konstraints.smt.BitVecFactory
 import tools.aqua.konstraints.smt.Sort
 import tools.aqua.konstraints.theories.BVSort
 import tools.aqua.konstraints.theories.BoolSort
@@ -117,5 +118,18 @@ class SortTests {
   @MethodSource("getEqualBVSortObjects")
   fun `test that equal BVSorts return the same hash code`(lhs: BVSort, rhs: BVSort) {
     assertEquals(lhs.hashCode(), rhs.hashCode())
+  }
+
+  @ParameterizedTest
+  @MethodSource("generateInts")
+  fun `test that BitVecFactory cache works`(n: Int) {
+    assert(BitVecFactory.build(n).bits == n)
+  }
+
+  private fun generateInts(): Stream<Arguments> {
+    return (1..2048)
+        .plus(listOf(4096, 8192, 16384, 32786, 65536))
+        .map { i -> arguments(i) }
+        .stream()
   }
 }
