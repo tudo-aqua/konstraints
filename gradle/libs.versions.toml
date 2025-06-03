@@ -16,12 +16,12 @@
 
 [versions]
 java-jdk = "11"
-kotlin = "2.1.0"
+kotlin = "2.1.21"
 prettier-toml = "2.0.1"
 
 [libraries]
 # gradle plugins
-gradle-detekt = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version = "1.23.7" }
+gradle-detekt = { group = "io.gitlab.arturbosch.detekt", name = "detekt-gradle-plugin", version = "1.23.8" }
 gradle-gitVersioning = { group = "me.qoomon", name = "gradle-git-versioning-plugin", version = "6.4.4" }
 gradle-kotlin-dokka = { group = "org.jetbrains.dokka", name = "dokka-gradle-plugin", version = "2.0.0" }
 gradle-kotlin-jvm = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -42,5 +42,5 @@ kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutine
 kotlin-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.8.0" }
 petitparser-core = { group = "com.github.petitparser", name = "petitparser-core", version = "2.4.0" }
 xz = { group = "org.tukaani", name = "xz", version = "1.10" }
-zstd = { group = "com.github.luben", name = "zstd-jni", version = "1.5.6-9" }
+zstd = { group = "com.github.luben", name = "zstd-jni", version = "1.5.7-2" }
 z3-turnkey = { group = "tools.aqua", name = "z3-turnkey", version = "4.13.4" }
