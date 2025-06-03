@@ -189,7 +189,9 @@ internal object EqualsDecl :
   ): Expression<BoolSort> {
     require(args.size >= 2)
     require(indices.isEmpty())
-    require(args.all { expr -> expr.sort == args[0].sort }) { "Expected all sorts in equals to be of the same sort but was: ${args.map { expr -> expr.sort }.joinToString(", ")}" }
+    require(args.all { expr -> expr.sort == args[0].sort }) {
+      "Expected all sorts in equals to be of the same sort but was: ${args.map { expr -> expr.sort }.joinToString(", ")}"
+    }
 
     return Equals(args)
   }
@@ -287,7 +289,9 @@ internal object BVConcatDecl :
   ): Expression<BVSort> {
     require(args.size == 2)
     require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort }) { "Expected all args to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})" }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     return BVConcat(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
   }
@@ -1355,10 +1359,10 @@ internal object RealsIntsTheory : Theory {
               ToRealDecl,
               ToIntDecl,
               IsIntDecl,
-            IntRealLessDecl,
-            IntRealLessEqDecl,
-            IntRealGreaterDecl,
-            IntRealGreaterEqDecl)
+              IntRealLessDecl,
+              IntRealLessEqDecl,
+              IntRealGreaterDecl,
+              IntRealGreaterEqDecl)
           .associateBy { it.symbol }
 
   override val sorts = mapOf(IntSort.symbol to IntFactory, RealSort.symbol to RealFactory)
@@ -1407,76 +1411,80 @@ internal object IntRealLessDecl :
     SMTTheoryFunction<BoolSort>(
         "<".toSymbolWithQuotes(), listOf(RealSort, RealSort), BoolSort, Associativity.CHAINABLE) {
 
-    override fun constructDynamic(
-        args: List<Expression<*>>,
-        indices: List<Index>
-    ): Expression<BoolSort> {
-        require(args.size >= 2)
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BoolSort> {
+    require(args.size >= 2)
 
-        return if (args[0].sort is IntSort && args[1].sort is IntSort)
-            IntLessDecl.constructDynamic(args, indices)
-        else if (args[0].sort is RealSort && args[1].sort is RealSort)
-            RealLessDecl.constructDynamic(args, indices)
-        else
-            throw IllegalArgumentException("Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})")
-    }
+    return if (args[0].sort is IntSort && args[1].sort is IntSort)
+        IntLessDecl.constructDynamic(args, indices)
+    else if (args[0].sort is RealSort && args[1].sort is RealSort)
+        RealLessDecl.constructDynamic(args, indices)
+    else
+        throw IllegalArgumentException(
+            "Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})")
+  }
 }
 
 internal object IntRealLessEqDecl :
     SMTTheoryFunction<BoolSort>(
         "<=".toSymbolWithQuotes(), listOf(RealSort, RealSort), BoolSort, Associativity.CHAINABLE) {
 
-    override fun constructDynamic(
-        args: List<Expression<*>>,
-        indices: List<Index>
-    ): Expression<BoolSort> {
-        require(args.size >= 2)
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BoolSort> {
+    require(args.size >= 2)
 
-        return if (args[0].sort is IntSort && args[1].sort is IntSort)
-            IntLessEqDecl.constructDynamic(args, indices)
-        else if (args[0].sort is RealSort && args[1].sort is RealSort)
-            RealLessEqDecl.constructDynamic(args, indices)
-        else
-            throw IllegalArgumentException("Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})")
-    }
+    return if (args[0].sort is IntSort && args[1].sort is IntSort)
+        IntLessEqDecl.constructDynamic(args, indices)
+    else if (args[0].sort is RealSort && args[1].sort is RealSort)
+        RealLessEqDecl.constructDynamic(args, indices)
+    else
+        throw IllegalArgumentException(
+            "Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})")
+  }
 }
 
 internal object IntRealGreaterEqDecl :
     SMTTheoryFunction<BoolSort>(
         ">=".toSymbolWithQuotes(), listOf(RealSort, RealSort), BoolSort, Associativity.CHAINABLE) {
 
-    override fun constructDynamic(
-        args: List<Expression<*>>,
-        indices: List<Index>
-    ): Expression<BoolSort> {
-        require(args.size >= 2)
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BoolSort> {
+    require(args.size >= 2)
 
-        return if (args[0].sort is IntSort && args[1].sort is IntSort)
-            IntGreaterEqDecl.constructDynamic(args, indices)
-        else if (args[0].sort is RealSort && args[1].sort is RealSort)
-            RealGreaterEqDecl.constructDynamic(args, indices)
-        else
-            throw IllegalArgumentException("Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})")
-    }
+    return if (args[0].sort is IntSort && args[1].sort is IntSort)
+        IntGreaterEqDecl.constructDynamic(args, indices)
+    else if (args[0].sort is RealSort && args[1].sort is RealSort)
+        RealGreaterEqDecl.constructDynamic(args, indices)
+    else
+        throw IllegalArgumentException(
+            "Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})")
+  }
 }
 
 internal object IntRealGreaterDecl :
     SMTTheoryFunction<BoolSort>(
         ">".toSymbolWithQuotes(), listOf(RealSort, RealSort), BoolSort, Associativity.CHAINABLE) {
 
-    override fun constructDynamic(
-        args: List<Expression<*>>,
-        indices: List<Index>
-    ): Expression<BoolSort> {
-        require(args.size >= 2)
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BoolSort> {
+    require(args.size >= 2)
 
-        return if (args[0].sort is IntSort && args[1].sort is IntSort)
-            IntGreaterDecl.constructDynamic(args, indices)
-        else if (args[0].sort is RealSort && args[1].sort is RealSort)
-            RealGreaterDecl.constructDynamic(args, indices)
-        else
-            throw IllegalArgumentException("Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})")
-    }
+    return if (args[0].sort is IntSort && args[1].sort is IntSort)
+        IntGreaterDecl.constructDynamic(args, indices)
+    else if (args[0].sort is RealSort && args[1].sort is RealSort)
+        RealGreaterDecl.constructDynamic(args, indices)
+    else
+        throw IllegalArgumentException(
+            "Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})")
+  }
 }
 
 /** FloatingPoint theory internal object */

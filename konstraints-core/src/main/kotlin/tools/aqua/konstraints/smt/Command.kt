@@ -80,7 +80,8 @@ data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : Attr
  */
 data class DeclareSort(val name: Symbol, val arity: Int) : Command("declare-sort $name $arity")
 
-data class DefineSort(val name: Symbol, var sortParameters: List<Symbol>, val sort: Sort) : Command("define-sort $name ($sortParameters) $sort")
+data class DefineSort(val name: Symbol, var sortParameters: List<Symbol>, val sort: Sort) :
+    Command("define-sort $name ($sortParameters) $sort")
 
 // TODO string serialization of OptionValue
 /** SMT (set-option [name] [OptionValue]) command */

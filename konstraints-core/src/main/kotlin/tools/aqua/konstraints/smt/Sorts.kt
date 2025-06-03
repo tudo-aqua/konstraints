@@ -360,25 +360,25 @@ class UserDeclaredSort(name: Symbol, parameters: List<Sort>) : Sort(name, emptyL
   override val theories = emptySet<Theories>()
 }
 
-class UserDefinedSortFactory(val symbol: Symbol, val sort : Sort) : SortFactory {
-    override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
-        require(parameters.isEmpty())
-        require(indices.isEmpty())
+class UserDefinedSortFactory(val symbol: Symbol, val sort: Sort) : SortFactory {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
+    require(parameters.isEmpty())
+    require(indices.isEmpty())
 
-        return sort
-    }
+    return sort
+  }
 
-    override fun isInstanceOf(sort: Sort): Boolean {
-        require(sort is UserDefinedSort)
+  override fun isInstanceOf(sort: Sort): Boolean {
+    require(sort is UserDefinedSort)
 
-        return sort.symbol == symbol && sort.sort == sort
-    }
+    return sort.symbol == symbol && sort.sort == sort
+  }
 
-    override val isIndexed = false
-    override val numIndicies = 0
+  override val isIndexed = false
+  override val numIndicies = 0
 }
 
 // TODO this only implements user defined sorts without sort parameters
-class UserDefinedSort(name : Symbol, val sort : Sort) : Sort(name, emptyList(), emptyList()) {
-    override val theories = emptySet<Theories>()
+class UserDefinedSort(name: Symbol, val sort: Sort) : Sort(name, emptyList(), emptyList()) {
+  override val theories = emptySet<Theories>()
 }

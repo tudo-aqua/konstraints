@@ -114,14 +114,16 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     } else if (expr is LetExpression) {
       context.let(expr.bindings) { checkContext(expr.inner) }
     } else if (expr is AnnotatedExpression) {
-        checkContext(expr.term)
+      checkContext(expr.term)
     } else {
-      val result = (expr.theories.isNotEmpty() || expr in context) && expr.children.all { checkContext(it) }
+      val result =
+          (expr.theories.isNotEmpty() || expr in context) && expr.children.all { checkContext(it) }
 
-        if(!result)
-            println("Not in theories ${logic?.theories}: ($expr ${expr.children.joinToString(" ")}) is in ${expr.theories}")
+      if (!result)
+          println(
+              "Not in theories ${logic?.theories}: ($expr ${expr.children.joinToString(" ")}) is in ${expr.theories}")
 
-        result
+      result
     }
   }
 
@@ -188,12 +190,14 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     _commands.add(DeclareSort(name, arity))
   }
 
-    fun defineSort(name: Symbol, parameters : List<Symbol>, sort : Sort) {
-        if(parameters.isNotEmpty()) { throw NotImplementedError("User defined sorts with parameters are not implemented yet!") }
-
-        context.defineSort(name, parameters, sort)
-        _commands.add(DefineSort(name, parameters, sort))
+  fun defineSort(name: Symbol, parameters: List<Symbol>, sort: Sort) {
+    if (parameters.isNotEmpty()) {
+      throw NotImplementedError("User defined sorts with parameters are not implemented yet!")
     }
+
+    context.defineSort(name, parameters, sort)
+    _commands.add(DefineSort(name, parameters, sort))
+  }
 
   /**
    * Inserts all [commands] at the end of the program

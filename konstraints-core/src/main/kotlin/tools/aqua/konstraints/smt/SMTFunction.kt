@@ -52,7 +52,8 @@ abstract class SMTFunction<out T : Sort> {
     // overloaded by a differing definition
   }
 
-  final override fun hashCode(): Int = symbol.hashCode() /* Objects.hash(symbol, sort, parameters) */
+  final override fun hashCode(): Int =
+      symbol.hashCode() /* Objects.hash(symbol, sort, parameters) */
 
   infix fun <T : Sort> castTo(to: T): SMTFunction<T> {
     if (sort != to) {
@@ -67,8 +68,12 @@ abstract class SMTFunction<out T : Sort> {
 abstract class DeclaredSMTFunction<T : Sort> : SMTFunction<T>() {
 
   override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<T> {
-    require(args.size == parameters.size) { "Expected ${parameters.size} arguments but got ${args.size}" }
-    require((args zipWithSameLength parameters).all { (par, sort) -> par.sort == sort }) { "Expected arguments of $symbol to be (${parameters.joinToString(" ")}) but was (${args.map { expr -> expr.sort }.joinToString(" ")})" }
+    require(args.size == parameters.size) {
+      "Expected ${parameters.size} arguments but got ${args.size}"
+    }
+    require((args zipWithSameLength parameters).all { (par, sort) -> par.sort == sort }) {
+      "Expected arguments of $symbol to be (${parameters.joinToString(" ")}) but was (${args.map { expr -> expr.sort }.joinToString(" ")})"
+    }
 
     return UserDeclaredExpression(symbol, sort, args, this)
   }

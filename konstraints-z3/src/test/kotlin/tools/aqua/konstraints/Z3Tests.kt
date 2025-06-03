@@ -50,8 +50,8 @@ class Z3Tests {
   private fun solve(file: File) {
     assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
 
-      // TODO this creates a massiv memory leak (solver is not closed properly)
-      val solver = Z3Solver()
+    // TODO this creates a massiv memory leak (solver is not closed properly)
+    val solver = Z3Solver()
     val result =
         Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString(" "))
 
@@ -120,7 +120,7 @@ class Z3Tests {
 
   fun getQFUFFile(): Stream<Arguments> = loadResource("/QF_UF/")
 
-    @Disabled
+  @Disabled
   @ParameterizedTest
   @MethodSource("getQFFPFile")
   @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)

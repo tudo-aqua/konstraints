@@ -157,13 +157,13 @@ class Z3Context {
         null
       }
 
-    fun reset() {
-        constants.clear()
-        functions.clear()
-        sorts.clear()
-        letStack.clear()
-        boundVars.clear()
-    }
+  fun reset() {
+    constants.clear()
+    functions.clear()
+    sorts.clear()
+    letStack.clear()
+    boundVars.clear()
+  }
 }
 
 class UnexpectedSortException(msg: String) : RuntimeException(msg)

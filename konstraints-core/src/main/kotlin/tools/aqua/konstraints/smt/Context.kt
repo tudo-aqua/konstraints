@@ -43,7 +43,7 @@ class Context {
   private val shadowingMap = Stack<MutableMap<SMTFunction<*>, SMTFunction<*>>>()
   private val functionUndoStack = Stack<MutableSet<Symbol>>()
   private val sortUndoStack = Stack<MutableSet<Symbol>>()
-   var locals : List<SortedVar<*>> = emptyList()
+  var locals: List<SortedVar<*>> = emptyList()
   private var logic: Logic? = null
 
   // true if we are currently in any binder (let/exists/forall/par/match)
@@ -109,29 +109,30 @@ class Context {
     return sort
   }
 
-    fun defineSort(def: DefineSort) = defineSort(UserDefinedSortFactory(def.name, def.sort))
+  fun defineSort(def: DefineSort) = defineSort(UserDefinedSortFactory(def.name, def.sort))
 
-    fun defineSort(name: Symbol, parameters : List<Symbol>, sort: Sort) = defineSort(UserDefinedSortFactory(name, sort))
+  fun defineSort(name: Symbol, parameters: List<Symbol>, sort: Sort) =
+      defineSort(UserDefinedSortFactory(name, sort))
 
-    fun defineSort(sort: UserDefinedSortFactory): UserDefinedSortFactory {
-        require(sort.symbol !in currentContext.sorts) {
-            "Can not overload or shadow sort symbol ${sort.symbol}!"
-        }
-
-        check(!activeBinderState) { "Can not add sort to the current context in this state!" }
-
-        currentContext.sorts[sort.symbol] = sort
-
-        if (sortUndoStack.isNotEmpty()) {
-            sortUndoStack.peek().add(sort.symbol)
-        }
-
-        return sort
+  fun defineSort(sort: UserDefinedSortFactory): UserDefinedSortFactory {
+    require(sort.symbol !in currentContext.sorts) {
+      "Can not overload or shadow sort symbol ${sort.symbol}!"
     }
+
+    check(!activeBinderState) { "Can not add sort to the current context in this state!" }
+
+    currentContext.sorts[sort.symbol] = sort
+
+    if (sortUndoStack.isNotEmpty()) {
+      sortUndoStack.peek().add(sort.symbol)
+    }
+
+    return sort
+  }
 
   operator fun contains(func: Symbol) = currentContext.functions[func] != null
 
-    // TODO this function should probably not exist look into checkContext
+  // TODO this function should probably not exist look into checkContext
   operator fun contains(expression: Expression<*>) =
       expression.func?.symbol in currentContext.functions
 
@@ -157,10 +158,11 @@ class Context {
     }
   }
 
-  fun getFunc(name: Symbol) = if(currentContext.functions[name] != null) {
-          currentContext.functions[name]!!
+  fun getFunc(name: Symbol) =
+      if (currentContext.functions[name] != null) {
+        currentContext.functions[name]!!
       } else {
-          locals.find { it -> it.symbol == name } ?: throw FunctionNotFoundException(name)
+        locals.find { it -> it.symbol == name } ?: throw FunctionNotFoundException(name)
       }
 
   fun push(n: Int) = repeat(n) { _ -> push() }
@@ -196,7 +198,7 @@ class Context {
     check(!activeBinderState) { "Can not pop inside binder!" }
 
     repeat(n) { _ ->
-        functionUndoStack.pop().forEach { symbol -> currentContext.functions.remove(symbol) }
+      functionUndoStack.pop().forEach { symbol -> currentContext.functions.remove(symbol) }
       currentContext.sorts.keys.removeAll(sortUndoStack.pop())
     }
   }
@@ -292,9 +294,7 @@ class Context {
     shadowingMap.pop().forEach { (local, shadowed) ->
       currentContext.functions[local.symbol] = shadowed
     }
-    functionUndoStack.pop().forEach { symbol ->
-        currentContext.functions.remove(symbol)
-    }
+    functionUndoStack.pop().forEach { symbol -> currentContext.functions.remove(symbol) }
   }
 
   fun setLogic(logic: Logic) {

@@ -160,7 +160,8 @@ class Parser {
 
     private val numeral = (of('0') + (range('1', '9') * digitCat.star())).flatten()
     private val decimal = (numeral * of('.') * numeral.plus()).flatten()
-    private val hexadecimal = (of("#x") * (digitCat + range('A', 'F') + range('a', 'f')).plus()).flatten()
+    private val hexadecimal =
+        (of("#x") * (digitCat + range('A', 'F') + range('a', 'f')).plus()).flatten()
     private val binary = (of("#b") * range('0', '1').plus()).flatten()
 
     // all printable characters that are not double quotes
@@ -402,10 +403,10 @@ class Parser {
             symbol.map { symbol: ParseSymbol -> SymbolIndex(symbol.symbol) }) trim whitespaceCat
 
     /* maps to an implementation of Identifier */
-      /*
-      * important to parse indexed identifier as "(_ " (note the space) or otherwise names that begin
-      * with _ do get truncated
-      */
+    /*
+     * important to parse indexed identifier as "(_ " (note the space) or otherwise names that begin
+     * with _ do get truncated
+     */
     private val identifier =
         symbol.map { symbol: ParseSymbol -> SymbolIdentifier(symbol) } +
             (lparen * of("_ ") * symbol * index.plus() * rparen).map { results: List<Any> ->
@@ -509,7 +510,9 @@ class Parser {
     sort.set(
         identifier.map { identifier: Identifier ->
           // check if sort is in the current context
-          require(program.context.containsSort(identifier.symbol)) { "Unexpected sort symbol ${identifier.symbol}" }
+          require(program.context.containsSort(identifier.symbol)) {
+            "Unexpected sort symbol ${identifier.symbol}"
+          }
           when (identifier) {
             is IndexedIdentifier ->
                 program.context
@@ -712,7 +715,7 @@ class Parser {
               sort *
               term)
           .map { result: ArrayList<Any> ->
-              program.context.locals = emptyList()
+            program.context.locals = emptyList()
             FunctionDef(
                 result[0] as ParseSymbol,
                 result[2] as List<SortedVar<*>>,
@@ -764,9 +767,11 @@ class Parser {
         program.declareSort(results[2] as Symbol, Integer.parseInt(results[3] as String))
       }
 
-    private val defineSortCMD = (lparen * defineSortKW * symbol * lparen * symbol.star() * rparen * sort * rparen).map { results: ArrayList<Any> ->
+  private val defineSortCMD =
+      (lparen * defineSortKW * symbol * lparen * symbol.star() * rparen * sort * rparen).map {
+          results: ArrayList<Any> ->
         program.defineSort(results[2] as Symbol, results[4] as List<Symbol>, results[6] as Sort)
-    }
+      }
 
   private val getModelCMD = (lparen * getModelKW * rparen).map { _: Any -> program.add(GetModel) }
 
@@ -810,13 +815,14 @@ class Parser {
     // this will lead to better error messages but requires some preprocessing to split the input
     // input individual commands (this may be done in linear time by searching the input from
     // left to right counting the number of opening an closing brackets)
-      // filter out all comments (all lines are truncated after ';')
-      splitInput(program.split("\n").joinToString(" ") { line -> line.substringBefore(';') }).forEach { cmd ->
-      val temp = command.parse(cmd)
-      if (!temp.isSuccess) {
-        throw ParseException(temp.message, temp.position, temp.buffer)
-      }
-    }
+    // filter out all comments (all lines are truncated after ';')
+    splitInput(program.split("\n").joinToString(" ") { line -> line.substringBefore(';') })
+        .forEach { cmd ->
+          val temp = command.parse(cmd)
+          if (!temp.isSuccess) {
+            throw ParseException(temp.message, temp.position, temp.buffer)
+          }
+        }
 
     return this.program
   }
@@ -858,7 +864,7 @@ class Parser {
   private val commandSplitter = undefined()
   private val preprocessingParser = commandSplitter.star()
 
-    init {
+  init {
     commandSplitter.set(
         ((specConstant.map { constant: SpecConstant -> constant.toString() } +
             reserved.map { reserved: Token -> reserved.getValue<Any>() } +
