@@ -53,7 +53,7 @@ class Z3Tests {
     // TODO this creates a massiv memory leak (solver is not closed properly)
     val solver = Z3Solver()
     val result =
-        Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString(" "))
+        Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
 
     assumeTrue(
         (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
