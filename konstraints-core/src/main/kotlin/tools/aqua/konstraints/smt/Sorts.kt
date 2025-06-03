@@ -155,7 +155,13 @@ object BitVecFactory : SortFactory {
           BVSort(256),
           BVSort(512),
           BVSort(1024),
-          BVSort(2048))
+          BVSort(2048),
+          BVSort(4096),
+          BVSort(8192),
+          BVSort(16384),
+          BVSort(32786),
+          BVSort(65536),
+      )
 
   override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): BVSort {
     require(parameters.isEmpty())
@@ -167,6 +173,38 @@ object BitVecFactory : SortFactory {
   fun build(n: Int) =
       when (n) {
         1 -> cache[0]
+        2 -> cache[1]
+        3 -> cache[2]
+        4 -> cache[3]
+        5 -> cache[4]
+        6 -> cache[5]
+        7 -> cache[6]
+        8 -> cache[7]
+        9 -> cache[8]
+        10 -> cache[9]
+        11 -> cache[10]
+        12 -> cache[11]
+        13 -> cache[12]
+        14 -> cache[13]
+        15 -> cache[14]
+        16 -> cache[15]
+        19 -> cache[16]
+        24 -> cache[17]
+        32 -> cache[18]
+        53 -> cache[19]
+        64 -> cache[20]
+        113 -> cache[21]
+        128 -> cache[22]
+        237 -> cache[23]
+        256 -> cache[24]
+        512 -> cache[25]
+        1024 -> cache[26]
+        2048 -> cache[27]
+        4096 -> cache[28]
+        8192 -> cache[29]
+        16384 -> cache[30]
+        32786 -> cache[31]
+        65536 -> cache[32]
         else -> BVSort(n)
       }
 
