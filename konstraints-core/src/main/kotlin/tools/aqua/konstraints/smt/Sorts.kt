@@ -18,8 +18,6 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.theories.*
-
 sealed interface SortFactory {
   abstract fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort
 

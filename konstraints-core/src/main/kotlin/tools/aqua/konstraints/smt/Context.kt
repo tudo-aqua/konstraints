@@ -26,16 +26,6 @@ import tools.aqua.konstraints.parser.IntsTheory
 import tools.aqua.konstraints.parser.RealsIntsTheory
 import tools.aqua.konstraints.parser.RealsTheory
 import tools.aqua.konstraints.parser.StringsTheory
-import tools.aqua.konstraints.theories.ArraySort
-import tools.aqua.konstraints.theories.BVSort
-import tools.aqua.konstraints.theories.BoolSort
-import tools.aqua.konstraints.theories.FPSort
-import tools.aqua.konstraints.theories.IntSort
-import tools.aqua.konstraints.theories.RealSort
-import tools.aqua.konstraints.theories.RegLan
-import tools.aqua.konstraints.theories.RoundingMode
-import tools.aqua.konstraints.theories.StringSort
-import tools.aqua.konstraints.theories.Theories
 import tools.aqua.konstraints.util.Stack
 
 private class CurrentContext {

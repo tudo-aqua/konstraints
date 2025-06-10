@@ -24,7 +24,6 @@ import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.dsl.UserDeclaredSMTFunctionN
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunction0
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunctionN
-import tools.aqua.konstraints.theories.BoolSort
 
 enum class SatStatus {
   SAT, // program is satisfiable

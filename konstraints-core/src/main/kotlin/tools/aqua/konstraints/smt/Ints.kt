@@ -16,11 +16,10 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.theories
+package tools.aqua.konstraints.smt
 
 import java.math.BigInteger
 import tools.aqua.konstraints.parser.*
-import tools.aqua.konstraints.smt.*
 
 /** Int sort */
 object IntSort : Sort("Int") {

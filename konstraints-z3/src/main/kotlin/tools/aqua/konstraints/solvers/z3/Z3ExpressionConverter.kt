@@ -23,13 +23,20 @@ import com.microsoft.z3.BitVecSort
 import com.microsoft.z3.BoolSort as Z3BoolSort
 import com.microsoft.z3.Expr
 import com.microsoft.z3.IntNum
+import tools.aqua.konstraints.smt.BVLiteral
+import tools.aqua.konstraints.smt.BVNot
 import com.microsoft.z3.IntSort as Z3IntSort
 import com.microsoft.z3.Sort as Z3Sort
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.Sort
-import tools.aqua.konstraints.theories.*
-import tools.aqua.konstraints.theories.BVSort
-import tools.aqua.konstraints.theories.BoolSort
+import tools.aqua.konstraints.smt.BVSort
+import tools.aqua.konstraints.smt.BoolSort
+import tools.aqua.konstraints.smt.Equals
+import tools.aqua.konstraints.smt.False
+import tools.aqua.konstraints.smt.IntLiteral
+import tools.aqua.konstraints.smt.IntNeg
+import tools.aqua.konstraints.smt.IntSort
+import tools.aqua.konstraints.smt.True
 
 fun Z3Sort.aquaify(): Sort =
     when (this) {
@@ -51,11 +58,11 @@ fun Expr<*>.aquaify(): Expression<*> =
 @JvmName("aquaifyBool")
 fun Expr<Z3BoolSort>.aquaify(): Expression<BoolSort> =
     if (isTrue) {
-      True
+        True
     } else if (isFalse) {
-      False
+        False
     } else if (isEq) {
-      Equals(this.args.map { it.aquaify() }.toList() as List<Expression<Sort>>)
+        Equals(this.args.map { it.aquaify() }.toList() as List<Expression<Sort>>)
     } else {
       throw RuntimeException("Unknown or unsupported bool expression $this")
     }
@@ -63,9 +70,9 @@ fun Expr<Z3BoolSort>.aquaify(): Expression<BoolSort> =
 @JvmName("aquaifyInt")
 fun Expr<Z3IntSort>.aquaify(): Expression<IntSort> =
     if (isUMinus) {
-      IntNeg(this.args[0].aquaify() as Expression<IntSort>)
+        IntNeg(this.args[0].aquaify() as Expression<IntSort>)
     } else if (isIntNum) {
-      IntLiteral((this as IntNum).bigInteger)
+        IntLiteral((this as IntNum).bigInteger)
     } else {
       throw RuntimeException("Unknown or unsupported int expression $this")
     }
@@ -73,11 +80,11 @@ fun Expr<Z3IntSort>.aquaify(): Expression<IntSort> =
 @JvmName("aquaifyBitVec")
 fun Expr<BitVecSort>.aquaify(): Expression<BVSort> =
     if (isBVNOT) {
-      BVNot(this.args[0].aquaify() as Expression<BVSort>)
+        BVNot(this.args[0].aquaify() as Expression<BVSort>)
     } else if (this is BitVecNum) {
       // its important that we pass the number of bits here to ensure sort compatibility with the
       // declared function
-      BVLiteral("#x${this.bigInteger.toString(16)}", this.sort.size)
+        BVLiteral("#x${this.bigInteger.toString(16)}", this.sort.size)
     } else {
       throw RuntimeException("Unknown or unsupported bitvec expression $this")
     }

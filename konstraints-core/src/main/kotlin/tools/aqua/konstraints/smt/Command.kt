@@ -19,7 +19,6 @@
 package tools.aqua.konstraints.smt
 
 import java.math.BigInteger
-import tools.aqua.konstraints.theories.BoolSort
 
 /** Base class for each SMT command */
 sealed class Command(val command: String) {

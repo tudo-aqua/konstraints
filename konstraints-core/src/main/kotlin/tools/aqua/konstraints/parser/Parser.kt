@@ -20,7 +20,6 @@ package tools.aqua.konstraints.parser
 
 import java.math.BigDecimal
 import java.math.BigInteger
-import kotlin.text.set
 import org.petitparser.context.Token
 import org.petitparser.parser.Parser
 import org.petitparser.parser.combinators.ChoiceParser
@@ -29,18 +28,13 @@ import org.petitparser.parser.combinators.SettableParser.undefined
 import org.petitparser.parser.primitive.CharacterParser.*
 import org.petitparser.parser.primitive.StringParser.of
 import org.petitparser.utils.FailureJoiner
-import tools.aqua.konstraints.parser.plus
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.smt.getFunc
-import tools.aqua.konstraints.smt.setInfo
-import tools.aqua.konstraints.smt.setOption
-import tools.aqua.konstraints.theories.BVLiteral
-import tools.aqua.konstraints.theories.BVLiteral.Companion.invoke
-import tools.aqua.konstraints.theories.BVSort
-import tools.aqua.konstraints.theories.BoolSort
-import tools.aqua.konstraints.theories.IntLiteral
-import tools.aqua.konstraints.theories.RealLiteral
-import tools.aqua.konstraints.theories.Theories
+import tools.aqua.konstraints.smt.BVLiteral
+import tools.aqua.konstraints.smt.BVSort
+import tools.aqua.konstraints.smt.BoolSort
+import tools.aqua.konstraints.smt.IntLiteral
+import tools.aqua.konstraints.smt.RealLiteral
+import tools.aqua.konstraints.smt.Theories
 
 operator fun Parser.plus(other: Parser): ChoiceParser = or(other)
 

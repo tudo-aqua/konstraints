@@ -23,7 +23,6 @@ import com.microsoft.z3.Sort
 import com.microsoft.z3.Status
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.solvers.Solver
-import tools.aqua.konstraints.theories.*
 import tools.aqua.konstraints.util.computeIfAbsentAndMerge
 import tools.aqua.konstraints.visitors.CommandVisitor
 

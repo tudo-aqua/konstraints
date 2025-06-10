@@ -20,7 +20,7 @@ package tools.aqua.konstraints.dsl
 
 import java.util.UUID
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.theories.BoolSort
+import tools.aqua.konstraints.smt.BoolSort
 
 @DslMarker annotation class SMTDSL
 

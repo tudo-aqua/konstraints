@@ -19,9 +19,6 @@
 package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.IteDecl
-import tools.aqua.konstraints.theories.BoolSort
-import tools.aqua.konstraints.theories.CORE_MARKER_SET
-import tools.aqua.konstraints.theories.Theories
 import tools.aqua.konstraints.util.reduceOrDefault
 
 /** Interface for all sorted SMT terms */

@@ -18,8 +18,47 @@
 
 package tools.aqua.konstraints.dsl
 
+import tools.aqua.konstraints.smt.BVSort
+import tools.aqua.konstraints.smt.BitVecToFP
 import tools.aqua.konstraints.smt.Expression
-import tools.aqua.konstraints.theories.*
+import tools.aqua.konstraints.smt.FPAdd
+import tools.aqua.konstraints.smt.FPDiv
+import tools.aqua.konstraints.smt.FPEq
+import tools.aqua.konstraints.smt.FPFma
+import tools.aqua.konstraints.smt.FPGeq
+import tools.aqua.konstraints.smt.FPGt
+import tools.aqua.konstraints.smt.FPIsInfinite
+import tools.aqua.konstraints.smt.FPIsNaN
+import tools.aqua.konstraints.smt.FPIsNegative
+import tools.aqua.konstraints.smt.FPIsNormal
+import tools.aqua.konstraints.smt.FPIsPositive
+import tools.aqua.konstraints.smt.FPIsSubnormal
+import tools.aqua.konstraints.smt.FPIsZero
+import tools.aqua.konstraints.smt.FPLeq
+import tools.aqua.konstraints.smt.FPLiteral
+import tools.aqua.konstraints.smt.FPLt
+import tools.aqua.konstraints.smt.FPMax
+import tools.aqua.konstraints.smt.FPMin
+import tools.aqua.konstraints.smt.FPMul
+import tools.aqua.konstraints.smt.FPRem
+import tools.aqua.konstraints.smt.FPRoundToIntegral
+import tools.aqua.konstraints.smt.FPSort
+import tools.aqua.konstraints.smt.FPSqrt
+import tools.aqua.konstraints.smt.FPSub
+import tools.aqua.konstraints.smt.FPToFP
+import tools.aqua.konstraints.smt.FPToReal
+import tools.aqua.konstraints.smt.FPToSBitVec
+import tools.aqua.konstraints.smt.FPToUBitVec
+import tools.aqua.konstraints.smt.RNA
+import tools.aqua.konstraints.smt.RNE
+import tools.aqua.konstraints.smt.RTN
+import tools.aqua.konstraints.smt.RTP
+import tools.aqua.konstraints.smt.RTZ
+import tools.aqua.konstraints.smt.RealSort
+import tools.aqua.konstraints.smt.RealToFP
+import tools.aqua.konstraints.smt.RoundingMode
+import tools.aqua.konstraints.smt.SBitVecToFP
+import tools.aqua.konstraints.smt.UBitVecToFP
 
 /*
  * floating-point infix operations
@@ -213,7 +252,7 @@ infix fun (() -> Expression<FPSort>).fpadd_rtz(summand: () -> Expression<FPSort>
  * Addition operator for FPSort expressions: [this] + [summand].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [summand] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * [tools.aqua.konstraints.smt.FPLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpadd(summand: Float) = this fpadd_rne FPLiteral(summand)
 

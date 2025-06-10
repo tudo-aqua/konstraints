@@ -36,7 +36,6 @@ import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.smt.VarBinding
 import tools.aqua.konstraints.solvers.z3.Z3Solver
-import tools.aqua.konstraints.theories.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Z3Tests {

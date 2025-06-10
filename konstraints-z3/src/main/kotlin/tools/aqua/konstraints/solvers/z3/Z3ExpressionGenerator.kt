@@ -31,7 +31,6 @@ import com.microsoft.z3.SeqSort
 import com.microsoft.z3.Sort as Z3Sort
 import com.microsoft.z3.UninterpretedSort
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.theories.*
 
 fun makeLeftAssoc(
     expressions: List<Expression<*>>,

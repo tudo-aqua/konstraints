@@ -16,12 +16,11 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.theories
+package tools.aqua.konstraints.smt
 
 import java.math.BigDecimal
 import java.math.BigInteger
 import tools.aqua.konstraints.parser.*
-import tools.aqua.konstraints.smt.*
 
 /** Real sort */
 object RealSort : Sort("Real") {

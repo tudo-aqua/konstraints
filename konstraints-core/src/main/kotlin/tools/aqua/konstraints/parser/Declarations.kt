@@ -19,7 +19,6 @@
 package tools.aqua.konstraints.parser
 
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.theories.*
 
 enum class Associativity {
   LEFT_ASSOC,

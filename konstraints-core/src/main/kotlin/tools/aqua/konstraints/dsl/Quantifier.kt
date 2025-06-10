@@ -20,7 +20,6 @@ package tools.aqua.konstraints.dsl
 
 import java.util.*
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.theories.*
 
 /** Exists quantifier with one bound variable of [sort]. */
 fun <S : Sort> exists(sort: S, block: (Expression<S>) -> Expression<BoolSort>): ExistsExpression {

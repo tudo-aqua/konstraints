@@ -21,7 +21,17 @@ package tools.aqua.konstraints.dsl
 import java.math.BigDecimal
 import java.math.BigInteger
 import tools.aqua.konstraints.smt.Expression
-import tools.aqua.konstraints.theories.*
+import tools.aqua.konstraints.smt.IntSort
+import tools.aqua.konstraints.smt.IsInt
+import tools.aqua.konstraints.smt.RealAdd
+import tools.aqua.konstraints.smt.RealDiv
+import tools.aqua.konstraints.smt.RealGreater
+import tools.aqua.konstraints.smt.RealLiteral
+import tools.aqua.konstraints.smt.RealMul
+import tools.aqua.konstraints.smt.RealNeg
+import tools.aqua.konstraints.smt.RealSort
+import tools.aqua.konstraints.smt.RealSub
+import tools.aqua.konstraints.smt.ToReal
 
 /** Negation operator for RealSort Expressions. */
 operator fun Expression<RealSort>.unaryMinus() = RealNeg(this)
@@ -33,9 +43,9 @@ operator fun Expression<RealSort>.unaryMinus() = RealNeg(this)
  */
 infix operator fun Expression<RealSort>.minus(subtrahend: Expression<RealSort>) =
     if (this is RealSub) {
-      RealSub(this.children + subtrahend)
+        RealSub(this.children + subtrahend)
     } else {
-      RealSub(this, subtrahend)
+        RealSub(this, subtrahend)
     }
 
 /**
@@ -66,7 +76,7 @@ infix operator fun (() -> Expression<RealSort>).minus(subtrahend: () -> Expressi
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts subtrahend from [Byte] to [IntLiteral].
+ * Converts subtrahend from [Byte] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.minus(subtrahend: Byte) = this minus RealLiteral(subtrahend)
 
@@ -74,7 +84,7 @@ infix operator fun Expression<RealSort>.minus(subtrahend: Byte) = this minus Rea
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts subtrahend from [Byte] to [IntLiteral].
+ * Converts subtrahend from [Byte] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Byte) =
     this() minus RealLiteral(subtrahend)
@@ -83,7 +93,7 @@ infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Byte) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts [this] from [Byte] to [IntLiteral].
+ * Converts [this] from [Byte] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Byte.minus(subtrahend: Expression<RealSort>) = RealLiteral(this) minus subtrahend
 
@@ -91,7 +101,7 @@ infix operator fun Byte.minus(subtrahend: Expression<RealSort>) = RealLiteral(th
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts [this] from [Byte] to [IntLiteral].
+ * Converts [this] from [Byte] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Byte.minus(subtrahend: () -> Expression<RealSort>) =
     RealLiteral(this) minus subtrahend()
@@ -100,7 +110,7 @@ infix operator fun Byte.minus(subtrahend: () -> Expression<RealSort>) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts subtrahend from [Short] to [IntLiteral].
+ * Converts subtrahend from [Short] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.minus(subtrahend: Short) =
     this minus RealLiteral(subtrahend)
@@ -109,7 +119,7 @@ infix operator fun Expression<RealSort>.minus(subtrahend: Short) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts subtrahend from [Short] to [IntLiteral].
+ * Converts subtrahend from [Short] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Short) =
     this() minus RealLiteral(subtrahend)
@@ -118,7 +128,7 @@ infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Short) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts [this] from [Short] to [IntLiteral].
+ * Converts [this] from [Short] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Short.minus(subtrahend: Expression<RealSort>) =
     RealLiteral(this) minus subtrahend
@@ -127,7 +137,7 @@ infix operator fun Short.minus(subtrahend: Expression<RealSort>) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts [this] from [Short] to [IntLiteral].
+ * Converts [this] from [Short] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Short.minus(subtrahend: () -> Expression<RealSort>) =
     RealLiteral(this) minus subtrahend()
@@ -136,7 +146,7 @@ infix operator fun Short.minus(subtrahend: () -> Expression<RealSort>) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts subtrahend from [Int] to [IntLiteral].
+ * Converts subtrahend from [Int] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.minus(subtrahend: Int) = this minus RealLiteral(subtrahend)
 
@@ -144,7 +154,7 @@ infix operator fun Expression<RealSort>.minus(subtrahend: Int) = this minus Real
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts subtrahend from [Int] to [IntLiteral].
+ * Converts subtrahend from [Int] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Int) =
     this() minus RealLiteral(subtrahend)
@@ -153,7 +163,7 @@ infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Int) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts [this] from [Int] to [IntLiteral].
+ * Converts [this] from [Int] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Int.minus(subtrahend: Expression<RealSort>) = RealLiteral(this) minus subtrahend
 
@@ -161,7 +171,7 @@ infix operator fun Int.minus(subtrahend: Expression<RealSort>) = RealLiteral(thi
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts [this] from [Int] to [IntLiteral].
+ * Converts [this] from [Int] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Int.minus(subtrahend: () -> Expression<RealSort>) =
     RealLiteral(this) minus subtrahend()
@@ -170,7 +180,7 @@ infix operator fun Int.minus(subtrahend: () -> Expression<RealSort>) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts subtrahend from [Long] to [IntLiteral].
+ * Converts subtrahend from [Long] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.minus(subtrahend: Long) = this minus RealLiteral(subtrahend)
 
@@ -178,7 +188,7 @@ infix operator fun Expression<RealSort>.minus(subtrahend: Long) = this minus Rea
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts subtrahend from [Long] to [IntLiteral].
+ * Converts subtrahend from [Long] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Long) =
     this() minus RealLiteral(subtrahend)
@@ -187,7 +197,7 @@ infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Long) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts [this] from [Long] to [IntLiteral].
+ * Converts [this] from [Long] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Long.minus(subtrahend: Expression<RealSort>) = RealLiteral(this) minus subtrahend
 
@@ -195,7 +205,7 @@ infix operator fun Long.minus(subtrahend: Expression<RealSort>) = RealLiteral(th
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts [this] from [Long] to [IntLiteral].
+ * Converts [this] from [Long] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Long.minus(subtrahend: () -> Expression<RealSort>) =
     RealLiteral(this) minus subtrahend()
@@ -204,7 +214,7 @@ infix operator fun Long.minus(subtrahend: () -> Expression<RealSort>) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts subtrahend from [BigInteger] to [IntLiteral].
+ * Converts subtrahend from [BigInteger] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.minus(subtrahend: BigInteger) =
     this minus RealLiteral(subtrahend)
@@ -213,7 +223,7 @@ infix operator fun Expression<RealSort>.minus(subtrahend: BigInteger) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts subtrahend from [BigInteger] to [IntLiteral].
+ * Converts subtrahend from [BigInteger] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).minus(subtrahend: BigInteger) =
     this() minus RealLiteral(subtrahend)
@@ -222,7 +232,7 @@ infix operator fun (() -> Expression<RealSort>).minus(subtrahend: BigInteger) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts [this] from [BigInteger] to [IntLiteral].
+ * Converts [this] from [BigInteger] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun BigInteger.minus(subtrahend: Expression<RealSort>) =
     RealLiteral(this) minus subtrahend
@@ -231,7 +241,7 @@ infix operator fun BigInteger.minus(subtrahend: Expression<RealSort>) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts [this] from [BigInteger] to [IntLiteral].
+ * Converts [this] from [BigInteger] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun BigInteger.minus(subtrahend: () -> Expression<RealSort>) =
     RealLiteral(this) minus subtrahend()
@@ -240,7 +250,7 @@ infix operator fun BigInteger.minus(subtrahend: () -> Expression<RealSort>) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts subtrahend from [Float] to [IntLiteral].
+ * Converts subtrahend from [Float] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.minus(subtrahend: Float) =
     this minus RealLiteral(subtrahend)
@@ -249,7 +259,7 @@ infix operator fun Expression<RealSort>.minus(subtrahend: Float) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts subtrahend from [Float] to [IntLiteral].
+ * Converts subtrahend from [Float] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Float) =
     this() minus RealLiteral(subtrahend)
@@ -258,7 +268,7 @@ infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Float) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts [this] from [Float] to [IntLiteral].
+ * Converts [this] from [Float] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Float.minus(subtrahend: Expression<RealSort>) =
     RealLiteral(this) minus subtrahend
@@ -267,7 +277,7 @@ infix operator fun Float.minus(subtrahend: Expression<RealSort>) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts [this] from [Float] to [IntLiteral].
+ * Converts [this] from [Float] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Float.minus(subtrahend: () -> Expression<RealSort>) =
     RealLiteral(this) minus subtrahend()
@@ -276,7 +286,7 @@ infix operator fun Float.minus(subtrahend: () -> Expression<RealSort>) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts subtrahend from [Double] to [IntLiteral].
+ * Converts subtrahend from [Double] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.minus(subtrahend: Double) =
     this minus RealLiteral(subtrahend)
@@ -285,7 +295,7 @@ infix operator fun Expression<RealSort>.minus(subtrahend: Double) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts subtrahend from [Double] to [IntLiteral].
+ * Converts subtrahend from [Double] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Double) =
     this() minus RealLiteral(subtrahend)
@@ -294,7 +304,7 @@ infix operator fun (() -> Expression<RealSort>).minus(subtrahend: Double) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts [this] from [Double] to [IntLiteral].
+ * Converts [this] from [Double] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Double.minus(subtrahend: Expression<RealSort>) =
     RealLiteral(this) minus subtrahend
@@ -303,7 +313,7 @@ infix operator fun Double.minus(subtrahend: Expression<RealSort>) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts [this] from [Double] to [IntLiteral].
+ * Converts [this] from [Double] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Double.minus(subtrahend: () -> Expression<RealSort>) =
     RealLiteral(this) minus subtrahend()
@@ -312,7 +322,7 @@ infix operator fun Double.minus(subtrahend: () -> Expression<RealSort>) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts subtrahend from [BigDecimal] to [IntLiteral].
+ * Converts subtrahend from [BigDecimal] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.minus(subtrahend: BigDecimal) =
     this minus RealLiteral(subtrahend)
@@ -321,7 +331,7 @@ infix operator fun Expression<RealSort>.minus(subtrahend: BigDecimal) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts subtrahend from [BigDecimal] to [IntLiteral].
+ * Converts subtrahend from [BigDecimal] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).minus(subtrahend: BigDecimal) =
     this() minus RealLiteral(subtrahend)
@@ -330,7 +340,7 @@ infix operator fun (() -> Expression<RealSort>).minus(subtrahend: BigDecimal) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts [this] from [BigDecimal] to [IntLiteral].
+ * Converts [this] from [BigDecimal] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun BigDecimal.minus(subtrahend: Expression<RealSort>) =
     RealLiteral(this) minus subtrahend
@@ -339,7 +349,7 @@ infix operator fun BigDecimal.minus(subtrahend: Expression<RealSort>) =
  * Subtraction operator for RealSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [RealSub] object, unpacks the children and returns a new combined [RealSub].
- * Converts [this] from [BigDecimal] to [IntLiteral].
+ * Converts [this] from [BigDecimal] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun BigDecimal.minus(subtrahend: () -> Expression<RealSort>) =
     RealLiteral(this) minus subtrahend()
@@ -351,9 +361,9 @@ infix operator fun BigDecimal.minus(subtrahend: () -> Expression<RealSort>) =
  */
 infix operator fun Expression<RealSort>.plus(summand: Expression<RealSort>) =
     if (this is RealAdd) {
-      RealAdd(this.children + summand)
+        RealAdd(this.children + summand)
     } else {
-      RealAdd(this, summand)
+        RealAdd(this, summand)
     }
 
 /**
@@ -384,7 +394,7 @@ infix operator fun (() -> Expression<RealSort>).plus(summand: () -> Expression<R
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts summand from [Byte] to [IntLiteral].
+ * Converts summand from [Byte] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.plus(summand: Byte) = this plus RealLiteral(summand)
 
@@ -392,7 +402,7 @@ infix operator fun Expression<RealSort>.plus(summand: Byte) = this plus RealLite
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts summand from [Byte] to [IntLiteral].
+ * Converts summand from [Byte] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).plus(summand: Byte) =
     this() plus RealLiteral(summand)
@@ -401,7 +411,7 @@ infix operator fun (() -> Expression<RealSort>).plus(summand: Byte) =
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts [this] from [Byte] to [IntLiteral].
+ * Converts [this] from [Byte] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Byte.plus(summand: Expression<RealSort>) = RealLiteral(this) plus summand
 
@@ -409,7 +419,7 @@ infix operator fun Byte.plus(summand: Expression<RealSort>) = RealLiteral(this) 
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts [this] from [Byte] to [IntLiteral].
+ * Converts [this] from [Byte] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Byte.plus(summand: () -> Expression<RealSort>) = RealLiteral(this) plus summand()
 
@@ -417,7 +427,7 @@ infix operator fun Byte.plus(summand: () -> Expression<RealSort>) = RealLiteral(
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts summand from [Short] to [IntLiteral].
+ * Converts summand from [Short] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.plus(summand: Short) = this plus RealLiteral(summand)
 
@@ -425,7 +435,7 @@ infix operator fun Expression<RealSort>.plus(summand: Short) = this plus RealLit
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts summand from [Short] to [IntLiteral].
+ * Converts summand from [Short] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).plus(summand: Short) =
     this() plus RealLiteral(summand)
@@ -434,7 +444,7 @@ infix operator fun (() -> Expression<RealSort>).plus(summand: Short) =
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts [this] from [Short] to [IntLiteral].
+ * Converts [this] from [Short] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Short.plus(summand: Expression<RealSort>) = RealLiteral(this) plus summand
 
@@ -442,7 +452,7 @@ infix operator fun Short.plus(summand: Expression<RealSort>) = RealLiteral(this)
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts [this] from [Short] to [IntLiteral].
+ * Converts [this] from [Short] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Short.plus(summand: () -> Expression<RealSort>) =
     RealLiteral(this) plus summand()
@@ -451,7 +461,7 @@ infix operator fun Short.plus(summand: () -> Expression<RealSort>) =
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts summand from [Int] to [IntLiteral].
+ * Converts summand from [Int] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.plus(summand: Int) = this plus RealLiteral(summand)
 
@@ -459,7 +469,7 @@ infix operator fun Expression<RealSort>.plus(summand: Int) = this plus RealLiter
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts summand from [Int] to [IntLiteral].
+ * Converts summand from [Int] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).plus(summand: Int) =
     this() plus RealLiteral(summand)
@@ -468,7 +478,7 @@ infix operator fun (() -> Expression<RealSort>).plus(summand: Int) =
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts [this] from [Int] to [IntLiteral].
+ * Converts [this] from [Int] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Int.plus(summand: Expression<RealSort>) = RealLiteral(this) plus summand
 
@@ -476,7 +486,7 @@ infix operator fun Int.plus(summand: Expression<RealSort>) = RealLiteral(this) p
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts [this] from [Int] to [IntLiteral].
+ * Converts [this] from [Int] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Int.plus(summand: () -> Expression<RealSort>) = RealLiteral(this) plus summand()
 
@@ -484,7 +494,7 @@ infix operator fun Int.plus(summand: () -> Expression<RealSort>) = RealLiteral(t
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts summand from [Long] to [IntLiteral].
+ * Converts summand from [Long] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.plus(summand: Long) = this plus RealLiteral(summand)
 
@@ -492,7 +502,7 @@ infix operator fun Expression<RealSort>.plus(summand: Long) = this plus RealLite
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts summand from [Long] to [IntLiteral].
+ * Converts summand from [Long] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).plus(summand: Long) =
     this() plus RealLiteral(summand)
@@ -501,7 +511,7 @@ infix operator fun (() -> Expression<RealSort>).plus(summand: Long) =
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts [this] from [Long] to [IntLiteral].
+ * Converts [this] from [Long] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Long.plus(summand: Expression<RealSort>) = RealLiteral(this) plus summand
 
@@ -509,7 +519,7 @@ infix operator fun Long.plus(summand: Expression<RealSort>) = RealLiteral(this) 
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts [this] from [Long] to [IntLiteral].
+ * Converts [this] from [Long] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Long.plus(summand: () -> Expression<RealSort>) = RealLiteral(this) plus summand()
 
@@ -517,7 +527,7 @@ infix operator fun Long.plus(summand: () -> Expression<RealSort>) = RealLiteral(
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts summand from [BigInteger] to [IntLiteral].
+ * Converts summand from [BigInteger] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.plus(summand: BigInteger) = this plus RealLiteral(summand)
 
@@ -525,7 +535,7 @@ infix operator fun Expression<RealSort>.plus(summand: BigInteger) = this plus Re
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts summand from [BigInteger] to [IntLiteral].
+ * Converts summand from [BigInteger] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).plus(summand: BigInteger) =
     this() plus RealLiteral(summand)
@@ -534,7 +544,7 @@ infix operator fun (() -> Expression<RealSort>).plus(summand: BigInteger) =
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts [this] from [BigInteger] to [IntLiteral].
+ * Converts [this] from [BigInteger] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun BigInteger.plus(summand: Expression<RealSort>) = RealLiteral(this) plus summand
 
@@ -542,7 +552,7 @@ infix operator fun BigInteger.plus(summand: Expression<RealSort>) = RealLiteral(
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts [this] from [BigInteger] to [IntLiteral].
+ * Converts [this] from [BigInteger] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun BigInteger.plus(summand: () -> Expression<RealSort>) =
     RealLiteral(this) plus summand()
@@ -551,7 +561,7 @@ infix operator fun BigInteger.plus(summand: () -> Expression<RealSort>) =
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts summand from [Float] to [IntLiteral].
+ * Converts summand from [Float] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.plus(summand: Float) = this plus RealLiteral(summand)
 
@@ -559,7 +569,7 @@ infix operator fun Expression<RealSort>.plus(summand: Float) = this plus RealLit
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts summand from [Float] to [IntLiteral].
+ * Converts summand from [Float] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).plus(summand: Float) =
     this() plus RealLiteral(summand)
@@ -568,7 +578,7 @@ infix operator fun (() -> Expression<RealSort>).plus(summand: Float) =
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts [this] from [Float] to [IntLiteral].
+ * Converts [this] from [Float] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Float.plus(summand: Expression<RealSort>) = RealLiteral(this) plus summand
 
@@ -576,7 +586,7 @@ infix operator fun Float.plus(summand: Expression<RealSort>) = RealLiteral(this)
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts [this] from [Float] to [IntLiteral].
+ * Converts [this] from [Float] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Float.plus(summand: () -> Expression<RealSort>) =
     RealLiteral(this) plus summand()
@@ -585,7 +595,7 @@ infix operator fun Float.plus(summand: () -> Expression<RealSort>) =
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts summand from [Double] to [IntLiteral].
+ * Converts summand from [Double] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.plus(summand: Double) = this plus RealLiteral(summand)
 
@@ -593,7 +603,7 @@ infix operator fun Expression<RealSort>.plus(summand: Double) = this plus RealLi
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts summand from [Double] to [IntLiteral].
+ * Converts summand from [Double] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).plus(summand: Double) =
     this() plus RealLiteral(summand)
@@ -602,7 +612,7 @@ infix operator fun (() -> Expression<RealSort>).plus(summand: Double) =
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts [this] from [Double] to [IntLiteral].
+ * Converts [this] from [Double] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Double.plus(summand: Expression<RealSort>) = RealLiteral(this) plus summand
 
@@ -610,7 +620,7 @@ infix operator fun Double.plus(summand: Expression<RealSort>) = RealLiteral(this
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts [this] from [Double] to [IntLiteral].
+ * Converts [this] from [Double] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Double.plus(summand: () -> Expression<RealSort>) =
     RealLiteral(this) plus summand()
@@ -619,7 +629,7 @@ infix operator fun Double.plus(summand: () -> Expression<RealSort>) =
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts summand from [BigDecimal] to [IntLiteral].
+ * Converts summand from [BigDecimal] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.plus(summand: BigDecimal) = this plus RealLiteral(summand)
 
@@ -627,7 +637,7 @@ infix operator fun Expression<RealSort>.plus(summand: BigDecimal) = this plus Re
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts summand from [BigDecimal] to [IntLiteral].
+ * Converts summand from [BigDecimal] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).plus(summand: BigDecimal) =
     this() plus RealLiteral(summand)
@@ -636,7 +646,7 @@ infix operator fun (() -> Expression<RealSort>).plus(summand: BigDecimal) =
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts [this] from [BigDecimal] to [IntLiteral].
+ * Converts [this] from [BigDecimal] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun BigDecimal.plus(summand: Expression<RealSort>) = RealLiteral(this) plus summand
 
@@ -644,7 +654,7 @@ infix operator fun BigDecimal.plus(summand: Expression<RealSort>) = RealLiteral(
  * Addition operator for RealSort Expressions: [this] - [summand].
  *
  * If [this] is an [RealAdd] object, unpacks the children and returns a new combined [RealAdd].
- * Converts [this] from [BigDecimal] to [IntLiteral].
+ * Converts [this] from [BigDecimal] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun BigDecimal.plus(summand: () -> Expression<RealSort>) =
     RealLiteral(this) plus summand()
@@ -656,9 +666,9 @@ infix operator fun BigDecimal.plus(summand: () -> Expression<RealSort>) =
  */
 infix operator fun Expression<RealSort>.times(multiplicand: Expression<RealSort>) =
     if (this is RealMul) {
-      RealMul(this.children + multiplicand)
+        RealMul(this.children + multiplicand)
     } else {
-      RealMul(this, multiplicand)
+        RealMul(this, multiplicand)
     }
 
 /**
@@ -689,7 +699,7 @@ infix operator fun (() -> Expression<RealSort>).times(multiplicand: () -> Expres
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts multiplicand from [Byte] to [IntLiteral].
+ * Converts multiplicand from [Byte] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.times(multiplicand: Byte) =
     this times RealLiteral(multiplicand)
@@ -698,7 +708,7 @@ infix operator fun Expression<RealSort>.times(multiplicand: Byte) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts multiplicand from [Byte] to [IntLiteral].
+ * Converts multiplicand from [Byte] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).times(multiplicand: Byte) =
     this() times RealLiteral(multiplicand)
@@ -707,7 +717,7 @@ infix operator fun (() -> Expression<RealSort>).times(multiplicand: Byte) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts [this] from [Byte] to [IntLiteral].
+ * Converts [this] from [Byte] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Byte.times(multiplicand: Expression<RealSort>) =
     RealLiteral(this) times multiplicand
@@ -716,7 +726,7 @@ infix operator fun Byte.times(multiplicand: Expression<RealSort>) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts [this] from [Byte] to [IntLiteral].
+ * Converts [this] from [Byte] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Byte.times(multiplicand: () -> Expression<RealSort>) =
     RealLiteral(this) times multiplicand()
@@ -725,7 +735,7 @@ infix operator fun Byte.times(multiplicand: () -> Expression<RealSort>) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts multiplicand from [Short] to [IntLiteral].
+ * Converts multiplicand from [Short] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.times(multiplicand: Short) =
     this times RealLiteral(multiplicand)
@@ -734,7 +744,7 @@ infix operator fun Expression<RealSort>.times(multiplicand: Short) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts multiplicand from [Short] to [IntLiteral].
+ * Converts multiplicand from [Short] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).times(multiplicand: Short) =
     this() times RealLiteral(multiplicand)
@@ -743,7 +753,7 @@ infix operator fun (() -> Expression<RealSort>).times(multiplicand: Short) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts [this] from [Short] to [IntLiteral].
+ * Converts [this] from [Short] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Short.times(multiplicand: Expression<RealSort>) =
     RealLiteral(this) times multiplicand
@@ -752,7 +762,7 @@ infix operator fun Short.times(multiplicand: Expression<RealSort>) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts [this] from [Short] to [IntLiteral].
+ * Converts [this] from [Short] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Short.times(multiplicand: () -> Expression<RealSort>) =
     RealLiteral(this) times multiplicand()
@@ -761,7 +771,7 @@ infix operator fun Short.times(multiplicand: () -> Expression<RealSort>) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts multiplicand from [Int] to [IntLiteral].
+ * Converts multiplicand from [Int] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.times(multiplicand: Int) =
     this times RealLiteral(multiplicand)
@@ -770,7 +780,7 @@ infix operator fun Expression<RealSort>.times(multiplicand: Int) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts multiplicand from [Int] to [IntLiteral].
+ * Converts multiplicand from [Int] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).times(multiplicand: Int) =
     this() times RealLiteral(multiplicand)
@@ -779,7 +789,7 @@ infix operator fun (() -> Expression<RealSort>).times(multiplicand: Int) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts [this] from [Int] to [IntLiteral].
+ * Converts [this] from [Int] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Int.times(multiplicand: Expression<RealSort>) =
     RealLiteral(this) times multiplicand
@@ -788,7 +798,7 @@ infix operator fun Int.times(multiplicand: Expression<RealSort>) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts [this] from [Int] to [IntLiteral].
+ * Converts [this] from [Int] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Int.times(multiplicand: () -> Expression<RealSort>) =
     RealLiteral(this) times multiplicand()
@@ -797,7 +807,7 @@ infix operator fun Int.times(multiplicand: () -> Expression<RealSort>) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts multiplicand from [Long] to [IntLiteral].
+ * Converts multiplicand from [Long] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.times(multiplicand: Long) =
     this times RealLiteral(multiplicand)
@@ -806,7 +816,7 @@ infix operator fun Expression<RealSort>.times(multiplicand: Long) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts multiplicand from [Long] to [IntLiteral].
+ * Converts multiplicand from [Long] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).times(multiplicand: Long) =
     this() times RealLiteral(multiplicand)
@@ -815,7 +825,7 @@ infix operator fun (() -> Expression<RealSort>).times(multiplicand: Long) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts [this] from [Long] to [IntLiteral].
+ * Converts [this] from [Long] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Long.times(multiplicand: Expression<RealSort>) =
     RealLiteral(this) times multiplicand
@@ -824,7 +834,7 @@ infix operator fun Long.times(multiplicand: Expression<RealSort>) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts [this] from [Long] to [IntLiteral].
+ * Converts [this] from [Long] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Long.times(multiplicand: () -> Expression<RealSort>) =
     RealLiteral(this) times multiplicand()
@@ -833,7 +843,7 @@ infix operator fun Long.times(multiplicand: () -> Expression<RealSort>) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts multiplicand from [BigInteger] to [IntLiteral].
+ * Converts multiplicand from [BigInteger] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.times(multiplicand: BigInteger) =
     this times RealLiteral(multiplicand)
@@ -842,7 +852,7 @@ infix operator fun Expression<RealSort>.times(multiplicand: BigInteger) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts multiplicand from [BigInteger] to [IntLiteral].
+ * Converts multiplicand from [BigInteger] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).times(multiplicand: BigInteger) =
     this() times RealLiteral(multiplicand)
@@ -851,7 +861,7 @@ infix operator fun (() -> Expression<RealSort>).times(multiplicand: BigInteger) 
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts [this] from [BigInteger] to [IntLiteral].
+ * Converts [this] from [BigInteger] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun BigInteger.times(multiplicand: Expression<RealSort>) =
     RealLiteral(this) times multiplicand
@@ -860,7 +870,7 @@ infix operator fun BigInteger.times(multiplicand: Expression<RealSort>) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts [this] from [BigInteger] to [IntLiteral].
+ * Converts [this] from [BigInteger] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun BigInteger.times(multiplicand: () -> Expression<RealSort>) =
     RealLiteral(this) times multiplicand()
@@ -869,7 +879,7 @@ infix operator fun BigInteger.times(multiplicand: () -> Expression<RealSort>) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts multiplicand from [Float] to [IntLiteral].
+ * Converts multiplicand from [Float] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.times(multiplicand: Float) =
     this times RealLiteral(multiplicand)
@@ -878,7 +888,7 @@ infix operator fun Expression<RealSort>.times(multiplicand: Float) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts multiplicand from [Float] to [IntLiteral].
+ * Converts multiplicand from [Float] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).times(multiplicand: Float) =
     this() times RealLiteral(multiplicand)
@@ -887,7 +897,7 @@ infix operator fun (() -> Expression<RealSort>).times(multiplicand: Float) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts [this] from [Float] to [IntLiteral].
+ * Converts [this] from [Float] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Float.times(multiplicand: Expression<RealSort>) =
     RealLiteral(this) times multiplicand
@@ -896,7 +906,7 @@ infix operator fun Float.times(multiplicand: Expression<RealSort>) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts [this] from [Float] to [IntLiteral].
+ * Converts [this] from [Float] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Float.times(multiplicand: () -> Expression<RealSort>) =
     RealLiteral(this) times multiplicand()
@@ -905,7 +915,7 @@ infix operator fun Float.times(multiplicand: () -> Expression<RealSort>) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts multiplicand from [Double] to [IntLiteral].
+ * Converts multiplicand from [Double] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.times(multiplicand: Double) =
     this times RealLiteral(multiplicand)
@@ -914,7 +924,7 @@ infix operator fun Expression<RealSort>.times(multiplicand: Double) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts multiplicand from [Double] to [IntLiteral].
+ * Converts multiplicand from [Double] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).times(multiplicand: Double) =
     this() times RealLiteral(multiplicand)
@@ -923,7 +933,7 @@ infix operator fun (() -> Expression<RealSort>).times(multiplicand: Double) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts [this] from [Double] to [IntLiteral].
+ * Converts [this] from [Double] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Double.times(multiplicand: Expression<RealSort>) =
     RealLiteral(this) times multiplicand
@@ -932,7 +942,7 @@ infix operator fun Double.times(multiplicand: Expression<RealSort>) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts [this] from [Double] to [IntLiteral].
+ * Converts [this] from [Double] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Double.times(multiplicand: () -> Expression<RealSort>) =
     RealLiteral(this) times multiplicand()
@@ -941,7 +951,7 @@ infix operator fun Double.times(multiplicand: () -> Expression<RealSort>) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts multiplicand from [BigDecimal] to [IntLiteral].
+ * Converts multiplicand from [BigDecimal] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.times(multiplicand: BigDecimal) =
     this times RealLiteral(multiplicand)
@@ -950,7 +960,7 @@ infix operator fun Expression<RealSort>.times(multiplicand: BigDecimal) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts multiplicand from [BigDecimal] to [IntLiteral].
+ * Converts multiplicand from [BigDecimal] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).times(multiplicand: BigDecimal) =
     this() times RealLiteral(multiplicand)
@@ -959,7 +969,7 @@ infix operator fun (() -> Expression<RealSort>).times(multiplicand: BigDecimal) 
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts [this] from [BigDecimal] to [IntLiteral].
+ * Converts [this] from [BigDecimal] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun BigDecimal.times(multiplicand: Expression<RealSort>) =
     RealLiteral(this) times multiplicand
@@ -968,7 +978,7 @@ infix operator fun BigDecimal.times(multiplicand: Expression<RealSort>) =
  * Multiplication operator for RealSort Expressions: [this] - [multiplicand].
  *
  * If [this] is an [RealMul] object, unpacks the children and returns a new combined [RealMul].
- * Converts [this] from [BigDecimal] to [IntLiteral].
+ * Converts [this] from [BigDecimal] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun BigDecimal.times(multiplicand: () -> Expression<RealSort>) =
     RealLiteral(this) times multiplicand()
@@ -980,9 +990,9 @@ infix operator fun BigDecimal.times(multiplicand: () -> Expression<RealSort>) =
  */
 infix operator fun Expression<RealSort>.div(divisor: Expression<RealSort>) =
     if (this is RealDiv) {
-      RealDiv(this.children + divisor)
+        RealDiv(this.children + divisor)
     } else {
-      RealDiv(this, divisor)
+        RealDiv(this, divisor)
     }
 
 /**
@@ -1013,7 +1023,7 @@ infix operator fun (() -> Expression<RealSort>).div(divisor: () -> Expression<Re
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts divisor from [Byte] to [IntLiteral].
+ * Converts divisor from [Byte] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.div(divisor: Byte) = this div RealLiteral(divisor)
 
@@ -1021,7 +1031,7 @@ infix operator fun Expression<RealSort>.div(divisor: Byte) = this div RealLitera
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts divisor from [Byte] to [IntLiteral].
+ * Converts divisor from [Byte] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).div(divisor: Byte) = this() div RealLiteral(divisor)
 
@@ -1029,7 +1039,7 @@ infix operator fun (() -> Expression<RealSort>).div(divisor: Byte) = this() div 
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts [this] from [Byte] to [IntLiteral].
+ * Converts [this] from [Byte] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Byte.div(divisor: Expression<RealSort>) = RealLiteral(this) div divisor
 
@@ -1037,7 +1047,7 @@ infix operator fun Byte.div(divisor: Expression<RealSort>) = RealLiteral(this) d
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts [this] from [Byte] to [IntLiteral].
+ * Converts [this] from [Byte] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Byte.div(divisor: () -> Expression<RealSort>) = RealLiteral(this) div divisor()
 
@@ -1045,7 +1055,7 @@ infix operator fun Byte.div(divisor: () -> Expression<RealSort>) = RealLiteral(t
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts divisor from [Short] to [IntLiteral].
+ * Converts divisor from [Short] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.div(divisor: Short) = this div RealLiteral(divisor)
 
@@ -1053,7 +1063,7 @@ infix operator fun Expression<RealSort>.div(divisor: Short) = this div RealLiter
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts divisor from [Short] to [IntLiteral].
+ * Converts divisor from [Short] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).div(divisor: Short) =
     this() div RealLiteral(divisor)
@@ -1062,7 +1072,7 @@ infix operator fun (() -> Expression<RealSort>).div(divisor: Short) =
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts [this] from [Short] to [IntLiteral].
+ * Converts [this] from [Short] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Short.div(divisor: Expression<RealSort>) = RealLiteral(this) div divisor
 
@@ -1070,7 +1080,7 @@ infix operator fun Short.div(divisor: Expression<RealSort>) = RealLiteral(this) 
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts [this] from [Short] to [IntLiteral].
+ * Converts [this] from [Short] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Short.div(divisor: () -> Expression<RealSort>) = RealLiteral(this) div divisor()
 
@@ -1078,7 +1088,7 @@ infix operator fun Short.div(divisor: () -> Expression<RealSort>) = RealLiteral(
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts divisor from [Int] to [IntLiteral].
+ * Converts divisor from [Int] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.div(divisor: Int) = this div RealLiteral(divisor)
 
@@ -1086,7 +1096,7 @@ infix operator fun Expression<RealSort>.div(divisor: Int) = this div RealLiteral
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts divisor from [Int] to [IntLiteral].
+ * Converts divisor from [Int] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).div(divisor: Int) = this() div RealLiteral(divisor)
 
@@ -1094,7 +1104,7 @@ infix operator fun (() -> Expression<RealSort>).div(divisor: Int) = this() div R
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts [this] from [Int] to [IntLiteral].
+ * Converts [this] from [Int] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Int.div(divisor: Expression<RealSort>) = RealLiteral(this) div divisor
 
@@ -1102,7 +1112,7 @@ infix operator fun Int.div(divisor: Expression<RealSort>) = RealLiteral(this) di
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts [this] from [Int] to [IntLiteral].
+ * Converts [this] from [Int] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Int.div(divisor: () -> Expression<RealSort>) = RealLiteral(this) div divisor()
 
@@ -1110,7 +1120,7 @@ infix operator fun Int.div(divisor: () -> Expression<RealSort>) = RealLiteral(th
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts divisor from [Long] to [IntLiteral].
+ * Converts divisor from [Long] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.div(divisor: Long) = this div RealLiteral(divisor)
 
@@ -1118,7 +1128,7 @@ infix operator fun Expression<RealSort>.div(divisor: Long) = this div RealLitera
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts divisor from [Long] to [IntLiteral].
+ * Converts divisor from [Long] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).div(divisor: Long) = this() div RealLiteral(divisor)
 
@@ -1126,7 +1136,7 @@ infix operator fun (() -> Expression<RealSort>).div(divisor: Long) = this() div 
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts [this] from [Long] to [IntLiteral].
+ * Converts [this] from [Long] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Long.div(divisor: Expression<RealSort>) = RealLiteral(this) div divisor
 
@@ -1134,7 +1144,7 @@ infix operator fun Long.div(divisor: Expression<RealSort>) = RealLiteral(this) d
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts [this] from [Long] to [IntLiteral].
+ * Converts [this] from [Long] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Long.div(divisor: () -> Expression<RealSort>) = RealLiteral(this) div divisor()
 
@@ -1142,7 +1152,7 @@ infix operator fun Long.div(divisor: () -> Expression<RealSort>) = RealLiteral(t
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts divisor from [BigInteger] to [IntLiteral].
+ * Converts divisor from [BigInteger] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.div(divisor: BigInteger) = this div RealLiteral(divisor)
 
@@ -1150,7 +1160,7 @@ infix operator fun Expression<RealSort>.div(divisor: BigInteger) = this div Real
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts divisor from [BigInteger] to [IntLiteral].
+ * Converts divisor from [BigInteger] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).div(divisor: BigInteger) =
     this() div RealLiteral(divisor)
@@ -1159,7 +1169,7 @@ infix operator fun (() -> Expression<RealSort>).div(divisor: BigInteger) =
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts [this] from [BigInteger] to [IntLiteral].
+ * Converts [this] from [BigInteger] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun BigInteger.div(divisor: Expression<RealSort>) = RealLiteral(this) div divisor
 
@@ -1167,7 +1177,7 @@ infix operator fun BigInteger.div(divisor: Expression<RealSort>) = RealLiteral(t
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts [this] from [BigInteger] to [IntLiteral].
+ * Converts [this] from [BigInteger] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun BigInteger.div(divisor: () -> Expression<RealSort>) =
     RealLiteral(this) div divisor()
@@ -1176,7 +1186,7 @@ infix operator fun BigInteger.div(divisor: () -> Expression<RealSort>) =
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts divisor from [Float] to [IntLiteral].
+ * Converts divisor from [Float] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.div(divisor: Float) = this div RealLiteral(divisor)
 
@@ -1184,7 +1194,7 @@ infix operator fun Expression<RealSort>.div(divisor: Float) = this div RealLiter
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts divisor from [Float] to [IntLiteral].
+ * Converts divisor from [Float] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).div(divisor: Float) =
     this() div RealLiteral(divisor)
@@ -1193,7 +1203,7 @@ infix operator fun (() -> Expression<RealSort>).div(divisor: Float) =
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts [this] from [Float] to [IntLiteral].
+ * Converts [this] from [Float] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Float.div(divisor: Expression<RealSort>) = RealLiteral(this) div divisor
 
@@ -1201,7 +1211,7 @@ infix operator fun Float.div(divisor: Expression<RealSort>) = RealLiteral(this) 
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts [this] from [Float] to [IntLiteral].
+ * Converts [this] from [Float] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Float.div(divisor: () -> Expression<RealSort>) = RealLiteral(this) div divisor()
 
@@ -1209,7 +1219,7 @@ infix operator fun Float.div(divisor: () -> Expression<RealSort>) = RealLiteral(
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts divisor from [Double] to [IntLiteral].
+ * Converts divisor from [Double] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.div(divisor: Double) = this div RealLiteral(divisor)
 
@@ -1217,7 +1227,7 @@ infix operator fun Expression<RealSort>.div(divisor: Double) = this div RealLite
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts divisor from [Double] to [IntLiteral].
+ * Converts divisor from [Double] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).div(divisor: Double) =
     this() div RealLiteral(divisor)
@@ -1226,7 +1236,7 @@ infix operator fun (() -> Expression<RealSort>).div(divisor: Double) =
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts [this] from [Double] to [IntLiteral].
+ * Converts [this] from [Double] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Double.div(divisor: Expression<RealSort>) = RealLiteral(this) div divisor
 
@@ -1234,7 +1244,7 @@ infix operator fun Double.div(divisor: Expression<RealSort>) = RealLiteral(this)
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts [this] from [Double] to [IntLiteral].
+ * Converts [this] from [Double] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Double.div(divisor: () -> Expression<RealSort>) = RealLiteral(this) div divisor()
 
@@ -1242,7 +1252,7 @@ infix operator fun Double.div(divisor: () -> Expression<RealSort>) = RealLiteral
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts divisor from [BigDecimal] to [IntLiteral].
+ * Converts divisor from [BigDecimal] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<RealSort>.div(divisor: BigDecimal) = this div RealLiteral(divisor)
 
@@ -1250,7 +1260,7 @@ infix operator fun Expression<RealSort>.div(divisor: BigDecimal) = this div Real
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts divisor from [BigDecimal] to [IntLiteral].
+ * Converts divisor from [BigDecimal] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun (() -> Expression<RealSort>).div(divisor: BigDecimal) =
     this() div RealLiteral(divisor)
@@ -1259,7 +1269,7 @@ infix operator fun (() -> Expression<RealSort>).div(divisor: BigDecimal) =
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts [this] from [BigDecimal] to [IntLiteral].
+ * Converts [this] from [BigDecimal] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun BigDecimal.div(divisor: Expression<RealSort>) = RealLiteral(this) div divisor
 
@@ -1267,7 +1277,7 @@ infix operator fun BigDecimal.div(divisor: Expression<RealSort>) = RealLiteral(t
  * Divison operator for RealSort Expressions: [this] - [divisor].
  *
  * If [this] is an [RealDiv] object, unpacks the children and returns a new combined [RealDiv].
- * Converts [this] from [BigDecimal] to [IntLiteral].
+ * Converts [this] from [BigDecimal] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun BigDecimal.div(divisor: () -> Expression<RealSort>) =
     RealLiteral(this) div divisor()

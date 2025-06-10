@@ -29,10 +29,10 @@ import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.dsl.*
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.theories.BVSort
-import tools.aqua.konstraints.theories.BoolSort
-import tools.aqua.konstraints.theories.FPSort
-import tools.aqua.konstraints.theories.bitvec
+import tools.aqua.konstraints.smt.BVSort
+import tools.aqua.konstraints.smt.BoolSort
+import tools.aqua.konstraints.smt.FPSort
+import tools.aqua.konstraints.smt.bitvec
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SMTProgramTests {
