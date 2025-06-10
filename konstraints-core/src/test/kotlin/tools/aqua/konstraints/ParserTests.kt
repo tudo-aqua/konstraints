@@ -94,7 +94,7 @@ class ParserTests {
                   "(assert (= val (select (store array key val) key)))\n" +
                   "(check-sat)"])
   fun testDefineSort(program: String) {
-      assertDoesNotThrow { Parser().parse(program) }
+    assertDoesNotThrow { Parser().parse(program) }
   }
 
   @ParameterizedTest

@@ -37,7 +37,6 @@ import tools.aqua.konstraints.theories.RoundingMode
 import tools.aqua.konstraints.theories.StringSort
 import tools.aqua.konstraints.theories.Theories
 import tools.aqua.konstraints.util.Stack
-import tools.aqua.konstraints.util.zipWithSameLength
 
 private class CurrentContext {
   val functions = mutableMapOf<Symbol, SMTFunction<*>>()
