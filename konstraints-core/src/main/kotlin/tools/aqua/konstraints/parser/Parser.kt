@@ -768,10 +768,21 @@ class Parser {
       }
 
   private val defineSortCMD =
-      (lparen * defineSortKW * symbol * lparen * symbol.star() * rparen * sort * rparen).map {
-          results: ArrayList<Any> ->
-        program.defineSort(results[2] as Symbol, results[4] as List<Symbol>, results[6] as Sort)
-      }
+      (lparen *
+              defineSortKW *
+              symbol *
+              lparen *
+              symbol.star().map { t: List<Symbol> ->
+                program.context.addSortParameters(t)
+                t
+              } *
+              rparen *
+              sort *
+              rparen)
+          .map { results: ArrayList<Any> ->
+            program.defineSort(results[2] as Symbol, results[4] as List<Symbol>, results[6] as Sort)
+            program.context.clearSortParameters()
+          }
 
   private val getModelCMD = (lparen * getModelKW * rparen).map { _: Any -> program.add(GetModel) }
 

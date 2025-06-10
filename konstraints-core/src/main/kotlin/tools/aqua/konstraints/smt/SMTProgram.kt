@@ -191,10 +191,6 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
   }
 
   fun defineSort(name: Symbol, parameters: List<Symbol>, sort: Sort) {
-    if (parameters.isNotEmpty()) {
-      throw NotImplementedError("User defined sorts with parameters are not implemented yet!")
-    }
-
     context.defineSort(name, parameters, sort)
     _commands.add(DefineSort(name, parameters, sort))
   }

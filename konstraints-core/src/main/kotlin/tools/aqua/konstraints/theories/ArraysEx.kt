@@ -22,7 +22,7 @@ import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
 
 /** Array sort */
-class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) :
+open class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) :
     Sort("Array".toSymbolWithQuotes(), emptyList(), listOf(x, y)) {
   override fun toString(): String = "(Array $x $y)"
 

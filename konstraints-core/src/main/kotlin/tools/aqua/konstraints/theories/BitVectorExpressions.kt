@@ -926,7 +926,7 @@ class RotateRight(val i: Int, override val inner: Expression<BVSort>) :
 }
 
 /** Bitvector sort with [bits] length */
-class BVSort private constructor(index: Index) : Sort("BitVec", listOf(index)) {
+open class BVSort internal constructor(index: Index) : Sort("BitVec", listOf(index)) {
   companion object {
     /**
      * Get BitVec sort with the given number of [bits].

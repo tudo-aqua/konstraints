@@ -18,7 +18,6 @@
 
 package tools.aqua.konstraints.smt
 
-import com.sun.tools.javac.tree.TreeInfo.symbol
 import tools.aqua.konstraints.parser.ArrayExTheory
 import tools.aqua.konstraints.parser.BitVectorExpressionTheory
 import tools.aqua.konstraints.parser.CoreTheory
@@ -27,7 +26,15 @@ import tools.aqua.konstraints.parser.IntsTheory
 import tools.aqua.konstraints.parser.RealsIntsTheory
 import tools.aqua.konstraints.parser.RealsTheory
 import tools.aqua.konstraints.parser.StringsTheory
+import tools.aqua.konstraints.theories.ArraySort
+import tools.aqua.konstraints.theories.BVSort
 import tools.aqua.konstraints.theories.BoolSort
+import tools.aqua.konstraints.theories.FPSort
+import tools.aqua.konstraints.theories.IntSort
+import tools.aqua.konstraints.theories.RealSort
+import tools.aqua.konstraints.theories.RegLan
+import tools.aqua.konstraints.theories.RoundingMode
+import tools.aqua.konstraints.theories.StringSort
 import tools.aqua.konstraints.theories.Theories
 import tools.aqua.konstraints.util.Stack
 import tools.aqua.konstraints.util.zipWithSameLength
@@ -43,6 +50,7 @@ class Context {
   private val shadowingMap = Stack<MutableMap<SMTFunction<*>, SMTFunction<*>>>()
   private val functionUndoStack = Stack<MutableSet<Symbol>>()
   private val sortUndoStack = Stack<MutableSet<Symbol>>()
+  private val sortParameters = mutableListOf<Symbol>()
   var locals: List<SortedVar<*>> = emptyList()
   private var logic: Logic? = null
 
@@ -93,42 +101,74 @@ class Context {
 
   fun declareSort(name: Symbol, arity: Int) = declareSort(UserDeclaredSortFactory(name, arity))
 
-  fun declareSort(sort: UserDeclaredSortFactory): UserDeclaredSortFactory {
-    require(sort.symbol !in currentContext.sorts) {
-      "Can not overload or shadow sort symbol ${sort.symbol}!"
-    }
+  fun declareSort(sort: UserDeclaredSortFactory) =
+      addSort(sort, sort.symbol) as UserDeclaredSortFactory
+
+  internal fun addSort(sort: SortFactory, symbol: Symbol): SortFactory {
+    require(symbol !in currentContext.sorts) { "Can not overload or shadow sort symbol ${symbol}!" }
 
     check(!activeBinderState) { "Can not add sort to the current context in this state!" }
 
-    currentContext.sorts[sort.symbol] = sort
+    currentContext.sorts[symbol] = sort
 
     if (sortUndoStack.isNotEmpty()) {
-      sortUndoStack.peek().add(sort.symbol)
+      sortUndoStack.peek().add(symbol)
     }
 
     return sort
   }
 
-  fun defineSort(def: DefineSort) = defineSort(UserDefinedSortFactory(def.name, def.sort))
+  fun addSortParameters(parameters: List<Symbol>) =
+      parameters.map { symbol -> addSortParameter(symbol) }
+
+  fun addSortParameter(parameter: Symbol): SortParameterFactory {
+    sortParameters.add(parameter)
+
+    return addSort(SortParameterFactory(parameter), parameter) as SortParameterFactory
+  }
+
+  fun clearSortParameters() {
+    currentContext.sorts.keys.removeAll(sortParameters)
+    sortParameters.clear()
+  }
+
+  fun defineSort(def: DefineSort) = defineSort(def.name, def.sortParameters, def.sort)
 
   fun defineSort(name: Symbol, parameters: List<Symbol>, sort: Sort) =
-      defineSort(UserDefinedSortFactory(name, sort))
+      when (sort) {
+        is BoolSort -> defineSort(name, BoolFactory)
+        is IntSort -> defineSort(name, IntFactory)
+        is RealSort -> defineSort(name, RealFactory)
+        is StringSort -> defineSort(name, StringFactory)
+        is RegLan -> defineSort(name, RegLanFactory)
+        is RoundingMode -> defineSort(name, RoundingModeFactory)
+        is BVSort -> defineSort(name, UserDefinedBitVectorFactory(name, sort.bits, parameters))
+        is FPSort ->
+            defineSort(
+                name,
+                UserDefinedFloatingPointFactory(
+                    name, sort.exponentBits, sort.significantBits, parameters))
+        is ArraySort<*, *> ->
+            defineSort(name, UserDefinedArrayFactory(name, sort.parameters, parameters))
+        else -> TODO("Implement UserDefinedUserDeclaredSortFactory")
+      }
 
-  fun defineSort(sort: UserDefinedSortFactory): UserDefinedSortFactory {
-    require(sort.symbol !in currentContext.sorts) {
-      "Can not overload or shadow sort symbol ${sort.symbol}!"
-    }
+  fun defineSort(symbol: Symbol, factory: SortFactory): SortFactory {
+    require(symbol !in currentContext.sorts) { "Can not overload or shadow sort symbol ${symbol}!" }
 
     check(!activeBinderState) { "Can not add sort to the current context in this state!" }
 
-    currentContext.sorts[sort.symbol] = sort
+    currentContext.sorts[symbol] = factory
 
     if (sortUndoStack.isNotEmpty()) {
-      sortUndoStack.peek().add(sort.symbol)
+      sortUndoStack.peek().add(symbol)
     }
 
-    return sort
+    return factory
   }
+
+  fun defineSort(factory: UserDefinedSortFactory) =
+      defineSort(factory.symbol, factory) as UserDefinedSortFactory
 
   operator fun contains(func: Symbol) = currentContext.functions[func] != null
 
@@ -296,6 +336,8 @@ class Context {
     }
     functionUndoStack.pop().forEach { symbol -> currentContext.functions.remove(symbol) }
   }
+
+  internal fun bindSortParameters(bindings: List<Symbol>) {}
 
   fun setLogic(logic: Logic) {
     this.logic = logic

@@ -81,7 +81,7 @@ sealed class FPBase(eb: Index, sb: Index) : Sort("FloatingPoint", listOf(eb, sb)
  * @param eb exponent bits
  * @param sb significant bits
  */
-class FPSort private constructor(eb: Index, sb: Index) : FPBase(eb, sb) {
+open class FPSort internal constructor(eb: Index, sb: Index) : FPBase(eb, sb) {
   companion object {
     operator fun invoke(eb: Int, sb: Int): FPSort = FPSort(NumeralIndex(eb), NumeralIndex(sb))
 

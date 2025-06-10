@@ -327,7 +327,7 @@ object ArraySortFactory : SortFactory {
  * @param parameters parameters of parameterized sorts (e.g. (Array 2))
  */
 abstract class Sort(
-    val symbol: Symbol,
+    open val symbol: Symbol,
     val indices: List<Index> = emptyList(),
     val parameters: List<Sort> = emptyList()
 ) : ContextSort {
@@ -339,6 +339,7 @@ abstract class Sort(
 
   override val name: String = symbol.toString()
   override val arity = parameters.size
+  open val definedSymbol: Symbol = "".toSymbolAsIs()
 
   abstract val theories: Set<Theories>
 
@@ -372,7 +373,9 @@ abstract class Sort(
   fun toSMTString() = symbol.toSMTString(QuotingRule.SAME_AS_INPUT)
 }
 
-class SortParameter(name: String) : Sort(name, emptyList(), emptyList()) {
+class SortParameter(name: Symbol) : Sort(name, emptyList(), emptyList()) {
+  constructor(name: String) : this(name.toSymbolWithQuotes())
+
   override val theories = emptySet<Theories>()
 }
 
@@ -398,25 +401,99 @@ class UserDeclaredSort(name: Symbol, parameters: List<Sort>) : Sort(name, emptyL
   override val theories = emptySet<Theories>()
 }
 
-class UserDefinedSortFactory(val symbol: Symbol, val sort: Sort) : SortFactory {
-  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
-    require(parameters.isEmpty())
-    require(indices.isEmpty())
+abstract class UserDefinedSortFactory(val symbol: Symbol) : SortFactory {
+  override val isIndexed = false
+  override val numIndicies = 0
+}
 
-    return sort
-  }
+class SortParameterFactory(val symbol: Symbol) : SortFactory {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>) = sort
 
-  override fun isInstanceOf(sort: Sort): Boolean {
-    require(sort is UserDefinedSort)
+  val sort = SortParameter(symbol)
 
-    return sort.symbol == symbol && sort.sort == sort
-  }
+  override fun isInstanceOf(sort: Sort) = sort is SortParameter && sort.symbol == symbol
 
   override val isIndexed = false
   override val numIndicies = 0
 }
 
-// TODO this only implements user defined sorts without sort parameters
-class UserDefinedSort(name: Symbol, val sort: Sort) : Sort(name, emptyList(), emptyList()) {
-  override val theories = emptySet<Theories>()
+class UserDefinedBitVectorFactory(symbol: Symbol, val bits: Int, val parameters: List<Symbol>) :
+    UserDefinedSortFactory(symbol) {
+  override fun build(
+      parameters: List<Sort>,
+      indices: List<NumeralIndex>
+  ): UserDefinedBitVectorSort {
+    require(parameters.size == this.parameters.size)
+    require(indices.isEmpty())
+
+    return bitvec
+  }
+
+  private val bitvec = UserDefinedBitVectorSort(symbol, bits)
+
+  override fun isInstanceOf(sort: Sort) = sort is BVSort && bits == sort.bits
+}
+
+class UserDefinedBitVectorSort(override val definedSymbol: Symbol, bits: Int) : BVSort(bits.idx()) {
+  override fun toString() = definedSymbol.toString()
+}
+
+class UserDefinedFloatingPointFactory(
+    symbol: Symbol,
+    val eb: Int,
+    val sb: Int,
+    val parameters: List<Symbol>
+) : UserDefinedSortFactory(symbol) {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
+    require(parameters.size == this.parameters.size)
+    require(indices.isEmpty())
+
+    return sort
+  }
+
+  private val sort = FPSort(eb, sb)
+
+  override fun isInstanceOf(sort: Sort) =
+      sort is UserDefinedFloatingPointSort && sort.exponentBits == eb && sort.significantBits == sb
+}
+
+class UserDefinedFloatingPointSort(override val definedSymbol: Symbol, eb: Int, sb: Int) :
+    FPSort(eb.idx(), sb.idx()) {
+  override fun toString() = definedSymbol.toString()
+}
+
+class UserDefinedArrayFactory(
+    symbol: Symbol,
+    val parameters: List<Sort>,
+    val sortParameters: List<Symbol>
+) : UserDefinedSortFactory(symbol) {
+  init {
+    require(parameters.size == 2)
+  }
+
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): ArraySort<*, *> {
+    require(parameters.size == sortParameters.size)
+    require(indices.isEmpty())
+
+    val mapping = (sortParameters zip parameters).toMap()
+
+    val actual =
+        this.parameters.map { sort ->
+          when (sort) {
+            is SortParameter -> mapping[sort.symbol]!!
+            else -> sort
+          }
+        }
+
+    return UserDefinedArraySort(symbol, actual[0], actual[1])
+  }
+
+  override fun isInstanceOf(sort: Sort): Boolean {
+    TODO("Not yet implemented")
+  }
+}
+
+class UserDefinedArraySort<X : Sort, Y : Sort>(override val definedSymbol: Symbol, x: X, y: Y) :
+    ArraySort<X, Y>(x, y) {
+  override fun toString() = definedSymbol.toString()
 }

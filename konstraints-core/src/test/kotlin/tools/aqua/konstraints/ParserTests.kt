@@ -21,6 +21,7 @@ package tools.aqua.konstraints
 import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -79,6 +80,22 @@ class ParserTests {
     }
   }
     */
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(set-logic AUFLIA)\n" +
+                  "(set-info :status sat)\n" +
+                  "(define-sort Arr (A) (Array Int A))\n" +
+                  "(declare-fun key () Int)\n" +
+                  "(declare-fun val () Int)\n" +
+                  "(declare-fun array () (Arr Int))\n" +
+                  "(assert (= val (select (store array key val) key)))\n" +
+                  "(check-sat)"])
+  fun testDefineSort(program: String) {
+      assertDoesNotThrow { Parser().parse(program) }
+  }
 
   @ParameterizedTest
   @ValueSource(
