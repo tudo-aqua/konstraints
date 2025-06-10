@@ -797,42 +797,6 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Context.forall(
         SortedVar("local!${sort5}5".toSymbolWithQuotes(), sort5),
         block)
 
-interface AssertionLevel<out FuncType : ContextFunction<*>, out SortType : ContextSort> {
-  fun contains(function: String, args: List<Expression<*>>) = get(function, args) != null
-
-  operator fun contains(function: Symbol) = functions.contains(function.toString())
-
-  operator fun contains(function: String) = functions.contains(function)
-
-  operator fun get(function: String, args: List<Expression<*>>) =
-      functions[function]?.takeIf { func ->
-        (func.parameters zipWithSameLength args.map { it.sort }).all { (param, actual) ->
-          param == actual
-        }
-      }
-
-  operator fun contains(sort: Sort) = sorts.containsKey(sort.symbol.toString())
-
-  fun containsSort(sort: String) = sorts.containsKey(sort)
-
-  val functions: Map<String, FuncType>
-  val sorts: Map<String, SortType>
-}
-
-fun <SortType : ContextSort> AssertionLevel<*, SortType>.contains(sort: SortType) =
-    sorts.containsKey(sort.name.toString())
-
-interface ContextFunction<S> {
-  val name: String
-  val parameters: List<S>
-  val sort: Sort
-}
-
-interface ContextSort {
-  val name: String
-  val arity: Int
-}
-
 class FunctionNotFoundException(name: Symbol) : NoSuchElementException("Function $name not found")
 
 class SortNotFoundException(name: Symbol) : NoSuchElementException("Sort $name not found")

@@ -330,15 +330,15 @@ abstract class Sort(
     open val symbol: Symbol,
     val indices: List<Index> = emptyList(),
     val parameters: List<Sort> = emptyList()
-) : ContextSort {
+) {
   constructor(
       name: String,
       indices: List<Index> = emptyList(),
       parameters: List<Sort> = emptyList()
   ) : this(name.toSymbolWithQuotes(), indices, parameters)
 
-  override val name: String = symbol.toString()
-  override val arity = parameters.size
+  open val name: String = symbol.toString()
+  open val arity = parameters.size
   open val definedSymbol: Symbol = "".toSymbolAsIs()
 
   abstract val theories: Set<Theories>
