@@ -18,8 +18,6 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.theories.Theories
-
 interface Logic {
   val theories: Set<Theories>
   val datatypes: Boolean

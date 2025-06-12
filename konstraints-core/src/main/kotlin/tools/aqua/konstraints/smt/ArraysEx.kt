@@ -16,18 +16,21 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.theories
+package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.*
-import tools.aqua.konstraints.smt.*
 
 /** Array sort */
-class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) :
-    Sort("Array".toSymbolWithQuotes(), emptyList(), listOf(x, y)) {
+sealed class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) :
+    Sort("Array".toSymbolWithQuotes()) {
+  override val parameters = listOf(x, y)
+
   override fun toString(): String = "(Array $x $y)"
 
   override val theories = ARRAYS_EX_MARKER_SET
 }
+
+class SMTArray<X : Sort, Y : Sort>(x: X, y: Y) : ArraySort<X, Y>(x, y)
 
 /**
  * Array selection operation
@@ -49,7 +52,7 @@ class ArraySelect<X : Sort, Y : Sort>(
   override val rhs: Expression<X> = index
 
   override fun copy(children: List<Expression<*>>): Expression<Y> =
-      ArraySelectDecl.buildExpression(children, emptyList()) as Expression<Y>
+      ArraySelectDecl.constructDynamic(children, emptyList()) as Expression<Y>
 }
 
 /**
@@ -78,5 +81,5 @@ class ArrayStore<X : Sort, Y : Sort>(
   override val children: List<Expression<*>> = listOf(array, index, value)
 
   override fun copy(children: List<Expression<*>>): Expression<ArraySort<X, Y>> =
-      ArrayStoreDecl.buildExpression(children, emptyList()) as Expression<ArraySort<X, Y>>
+      ArrayStoreDecl.constructDynamic(children, emptyList()) as Expression<ArraySort<X, Y>>
 }

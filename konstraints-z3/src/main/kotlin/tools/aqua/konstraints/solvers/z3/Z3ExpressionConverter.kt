@@ -25,16 +25,25 @@ import com.microsoft.z3.Expr
 import com.microsoft.z3.IntNum
 import com.microsoft.z3.IntSort as Z3IntSort
 import com.microsoft.z3.Sort as Z3Sort
+import tools.aqua.konstraints.smt.BVLiteral
+import tools.aqua.konstraints.smt.BVNot
+import tools.aqua.konstraints.smt.BVSort
+import tools.aqua.konstraints.smt.Bool
+import tools.aqua.konstraints.smt.BoolSort
+import tools.aqua.konstraints.smt.Equals
 import tools.aqua.konstraints.smt.Expression
+import tools.aqua.konstraints.smt.False
+import tools.aqua.konstraints.smt.IntLiteral
+import tools.aqua.konstraints.smt.IntNeg
+import tools.aqua.konstraints.smt.IntSort
+import tools.aqua.konstraints.smt.SMTInt
 import tools.aqua.konstraints.smt.Sort
-import tools.aqua.konstraints.theories.*
-import tools.aqua.konstraints.theories.BVSort
-import tools.aqua.konstraints.theories.BoolSort
+import tools.aqua.konstraints.smt.True
 
 fun Z3Sort.aquaify(): Sort =
     when (this) {
-      is Z3BoolSort -> BoolSort
-      is Z3IntSort -> IntSort
+      is Z3BoolSort -> Bool
+      is Z3IntSort -> SMTInt
       is BitVecSort -> BVSort(this.size)
       else -> throw RuntimeException("Unknown or unsupported Z3 sort $this")
     }

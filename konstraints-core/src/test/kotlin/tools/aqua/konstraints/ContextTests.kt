@@ -27,16 +27,14 @@ import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.dsl.*
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.theories.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ContextTests {
-  val boolFunc1 = UserDeclaredSMTFunction0("A".toSymbolWithQuotes(), BoolSort)
-  val boolFunc2 = UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), BoolSort, BVSort(8), BVSort(8))
-  val boolFunc2Copy =
-      UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), BoolSort, BVSort(8), BVSort(8))
+  val boolFunc1 = UserDeclaredSMTFunction0("A".toSymbolWithQuotes(), Bool)
+  val boolFunc2 = UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), Bool, BVSort(8), BVSort(8))
+  val boolFunc2Copy = UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), Bool, BVSort(8), BVSort(8))
   val boolFunc2Overloaded =
-      UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), BoolSort, BVSort(16), BVSort(16))
+      UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), Bool, BVSort(16), BVSort(16))
 
   @ParameterizedTest
   @MethodSource("getContextAndNames")
@@ -50,7 +48,7 @@ class ContextTests {
   @ParameterizedTest
   @MethodSource("getContextAndFunctions")
   fun testGetFunction(context: Context, func: SMTFunction<*>) {
-    assertTrue(context.getFunc(func.name) == func)
+    assertTrue(context.getFunc(func.symbol) == func)
   }
 
   private fun getContextAndFunctions(): Stream<Arguments> =
@@ -77,16 +75,13 @@ class ContextTests {
 
   private fun getContextAndIllegalNameFunctions(): Stream<Arguments> =
       Stream.of(
+          arguments(createContext(), UserDeclaredSMTFunction0("and".toSymbolWithQuotes(), Bool)),
+          arguments(createContext(), UserDeclaredSMTFunction0("true".toSymbolWithQuotes(), Bool)),
           arguments(
-              createContext(), UserDeclaredSMTFunction0("and".toSymbolWithQuotes(), BoolSort)),
+              createContext(), UserDeclaredSMTFunction0("distinct".toSymbolWithQuotes(), Bool)),
+          arguments(createContext(), UserDeclaredSMTFunction0("bvadd".toSymbolWithQuotes(), Bool)),
           arguments(
-              createContext(), UserDeclaredSMTFunction0("true".toSymbolWithQuotes(), BoolSort)),
-          arguments(
-              createContext(), UserDeclaredSMTFunction0("distinct".toSymbolWithQuotes(), BoolSort)),
-          arguments(
-              createContext(), UserDeclaredSMTFunction0("bvadd".toSymbolWithQuotes(), BoolSort)),
-          arguments(
-              createContext(), UserDeclaredSMTFunction0("extract".toSymbolWithQuotes(), BoolSort)))
+              createContext(), UserDeclaredSMTFunction0("extract".toSymbolWithQuotes(), Bool)))
 
   @Test
   fun testPopFailsOnContextWithOnlyOneLevel() {
@@ -101,15 +96,15 @@ class ContextTests {
     context.push {
       addFun(func)
 
-      assertTrue(context.contains(func.name))
+      assertTrue(context.contains(func.symbol))
     }
 
-    assertFalse(context.contains(func.name))
+    assertFalse(context.contains(func.symbol))
   }
 
   private fun getContextAndNewFunction() =
       Stream.of(
-          arguments(createContext(), UserDeclaredSMTFunction0("C".toSymbolWithQuotes(), BoolSort)),
+          arguments(createContext(), UserDeclaredSMTFunction0("C".toSymbolWithQuotes(), Bool)),
       )
 
   @ParameterizedTest
@@ -135,7 +130,7 @@ class ContextTests {
 
     context.let(bindings) { context, bindings -> True }
 
-    assertTrue(context.getFunc(function.name) == function)
+    assertTrue(context.getFunc(function.symbol) == function)
   }
 
   @ParameterizedTest
@@ -144,7 +139,7 @@ class ContextTests {
     val function = context.getFunc(bindings[0].name)
 
     context.let(bindings) { bindings, context ->
-      assertFalse(context.getFunc(function.name) == function)
+      assertFalse(context.getFunc(function.symbol) == function)
       True
     }
   }
@@ -166,15 +161,15 @@ class ContextTests {
       Stream.of(
           arguments(
               createContext(),
-              UserDeclaredSMTFunction0("|Quoted|".toSymbolWithQuotes(), BoolSort),
+              UserDeclaredSMTFunction0("|Quoted|".toSymbolWithQuotes(), Bool),
               "Quoted"),
           arguments(
               createContext(),
-              UserDeclaredSMTFunction0("|Quoted|".toSymbolWithQuotes(), BoolSort),
+              UserDeclaredSMTFunction0("|Quoted|".toSymbolWithQuotes(), Bool),
               "|Quoted|"),
           arguments(
               createContext(),
-              UserDeclaredSMTFunction0("Unquoted".toSymbolWithQuotes(), BoolSort),
+              UserDeclaredSMTFunction0("Unquoted".toSymbolWithQuotes(), Bool),
               "|Unquoted|"),
       )
 

@@ -18,14 +18,22 @@
 
 package tools.aqua.konstraints.dsl
 
+import tools.aqua.konstraints.smt.And
+import tools.aqua.konstraints.smt.BoolSort
+import tools.aqua.konstraints.smt.Distinct
+import tools.aqua.konstraints.smt.Equals
 import tools.aqua.konstraints.smt.Expression
+import tools.aqua.konstraints.smt.Implies
+import tools.aqua.konstraints.smt.Not
+import tools.aqua.konstraints.smt.Or
 import tools.aqua.konstraints.smt.Sort
-import tools.aqua.konstraints.theories.*
+import tools.aqua.konstraints.smt.XOr
 
 /**
  * Creates a logical implication: [this] => [other].
  *
- * If [this] is an [Implies] object, unpacks the children and returns a new combined Implies.
+ * If [this] is an [tools.aqua.konstraints.smt.Implies] object, unpacks the children and returns a
+ * new combined Implies.
  */
 infix fun Expression<BoolSort>.implies(other: Expression<BoolSort>) =
     if (this is Implies) {
@@ -158,7 +166,8 @@ infix fun (() -> Expression<BoolSort>).xor(other: () -> Expression<BoolSort>) = 
 /**
  * Creates an equals: [this] equals [other].
  *
- * If [this] is an [Equals] object, unpacks the children and returns a new combined Equals.
+ * If [this] is an [tools.aqua.konstraints.smt.Equals] object, unpacks the children and returns a
+ * new combined Equals.
  */
 infix fun <T : Sort> Expression<T>.eq(other: Expression<T>) =
     if (this is Equals<*>) {

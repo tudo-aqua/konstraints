@@ -19,7 +19,6 @@
 package tools.aqua.konstraints.dsl
 
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.theories.*
 
 /** Select value stored in [array] at location [index]. */
 fun <X : Sort, Y : Sort> select(array: Expression<ArraySort<X, Y>>, index: Expression<X>) =

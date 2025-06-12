@@ -63,4 +63,7 @@ class Stack<E>(private val stack: MutableList<E> = mutableListOf()) : List<E> by
   fun push(element: E) {
     stack.add(0, element)
   }
+
+  /** Clear the entire stack */
+  fun clear() = stack.clear()
 }

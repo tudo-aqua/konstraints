@@ -19,7 +19,6 @@
 package tools.aqua.konstraints.smt
 
 import java.math.BigInteger
-import tools.aqua.konstraints.theories.BoolSort
 
 /** Base class for each SMT command */
 sealed class Command(val command: String) {
@@ -36,7 +35,7 @@ object Exit : Command("exit")
 object GetModel : Command("get-model")
 
 /** SMT (assert) command */
-data class Assert(val expression: Expression<BoolSort>) : Command("assert $expression") {
+data class Assert(val expr: Expression<BoolSort>) : Command("assert $expr") {
   override fun toString(): String = super.toString()
 }
 
@@ -80,6 +79,9 @@ data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : Attr
  */
 data class DeclareSort(val name: Symbol, val arity: Int) : Command("declare-sort $name $arity")
 
+data class DefineSort(val name: Symbol, var sortParameters: List<Symbol>, val sort: Sort) :
+    Command("define-sort $name ($sortParameters) $sort")
+
 // TODO string serialization of OptionValue
 /** SMT (set-option [name] [OptionValue]) command */
 data class SetOption(val name: String, val value: OptionValue) : Command("set-option $name $value")
@@ -96,6 +98,10 @@ data class AttributeOptionValue(val attribute: Attribute) : OptionValue
 
 /** SMT (set-logic [logic]) command */
 data class SetLogic(val logic: Logic) : Command("set-logic $logic")
+
+/** SMT (define-const [name] [sort] [term]) command */
+data class DefineConst(val name: Symbol, val sort: Sort, val term: Expression<Sort>) :
+    Command("define-const $name $sort $term")
 
 /** SMT (define-fun [functionDef]) command */
 data class DefineFun(val functionDef: FunctionDef<*>) : Command("define-fun $functionDef") {

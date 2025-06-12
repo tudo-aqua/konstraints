@@ -76,7 +76,7 @@ class BenchmarkTest {
 
     val solver = Z3Solver()
 
-    val result = tools.aqua.konstraints.parser.Parser.parse(benchmark.program)
+    val result = Parser().parse(benchmark.program)
 
     /* ignore the test if assumption fails, ignores all unknown tests */
     Assumptions.assumeTrue(

@@ -19,12 +19,13 @@
 package tools.aqua.konstraints.smt
 
 import java.math.BigDecimal
+import java.math.BigInteger
 
 sealed interface SpecConstant
 
 data class StringConstant(val string: String) : SpecConstant
 
-data class NumeralConstant(val numeral: String) : SpecConstant
+data class NumeralConstant(val numeral: BigInteger) : SpecConstant
 
 /* BinaryConstant of the form #b followed by a non-empty sequence of 0 and 1 characters */
 data class BinaryConstant(val binary: String) : SpecConstant {

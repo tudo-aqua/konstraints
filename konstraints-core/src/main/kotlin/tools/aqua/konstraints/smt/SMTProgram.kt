@@ -18,10 +18,12 @@
 
 package tools.aqua.konstraints.smt
 
+import java.math.BigDecimal
+import java.math.BigInteger
 import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.dsl.UserDeclaredSMTFunctionN
-import tools.aqua.konstraints.parser.ParseContext
-import tools.aqua.konstraints.theories.BoolSort
+import tools.aqua.konstraints.dsl.UserDefinedSMTFunction0
+import tools.aqua.konstraints.dsl.UserDefinedSMTFunctionN
 
 enum class SatStatus {
   SAT, // program is satisfiable
@@ -38,29 +40,23 @@ enum class SatStatus {
       }
 }
 
-abstract class SMTProgram(commands: List<Command>, context: ParseContext?) {
+abstract class SMTProgram(commands: List<Command>) {
   var model: Model? = null
   var status = SatStatus.PENDING
-  val info: List<Attribute>
+  val info = mutableListOf<Attribute>()
   var logic: Logic? = null
     protected set
 
-  protected val context = Context()
+  val context = Context()
 
   protected val _commands: MutableList<Command> = commands.toMutableList()
   val commands: List<Command>
     get() = _commands.toList()
-
-  init {
-    info = commands.filterIsInstance<SetInfo>().map { it.attribute }
-  }
 }
 
-class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
-    SMTProgram(commands, context) {
-  constructor(commands: List<Command>) : this(commands, null)
+class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
 
-  constructor() : this(emptyList(), null)
+  constructor() : this(emptyList())
 
   /**
    * Inserts [command] at the end of the program
@@ -82,50 +78,120 @@ class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
       "Prefer usage of specialized functions (e.g. assert)", level = DeprecationLevel.WARNING)
   fun add(command: Command, index: Int) {
     if (command is Assert) {
-      require(command.expression.all { context.contains(it) })
+      require(command.expr.all { context.contains(it) })
     }
 
     _commands.add(index, command)
   }
 
-  fun assert(expr: Expression<BoolSort>) {
-    // check expr is in logic when logic is set
-    if (logic != null) {
-      require(
-          expr.all {
-            (it.theories.isEmpty() or it.theories.any { it in logic!!.theories }) and
-                (it.sort.theories.isEmpty() or it.sort.theories.any { it in logic!!.theories })
-          }) {
-            "Expression not in boundaries of logic"
-          }
+  fun assert(assertion: Assert) {
+    check(logic != null) { "Logic must be set before adding assertions!" }
+
+    // check expr is in logic
+    assertion.expr.all {
+      if (!(it.theories.isEmpty() || it.theories.any { it in logic!!.theories })) {
+        throw AssertionOutOfLogicBounds(
+            "$it was not in logic bounds: expected any of ${logic!!.theories} but was ${it.theories}")
+      } else if (!(it.sort.theories.isEmpty() || it.sort.theories.any { it in logic!!.theories })) {
+        throw AssertionOutOfLogicBounds(
+            "${it.sort} was not in logic bounds: expected any of ${logic!!.theories} but was ${it.sort.theories}")
+      }
+      true
     }
 
     // check all symbols are known
+    require(checkContext(assertion.expr))
 
-    _commands.add(Assert(expr))
+    _commands.add(assertion)
+  }
+
+  private fun checkContext(expr: Expression<*>): Boolean {
+    return if (expr is ExistsExpression) {
+      context.exists(expr.vars) { checkContext(expr.term) }
+    } else if (expr is ForallExpression) {
+      context.forall(expr.vars) { checkContext(expr.term) }
+    } else if (expr is LetExpression) {
+      context.let(expr.bindings) { checkContext(expr.inner) }
+    } else if (expr is AnnotatedExpression) {
+      checkContext(expr.term)
+    } else {
+      val result =
+          (expr.theories.isNotEmpty() || expr in context) && expr.children.all { checkContext(it) }
+
+      if (!result)
+          println(
+              "Not in theories ${logic?.theories}: ($expr ${expr.children.joinToString(" ")}) is in ${expr.theories}")
+
+      result
+    }
   }
 
   fun <T : Sort> declareConst(name: Symbol, sort: T): UserDeclaredSMTFunction0<T> {
     val func = UserDeclaredSMTFunction0(name, sort)
     context.addFun(func)
-
     _commands.add(DeclareConst(name, sort))
 
     return func
   }
 
-  fun <T : Sort> declareFun(func: SMTFunction<T>) {
+  fun <T : Sort> declareFun(func: DeclaredSMTFunction<T>): DeclaredSMTFunction<T> {
+    context.addFun(func)
+    _commands.add(DeclareFun(func.symbol, func.parameters, func.sort))
+
+    return func
+  }
+
+  fun <T : Sort> defineConst(
+      name: Symbol,
+      sort: T,
+      term: Expression<T>
+  ): UserDefinedSMTFunction0<T> {
+    val func = UserDefinedSMTFunction0(name, sort, term)
     context.addFun(func)
 
-    _commands.add(DeclareFun(func.symbol, func.parameters, func.sort))
+    _commands.add(DefineConst(name, sort, term))
+
+    return func
   }
 
-  fun declareFun(name: Symbol, parameter: List<Sort>, sort: Sort) {
-    declareFun(UserDeclaredSMTFunctionN(name, sort, parameter))
+  fun <T : Sort> defineFun(func: DefinedSMTFunction<T>): DefinedSMTFunction<T> {
+    context.addFun(func)
+    _commands.add(DefineFun(func.symbol, func.sortedVars, func.sort, func.term))
+
+    return func
   }
+
+  fun push(n: Int) = context.push(n)
+
+  fun push() = context.push()
+
+  fun push(block: (Context) -> Unit) = context.push(block)
+
+  fun pop(n: Int) = context.pop(n)
 
   fun setOption(option: SetOption) {
     _commands.add(option)
+  }
+
+  fun setInfo(info: SetInfo) {
+    this.info.add(info.attribute)
+
+    _commands.add(info)
+  }
+
+  fun declareSort(decl: DeclareSort) {
+    context.declareSort(decl)
+    _commands.add(decl)
+  }
+
+  fun declareSort(name: Symbol, arity: Int) {
+    context.declareSort(name, arity)
+    _commands.add(DeclareSort(name, arity))
+  }
+
+  fun defineSort(name: Symbol, parameters: List<Symbol>, sort: Sort) {
+    context.defineSort(name, parameters, sort)
+    _commands.add(DefineSort(name, parameters, sort))
   }
 
   /**
@@ -154,5 +220,63 @@ class MutableSMTProgram(commands: List<Command>, context: ParseContext?) :
   }
 }
 
-class DefaultSMTProgram(commands: List<Command>, context: ParseContext) :
-    SMTProgram(commands, context)
+class DefaultSMTProgram(commands: List<Command>) : SMTProgram(commands)
+
+fun MutableSMTProgram.assert(expr: Expression<BoolSort>) = assert(Assert(expr))
+
+fun MutableSMTProgram.declareFun(name: Symbol, parameters: List<Sort>, sort: Sort) =
+    declareFun(UserDeclaredSMTFunctionN(name, sort, parameters))
+
+fun <T : Sort> MutableSMTProgram.defineFun(
+    name: Symbol,
+    parameters: List<Sort>,
+    sort: T,
+    term: Expression<T>
+) = defineFun(UserDefinedSMTFunctionN(name, sort, parameters, term))
+
+fun <T : Sort> MutableSMTProgram.defineFun(def: FunctionDef<T>) =
+    defineFun(UserDefinedSMTFunctionN(def.name, def.sort, def.parameters, def.term))
+
+fun MutableSMTProgram.setOption(name: String, value: Boolean) =
+    setOption(SetOption(name, BooleanOptionValue(value)))
+
+fun MutableSMTProgram.setOption(name: String, value: String) =
+    setOption(SetOption(name, StringOptionValue(value)))
+
+fun MutableSMTProgram.setOption(name: String, value: Int) =
+    setOption(SetOption(name, NumeralOptionValue(value.toBigInteger())))
+
+fun MutableSMTProgram.setOption(name: String, value: Long) =
+    setOption(SetOption(name, NumeralOptionValue(value.toBigInteger())))
+
+fun MutableSMTProgram.setOption(name: String, value: BigInteger) =
+    setOption(SetOption(name, NumeralOptionValue(value)))
+
+fun MutableSMTProgram.setOption(name: String, value: OptionValue) =
+    setOption(SetOption(name, value))
+
+fun MutableSMTProgram.setInfo(name: String, value: String) =
+    setInfo(SetInfo(Attribute(name, ConstantAttributeValue(StringConstant(value)))))
+
+fun MutableSMTProgram.setInfo(name: String, value: Int) =
+    setInfo(SetInfo(Attribute(name, ConstantAttributeValue(NumeralConstant(value.toBigInteger())))))
+
+fun MutableSMTProgram.setInfo(name: String, value: Long) =
+    setInfo(SetInfo(Attribute(name, ConstantAttributeValue(NumeralConstant(value.toBigInteger())))))
+
+fun MutableSMTProgram.setInfo(name: String, value: BigInteger) =
+    setInfo(SetInfo(Attribute(name, ConstantAttributeValue(NumeralConstant(value)))))
+
+fun MutableSMTProgram.setInfo(name: String, value: Float) =
+    setInfo(SetInfo(Attribute(name, ConstantAttributeValue(DecimalConstant(value.toBigDecimal())))))
+
+fun MutableSMTProgram.setInfo(name: String, value: Double) =
+    setInfo(SetInfo(Attribute(name, ConstantAttributeValue(DecimalConstant(value.toBigDecimal())))))
+
+fun MutableSMTProgram.setInfo(name: String, value: BigDecimal) =
+    setInfo(SetInfo(Attribute(name, ConstantAttributeValue(DecimalConstant(value)))))
+
+fun MutableSMTProgram.setInfo(name: String, value: Symbol) =
+    setInfo(SetInfo(Attribute(name, SymbolAttributeValue(value))))
+
+class AssertionOutOfLogicBounds(msg: String) : RuntimeException(msg)
