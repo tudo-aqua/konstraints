@@ -38,8 +38,8 @@ import tools.aqua.konstraints.smt.bitvec
 class SMTProgramTests {
   // test basic expressions
   val coreProgram = MutableSMTProgram().apply { setLogic(UF) }
-  val coreFunA = coreProgram.declareConst("A!bool".toSymbolWithQuotes(), BoolSort)()
-  val coreFunB = coreProgram.declareConst("B!bool".toSymbolWithQuotes(), BoolSort)()
+  val coreFunA = coreProgram.declareConst("A!bool".toSymbolWithQuotes(), Bool)()
+  val coreFunB = coreProgram.declareConst("B!bool".toSymbolWithQuotes(), Bool)()
   val coreExpressionA = (not { coreFunB and coreFunA }) eq (not(coreFunA) and not(coreFunB))
 
   val bvProgram =
@@ -86,9 +86,9 @@ class SMTProgramTests {
         arguments(bvProgram, bvExpressionB),
         arguments(bvProgram, bvExpressionC),
         arguments(
-            coreProgram, exists(BoolSort) { local -> (local eq coreFunA) and (local eq coreFunB) }),
+            coreProgram, exists(Bool) { local -> (local eq coreFunA) and (local eq coreFunB) }),
         arguments(
-            coreProgram, forall(BoolSort) { local -> (local eq coreFunA) and (local eq coreFunB) }))
+            coreProgram, forall(Bool) { local -> (local eq coreFunA) and (local eq coreFunB) }))
   }
 
   @ParameterizedTest
@@ -117,6 +117,6 @@ class SMTProgramTests {
     return Stream.of(
         arguments(
             coreProgram,
-            UserDeclaredSMTFunction0("Unregistered!bool".toSymbolWithQuotes(), BoolSort)()))
+            UserDeclaredSMTFunction0("Unregistered!bool".toSymbolWithQuotes(), Bool)()))
   }
 }

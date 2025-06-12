@@ -63,9 +63,9 @@ import tools.aqua.konstraints.smt.ZeroExtend
  */
 infix fun Expression<BVSort>.bvand(other: Expression<BVSort>) =
     if (this is BVAnd) {
-        BVAnd(this.children + other)
+      BVAnd(this.children + other)
     } else {
-        BVAnd(this, other)
+      BVAnd(this, other)
     }
 
 /**
@@ -97,9 +97,9 @@ infix fun (() -> Expression<BVSort>).bvand(other: () -> Expression<BVSort>): BVA
  */
 infix fun Expression<BVSort>.bvor(other: Expression<BVSort>) =
     if (this is BVOr) {
-        BVOr(this.children + other)
+      BVOr(this.children + other)
     } else {
-        BVOr(this, other)
+      BVOr(this, other)
     }
 
 /**
@@ -131,9 +131,9 @@ infix fun (() -> Expression<BVSort>).bvor(other: () -> Expression<BVSort>): BVOr
  */
 infix fun Expression<BVSort>.bvadd(other: Expression<BVSort>) =
     if (this is BVAdd) {
-        BVAdd(this.children + other)
+      BVAdd(this.children + other)
     } else {
-        BVAdd(this, other)
+      BVAdd(this, other)
     }
 
 /**
@@ -165,9 +165,9 @@ infix fun (() -> Expression<BVSort>).bvadd(other: () -> Expression<BVSort>): BVA
  */
 infix fun Expression<BVSort>.bvmul(other: Expression<BVSort>) =
     if (this is BVMul) {
-        BVMul(this.children + other)
+      BVMul(this.children + other)
     } else {
-        BVMul(this, other)
+      BVMul(this, other)
     }
 
 /**
@@ -264,7 +264,8 @@ infix fun (() -> Expression<BVSort>).bvlshr(distance: () -> Expression<BVSort>) 
 /**
  * Implements a bitwise nand operation: [this] nand [other].
  *
- * If [this] is a [tools.aqua.konstraints.smt.BVNAnd] object, unpacks the children and returns a new combined BVNAnd.
+ * If [this] is a [tools.aqua.konstraints.smt.BVNAnd] object, unpacks the children and returns a new
+ * combined BVNAnd.
  */
 infix fun Expression<BVSort>.bvnand(other: Expression<BVSort>) = BVNAnd(this, other)
 
@@ -293,7 +294,8 @@ infix fun (() -> Expression<BVSort>).bvnand(other: () -> Expression<BVSort>) =
 /**
  * Implements a bitwise nor operation: [this] nor [other].
  *
- * If [this] is a [tools.aqua.konstraints.smt.BVNOr] object, unpacks the children and returns a new combined BVNor.
+ * If [this] is a [tools.aqua.konstraints.smt.BVNOr] object, unpacks the children and returns a new
+ * combined BVNor.
  */
 infix fun Expression<BVSort>.bvnor(other: Expression<BVSort>) = BVNOr(this, other)
 
@@ -325,9 +327,9 @@ infix fun (() -> Expression<BVSort>).bvnor(other: () -> Expression<BVSort>) = BV
  */
 infix fun Expression<BVSort>.bvxor(other: Expression<BVSort>) =
     if (this is BVXOr) {
-        BVXOr(this.children + other)
+      BVXOr(this.children + other)
     } else {
-        BVXOr(this, other)
+      BVXOr(this, other)
     }
 
 /**
@@ -354,7 +356,8 @@ infix fun (() -> Expression<BVSort>).bvxor(other: () -> Expression<BVSort>) = BV
 /**
  * Implements a bitwise xnor operation: [this] xnor [rhs].
  *
- * If [this] is a [tools.aqua.konstraints.smt.BVXNOr] object, unpacks the children and returns a new combined BVXNor.
+ * If [this] is a [tools.aqua.konstraints.smt.BVXNOr] object, unpacks the children and returns a new
+ * combined BVXNor.
  */
 infix fun Expression<BVSort>.bvxnor(rhs: Expression<BVSort>) = BVXNOr(this, rhs)
 

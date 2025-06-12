@@ -18,10 +18,10 @@
 
 package tools.aqua.konstraints.dsl
 
+import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.Ite
 import tools.aqua.konstraints.smt.Sort
-import tools.aqua.konstraints.smt.BoolSort
 
 @SMTDSL
 class ITE1(val condition: Expression<BoolSort>) {

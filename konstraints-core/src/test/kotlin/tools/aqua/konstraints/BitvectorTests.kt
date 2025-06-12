@@ -41,12 +41,12 @@ import tools.aqua.konstraints.smt.BVNeg
 import tools.aqua.konstraints.smt.BVNot
 import tools.aqua.konstraints.smt.BVOr
 import tools.aqua.konstraints.smt.BVShl
-import tools.aqua.konstraints.smt.Expression
-import tools.aqua.konstraints.smt.toSymbolWithQuotes
 import tools.aqua.konstraints.smt.BVSort
 import tools.aqua.konstraints.smt.BVUDiv
 import tools.aqua.konstraints.smt.BVURem
 import tools.aqua.konstraints.smt.BVUlt
+import tools.aqua.konstraints.smt.Expression
+import tools.aqua.konstraints.smt.toSymbolWithQuotes
 
 /*
  * Lifecycle.PER_CLASS is needed for MethodSource to avoid moving sources to a companion object

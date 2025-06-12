@@ -28,10 +28,10 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
-import tools.aqua.konstraints.smt.BitVecFactory
-import tools.aqua.konstraints.smt.Sort
 import tools.aqua.konstraints.smt.BVSort
-import tools.aqua.konstraints.smt.BoolSort
+import tools.aqua.konstraints.smt.BitVecFactory
+import tools.aqua.konstraints.smt.Bool
+import tools.aqua.konstraints.smt.Sort
 
 /*
  * Lifecycle.PER_CLASS is needed for MethodSource to avoid moving sources to a companion object
@@ -46,7 +46,7 @@ class SortTests {
   }
 
   private fun getSortsAndTheirSerialization(): Stream<Arguments> {
-    return Stream.of(arguments("Bool", BoolSort), arguments("(_ BitVec 32)", BVSort(32)))
+    return Stream.of(arguments("Bool", Bool), arguments("(_ BitVec 32)", BVSort(32)))
   }
 
   @ParameterizedTest

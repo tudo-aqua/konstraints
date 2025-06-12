@@ -21,12 +21,16 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.parser.*
 
 /** Array sort */
-open class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) :
-    Sort("Array".toSymbolWithQuotes(), emptyList(), listOf(x, y)) {
+sealed class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) :
+    Sort("Array".toSymbolWithQuotes()) {
+  override val parameters = listOf(x, y)
+
   override fun toString(): String = "(Array $x $y)"
 
   override val theories = ARRAYS_EX_MARKER_SET
 }
+
+class SMTArray<X : Sort, Y : Sort>(x: X, y: Y) : ArraySort<X, Y>(x, y)
 
 /**
  * Array selection operation

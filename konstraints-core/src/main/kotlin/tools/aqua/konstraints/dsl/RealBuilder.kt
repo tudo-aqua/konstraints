@@ -43,9 +43,9 @@ operator fun Expression<RealSort>.unaryMinus() = RealNeg(this)
  */
 infix operator fun Expression<RealSort>.minus(subtrahend: Expression<RealSort>) =
     if (this is RealSub) {
-        RealSub(this.children + subtrahend)
+      RealSub(this.children + subtrahend)
     } else {
-        RealSub(this, subtrahend)
+      RealSub(this, subtrahend)
     }
 
 /**
@@ -361,9 +361,9 @@ infix operator fun BigDecimal.minus(subtrahend: () -> Expression<RealSort>) =
  */
 infix operator fun Expression<RealSort>.plus(summand: Expression<RealSort>) =
     if (this is RealAdd) {
-        RealAdd(this.children + summand)
+      RealAdd(this.children + summand)
     } else {
-        RealAdd(this, summand)
+      RealAdd(this, summand)
     }
 
 /**
@@ -666,9 +666,9 @@ infix operator fun BigDecimal.plus(summand: () -> Expression<RealSort>) =
  */
 infix operator fun Expression<RealSort>.times(multiplicand: Expression<RealSort>) =
     if (this is RealMul) {
-        RealMul(this.children + multiplicand)
+      RealMul(this.children + multiplicand)
     } else {
-        RealMul(this, multiplicand)
+      RealMul(this, multiplicand)
     }
 
 /**
@@ -990,9 +990,9 @@ infix operator fun BigDecimal.times(multiplicand: () -> Expression<RealSort>) =
  */
 infix operator fun Expression<RealSort>.div(divisor: Expression<RealSort>) =
     if (this is RealDiv) {
-        RealDiv(this.children + divisor)
+      RealDiv(this.children + divisor)
     } else {
-        RealDiv(this, divisor)
+      RealDiv(this, divisor)
     }
 
 /**

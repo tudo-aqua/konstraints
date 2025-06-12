@@ -26,7 +26,7 @@ import tools.aqua.konstraints.parser.*
  * (to_real Int Real)
  */
 class ToReal(override val inner: Expression<IntSort>) :
-    UnaryExpression<RealSort, IntSort>("to_real".toSymbolWithQuotes(), RealSort) {
+    UnaryExpression<RealSort, IntSort>("to_real".toSymbolWithQuotes(), Real) {
   override val theories = REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
@@ -39,7 +39,7 @@ class ToReal(override val inner: Expression<IntSort>) :
  * (to_int Real Int)
  */
 class ToInt(override val inner: Expression<RealSort>) :
-    UnaryExpression<IntSort, RealSort>("to_int".toSymbolWithQuotes(), IntSort) {
+    UnaryExpression<IntSort, RealSort>("to_int".toSymbolWithQuotes(), SMTInt) {
   override val theories = REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
@@ -48,7 +48,7 @@ class ToInt(override val inner: Expression<RealSort>) :
 
 /** (is_int Real Bool) */
 class IsInt(override val inner: Expression<RealSort>) :
-    UnaryExpression<BoolSort, RealSort>("is_int".toSymbolWithQuotes(), BoolSort) {
+    UnaryExpression<BoolSort, RealSort>("is_int".toSymbolWithQuotes(), Bool) {
   override val theories = REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =

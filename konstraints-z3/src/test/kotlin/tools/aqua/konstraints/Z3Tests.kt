@@ -351,8 +351,8 @@ class Z3Tests {
             Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)))
     val u = VarBinding("u".toSymbolWithQuotes(), BVURem(abs_s.instance, abs_t.instance))
 
-    val A = program.declareConst("A".toSymbolWithQuotes(), IntSort)()
-    val B = program.declareConst("B".toSymbolWithQuotes(), IntSort)()
+    val A = program.declareConst("A".toSymbolWithQuotes(), SMTInt)()
+    val B = program.declareConst("B".toSymbolWithQuotes(), SMTInt)()
 
     return Stream.of(
         Arguments.arguments(listOf(And(IntGreaterEq(A, B), IntLessEq(A, B)))),

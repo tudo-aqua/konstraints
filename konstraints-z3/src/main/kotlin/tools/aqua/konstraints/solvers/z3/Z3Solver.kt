@@ -100,7 +100,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
           is BVSort -> context.context.mkBitVecSort(sort.bits)
           is IntSort -> context.context.mkIntSort()
           is RealSort -> context.context.mkRealSort()
-          is RoundingMode -> context.context.mkFPRoundingModeSort()
+          is RoundingModeSort -> context.context.mkFPRoundingModeSort()
           is FPSort -> context.context.mkFPSort(sort.exponentBits, sort.significantBits)
           is FP16 -> context.context.mkFPSort16()
           is FP32 -> context.context.mkFPSort32()

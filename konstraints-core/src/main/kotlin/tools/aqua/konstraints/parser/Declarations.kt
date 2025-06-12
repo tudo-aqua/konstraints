@@ -59,12 +59,12 @@ interface Theory {
               IteDecl,
               ImpliesDecl)
           .associateBy { it.symbol }
-  override val sorts = mapOf(BoolSort.symbol to BoolFactory)
+  override val sorts = mapOf(Bool.symbol to BoolFactory)
 }
 
 internal object TrueDecl :
     SMTTheoryFunction<BoolSort>(
-        "true".toSymbolWithQuotes(), emptyList(), BoolSort, Associativity.NONE) {
+        "true".toSymbolWithQuotes(), emptyList(), Bool, Associativity.NONE) {
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
@@ -78,7 +78,7 @@ internal object TrueDecl :
 
 internal object FalseDecl :
     SMTTheoryFunction<BoolSort>(
-        "false".toSymbolWithQuotes(), emptyList(), BoolSort, Associativity.NONE) {
+        "false".toSymbolWithQuotes(), emptyList(), Bool, Associativity.NONE) {
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
@@ -93,7 +93,7 @@ internal object FalseDecl :
 /** Not declaration internal object */
 internal object NotDecl :
     SMTTheoryFunction<BoolSort>(
-        "not".toSymbolWithQuotes(), listOf(BoolSort), BoolSort, Associativity.NONE) {
+        "not".toSymbolWithQuotes(), listOf(Bool), Bool, Associativity.NONE) {
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
@@ -101,14 +101,14 @@ internal object NotDecl :
     require(args.size == 1)
     require(indices.isEmpty())
 
-    return Not(args.single() castTo BoolSort)
+    return Not(args.single() castTo Bool)
   }
 }
 
 /** Implies declaration internal object */
 internal object ImpliesDecl :
     SMTTheoryFunction<BoolSort>(
-        "=>".toSymbolWithQuotes(), listOf(BoolSort, BoolSort), BoolSort, Associativity.CHAINABLE) {
+        "=>".toSymbolWithQuotes(), listOf(Bool, Bool), Bool, Associativity.CHAINABLE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -117,17 +117,14 @@ internal object ImpliesDecl :
     require(args.size >= 2)
     require(indices.isEmpty())
 
-    return Implies(args.map { it castTo BoolSort })
+    return Implies(args.map { it castTo Bool })
   }
 }
 
 /** And declaration internal object */
 internal object AndDecl :
     SMTTheoryFunction<BoolSort>(
-        "and".toSymbolWithQuotes(),
-        listOf(BoolSort, BoolSort),
-        BoolSort,
-        Associativity.LEFT_ASSOC) {
+        "and".toSymbolWithQuotes(), listOf(Bool, Bool), Bool, Associativity.LEFT_ASSOC) {
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
@@ -135,14 +132,14 @@ internal object AndDecl :
     require(args.size >= 2)
     require(indices.isEmpty())
 
-    return And(args.map { it castTo BoolSort })
+    return And(args.map { it castTo Bool })
   }
 }
 
 /** Or declaration internal object */
 internal object OrDecl :
     SMTTheoryFunction<BoolSort>(
-        "or".toSymbolWithQuotes(), listOf(BoolSort, BoolSort), BoolSort, Associativity.LEFT_ASSOC) {
+        "or".toSymbolWithQuotes(), listOf(Bool, Bool), Bool, Associativity.LEFT_ASSOC) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -151,17 +148,14 @@ internal object OrDecl :
     require(args.size >= 2)
     require(indices.isEmpty())
 
-    return Or(args.map { it castTo BoolSort })
+    return Or(args.map { it castTo Bool })
   }
 }
 
 /** Xor declaration internal object */
 internal object XOrDecl :
     SMTTheoryFunction<BoolSort>(
-        "xor".toSymbolWithQuotes(),
-        listOf(BoolSort, BoolSort),
-        BoolSort,
-        Associativity.LEFT_ASSOC) {
+        "xor".toSymbolWithQuotes(), listOf(Bool, Bool), Bool, Associativity.LEFT_ASSOC) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -170,7 +164,7 @@ internal object XOrDecl :
     require(args.size >= 2)
     require(indices.isEmpty())
 
-    return XOr(args.map { it castTo BoolSort })
+    return XOr(args.map { it castTo Bool })
   }
 }
 
@@ -220,15 +214,15 @@ internal object DistinctDecl :
 internal object IteDecl :
     SMTTheoryFunction<Sort>(
         "ite".toSymbolWithQuotes(),
-        listOf(BoolSort, SortParameter("A"), SortParameter("A")),
-        BoolSort,
+        listOf(Bool, SortParameter("A"), SortParameter("A")),
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Ite<*> {
     require(args.size == 3)
     require(indices.isEmpty())
 
-    return Ite(args[0] castTo BoolSort, args[1], args[2])
+    return Ite(args[0] castTo Bool, args[1], args[2])
   }
 }
 
@@ -524,7 +518,7 @@ internal object BVUltDecl :
     SMTTheoryFunction<BoolSort>(
         "bvult".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
-        BoolSort,
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -724,7 +718,7 @@ internal object BVULeDecl :
     SMTTheoryFunction<BoolSort>(
         "bvule".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
-        BoolSort,
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -744,7 +738,7 @@ internal object BVUGtDecl :
     SMTTheoryFunction<BoolSort>(
         "bvugt".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
-        BoolSort,
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -764,7 +758,7 @@ internal object BVUGeDecl :
     SMTTheoryFunction<BoolSort>(
         "bvuge".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
-        BoolSort,
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -784,7 +778,7 @@ internal object BVSLtDecl :
     SMTTheoryFunction<BoolSort>(
         "bvslt".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
-        BoolSort,
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -804,7 +798,7 @@ internal object BVSLeDecl :
     SMTTheoryFunction<BoolSort>(
         "bvsle".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
-        BoolSort,
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -824,7 +818,7 @@ internal object BVSGtDecl :
     SMTTheoryFunction<BoolSort>(
         "bvsgt".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
-        BoolSort,
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -844,7 +838,7 @@ internal object BVSGeDecl :
     SMTTheoryFunction<BoolSort>(
         "bvsge".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
-        BoolSort,
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -1005,39 +999,39 @@ internal object IntsTheory : Theory {
               DivisibleDecl)
           .associateBy { it.symbol }
 
-  override val sorts = mapOf(IntSort.symbol to IntFactory)
+  override val sorts = mapOf(SMTInt.symbol to IntFactory)
 }
 
 internal object IntNegDecl :
     SMTTheoryFunction<IntSort>(
-        "-".toSymbolWithQuotes(), listOf(IntSort), IntSort, Associativity.NONE) {
+        "-".toSymbolWithQuotes(), listOf(SMTInt), SMTInt, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
     require(args.size == 1)
-    return IntNeg(args.single() castTo IntSort)
+    return IntNeg(args.single() castTo SMTInt)
   }
 }
 
 internal object IntSubDecl :
     SMTTheoryFunction<IntSort>(
-        "-".toSymbolWithQuotes(), listOf(IntSort, IntSort), IntSort, Associativity.LEFT_ASSOC) {
+        "-".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), SMTInt, Associativity.LEFT_ASSOC) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
     require(args.size >= 2)
-    return IntSub(args.map { expr -> expr castTo IntSort })
+    return IntSub(args.map { expr -> expr castTo SMTInt })
   }
 }
 
 /** Combined function declaration for overloaded '-' operator */
 internal object IntNegSubDecl :
     SMTTheoryFunction<IntSort>(
-        "-".toSymbolWithQuotes(), listOf(IntSort), IntSort, Associativity.NONE) {
+        "-".toSymbolWithQuotes(), listOf(SMTInt), SMTInt, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -1054,124 +1048,124 @@ internal object IntNegSubDecl :
 
 internal object IntAddDecl :
     SMTTheoryFunction<IntSort>(
-        "+".toSymbolWithQuotes(), listOf(IntSort, IntSort), IntSort, Associativity.LEFT_ASSOC) {
+        "+".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), SMTInt, Associativity.LEFT_ASSOC) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
     require(args.size >= 2)
-    return IntAdd(args.map { expr -> expr castTo IntSort })
+    return IntAdd(args.map { expr -> expr castTo SMTInt })
   }
 }
 
 internal object IntMulDecl :
     SMTTheoryFunction<IntSort>(
-        "*".toSymbolWithQuotes(), listOf(IntSort, IntSort), IntSort, Associativity.LEFT_ASSOC) {
+        "*".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), SMTInt, Associativity.LEFT_ASSOC) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
     require(args.size >= 2)
-    return IntMul(args.map { expr -> expr castTo IntSort })
+    return IntMul(args.map { expr -> expr castTo SMTInt })
   }
 }
 
 internal object IntDivDecl :
     SMTTheoryFunction<IntSort>(
-        "div".toSymbolWithQuotes(), listOf(IntSort, IntSort), IntSort, Associativity.LEFT_ASSOC) {
+        "div".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), SMTInt, Associativity.LEFT_ASSOC) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
     require(args.size >= 2)
-    return IntDiv(args.map { expr -> expr castTo IntSort })
+    return IntDiv(args.map { expr -> expr castTo SMTInt })
   }
 }
 
 internal object ModDecl :
     SMTTheoryFunction<IntSort>(
-        "mod".toSymbolWithQuotes(), listOf(IntSort, IntSort), IntSort, Associativity.NONE) {
+        "mod".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), SMTInt, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
     require(args.size == 2)
-    return Mod(args[0] castTo IntSort, args[1] castTo IntSort)
+    return Mod(args[0] castTo SMTInt, args[1] castTo SMTInt)
   }
 }
 
 internal object AbsDecl :
     SMTTheoryFunction<IntSort>(
-        "abs".toSymbolWithQuotes(), listOf(IntSort), IntSort, Associativity.NONE) {
+        "abs".toSymbolWithQuotes(), listOf(SMTInt), SMTInt, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
     require(args.size == 1)
-    return IntNeg(args.single() castTo IntSort)
+    return IntNeg(args.single() castTo SMTInt)
   }
 }
 
 internal object IntLessEqDecl :
     SMTTheoryFunction<BoolSort>(
-        "<=".toSymbolWithQuotes(), listOf(IntSort, IntSort), BoolSort, Associativity.CHAINABLE) {
+        "<=".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), Bool, Associativity.CHAINABLE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
     require(args.size >= 2)
-    return IntLessEq(args.map { expr -> expr castTo IntSort })
+    return IntLessEq(args.map { expr -> expr castTo SMTInt })
   }
 }
 
 internal object IntLessDecl :
     SMTTheoryFunction<BoolSort>(
-        "<".toSymbolWithQuotes(), listOf(IntSort, IntSort), BoolSort, Associativity.CHAINABLE) {
+        "<".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), Bool, Associativity.CHAINABLE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
     require(args.size >= 2)
-    return IntLess(args.map { expr -> expr castTo IntSort })
+    return IntLess(args.map { expr -> expr castTo SMTInt })
   }
 }
 
 internal object IntGreaterEqDecl :
     SMTTheoryFunction<BoolSort>(
-        ">=".toSymbolWithQuotes(), listOf(IntSort, IntSort), BoolSort, Associativity.CHAINABLE) {
+        ">=".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), Bool, Associativity.CHAINABLE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
     require(args.size >= 2)
-    return IntGreaterEq(args.map { expr -> expr castTo IntSort })
+    return IntGreaterEq(args.map { expr -> expr castTo SMTInt })
   }
 }
 
 internal object IntGreaterDecl :
     SMTTheoryFunction<BoolSort>(
-        ">".toSymbolWithQuotes(), listOf(IntSort, IntSort), BoolSort, Associativity.CHAINABLE) {
+        ">".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), Bool, Associativity.CHAINABLE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
     require(args.size >= 2)
-    return IntGreater(args.map { expr -> expr castTo IntSort })
+    return IntGreater(args.map { expr -> expr castTo SMTInt })
   }
 }
 
 internal object DivisibleDecl :
     SMTTheoryFunction<BoolSort>(
-        "divisible".toSymbolWithQuotes(), listOf(IntSort), BoolSort, Associativity.NONE) {
+        "divisible".toSymbolWithQuotes(), listOf(SMTInt), Bool, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -1202,39 +1196,37 @@ internal object RealsTheory : Theory {
               RealGreaterDecl)
           .associateBy { it.symbol }
 
-  override val sorts = mapOf(RealSort.symbol to RealFactory)
+  override val sorts = mapOf(Real.symbol to RealFactory)
 }
 
 internal object RealNegDecl :
-    SMTTheoryFunction<RealSort>(
-        "-".toSymbolWithQuotes(), listOf(RealSort), RealSort, Associativity.NONE) {
+    SMTTheoryFunction<RealSort>("-".toSymbolWithQuotes(), listOf(Real), Real, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RealSort> {
     require(args.size == 1)
-    return RealNeg(args.single() castTo RealSort)
+    return RealNeg(args.single() castTo Real)
   }
 }
 
 internal object RealSubDecl :
     SMTTheoryFunction<RealSort>(
-        "-".toSymbolWithQuotes(), listOf(RealSort), RealSort, Associativity.LEFT_ASSOC) {
+        "-".toSymbolWithQuotes(), listOf(Real), Real, Associativity.LEFT_ASSOC) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RealSort> {
     require(args.size >= 2)
-    return RealSub(args.map { expr -> expr castTo RealSort })
+    return RealSub(args.map { expr -> expr castTo Real })
   }
 }
 
 /** Combined function declaration for overloaded '-' operator */
 internal object RealNegSubDecl :
-    SMTTheoryFunction<RealSort>(
-        "-".toSymbolWithQuotes(), listOf(RealSort), RealSort, Associativity.NONE) {
+    SMTTheoryFunction<RealSort>("-".toSymbolWithQuotes(), listOf(Real), Real, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -1251,92 +1243,92 @@ internal object RealNegSubDecl :
 
 internal object RealAddDecl :
     SMTTheoryFunction<RealSort>(
-        "+".toSymbolWithQuotes(), listOf(RealSort, RealSort), RealSort, Associativity.LEFT_ASSOC) {
+        "+".toSymbolWithQuotes(), listOf(Real, Real), Real, Associativity.LEFT_ASSOC) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RealSort> {
     require(args.size >= 2)
-    return RealAdd(args.map { expr -> expr castTo RealSort })
+    return RealAdd(args.map { expr -> expr castTo Real })
   }
 }
 
 internal object RealMulDecl :
     SMTTheoryFunction<RealSort>(
-        "*".toSymbolWithQuotes(), listOf(RealSort, RealSort), RealSort, Associativity.LEFT_ASSOC) {
+        "*".toSymbolWithQuotes(), listOf(Real, Real), Real, Associativity.LEFT_ASSOC) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RealSort> {
     require(args.size >= 2)
-    return RealMul(args.map { expr -> expr castTo RealSort })
+    return RealMul(args.map { expr -> expr castTo Real })
   }
 }
 
 internal object RealDivDecl :
     SMTTheoryFunction<RealSort>(
-        "/".toSymbolWithQuotes(), listOf(RealSort, RealSort), RealSort, Associativity.LEFT_ASSOC) {
+        "/".toSymbolWithQuotes(), listOf(Real, Real), Real, Associativity.LEFT_ASSOC) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RealSort> {
     require(args.size >= 2)
-    return RealDiv(args.map { expr -> expr castTo RealSort })
+    return RealDiv(args.map { expr -> expr castTo Real })
   }
 }
 
 internal object RealLessEqDecl :
     SMTTheoryFunction<BoolSort>(
-        "<=".toSymbolWithQuotes(), listOf(RealSort, RealSort), BoolSort, Associativity.CHAINABLE) {
+        "<=".toSymbolWithQuotes(), listOf(Real, Real), Bool, Associativity.CHAINABLE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
     require(args.size >= 2)
-    return RealLessEq(args.map { expr -> expr castTo RealSort })
+    return RealLessEq(args.map { expr -> expr castTo Real })
   }
 }
 
 internal object RealLessDecl :
     SMTTheoryFunction<BoolSort>(
-        "<".toSymbolWithQuotes(), listOf(RealSort, RealSort), BoolSort, Associativity.CHAINABLE) {
+        "<".toSymbolWithQuotes(), listOf(Real, Real), Bool, Associativity.CHAINABLE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
     require(args.size >= 2)
-    return RealLess(args.map { expr -> expr castTo RealSort })
+    return RealLess(args.map { expr -> expr castTo Real })
   }
 }
 
 internal object RealGreaterEqDecl :
     SMTTheoryFunction<BoolSort>(
-        ">=".toSymbolWithQuotes(), listOf(RealSort, RealSort), BoolSort, Associativity.CHAINABLE) {
+        ">=".toSymbolWithQuotes(), listOf(Real, Real), Bool, Associativity.CHAINABLE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
     require(args.size >= 2)
-    return RealGreaterEq(args.map { expr -> expr castTo RealSort })
+    return RealGreaterEq(args.map { expr -> expr castTo Real })
   }
 }
 
 internal object RealGreaterDecl :
     SMTTheoryFunction<BoolSort>(
-        ">".toSymbolWithQuotes(), listOf(RealSort, RealSort), BoolSort, Associativity.CHAINABLE) {
+        ">".toSymbolWithQuotes(), listOf(Real, Real), Bool, Associativity.CHAINABLE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
     require(args.size >= 2)
-    return RealGreater(args.map { expr -> expr castTo RealSort })
+    return RealGreater(args.map { expr -> expr castTo Real })
   }
 }
 
@@ -1364,51 +1356,51 @@ internal object RealsIntsTheory : Theory {
               IntRealGreaterEqDecl)
           .associateBy { it.symbol }
 
-  override val sorts = mapOf(IntSort.symbol to IntFactory, RealSort.symbol to RealFactory)
+  override val sorts = mapOf(SMTInt.symbol to IntFactory, Real.symbol to RealFactory)
 }
 
 internal object ToRealDecl :
     SMTTheoryFunction<RealSort>(
-        "to_real".toSymbolWithQuotes(), listOf(IntSort), RealSort, Associativity.NONE) {
+        "to_real".toSymbolWithQuotes(), listOf(SMTInt), Real, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RealSort> {
     require(args.size == 1)
-    return ToReal(args.single() castTo IntSort)
+    return ToReal(args.single() castTo SMTInt)
   }
 }
 
 internal object ToIntDecl :
     SMTTheoryFunction<IntSort>(
-        "to_real".toSymbolWithQuotes(), listOf(RealSort), IntSort, Associativity.NONE) {
+        "to_real".toSymbolWithQuotes(), listOf(Real), SMTInt, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
     require(args.size == 1)
-    return ToInt(args.single() castTo RealSort)
+    return ToInt(args.single() castTo Real)
   }
 }
 
 internal object IsIntDecl :
     SMTTheoryFunction<BoolSort>(
-        "to_real".toSymbolWithQuotes(), listOf(RealSort), BoolSort, Associativity.NONE) {
+        "to_real".toSymbolWithQuotes(), listOf(Real), Bool, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
     require(args.size == 1)
-    return IsInt(args.single() castTo RealSort)
+    return IsInt(args.single() castTo Real)
   }
 }
 
 internal object IntRealLessDecl :
     SMTTheoryFunction<BoolSort>(
-        "<".toSymbolWithQuotes(), listOf(RealSort, RealSort), BoolSort, Associativity.CHAINABLE) {
+        "<".toSymbolWithQuotes(), listOf(Real, Real), Bool, Associativity.CHAINABLE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -1428,7 +1420,7 @@ internal object IntRealLessDecl :
 
 internal object IntRealLessEqDecl :
     SMTTheoryFunction<BoolSort>(
-        "<=".toSymbolWithQuotes(), listOf(RealSort, RealSort), BoolSort, Associativity.CHAINABLE) {
+        "<=".toSymbolWithQuotes(), listOf(Real, Real), Bool, Associativity.CHAINABLE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -1448,7 +1440,7 @@ internal object IntRealLessEqDecl :
 
 internal object IntRealGreaterEqDecl :
     SMTTheoryFunction<BoolSort>(
-        ">=".toSymbolWithQuotes(), listOf(RealSort, RealSort), BoolSort, Associativity.CHAINABLE) {
+        ">=".toSymbolWithQuotes(), listOf(Real, Real), Bool, Associativity.CHAINABLE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -1468,7 +1460,7 @@ internal object IntRealGreaterEqDecl :
 
 internal object IntRealGreaterDecl :
     SMTTheoryFunction<BoolSort>(
-        ">".toSymbolWithQuotes(), listOf(RealSort, RealSort), BoolSort, Associativity.CHAINABLE) {
+        ">".toSymbolWithQuotes(), listOf(Real, Real), Bool, Associativity.CHAINABLE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -1540,11 +1532,7 @@ internal object FloatingPointTheory : Theory {
   override val sorts =
       mapOf(
           RoundingMode.symbol to RoundingModeFactory,
-          RealSort.symbol to RealFactory,
-          // FP16.symbol,
-          // FP32.symbol,
-          // FP64.symbol,
-          // FP128.symbol,
+          Real.symbol to RealFactory,
           "BitVec".toSymbolWithQuotes() to BitVecFactory,
           "FloatingPoint".toSymbolWithQuotes() to FloatingPointFactory,
           "Float16".toSymbolWithQuotes() to Float16Factory,
@@ -1554,7 +1542,7 @@ internal object FloatingPointTheory : Theory {
 }
 
 internal object RoundNearestTiesToEvenDecl :
-    SMTTheoryFunction<RoundingMode>(
+    SMTTheoryFunction<RoundingModeSort>(
         "roundNearestTiesToEven".toSymbolWithQuotes(),
         emptyList(),
         RoundingMode,
@@ -1563,27 +1551,27 @@ internal object RoundNearestTiesToEvenDecl :
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RoundingMode> {
+  ): Expression<RoundingModeSort> {
     require(args.isEmpty())
     return RoundNearestTiesToEven
   }
 }
 
 internal object RNEDecl :
-    SMTTheoryFunction<RoundingMode>(
+    SMTTheoryFunction<RoundingModeSort>(
         "RNE".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RoundingMode> {
+  ): Expression<RoundingModeSort> {
     require(args.isEmpty())
     return RNE
   }
 }
 
 internal object RoundNearestTiesToAwayDecl :
-    SMTTheoryFunction<RoundingMode>(
+    SMTTheoryFunction<RoundingModeSort>(
         "roundNearestTiesToAway".toSymbolWithQuotes(),
         emptyList(),
         RoundingMode,
@@ -1592,98 +1580,98 @@ internal object RoundNearestTiesToAwayDecl :
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RoundingMode> {
+  ): Expression<RoundingModeSort> {
     require(args.isEmpty())
     return RoundNearestTiesToAway
   }
 }
 
 internal object RNADecl :
-    SMTTheoryFunction<RoundingMode>(
+    SMTTheoryFunction<RoundingModeSort>(
         "RNA".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RoundingMode> {
+  ): Expression<RoundingModeSort> {
     require(args.isEmpty())
     return RNA
   }
 }
 
 internal object RoundTowardPositiveDecl :
-    SMTTheoryFunction<RoundingMode>(
+    SMTTheoryFunction<RoundingModeSort>(
         "roundTowardPositive".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RoundingMode> {
+  ): Expression<RoundingModeSort> {
     require(args.isEmpty())
     return RoundTowardPositive
   }
 }
 
 internal object RTPDecl :
-    SMTTheoryFunction<RoundingMode>(
+    SMTTheoryFunction<RoundingModeSort>(
         "RTP".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RoundingMode> {
+  ): Expression<RoundingModeSort> {
     require(args.isEmpty())
     return RTP
   }
 }
 
 internal object RoundTowardNegativeDecl :
-    SMTTheoryFunction<RoundingMode>(
+    SMTTheoryFunction<RoundingModeSort>(
         "roundTowardNegative".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RoundingMode> {
+  ): Expression<RoundingModeSort> {
     require(args.isEmpty())
     return RoundTowardNegative
   }
 }
 
 internal object RTNDecl :
-    SMTTheoryFunction<RoundingMode>(
+    SMTTheoryFunction<RoundingModeSort>(
         "RTN".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RoundingMode> {
+  ): Expression<RoundingModeSort> {
     require(args.isEmpty())
     return RTN
   }
 }
 
 internal object RoundTowardZeroDecl :
-    SMTTheoryFunction<RoundingMode>(
+    SMTTheoryFunction<RoundingModeSort>(
         "roundTowardZero".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RoundingMode> {
+  ): Expression<RoundingModeSort> {
     require(args.isEmpty())
     return RoundTowardZero
   }
 }
 
 internal object RTZDecl :
-    SMTTheoryFunction<RoundingMode>(
+    SMTTheoryFunction<RoundingModeSort>(
         "RTZ".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RoundingMode> {
+  ): Expression<RoundingModeSort> {
     require(args.isEmpty())
     return RTZ
   }
@@ -1864,7 +1852,7 @@ internal object FPAddDecl :
   ): Expression<FPSort> {
     require(args.size == 3)
     require(indices.isEmpty())
-    require(args[0].sort is RoundingMode)
+    require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
     require(args[2].sort is FPSort)
 
@@ -1888,7 +1876,7 @@ internal object FPSubDecl :
   ): Expression<FPSort> {
     require(args.size == 3)
     require(indices.isEmpty())
-    require(args[0].sort is RoundingMode)
+    require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
     require(args[2].sort is FPSort)
 
@@ -1911,7 +1899,7 @@ internal object FPMulDecl :
   ): Expression<FPSort> {
     require(args.size == 3)
     require(indices.isEmpty())
-    require(args[0].sort is RoundingMode)
+    require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
     require(args[2].sort is FPSort)
 
@@ -1934,7 +1922,7 @@ internal object FPDivDecl :
   ): Expression<FPSort> {
     require(args.size == 3)
     require(indices.isEmpty())
-    require(args[0].sort is RoundingMode)
+    require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
     require(args[2].sort is FPSort)
 
@@ -1961,7 +1949,7 @@ internal object FPFmaDecl :
   ): Expression<FPSort> {
     require(args.size == 4)
     require(indices.isEmpty())
-    require(args[0].sort is RoundingMode)
+    require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
     require(args[2].sort is FPSort)
     require(args[3].sort is FPSort)
@@ -1988,7 +1976,7 @@ internal object FPSqrtDecl :
   ): Expression<FPSort> {
     require(args.size == 2)
     require(indices.isEmpty())
-    require(args[0].sort is RoundingMode)
+    require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
 
     @Suppress("UNCHECKED_CAST")
@@ -2029,7 +2017,7 @@ internal object FPRoundToIntegralDecl :
   ): Expression<FPSort> {
     require(args.size == 2)
     require(indices.isEmpty())
-    require(args[0].sort is RoundingMode)
+    require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
 
     @Suppress("UNCHECKED_CAST")
@@ -2081,7 +2069,7 @@ internal object FPLeqDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.leq".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
-        BoolSort,
+        Bool,
         Associativity.CHAINABLE) {
 
   override fun constructDynamic(
@@ -2101,7 +2089,7 @@ internal object FPLtDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.lt".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
-        BoolSort,
+        Bool,
         Associativity.CHAINABLE) {
 
   override fun constructDynamic(
@@ -2121,7 +2109,7 @@ internal object FPGeqDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.geq".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
-        BoolSort,
+        Bool,
         Associativity.CHAINABLE) {
 
   override fun constructDynamic(
@@ -2141,7 +2129,7 @@ internal object FPGtDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.gt".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
-        BoolSort,
+        Bool,
         Associativity.CHAINABLE) {
 
   override fun constructDynamic(
@@ -2161,7 +2149,7 @@ internal object FPEqDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.eq".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
-        BoolSort,
+        Bool,
         Associativity.CHAINABLE) {
 
   override fun constructDynamic(
@@ -2181,7 +2169,7 @@ internal object FPIsNormalDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.isNormal".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
-        BoolSort,
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -2201,7 +2189,7 @@ internal object FPIsSubormalDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.isSubnormal".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
-        BoolSort,
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -2221,7 +2209,7 @@ internal object FPIsZeroDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.isZero".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
-        BoolSort,
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -2241,7 +2229,7 @@ internal object FPIsInfiniteDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.isInfinite".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
-        BoolSort,
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -2261,7 +2249,7 @@ internal object FPIsNaNDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.isNaN".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
-        BoolSort,
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -2281,7 +2269,7 @@ internal object FPIsNegativeDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.isNegative".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
-        BoolSort,
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -2301,7 +2289,7 @@ internal object FPIsPositiveDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.isPositive".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
-        BoolSort,
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -2334,7 +2322,7 @@ internal object ToFPDecl :
     return if (args.size == 1) {
       BitVecToFPDecl.constructDynamic(args, indices)
     } else if (args.size == 2) {
-      require(args[0].sort is RoundingMode)
+      require(args[0].sort is RoundingModeSort)
 
       when (args[1].sort) {
         is FPSort -> FPToFPDecl.constructDynamic(args, indices)
@@ -2385,7 +2373,7 @@ internal object FPToFPDecl :
   ): Expression<FPSort> {
     require(args.size == 2)
     require(indices.size == 2)
-    require(args[0].sort is RoundingMode)
+    require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
     require(indices.all { index -> index is NumeralIndex })
 
@@ -2401,7 +2389,7 @@ internal object FPToFPDecl :
 internal object RealToFPDecl :
     SMTTheoryFunction<FPSort>(
         "to_fp".toSymbolWithQuotes(),
-        listOf(RoundingMode, RealSort),
+        listOf(RoundingMode, Real),
         FPSort("eb".idx(), "sb".idx()),
         Associativity.NONE) {
 
@@ -2411,7 +2399,7 @@ internal object RealToFPDecl :
   ): Expression<FPSort> {
     require(args.size == 2)
     require(indices.size == 2)
-    require(args[0].sort is RoundingMode)
+    require(args[0].sort is RoundingModeSort)
     require(args[1].sort is RealSort)
     require(indices.all { index -> index is NumeralIndex })
 
@@ -2437,7 +2425,7 @@ internal object SBitVecToFPDecl :
   ): Expression<FPSort> {
     require(args.size == 2)
     require(indices.size == 2)
-    require(args[0].sort is RoundingMode)
+    require(args[0].sort is RoundingModeSort)
     require(args[1].sort is BVSort)
     require(indices.all { index -> index is NumeralIndex })
 
@@ -2466,7 +2454,7 @@ internal object UBitVecToFPDecl :
   ): Expression<FPSort> {
     require(args.size == 2)
     require(indices.size == 2)
-    require(args[0].sort is RoundingMode)
+    require(args[0].sort is RoundingModeSort)
     require(args[1].sort is BVSort)
     require(indices.all { index -> index is NumeralIndex })
 
@@ -2492,7 +2480,7 @@ internal object FPToUBitVecDecl :
   ): Expression<BVSort> {
     require(args.size == 2)
     require(indices.size == 1)
-    require(args[0].sort is RoundingMode)
+    require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
     require(indices.single() is NumeralIndex)
 
@@ -2517,7 +2505,7 @@ internal object FPToSBitVecDecl :
   ): Expression<BVSort> {
     require(args.size == 2)
     require(indices.size == 1)
-    require(args[0].sort is RoundingMode)
+    require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
     require(indices.single() is NumeralIndex)
 
@@ -2535,7 +2523,7 @@ internal object FPToRealDecl :
         listOf(
             FPSort("eb".idx(), "sb".idx()),
         ),
-        RealSort,
+        Real,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -2562,7 +2550,7 @@ internal object ArrayExTheory : Theory {
 internal object ArraySelectDecl :
     SMTTheoryFunction<Sort>(
         "select".toSymbolWithQuotes(),
-        listOf(ArraySort(SortParameter("X"), SortParameter("Y"))),
+        listOf(SMTArray(SortParameter("X"), SortParameter("Y"))),
         SortParameter("Y"),
         Associativity.NONE) {
 
@@ -2584,8 +2572,8 @@ internal object ArraySelectDecl :
 internal object ArrayStoreDecl :
     SMTTheoryFunction<ArraySort<Sort, Sort>>(
         "store".toSymbolWithQuotes(),
-        listOf(ArraySort(SortParameter("X"), SortParameter("Y"))),
-        ArraySort(SortParameter("X"), SortParameter("Y")),
+        listOf(SMTArray(SortParameter("X"), SortParameter("Y"))),
+        SMTArray(SortParameter("X"), SortParameter("Y")),
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -2649,14 +2637,14 @@ internal object StringsTheory : Theory {
 
   override val sorts =
       mapOf(
-          StringSort.symbol to StringFactory,
+          SMTString.symbol to StringFactory,
           RegLan.symbol to RegLanFactory,
-          IntSort.symbol to IntFactory)
+          SMTInt.symbol to IntFactory)
 }
 
 internal object CharDecl :
     SMTTheoryFunction<StringSort>(
-        "char".toSymbolWithQuotes(), emptyList(), StringSort, Associativity.NONE) {
+        "char".toSymbolWithQuotes(), emptyList(), SMTString, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -2673,8 +2661,8 @@ internal object CharDecl :
 internal object StrConcatDecl :
     SMTTheoryFunction<StringSort>(
         "str.++".toSymbolWithQuotes(),
-        listOf(StringSort, StringSort),
-        StringSort,
+        listOf(SMTString, SMTString),
+        SMTString,
         Associativity.LEFT_ASSOC) {
 
   override fun constructDynamic(
@@ -2692,7 +2680,7 @@ internal object StrConcatDecl :
 
 internal object StrLengthDecl :
     SMTTheoryFunction<IntSort>(
-        "str.len".toSymbolWithQuotes(), listOf(StringSort), IntSort, Associativity.NONE) {
+        "str.len".toSymbolWithQuotes(), listOf(SMTString), SMTInt, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -2702,16 +2690,13 @@ internal object StrLengthDecl :
     require(indices.isEmpty())
     require(args.single().sort is StringSort)
 
-    return StrLength(args.single() castTo StringSort)
+    return StrLength(args.single() castTo SMTString)
   }
 }
 
 internal object StrLexOrderDecl :
     SMTTheoryFunction<BoolSort>(
-        "str.<".toSymbolWithQuotes(),
-        listOf(StringSort, StringSort),
-        BoolSort,
-        Associativity.CHAINABLE) {
+        "str.<".toSymbolWithQuotes(), listOf(SMTString, SMTString), Bool, Associativity.CHAINABLE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -2727,27 +2712,24 @@ internal object StrLexOrderDecl :
 }
 
 internal object ToRegexDecl :
-    SMTTheoryFunction<RegLan>(
-        "str.to_reg".toSymbolWithQuotes(), listOf(StringSort), RegLan, Associativity.NONE) {
+    SMTTheoryFunction<RegLanSort>(
+        "str.to_reg".toSymbolWithQuotes(), listOf(SMTString), RegLan, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RegLan> {
+  ): Expression<RegLanSort> {
     require(args.size == 1)
     require(indices.isEmpty())
     require(args.single().sort is StringSort)
 
-    return ToRegex(args.single() castTo StringSort)
+    return ToRegex(args.single() castTo SMTString)
   }
 }
 
 internal object InRegexDecl :
     SMTTheoryFunction<BoolSort>(
-        "str.in_reg".toSymbolWithQuotes(),
-        listOf(StringSort, RegLan),
-        BoolSort,
-        Associativity.NONE) {
+        "str.in_reg".toSymbolWithQuotes(), listOf(SMTString, RegLan), Bool, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -2756,20 +2738,20 @@ internal object InRegexDecl :
     require(args.size == 2)
     require(indices.isEmpty())
     require(args[0].sort is StringSort)
-    require(args[1].sort is RegLan)
+    require(args[1].sort is RegLanSort)
 
-    return InRegex(args[0] castTo StringSort, args[1] castTo RegLan)
+    return InRegex(args[0] castTo SMTString, args[1] castTo RegLan)
   }
 }
 
 internal object RegexNoneDecl :
-    SMTTheoryFunction<RegLan>(
+    SMTTheoryFunction<RegLanSort>(
         "re.none".toSymbolWithQuotes(), emptyList(), RegLan, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RegLan> {
+  ): Expression<RegLanSort> {
     require(args.isEmpty())
     require(indices.isEmpty())
 
@@ -2778,13 +2760,13 @@ internal object RegexNoneDecl :
 }
 
 internal object RegexAllDecl :
-    SMTTheoryFunction<RegLan>(
+    SMTTheoryFunction<RegLanSort>(
         "re.all".toSymbolWithQuotes(), emptyList(), RegLan, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RegLan> {
+  ): Expression<RegLanSort> {
     require(args.isEmpty())
     require(indices.isEmpty())
 
@@ -2793,13 +2775,13 @@ internal object RegexAllDecl :
 }
 
 internal object RegexAllCharDecl :
-    SMTTheoryFunction<RegLan>(
+    SMTTheoryFunction<RegLanSort>(
         "re.allchar".toSymbolWithQuotes(), emptyList(), RegLan, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RegLan> {
+  ): Expression<RegLanSort> {
     require(args.isEmpty())
     require(indices.isEmpty())
 
@@ -2808,67 +2790,67 @@ internal object RegexAllCharDecl :
 }
 
 internal object RegexConcatDecl :
-    SMTTheoryFunction<RegLan>(
+    SMTTheoryFunction<RegLanSort>(
         "re.++".toSymbolWithQuotes(), listOf(RegLan, RegLan), RegLan, Associativity.LEFT_ASSOC) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RegLan> {
+  ): Expression<RegLanSort> {
     require(args.size >= 2)
     require(indices.isEmpty())
-    require(args.all { expr -> expr.sort is RegLan })
+    require(args.all { expr -> expr.sort is RegLanSort })
 
     @Suppress("UNCHECKED_CAST")
-    return RegexConcat(args as List<Expression<RegLan>>)
+    return RegexConcat(args as List<Expression<RegLanSort>>)
   }
 }
 
 internal object RegexUnionDecl :
-    SMTTheoryFunction<RegLan>(
+    SMTTheoryFunction<RegLanSort>(
         "re.union".toSymbolWithQuotes(), listOf(RegLan, RegLan), RegLan, Associativity.LEFT_ASSOC) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RegLan> {
+  ): Expression<RegLanSort> {
     require(args.size >= 2)
     require(indices.isEmpty())
-    require(args.all { expr -> expr.sort is RegLan })
+    require(args.all { expr -> expr.sort is RegLanSort })
 
     @Suppress("UNCHECKED_CAST")
-    return RegexUnion(args as List<Expression<RegLan>>)
+    return RegexUnion(args as List<Expression<RegLanSort>>)
   }
 }
 
 internal object RegexIntersecDecl :
-    SMTTheoryFunction<RegLan>(
+    SMTTheoryFunction<RegLanSort>(
         "re.inter".toSymbolWithQuotes(), listOf(RegLan, RegLan), RegLan, Associativity.LEFT_ASSOC) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RegLan> {
+  ): Expression<RegLanSort> {
     require(args.size >= 2)
     require(indices.isEmpty())
-    require(args.all { expr -> expr.sort is RegLan })
+    require(args.all { expr -> expr.sort is RegLanSort })
 
     @Suppress("UNCHECKED_CAST")
-    return RegexIntersec(args as List<Expression<RegLan>>)
+    return RegexIntersec(args as List<Expression<RegLanSort>>)
   }
 }
 
 internal object RegexStarDecl :
-    SMTTheoryFunction<RegLan>(
+    SMTTheoryFunction<RegLanSort>(
         "re.*".toSymbolWithQuotes(), listOf(RegLan), RegLan, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RegLan> {
+  ): Expression<RegLanSort> {
     require(args.size == 1)
     require(indices.isEmpty())
-    require(args.single().sort is RegLan)
+    require(args.single().sort is RegLanSort)
 
     @Suppress("UNCHECKED_CAST")
     return RegexStar(args.single() castTo RegLan)
@@ -2878,8 +2860,8 @@ internal object RegexStarDecl :
 internal object StrRefLexOrderDecl :
     SMTTheoryFunction<BoolSort>(
         "str.<=".toSymbolWithQuotes(),
-        listOf(StringSort, StringSort),
-        BoolSort,
+        listOf(SMTString, SMTString),
+        Bool,
         Associativity.CHAINABLE) {
 
   override fun constructDynamic(
@@ -2897,10 +2879,7 @@ internal object StrRefLexOrderDecl :
 
 internal object StrAtDecl :
     SMTTheoryFunction<StringSort>(
-        "str.at".toSymbolWithQuotes(),
-        listOf(StringSort, IntSort),
-        StringSort,
-        Associativity.NONE) {
+        "str.at".toSymbolWithQuotes(), listOf(SMTString, SMTInt), SMTString, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -2911,15 +2890,15 @@ internal object StrAtDecl :
     require(args[0].sort is StringSort)
     require(args[1].sort is IntSort)
 
-    return StrAt(args[0] castTo StringSort, args[1] castTo IntSort)
+    return StrAt(args[0] castTo SMTString, args[1] castTo SMTInt)
   }
 }
 
 internal object StrSubstringDecl :
     SMTTheoryFunction<StringSort>(
         "str.substr".toSymbolWithQuotes(),
-        listOf(StringSort, IntSort, IntSort),
-        StringSort,
+        listOf(SMTString, SMTInt, SMTInt),
+        SMTString,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -2932,15 +2911,15 @@ internal object StrSubstringDecl :
     require(args[1].sort is IntSort)
     require(args[2].sort is IntSort)
 
-    return StrSubstring(args[0] castTo StringSort, args[1] castTo IntSort, args[2] castTo IntSort)
+    return StrSubstring(args[0] castTo SMTString, args[1] castTo SMTInt, args[2] castTo SMTInt)
   }
 }
 
 internal object StrPrefixOfDecl :
     SMTTheoryFunction<BoolSort>(
         "str.prefixof".toSymbolWithQuotes(),
-        listOf(StringSort, StringSort),
-        BoolSort,
+        listOf(SMTString, SMTString),
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -2951,15 +2930,15 @@ internal object StrPrefixOfDecl :
     require(indices.isEmpty())
     require(args.all { expr -> expr.sort is StringSort })
 
-    return StrPrefixOf(args[0] castTo StringSort, args[1] castTo StringSort)
+    return StrPrefixOf(args[0] castTo SMTString, args[1] castTo SMTString)
   }
 }
 
 internal object StrSuffixOfDecl :
     SMTTheoryFunction<BoolSort>(
         "str.suffixof".toSymbolWithQuotes(),
-        listOf(StringSort, StringSort),
-        BoolSort,
+        listOf(SMTString, SMTString),
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -2970,15 +2949,15 @@ internal object StrSuffixOfDecl :
     require(indices.isEmpty())
     require(args.all { expr -> expr.sort is StringSort })
 
-    return StrSuffixOf(args[0] castTo StringSort, args[1] castTo StringSort)
+    return StrSuffixOf(args[0] castTo SMTString, args[1] castTo SMTString)
   }
 }
 
 internal object StrContainsDecl :
     SMTTheoryFunction<BoolSort>(
         "str.contains".toSymbolWithQuotes(),
-        listOf(StringSort, StringSort),
-        BoolSort,
+        listOf(SMTString, SMTString),
+        Bool,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -2989,15 +2968,15 @@ internal object StrContainsDecl :
     require(indices.isEmpty())
     require(args.all { expr -> expr.sort is StringSort })
 
-    return StrContains(args[0] castTo StringSort, args[1] castTo StringSort)
+    return StrContains(args[0] castTo SMTString, args[1] castTo SMTString)
   }
 }
 
 internal object StrIndexOfDecl :
     SMTTheoryFunction<IntSort>(
         "str.indexof".toSymbolWithQuotes(),
-        listOf(StringSort, StringSort, IntSort),
-        IntSort,
+        listOf(SMTString, SMTString, SMTInt),
+        SMTInt,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -3010,15 +2989,15 @@ internal object StrIndexOfDecl :
     require(args[1].sort is StringSort)
     require(args[2].sort is IntSort)
 
-    return StrIndexOf(args[0] castTo StringSort, args[1] castTo StringSort, args[2] castTo IntSort)
+    return StrIndexOf(args[0] castTo SMTString, args[1] castTo SMTString, args[2] castTo SMTInt)
   }
 }
 
 internal object StrReplaceDecl :
     SMTTheoryFunction<StringSort>(
         "str.replace".toSymbolWithQuotes(),
-        listOf(StringSort, StringSort, StringSort),
-        StringSort,
+        listOf(SMTString, SMTString, SMTString),
+        SMTString,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -3029,16 +3008,15 @@ internal object StrReplaceDecl :
     require(indices.isEmpty())
     require(args.all { expr -> expr.sort is StringSort })
 
-    return StrReplace(
-        args[0] castTo StringSort, args[1] castTo StringSort, args[2] castTo StringSort)
+    return StrReplace(args[0] castTo SMTString, args[1] castTo SMTString, args[2] castTo SMTString)
   }
 }
 
 internal object StrReplaceAllDecl :
     SMTTheoryFunction<StringSort>(
         "str.replace".toSymbolWithQuotes(),
-        listOf(StringSort, StringSort, StringSort),
-        StringSort,
+        listOf(SMTString, SMTString, SMTString),
+        SMTString,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -3050,15 +3028,15 @@ internal object StrReplaceAllDecl :
     require(args.all { expr -> expr.sort is StringSort })
 
     return StrReplaceAll(
-        args[0] castTo StringSort, args[1] castTo StringSort, args[2] castTo StringSort)
+        args[0] castTo SMTString, args[1] castTo SMTString, args[2] castTo SMTString)
   }
 }
 
 internal object StrReplaceRegexDecl :
     SMTTheoryFunction<StringSort>(
         "str.replace_re".toSymbolWithQuotes(),
-        listOf(StringSort, RegLan, StringSort),
-        StringSort,
+        listOf(SMTString, RegLan, SMTString),
+        SMTString,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -3068,19 +3046,19 @@ internal object StrReplaceRegexDecl :
     require(args.size == 3)
     require(indices.isEmpty())
     require(args[0].sort is StringSort)
-    require(args[1].sort is RegLan)
+    require(args[1].sort is RegLanSort)
     require(args[2].sort is StringSort)
 
     return StrReplaceRegex(
-        args[0] castTo StringSort, args[1] castTo RegLan, args[2] castTo StringSort)
+        args[0] castTo SMTString, args[1] castTo RegLan, args[2] castTo SMTString)
   }
 }
 
 internal object StrReplaceAllRegexDecl :
     SMTTheoryFunction<StringSort>(
         "str.replace_re_all".toSymbolWithQuotes(),
-        listOf(StringSort, RegLan, StringSort),
-        StringSort,
+        listOf(SMTString, RegLan, SMTString),
+        SMTString,
         Associativity.NONE) {
 
   override fun constructDynamic(
@@ -3090,109 +3068,106 @@ internal object StrReplaceAllRegexDecl :
     require(args.size == 3)
     require(indices.isEmpty())
     require(args[0].sort is StringSort)
-    require(args[1].sort is RegLan)
+    require(args[1].sort is RegLanSort)
     require(args[2].sort is StringSort)
 
     return StrReplaceAllRegex(
-        args[0] castTo StringSort, args[1] castTo RegLan, args[2] castTo StringSort)
+        args[0] castTo SMTString, args[1] castTo RegLan, args[2] castTo SMTString)
   }
 }
 
 internal object RegexCompDecl :
-    SMTTheoryFunction<RegLan>(
+    SMTTheoryFunction<RegLanSort>(
         "re.comp".toSymbolWithQuotes(), listOf(RegLan), RegLan, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RegLan> {
+  ): Expression<RegLanSort> {
     require(args.size == 1)
     require(indices.isEmpty())
-    require(args.single().sort is RegLan)
+    require(args.single().sort is RegLanSort)
 
     return RegexComp(args.single() castTo RegLan)
   }
 }
 
 internal object RegexDiffDecl :
-    SMTTheoryFunction<RegLan>(
+    SMTTheoryFunction<RegLanSort>(
         "re.diff".toSymbolWithQuotes(), listOf(RegLan, RegLan), RegLan, Associativity.LEFT_ASSOC) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RegLan> {
+  ): Expression<RegLanSort> {
     require(args.size >= 2)
     require(indices.isEmpty())
-    require(args.all { expr -> expr.sort is RegLan })
+    require(args.all { expr -> expr.sort is RegLanSort })
 
     @Suppress("UNCHECKED_CAST")
-    return RegexDiff(args as List<Expression<RegLan>>)
+    return RegexDiff(args as List<Expression<RegLanSort>>)
   }
 }
 
 internal object RegexPlusDecl :
-    SMTTheoryFunction<RegLan>(
+    SMTTheoryFunction<RegLanSort>(
         "re.+".toSymbolWithQuotes(), listOf(RegLan), RegLan, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RegLan> {
+  ): Expression<RegLanSort> {
     require(args.size == 1)
     require(indices.isEmpty())
-    require(args.single().sort is RegLan)
+    require(args.single().sort is RegLanSort)
 
     return RegexPlus(args.single() castTo RegLan)
   }
 }
 
 internal object RegexOptionDecl :
-    SMTTheoryFunction<RegLan>(
+    SMTTheoryFunction<RegLanSort>(
         "re.opt".toSymbolWithQuotes(), listOf(RegLan), RegLan, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RegLan> {
+  ): Expression<RegLanSort> {
     require(args.size == 1)
     require(indices.isEmpty())
-    require(args.single().sort is RegLan)
+    require(args.single().sort is RegLanSort)
 
     return RegexOption(args.single() castTo RegLan)
   }
 }
 
 internal object RegexRangeDecl :
-    SMTTheoryFunction<RegLan>(
-        "re.range".toSymbolWithQuotes(),
-        listOf(StringSort, StringSort),
-        RegLan,
-        Associativity.NONE) {
+    SMTTheoryFunction<RegLanSort>(
+        "re.range".toSymbolWithQuotes(), listOf(SMTString, SMTString), RegLan, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RegLan> {
+  ): Expression<RegLanSort> {
     require(args.size == 2)
     require(indices.isEmpty())
     require(args.all { expr -> expr.sort is StringSort })
 
-    return RegexRange(args[0] castTo StringSort, args[1] castTo StringSort)
+    return RegexRange(args[0] castTo SMTString, args[1] castTo SMTString)
   }
 }
 
 internal object RegexPowerDecl :
-    SMTTheoryFunction<RegLan>(
+    SMTTheoryFunction<RegLanSort>(
         "re.^".toSymbolWithQuotes(), listOf(RegLan), RegLan, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RegLan> {
+  ): Expression<RegLanSort> {
     require(args.size == 1)
     require(indices.size == 1)
-    require(args.single().sort is RegLan)
+    require(args.single().sort is RegLanSort)
     require(indices.single() is NumeralIndex)
 
     return RegexPower(args[0] castTo RegLan, (indices.single() as NumeralIndex).numeral)
@@ -3200,16 +3175,16 @@ internal object RegexPowerDecl :
 }
 
 internal object RegexLoopDecl :
-    SMTTheoryFunction<RegLan>(
+    SMTTheoryFunction<RegLanSort>(
         "re.loop".toSymbolWithQuotes(), listOf(RegLan), RegLan, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>
-  ): Expression<RegLan> {
+  ): Expression<RegLanSort> {
     require(args.size == 1)
     require(indices.size == 2)
-    require(args.single().sort is RegLan)
+    require(args.single().sort is RegLanSort)
     require(indices.all { index -> index is NumeralIndex })
 
     return RegexLoop(
@@ -3221,7 +3196,7 @@ internal object RegexLoopDecl :
 
 internal object StrIsDigitDecl :
     SMTTheoryFunction<BoolSort>(
-        "str.is_digit".toSymbolWithQuotes(), listOf(StringSort), BoolSort, Associativity.NONE) {
+        "str.is_digit".toSymbolWithQuotes(), listOf(SMTString), Bool, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -3231,13 +3206,13 @@ internal object StrIsDigitDecl :
     require(indices.isEmpty())
     require(args.single().sort is StringSort)
 
-    return StrIsDigit(args.single() castTo StringSort)
+    return StrIsDigit(args.single() castTo SMTString)
   }
 }
 
 internal object StrToCodeDecl :
     SMTTheoryFunction<IntSort>(
-        "str.to_code".toSymbolWithQuotes(), listOf(StringSort), IntSort, Associativity.NONE) {
+        "str.to_code".toSymbolWithQuotes(), listOf(SMTString), SMTInt, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -3247,13 +3222,13 @@ internal object StrToCodeDecl :
     require(indices.isEmpty())
     require(args.single().sort is StringSort)
 
-    return StrToCode(args.single() castTo StringSort)
+    return StrToCode(args.single() castTo SMTString)
   }
 }
 
 internal object StrFromCodeDecl :
     SMTTheoryFunction<StringSort>(
-        "str.from_code".toSymbolWithQuotes(), listOf(IntSort), StringSort, Associativity.NONE) {
+        "str.from_code".toSymbolWithQuotes(), listOf(SMTInt), SMTString, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -3263,13 +3238,13 @@ internal object StrFromCodeDecl :
     require(indices.isEmpty())
     require(args.single().sort is IntSort)
 
-    return StrFromCode(args.single() castTo IntSort)
+    return StrFromCode(args.single() castTo SMTInt)
   }
 }
 
 internal object StrToIntDecl :
     SMTTheoryFunction<IntSort>(
-        "str.to_code".toSymbolWithQuotes(), listOf(StringSort), IntSort, Associativity.NONE) {
+        "str.to_code".toSymbolWithQuotes(), listOf(SMTString), SMTInt, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -3279,13 +3254,13 @@ internal object StrToIntDecl :
     require(indices.isEmpty())
     require(args.single().sort is StringSort)
 
-    return StrToInt(args.single() castTo StringSort)
+    return StrToInt(args.single() castTo SMTString)
   }
 }
 
 internal object StrFromIntDecl :
     SMTTheoryFunction<StringSort>(
-        "str.from_code".toSymbolWithQuotes(), listOf(IntSort), StringSort, Associativity.NONE) {
+        "str.from_code".toSymbolWithQuotes(), listOf(SMTInt), SMTString, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -3295,6 +3270,6 @@ internal object StrFromIntDecl :
     require(indices.isEmpty())
     require(args.single().sort is IntSort)
 
-    return StrFromInt(args.single() castTo IntSort)
+    return StrFromInt(args.single() castTo SMTInt)
   }
 }

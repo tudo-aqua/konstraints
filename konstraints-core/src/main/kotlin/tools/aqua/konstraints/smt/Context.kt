@@ -125,12 +125,12 @@ class Context {
 
   fun defineSort(name: Symbol, parameters: List<Symbol>, sort: Sort) =
       when (sort) {
-        is BoolSort -> defineSort(name, BoolFactory)
-        is IntSort -> defineSort(name, IntFactory)
-        is RealSort -> defineSort(name, RealFactory)
-        is StringSort -> defineSort(name, StringFactory)
-        is RegLan -> defineSort(name, RegLanFactory)
-        is RoundingMode -> defineSort(name, RoundingModeFactory)
+        is BoolSort -> defineSort(name, UserDefinedBoolFactory(name, parameters))
+        is IntSort -> defineSort(name, UserDefinedIntFactory(name, parameters))
+        is RealSort -> defineSort(name, UserDefinedRealFactory(name, parameters))
+        is StringSort -> defineSort(name, UserDefinedStringFactory(name, parameters))
+        is RegLanSort -> defineSort(name, UserDefinedRegLanFactory(name, parameters))
+        is RoundingModeSort -> defineSort(name, UserDefinedRoundingModeFactory(name, parameters))
         is BVSort -> defineSort(name, UserDefinedBitVectorFactory(name, sort.bits, parameters))
         is FPSort ->
             defineSort(
@@ -139,7 +139,11 @@ class Context {
                     name, sort.exponentBits, sort.significantBits, parameters))
         is ArraySort<*, *> ->
             defineSort(name, UserDefinedArrayFactory(name, sort.parameters, parameters))
-        else -> TODO("Implement UserDefinedUserDeclaredSortFactory")
+        else ->
+            defineSort(
+                name,
+                UserDefinedUserDeclaredFactory(
+                    name, parameters, getSort(sort.symbol) as UserDeclaredSortFactory))
       }
 
   fun defineSort(symbol: Symbol, factory: SortFactory): SortFactory {

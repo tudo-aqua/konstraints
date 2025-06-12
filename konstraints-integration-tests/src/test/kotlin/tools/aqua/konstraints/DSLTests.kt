@@ -38,12 +38,12 @@ class DSLTests {
 
     val program =
         smt(QF_FPLRA) {
-          val A = const("A", BoolSort)
-          val B = const("B", BoolSort)
-          val C = const("C", BoolSort)
+          val A = const("A", Bool)
+          val B = const("B", Bool)
+          val C = const("C", Bool)
 
-          val D = const("D", RealSort)
-          val E = const("E", RealSort)
+          val D = const("D", Real)
+          val E = const("E", Real)
 
           val F = const("F", FPSort(5, 11))
 
@@ -309,7 +309,7 @@ class DSLTests {
           arguments(
               smt(QF_BV) {
                 val bvugt2 by
-                    defining(BoolSort, BVSort(8), BVSort(8)) { s, t ->
+                    defining(Bool, BVSort(8), BVSort(8)) { s, t ->
                       not { s eq t } and not { s bvult t }
                     }
                 assert { bvugt2("#b11111111".bitvec(), "#b01111111".bitvec()) }
@@ -317,15 +317,15 @@ class DSLTests {
               SatStatus.SAT),
           arguments(
               smt(QF_UF) {
-                val A by declaringConst(BoolSort)
-                val B by declaringConst(BoolSort)
+                val A by declaringConst(Bool)
+                val B by declaringConst(Bool)
                 assert { A implies { B } implies A }
               },
               SatStatus.SAT),
           arguments(
               smt(QF_UF) {
-                val A = const(BoolSort)
-                val B = const(BoolSort)
+                val A = const(Bool)
+                val B = const(Bool)
                 assert { A implies { B } implies A }
               },
               SatStatus.SAT),
@@ -342,8 +342,8 @@ class DSLTests {
               SatStatus.SAT),
           arguments(
               smt(QF_ABV) {
-                val x by declaringConst(ArraySort(BVSort(32), BVSort(8)))
-                val y by declaringConst(ArraySort(BVSort(32), BVSort(8)))
+                val x by declaringConst(SMTArray(BVSort(32), BVSort(8)))
+                val y by declaringConst(SMTArray(BVSort(32), BVSort(8)))
 
                 assert {
                   ("#b0".bitvec(30) concat extract(2, 1) { select(x, "#b0".bitvec(32)) }) eq

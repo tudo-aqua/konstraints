@@ -22,7 +22,6 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.api.Assertions.*
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.theories.*
 
 
 /*

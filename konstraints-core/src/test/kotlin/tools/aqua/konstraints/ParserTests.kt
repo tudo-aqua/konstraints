@@ -85,14 +85,9 @@ class ParserTests {
   @ValueSource(
       strings =
           [
-              "(set-logic AUFLIA)\n" +
-                  "(set-info :status sat)\n" +
-                  "(define-sort Arr (A) (Array Int A))\n" +
-                  "(declare-fun key () Int)\n" +
-                  "(declare-fun val () Int)\n" +
-                  "(declare-fun array () (Arr Int))\n" +
-                  "(assert (= val (select (store array key val) key)))\n" +
-                  "(check-sat)"])
+              "(set-logic AUFLIA)(set-info :status sat)(define-sort Arr (A) (Array Int A))(declare-fun key () Int)(declare-fun val () Int)(declare-fun array () (Arr Int))(assert (= val (select (store array key val) key)))(check-sat)",
+              "(set-logic QF_UF)(define-sort custom-bool (A) Bool)(declare-fun foo () (custom-bool Bool))(assert foo)(check-sat)",
+              "(set-logic QF_UF)(declare-sort sort 1)(define-sort custom-bool (A) (sort A))(declare-fun foo () (custom-bool Bool))(declare-fun bar ((custom-bool Bool)) Bool)(assert (bar foo))(check-sat)"])
   fun testDefineSort(program: String) {
     assertDoesNotThrow { Parser().parse(program) }
   }
