@@ -102,6 +102,47 @@ class ParserTests {
     assertThrows<FunctionNotFoundException> { parser.parse(program) }
   }
 
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(set-logic QF_UF)(set-info :status unknown)(assert (true true true))",
+              "(set-logic QF_BV)(set-info :status unknown)(declare-fun A () (_ BitVec 8))(assert (bvult A A A))",
+              "(set-logic QF_BV)(set-info :status unknown)(declare-fun A () (_ BitVec 8))(assert (bvult (bvneg A) (bvadd A A) A))",
+              "(set-logic QF_FP)(set-info :status unknown)(declare-fun A () Float16)(assert (fp.isNormal A A))"])
+  fun testTooManyArgsFails(program: String) {
+    println(assertThrows<IllegalArgumentException> { Parser().parse(program) }.message)
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(set-logic QF_BV)(set-info :status unknown)(declare-fun A () (_ BitVec 8))(assert (bvult A))",
+              "(set-logic QF_BV)(set-info :status unknown)(declare-fun A () (_ BitVec 8))(assert (bvult (bvneg A)))",
+              "(set-logic QF_FP)(set-info :status unknown)(declare-fun A () Float16)(assert (fp.isNormal (fp.fma A A)))"])
+  fun testTooFewArgsFails(program: String) {
+    println(assertThrows<IllegalArgumentException> { Parser().parse(program) }.message)
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(set-logic QF_NIA)(set-info :status unknown)(declare-fun A () Int)(assert (divisible A))"])
+  fun testTooFewIndicesFails(program: String) {
+    println(assertThrows<IllegalArgumentException> { Parser().parse(program) }.message)
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(set-logic QF_NIA)(set-info :status unknown)(declare-fun A () Int)(assert ((_ divisible 4 4) A))"])
+  fun testTooManyIndicesFails(program: String) {
+    println(assertThrows<IllegalArgumentException> { Parser().parse(program) }.message)
+  }
+
   /*
   @ParameterizedTest
   @ValueSource(

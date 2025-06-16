@@ -69,8 +69,12 @@ internal object TrueDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.isEmpty())
-    require(indices.isEmpty())
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
 
     return True
   }
@@ -83,8 +87,12 @@ internal object FalseDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.isEmpty())
-    require(indices.isEmpty())
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
 
     return False
   }
@@ -98,8 +106,12 @@ internal object NotDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
 
     return Not(args.single() castTo Bool)
   }
@@ -114,8 +126,12 @@ internal object ImpliesDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
 
     return Implies(args.map { it castTo Bool })
   }
@@ -129,8 +145,12 @@ internal object AndDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
 
     return And(args.map { it castTo Bool })
   }
@@ -145,8 +165,12 @@ internal object OrDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
 
     return Or(args.map { it castTo Bool })
   }
@@ -161,8 +185,12 @@ internal object XOrDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
 
     return XOr(args.map { it castTo Bool })
   }
@@ -180,10 +208,14 @@ internal object EqualsDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort == args[0].sort }) {
-      "Expected all sorts in equals to be of the same sort but was: ${args.map { expr -> expr.sort }.joinToString(", ")}"
+      "Expected all args of $symbol to be of the same sort but was: ${args.map { expr -> expr.sort }.joinToString(", ")}"
     }
 
     return Equals(args)
@@ -202,9 +234,15 @@ internal object DistinctDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
-    require(args.all { expr -> expr.sort == args[0].sort }) // TODO is this necessary?
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expr -> expr.sort == args[0].sort }) {
+      "Expected all args of $symbol to be of the same sort but was: ${args.map { expr -> expr.sort }.joinToString(", ")}"
+    }
 
     return Distinct(args)
   }
@@ -219,8 +257,12 @@ internal object IteDecl :
         Associativity.NONE) {
 
   override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Ite<*> {
-    require(args.size == 3)
-    require(indices.isEmpty())
+    require(args.size == 3) {
+      "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
 
     return Ite(args[0] castTo Bool, args[1], args[2])
   }
@@ -280,10 +322,14 @@ internal object BVConcatDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expression -> expression.sort is BVSort }) {
-      "Expected all args to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
     }
 
     return BVConcat(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -301,10 +347,18 @@ internal object ExtractDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 1)
-    require(indices.size == 2)
-    require(args.single().sort is BVSort)
-    require(indices.all { index -> index is NumeralIndex })
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 2) {
+      "Two indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+    require(indices.all { index -> index is NumeralIndex }) {
+      "Expected all indices of $symbol to be numeral"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVExtract(
@@ -325,9 +379,15 @@ internal object BVNotDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
-    require(args.single().sort is BVSort)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVNot(args.single() as Expression<BVSort>)
@@ -345,9 +405,15 @@ internal object BVNegDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
-    require(args.single().sort is BVSort)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVNeg(args.single() as Expression<BVSort>)
@@ -365,9 +431,15 @@ internal object BVAndDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVAnd(args.map { expression -> expression as Expression<BVSort> })
@@ -385,9 +457,15 @@ internal object BVOrDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVOr(args.map { expression -> expression as Expression<BVSort> })
@@ -405,9 +483,15 @@ internal object BVAddDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVAdd(args.map { expression -> expression as Expression<BVSort> })
@@ -425,9 +509,15 @@ internal object BVMulDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVMul(args.map { expression -> expression as Expression<BVSort> })
@@ -445,9 +535,15 @@ internal object BVUDivDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVUDiv(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -465,9 +561,15 @@ internal object BVURemDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVURem(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -485,9 +587,15 @@ internal object BVShlDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVShl(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -505,9 +613,15 @@ internal object BVLShrDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVLShr(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -525,9 +639,15 @@ internal object BVUltDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVUlt(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -545,9 +665,15 @@ internal object BVNAndDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVNAnd(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -565,9 +691,15 @@ internal object BVNOrDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVNOr(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -585,9 +717,15 @@ internal object BVXOrDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVXOr(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -605,9 +743,15 @@ internal object BVXNOrDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVXNOr(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -625,9 +769,15 @@ internal object BVCompDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVComp(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -645,9 +795,15 @@ internal object BVSubDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVSub(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -665,9 +821,15 @@ internal object BVSDivDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVSDiv(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -685,9 +847,15 @@ internal object BVSRemDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVSRem(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -705,9 +873,15 @@ internal object BVSModDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVSMod(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -725,9 +899,15 @@ internal object BVULeDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVULe(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -745,9 +925,15 @@ internal object BVUGtDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVUGt(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -765,9 +951,15 @@ internal object BVUGeDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVUGe(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -785,9 +977,15 @@ internal object BVSLtDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVSLt(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -805,9 +1003,15 @@ internal object BVSLeDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVSLe(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -825,9 +1029,15 @@ internal object BVSGtDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVSGt(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -845,9 +1055,15 @@ internal object BVSGeDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVSGe(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -865,9 +1081,15 @@ internal object BVAShrDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
-    require(args.all { expression -> expression.sort is BVSort })
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.all { expression -> expression.sort is BVSort }) {
+      "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BVAShr(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
@@ -884,10 +1106,18 @@ internal object RepeatDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 1)
-    require(indices.size == 1)
-    require(args.single().sort is BVSort)
-    require(indices.single() is NumeralIndex)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 1) {
+      "One index expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+    require(indices.single() is NumeralIndex) {
+      "Expected index of $symbol to be numeral but was ${indices.single()}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return Repeat((indices.single() as NumeralIndex).numeral, args.single() as Expression<BVSort>)
@@ -905,10 +1135,18 @@ internal object ZeroExtendDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 1)
-    require(indices.size == 1)
-    require(args.single().sort is BVSort)
-    require(indices.single() is NumeralIndex)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 1) {
+      "One index expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+    require(indices.single() is NumeralIndex) {
+      "Expected index of $symbol to be numeral but was ${indices.single()}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return ZeroExtend(
@@ -927,10 +1165,18 @@ internal object SignExtendDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 1)
-    require(indices.size == 1)
-    require(args.single().sort is BVSort)
-    require(indices.single() is NumeralIndex)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 1) {
+      "One index expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+    require(indices.single() is NumeralIndex) {
+      "Expected index of $symbol to be numeral but was ${indices.single()}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return SignExtend(
@@ -949,10 +1195,18 @@ internal object RotateLeftDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 1)
-    require(indices.size == 1)
-    require(args.single().sort is BVSort)
-    require(indices.single() is NumeralIndex)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 1) {
+      "One index expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+    require(indices.single() is NumeralIndex) {
+      "Expected index of $symbol to be numeral but was ${indices.single()}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return RotateLeft(
@@ -971,10 +1225,18 @@ internal object RotateRightDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 1)
-    require(indices.size == 1)
-    require(args.single().sort is BVSort)
-    require(indices.single() is NumeralIndex)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 1) {
+      "One index expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+    require(indices.single() is NumeralIndex) {
+      "Expected index of $symbol to be numeral but was ${indices.single()}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return RotateRight(
@@ -1010,7 +1272,9 @@ internal object IntNegDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
-    require(args.size == 1)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return IntNeg(args.single() castTo SMTInt)
   }
 }
@@ -1023,7 +1287,9 @@ internal object IntSubDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return IntSub(args.map { expr -> expr castTo SMTInt })
   }
 }
@@ -1054,7 +1320,9 @@ internal object IntAddDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return IntAdd(args.map { expr -> expr castTo SMTInt })
   }
 }
@@ -1067,7 +1335,9 @@ internal object IntMulDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return IntMul(args.map { expr -> expr castTo SMTInt })
   }
 }
@@ -1080,7 +1350,9 @@ internal object IntDivDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return IntDiv(args.map { expr -> expr castTo SMTInt })
   }
 }
@@ -1093,7 +1365,9 @@ internal object ModDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
-    require(args.size == 2)
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return Mod(args[0] castTo SMTInt, args[1] castTo SMTInt)
   }
 }
@@ -1106,7 +1380,9 @@ internal object AbsDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
-    require(args.size == 1)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return IntNeg(args.single() castTo SMTInt)
   }
 }
@@ -1119,7 +1395,9 @@ internal object IntLessEqDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return IntLessEq(args.map { expr -> expr castTo SMTInt })
   }
 }
@@ -1132,7 +1410,9 @@ internal object IntLessDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return IntLess(args.map { expr -> expr castTo SMTInt })
   }
 }
@@ -1145,7 +1425,9 @@ internal object IntGreaterEqDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return IntGreaterEq(args.map { expr -> expr castTo SMTInt })
   }
 }
@@ -1158,7 +1440,9 @@ internal object IntGreaterDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return IntGreater(args.map { expr -> expr castTo SMTInt })
   }
 }
@@ -1171,10 +1455,18 @@ internal object DivisibleDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 1)
-    require(indices.size == 1)
-    require(args.single().sort is IntSort)
-    require(indices.single() is NumeralIndex)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 1) {
+      "One index expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is IntSort) {
+      "Expected arg of $symbol to be Int but was ${args.single().sort}"
+    }
+    require(indices.single() is NumeralIndex) {
+      "Expected index of $symbol to be numeral but was ${indices.single()}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return Divisible(
@@ -1206,7 +1498,9 @@ internal object RealNegDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RealSort> {
-    require(args.size == 1)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RealNeg(args.single() castTo Real)
   }
 }
@@ -1219,7 +1513,9 @@ internal object RealSubDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RealSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RealSub(args.map { expr -> expr castTo Real })
   }
 }
@@ -1249,7 +1545,9 @@ internal object RealAddDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RealSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RealAdd(args.map { expr -> expr castTo Real })
   }
 }
@@ -1262,7 +1560,9 @@ internal object RealMulDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RealSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RealMul(args.map { expr -> expr castTo Real })
   }
 }
@@ -1275,7 +1575,9 @@ internal object RealDivDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RealSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RealDiv(args.map { expr -> expr castTo Real })
   }
 }
@@ -1288,7 +1590,9 @@ internal object RealLessEqDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RealLessEq(args.map { expr -> expr castTo Real })
   }
 }
@@ -1301,7 +1605,9 @@ internal object RealLessDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RealLess(args.map { expr -> expr castTo Real })
   }
 }
@@ -1314,7 +1620,9 @@ internal object RealGreaterEqDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RealGreaterEq(args.map { expr -> expr castTo Real })
   }
 }
@@ -1327,7 +1635,9 @@ internal object RealGreaterDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RealGreater(args.map { expr -> expr castTo Real })
   }
 }
@@ -1367,7 +1677,9 @@ internal object ToRealDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RealSort> {
-    require(args.size == 1)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return ToReal(args.single() castTo SMTInt)
   }
 }
@@ -1380,7 +1692,9 @@ internal object ToIntDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
-    require(args.size == 1)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return ToInt(args.single() castTo Real)
   }
 }
@@ -1393,7 +1707,9 @@ internal object IsIntDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 1)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return IsInt(args.single() castTo Real)
   }
 }
@@ -1406,7 +1722,9 @@ internal object IntRealLessDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
 
     return if (args[0].sort is IntSort && args[1].sort is IntSort)
         IntLessDecl.constructDynamic(args, indices)
@@ -1426,7 +1744,9 @@ internal object IntRealLessEqDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
 
     return if (args[0].sort is IntSort && args[1].sort is IntSort)
         IntLessEqDecl.constructDynamic(args, indices)
@@ -1446,7 +1766,9 @@ internal object IntRealGreaterEqDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
 
     return if (args[0].sort is IntSort && args[1].sort is IntSort)
         IntGreaterEqDecl.constructDynamic(args, indices)
@@ -1466,7 +1788,9 @@ internal object IntRealGreaterDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
 
     return if (args[0].sort is IntSort && args[1].sort is IntSort)
         IntGreaterDecl.constructDynamic(args, indices)
@@ -1552,7 +1876,9 @@ internal object RoundNearestTiesToEvenDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RoundingModeSort> {
-    require(args.isEmpty())
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RoundNearestTiesToEven
   }
 }
@@ -1565,7 +1891,9 @@ internal object RNEDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RoundingModeSort> {
-    require(args.isEmpty())
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RNE
   }
 }
@@ -1581,7 +1909,9 @@ internal object RoundNearestTiesToAwayDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RoundingModeSort> {
-    require(args.isEmpty())
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RoundNearestTiesToAway
   }
 }
@@ -1594,7 +1924,9 @@ internal object RNADecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RoundingModeSort> {
-    require(args.isEmpty())
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RNA
   }
 }
@@ -1607,7 +1939,9 @@ internal object RoundTowardPositiveDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RoundingModeSort> {
-    require(args.isEmpty())
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RoundTowardPositive
   }
 }
@@ -1620,7 +1954,9 @@ internal object RTPDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RoundingModeSort> {
-    require(args.isEmpty())
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RTP
   }
 }
@@ -1633,7 +1969,9 @@ internal object RoundTowardNegativeDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RoundingModeSort> {
-    require(args.isEmpty())
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RoundTowardNegative
   }
 }
@@ -1646,7 +1984,9 @@ internal object RTNDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RoundingModeSort> {
-    require(args.isEmpty())
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RTN
   }
 }
@@ -1659,7 +1999,9 @@ internal object RoundTowardZeroDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RoundingModeSort> {
-    require(args.isEmpty())
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RoundTowardZero
   }
 }
@@ -1672,7 +2014,9 @@ internal object RTZDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RoundingModeSort> {
-    require(args.isEmpty())
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     return RTZ
   }
 }
@@ -1689,7 +2033,9 @@ internal object FPLiteralDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 3)
+    require(args.size == 3) {
+      "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is BVSort })
     return FPLiteral(
         args[0] as Expression<BVSort>, args[1] as Expression<BVSort>, args[2] as Expression<BVSort>)
@@ -1707,9 +2053,15 @@ internal object FPInfinityDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.isEmpty())
-    require(indices.size == 2)
-    require(indices.all { index -> index is NumeralIndex })
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 2) {
+      "Two indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(indices.all { index -> index is NumeralIndex }) {
+      "Expected all indices of $symbol to be numeral"
+    }
 
     return FPInfinity((indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
   }
@@ -1727,9 +2079,15 @@ internal object FPMinusInfinityDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.isEmpty())
-    require(indices.size == 2)
-    require(indices.all { index -> index is NumeralIndex })
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 2) {
+      "Two indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(indices.all { index -> index is NumeralIndex }) {
+      "Expected all indices of $symbol to be numeral"
+    }
 
     return FPMinusInfinity(
         (indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
@@ -1748,9 +2106,15 @@ internal object FPZeroDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.isEmpty())
-    require(indices.size == 2)
-    require(indices.all { index -> index is NumeralIndex })
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 2) {
+      "Two indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(indices.all { index -> index is NumeralIndex }) {
+      "Expected all indices of $symbol to be numeral"
+    }
 
     return FPZero((indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
   }
@@ -1768,9 +2132,15 @@ internal object FPMinusZeroDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.isEmpty())
-    require(indices.size == 2)
-    require(indices.all { index -> index is NumeralIndex })
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 2) {
+      "Two indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(indices.all { index -> index is NumeralIndex }) {
+      "Expected all indices of $symbol to be numeral"
+    }
 
     return FPMinusZero((indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
   }
@@ -1788,9 +2158,15 @@ internal object FPNaNDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.isEmpty())
-    require(indices.size == 2)
-    require(indices.all { index -> index is NumeralIndex })
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 2) {
+      "Two indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(indices.all { index -> index is NumeralIndex }) {
+      "Expected all indices of $symbol to be numeral"
+    }
 
     return FPNaN((indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
   }
@@ -1808,9 +2184,15 @@ internal object FPAbsDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
-    require(args.single().sort is FPSort)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is FPSort) {
+      "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return FPAbs(args.single() as Expression<FPSort>)
@@ -1829,9 +2211,15 @@ internal object FPNegDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
-    require(args.single().sort is FPSort)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is FPSort) {
+      "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return FPNeg(args.single() as Expression<FPSort>)
@@ -1850,8 +2238,12 @@ internal object FPAddDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 3)
-    require(indices.isEmpty())
+    require(args.size == 3) {
+      "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
     require(args[2].sort is FPSort)
@@ -1874,8 +2266,12 @@ internal object FPSubDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 3)
-    require(indices.isEmpty())
+    require(args.size == 3) {
+      "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
     require(args[2].sort is FPSort)
@@ -1897,8 +2293,12 @@ internal object FPMulDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 3)
-    require(indices.isEmpty())
+    require(args.size == 3) {
+      "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
     require(args[2].sort is FPSort)
@@ -1920,8 +2320,12 @@ internal object FPDivDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 3)
-    require(indices.isEmpty())
+    require(args.size == 3) {
+      "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
     require(args[2].sort is FPSort)
@@ -1947,8 +2351,12 @@ internal object FPFmaDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 4)
-    require(indices.isEmpty())
+    require(args.size == 4) {
+      "Four arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
     require(args[2].sort is FPSort)
@@ -1974,8 +2382,12 @@ internal object FPSqrtDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
 
@@ -1995,8 +2407,12 @@ internal object FPRemDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is FPSort })
 
     @Suppress("UNCHECKED_CAST")
@@ -2015,8 +2431,12 @@ internal object FPRoundToIntegralDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
 
@@ -2036,8 +2456,12 @@ internal object FPMinDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is FPSort })
 
     @Suppress("UNCHECKED_CAST")
@@ -2056,8 +2480,12 @@ internal object FPMaxDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is FPSort })
 
     @Suppress("UNCHECKED_CAST")
@@ -2076,8 +2504,12 @@ internal object FPLeqDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is FPSort })
 
     @Suppress("UNCHECKED_CAST")
@@ -2096,8 +2528,12 @@ internal object FPLtDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is FPSort })
 
     @Suppress("UNCHECKED_CAST")
@@ -2116,8 +2552,12 @@ internal object FPGeqDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is FPSort })
 
     @Suppress("UNCHECKED_CAST")
@@ -2136,8 +2576,12 @@ internal object FPGtDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is FPSort })
 
     @Suppress("UNCHECKED_CAST")
@@ -2156,8 +2600,12 @@ internal object FPEqDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is FPSort })
 
     @Suppress("UNCHECKED_CAST")
@@ -2176,9 +2624,15 @@ internal object FPIsNormalDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
-    require(args.single().sort is FPSort)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is FPSort) {
+      "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return FPIsNormal(args.single() as Expression<FPSort>)
@@ -2196,9 +2650,15 @@ internal object FPIsSubormalDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
-    require(args.single().sort is FPSort)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is FPSort) {
+      "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return FPIsSubnormal(args.single() as Expression<FPSort>)
@@ -2216,9 +2676,15 @@ internal object FPIsZeroDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
-    require(args.single().sort is FPSort)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is FPSort) {
+      "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return FPIsZero(args.single() as Expression<FPSort>)
@@ -2236,9 +2702,15 @@ internal object FPIsInfiniteDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
-    require(args.single().sort is FPSort)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is FPSort) {
+      "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return FPIsInfinite(args.single() as Expression<FPSort>)
@@ -2256,9 +2728,15 @@ internal object FPIsNaNDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
-    require(args.single().sort is FPSort)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is FPSort) {
+      "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return FPIsNaN(args.single() as Expression<FPSort>)
@@ -2276,9 +2754,15 @@ internal object FPIsNegativeDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
-    require(args.single().sort is FPSort)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is FPSort) {
+      "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return FPIsNegative(args.single() as Expression<FPSort>)
@@ -2296,9 +2780,15 @@ internal object FPIsPositiveDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
-    require(args.single().sort is FPSort)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is FPSort) {
+      "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return FPIsPositive(args.single() as Expression<FPSort>)
@@ -2316,7 +2806,9 @@ internal object ToFPDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(indices.size == 2)
+    require(indices.size == 2) {
+      "Two indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
 
     // can only be bitvec version
     return if (args.size == 1) {
@@ -2347,10 +2839,18 @@ internal object BitVecToFPDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 1)
-    require(indices.size == 2)
-    require(args.single().sort is BVSort)
-    require(indices.all { index -> index is NumeralIndex })
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 2) {
+      "Two indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+    require(indices.all { index -> index is NumeralIndex }) {
+      "Expected all indices of $symbol to be numeral"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return BitVecToFP(
@@ -2371,11 +2871,17 @@ internal object FPToFPDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 2)
-    require(indices.size == 2)
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 2) {
+      "Two indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
-    require(indices.all { index -> index is NumeralIndex })
+    require(indices.all { index -> index is NumeralIndex }) {
+      "Expected all indices of $symbol to be numeral"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return FPToFP(
@@ -2397,11 +2903,17 @@ internal object RealToFPDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 2)
-    require(indices.size == 2)
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 2) {
+      "Two indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is RoundingModeSort)
     require(args[1].sort is RealSort)
-    require(indices.all { index -> index is NumeralIndex })
+    require(indices.all { index -> index is NumeralIndex }) {
+      "Expected all indices of $symbol to be numeral"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return RealToFP(
@@ -2423,11 +2935,17 @@ internal object SBitVecToFPDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 2)
-    require(indices.size == 2)
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 2) {
+      "Two indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is RoundingModeSort)
     require(args[1].sort is BVSort)
-    require(indices.all { index -> index is NumeralIndex })
+    require(indices.all { index -> index is NumeralIndex }) {
+      "Expected all indices of $symbol to be numeral"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return SBitVecToFP(
@@ -2452,11 +2970,17 @@ internal object UBitVecToFPDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<FPSort> {
-    require(args.size == 2)
-    require(indices.size == 2)
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 2) {
+      "Two indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is RoundingModeSort)
     require(args[1].sort is BVSort)
-    require(indices.all { index -> index is NumeralIndex })
+    require(indices.all { index -> index is NumeralIndex }) {
+      "Expected all indices of $symbol to be numeral"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return UBitVecToFP(
@@ -2478,11 +3002,17 @@ internal object FPToUBitVecDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2)
-    require(indices.size == 1)
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 1) {
+      "One index expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
-    require(indices.single() is NumeralIndex)
+    require(indices.single() is NumeralIndex) {
+      "Expected index of $symbol to be numeral but was ${indices.single()}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return FPToUBitVec(
@@ -2503,11 +3033,17 @@ internal object FPToSBitVecDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2)
-    require(indices.size == 1)
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 1) {
+      "One index expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is RoundingModeSort)
     require(args[1].sort is FPSort)
-    require(indices.single() is NumeralIndex)
+    require(indices.single() is NumeralIndex) {
+      "Expected index of $symbol to be numeral but was ${indices.single()}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return FPToSBitVec(
@@ -2530,9 +3066,15 @@ internal object FPToRealDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RealSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
-    require(args.single().sort is FPSort)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is FPSort) {
+      "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
+    }
 
     @Suppress("UNCHECKED_CAST")
     return FPToReal(args.single() as Expression<FPSort>)
@@ -2556,8 +3098,12 @@ internal object ArraySelectDecl :
 
   // TODO can this be improved (maybe make this generic)?
   override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<Sort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is ArraySort<*, *>)
     require(args[1].sort == (args[0].sort as ArraySort<*, *>).x)
 
@@ -2580,8 +3126,12 @@ internal object ArrayStoreDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<ArraySort<Sort, Sort>> {
-    require(args.size == 3)
-    require(indices.isEmpty())
+    require(args.size == 3) {
+      "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is ArraySort<*, *>)
 
     // TODO these can probably be removed (castTo) checks the same requirement
@@ -2650,9 +3200,15 @@ internal object CharDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<StringSort> {
-    require(args.isEmpty())
-    require(indices.size == 1)
-    require(indices.single() is NumeralIndex)
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 1) {
+      "One index expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(indices.single() is NumeralIndex) {
+      "Expected index of $symbol to be numeral but was ${indices.single()}"
+    }
 
     return TODO("SMT-Lib char not implemented yet!")
   }
@@ -2669,8 +3225,12 @@ internal object StrConcatDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<StringSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is StringSort })
 
     @Suppress("UNCHECKED_CAST")
@@ -2686,8 +3246,12 @@ internal object StrLengthDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.single().sort is StringSort)
 
     return StrLength(args.single() castTo SMTString)
@@ -2702,8 +3266,12 @@ internal object StrLexOrderDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is StringSort })
 
     @Suppress("UNCHECKED_CAST")
@@ -2719,8 +3287,12 @@ internal object ToRegexDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RegLanSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.single().sort is StringSort)
 
     return ToRegex(args.single() castTo SMTString)
@@ -2735,8 +3307,12 @@ internal object InRegexDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is StringSort)
     require(args[1].sort is RegLanSort)
 
@@ -2752,8 +3328,12 @@ internal object RegexNoneDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RegLanSort> {
-    require(args.isEmpty())
-    require(indices.isEmpty())
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
 
     return RegexNone
   }
@@ -2767,8 +3347,12 @@ internal object RegexAllDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RegLanSort> {
-    require(args.isEmpty())
-    require(indices.isEmpty())
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
 
     return RegexAll
   }
@@ -2782,8 +3366,12 @@ internal object RegexAllCharDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RegLanSort> {
-    require(args.isEmpty())
-    require(indices.isEmpty())
+    require(args.isEmpty()) {
+      "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
 
     return RegexAllChar
   }
@@ -2797,8 +3385,12 @@ internal object RegexConcatDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RegLanSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is RegLanSort })
 
     @Suppress("UNCHECKED_CAST")
@@ -2814,8 +3406,12 @@ internal object RegexUnionDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RegLanSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is RegLanSort })
 
     @Suppress("UNCHECKED_CAST")
@@ -2831,8 +3427,12 @@ internal object RegexIntersecDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RegLanSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is RegLanSort })
 
     @Suppress("UNCHECKED_CAST")
@@ -2848,8 +3448,12 @@ internal object RegexStarDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RegLanSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.single().sort is RegLanSort)
 
     @Suppress("UNCHECKED_CAST")
@@ -2868,8 +3472,12 @@ internal object StrRefLexOrderDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is StringSort })
 
     @Suppress("UNCHECKED_CAST")
@@ -2885,8 +3493,12 @@ internal object StrAtDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<StringSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is StringSort)
     require(args[1].sort is IntSort)
 
@@ -2905,8 +3517,12 @@ internal object StrSubstringDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<StringSort> {
-    require(args.size == 3)
-    require(indices.isEmpty())
+    require(args.size == 3) {
+      "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is StringSort)
     require(args[1].sort is IntSort)
     require(args[2].sort is IntSort)
@@ -2926,8 +3542,12 @@ internal object StrPrefixOfDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is StringSort })
 
     return StrPrefixOf(args[0] castTo SMTString, args[1] castTo SMTString)
@@ -2945,8 +3565,12 @@ internal object StrSuffixOfDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is StringSort })
 
     return StrSuffixOf(args[0] castTo SMTString, args[1] castTo SMTString)
@@ -2964,8 +3588,12 @@ internal object StrContainsDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is StringSort })
 
     return StrContains(args[0] castTo SMTString, args[1] castTo SMTString)
@@ -2983,8 +3611,12 @@ internal object StrIndexOfDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
-    require(args.size == 3)
-    require(indices.isEmpty())
+    require(args.size == 3) {
+      "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is StringSort)
     require(args[1].sort is StringSort)
     require(args[2].sort is IntSort)
@@ -3004,8 +3636,12 @@ internal object StrReplaceDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<StringSort> {
-    require(args.size == 3)
-    require(indices.isEmpty())
+    require(args.size == 3) {
+      "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is StringSort })
 
     return StrReplace(args[0] castTo SMTString, args[1] castTo SMTString, args[2] castTo SMTString)
@@ -3023,8 +3659,12 @@ internal object StrReplaceAllDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<StringSort> {
-    require(args.size == 3)
-    require(indices.isEmpty())
+    require(args.size == 3) {
+      "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is StringSort })
 
     return StrReplaceAll(
@@ -3043,8 +3683,12 @@ internal object StrReplaceRegexDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<StringSort> {
-    require(args.size == 3)
-    require(indices.isEmpty())
+    require(args.size == 3) {
+      "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is StringSort)
     require(args[1].sort is RegLanSort)
     require(args[2].sort is StringSort)
@@ -3065,8 +3709,12 @@ internal object StrReplaceAllRegexDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<StringSort> {
-    require(args.size == 3)
-    require(indices.isEmpty())
+    require(args.size == 3) {
+      "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args[0].sort is StringSort)
     require(args[1].sort is RegLanSort)
     require(args[2].sort is StringSort)
@@ -3084,8 +3732,12 @@ internal object RegexCompDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RegLanSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.single().sort is RegLanSort)
 
     return RegexComp(args.single() castTo RegLan)
@@ -3100,8 +3752,12 @@ internal object RegexDiffDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RegLanSort> {
-    require(args.size >= 2)
-    require(indices.isEmpty())
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is RegLanSort })
 
     @Suppress("UNCHECKED_CAST")
@@ -3117,8 +3773,12 @@ internal object RegexPlusDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RegLanSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.single().sort is RegLanSort)
 
     return RegexPlus(args.single() castTo RegLan)
@@ -3133,8 +3793,12 @@ internal object RegexOptionDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RegLanSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.single().sort is RegLanSort)
 
     return RegexOption(args.single() castTo RegLan)
@@ -3149,8 +3813,12 @@ internal object RegexRangeDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RegLanSort> {
-    require(args.size == 2)
-    require(indices.isEmpty())
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.all { expr -> expr.sort is StringSort })
 
     return RegexRange(args[0] castTo SMTString, args[1] castTo SMTString)
@@ -3165,10 +3833,16 @@ internal object RegexPowerDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RegLanSort> {
-    require(args.size == 1)
-    require(indices.size == 1)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 1) {
+      "One index expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.single().sort is RegLanSort)
-    require(indices.single() is NumeralIndex)
+    require(indices.single() is NumeralIndex) {
+      "Expected index of $symbol to be numeral but was ${indices.single()}"
+    }
 
     return RegexPower(args[0] castTo RegLan, (indices.single() as NumeralIndex).numeral)
   }
@@ -3182,10 +3856,16 @@ internal object RegexLoopDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<RegLanSort> {
-    require(args.size == 1)
-    require(indices.size == 2)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 2) {
+      "Two indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.single().sort is RegLanSort)
-    require(indices.all { index -> index is NumeralIndex })
+    require(indices.all { index -> index is NumeralIndex }) {
+      "Expected all indices of $symbol to be numeral"
+    }
 
     return RegexLoop(
         args[0] castTo RegLan,
@@ -3202,8 +3882,12 @@ internal object StrIsDigitDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BoolSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.single().sort is StringSort)
 
     return StrIsDigit(args.single() castTo SMTString)
@@ -3218,8 +3902,12 @@ internal object StrToCodeDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.single().sort is StringSort)
 
     return StrToCode(args.single() castTo SMTString)
@@ -3234,9 +3922,15 @@ internal object StrFromCodeDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<StringSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
-    require(args.single().sort is IntSort)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is IntSort) {
+      "Expected arg of $symbol to be Int but was ${args.single().sort}"
+    }
 
     return StrFromCode(args.single() castTo SMTInt)
   }
@@ -3250,8 +3944,12 @@ internal object StrToIntDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<IntSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
     require(args.single().sort is StringSort)
 
     return StrToInt(args.single() castTo SMTString)
@@ -3266,9 +3964,15 @@ internal object StrFromIntDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<StringSort> {
-    require(args.size == 1)
-    require(indices.isEmpty())
-    require(args.single().sort is IntSort)
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.isEmpty()) {
+      "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is IntSort) {
+      "Expected arg of $symbol to be Int but was ${args.single().sort}"
+    }
 
     return StrFromInt(args.single() castTo SMTInt)
   }
