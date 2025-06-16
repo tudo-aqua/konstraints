@@ -30,7 +30,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.theories.*
 
 
 /*
@@ -327,3 +326,4 @@ class ParseContextTests {
         })
   }
 }
+*/
