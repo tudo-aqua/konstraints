@@ -416,3 +416,74 @@ class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T)
   val instance = BoundVariable(symbol, sort, this)
   override val parameters: List<Sort> = emptyList()
 }
+
+fun Expression<*>.toBool() : Expression<BoolSort> {
+    require(sort is BoolSort) { "Can not cast expression $name of sort $sort to Bool"}
+
+    @Suppress("UNCHECKED_CAST")
+    return this as Expression<BoolSort>
+}
+
+inline fun<reified X : Sort, reified Y : Sort> Expression<*>.toArray() : Expression<ArraySort<X ,Y>> {
+    require(sort is ArraySort<*, *>) { "Can not cast expression $name of sort $sort to ArraySort"}
+    require((sort as ArraySort<*, *>).x is X)
+    require((sort as ArraySort<*, *>).y is Y)
+
+    @Suppress("UNCHECKED_CAST")
+    return this as Expression<ArraySort<X, Y>>
+}
+
+fun Expression<*>.toBitVec() : Expression<BVSort> {
+    require(sort is BVSort) { "Can not cast expression $name of sort $sort to BitVec"}
+
+    @Suppress("UNCHECKED_CAST")
+    return this as Expression<BVSort>
+}
+
+fun Expression<*>.toFloatingPoint() : Expression<FPSort> {
+    require(sort is FPSort) { "Can not cast expression $name of sort $sort to FloatingPoint"}
+
+    @Suppress("UNCHECKED_CAST")
+    return this as Expression<FPSort>
+}
+
+fun Expression<*>.toRoundingMode() : Expression<RoundingModeSort> {
+    require(sort is RoundingModeSort) { "Can not cast expression $name of sort $sort to RoundingMode"}
+
+    @Suppress("UNCHECKED_CAST")
+    return this as Expression<RoundingModeSort>
+}
+
+fun Expression<*>.toReal() : Expression<RealSort> {
+    require(sort is RealSort) { "Can not cast expression $name of sort $sort to Real"}
+
+    @Suppress("UNCHECKED_CAST")
+    return this as Expression<RealSort>
+}
+
+fun Expression<*>.toInt() : Expression<IntSort> {
+    require(sort is IntSort) { "Can not cast expression $name of sort $sort to IntSort"}
+
+    @Suppress("UNCHECKED_CAST")
+    return this as Expression<IntSort>
+}
+
+fun Expression<*>.toStringSort() : Expression<StringSort> {
+    require(sort is StringSort) { "Can not cast expression $name of sort $sort to StringSort"}
+
+    @Suppress("UNCHECKED_CAST")
+    return this as Expression<StringSort>
+}
+
+fun Expression<*>.toRegLan() : Expression<RegLanSort> {
+    require(sort is RegLanSort) { "Can not cast expression $name of sort $sort to RegLan"}
+
+    @Suppress("UNCHECKED_CAST")
+    return this as Expression<RegLanSort>
+}
+
+inline fun<reified T : Sort> Expression<*>.castTo() : Expression<T> =
+    when(T::class) {
+        is BoolSort -> toBool()
+        else -> throw RuntimeException("Unrechable")
+    } as Expression<T>
