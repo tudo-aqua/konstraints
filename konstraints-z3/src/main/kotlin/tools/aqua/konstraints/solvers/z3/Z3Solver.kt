@@ -23,7 +23,6 @@ import com.microsoft.z3.Sort
 import com.microsoft.z3.Status
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.solvers.Solver
-import tools.aqua.konstraints.theories.*
 import tools.aqua.konstraints.util.computeIfAbsentAndMerge
 import tools.aqua.konstraints.visitors.CommandVisitor
 
@@ -54,6 +53,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
 
   override fun solve(program: SMTProgram): SatStatus {
     program.commands.forEach { visit(it) }
+    program.status = status
 
     return status
   }
@@ -65,7 +65,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     get() = z3model != null
 
   override fun visit(assert: Assert) {
-    val assertion = assert.expression.z3ify(context)
+    val assertion = assert.expr.z3ify(context)
 
     solver.add(assertion)
   }
@@ -100,7 +100,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
           is BVSort -> context.context.mkBitVecSort(sort.bits)
           is IntSort -> context.context.mkIntSort()
           is RealSort -> context.context.mkRealSort()
-          is RoundingMode -> context.context.mkFPRoundingModeSort()
+          is RoundingModeSort -> context.context.mkFPRoundingModeSort()
           is FPSort -> context.context.mkFPSort(sort.exponentBits, sort.significantBits)
           is FP16 -> context.context.mkFPSort16()
           is FP32 -> context.context.mkFPSort32()
@@ -135,6 +135,10 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     z3model = solver.model
   }
 
+  override fun visit(defineConst: DefineConst) {
+    TODO("Not yet implemented")
+  }
+
   override fun visit(defineFun: DefineFun) {
     // this is empty as we do not need to do any work when seeing a "defineFun"
     // Z3 has no concept of function definitions, we replace function created via define-fun
@@ -147,6 +151,15 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
 
   override fun visit(pop: Pop) {
     solver.pop(pop.n)
+  }
+
+  override fun visit(defineSort: DefineSort) {
+    // empty
+  }
+
+  fun reset() {
+    solver.reset()
+    context.reset()
   }
 
   // this should later be part of solver interface
@@ -171,7 +184,7 @@ operator fun Model.Companion.invoke(model: Z3Model): Model {
             decl.name.toString().toSymbolWithQuotes(),
             emptyList(),
             decl.range.aquaify(),
-            model.getConstInterp(decl).aquaify() castTo decl.range.aquaify())
+            model.getConstInterp(decl).aquaify())
       })
 
   temp.addAll(
@@ -182,7 +195,7 @@ operator fun Model.Companion.invoke(model: Z3Model): Model {
               SortedVar("x$index".toSymbolWithQuotes(), sort.aquaify())
             },
             decl.range.aquaify(),
-            model.getFuncInterp(decl).`else`.aquaify() castTo decl.range.aquaify())
+            model.getFuncInterp(decl).`else`.aquaify())
       })
 
   return Model(temp)

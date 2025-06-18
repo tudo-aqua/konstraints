@@ -28,7 +28,6 @@ import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.theories.*
 
 /*
  * Lifecycle.PER_CLASS is needed for MethodSource to avoid moving sources to a companion object
@@ -36,9 +35,9 @@ import tools.aqua.konstraints.theories.*
  */
 @TestInstance(Lifecycle.PER_CLASS)
 class CoreTests {
-  private val A = UserDeclaredSMTFunction0("A".toSymbolWithQuotes(), BoolSort)()
-  private val B = UserDeclaredSMTFunction0("B".toSymbolWithQuotes(), BoolSort)()
-  private val C = UserDeclaredSMTFunction0("C".toSymbolWithQuotes(), BoolSort)()
+  private val A = UserDeclaredSMTFunction0("A".toSymbolWithQuotes(), Bool)()
+  private val B = UserDeclaredSMTFunction0("B".toSymbolWithQuotes(), Bool)()
+  private val C = UserDeclaredSMTFunction0("C".toSymbolWithQuotes(), Bool)()
 
   @ParameterizedTest
   @MethodSource("getCoreTheoryExpressionsAndTheirSerialization")

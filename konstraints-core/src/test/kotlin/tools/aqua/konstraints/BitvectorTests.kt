@@ -30,10 +30,23 @@ import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
+import tools.aqua.konstraints.smt.BVAdd
+import tools.aqua.konstraints.smt.BVAnd
+import tools.aqua.konstraints.smt.BVConcat
+import tools.aqua.konstraints.smt.BVExtract
+import tools.aqua.konstraints.smt.BVLShr
+import tools.aqua.konstraints.smt.BVLiteral
+import tools.aqua.konstraints.smt.BVMul
+import tools.aqua.konstraints.smt.BVNeg
+import tools.aqua.konstraints.smt.BVNot
+import tools.aqua.konstraints.smt.BVOr
+import tools.aqua.konstraints.smt.BVShl
+import tools.aqua.konstraints.smt.BVSort
+import tools.aqua.konstraints.smt.BVUDiv
+import tools.aqua.konstraints.smt.BVURem
+import tools.aqua.konstraints.smt.BVUlt
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.toSymbolWithQuotes
-import tools.aqua.konstraints.theories.*
-import tools.aqua.konstraints.theories.BVSort
 
 /*
  * Lifecycle.PER_CLASS is needed for MethodSource to avoid moving sources to a companion object

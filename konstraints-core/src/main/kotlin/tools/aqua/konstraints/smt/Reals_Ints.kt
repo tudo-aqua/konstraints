@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.theories
+package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.*
-import tools.aqua.konstraints.smt.*
 
 /**
  * Convert an integer [inner] to real
@@ -27,11 +26,11 @@ import tools.aqua.konstraints.smt.*
  * (to_real Int Real)
  */
 class ToReal(override val inner: Expression<IntSort>) :
-    UnaryExpression<RealSort, IntSort>("to_real".toSymbolWithQuotes(), RealSort) {
+    UnaryExpression<RealSort, IntSort>("to_real".toSymbolWithQuotes(), Real) {
   override val theories = REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
-      ToRealDecl.buildExpression(children, emptyList())
+      ToRealDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -40,18 +39,18 @@ class ToReal(override val inner: Expression<IntSort>) :
  * (to_int Real Int)
  */
 class ToInt(override val inner: Expression<RealSort>) :
-    UnaryExpression<IntSort, RealSort>("to_int".toSymbolWithQuotes(), IntSort) {
+    UnaryExpression<IntSort, RealSort>("to_int".toSymbolWithQuotes(), SMTInt) {
   override val theories = REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
-      ToIntDecl.buildExpression(children, emptyList())
+      ToIntDecl.constructDynamic(children, emptyList())
 }
 
 /** (is_int Real Bool) */
 class IsInt(override val inner: Expression<RealSort>) :
-    UnaryExpression<BoolSort, RealSort>("is_int".toSymbolWithQuotes(), BoolSort) {
+    UnaryExpression<BoolSort, RealSort>("is_int".toSymbolWithQuotes(), Bool) {
   override val theories = REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      IsIntDecl.buildExpression(children, emptyList())
+      IsIntDecl.constructDynamic(children, emptyList())
 }

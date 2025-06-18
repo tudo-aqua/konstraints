@@ -56,6 +56,8 @@ open class Symbol internal constructor(raw: String, val wasQuoted: Boolean) : SM
   // Parser must consume the entire string so .end() is needed
   val mustQuote: Boolean =
       // check if we have a simple symbol (that is a symbol that is valid without quotes)
+      // TODO this isnt very performant there should be a faster solution (regex? or linear scan on
+      // input)
       if (Parser.simpleSymbol.end().accept(raw) && !Parser.reserved.end().accept(raw)) {
         false
       }
@@ -71,6 +73,8 @@ open class Symbol internal constructor(raw: String, val wasQuoted: Boolean) : SM
       } else {
         throw IllegalSymbolException(raw)
       }
+
+  val isSimple = !mustQuote
 
   /**
    * Internal representation of the symbol without quotes, quoting will be reconstructed by

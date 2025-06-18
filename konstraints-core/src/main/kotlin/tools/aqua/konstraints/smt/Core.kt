@@ -16,10 +16,9 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.theories
+package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.*
-import tools.aqua.konstraints.smt.*
 
 /*
  * This file implements the SMT core theory
@@ -27,14 +26,14 @@ import tools.aqua.konstraints.smt.*
  */
 
 /** Object for SMT true */
-object True : ConstantExpression<BoolSort>("true".toSymbolWithQuotes(), BoolSort) {
+object True : ConstantExpression<BoolSort>("true".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
 }
 
 /** Object for SMT false */
-object False : ConstantExpression<BoolSort>("false".toSymbolWithQuotes(), BoolSort) {
+object False : ConstantExpression<BoolSort>("false".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
@@ -46,13 +45,13 @@ object False : ConstantExpression<BoolSort>("false".toSymbolWithQuotes(), BoolSo
  * @param inner [Expression] of [BoolSort] to be negated
  */
 class Not(override val inner: Expression<BoolSort>) :
-    UnaryExpression<BoolSort, BoolSort>("not".toSymbolWithQuotes(), BoolSort) {
+    UnaryExpression<BoolSort, BoolSort>("not".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
 
   override fun toString(): String = "(not $inner)"
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      NotDecl.buildExpression(children, emptyList())
+      NotDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -61,7 +60,7 @@ class Not(override val inner: Expression<BoolSort>) :
  * @param statements multiple [Expression] of [BoolSort] to be checked in implies statement
  */
 class Implies(val statements: List<Expression<BoolSort>>) :
-    HomogenousExpression<BoolSort, BoolSort>("=>".toSymbolWithQuotes(), BoolSort) {
+    HomogenousExpression<BoolSort, BoolSort>("=>".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg statements: Expression<BoolSort>) : this(statements.toList())
@@ -69,7 +68,7 @@ class Implies(val statements: List<Expression<BoolSort>>) :
   override val children: List<Expression<BoolSort>> = statements
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      ImpliesDecl.buildExpression(children, emptyList())
+      ImpliesDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -78,7 +77,7 @@ class Implies(val statements: List<Expression<BoolSort>>) :
  * @param conjuncts multiple [Expression] of [BoolSort] to be joined in and statement
  */
 class And(val conjuncts: List<Expression<BoolSort>>) :
-    HomogenousExpression<BoolSort, BoolSort>("and".toSymbolWithQuotes(), BoolSort) {
+    HomogenousExpression<BoolSort, BoolSort>("and".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg conjuncts: Expression<BoolSort>) : this(conjuncts.toList())
@@ -86,7 +85,7 @@ class And(val conjuncts: List<Expression<BoolSort>>) :
   override val children: List<Expression<BoolSort>> = conjuncts
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      AndDecl.buildExpression(children, emptyList())
+      AndDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -95,7 +94,7 @@ class And(val conjuncts: List<Expression<BoolSort>>) :
  * @param disjuncts multiple [Expression] of [BoolSort] to be joined in or statement
  */
 class Or(val disjuncts: List<Expression<BoolSort>>) :
-    HomogenousExpression<BoolSort, BoolSort>("or".toSymbolWithQuotes(), BoolSort) {
+    HomogenousExpression<BoolSort, BoolSort>("or".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
@@ -103,7 +102,7 @@ class Or(val disjuncts: List<Expression<BoolSort>>) :
   override val children: List<Expression<BoolSort>> = disjuncts
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      OrDecl.buildExpression(children, emptyList())
+      OrDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -112,7 +111,7 @@ class Or(val disjuncts: List<Expression<BoolSort>>) :
  * @param disjuncts multiple [Expression] of [BoolSort] to be joined in xor statement
  */
 class XOr(val disjuncts: List<Expression<BoolSort>>) :
-    HomogenousExpression<BoolSort, BoolSort>("xor".toSymbolWithQuotes(), BoolSort) {
+    HomogenousExpression<BoolSort, BoolSort>("xor".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
@@ -120,7 +119,7 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) :
   override val children: List<Expression<BoolSort>> = disjuncts
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      XOrDecl.buildExpression(children, emptyList())
+      XOrDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -129,7 +128,7 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) :
  * @param statements multiple [Expression] of [BoolSort] to be checked in equals statement
  */
 class Equals<T : Sort>(val statements: List<Expression<T>>) :
-    HomogenousExpression<BoolSort, Sort>("=".toSymbolWithQuotes(), BoolSort) {
+    HomogenousExpression<BoolSort, Sort>("=".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg statements: Expression<T>) : this(statements.toList())
@@ -137,7 +136,7 @@ class Equals<T : Sort>(val statements: List<Expression<T>>) :
   override val children: List<Expression<T>> = statements
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      EqualsDecl.buildExpression(children, emptyList())
+      EqualsDecl.constructDynamic(children, emptyList())
 }
 
 /**
@@ -146,7 +145,7 @@ class Equals<T : Sort>(val statements: List<Expression<T>>) :
  * @param statements multiple [Expression] of [BoolSort] to be checked in distinct statement
  */
 class Distinct<T : Sort>(val statements: List<Expression<T>>) :
-    HomogenousExpression<BoolSort, T>("distinct".toSymbolWithQuotes(), BoolSort) {
+    HomogenousExpression<BoolSort, T>("distinct".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg statements: Expression<T>) : this(statements.toList())
@@ -154,10 +153,12 @@ class Distinct<T : Sort>(val statements: List<Expression<T>>) :
   override val children: List<Expression<T>> = statements
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-      DistinctDecl.buildExpression(children, emptyList())
+      DistinctDecl.constructDynamic(children, emptyList())
 }
 
 /** Bool sort */
-object BoolSort : Sort("Bool") {
+sealed class BoolSort : Sort("Bool") {
   override val theories = CORE_MARKER_SET
 }
+
+object Bool : BoolSort()

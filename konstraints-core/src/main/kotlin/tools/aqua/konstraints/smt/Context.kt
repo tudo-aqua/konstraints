@@ -18,21 +18,29 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.Theory
-import tools.aqua.konstraints.theories.BoolSort
+import tools.aqua.konstraints.parser.ArrayExTheory
+import tools.aqua.konstraints.parser.BitVectorExpressionTheory
+import tools.aqua.konstraints.parser.CoreTheory
+import tools.aqua.konstraints.parser.FloatingPointTheory
+import tools.aqua.konstraints.parser.IntsTheory
+import tools.aqua.konstraints.parser.RealsIntsTheory
+import tools.aqua.konstraints.parser.RealsTheory
+import tools.aqua.konstraints.parser.StringsTheory
 import tools.aqua.konstraints.util.Stack
-import tools.aqua.konstraints.util.zipWithSameLength
 
 private class CurrentContext {
   val functions = mutableMapOf<Symbol, SMTFunction<*>>()
-  val sorts = mutableMapOf<Symbol, Sort>()
+  val sorts = mutableMapOf<Symbol, SortFactory>()
 }
 
 class Context {
   private val forbiddenNames = mutableSetOf<Symbol>()
   private val currentContext = CurrentContext()
   private val shadowingMap = Stack<MutableMap<SMTFunction<*>, SMTFunction<*>>>()
-  private val undoStack = Stack<MutableSet<SMTFunction<*>>>()
+  private val functionUndoStack = Stack<MutableSet<Symbol>>()
+  private val sortUndoStack = Stack<MutableSet<Symbol>>()
+  private val sortParameters = mutableListOf<Symbol>()
+  var locals: List<SortedVar<*>> = emptyList()
   private var logic: Logic? = null
 
   // true if we are currently in any binder (let/exists/forall/par/match)
@@ -42,37 +50,128 @@ class Context {
     return try {
       addFun(func)
     } catch (_: IllegalArgumentException) {
-      return null
+      null
     } catch (_: IllegalStateException) {
-      return null
+      null
     }
   }
 
   fun <T : Sort> addFun(func: SMTFunction<T>): SMTFunction<T> {
     require(func.symbol !in forbiddenNames) {
-      "Can not overload or shadow theory symbol ${func.name}!"
+      "Can not overload or shadow theory symbol ${func.symbol}!"
     }
     require(func.symbol !in currentContext.functions) {
-      "Can not overload or shadow user defined symbol ${func.name}!"
+      "Can not overload or shadow user defined symbol ${func.symbol}!"
     }
     check(!activeBinderState) { "Can not add functions to the current context in this state!" }
 
     currentContext.functions[func.symbol] = func
 
     // if the undoStack is not empty, and we are not currently inside any binder
-    // there was at least one push, so we save the added func to remove on the appropriate pop
-    if (undoStack.isNotEmpty()) {
-      undoStack.peek().add(func)
+    // there was at least one push, so we save the added func to remove on the next pop operation
+    if (functionUndoStack.isNotEmpty()) {
+      functionUndoStack.peek().add(func.symbol)
     }
 
     return func
   }
 
-  fun contains(func: Symbol) = currentContext.functions[func] != null
+  fun addSortOrNull(sort: UserDeclaredSortFactory): UserDeclaredSortFactory? {
+    return try {
+      declareSort(sort)
+    } catch (_: IllegalArgumentException) {
+      null
+    } catch (_: IllegalStateException) {
+      null
+    }
+  }
 
-  fun contains(expression: Expression<*>) = expression.func in currentContext.functions.values
+  fun declareSort(decl: DeclareSort) = declareSort(UserDeclaredSortFactory(decl.name, decl.arity))
 
-  fun contains(sort: Sort): Boolean = sort in currentContext.sorts.values
+  fun declareSort(name: Symbol, arity: Int) = declareSort(UserDeclaredSortFactory(name, arity))
+
+  fun declareSort(sort: UserDeclaredSortFactory) =
+      addSort(sort, sort.symbol) as UserDeclaredSortFactory
+
+  internal fun addSort(sort: SortFactory, symbol: Symbol): SortFactory {
+    require(symbol !in currentContext.sorts) { "Can not overload or shadow sort symbol ${symbol}!" }
+
+    check(!activeBinderState) { "Can not add sort to the current context in this state!" }
+
+    currentContext.sorts[symbol] = sort
+
+    if (sortUndoStack.isNotEmpty()) {
+      sortUndoStack.peek().add(symbol)
+    }
+
+    return sort
+  }
+
+  fun addSortParameters(parameters: List<Symbol>) =
+      parameters.map { symbol -> addSortParameter(symbol) }
+
+  fun addSortParameter(parameter: Symbol): SortParameterFactory {
+    sortParameters.add(parameter)
+
+    return addSort(SortParameterFactory(parameter), parameter) as SortParameterFactory
+  }
+
+  fun clearSortParameters() {
+    currentContext.sorts.keys.removeAll(sortParameters)
+    sortParameters.clear()
+  }
+
+  fun defineSort(def: DefineSort) = defineSort(def.name, def.sortParameters, def.sort)
+
+  fun defineSort(name: Symbol, parameters: List<Symbol>, sort: Sort) =
+      when (sort) {
+        is BoolSort -> defineSort(name, UserDefinedBoolFactory(name, parameters))
+        is IntSort -> defineSort(name, UserDefinedIntFactory(name, parameters))
+        is RealSort -> defineSort(name, UserDefinedRealFactory(name, parameters))
+        is StringSort -> defineSort(name, UserDefinedStringFactory(name, parameters))
+        is RegLanSort -> defineSort(name, UserDefinedRegLanFactory(name, parameters))
+        is RoundingModeSort -> defineSort(name, UserDefinedRoundingModeFactory(name, parameters))
+        is BVSort -> defineSort(name, UserDefinedBitVectorFactory(name, sort.bits, parameters))
+        is FPSort ->
+            defineSort(
+                name,
+                UserDefinedFloatingPointFactory(
+                    name, sort.exponentBits, sort.significantBits, parameters))
+        is ArraySort<*, *> ->
+            defineSort(name, UserDefinedArrayFactory(name, sort.parameters, parameters))
+        else ->
+            defineSort(
+                name,
+                UserDefinedUserDeclaredFactory(
+                    name, parameters, getSort(sort.symbol) as UserDeclaredSortFactory))
+      }
+
+  fun defineSort(symbol: Symbol, factory: SortFactory): SortFactory {
+    require(symbol !in currentContext.sorts) { "Can not overload or shadow sort symbol ${symbol}!" }
+
+    check(!activeBinderState) { "Can not add sort to the current context in this state!" }
+
+    currentContext.sorts[symbol] = factory
+
+    if (sortUndoStack.isNotEmpty()) {
+      sortUndoStack.peek().add(symbol)
+    }
+
+    return factory
+  }
+
+  fun defineSort(factory: UserDefinedSortFactory) =
+      defineSort(factory.symbol, factory) as UserDefinedSortFactory
+
+  operator fun contains(func: Symbol) = currentContext.functions[func] != null
+
+  // TODO this function should probably not exist look into checkContext
+  operator fun contains(expression: Expression<*>) =
+      expression.func?.symbol in currentContext.functions
+
+  operator fun contains(sort: Sort): Boolean = sort.symbol in currentContext.sorts
+
+  fun containsSort(sort: Symbol): Boolean = sort in currentContext.sorts
 
   fun <T : Sort> getFuncOrNull(name: Symbol, sort: T) =
       try {
@@ -93,52 +192,72 @@ class Context {
   }
 
   fun getFunc(name: Symbol) =
-      currentContext.functions[name] ?: throw FunctionNotFoundException(name)
+      if (currentContext.functions[name] != null) {
+        currentContext.functions[name]!!
+      } else {
+        locals.find { it -> it.symbol == name } ?: throw FunctionNotFoundException(name)
+      }
 
+  fun push(n: Int) = repeat(n) { _ -> push() }
+
+  // use if you have to pop manually or the operation can not be completed within the lambda passed
+  // to push
+  fun push() {
+    functionUndoStack.push(mutableSetOf<Symbol>())
+    sortUndoStack.push(mutableSetOf<Symbol>())
+  }
+
+  fun getSortOrNull(name: Symbol): SortFactory? {
+    return try {
+      getSort(name)
+    } catch (_: FunctionNotFoundException) {
+      null
+    }
+  }
+
+  fun getSort(name: Symbol): SortFactory =
+      currentContext.sorts[name] ?: throw SortNotFoundException(name)
+
+  // auto pops after block
   fun push(block: Context.() -> Unit) {
-    undoStack.push(mutableSetOf<SMTFunction<*>>())
+    functionUndoStack.push(mutableSetOf<Symbol>())
+    sortUndoStack.push(mutableSetOf<Symbol>())
     block()
     pop(1)
   }
 
   fun pop(n: Int) {
-    check(n <= undoStack.size)
+    check(n <= functionUndoStack.size)
     check(!activeBinderState) { "Can not pop inside binder!" }
 
-    repeat(n) { _ -> currentContext.functions.values.removeAll(undoStack.pop()) }
+    repeat(n) { _ ->
+      functionUndoStack.pop().forEach { symbol -> currentContext.functions.remove(symbol) }
+      currentContext.sorts.keys.removeAll(sortUndoStack.pop())
+    }
   }
 
-  internal fun <T : Sort> let(
-      varBindings: List<VarBinding<*>>,
-      block: () -> Expression<T>
-  ): LetExpression<T> {
+  internal fun <T> let(varBindings: List<VarBinding<*>>, block: () -> T): T {
     bindVariables(varBindings)
-    val term = block()
+    val result = block()
     unbindVariables()
 
-    return LetExpression(varBindings, term)
+    return result
   }
 
-  internal fun exists(
-      sortedVars: List<SortedVar<*>>,
-      block: () -> Expression<BoolSort>
-  ): ExistsExpression {
+  internal fun <T> exists(sortedVars: List<SortedVar<*>>, block: () -> T): T {
     bindVariables(sortedVars)
-    val term = block()
+    val result = block()
     unbindVariables()
 
-    return ExistsExpression(sortedVars, term)
+    return result
   }
 
-  internal fun forall(
-      sortedVars: List<SortedVar<*>>,
-      block: () -> Expression<BoolSort>
-  ): ForallExpression {
+  internal fun <T> forall(sortedVars: List<SortedVar<*>>, block: () -> T): T {
     bindVariables(sortedVars)
-    val term = block()
+    val result = block()
     unbindVariables()
 
-    return ForallExpression(sortedVars, term)
+    return result
   }
 
   /**
@@ -147,7 +266,7 @@ class Context {
    * - adding all remaining functions to the undo stack all bindings must be distinct by name
    */
   @JvmName("bindVariablesLet")
-  private fun bindVariables(varBindings: List<VarBinding<*>>) {
+  internal fun bindVariables(varBindings: List<VarBinding<*>>) {
     require(varBindings.distinctBy { it.name }.size == varBindings.size) {
       "VarBindings in let must be distinct!"
     }
@@ -158,13 +277,13 @@ class Context {
     shadowingMap.push(mutableMapOf())
 
     // add all bindings to undoStack first, remove all binding that shadow from undoStack later
-    undoStack.push(mutableSetOf())
-    undoStack.peek().addAll(varBindings)
+    functionUndoStack.push(mutableSetOf())
+    functionUndoStack.peek().addAll(varBindings.map { it.symbol })
 
     varBindings.forEach { binding ->
       currentContext.functions.put(binding.symbol, binding)?.let { old ->
         shadowingMap.peek().put(binding, old)
-        undoStack.peek().remove(binding)
+        functionUndoStack.peek().remove(binding.symbol)
       }
     }
   }
@@ -175,7 +294,7 @@ class Context {
    * - adding all remaining functions to the undo stack
    */
   @JvmName("bindVariablesQuantifier")
-  private fun bindVariables(sortedVars: List<SortedVar<*>>) {
+  internal fun bindVariables(sortedVars: List<SortedVar<*>>) {
     require(sortedVars.all { it.symbol !in forbiddenNames }) {
       "VarBindings can not shadow theory function symbols!"
     }
@@ -186,13 +305,13 @@ class Context {
     shadowingMap.push(mutableMapOf())
 
     // add all bindings to undoStack first, remove all binding that shadow from undoStack later
-    undoStack.push(mutableSetOf())
-    undoStack.peek().addAll(vars)
+    functionUndoStack.push(mutableSetOf())
+    functionUndoStack.peek().addAll(vars.map { it.symbol })
 
     vars.forEach { binding ->
       currentContext.functions.put(binding.symbol, binding)?.let { old ->
         shadowingMap.peek().put(binding, old)
-        undoStack.peek().remove(binding)
+        functionUndoStack.peek().remove(binding.symbol)
       }
     }
   }
@@ -203,20 +322,35 @@ class Context {
    * - removing all local variable from the current context Pops the top level of the shadowingMap
    *   and undo stack
    */
-  private fun unbindVariables() {
+  internal fun unbindVariables() {
     // add all shadowed elements back first, then remove all remaining bindings
     shadowingMap.pop().forEach { (local, shadowed) ->
       currentContext.functions[local.symbol] = shadowed
     }
-    currentContext.functions.values.removeAll(undoStack.pop())
+    functionUndoStack.pop().forEach { symbol -> currentContext.functions.remove(symbol) }
   }
+
+  internal fun bindSortParameters(bindings: List<Symbol>) {}
 
   fun setLogic(logic: Logic) {
     this.logic = logic
-    forbiddenNames.addAll(
-        logic.theories.flatMap { theory ->
-          Theory.logicLookup[theory]!!.functions.map { (_, func) -> func.symbol }
-        })
+
+    logic.theories.forEach { theory ->
+      when (theory) {
+        Theories.CORE -> CoreTheory
+        Theories.ARRAYS_EX -> ArrayExTheory
+        Theories.FIXED_SIZE_BIT_VECTORS -> BitVectorExpressionTheory
+        Theories.FLOATING_POINT -> FloatingPointTheory
+        Theories.INTS -> IntsTheory
+        Theories.REALS -> RealsTheory
+        Theories.REALS_INTS -> RealsIntsTheory
+        Theories.STRINGS -> StringsTheory
+      }.let {
+        forbiddenNames.addAll(it.functions.map { (_, func) -> func.symbol })
+        currentContext.functions.putAll(it.functions)
+        currentContext.sorts.putAll(it.sorts)
+      }
+    }
   }
 }
 
@@ -581,7 +715,7 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Context.forall(
           this)
     }
 
-@JvmName("existsWithSorts")
+@JvmName("forallWithSorts")
 fun Context.forall(
     sortedVars: List<Sort>,
     block: (List<Expression<*>>, Context) -> Expression<BoolSort>
@@ -656,40 +790,6 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> Context.forall(
         SortedVar("local!${sort5}5".toSymbolWithQuotes(), sort5),
         block)
 
-interface AssertionLevel<out FuncType : ContextFunction<*>, out SortType : ContextSort> {
-  fun contains(function: String, args: List<Expression<*>>) = get(function, args) != null
-
-  operator fun contains(function: Symbol) = functions.contains(function.toString())
-
-  operator fun contains(function: String) = functions.contains(function)
-
-  operator fun get(function: String, args: List<Expression<*>>) =
-      functions[function]?.takeIf { func ->
-        (func.parameters zipWithSameLength args.map { it.sort }).all { (param, actual) ->
-          param == actual
-        }
-      }
-
-  operator fun contains(sort: Sort) = sorts.containsKey(sort.symbol.toString())
-
-  fun containsSort(sort: String) = sorts.containsKey(sort)
-
-  val functions: Map<String, FuncType>
-  val sorts: Map<String, SortType>
-}
-
-fun <SortType : ContextSort> AssertionLevel<*, SortType>.contains(sort: SortType) =
-    sorts.containsKey(sort.name.toString())
-
-interface ContextFunction<S> {
-  val name: String
-  val parameters: List<S>
-  val sort: Sort
-}
-
-interface ContextSort {
-  val name: String
-  val arity: Int
-}
-
 class FunctionNotFoundException(name: Symbol) : NoSuchElementException("Function $name not found")
+
+class SortNotFoundException(name: Symbol) : NoSuchElementException("Sort $name not found")

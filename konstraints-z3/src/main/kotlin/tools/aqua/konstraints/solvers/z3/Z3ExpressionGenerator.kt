@@ -31,7 +31,6 @@ import com.microsoft.z3.SeqSort
 import com.microsoft.z3.Sort as Z3Sort
 import com.microsoft.z3.UninterpretedSort
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.theories.*
 
 fun makeLeftAssoc(
     expressions: List<Expression<*>>,
@@ -72,21 +71,17 @@ fun Expression<*>.z3ify(context: Z3Context): Expr<*> {
   }
 
   return when (this.sort) {
-    is BoolSort -> (this castTo BoolSort).z3ify(context)
-    is BVSort -> (this as Expression<BVSort>).z3ify(context)
-    is IntSort -> (this castTo IntSort).z3ify(context)
-    is RealSort -> (this castTo RealSort).z3ify(context)
-    is RoundingMode -> (this castTo RoundingMode).z3ify(context)
-    is FPSort -> (this as Expression<FPSort>).z3ify(context)
-    is FP16 -> (this as Expression<FPSort>).z3ify(context)
-    is FP32 -> (this as Expression<FPSort>).z3ify(context)
-    is FP64 -> (this as Expression<FPSort>).z3ify(context)
-    is FP128 -> (this as Expression<FPSort>).z3ify(context)
-    is StringSort -> (this castTo StringSort).z3ify(context)
-    is RegLan -> (this castTo RegLan).z3ify(context)
-    is UserDefinedSort -> (this as Expression<UserDefinedSort>).z3ify(context)
-    is ArraySort<*, *> -> (this as Expression<ArraySort<*, *>>).z3ify(context)
-    else -> throw RuntimeException("Unknown sort ${this.sort}")
+    is BoolSort -> this.castTo<BoolSort>().z3ify(context)
+    is BVSort -> this.castTo<BVSort>().z3ify(context)
+    is IntSort -> this.castTo<IntSort>().z3ify(context)
+    is RealSort -> this.castTo<RealSort>().z3ify(context)
+    is RoundingModeSort -> this.castTo<RoundingMode>().z3ify(context)
+    is FPSort -> this.castTo<FPSort>().z3ify(context)
+    is StringSort -> this.castTo<SMTString>().z3ify(context)
+    is RegLanSort -> this.castTo<RegLanSort>().z3ify(context)
+    is UserDeclaredSort -> this.castTo<UserDeclaredSort>().z3ify(context)
+    is ArraySort<*, *> -> this.castTo<ArraySort<*, *>>().z3ify(context)
+    is SortParameter -> TODO()
   }
 }
 
@@ -126,7 +121,7 @@ fun Ite<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
         this.otherwise.z3ify(context) as Expr<Z3FPSort>)
 
 @JvmName("z3ifyIteRM")
-fun Ite<RoundingMode>.z3ify(context: Z3Context): Expr<FPRMSort> =
+fun Ite<RoundingModeSort>.z3ify(context: Z3Context): Expr<FPRMSort> =
     context.context.mkITE(
         this.statement.z3ify(context),
         this.then.z3ify(context) as Expr<FPRMSort>,
@@ -140,7 +135,7 @@ fun Ite<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
         this.otherwise.z3ify(context) as Expr<SeqSort<CharSort>>)
 
 @JvmName("z3ifyIteFreeSort")
-fun Ite<UserDefinedSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
+fun Ite<UserDeclaredSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
     context.context.mkITE(
         this.statement.z3ify(context),
         this.then.z3ify(context) as Expr<UninterpretedSort>,
@@ -177,7 +172,7 @@ fun ArraySelect<*, FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
         this.index.z3ify(context) as Expr<Z3Sort>)
 
 @JvmName("z3ifyArraySelectRM")
-fun ArraySelect<*, RoundingMode>.z3ify(context: Z3Context): Expr<FPRMSort> =
+fun ArraySelect<*, RoundingModeSort>.z3ify(context: Z3Context): Expr<FPRMSort> =
     context.context.mkSelect(
         this.array.z3ify(context) as Expr<Z3ArraySort<Z3Sort, FPRMSort>>,
         this.index.z3ify(context) as Expr<Z3Sort>)
@@ -189,7 +184,7 @@ fun ArraySelect<*, StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>
         this.index.z3ify(context) as Expr<Z3Sort>)
 
 @JvmName("z3ifyArraySelectFreeSort")
-fun ArraySelect<*, UserDefinedSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
+fun ArraySelect<*, UserDeclaredSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
     context.context.mkSelect(
         this.array.z3ify(context) as Expr<Z3ArraySort<Z3Sort, UninterpretedSort>>,
         this.index.z3ify(context) as Expr<Z3Sort>)
@@ -282,7 +277,8 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-      is UserDefinedExpression -> this.expand().z3ify(context) as Expr<Z3BoolSort>
+      is UserDefinedExpression ->
+          context.bind(this.func.sortedVars) { this.func.term.z3ify(context) as Expr<Z3BoolSort> }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
 
@@ -913,7 +909,7 @@ fun UBitVecToFP.z3ify(context: Z3Context): Expr<Z3FPSort> =
         false)
 
 @JvmName("z3ifyRoundingMode")
-fun Expression<RoundingMode>.z3ify(context: Z3Context): Expr<FPRMSort> =
+fun Expression<RoundingModeSort>.z3ify(context: Z3Context): Expr<FPRMSort> =
     when (this) {
       is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
@@ -929,7 +925,7 @@ fun Expression<RoundingMode>.z3ify(context: Z3Context): Expr<FPRMSort> =
       is RTN -> this.z3ify(context)
       is RoundTowardZero -> this.z3ify(context)
       is RTZ -> this.z3ify(context)
-      is ArraySelect<*, RoundingMode> -> this.z3ify(context)
+      is ArraySelect<*, RoundingModeSort> -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDeclaredExpression ->
           if (this.children.isEmpty()) {
@@ -1027,7 +1023,7 @@ fun StrFromInt.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
     context.context.intToString(inner.z3ify(context))
 
 @JvmName("z3ifyRegLan")
-fun Expression<RegLan>.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
+fun Expression<RegLanSort>.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
     when (this) {
       is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
@@ -1131,7 +1127,7 @@ fun ArrayStore<*, *>.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>
         this.index.z3ify(context) as Expr<Z3Sort>,
         this.value.z3ify(context) as Expr<Z3Sort>)
 
-fun Expression<UserDefinedSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
+fun Expression<UserDeclaredSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
     when (this) {
       is Ite -> this.z3ify(context)
       is LocalExpression ->
@@ -1139,7 +1135,7 @@ fun Expression<UserDefinedSort>.z3ify(context: Z3Context): Expr<UninterpretedSor
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
       is BoundVariable ->
           context.boundVariable(this.name, this.sort.z3ify(context)) as Expr<UninterpretedSort>
-      is ArraySelect<*, UserDefinedSort> -> this.z3ify(context)
+      is ArraySelect<*, UserDeclaredSort> -> this.z3ify(context)
       else ->
           if (context.constants[this.name.toString()] != null) {
             context.constants[this.name.toString()]!! as Expr<UninterpretedSort>
@@ -1162,10 +1158,10 @@ fun Sort.z3ify(context: Z3Context): Z3Sort =
       is IntSort -> this.z3ify(context)
       is RealSort -> this.z3ify(context)
       is FPSort -> this.z3ify(context)
-      is RoundingMode -> this.z3ify(context)
+      is RoundingModeSort -> this.z3ify(context)
       is StringSort -> this.z3ify(context)
-      is RegLan -> this.z3ify(context)
-      is UserDefinedSort -> this.z3ify(context)
+      is RegLanSort -> this.z3ify(context)
+      is UserDeclaredSort -> this.z3ify(context)
       is ArraySort<*, *> -> this.z3ify(context)
       // unknown sorts
       else -> throw IllegalStateException("Unknown or unsupported sort $this")
@@ -1182,15 +1178,15 @@ fun RealSort.z3ify(context: Z3Context): Z3RealSort = context.context.mkRealSort(
 fun FPSort.z3ify(context: Z3Context): Z3FPSort =
     context.context.mkFPSort(this.exponentBits, this.significantBits)
 
-fun RoundingMode.z3ify(context: Z3Context): FPRMSort = context.context.mkFPRoundingModeSort()
+fun RoundingModeSort.z3ify(context: Z3Context): FPRMSort = context.context.mkFPRoundingModeSort()
 
 fun StringSort.z3ify(context: Z3Context): SeqSort<CharSort> =
     context.context.mkSeqSort(context.context.mkCharSort())
 
-fun RegLan.z3ify(context: Z3Context): ReSort<SeqSort<CharSort>> =
+fun RegLanSort.z3ify(context: Z3Context): ReSort<SeqSort<CharSort>> =
     context.context.mkReSort(context.context.mkSeqSort(context.context.mkCharSort()))
 
-fun UserDefinedSort.z3ify(context: Z3Context): UninterpretedSort =
+fun UserDeclaredSort.z3ify(context: Z3Context): UninterpretedSort =
     context.context.mkUninterpretedSort(this.symbol.toSMTString())
 
 fun ArraySort<*, *>.z3ify(context: Z3Context): Z3ArraySort<*, *> =

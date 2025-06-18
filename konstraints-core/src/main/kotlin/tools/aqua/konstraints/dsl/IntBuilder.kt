@@ -19,8 +19,19 @@
 package tools.aqua.konstraints.dsl
 
 import java.math.BigInteger
+import tools.aqua.konstraints.smt.Abs
 import tools.aqua.konstraints.smt.Expression
-import tools.aqua.konstraints.theories.*
+import tools.aqua.konstraints.smt.IntAdd
+import tools.aqua.konstraints.smt.IntDiv
+import tools.aqua.konstraints.smt.IntGreater
+import tools.aqua.konstraints.smt.IntLiteral
+import tools.aqua.konstraints.smt.IntMul
+import tools.aqua.konstraints.smt.IntNeg
+import tools.aqua.konstraints.smt.IntSort
+import tools.aqua.konstraints.smt.IntSub
+import tools.aqua.konstraints.smt.Mod
+import tools.aqua.konstraints.smt.RealSort
+import tools.aqua.konstraints.smt.ToInt
 
 /** Negation operator for IntSort Expressions. */
 operator fun Expression<IntSort>.unaryMinus() = IntNeg(this)
@@ -65,7 +76,7 @@ infix operator fun (() -> Expression<IntSort>).minus(subtrahend: () -> Expressio
  * Subtraction operator for IntSort Expressions: [this] - [subtrahend].
  *
  * If [this] is an [IntSub] object, unpacks the children and returns a new combined [IntSub].
- * Converts subtrahend from [Byte] to [IntLiteral].
+ * Converts subtrahend from [Byte] to [tools.aqua.konstraints.smt.IntLiteral].
  */
 infix operator fun Expression<IntSort>.minus(subtrahend: Byte) = this minus IntLiteral(subtrahend)
 

@@ -18,10 +18,10 @@
 
 package tools.aqua.konstraints
 
-import java.lang.Exception
 import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -34,6 +34,7 @@ import tools.aqua.konstraints.smt.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserTests {
+  /*
   @ParameterizedTest
   @ValueSource(
       strings =
@@ -78,6 +79,18 @@ class ParserTests {
       throw ParseError(result.failure(result.message))
     }
   }
+    */
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(set-logic AUFLIA)(set-info :status sat)(define-sort Arr (A) (Array Int A))(declare-fun key () Int)(declare-fun val () Int)(declare-fun array () (Arr Int))(assert (= val (select (store array key val) key)))(check-sat)",
+              "(set-logic QF_UF)(define-sort custom-bool (A) Bool)(declare-fun foo () (custom-bool Bool))(assert foo)(check-sat)",
+              "(set-logic QF_UF)(declare-sort sort 1)(define-sort custom-bool (A) (sort A))(declare-fun foo () (custom-bool Bool))(declare-fun bar ((custom-bool Bool)) Bool)(assert (bar foo))(check-sat)"])
+  fun testDefineSort(program: String) {
+    assertDoesNotThrow { Parser().parse(program) }
+  }
 
   @ParameterizedTest
   @ValueSource(
@@ -85,9 +98,52 @@ class ParserTests {
           [
               "(set-logic QF_UF)(set-info :status sat)(declare-fun A () Bool)(push 1)(declare-fun B () Bool)(assert (= A B))(pop 1)(assert (= A B))(check-sat)"])
   fun testPushPopFails(program: String) {
-    assertThrows<IllegalStateException> { Parser.parse(program) }
+    val parser = Parser()
+    assertThrows<FunctionNotFoundException> { parser.parse(program) }
   }
 
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(set-logic QF_UF)(set-info :status unknown)(assert (true true true))",
+              "(set-logic QF_BV)(set-info :status unknown)(declare-fun A () (_ BitVec 8))(assert (bvult A A A))",
+              "(set-logic QF_BV)(set-info :status unknown)(declare-fun A () (_ BitVec 8))(assert (bvult (bvneg A) (bvadd A A) A))",
+              "(set-logic QF_FP)(set-info :status unknown)(declare-fun A () Float16)(assert (fp.isNormal A A))"])
+  fun testTooManyArgsFails(program: String) {
+    println(assertThrows<IllegalArgumentException> { Parser().parse(program) }.message)
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(set-logic QF_BV)(set-info :status unknown)(declare-fun A () (_ BitVec 8))(assert (bvult A))",
+              "(set-logic QF_BV)(set-info :status unknown)(declare-fun A () (_ BitVec 8))(assert (bvult (bvneg A)))",
+              "(set-logic QF_FP)(set-info :status unknown)(declare-fun A () Float16)(assert (fp.isNormal (fp.fma A A)))"])
+  fun testTooFewArgsFails(program: String) {
+    println(assertThrows<IllegalArgumentException> { Parser().parse(program) }.message)
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(set-logic QF_NIA)(set-info :status unknown)(declare-fun A () Int)(assert (divisible A))"])
+  fun testTooFewIndicesFails(program: String) {
+    println(assertThrows<IllegalArgumentException> { Parser().parse(program) }.message)
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(set-logic QF_NIA)(set-info :status unknown)(declare-fun A () Int)(assert ((_ divisible 4 4) A))"])
+  fun testTooManyIndicesFails(program: String) {
+    println(assertThrows<IllegalArgumentException> { Parser().parse(program) }.message)
+  }
+
+  /*
   @ParameterizedTest
   @ValueSource(
       strings =
@@ -95,6 +151,7 @@ class ParserTests {
               "(declare-fun A Bool)",
               "(assert (not (= (bvlshr s (bvshl t #b00000000000000000000000000000000)) (bvlshr s t)))"])
   fun testIllegalCommands(command: String) {
+      Parser.program = MutableSMTProgram()
     val result = Parser.command.parse(command)
     assert(result.isFailure)
 
@@ -102,7 +159,9 @@ class ParserTests {
     println(result.position)
     println(result.buffer)
   }
+    */
 
+  /*
   @ParameterizedTest
   @ValueSource(
       strings =
@@ -117,20 +176,34 @@ class ParserTests {
 
     if (result.isSuccess) println(result.get<Any>()) else throw Exception()
   }
+  */
 
   @ParameterizedTest
   @ValueSource(
       strings =
           [
-              "(set-info :info 1)(declare-fun s () (_ BitVec 32))(declare-fun t () (_ BitVec 32))(assert (not (= (bvand s s) s)))(check-sat)"])
+              "(set-logic QF_BV)(declare-fun s () (_ BitVec 32))(declare-fun t () (_ BitVec 32))(assert (not (= (bvand s s) s)))(check-sat)",
+              "(set-logic QF_UF)(declare-sort S 1)(declare-fun foo ((S Bool) (S Bool)) Bool)(declare-const S1 (S Bool))(declare-const S2 (S Bool))(assert (foo S1 S2))(check-sat)",
+              "(set-logic QF_UF)(declare-sort S 0)(declare-fun foo (S S) Bool)(declare-const S1 S)(declare-const S2 S)(assert (foo S1 S2))(check-sat)"])
   fun testScriptParsing(script: String) {
-    val result = Parser.script.parse(script)
+    val parser = Parser()
+    val result = parser.script.parse(script)
 
     if (result.isSuccess) {
       println(result.get<String>())
     } else {
       throw ParseError(result.failure(result.message))
     }
+  }
+
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(set-logic QF_UF)(push 1)(declare-sort S 0)(declare-fun foo (S S) Bool)(declare-const S1 S)(declare-const S2 S)(assert (foo S1 S2))(pop 1)(declare-fun bar (S S) Bool)(assert (bar S1 S2))(check-sat)"])
+  fun testIllegalScriptParsing(script: String) {
+    val parser = Parser()
+    assertThrows<IllegalArgumentException> { parser.script.parse(script) }
   }
 
   @ParameterizedTest

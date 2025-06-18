@@ -50,7 +50,8 @@ class QF_BV {
         file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
 
     val solver = Z3Solver()
-    val result = Parser.parse(file.bufferedReader().use(BufferedReader::readLines).joinToString(""))
+    val result =
+        Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString(""))
 
     Assumptions.assumeTrue(
         (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
