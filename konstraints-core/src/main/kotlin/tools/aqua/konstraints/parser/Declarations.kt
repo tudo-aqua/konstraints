@@ -3108,9 +3108,7 @@ internal object ArraySelectDecl :
     require(args[1].sort == (args[0].sort as ArraySort<*, *>).x)
 
     @Suppress("UNCHECKED_CAST")
-    return ArraySelect(
-        args[0].castTo(),
-        args[1].castTo())
+    return ArraySelect(args[0].castTo(), args[1].castTo())
   }
 }
 
@@ -3139,10 +3137,7 @@ internal object ArrayStoreDecl :
     require(args[2].sort == (args[0].sort as ArraySort<*, *>).y)
 
     @Suppress("UNCHECKED_CAST")
-    return ArrayStore(
-        args[0].castTo(),
-        args[1].castTo(),
-        args[2].castTo())
+    return ArrayStore(args[0].castTo(), args[1].castTo(), args[2].castTo())
   }
 }
 
@@ -3667,8 +3662,7 @@ internal object StrReplaceAllDecl :
     }
     require(args.all { expr -> expr.sort is StringSort })
 
-    return StrReplaceAll(
-        args[0].castTo(), args[1].castTo(), args[2].castTo())
+    return StrReplaceAll(args[0].castTo(), args[1].castTo(), args[2].castTo())
   }
 }
 
@@ -3693,8 +3687,7 @@ internal object StrReplaceRegexDecl :
     require(args[1].sort is RegLanSort)
     require(args[2].sort is StringSort)
 
-    return StrReplaceRegex(
-        args[0].castTo(), args[1].castTo(), args[2].castTo())
+    return StrReplaceRegex(args[0].castTo(), args[1].castTo(), args[2].castTo())
   }
 }
 
@@ -3719,8 +3712,7 @@ internal object StrReplaceAllRegexDecl :
     require(args[1].sort is RegLanSort)
     require(args[2].sort is StringSort)
 
-    return StrReplaceAllRegex(
-        args[0].castTo(), args[1].castTo(), args[2].castTo())
+    return StrReplaceAllRegex(args[0].castTo(), args[1].castTo(), args[2].castTo())
   }
 }
 

@@ -247,9 +247,9 @@ class LetExpression<out T : Sort>(val bindings: List<VarBinding<*>>, val inner: 
 
   override fun copy(children: List<Expression<*>>): Expression<T> {
     require(children.size == 1)
-      require(children.single().sort == sort)
+    require(children.single().sort == sort)
 
-      @Suppress("UNCHECKED_CAST")
+    @Suppress("UNCHECKED_CAST")
     return LetExpression(bindings, children.single() as Expression<T>) as Expression<T>
   }
 
@@ -305,9 +305,9 @@ class LocalExpression<T : Sort>(
 
   override fun copy(children: List<Expression<*>>): Expression<T> {
     require(children.size == 1)
-      require(children.single().sort == sort)
+    require(children.single().sort == sort)
 
-      @Suppress("UNCHECKED_CAST")
+    @Suppress("UNCHECKED_CAST")
     return LocalExpression(name, sort, children.single() as Expression<T>, func) as Expression<T>
   }
 
@@ -412,8 +412,8 @@ class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T)
  * @throws [ExpressionCastException] if [sort] is not [T]
  */
 inline fun <reified T : Sort> Expression<*>.castTo(): Expression<T> {
-    require(sort is T) { "Can not cast expression $name of sort $sort to ${T::class}" }
+  require(sort is T) { "Can not cast expression $name of sort $sort to ${T::class}" }
 
-    @Suppress("UNCHECKED_CAST")
-    return this as Expression<T>
+  @Suppress("UNCHECKED_CAST")
+  return this as Expression<T>
 }

@@ -81,7 +81,7 @@ fun Expression<*>.z3ify(context: Z3Context): Expr<*> {
     is RegLanSort -> this.castTo<RegLanSort>().z3ify(context)
     is UserDeclaredSort -> this.castTo<UserDeclaredSort>().z3ify(context)
     is ArraySort<*, *> -> this.castTo<ArraySort<*, *>>().z3ify(context)
-      is SortParameter -> TODO()
+    is SortParameter -> TODO()
   }
 }
 
