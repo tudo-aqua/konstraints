@@ -113,7 +113,7 @@ internal object NotDecl :
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
 
-    return Not(args.single() castTo Bool)
+    return Not(args.single().castTo<BoolSort>())
   }
 }
 
@@ -133,7 +133,7 @@ internal object ImpliesDecl :
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
 
-    return Implies(args.map { it castTo Bool })
+    return Implies(args.map { it.castTo<BoolSort>() })
   }
 }
 
@@ -152,7 +152,7 @@ internal object AndDecl :
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
 
-    return And(args.map { it castTo Bool })
+    return And(args.map { it.castTo<BoolSort>() })
   }
 }
 
@@ -172,7 +172,7 @@ internal object OrDecl :
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
 
-    return Or(args.map { it castTo Bool })
+    return Or(args.map { it.castTo<BoolSort>() })
   }
 }
 
@@ -192,7 +192,7 @@ internal object XOrDecl :
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
 
-    return XOr(args.map { it castTo Bool })
+    return XOr(args.map { it.castTo<BoolSort>() })
   }
 }
 
@@ -264,7 +264,7 @@ internal object IteDecl :
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
 
-    return Ite(args[0] castTo Bool, args[1], args[2])
+    return Ite(args[0].castTo<BoolSort>(), args[1], args[2])
   }
 }
 
@@ -1275,7 +1275,7 @@ internal object IntNegDecl :
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return IntNeg(args.single() castTo SMTInt)
+    return IntNeg(args.single().castTo<IntSort>())
   }
 }
 
@@ -1290,7 +1290,7 @@ internal object IntSubDecl :
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return IntSub(args.map { expr -> expr castTo SMTInt })
+    return IntSub(args.map { expr -> expr.castTo<IntSort>() })
   }
 }
 
@@ -1323,7 +1323,7 @@ internal object IntAddDecl :
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return IntAdd(args.map { expr -> expr castTo SMTInt })
+    return IntAdd(args.map { expr -> expr.castTo<IntSort>() })
   }
 }
 
@@ -1338,7 +1338,7 @@ internal object IntMulDecl :
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return IntMul(args.map { expr -> expr castTo SMTInt })
+    return IntMul(args.map { expr -> expr.castTo<IntSort>() })
   }
 }
 
@@ -1353,7 +1353,7 @@ internal object IntDivDecl :
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return IntDiv(args.map { expr -> expr castTo SMTInt })
+    return IntDiv(args.map { expr -> expr.castTo<IntSort>() })
   }
 }
 
@@ -1368,7 +1368,7 @@ internal object ModDecl :
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return Mod(args[0] castTo SMTInt, args[1] castTo SMTInt)
+    return Mod(args[0].castTo<IntSort>(), args[1].castTo<IntSort>())
   }
 }
 
@@ -1383,7 +1383,7 @@ internal object AbsDecl :
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return IntNeg(args.single() castTo SMTInt)
+    return IntNeg(args.single().castTo<IntSort>())
   }
 }
 
@@ -1398,7 +1398,7 @@ internal object IntLessEqDecl :
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return IntLessEq(args.map { expr -> expr castTo SMTInt })
+    return IntLessEq(args.map { expr -> expr.castTo<IntSort>() })
   }
 }
 
@@ -1413,7 +1413,7 @@ internal object IntLessDecl :
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return IntLess(args.map { expr -> expr castTo SMTInt })
+    return IntLess(args.map { expr -> expr.castTo<IntSort>() })
   }
 }
 
@@ -1428,7 +1428,7 @@ internal object IntGreaterEqDecl :
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return IntGreaterEq(args.map { expr -> expr castTo SMTInt })
+    return IntGreaterEq(args.map { expr -> expr.castTo<IntSort>() })
   }
 }
 
@@ -1443,7 +1443,7 @@ internal object IntGreaterDecl :
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return IntGreater(args.map { expr -> expr castTo SMTInt })
+    return IntGreater(args.map { expr -> expr.castTo<IntSort>() })
   }
 }
 
@@ -1501,7 +1501,7 @@ internal object RealNegDecl :
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return RealNeg(args.single() castTo Real)
+    return RealNeg(args.single().castTo<RealSort>())
   }
 }
 
@@ -1516,7 +1516,7 @@ internal object RealSubDecl :
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return RealSub(args.map { expr -> expr castTo Real })
+    return RealSub(args.map { expr -> expr.castTo<RealSort>() })
   }
 }
 
@@ -1548,7 +1548,7 @@ internal object RealAddDecl :
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return RealAdd(args.map { expr -> expr castTo Real })
+    return RealAdd(args.map { expr -> expr.castTo<RealSort>() })
   }
 }
 
@@ -1563,7 +1563,7 @@ internal object RealMulDecl :
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return RealMul(args.map { expr -> expr castTo Real })
+    return RealMul(args.map { expr -> expr.castTo<RealSort>() })
   }
 }
 
@@ -1578,7 +1578,7 @@ internal object RealDivDecl :
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return RealDiv(args.map { expr -> expr castTo Real })
+    return RealDiv(args.map { expr -> expr.castTo<RealSort>() })
   }
 }
 
@@ -1593,7 +1593,7 @@ internal object RealLessEqDecl :
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return RealLessEq(args.map { expr -> expr castTo Real })
+    return RealLessEq(args.map { expr -> expr.castTo<RealSort>() })
   }
 }
 
@@ -1608,7 +1608,7 @@ internal object RealLessDecl :
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return RealLess(args.map { expr -> expr castTo Real })
+    return RealLess(args.map { expr -> expr.castTo<RealSort>() })
   }
 }
 
@@ -1623,7 +1623,7 @@ internal object RealGreaterEqDecl :
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return RealGreaterEq(args.map { expr -> expr castTo Real })
+    return RealGreaterEq(args.map { expr -> expr.castTo<RealSort>() })
   }
 }
 
@@ -1638,7 +1638,7 @@ internal object RealGreaterDecl :
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return RealGreater(args.map { expr -> expr castTo Real })
+    return RealGreater(args.map { expr -> expr.castTo<RealSort>() })
   }
 }
 
@@ -1680,7 +1680,7 @@ internal object ToRealDecl :
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return ToReal(args.single() castTo SMTInt)
+    return ToReal(args.single().castTo<IntSort>())
   }
 }
 
@@ -1695,7 +1695,7 @@ internal object ToIntDecl :
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return ToInt(args.single() castTo Real)
+    return ToInt(args.single().castTo<RealSort>())
   }
 }
 
@@ -1710,7 +1710,7 @@ internal object IsIntDecl :
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
-    return IsInt(args.single() castTo Real)
+    return IsInt(args.single().castTo<RealSort>())
   }
 }
 
@@ -2195,7 +2195,7 @@ internal object FPAbsDecl :
     }
 
     @Suppress("UNCHECKED_CAST")
-    return FPAbs(args.single() as Expression<FPSort>)
+    return FPAbs(args.single().castTo<FPSort>())
   }
 }
 
@@ -2222,7 +2222,7 @@ internal object FPNegDecl :
     }
 
     @Suppress("UNCHECKED_CAST")
-    return FPNeg(args.single() as Expression<FPSort>)
+    return FPNeg(args.single().castTo<FPSort>())
   }
 }
 
@@ -2250,7 +2250,7 @@ internal object FPAddDecl :
 
     @Suppress("UNCHECKED_CAST")
     return FPAdd(
-        args[0] castTo RoundingMode, args[1] as Expression<FPSort>, args[2] as Expression<FPSort>)
+        args[0].castTo<RoundingModeSort>(), args[1].castTo<FPSort>(), args[2].castTo<FPSort>())
   }
 }
 
@@ -2278,7 +2278,7 @@ internal object FPSubDecl :
 
     @Suppress("UNCHECKED_CAST")
     return FPSub(
-        args[0] castTo RoundingMode, args[1] as Expression<FPSort>, args[2] as Expression<FPSort>)
+        args[0].castTo<RoundingModeSort>(), args[1].castTo<FPSort>(), args[2].castTo<FPSort>())
   }
 }
 
@@ -2305,7 +2305,7 @@ internal object FPMulDecl :
 
     @Suppress("UNCHECKED_CAST")
     return FPMul(
-        args[0] castTo RoundingMode, args[1] as Expression<FPSort>, args[2] as Expression<FPSort>)
+        args[0].castTo<RoundingModeSort>(), args[1].castTo<FPSort>(), args[2].castTo<FPSort>())
   }
 }
 
@@ -2332,7 +2332,7 @@ internal object FPDivDecl :
 
     @Suppress("UNCHECKED_CAST")
     return FPDiv(
-        args[0] castTo RoundingMode, args[1] as Expression<FPSort>, args[2] as Expression<FPSort>)
+        args[0].castTo<RoundingModeSort>(), args[1].castTo<FPSort>(), args[2].castTo<FPSort>())
   }
 }
 
@@ -2364,10 +2364,10 @@ internal object FPFmaDecl :
 
     @Suppress("UNCHECKED_CAST")
     return FPFma(
-        args[0] castTo RoundingMode,
-        args[1] as Expression<FPSort>,
-        args[2] as Expression<FPSort>,
-        args[3] as Expression<FPSort>)
+        args[0].castTo<RoundingModeSort>(),
+        args[1].castTo<FPSort>(),
+        args[2].castTo<FPSort>(),
+        args[3].castTo<FPSort>())
   }
 }
 
@@ -2392,7 +2392,7 @@ internal object FPSqrtDecl :
     require(args[1].sort is FPSort)
 
     @Suppress("UNCHECKED_CAST")
-    return FPSqrt(args[0] castTo RoundingMode, args[1] as Expression<FPSort>)
+    return FPSqrt(args[0].castTo<RoundingModeSort>(), args[1].castTo<FPSort>())
   }
 }
 
@@ -2416,7 +2416,7 @@ internal object FPRemDecl :
     require(args.all { expr -> expr.sort is FPSort })
 
     @Suppress("UNCHECKED_CAST")
-    return FPRem(args[0] as Expression<FPSort>, args[1] as Expression<FPSort>)
+    return FPRem(args[0].castTo<FPSort>(), args[1].castTo<FPSort>())
   }
 }
 
@@ -2441,7 +2441,7 @@ internal object FPRoundToIntegralDecl :
     require(args[1].sort is FPSort)
 
     @Suppress("UNCHECKED_CAST")
-    return FPRoundToIntegral(args[0] castTo RoundingMode, args[1] as Expression<FPSort>)
+    return FPRoundToIntegral(args[0].castTo<RoundingModeSort>(), args[1].castTo<FPSort>())
   }
 }
 
@@ -2465,7 +2465,7 @@ internal object FPMinDecl :
     require(args.all { expr -> expr.sort is FPSort })
 
     @Suppress("UNCHECKED_CAST")
-    return FPMin(args[0] as Expression<FPSort>, args[1] as Expression<FPSort>)
+    return FPMin(args[0].castTo<FPSort>(), args[1].castTo<FPSort>())
   }
 }
 
@@ -2489,7 +2489,7 @@ internal object FPMaxDecl :
     require(args.all { expr -> expr.sort is FPSort })
 
     @Suppress("UNCHECKED_CAST")
-    return FPMax(args[0] as Expression<FPSort>, args[1] as Expression<FPSort>)
+    return FPMax(args[0].castTo<FPSort>(), args[1].castTo<FPSort>())
   }
 }
 
@@ -2635,7 +2635,7 @@ internal object FPIsNormalDecl :
     }
 
     @Suppress("UNCHECKED_CAST")
-    return FPIsNormal(args.single() as Expression<FPSort>)
+    return FPIsNormal(args.single().castTo<FPSort>())
   }
 }
 
@@ -2661,7 +2661,7 @@ internal object FPIsSubormalDecl :
     }
 
     @Suppress("UNCHECKED_CAST")
-    return FPIsSubnormal(args.single() as Expression<FPSort>)
+    return FPIsSubnormal(args.single().castTo<FPSort>())
   }
 }
 
@@ -2687,7 +2687,7 @@ internal object FPIsZeroDecl :
     }
 
     @Suppress("UNCHECKED_CAST")
-    return FPIsZero(args.single() as Expression<FPSort>)
+    return FPIsZero(args.single().castTo<FPSort>())
   }
 }
 
@@ -2713,7 +2713,7 @@ internal object FPIsInfiniteDecl :
     }
 
     @Suppress("UNCHECKED_CAST")
-    return FPIsInfinite(args.single() as Expression<FPSort>)
+    return FPIsInfinite(args.single().castTo<FPSort>())
   }
 }
 
@@ -2739,7 +2739,7 @@ internal object FPIsNaNDecl :
     }
 
     @Suppress("UNCHECKED_CAST")
-    return FPIsNaN(args.single() as Expression<FPSort>)
+    return FPIsNaN(args.single().castTo<FPSort>())
   }
 }
 
@@ -2765,7 +2765,7 @@ internal object FPIsNegativeDecl :
     }
 
     @Suppress("UNCHECKED_CAST")
-    return FPIsNegative(args.single() as Expression<FPSort>)
+    return FPIsNegative(args.single().castTo<FPSort>())
   }
 }
 
@@ -2791,7 +2791,7 @@ internal object FPIsPositiveDecl :
     }
 
     @Suppress("UNCHECKED_CAST")
-    return FPIsPositive(args.single() as Expression<FPSort>)
+    return FPIsPositive(args.single().castTo<FPSort>())
   }
 }
 
@@ -2885,8 +2885,8 @@ internal object FPToFPDecl :
 
     @Suppress("UNCHECKED_CAST")
     return FPToFP(
-        args[0] castTo RoundingMode,
-        args[1] as Expression<FPSort>,
+        args[0].castTo<RoundingModeSort>(),
+        args[1].castTo<FPSort>(),
         (indices[0] as NumeralIndex).numeral,
         (indices[1] as NumeralIndex).numeral)
   }
@@ -2917,7 +2917,7 @@ internal object RealToFPDecl :
 
     @Suppress("UNCHECKED_CAST")
     return RealToFP(
-        args[0] castTo RoundingMode,
+        args[0].castTo<RoundingModeSort>(),
         args[1] as Expression<RealSort>,
         (indices[0] as NumeralIndex).numeral,
         (indices[1] as NumeralIndex).numeral)
@@ -2949,7 +2949,7 @@ internal object SBitVecToFPDecl :
 
     @Suppress("UNCHECKED_CAST")
     return SBitVecToFP(
-        args[0] castTo RoundingMode,
+        args[0].castTo<RoundingModeSort>(),
         args[1] as Expression<BVSort>,
         (indices[0] as NumeralIndex).numeral,
         (indices[1] as NumeralIndex).numeral)
@@ -2984,7 +2984,7 @@ internal object UBitVecToFPDecl :
 
     @Suppress("UNCHECKED_CAST")
     return UBitVecToFP(
-        args[0] castTo RoundingMode,
+        args[0].castTo<RoundingModeSort>(),
         args[1] as Expression<BVSort>,
         (indices[0] as NumeralIndex).numeral,
         (indices[1] as NumeralIndex).numeral)
@@ -3016,8 +3016,8 @@ internal object FPToUBitVecDecl :
 
     @Suppress("UNCHECKED_CAST")
     return FPToUBitVec(
-        args[0] castTo RoundingMode,
-        args[1] as Expression<FPSort>,
+        args[0].castTo<RoundingModeSort>(),
+        args[1].castTo<FPSort>(),
         (indices.single() as NumeralIndex).numeral)
   }
 }
@@ -3047,8 +3047,8 @@ internal object FPToSBitVecDecl :
 
     @Suppress("UNCHECKED_CAST")
     return FPToSBitVec(
-        args[0] castTo RoundingMode,
-        args[1] as Expression<FPSort>,
+        args[0].castTo<RoundingModeSort>(),
+        args[1].castTo<FPSort>(),
         (indices.single() as NumeralIndex).numeral)
   }
 }
@@ -3077,7 +3077,7 @@ internal object FPToRealDecl :
     }
 
     @Suppress("UNCHECKED_CAST")
-    return FPToReal(args.single() as Expression<FPSort>)
+    return FPToReal(args.single().castTo<FPSort>())
   }
 }
 
@@ -3109,8 +3109,8 @@ internal object ArraySelectDecl :
 
     @Suppress("UNCHECKED_CAST")
     return ArraySelect(
-        args[0] as Expression<ArraySort<Sort, Sort>>,
-        args[1] castTo (args[0].sort as ArraySort<*, *>).x)
+        args[0].castTo(),
+        args[1].castTo())
   }
 }
 
@@ -3140,9 +3140,9 @@ internal object ArrayStoreDecl :
 
     @Suppress("UNCHECKED_CAST")
     return ArrayStore(
-        args[0] as Expression<ArraySort<Sort, Sort>>,
-        args[1] castTo (args[0].sort as ArraySort<*, *>).x,
-        args[2] castTo (args[0].sort as ArraySort<*, *>).y)
+        args[0].castTo(),
+        args[1].castTo(),
+        args[2].castTo())
   }
 }
 
@@ -3254,7 +3254,7 @@ internal object StrLengthDecl :
     }
     require(args.single().sort is StringSort)
 
-    return StrLength(args.single() castTo SMTString)
+    return StrLength(args.single().castTo())
   }
 }
 
@@ -3295,7 +3295,7 @@ internal object ToRegexDecl :
     }
     require(args.single().sort is StringSort)
 
-    return ToRegex(args.single() castTo SMTString)
+    return ToRegex(args.single().castTo())
   }
 }
 
@@ -3316,7 +3316,7 @@ internal object InRegexDecl :
     require(args[0].sort is StringSort)
     require(args[1].sort is RegLanSort)
 
-    return InRegex(args[0] castTo SMTString, args[1] castTo RegLan)
+    return InRegex(args[0].castTo(), args[1].castTo())
   }
 }
 
@@ -3457,7 +3457,7 @@ internal object RegexStarDecl :
     require(args.single().sort is RegLanSort)
 
     @Suppress("UNCHECKED_CAST")
-    return RegexStar(args.single() castTo RegLan)
+    return RegexStar(args.single().castTo())
   }
 }
 
@@ -3502,7 +3502,7 @@ internal object StrAtDecl :
     require(args[0].sort is StringSort)
     require(args[1].sort is IntSort)
 
-    return StrAt(args[0] castTo SMTString, args[1] castTo SMTInt)
+    return StrAt(args[0].castTo(), args[1].castTo<IntSort>())
   }
 }
 
@@ -3527,7 +3527,7 @@ internal object StrSubstringDecl :
     require(args[1].sort is IntSort)
     require(args[2].sort is IntSort)
 
-    return StrSubstring(args[0] castTo SMTString, args[1] castTo SMTInt, args[2] castTo SMTInt)
+    return StrSubstring(args[0].castTo(), args[1].castTo<IntSort>(), args[2].castTo<IntSort>())
   }
 }
 
@@ -3550,7 +3550,7 @@ internal object StrPrefixOfDecl :
     }
     require(args.all { expr -> expr.sort is StringSort })
 
-    return StrPrefixOf(args[0] castTo SMTString, args[1] castTo SMTString)
+    return StrPrefixOf(args[0].castTo(), args[1].castTo())
   }
 }
 
@@ -3573,7 +3573,7 @@ internal object StrSuffixOfDecl :
     }
     require(args.all { expr -> expr.sort is StringSort })
 
-    return StrSuffixOf(args[0] castTo SMTString, args[1] castTo SMTString)
+    return StrSuffixOf(args[0].castTo(), args[1].castTo())
   }
 }
 
@@ -3596,7 +3596,7 @@ internal object StrContainsDecl :
     }
     require(args.all { expr -> expr.sort is StringSort })
 
-    return StrContains(args[0] castTo SMTString, args[1] castTo SMTString)
+    return StrContains(args[0].castTo(), args[1].castTo())
   }
 }
 
@@ -3621,7 +3621,7 @@ internal object StrIndexOfDecl :
     require(args[1].sort is StringSort)
     require(args[2].sort is IntSort)
 
-    return StrIndexOf(args[0] castTo SMTString, args[1] castTo SMTString, args[2] castTo SMTInt)
+    return StrIndexOf(args[0].castTo(), args[1].castTo(), args[2].castTo<IntSort>())
   }
 }
 
@@ -3644,7 +3644,7 @@ internal object StrReplaceDecl :
     }
     require(args.all { expr -> expr.sort is StringSort })
 
-    return StrReplace(args[0] castTo SMTString, args[1] castTo SMTString, args[2] castTo SMTString)
+    return StrReplace(args[0].castTo(), args[1].castTo(), args[2].castTo())
   }
 }
 
@@ -3668,7 +3668,7 @@ internal object StrReplaceAllDecl :
     require(args.all { expr -> expr.sort is StringSort })
 
     return StrReplaceAll(
-        args[0] castTo SMTString, args[1] castTo SMTString, args[2] castTo SMTString)
+        args[0].castTo(), args[1].castTo(), args[2].castTo())
   }
 }
 
@@ -3694,7 +3694,7 @@ internal object StrReplaceRegexDecl :
     require(args[2].sort is StringSort)
 
     return StrReplaceRegex(
-        args[0] castTo SMTString, args[1] castTo RegLan, args[2] castTo SMTString)
+        args[0].castTo(), args[1].castTo(), args[2].castTo())
   }
 }
 
@@ -3720,7 +3720,7 @@ internal object StrReplaceAllRegexDecl :
     require(args[2].sort is StringSort)
 
     return StrReplaceAllRegex(
-        args[0] castTo SMTString, args[1] castTo RegLan, args[2] castTo SMTString)
+        args[0].castTo(), args[1].castTo(), args[2].castTo())
   }
 }
 
@@ -3740,7 +3740,7 @@ internal object RegexCompDecl :
     }
     require(args.single().sort is RegLanSort)
 
-    return RegexComp(args.single() castTo RegLan)
+    return RegexComp(args.single().castTo())
   }
 }
 
@@ -3781,7 +3781,7 @@ internal object RegexPlusDecl :
     }
     require(args.single().sort is RegLanSort)
 
-    return RegexPlus(args.single() castTo RegLan)
+    return RegexPlus(args.single().castTo())
   }
 }
 
@@ -3801,7 +3801,7 @@ internal object RegexOptionDecl :
     }
     require(args.single().sort is RegLanSort)
 
-    return RegexOption(args.single() castTo RegLan)
+    return RegexOption(args.single().castTo())
   }
 }
 
@@ -3821,7 +3821,7 @@ internal object RegexRangeDecl :
     }
     require(args.all { expr -> expr.sort is StringSort })
 
-    return RegexRange(args[0] castTo SMTString, args[1] castTo SMTString)
+    return RegexRange(args[0].castTo(), args[1].castTo())
   }
 }
 
@@ -3844,7 +3844,7 @@ internal object RegexPowerDecl :
       "Expected index of $symbol to be numeral but was ${indices.single()}"
     }
 
-    return RegexPower(args[0] castTo RegLan, (indices.single() as NumeralIndex).numeral)
+    return RegexPower(args[0].castTo(), (indices.single() as NumeralIndex).numeral)
   }
 }
 
@@ -3868,7 +3868,7 @@ internal object RegexLoopDecl :
     }
 
     return RegexLoop(
-        args[0] castTo RegLan,
+        args[0].castTo(),
         (indices[0] as NumeralIndex).numeral,
         (indices[1] as NumeralIndex).numeral)
   }
@@ -3890,7 +3890,7 @@ internal object StrIsDigitDecl :
     }
     require(args.single().sort is StringSort)
 
-    return StrIsDigit(args.single() castTo SMTString)
+    return StrIsDigit(args.single().castTo())
   }
 }
 
@@ -3910,7 +3910,7 @@ internal object StrToCodeDecl :
     }
     require(args.single().sort is StringSort)
 
-    return StrToCode(args.single() castTo SMTString)
+    return StrToCode(args.single().castTo())
   }
 }
 
@@ -3932,7 +3932,7 @@ internal object StrFromCodeDecl :
       "Expected arg of $symbol to be Int but was ${args.single().sort}"
     }
 
-    return StrFromCode(args.single() castTo SMTInt)
+    return StrFromCode(args.single().castTo<IntSort>())
   }
 }
 
@@ -3952,7 +3952,7 @@ internal object StrToIntDecl :
     }
     require(args.single().sort is StringSort)
 
-    return StrToInt(args.single() castTo SMTString)
+    return StrToInt(args.single().castTo())
   }
 }
 
@@ -3974,6 +3974,6 @@ internal object StrFromIntDecl :
       "Expected arg of $symbol to be Int but was ${args.single().sort}"
     }
 
-    return StrFromInt(args.single() castTo SMTInt)
+    return StrFromInt(args.single().castTo<IntSort>())
   }
 }

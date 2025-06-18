@@ -626,7 +626,7 @@ class Parser {
                 .map { results: List<Any> ->
                   program.context.unbindVariables()
                   ForallExpression(
-                      results[3] as List<SortedVar<*>>, results[5] as Expression<*> castTo Bool)
+                      results[3] as List<SortedVar<*>>, (results[5] as Expression<*>).castTo())
                   // results[3] is guaranteed to be a list of SortedVar
                 } + /* maps to ProtoForAll */
             (lparen *
@@ -642,7 +642,7 @@ class Parser {
                 .map { results: List<Any> ->
                   program.context.unbindVariables()
                   ExistsExpression(
-                      results[3] as List<SortedVar<*>>, results[5] as Expression<*> castTo Bool)
+                      results[3] as List<SortedVar<*>>, (results[5] as Expression<*>).castTo())
                   // results[3] is guaranteed to be a list of SortedVar
                 } + /* maps to ProtoExists */
             (lparen * matchKW * term * lparen * matchCase.plus() * rparen * rparen).map {
@@ -718,7 +718,7 @@ class Parser {
 
   private val assertCMD =
       (lparen * assertKW * term * rparen).map { results: List<Any> ->
-        program.assert(results[2] as Expression<*> castTo Bool)
+        program.assert((results[2] as Expression<*>).castTo())
       }
 
   private val checkSatCMD = (lparen * checkSatKW * rparen).map { _: Any -> program.add(CheckSat) }

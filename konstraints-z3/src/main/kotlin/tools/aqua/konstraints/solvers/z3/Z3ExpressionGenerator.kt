@@ -71,21 +71,17 @@ fun Expression<*>.z3ify(context: Z3Context): Expr<*> {
   }
 
   return when (this.sort) {
-    is BoolSort -> (this castTo Bool).z3ify(context)
-    is BVSort -> (this as Expression<BVSort>).z3ify(context)
-    is IntSort -> (this castTo SMTInt).z3ify(context)
-    is RealSort -> (this castTo Real).z3ify(context)
-    is RoundingModeSort -> (this castTo RoundingMode).z3ify(context)
-    is FPSort -> (this as Expression<FPSort>).z3ify(context)
-    is FP16 -> (this as Expression<FPSort>).z3ify(context)
-    is FP32 -> (this as Expression<FPSort>).z3ify(context)
-    is FP64 -> (this as Expression<FPSort>).z3ify(context)
-    is FP128 -> (this as Expression<FPSort>).z3ify(context)
-    is StringSort -> (this castTo SMTString).z3ify(context)
-    is RegLanSort -> (this castTo RegLan).z3ify(context)
-    is UserDeclaredSort -> (this as Expression<UserDeclaredSort>).z3ify(context)
-    is ArraySort<*, *> -> (this as Expression<ArraySort<*, *>>).z3ify(context)
-    else -> throw RuntimeException("Unknown sort ${this.sort}")
+    is BoolSort -> this.castTo<BoolSort>().z3ify(context)
+    is BVSort -> this.castTo<BVSort>().z3ify(context)
+    is IntSort -> this.castTo<IntSort>().z3ify(context)
+    is RealSort -> this.castTo<RealSort>().z3ify(context)
+    is RoundingModeSort -> this.castTo<RoundingMode>().z3ify(context)
+    is FPSort -> this.castTo<FPSort>().z3ify(context)
+    is StringSort -> this.castTo<SMTString>().z3ify(context)
+    is RegLanSort -> this.castTo<RegLanSort>().z3ify(context)
+    is UserDeclaredSort -> this.castTo<UserDeclaredSort>().z3ify(context)
+    is ArraySort<*, *> -> this.castTo<ArraySort<*, *>>().z3ify(context)
+      is SortParameter -> TODO()
   }
 }
 

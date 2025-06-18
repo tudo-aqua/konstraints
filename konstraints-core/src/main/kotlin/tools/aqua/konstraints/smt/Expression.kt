@@ -37,20 +37,6 @@ sealed interface Expression<out T : Sort> {
   // TODO implement more operations like filter, filterIsInstance, filterIsSort, forEach, onEach
   // etc.
 
-  /**
-   * Safely cast this expression to an Expression of Sort S.
-   *
-   * @throws [ExpressionCastException] if [sort] is not [S]
-   */
-  infix fun <S : Sort> castTo(to: S): Expression<S> {
-    if (sort != to) {
-      throw ExpressionCastException(sort, to.toString())
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    return this as Expression<S>
-  }
-
   fun all(predicate: (Expression<*>) -> Boolean): Boolean =
       when (this) {
         is ConstantExpression -> predicate(this)
@@ -93,11 +79,10 @@ sealed interface Expression<out T : Sort> {
     // check if any child was copied
     return if ((transformedChildren zip this.children).any { (new, old) -> new !== old }) {
       // return copied expression with new children
-      val copied = this.copy(transformedChildren)
-      transformation(copied) castTo sort
+      transformation(this.copy(transformedChildren)) as Expression<T>
     } else {
       // transform this expression, prevent it from changing the sort
-      transformation(this) castTo sort
+      transformation(this) as Expression<T>
     }
   }
 
@@ -213,7 +198,7 @@ class Ite<out T : Sort>(
   override val func = null
 
   override fun copy(children: List<Expression<*>>): Expression<T> =
-      IteDecl.constructDynamic(children, emptyList()) castTo sort
+      IteDecl.constructDynamic(children, emptyList()) as Expression<T>
 
   override val name: Symbol = "ite".toSymbolWithQuotes()
 
@@ -262,8 +247,10 @@ class LetExpression<out T : Sort>(val bindings: List<VarBinding<*>>, val inner: 
 
   override fun copy(children: List<Expression<*>>): Expression<T> {
     require(children.size == 1)
+      require(children.single().sort == sort)
 
-    return LetExpression(bindings, children.single() castTo sort) castTo sort
+      @Suppress("UNCHECKED_CAST")
+    return LetExpression(bindings, children.single() as Expression<T>) as Expression<T>
   }
 
   override val children: List<Expression<*>> = listOf(inner)
@@ -318,8 +305,10 @@ class LocalExpression<T : Sort>(
 
   override fun copy(children: List<Expression<*>>): Expression<T> {
     require(children.size == 1)
+      require(children.single().sort == sort)
 
-    return LocalExpression(name, sort, children.single() castTo sort, func) castTo sort
+      @Suppress("UNCHECKED_CAST")
+    return LocalExpression(name, sort, children.single() as Expression<T>, func) as Expression<T>
   }
 
   override val children: List<Expression<*>> = emptyList()
@@ -339,7 +328,7 @@ class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> {
     require(children.size == 1)
 
-    return ExistsExpression(vars, children.single() castTo sort)
+    return ExistsExpression(vars, children.single().castTo<BoolSort>())
   }
 }
 
@@ -355,7 +344,7 @@ class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> {
     require(children.size == 1)
 
-    return ForallExpression(vars, children.single() castTo sort)
+    return ForallExpression(vars, children.single().castTo<BoolSort>())
   }
 }
 
@@ -382,7 +371,7 @@ class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: Lis
   override fun copy(children: List<Expression<*>>): Expression<T> {
     require(children.size == 1)
 
-    return AnnotatedExpression(children.single() castTo sort, annoations)
+    return AnnotatedExpression(children.single() as Expression<T>, annoations)
   }
 
   override val children: List<Expression<*>> = listOf(term)
@@ -417,77 +406,14 @@ class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T)
   override val parameters: List<Sort> = emptyList()
 }
 
-fun Expression<*>.toBool(): Expression<BoolSort> {
-  require(sort is BoolSort) { "Can not cast expression $name of sort $sort to Bool" }
+/**
+ * Safely cast this expression to an Expression of Sort T.
+ *
+ * @throws [ExpressionCastException] if [sort] is not [T]
+ */
+inline fun <reified T : Sort> Expression<*>.castTo(): Expression<T> {
+    require(sort is T) { "Can not cast expression $name of sort $sort to ${T::class}" }
 
-  @Suppress("UNCHECKED_CAST")
-  return this as Expression<BoolSort>
+    @Suppress("UNCHECKED_CAST")
+    return this as Expression<T>
 }
-
-inline fun <reified X : Sort, reified Y : Sort> Expression<*>.toArray():
-    Expression<ArraySort<X, Y>> {
-  require(sort is ArraySort<*, *>) { "Can not cast expression $name of sort $sort to ArraySort" }
-  require((sort as ArraySort<*, *>).x is X)
-  require((sort as ArraySort<*, *>).y is Y)
-
-  @Suppress("UNCHECKED_CAST")
-  return this as Expression<ArraySort<X, Y>>
-}
-
-fun Expression<*>.toBitVec(): Expression<BVSort> {
-  require(sort is BVSort) { "Can not cast expression $name of sort $sort to BitVec" }
-
-  @Suppress("UNCHECKED_CAST")
-  return this as Expression<BVSort>
-}
-
-fun Expression<*>.toFloatingPoint(): Expression<FPSort> {
-  require(sort is FPSort) { "Can not cast expression $name of sort $sort to FloatingPoint" }
-
-  @Suppress("UNCHECKED_CAST")
-  return this as Expression<FPSort>
-}
-
-fun Expression<*>.toRoundingMode(): Expression<RoundingModeSort> {
-  require(sort is RoundingModeSort) {
-    "Can not cast expression $name of sort $sort to RoundingMode"
-  }
-
-  @Suppress("UNCHECKED_CAST")
-  return this as Expression<RoundingModeSort>
-}
-
-fun Expression<*>.toReal(): Expression<RealSort> {
-  require(sort is RealSort) { "Can not cast expression $name of sort $sort to Real" }
-
-  @Suppress("UNCHECKED_CAST")
-  return this as Expression<RealSort>
-}
-
-fun Expression<*>.toInt(): Expression<IntSort> {
-  require(sort is IntSort) { "Can not cast expression $name of sort $sort to IntSort" }
-
-  @Suppress("UNCHECKED_CAST")
-  return this as Expression<IntSort>
-}
-
-fun Expression<*>.toStringSort(): Expression<StringSort> {
-  require(sort is StringSort) { "Can not cast expression $name of sort $sort to StringSort" }
-
-  @Suppress("UNCHECKED_CAST")
-  return this as Expression<StringSort>
-}
-
-fun Expression<*>.toRegLan(): Expression<RegLanSort> {
-  require(sort is RegLanSort) { "Can not cast expression $name of sort $sort to RegLan" }
-
-  @Suppress("UNCHECKED_CAST")
-  return this as Expression<RegLanSort>
-}
-
-inline fun <reified T : Sort> Expression<*>.castTo(): Expression<T> =
-    when (T::class) {
-      is BoolSort -> toBool()
-      else -> throw RuntimeException("Unrechable")
-    }
-        as Expression<T>

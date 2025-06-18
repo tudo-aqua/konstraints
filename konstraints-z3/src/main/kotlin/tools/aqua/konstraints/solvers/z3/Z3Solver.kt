@@ -184,7 +184,7 @@ operator fun Model.Companion.invoke(model: Z3Model): Model {
             decl.name.toString().toSymbolWithQuotes(),
             emptyList(),
             decl.range.aquaify(),
-            model.getConstInterp(decl).aquaify() castTo decl.range.aquaify())
+            model.getConstInterp(decl).aquaify())
       })
 
   temp.addAll(
@@ -195,7 +195,7 @@ operator fun Model.Companion.invoke(model: Z3Model): Model {
               SortedVar("x$index".toSymbolWithQuotes(), sort.aquaify())
             },
             decl.range.aquaify(),
-            model.getFuncInterp(decl).`else`.aquaify() castTo decl.range.aquaify())
+            model.getFuncInterp(decl).`else`.aquaify())
       })
 
   return Model(temp)
