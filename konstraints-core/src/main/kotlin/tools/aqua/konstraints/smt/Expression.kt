@@ -328,7 +328,7 @@ class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> {
     require(children.size == 1)
 
-    return ExistsExpression(vars, children.single().castTo<BoolSort>())
+    return ExistsExpression(vars, children.single().cast<BoolSort>())
   }
 }
 
@@ -344,7 +344,7 @@ class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> {
     require(children.size == 1)
 
-    return ForallExpression(vars, children.single().castTo<BoolSort>())
+    return ForallExpression(vars, children.single().cast<BoolSort>())
   }
 }
 
@@ -377,8 +377,7 @@ class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: Lis
   override val children: List<Expression<*>> = listOf(term)
 }
 
-class ExpressionCastException(from: Sort, to: String) :
-    ClassCastException("Can not cast expression from $from to $to")
+class ExpressionCastException(msg: String) : ClassCastException(msg)
 
 class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>) :
     SMTFunction<T>() {
@@ -411,8 +410,9 @@ class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T)
  *
  * @throws [ExpressionCastException] if [sort] is not [T]
  */
-inline fun <reified T : Sort> Expression<*>.castTo(): Expression<T> {
-  require(sort is T) { "Can not cast expression $name of sort $sort to ${T::class}" }
+inline fun <reified T : Sort> Expression<*>.cast(): Expression<T> {
+  if (sort !is T)
+      throw ExpressionCastException("Can not cast expression $name of sort $sort to ${T::class}")
 
   @Suppress("UNCHECKED_CAST")
   return this as Expression<T>

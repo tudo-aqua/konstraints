@@ -21,8 +21,6 @@ package tools.aqua.konstraints.parser
 import org.petitparser.context.Token
 import tools.aqua.konstraints.smt.*
 
-sealed interface ProtoCommand
-
 class ParseSymbol(val token: Token) :
     Symbol(
         token.getValue(),
