@@ -54,6 +54,7 @@ class Parser {
 
     private val exclamationKW = of('!') trim whitespaceCat
     private val underscoreKW = of('_') trim whitespaceCat
+    // .end() parser is important here to avoid issues when symbols start with 'as'
     private val asKW = (of("as") trim whitespaceCat).end()
     private val binaryKW = of("BINARY") trim whitespaceCat
     private val decimalKW = of("DECIMAL") trim whitespaceCat
@@ -545,6 +546,10 @@ class Parser {
           require(program.context.containsSort("BitVec".toSymbolAsIs()))
 
           listOf(
+              /*
+               * On the fly construction of BVLiteral factory as such an object does not exist since literals are no
+               * SMT functions
+               */
               object : SMTFunction<BVSort>() {
                 override val symbol = identifier.symbol
                 override val sort =
@@ -602,7 +607,10 @@ class Parser {
                 letKW *
                 lparen *
                 varBinding.plus().map { bindings: List<VarBinding<*>> ->
+                  21
+                  // bind variables in the context
                   program.context.bindVariables(bindings)
+                  // return bindings to they can be added to LetExpression and unbound later
                   bindings
                 } *
                 rparen *
@@ -612,12 +620,14 @@ class Parser {
               program.context.unbindVariables()
               LetExpression(results[3] as List<VarBinding<*>>, results[5] as Expression<*>)
               // results[3] is guaranteed to be a list of VarBinding
-            } + /* maps to ProtoLet */
+            } + /* maps to LetExpression */
             (lparen *
                     forallKW *
                     lparen *
                     sortedVar.plus().map { bindings: List<SortedVar<*>> ->
+                      // bind variables in the context
                       program.context.bindVariables(bindings)
+                      // return bindings to they can be added to LetExpression and unbound later
                       bindings
                     } *
                     rparen *
@@ -626,14 +636,16 @@ class Parser {
                 .map { results: List<Any> ->
                   program.context.unbindVariables()
                   ForallExpression(
-                      results[3] as List<SortedVar<*>>, (results[5] as Expression<*>).castTo())
+                      results[3] as List<SortedVar<*>>, (results[5] as Expression<*>).cast())
                   // results[3] is guaranteed to be a list of SortedVar
-                } + /* maps to ProtoForAll */
+                } + /* maps to ForallExpression */
             (lparen *
                     existsKW *
                     lparen *
                     sortedVar.plus().map { bindings: List<SortedVar<*>> ->
+                      // bind variables in the context
                       program.context.bindVariables(bindings)
+                      // return bindings to they can be added to LetExpression and unbound later
                       bindings
                     } *
                     rparen *
@@ -642,9 +654,9 @@ class Parser {
                 .map { results: List<Any> ->
                   program.context.unbindVariables()
                   ExistsExpression(
-                      results[3] as List<SortedVar<*>>, (results[5] as Expression<*>).castTo())
+                      results[3] as List<SortedVar<*>>, (results[5] as Expression<*>).cast())
                   // results[3] is guaranteed to be a list of SortedVar
-                } + /* maps to ProtoExists */
+                } + /* maps to ExistsExpression */
             (lparen * matchKW * term * lparen * matchCase.plus() * rparen * rparen).map {
                 results: List<Any> ->
               TODO("Match not implemented yet!")
@@ -653,7 +665,7 @@ class Parser {
             (lparen * exclamationKW * term * attribute.plus() * rparen).map { results: List<Any> ->
               AnnotatedExpression(results[2] as Expression<*>, results[3] as List<Attribute>)
               // results[3] is guaranteed to be a list of Attributes
-            } /* maps to ProtoExclamation */ +
+            } /* maps to AnnotatedExpression */ +
             specConstant.map { constant: SpecConstant ->
               when (constant) {
                 is BinaryConstant -> BVLiteral(constant.binary)
@@ -666,14 +678,14 @@ class Parser {
                         RealLiteral(BigDecimal(constant.numeral))
                     else throw RuntimeException("Unsupported numeral literal!")
 
-                is StringConstant -> TODO()
+                is StringConstant -> TODO("String constant not implemented yet!")
               }
-            } + /* maps to SpecConstantTerm */
+            } + /* maps to Literal */
             qualIdentifier.map { results: List<Any> ->
               /* Results is an SMTFunction without any parameters */
               (results[0] as SMTFunction<*>).constructDynamic(
                   emptyList(), results[1] as List<Index>)
-            } +
+            } /* maps to Expression */ +
             (lparen * qualIdentifier * term.plus() * rparen).map { results: List<Any> ->
               /* Results contains list of SMTFunction and indices follow by list of its arguments as Expressions */
               val function = (results[1] as List<Any>)[0] as SMTFunction<*>
@@ -701,6 +713,8 @@ class Parser {
       (symbol *
               lparen *
               sortedVar.star().map { bindings: List<SortedVar<*>> ->
+                // set special locals field where context stores locally used sorted vars
+                // to construct defined expression
                 program.context.locals = bindings
                 bindings
               } *
@@ -708,6 +722,7 @@ class Parser {
               sort *
               term)
           .map { result: ArrayList<Any> ->
+            // clear locals
             program.context.locals = emptyList()
             FunctionDef(
                 result[0] as ParseSymbol,
@@ -718,7 +733,7 @@ class Parser {
 
   private val assertCMD =
       (lparen * assertKW * term * rparen).map { results: List<Any> ->
-        program.assert((results[2] as Expression<*>).castTo())
+        program.assert((results[2] as Expression<*>).cast())
       }
 
   private val checkSatCMD = (lparen * checkSatKW * rparen).map { _: Any -> program.add(CheckSat) }
@@ -732,7 +747,7 @@ class Parser {
       (lparen * declareFunKW * symbol * lparen * sort.star() * rparen * sort * rparen).map {
           results: ArrayList<Any> ->
         program.declareFun(results[2] as ParseSymbol, results[4] as List<Sort>, results[6] as Sort)
-        // results[4] is guaranteed to be a List of ProtoSort
+        // results[4] is guaranteed to be a List of Sort
       }
 
   private val exitCMD = (lparen * exitKW * rparen).map { results: ArrayList<Any> -> Exit }
@@ -814,10 +829,14 @@ class Parser {
 
   internal val script = command.star().end()
 
+  /**
+   * Parses an SMTProgram in string format IMPORTANT linebreak characters ('\n') must be present in
+   * the string representation to correctly filter out comments in the smt code
+   */
   fun parse(program: String): SMTProgram {
     // TODO parse each command individually, fail on the first command that can not be parsed
     // this will lead to better error messages but requires some preprocessing to split the input
-    // input individual commands (this may be done in linear time by searching the input from
+    // into individual commands (this may be done in linear time by searching the input from
     // left to right counting the number of opening an closing brackets)
     // filter out all comments (all lines are truncated after ';')
     splitInput(program.split("\n").joinToString(" ") { line -> line.substringBefore(';') })
@@ -854,38 +873,6 @@ class Parser {
 
     return commands
   }
-
-  private fun preprocess(program: String): List<String> {
-    val temp = preprocessingParser.parse(program)
-
-    if (temp.isSuccess) {
-      return temp.get()
-    } else {
-      throw ParseException(temp.message, temp.position, temp.buffer)
-    }
-  }
-
-  private val commandSplitter = undefined()
-  private val preprocessingParser = commandSplitter.star()
-
-  init {
-    commandSplitter.set(
-        ((specConstant.map { constant: SpecConstant -> constant.toString() } +
-            reserved.map { reserved: Token -> reserved.getValue<Any>() } +
-            symbol.map { symbol: ParseSymbol -> symbol.toString() } +
-            keyword.map { keyword: Token -> keyword }) trim whitespaceCat) +
-            ((lparen * commandSplitter.star() * rparen).map { results: List<Any> ->
-              print(results)
-            } trim whitespaceCat))
-  }
-}
-
-internal fun BitVecFactory.build(identifier: Identifier): BVSort {
-  require(identifier is IndexedIdentifier)
-  require(identifier.indices.size == 1)
-  require(identifier.indices.single() is NumeralIndex)
-
-  return build((identifier.indices.single() as NumeralIndex).numeral)
 }
 
 class ParseException(message: String, position: Int, buffer: String) :

@@ -71,16 +71,16 @@ fun Expression<*>.z3ify(context: Z3Context): Expr<*> {
   }
 
   return when (this.sort) {
-    is BoolSort -> this.castTo<BoolSort>().z3ify(context)
-    is BVSort -> this.castTo<BVSort>().z3ify(context)
-    is IntSort -> this.castTo<IntSort>().z3ify(context)
-    is RealSort -> this.castTo<RealSort>().z3ify(context)
-    is RoundingModeSort -> this.castTo<RoundingMode>().z3ify(context)
-    is FPSort -> this.castTo<FPSort>().z3ify(context)
-    is StringSort -> this.castTo<SMTString>().z3ify(context)
-    is RegLanSort -> this.castTo<RegLanSort>().z3ify(context)
-    is UserDeclaredSort -> this.castTo<UserDeclaredSort>().z3ify(context)
-    is ArraySort<*, *> -> this.castTo<ArraySort<*, *>>().z3ify(context)
+    is BoolSort -> this.cast<BoolSort>().z3ify(context)
+    is BVSort -> this.cast<BVSort>().z3ify(context)
+    is IntSort -> this.cast<IntSort>().z3ify(context)
+    is RealSort -> this.cast<RealSort>().z3ify(context)
+    is RoundingModeSort -> this.cast<RoundingMode>().z3ify(context)
+    is FPSort -> this.cast<FPSort>().z3ify(context)
+    is StringSort -> this.cast<SMTString>().z3ify(context)
+    is RegLanSort -> this.cast<RegLanSort>().z3ify(context)
+    is UserDeclaredSort -> this.cast<UserDeclaredSort>().z3ify(context)
+    is ArraySort<*, *> -> this.cast<ArraySort<*, *>>().z3ify(context)
     is SortParameter -> TODO()
   }
 }
