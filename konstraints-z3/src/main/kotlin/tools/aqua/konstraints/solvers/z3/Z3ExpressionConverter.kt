@@ -50,10 +50,11 @@ fun Z3Sort.aquaify(): Sort =
 
 @JvmName("aquaifyAny")
 fun Expr<*>.aquaify(): Expression<*> =
+    @Suppress("UNCHECKED_CAST")
     when (this.sort) {
-      is Z3BoolSort -> (this as Expr<Z3BoolSort>).aquaify() as Expression<Sort>
-      is Z3IntSort -> (this as Expr<Z3IntSort>).aquaify() as Expression<Sort>
-      is BitVecSort -> (this as Expr<BitVecSort>).aquaify() as Expression<Sort>
+      is Z3BoolSort -> (this as Expr<Z3BoolSort>).aquaify()
+      is Z3IntSort -> (this as Expr<Z3IntSort>).aquaify()
+      is BitVecSort -> (this as Expr<BitVecSort>).aquaify()
       else -> throw RuntimeException("Unknown or unsupported Z3 sort ${this.sort}")
     }
 
@@ -64,7 +65,7 @@ fun Expr<Z3BoolSort>.aquaify(): Expression<BoolSort> =
     } else if (isFalse) {
       False
     } else if (isEq) {
-      Equals(this.args.map { it.aquaify() }.toList() as List<Expression<Sort>>)
+      Equals(this.args.map { it.aquaify() })
     } else {
       throw RuntimeException("Unknown or unsupported bool expression $this")
     }

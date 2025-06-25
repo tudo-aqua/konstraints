@@ -32,17 +32,31 @@ import com.microsoft.z3.Sort as Z3Sort
 import com.microsoft.z3.UninterpretedSort
 import tools.aqua.konstraints.smt.*
 
-fun makeLeftAssoc(
+/**
+ * Safely cast this expression to an Expression of Sort T.
+ *
+ * @throws [ExpressionCastException] if [sort] is not [T]
+ */
+inline fun <reified T : Z3Sort> Expr<*>.cast(): Expr<T> {
+  if (sort !is T)
+      throw ExpressionCastException("Can not cast expression $string of sort $sort to ${T::class}")
+
+  @Suppress("UNCHECKED_CAST")
+  return this as Expr<T>
+}
+
+inline fun <reified S1 : Z3Sort, reified S2 : Z3Sort> makeLeftAssoc(
     expressions: List<Expression<*>>,
     context: Z3Context,
-    operation: (Expr<*>, Expr<*>) -> Expr<*>
-): Expr<*> {
+    operation: (Expr<S1>, Expr<S2>) -> Expr<S1>
+): Expr<S1> {
   return if (expressions.size == 2) {
-    operation(expressions[0].z3ify(context), expressions[1].z3ify(context))
+    operation(expressions[0].z3ify(context).cast(), expressions[1].z3ify(context).cast())
   } else {
-    operation(
-        makeLeftAssoc(expressions.dropLast(1), context, operation),
-        expressions.last().z3ify(context))
+    expressions
+        .map { expr -> expr.z3ify(context) }
+        .reduce { lhs, rhs -> operation(lhs.cast(), rhs.cast()) }
+        .cast()
   }
 }
 
@@ -50,16 +64,18 @@ fun makeLeftAssoc(
  * Build a right associative expression using [operation] (e.g. =>) S1 and S2 are Z3 target sorts, R
  * is a konstraints sort of the original expression
  */
-fun makeRightAssoc(
+inline fun <reified S1 : Z3Sort, reified S2 : Z3Sort> makeRightAssoc(
     expressions: List<Expression<*>>,
     context: Z3Context,
-    operation: (Expr<*>, Expr<*>) -> Expr<*>
-): Expr<*> {
+    operation: (Expr<S1>, Expr<S2>) -> Expr<S2>
+): Expr<S2> {
   return if (expressions.size == 2) {
-    operation(expressions[0].z3ify(context), expressions[1].z3ify(context))
+    operation(expressions[0].z3ify(context).cast(), expressions[1].z3ify(context).cast())
   } else {
-    operation(
-        expressions.first().z3ify(context), makeRightAssoc(expressions.drop(1), context, operation))
+    expressions
+        .map { expr -> expr.z3ify(context) }
+        .reduceRight { lhs, rhs -> operation(lhs.cast(), rhs.cast()) }
+        .cast()
   }
 }
 
@@ -88,106 +104,90 @@ fun Expression<*>.z3ify(context: Z3Context): Expr<*> {
 @JvmName("z3ifyIteBool")
 fun Ite<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkITE(
-        this.statement.z3ify(context),
-        this.then.z3ify(context) as Expr<Z3BoolSort>,
-        this.otherwise.z3ify(context) as Expr<Z3BoolSort>)
+        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
 @JvmName("z3ifyIteBitVec")
 fun Ite<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
     context.context.mkITE(
-        this.statement.z3ify(context),
-        this.then.z3ify(context) as Expr<BitVecSort>,
-        this.otherwise.z3ify(context) as Expr<BitVecSort>)
+        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
 @JvmName("z3ifyIteInt")
 fun Ite<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
     context.context.mkITE(
-        this.statement.z3ify(context),
-        this.then.z3ify(context) as Expr<Z3IntSort>,
-        this.otherwise.z3ify(context) as Expr<Z3IntSort>)
+        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
 @JvmName("z3ifyIteReal")
 fun Ite<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
     context.context.mkITE(
-        this.statement.z3ify(context),
-        this.then.z3ify(context) as Expr<Z3RealSort>,
-        this.otherwise.z3ify(context) as Expr<Z3RealSort>)
+        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
 @JvmName("z3ifyIteFP")
 fun Ite<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
     context.context.mkITE(
-        this.statement.z3ify(context),
-        this.then.z3ify(context) as Expr<Z3FPSort>,
-        this.otherwise.z3ify(context) as Expr<Z3FPSort>)
+        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
 @JvmName("z3ifyIteRM")
 fun Ite<RoundingModeSort>.z3ify(context: Z3Context): Expr<FPRMSort> =
     context.context.mkITE(
-        this.statement.z3ify(context),
-        this.then.z3ify(context) as Expr<FPRMSort>,
-        this.otherwise.z3ify(context) as Expr<FPRMSort>)
+        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
 @JvmName("z3ifyIteString")
 fun Ite<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
     context.context.mkITE(
-        this.statement.z3ify(context),
-        this.then.z3ify(context) as Expr<SeqSort<CharSort>>,
-        this.otherwise.z3ify(context) as Expr<SeqSort<CharSort>>)
+        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
 @JvmName("z3ifyIteFreeSort")
 fun Ite<UserDeclaredSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
     context.context.mkITE(
-        this.statement.z3ify(context),
-        this.then.z3ify(context) as Expr<UninterpretedSort>,
-        this.otherwise.z3ify(context) as Expr<UninterpretedSort>)
+        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
 @JvmName("z3ifyArraySelectBool")
 fun ArraySelect<*, BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkSelect(
-        this.array.z3ify(context) as Expr<Z3ArraySort<Z3Sort, Z3BoolSort>>,
-        this.index.z3ify(context) as Expr<Z3Sort>)
+        this.array.z3ify(context).cast<Z3ArraySort<Z3Sort, Z3BoolSort>>(),
+        this.index.z3ify(context).cast<Z3Sort>())
 
 @JvmName("z3ifyArraySelectBitVec")
 fun ArraySelect<*, BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
     context.context.mkSelect(
-        this.array.z3ify(context) as Expr<Z3ArraySort<Z3Sort, BitVecSort>>,
-        this.index.z3ify(context) as Expr<Z3Sort>)
+        this.array.z3ify(context).cast<Z3ArraySort<Z3Sort, BitVecSort>>(),
+        this.index.z3ify(context).cast<Z3Sort>())
 
 @JvmName("z3ifyArraySelectInt")
 fun ArraySelect<*, IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
     context.context.mkSelect(
-        this.array.z3ify(context) as Expr<Z3ArraySort<Z3Sort, Z3IntSort>>,
-        this.index.z3ify(context) as Expr<Z3Sort>)
+        this.array.z3ify(context).cast<Z3ArraySort<Z3Sort, Z3IntSort>>(),
+        this.index.z3ify(context).cast<Z3Sort>())
 
 @JvmName("z3ifyArraySelectReal")
 fun ArraySelect<*, RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
     context.context.mkSelect(
-        this.array.z3ify(context) as Expr<Z3ArraySort<Z3Sort, Z3RealSort>>,
-        this.index.z3ify(context) as Expr<Z3Sort>)
+        this.array.z3ify(context).cast<Z3ArraySort<Z3Sort, Z3RealSort>>(),
+        this.index.z3ify(context).cast<Z3Sort>())
 
 @JvmName("z3ifyArraySelectFP")
 fun ArraySelect<*, FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
     context.context.mkSelect(
-        this.array.z3ify(context) as Expr<Z3ArraySort<Z3Sort, Z3FPSort>>,
-        this.index.z3ify(context) as Expr<Z3Sort>)
+        this.array.z3ify(context).cast<Z3ArraySort<Z3Sort, Z3FPSort>>(),
+        this.index.z3ify(context).cast<Z3Sort>())
 
 @JvmName("z3ifyArraySelectRM")
 fun ArraySelect<*, RoundingModeSort>.z3ify(context: Z3Context): Expr<FPRMSort> =
     context.context.mkSelect(
-        this.array.z3ify(context) as Expr<Z3ArraySort<Z3Sort, FPRMSort>>,
-        this.index.z3ify(context) as Expr<Z3Sort>)
+        this.array.z3ify(context).cast<Z3ArraySort<Z3Sort, FPRMSort>>(),
+        this.index.z3ify(context).cast<Z3Sort>())
 
 @JvmName("z3ifyArraySelectString")
 fun ArraySelect<*, StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
     context.context.mkSelect(
-        this.array.z3ify(context) as Expr<Z3ArraySort<Z3Sort, SeqSort<CharSort>>>,
-        this.index.z3ify(context) as Expr<Z3Sort>)
+        this.array.z3ify(context).cast<Z3ArraySort<Z3Sort, SeqSort<CharSort>>>(),
+        this.index.z3ify(context).cast<Z3Sort>())
 
 @JvmName("z3ifyArraySelectFreeSort")
 fun ArraySelect<*, UserDeclaredSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
     context.context.mkSelect(
-        this.array.z3ify(context) as Expr<Z3ArraySort<Z3Sort, UninterpretedSort>>,
-        this.index.z3ify(context) as Expr<Z3Sort>)
+        this.array.z3ify(context).cast<Z3ArraySort<Z3Sort, UninterpretedSort>>(),
+        this.index.z3ify(context).cast<Z3Sort>())
 
 @JvmName("z3ifyBool")
 fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
@@ -278,7 +278,7 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
       is UserDefinedExpression ->
-          context.bind(this.func.sortedVars) { this.func.term.z3ify(context) as Expr<Z3BoolSort> }
+          context.bind(this.func.sortedVars) { this.func.term.z3ify(context) }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
 
@@ -290,10 +290,7 @@ fun Not.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkNot(this.inner.z3ify(context))
 
 fun Implies.z3ify(context: Z3Context): Expr<Z3BoolSort> =
-    makeRightAssoc(this.statements, context) { lhs, rhs ->
-      context.context.mkImplies(lhs as Expr<Z3BoolSort>, rhs as Expr<Z3BoolSort>)
-    }
-        as Expr<Z3BoolSort>
+    makeRightAssoc(this.statements, context) { lhs, rhs -> context.context.mkImplies(lhs, rhs) }
 
 fun And.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkAnd(*this.conjuncts.map { it.z3ify(context) }.toTypedArray())
@@ -302,10 +299,7 @@ fun Or.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkOr(*this.disjuncts.map { it.z3ify(context) }.toTypedArray())
 
 fun XOr.z3ify(context: Z3Context): Expr<Z3BoolSort> =
-    makeLeftAssoc(this.disjuncts, context) { lhs, rhs ->
-      context.context.mkXor(lhs as Expr<Z3BoolSort>, rhs as Expr<Z3BoolSort>)
-    }
-        as Expr<Z3BoolSort>
+    makeLeftAssoc(this.disjuncts, context) { lhs, rhs -> context.context.mkXor(lhs, rhs) }
 
 fun Equals<*>.z3ify(context: Z3Context): Expr<Z3BoolSort> {
   val inner =
@@ -343,52 +337,68 @@ fun BVSGe.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkBVSGE(lhs.z3ify(context), rhs.z3ify(context))
 
 fun IntLessEq.z3ify(context: Z3Context): Expr<Z3BoolSort> =
-    makeLeftAssoc(this.terms, context) { lhs, rhs ->
-      context.context.mkLe(lhs as Expr<out ArithSort>, rhs as Expr<out ArithSort>)
-    }
-        as Expr<Z3BoolSort>
+    context.context.mkAnd(
+        *this.terms
+            .zipWithNext { lhs, rhs ->
+              context.context.mkLe(lhs.z3ify(context), rhs.z3ify(context))
+            }
+            .toTypedArray())
 
 fun IntLess.z3ify(context: Z3Context): Expr<Z3BoolSort> =
-    makeLeftAssoc(this.terms, context) { lhs, rhs ->
-      context.context.mkLt(lhs as Expr<out ArithSort>, rhs as Expr<out ArithSort>)
-    }
-        as Expr<Z3BoolSort>
+    context.context.mkAnd(
+        *this.terms
+            .zipWithNext { lhs, rhs ->
+              context.context.mkLt(lhs.z3ify(context), rhs.z3ify(context))
+            }
+            .toTypedArray())
 
 fun IntGreaterEq.z3ify(context: Z3Context): Expr<Z3BoolSort> =
-    makeLeftAssoc(this.terms, context) { lhs, rhs ->
-      context.context.mkGe(lhs as Expr<out ArithSort>, rhs as Expr<out ArithSort>)
-    }
-        as Expr<Z3BoolSort>
+    context.context.mkAnd(
+        *this.terms
+            .zipWithNext { lhs, rhs ->
+              context.context.mkGe(lhs.z3ify(context), rhs.z3ify(context))
+            }
+            .toTypedArray())
 
 fun IntGreater.z3ify(context: Z3Context): Expr<Z3BoolSort> =
-    makeLeftAssoc(this.terms, context) { lhs, rhs ->
-      context.context.mkGt(lhs as Expr<out ArithSort>, rhs as Expr<out ArithSort>)
-    }
-        as Expr<Z3BoolSort>
+    context.context.mkAnd(
+        *this.terms
+            .zipWithNext { lhs, rhs ->
+              context.context.mkGt(lhs.z3ify(context), rhs.z3ify(context))
+            }
+            .toTypedArray())
 
 fun RealLessEq.z3ify(context: Z3Context): Expr<Z3BoolSort> =
-    makeLeftAssoc(this.terms, context) { lhs, rhs ->
-      context.context.mkLe(lhs as Expr<out ArithSort>, rhs as Expr<out ArithSort>)
-    }
-        as Expr<Z3BoolSort>
+    context.context.mkAnd(
+        *this.terms
+            .zipWithNext { lhs, rhs ->
+              context.context.mkLe(lhs.z3ify(context), rhs.z3ify(context))
+            }
+            .toTypedArray())
 
 fun RealLess.z3ify(context: Z3Context): Expr<Z3BoolSort> =
-    makeLeftAssoc(this.terms, context) { lhs, rhs ->
-      context.context.mkLt(lhs as Expr<out ArithSort>, rhs as Expr<out ArithSort>)
-    }
-        as Expr<Z3BoolSort>
+    context.context.mkAnd(
+        *this.terms
+            .zipWithNext { lhs, rhs ->
+              context.context.mkLt(lhs.z3ify(context), rhs.z3ify(context))
+            }
+            .toTypedArray())
 
 fun RealGreaterEq.z3ify(context: Z3Context): Expr<Z3BoolSort> =
-    makeLeftAssoc(this.terms, context) { lhs, rhs ->
-      context.context.mkGe(lhs as Expr<out ArithSort>, rhs as Expr<out ArithSort>)
-    }
-        as Expr<Z3BoolSort>
+    context.context.mkAnd(
+        *this.terms
+            .zipWithNext { lhs, rhs ->
+              context.context.mkGe(lhs.z3ify(context), rhs.z3ify(context))
+            }
+            .toTypedArray())
 
 fun RealGreater.z3ify(context: Z3Context): Expr<Z3BoolSort> =
-    makeLeftAssoc(this.terms, context) { lhs, rhs ->
-      context.context.mkGt(lhs as Expr<out ArithSort>, rhs as Expr<out ArithSort>)
-    }
-        as Expr<Z3BoolSort>
+    context.context.mkAnd(
+        *this.terms
+            .zipWithNext { lhs, rhs ->
+              context.context.mkGt(lhs.z3ify(context), rhs.z3ify(context))
+            }
+            .toTypedArray())
 
 fun Divisible.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO() // C-API mk_divides missing
 
@@ -398,36 +408,41 @@ fun IsInt.z3ify(context: Z3Context): Expr<Z3BoolSort> =
 fun FPLeq.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkAnd(
         *this.terms
-            .zipWithNext()
-            .map { (lhs, rhs) -> context.context.mkFPLEq(lhs.z3ify(context), rhs.z3ify(context)) }
+            .zipWithNext { lhs, rhs ->
+              context.context.mkFPLEq(lhs.z3ify(context), rhs.z3ify(context))
+            }
             .toTypedArray())
 
 fun FPLt.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkAnd(
         *this.terms
-            .zipWithNext()
-            .map { (lhs, rhs) -> context.context.mkFPLt(lhs.z3ify(context), rhs.z3ify(context)) }
+            .zipWithNext { lhs, rhs ->
+              context.context.mkFPLt(lhs.z3ify(context), rhs.z3ify(context))
+            }
             .toTypedArray())
 
 fun FPGeq.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkAnd(
         *this.terms
-            .zipWithNext()
-            .map { (lhs, rhs) -> context.context.mkFPGEq(lhs.z3ify(context), rhs.z3ify(context)) }
+            .zipWithNext { lhs, rhs ->
+              context.context.mkFPGEq(lhs.z3ify(context), rhs.z3ify(context))
+            }
             .toTypedArray())
 
 fun FPGt.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkAnd(
         *this.terms
-            .zipWithNext()
-            .map { (lhs, rhs) -> context.context.mkFPGt(lhs.z3ify(context), rhs.z3ify(context)) }
+            .zipWithNext { lhs, rhs ->
+              context.context.mkFPGt(lhs.z3ify(context), rhs.z3ify(context))
+            }
             .toTypedArray())
 
 fun FPEq.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkAnd(
         *this.terms
-            .zipWithNext()
-            .map { (lhs, rhs) -> context.context.mkFPEq(lhs.z3ify(context), rhs.z3ify(context)) }
+            .zipWithNext { lhs, rhs ->
+              context.context.mkFPEq(lhs.z3ify(context), rhs.z3ify(context))
+            }
             .toTypedArray())
 
 fun FPIsNormal.z3ify(context: Z3Context): Expr<Z3BoolSort> =
@@ -526,7 +541,7 @@ fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-      is UserDefinedExpression -> this.expand().z3ify(context) as Expr<BitVecSort>
+      is UserDefinedExpression -> this.expand().z3ify(context).cast<BitVecSort>()
       else -> throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
 
@@ -546,28 +561,16 @@ fun BVNeg.z3ify(context: Z3Context): Expr<BitVecSort> =
     context.context.mkBVNeg(this.inner.z3ify(context))
 
 fun BVAnd.z3ify(context: Z3Context): Expr<BitVecSort> =
-    makeLeftAssoc(this.conjuncts, context) { lhs, rhs ->
-      context.context.mkBVAND(lhs as Expr<BitVecSort>, rhs as Expr<BitVecSort>)
-    }
-        as Expr<BitVecSort>
+    makeLeftAssoc(this.conjuncts, context) { lhs, rhs -> context.context.mkBVAND(lhs, rhs) }
 
 fun BVOr.z3ify(context: Z3Context): Expr<BitVecSort> =
-    makeLeftAssoc(this.disjuncts, context) { lhs, rhs ->
-      context.context.mkBVOR(lhs as Expr<BitVecSort>, rhs as Expr<BitVecSort>)
-    }
-        as Expr<BitVecSort>
+    makeLeftAssoc(this.disjuncts, context) { lhs, rhs -> context.context.mkBVOR(lhs, rhs) }
 
 fun BVAdd.z3ify(context: Z3Context): Expr<BitVecSort> =
-    makeLeftAssoc(this.summands, context) { lhs, rhs ->
-      context.context.mkBVAdd(lhs as Expr<BitVecSort>, rhs as Expr<BitVecSort>)
-    }
-        as Expr<BitVecSort>
+    makeLeftAssoc(this.summands, context) { lhs, rhs -> context.context.mkBVAdd(lhs, rhs) }
 
 fun BVMul.z3ify(context: Z3Context): Expr<BitVecSort> =
-    makeLeftAssoc(this.factors, context) { lhs, rhs ->
-      context.context.mkBVMul(lhs as Expr<BitVecSort>, rhs as Expr<BitVecSort>)
-    }
-        as Expr<BitVecSort>
+    makeLeftAssoc(this.factors, context) { lhs, rhs -> context.context.mkBVMul(lhs, rhs) }
 
 fun BVUDiv.z3ify(context: Z3Context): Expr<BitVecSort> =
     context.context.mkBVUDiv(this.numerator.z3ify(context), this.denominator.z3ify(context))
@@ -667,7 +670,7 @@ fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-      is UserDefinedExpression -> this.expand().z3ify(context) as Expr<Z3IntSort>
+      is UserDefinedExpression -> this.expand().z3ify(context).cast<Z3IntSort>()
       else -> throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
 
@@ -687,10 +690,7 @@ fun IntMul.z3ify(context: Z3Context): Expr<Z3IntSort> =
     context.context.mkMul(*this.factors.map { it.z3ify(context) }.toTypedArray())
 
 fun IntDiv.z3ify(context: Z3Context): Expr<Z3IntSort> =
-    makeLeftAssoc(this.terms, context) { lhs, rhs ->
-      context.context.mkDiv(lhs as Expr<ArithSort>, rhs as Expr<ArithSort>)
-    }
-        as Expr<Z3IntSort>
+    makeLeftAssoc(this.terms, context) { lhs, rhs -> context.context.mkDiv(lhs, rhs) }
 
 fun Mod.z3ify(context: Z3Context): Expr<Z3IntSort> =
     context.context.mkMod(this.dividend.z3ify(context), this.divisor.z3ify(context))
@@ -741,7 +741,7 @@ fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-      is UserDefinedExpression -> this.expand().z3ify(context) as Expr<Z3RealSort>
+      is UserDefinedExpression -> this.expand().z3ify(context).cast<Z3RealSort>()
       else -> throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
 
@@ -761,10 +761,7 @@ fun RealMul.z3ify(context: Z3Context): Expr<Z3RealSort> =
     context.context.mkMul(*this.factors.map { it.z3ify(context) }.toTypedArray())
 
 fun RealDiv.z3ify(context: Z3Context): Expr<Z3RealSort> =
-    makeLeftAssoc(this.terms, context) { lhs, rhs ->
-      context.context.mkDiv(lhs as Expr<ArithSort>, rhs as Expr<ArithSort>)
-    }
-        as Expr<Z3RealSort>
+    makeLeftAssoc(this.terms, context) { lhs, rhs -> context.context.mkDiv(lhs, rhs) }
 
 fun ToReal.z3ify(context: Z3Context): Expr<Z3RealSort> =
     context.context.mkInt2Real(this.inner.z3ify(context))
@@ -811,7 +808,7 @@ fun Expression<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-      is UserDefinedExpression -> this.expand().z3ify(context) as Expr<Z3FPSort>
+      is UserDefinedExpression -> this.expand().z3ify(context).cast<Z3FPSort>()
       else -> throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
 
@@ -934,7 +931,7 @@ fun Expression<RoundingModeSort>.z3ify(context: Z3Context): Expr<FPRMSort> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-      is UserDefinedExpression -> this.expand().z3ify(context) as Expr<FPRMSort>
+      is UserDefinedExpression -> this.expand().z3ify(context).cast<FPRMSort>()
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
 
@@ -991,7 +988,7 @@ fun Expression<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-      is UserDefinedExpression -> this.expand().z3ify(context) as Expr<SeqSort<CharSort>>
+      is UserDefinedExpression -> this.expand().z3ify(context).cast<SeqSort<CharSort>>()
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
 
@@ -1050,7 +1047,7 @@ fun Expression<RegLanSort>.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSo
             context.getFunction(
                 this.name, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
-      is UserDefinedExpression -> this.expand().z3ify(context) as Expr<ReSort<SeqSort<CharSort>>>
+      is UserDefinedExpression -> this.expand().z3ify(context).cast<ReSort<SeqSort<CharSort>>>()
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
 
@@ -1082,11 +1079,7 @@ fun RegexComp.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
     context.context.mkComplement(this.inner.z3ify(context))
 
 fun RegexDiff.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
-    makeLeftAssoc(this.regex, context) { lhs, rhs ->
-      context.context.mkDiff(
-          lhs as Expr<ReSort<SeqSort<CharSort>>>, rhs as Expr<ReSort<SeqSort<CharSort>>>)
-    }
-        as Expr<ReSort<SeqSort<CharSort>>>
+    makeLeftAssoc(this.regex, context) { lhs, rhs -> context.context.mkDiff(lhs, rhs) }
 
 fun RegexPlus.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
     context.context.mkPlus(this.inner.z3ify(context))
@@ -1107,13 +1100,14 @@ fun RegexLoop.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
 fun Expression<ArraySort<*, *>>.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>> =
     when (this) {
       is LocalExpression ->
-          context.localVariable(this.name, this.sort.z3ify(context))
-              as Expr<com.microsoft.z3.ArraySort<com.microsoft.z3.Sort, com.microsoft.z3.Sort>>
+          context
+              .localVariable(this.name, this.sort.z3ify(context))
+              .cast<Z3ArraySort<Z3Sort, Z3Sort>>()
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
-      is ArrayStore -> (this as ArrayStore).z3ify(context)
+      is ArrayStore -> this.z3ify(context)
       else ->
           if (context.constants[this.name.toString()] != null) {
-            context.constants[this.name.toString()]!! as Expr<Z3ArraySort<Z3Sort, Z3Sort>>
+            context.constants[this.name.toString()]!!.cast<Z3ArraySort<Z3Sort, Z3Sort>>()
           } else if (context.functions[this.name.toString()] != null) {
             TODO("Implement free function symbols")
           } else {
@@ -1123,25 +1117,25 @@ fun Expression<ArraySort<*, *>>.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3So
 
 fun ArrayStore<*, *>.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>> =
     context.context.mkStore(
-        this.array.z3ify(context) as Expr<Z3ArraySort<Z3Sort, Z3Sort>>,
-        this.index.z3ify(context) as Expr<Z3Sort>,
-        this.value.z3ify(context) as Expr<Z3Sort>)
+        this.array.z3ify(context).cast<Z3ArraySort<Z3Sort, Z3Sort>>(),
+        this.index.z3ify(context).cast<Z3Sort>(),
+        this.value.z3ify(context).cast<Z3Sort>())
 
 fun Expression<UserDeclaredSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
     when (this) {
       is Ite -> this.z3ify(context)
-      is LocalExpression ->
-          context.localVariable(this.name, this.sort.z3ify(context)) as Expr<UninterpretedSort>
+      is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
       is BoundVariable ->
-          context.boundVariable(this.name, this.sort.z3ify(context)) as Expr<UninterpretedSort>
+          context.boundVariable(this.name, this.sort.z3ify(context)).cast<UninterpretedSort>()
       is ArraySelect<*, UserDeclaredSort> -> this.z3ify(context)
       else ->
           if (context.constants[this.name.toString()] != null) {
-            context.constants[this.name.toString()]!! as Expr<UninterpretedSort>
+            context.constants[this.name.toString()]!!.cast<UninterpretedSort>()
           } else if (context.functions[this.name.toString()] != null) {
-            context.functions[this.name.toString()]!!.apply(
-                *this.children.map { it.z3ify(context) }.toTypedArray()) as Expr<UninterpretedSort>
+            context.functions[this.name.toString()]!!
+                .apply(*this.children.map { it.z3ify(context) }.toTypedArray())
+                .cast<UninterpretedSort>()
           } else {
             throw IllegalArgumentException("Z3 can not visit expression $this!")
           }

@@ -101,11 +101,12 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
           is IntSort -> context.context.mkIntSort()
           is RealSort -> context.context.mkRealSort()
           is RoundingModeSort -> context.context.mkFPRoundingModeSort()
-          is FPSort -> context.context.mkFPSort(sort.exponentBits, sort.significantBits)
+          /* specialized floating point sorts need to be checked first as they are all FPSorts */
           is FP16 -> context.context.mkFPSort16()
           is FP32 -> context.context.mkFPSort32()
           is FP64 -> context.context.mkFPSort64()
           is FP128 -> context.context.mkFPSort128()
+          is FPSort -> context.context.mkFPSort(sort.exponentBits, sort.significantBits)
           is ArraySort<*, *> ->
               context.context.mkArraySort(getOrCreateSort(sort.x), getOrCreateSort(sort.y))
           else -> context.context.mkUninterpretedSort(sort.toSMTString())
