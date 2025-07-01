@@ -72,6 +72,11 @@ sealed interface Expression<out T : Sort> {
     children.forEach { yieldAll(it.asSequence()) }
   }
 
+  fun forEach(action: (Expression<*>) -> Unit) {
+    action(this)
+    children.forEach { it.forEach(action) }
+  }
+
   fun transform(transformation: (Expression<*>) -> Expression<*>): Expression<T> {
     // transform all children
     val transformedChildren = this.children.map { it.transform(transformation) }

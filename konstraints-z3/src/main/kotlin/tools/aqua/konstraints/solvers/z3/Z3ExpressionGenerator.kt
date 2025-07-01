@@ -141,6 +141,11 @@ fun Ite<UserDeclaredSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
     context.context.mkITE(
         this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
+@JvmName("z3ifyIteArraySort")
+fun Ite<ArraySort<*, *>>.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>> =
+    context.context.mkITE(
+        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+
 @JvmName("z3ifyArraySelectBool")
 fun ArraySelect<*, BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkSelect(
@@ -1099,6 +1104,7 @@ fun RegexLoop.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
 @JvmName("z3ifyArrayEx")
 fun Expression<ArraySort<*, *>>.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>> =
     when (this) {
+      is Ite -> this.z3ify(context)
       is LocalExpression ->
           context
               .localVariable(this.name, this.sort.z3ify(context))

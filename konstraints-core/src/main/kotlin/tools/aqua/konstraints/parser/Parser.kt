@@ -542,9 +542,10 @@ class Parser {
   private val qualIdentifier =
       identifier.map { identifier: Identifier ->
         if (identifier.symbol.value.startsWith("bv") &&
+            // this prevents us from creating bitvectors when normal smt functions are named bv in
+            // logics without bitvectors
+            program.context.containsSort("BitVec".toSymbolAsIs()) &&
             identifier.symbol.value.substring(2).all { ch -> ch.isDigit() }) {
-          require(program.context.containsSort("BitVec".toSymbolAsIs()))
-
           listOf(
               /*
                * On the fly construction of BVLiteral factory as such an object does not exist since literals are no
