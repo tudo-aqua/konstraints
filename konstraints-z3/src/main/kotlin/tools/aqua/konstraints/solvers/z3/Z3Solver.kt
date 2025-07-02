@@ -84,7 +84,6 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
       return visit(DeclareConst(declareFun.name, declareFun.sort))
     }
 
-    val name = declareFun.name.toString()
     require(name !in context.functions) { "function $declareFun already declared." }
     context.functions[name] =
         context.context.mkFuncDecl(

@@ -26,6 +26,7 @@ import kotlin.streams.asStream
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
@@ -119,17 +120,62 @@ class Z3Tests {
 
   fun getQFUFFile(): Stream<Arguments> = loadResource("/QF_UF/")
 
-  @Disabled
   @ParameterizedTest
   @MethodSource("getQFFPFile")
-  @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_FP(file: File) = solve(file)
 
   fun getQFFPFile(): Stream<Arguments> = loadResource("/QF_FP/")
 
   @ParameterizedTest
+  @MethodSource("getQFALIAFile")
+  @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  fun QF_ALIA(file: File) = solve(file)
+
+  fun getQFALIAFile(): Stream<Arguments> = loadResource("/QF_ALIA/")
+
+  @Test
+  fun count() {
+    val countMap = mutableMapOf<SMTSerializable, Int>()
+    val context = Context()
+    context.setLogic(UF)
+    context.currentContext.functions.forEach { t, u -> countMap.put(t, 0) }
+
+    countMap.put("forall".toSymbolWithQuotes(), 0)
+    countMap.put("exists".toSymbolWithQuotes(), 0)
+
+    File(javaClass.getResource("/UF/")!!.file)
+        .walk()
+        .filter { file: File -> file.isFile }
+        .forEach { file: File ->
+          val program =
+              Parser()
+                  .parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
+          program.commands.filterIsInstance<Assert>().forEach { assertion: Assert ->
+            assertion.expr.forEach { expression ->
+              if (countMap.containsKey(expression.name)) {
+                countMap[expression.name] = countMap[expression.name]!! + 1
+              }
+
+              if (expression is ForallExpression) {
+                countMap["forall".toSymbolWithQuotes()] =
+                    countMap["forall".toSymbolWithQuotes()]!! + 1
+              }
+
+              if (expression is ExistsExpression) {
+                countMap["exists".toSymbolWithQuotes()] =
+                    countMap["exists".toSymbolWithQuotes()]!! + 1
+              }
+            }
+          }
+        }
+
+    countMap.forEach { (function, count) -> println("$function: $count") }
+  }
+
+  @ParameterizedTest
   @MethodSource("getUFFile")
-  @Timeout(value = 600, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 2, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun UF(file: File) = solve(file)
 
   fun getUFFile(): Stream<Arguments> = loadResource("/UF/")
