@@ -30,6 +30,7 @@ import com.microsoft.z3.RealSort as Z3RealSort
 import com.microsoft.z3.SeqSort
 import com.microsoft.z3.Sort as Z3Sort
 import com.microsoft.z3.UninterpretedSort
+import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.smt.*
 
 /**
@@ -197,7 +198,7 @@ fun ArraySelect<*, UserDeclaredSort>.z3ify(context: Z3Context): Expr<Uninterpret
 @JvmName("z3ifyBool")
 fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     when (this) {
-      is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
+      is LocalExpression -> context.localVariable(this.func, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
       is ForallExpression ->
           context.bind(this.vars) { boundVars ->
@@ -223,7 +224,7 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
                 context.context.mkSymbol("skolemID"), /* skolem id */
             )
           }
-      is BoundVariable -> context.boundVariable(this.name, this.sort.z3ify(context))
+      is BoundVariable -> context.boundVariable(this.func, this.sort.z3ify(context))
       // annotations are usually handled by the most generic z3ify function
       // this is only needed in case the first term in an assert is annotated
       is AnnotatedExpression -> this.term.z3ify(context)
@@ -276,7 +277,10 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
       is ArraySelect<*, BoolSort> -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDeclaredExpression ->
-          if (this.children.isEmpty()) {
+          // prevent case where function without parameters is registered as SMTFunctionN thus
+          // resulting in different
+          // objects when calling constructDynamic (so we can not check object equality anymore)
+          if (this.func is UserDeclaredSMTFunction0) {
             context.getConstant(this)
           } else {
             context.getFunction(
@@ -503,9 +507,9 @@ fun StrIsDigit.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
 @JvmName("z3ifyBitVec")
 fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
     when (this) {
-      is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
+      is LocalExpression -> context.localVariable(this.func, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
-      is BoundVariable -> context.boundVariable(this.name, this.sort.z3ify(context))
+      is BoundVariable -> context.boundVariable(this.func, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is BVLiteral -> this.z3ify(context)
       is BVConcat -> this.z3ify(context)
@@ -540,7 +544,10 @@ fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
       is ArraySelect<*, BVSort> -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDeclaredExpression ->
-          if (this.children.isEmpty()) {
+          // prevent case where function without parameters is registered as SMTFunctionN thus
+          // resulting in different
+          // objects when calling constructDynamic (so we can not check object equality anymore)
+          if (this.func is UserDeclaredSMTFunction0) {
             context.getConstant(this)
           } else {
             context.getFunction(
@@ -649,9 +656,9 @@ fun RotateRight.z3ify(context: Z3Context): Expr<BitVecSort> =
 @JvmName("z3ifyInts")
 fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
     when (this) {
-      is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
+      is LocalExpression -> context.localVariable(this.func, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
-      is BoundVariable -> context.boundVariable(this.name, this.sort.z3ify(context))
+      is BoundVariable -> context.boundVariable(this.func, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is IntLiteral -> this.z3ify(context)
       is IntNeg -> this.z3ify(context)
@@ -669,7 +676,10 @@ fun Expression<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
       is ArraySelect<*, IntSort> -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDeclaredExpression ->
-          if (this.children.isEmpty()) {
+          // prevent case where function without parameters is registered as SMTFunctionN thus
+          // resulting in different
+          // objects when calling constructDynamic (so we can not check object equality anymore)
+          if (this.func is UserDeclaredSMTFunction0) {
             context.getConstant(this)
           } else {
             context.getFunction(
@@ -725,9 +735,9 @@ fun StrToCode.z3ify(context: Z3Context): Expr<Z3IntSort> =
 @JvmName("z3ifyReals")
 fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
     when (this) {
-      is LocalExpression -> context.localVariable(this.name, context.context.mkRealSort())
+      is LocalExpression -> context.localVariable(this.func, context.context.mkRealSort())
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
-      is BoundVariable -> context.boundVariable(this.name, this.sort.z3ify(context))
+      is BoundVariable -> context.boundVariable(this.func, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is RealLiteral -> this.z3ify(context)
       is RealNeg -> this.z3ify(context)
@@ -740,7 +750,10 @@ fun Expression<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
       is ArraySelect<*, RealSort> -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDeclaredExpression ->
-          if (this.children.isEmpty()) {
+          // prevent case where function without parameters is registered as SMTFunctionN thus
+          // resulting in different
+          // objects when calling constructDynamic (so we can not check object equality anymore)
+          if (this.func is UserDeclaredSMTFunction0) {
             context.getConstant(this)
           } else {
             context.getFunction(
@@ -777,9 +790,9 @@ fun FPToReal.z3ify(context: Z3Context): Expr<Z3RealSort> =
 @JvmName("z3ifyFloatingPoint")
 fun Expression<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
     when (this) {
-      is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
+      is LocalExpression -> context.localVariable(this.func, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
-      is BoundVariable -> context.boundVariable(this.name, this.sort.z3ify(context))
+      is BoundVariable -> context.boundVariable(this.func, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is FPLiteral -> this.z3ify(context)
       is FPInfinity -> this.z3ify(context)
@@ -807,7 +820,10 @@ fun Expression<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
       is ArraySelect<*, FPSort> -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDeclaredExpression ->
-          if (this.children.isEmpty()) {
+          // prevent case where function without parameters is registered as SMTFunctionN thus
+          // resulting in different
+          // objects when calling constructDynamic (so we can not check object equality anymore)
+          if (this.func is UserDeclaredSMTFunction0) {
             context.getConstant(this)
           } else {
             context.getFunction(
@@ -913,9 +929,9 @@ fun UBitVecToFP.z3ify(context: Z3Context): Expr<Z3FPSort> =
 @JvmName("z3ifyRoundingMode")
 fun Expression<RoundingModeSort>.z3ify(context: Z3Context): Expr<FPRMSort> =
     when (this) {
-      is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
+      is LocalExpression -> context.localVariable(this.func, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
-      is BoundVariable -> context.boundVariable(this.name, this.sort.z3ify(context))
+      is BoundVariable -> context.boundVariable(this.func, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is RoundNearestTiesToEven -> this.z3ify(context)
       is RNE -> this.z3ify(context)
@@ -930,7 +946,10 @@ fun Expression<RoundingModeSort>.z3ify(context: Z3Context): Expr<FPRMSort> =
       is ArraySelect<*, RoundingModeSort> -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDeclaredExpression ->
-          if (this.children.isEmpty()) {
+          // prevent case where function without parameters is registered as SMTFunctionN thus
+          // resulting in different
+          // objects when calling constructDynamic (so we can not check object equality anymore)
+          if (this.func is UserDeclaredSMTFunction0) {
             context.getConstant(this)
           } else {
             context.getFunction(
@@ -971,9 +990,9 @@ fun RTZ.z3ify(context: Z3Context): Expr<FPRMSort> = context.context.mkFPRTZ()
 @JvmName("z3ifyString")
 fun Expression<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
     when (this) {
-      is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
+      is LocalExpression -> context.localVariable(this.func, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
-      is BoundVariable -> context.boundVariable(this.name, this.sort.z3ify(context))
+      is BoundVariable -> context.boundVariable(this.func, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
       is StrConcat -> this.z3ify(context)
       is StrAt -> this.z3ify(context)
@@ -987,7 +1006,10 @@ fun Expression<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
       is ArraySelect<*, StringSort> -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDeclaredExpression ->
-          if (this.children.isEmpty()) {
+          // prevent case where function without parameters is registered as SMTFunctionN thus
+          // resulting in different
+          // objects when calling constructDynamic (so we can not check object equality anymore)
+          if (this.func is UserDeclaredSMTFunction0) {
             context.getConstant(this)
           } else {
             context.getFunction(
@@ -1027,9 +1049,9 @@ fun StrFromInt.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
 @JvmName("z3ifyRegLan")
 fun Expression<RegLanSort>.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
     when (this) {
-      is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
+      is LocalExpression -> context.localVariable(this.func, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
-      is BoundVariable -> context.boundVariable(this.name, this.sort.z3ify(context))
+      is BoundVariable -> context.boundVariable(this.func, this.sort.z3ify(context))
       is RegexNone -> this.z3ify(context)
       is RegexAll -> this.z3ify(context)
       is RegexAllChar -> this.z3ify(context)
@@ -1046,7 +1068,10 @@ fun Expression<RegLanSort>.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSo
       is RegexLoop -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDeclaredExpression ->
-          if (this.children.isEmpty()) {
+          // prevent case where function without parameters is registered as SMTFunctionN thus
+          // resulting in different
+          // objects when calling constructDynamic (so we can not check object equality anymore)
+          if (this.func is UserDeclaredSMTFunction0) {
             context.getConstant(this)
           } else {
             context.getFunction(
@@ -1107,19 +1132,22 @@ fun Expression<ArraySort<*, *>>.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3So
       is Ite -> this.z3ify(context)
       is LocalExpression ->
           context
-              .localVariable(this.name, this.sort.z3ify(context))
+              .localVariable(this.func, this.sort.z3ify(context))
               .cast<Z3ArraySort<Z3Sort, Z3Sort>>()
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
       is ArrayStore -> this.z3ify(context)
-        is UserDeclaredExpression ->
-            if (this.children.isEmpty()) {
-                context.getConstant<Z3ArraySort<Z3Sort, Z3Sort>>(this)
-            } else {
-                context.getFunction(
-                    this.func, this.children.map { it.z3ify(context) },
-                    this.sort.z3ify(context)
-                ).cast<Z3ArraySort<Z3Sort, Z3Sort>>()
-            }
+      is UserDeclaredExpression ->
+          // prevent case where function without parameters is registered as SMTFunctionN thus
+          // resulting in different
+          // objects when calling constructDynamic (so we can not check object equality anymore)
+          if (this.func is UserDeclaredSMTFunction0) {
+            context.getConstant<Z3ArraySort<Z3Sort, Z3Sort>>(this)
+          } else {
+            context
+                .getFunction(
+                    this.func, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
+                .cast<Z3ArraySort<Z3Sort, Z3Sort>>()
+          }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
 
@@ -1132,20 +1160,21 @@ fun ArrayStore<*, *>.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>
 fun Expression<UserDeclaredSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
     when (this) {
       is Ite -> this.z3ify(context)
-      is LocalExpression -> context.localVariable(this.name, this.sort.z3ify(context))
+      is LocalExpression -> context.localVariable(this.func, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
       is BoundVariable ->
-          context.boundVariable(this.name, this.sort.z3ify(context)).cast<UninterpretedSort>()
+          context.boundVariable(this.func, this.sort.z3ify(context)).cast<UninterpretedSort>()
       is ArraySelect<*, UserDeclaredSort> -> this.z3ify(context)
-        is UserDeclaredExpression ->
-            if (this.children.isEmpty()) {
-                context.getConstant(this)
-            } else {
-                context.getFunction(
-                    this.func, this.children.map { it.z3ify(context) },
-                    this.sort.z3ify(context)
-                )
-            }
+      is UserDeclaredExpression ->
+          // prevent case where function without parameters is registered as SMTFunctionN thus
+          // resulting in different
+          // objects when calling constructDynamic (so we can not check object equality anymore)
+          if (this.func is UserDeclaredSMTFunction0) {
+            context.getConstant(this)
+          } else {
+            context.getFunction(
+                this.func, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
+          }
       else -> throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
 

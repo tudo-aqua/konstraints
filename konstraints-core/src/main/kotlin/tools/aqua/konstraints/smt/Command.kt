@@ -44,8 +44,13 @@ data class Assert(val expr: Expression<BoolSort>) : Command("assert $expr") {
  *
  * Declares a new a constant function of [sort] with the given [name]
  */
-data class DeclareConst(val name: Symbol, val sort: Sort) : Command("declare-const $name $sort") {
+data class DeclareConst<T : Sort>(val instance: UserDeclaredExpression<T>) :
+    Command("declare-const ${instance.name} ${instance.sort}") {
   override fun toString(): String = super.toString()
+
+  val func = instance.func
+  val name = instance.name
+  val sort = instance.sort
 }
 
 /**
@@ -53,9 +58,13 @@ data class DeclareConst(val name: Symbol, val sort: Sort) : Command("declare-con
  *
  * Declares a new a function of [sort] with the given [name] and [parameters]
  */
-data class DeclareFun(val name: Symbol, val parameters: List<Sort>, val sort: Sort) :
-    Command("declare-fun $name (${parameters.joinToString(" ")}) $sort") {
+data class DeclareFun<T : Sort>(val func: SMTFunction<T>) :
+    Command("declare-fun ${func.symbol} (${func.parameters.joinToString(" ")}) ${func.sort}") {
   override fun toString(): String = super.toString()
+
+  val name = func.symbol
+  val parameters = func.parameters
+  val sort = func.sort
 }
 
 /** SMT (set-info [Attribute.keyword] [Attribute.value]) command */

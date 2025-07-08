@@ -1,49 +1,71 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Copyright 2023-2025 The Konstraints Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package tools.aqua.konstraints.util
 
 class LeveledMap<K, V> : MutableMap<K, V> {
-    private val map = mutableMapOf<K, V>()
-    private val stack = Stack<MutableList<K>>()
+  private val map = mutableMapOf<K, V>()
+  private val stack = Stack<MutableList<K>>()
 
-    fun push() {
-        stack.push(mutableListOf())
-    }
+  init {
+    stack.push(mutableListOf())
+  }
 
-    fun pop() {
-        stack.pop().forEach { key ->
-            map.remove(key)
-        }
-    }
+  fun push() {
+    stack.push(mutableListOf())
+  }
 
-    override val keys = map.keys
-    override val values = map.values
-    override val entries = map.entries
+  fun pop() {
+    stack.pop().forEach { key -> map.remove(key) }
+  }
 
-    override fun put(key: K, value: V): V? {
-        stack.peek().add(key)
-        return map.put(key, value)
-    }
+  override val keys = map.keys
+  override val values = map.values
+  override val entries = map.entries
 
-    override fun remove(key: K): V? {
-        return map.remove(key)
-    }
+  override fun put(key: K, value: V): V? {
+    stack.peek().add(key)
+    return map.put(key, value)
+  }
 
-    override fun putAll(from: Map<out K, V>) {
-        map.putAll(from)
-        stack.peek().addAll(from.keys)
-    }
+  override fun remove(key: K): V? {
+    throw UnsupportedOperationException(
+        "Remove operation is not supported by LeveledMap, use push/pop to control map contents!")
+  }
 
-    override fun clear() {
-        map.clear()
-        stack.clear()
-    }
+  override fun putAll(from: Map<out K, V>) {
+    map.putAll(from)
+    stack.peek().addAll(from.keys)
+  }
 
-    override val size = map.size
+  override fun clear() {
+    map.clear()
+    stack.clear()
+    stack.push(mutableListOf())
+  }
 
-    override fun isEmpty() = map.isEmpty()
+  override val size = map.size
 
-    override fun containsKey(key: K) = map.containsKey(key)
+  override fun isEmpty() = map.isEmpty()
 
-    override fun containsValue(value: V) = map.containsValue(value)
+  override fun containsKey(key: K) = map.containsKey(key)
 
-    override fun get(key: K) = map[key]
+  override fun containsValue(value: V) = map.containsValue(value)
+
+  override fun get(key: K) = map[key]
 }

@@ -21,6 +21,7 @@ package tools.aqua.konstraints.solvers.z3
 import com.microsoft.z3.Model as Z3Model
 import com.microsoft.z3.Sort
 import com.microsoft.z3.Status
+import tools.aqua.konstraints.dsl.UserDeclaredSMTFunctionN
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.solvers.Solver
 import tools.aqua.konstraints.util.computeIfAbsentAndMerge
@@ -35,11 +36,13 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
   private var z3model: Z3Model? = null
 
   fun solve(terms: List<Expression<BoolSort>>): SatStatus {
-    val declarationsByName = mutableMapOf<Symbol, DeclareFun>()
+    val declarationsByName = mutableMapOf<Symbol, DeclareFun<*>>()
     terms.forEach { base ->
       base.asSequence().filterIsInstance<UserDeclaredExpression<*>>().forEach { expr ->
         declarationsByName.computeIfAbsentAndMerge(expr.name) { _ ->
-          DeclareFun(expr.name, expr.children.map(Expression<*>::sort), expr.sort)
+          DeclareFun(
+              UserDeclaredSMTFunctionN(
+                  expr.name, expr.sort, expr.children.map(Expression<*>::sort)))
         }
       }
     }
@@ -70,26 +73,35 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     solver.add(assertion)
   }
 
-  override fun visit(declareConst: DeclareConst) {
-    val name = declareConst.name.toString()
-    require(name !in context.constants) { "constant $declareConst already declared." }
-    context.constants[name] =
+  override fun visit(declareConst: DeclareConst<*>) {
+    if (context.constants.put(
+        declareConst.instance,
         context.context
             .mkConstDecl(declareConst.name.toSMTString(), getOrCreateSort(declareConst.sort))
-            .apply()
+            .apply()) != null) {
+      /*
+       * if the smt program we are solving is correct (which we assume since otherwise there is a bug somewhere
+       * in the construction of said program) this exception SHOULD never be reached
+       */
+
+      throw IllegalStateException("Function ${declareConst.func} was already declared!")
+    }
   }
 
-  override fun visit(declareFun: DeclareFun) {
-    if (declareFun.parameters.isEmpty()) {
-      return visit(DeclareConst(declareFun.name, declareFun.sort))
-    }
-
-    require(name !in context.functions) { "function $declareFun already declared." }
-    context.functions[name] =
+  override fun visit(declareFun: DeclareFun<*>) {
+    if (context.functions.put(
+        declareFun.func,
         context.context.mkFuncDecl(
             declareFun.name.toSMTString(),
             declareFun.parameters.map { getOrCreateSort(it) }.toTypedArray(),
-            getOrCreateSort(declareFun.sort))
+            getOrCreateSort(declareFun.sort))) != null) {
+      /*
+       * if the smt program we are solving is correct (which we assume since otherwise there is a bug somewhere
+       * in the construction of said program) this exception SHOULD never be reached
+       */
+
+      throw IllegalStateException("Function ${declareFun.func} was already declared!")
+    }
   }
 
   private fun getOrCreateSort(sort: tools.aqua.konstraints.smt.Sort): Sort =

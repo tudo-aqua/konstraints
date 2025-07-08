@@ -676,7 +676,9 @@ data class UserDeclaredSMTFunction0<T : Sort>(
 ) : DeclaredSMTFunction<T>() {
   override val parameters = emptyList<Sort>()
 
-  operator fun invoke() = UserDeclaredExpression(symbol, sort, this)
+  val instance = UserDeclaredExpression(symbol, sort, this)
+
+  operator fun invoke() = instance
 }
 
 /**

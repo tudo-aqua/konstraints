@@ -128,15 +128,16 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
 
   fun <T : Sort> declareConst(name: Symbol, sort: T): UserDeclaredSMTFunction0<T> {
     val func = UserDeclaredSMTFunction0(name, sort)
+
     context.addFun(func)
-    _commands.add(DeclareConst(name, sort))
+    _commands.add(DeclareConst(func()))
 
     return func
   }
 
   fun <T : Sort> declareFun(func: DeclaredSMTFunction<T>): DeclaredSMTFunction<T> {
     context.addFun(func)
-    _commands.add(DeclareFun(func.symbol, func.parameters, func.sort))
+    _commands.add(DeclareFun(func))
 
     return func
   }
@@ -225,7 +226,11 @@ class DefaultSMTProgram(commands: List<Command>) : SMTProgram(commands)
 fun MutableSMTProgram.assert(expr: Expression<BoolSort>) = assert(Assert(expr))
 
 fun MutableSMTProgram.declareFun(name: Symbol, parameters: List<Sort>, sort: Sort) =
-    declareFun(UserDeclaredSMTFunctionN(name, sort, parameters))
+    if (parameters.isEmpty()) {
+      declareFun(UserDeclaredSMTFunction0(name, sort))
+    } else {
+      declareFun(UserDeclaredSMTFunctionN(name, sort, parameters))
+    }
 
 fun <T : Sort> MutableSMTProgram.defineFun(
     name: Symbol,

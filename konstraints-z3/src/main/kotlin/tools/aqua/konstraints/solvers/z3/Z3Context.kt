@@ -21,15 +21,13 @@ package tools.aqua.konstraints.solvers.z3
 import com.microsoft.z3.Context
 import com.microsoft.z3.Expr
 import com.microsoft.z3.FuncDecl
-import tools.aqua.konstraints.smt.BoundVariable
+import com.microsoft.z3.Sort as Z3Sort
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.SMTFunction
-import com.microsoft.z3.Sort as Z3Sort
 import tools.aqua.konstraints.smt.Sort
 import tools.aqua.konstraints.smt.SortedVar
 import tools.aqua.konstraints.smt.Symbol
 import tools.aqua.konstraints.smt.VarBinding
-import tools.aqua.konstraints.util.Stack
 import tools.aqua.konstraints.util.LeveledMap
 
 class Z3Context {
@@ -44,7 +42,7 @@ class Z3Context {
   /** Create Z3 expressions for all local variables in [bindings]. */
   fun <T> let(bindings: List<VarBinding<*>>, block: () -> T): T {
     letStack.push()
-      letStack.putAll(bindings zip bindings.map { binding -> binding.term.z3ify(this) })
+    letStack.putAll(bindings zip bindings.map { binding -> binding.term.z3ify(this) })
 
     val expr = block()
 
@@ -54,12 +52,13 @@ class Z3Context {
   }
 
   fun <T> bind(sortedVars: List<SortedVar<*>>, block: (List<Expr<*>>) -> T): T {
-      val vars = sortedVars.map { sortedVar ->
+    val vars =
+        sortedVars.map { sortedVar ->
           context.mkConst(sortedVar.symbol.toSMTString(), sortedVar.sort.z3ify(this))
-      }
+        }
 
     boundVars.push()
-      boundVars.putAll(sortedVars zip vars)
+    boundVars.putAll(sortedVars zip vars)
 
     val expr = block(vars)
 
@@ -74,7 +73,7 @@ class Z3Context {
    * @throws RuntimeException if the local variable is unknown
    * @throws RuntimeException if the local variable is not of sort [T]
    */
-  fun <T : Z3Sort> localVariable(binding: VarBinding<*>, sort : T): Expr<T> {
+  fun <T : Z3Sort> localVariable(binding: VarBinding<*>, sort: T): Expr<T> {
     val localVar = letStack[binding] ?: throw RuntimeException()
 
     if (localVar.sort != sort)
@@ -86,7 +85,7 @@ class Z3Context {
     return localVar as Expr<T>
   }
 
-  fun <T : Z3Sort> boundVariable(sortedVar : SortedVar<*>, sort: T): Expr<T> {
+  fun <T : Z3Sort> boundVariable(sortedVar: SortedVar<*>, sort: T): Expr<T> {
     val boundVar = boundVars[sortedVar] ?: throw RuntimeException()
 
     if (boundVar.sort != sort)
@@ -101,7 +100,7 @@ class Z3Context {
   fun <T : Z3Sort> getConstant(expr: Expression<*>): Expr<T> {
     val constant = constants[expr] ?: throw UnknownFunctionException(expr.name as Symbol)
 
-      // FIXME this sort here might be wrong
+    // FIXME this sort here might be wrong
     if (constant.sort != sorts[expr.sort]) {
       throw UnexpectedSortException(
           "Constant ${expr.name} had unexpected sort: expected ${expr.sort} but was ${constant.sort}")
@@ -111,7 +110,7 @@ class Z3Context {
     return constant as Expr<T>
   }
 
-  fun <T : Z3Sort> getConstantOrNull(expr : Expression<*>): Expr<T>? =
+  fun <T : Z3Sort> getConstantOrNull(expr: Expression<*>): Expr<T>? =
       try {
         getConstant(expr)
       } catch (e: UnexpectedSortException) {
@@ -121,7 +120,7 @@ class Z3Context {
         null
       }
 
-  fun <T : Z3Sort> getFunction(func : SMTFunction<*>, args: List<Expr<*>>, sort: T): Expr<T> {
+  fun <T : Z3Sort> getFunction(func: SMTFunction<*>, args: List<Expr<*>>, sort: T): Expr<T> {
     val functionDef = functions[func] ?: throw UnknownFunctionException(func.symbol)
 
     val function = functionDef.apply(*args.toTypedArray())
@@ -135,7 +134,7 @@ class Z3Context {
     return function as Expr<T>
   }
 
-  fun <T : Z3Sort> getFunctionOrNull(func : SMTFunction<*>, args: List<Expr<*>>, sort: T): Expr<T>? =
+  fun <T : Z3Sort> getFunctionOrNull(func: SMTFunction<*>, args: List<Expr<*>>, sort: T): Expr<T>? =
       try {
         getFunction(func, args, sort)
       } catch (e: UnexpectedSortException) {
