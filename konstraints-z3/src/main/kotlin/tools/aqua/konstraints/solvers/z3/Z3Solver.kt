@@ -58,6 +58,20 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     return status
   }
 
+  fun simplify(term: Expression<BoolSort>): Expression<BoolSort> {
+    val declarationsByName = mutableMapOf<Symbol, DeclareFun>()
+    term.asSequence().filterIsInstance<UserDeclaredExpression<*>>().forEach { expr ->
+      declarationsByName.computeIfAbsentAndMerge(expr.name) { _ ->
+        DeclareFun(expr.name, expr.children.map(Expression<*>::sort), expr.sort)
+      }
+    }
+
+    declarationsByName.values.forEach { visit(it) }
+    val termSimplified = term.z3ify(context).simplify().aquaify()
+
+    return termSimplified
+  }
+
   override val modelOrNull: Model?
     get() = z3model?.let { Model(it) }
 
@@ -69,6 +83,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
 
     solver.add(assertion)
   }
+
 
   override fun visit(declareConst: DeclareConst) {
     val name = declareConst.name.toString()
