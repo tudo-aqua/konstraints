@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.util
 
+// split into shadowed unshadowed
 class LeveledMap<K, V> : MutableMap<K, V> {
   private val map = mutableMapOf<K, V>()
   private val stack = Stack<MutableList<K>>()
@@ -30,15 +31,19 @@ class LeveledMap<K, V> : MutableMap<K, V> {
     stack.push(mutableListOf())
   }
 
-  fun pop() {
-    stack.pop().forEach { key -> map.remove(key) }
+  fun pop() : Boolean {
+    require(stack.isNotEmpty())
+
+    return map.keys.removeAll(stack.pop())
   }
 
-  override val keys = map.keys
-  override val values = map.values
-  override val entries = map.entries
+  override val keys get() = map.keys
+  override val values get() = map.values
+  override val entries get() = map.entries
 
   override fun put(key: K, value: V): V? {
+    require(!map.contains(key))
+
     stack.peek().add(key)
     return map.put(key, value)
   }
@@ -59,7 +64,7 @@ class LeveledMap<K, V> : MutableMap<K, V> {
     stack.push(mutableListOf())
   }
 
-  override val size = map.size
+  override val size get() = map.size
 
   override fun isEmpty() = map.isEmpty()
 
