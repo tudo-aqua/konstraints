@@ -132,8 +132,7 @@ class Z3Tests {
   @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_ALIA(file: File) = solve(file)
 
-    @Disabled
-  fun getQFALIAFile(): Stream<Arguments> = loadResource("/QF_ALIA/")
+  @Disabled fun getQFALIAFile(): Stream<Arguments> = loadResource("/QF_ALIA/")
 
   @Test
   fun count() {

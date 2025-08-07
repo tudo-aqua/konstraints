@@ -31,15 +31,20 @@ class LeveledMap<K, V> : MutableMap<K, V> {
     stack.push(mutableListOf())
   }
 
-  fun pop() : Boolean {
+  fun pop(): Boolean {
     require(stack.isNotEmpty())
 
     return map.keys.removeAll(stack.pop())
   }
 
-  override val keys get() = map.keys
-  override val values get() = map.values
-  override val entries get() = map.entries
+  override val keys
+    get() = map.keys
+
+  override val values
+    get() = map.values
+
+  override val entries
+    get() = map.entries
 
   override fun put(key: K, value: V): V? {
     require(!map.contains(key))
@@ -64,7 +69,8 @@ class LeveledMap<K, V> : MutableMap<K, V> {
     stack.push(mutableListOf())
   }
 
-  override val size get() = map.size
+  override val size
+    get() = map.size
 
   override fun isEmpty() = map.isEmpty()
 

@@ -23,7 +23,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.assertNull
 import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
@@ -66,71 +65,68 @@ class UtilsTest {
     )
   }
 
-    @Test
-    fun testPut() {
-        val map = LeveledMap<Int, Int>()
-        map.put(1, 1)
+  @Test
+  fun testPut() {
+    val map = LeveledMap<Int, Int>()
+    map.put(1, 1)
 
-        assertEquals(1, map[1])
-    }
+    assertEquals(1, map[1])
+  }
 
-    @Test
-    fun testPop() {
-        val map = LeveledMap<Int, Int>()
-        map.push()
-        map.put(1, 1)
-        map.pop()
+  @Test
+  fun testPop() {
+    val map = LeveledMap<Int, Int>()
+    map.push()
+    map.put(1, 1)
+    map.pop()
 
-        assertNull(map[1])
-    }
+    assertNull(map[1])
+  }
 
-    @Test
-    fun testPopSize() {
-        val map = LeveledMap<Int, Int>()
-        map.push()
-        map.put(1, 1)
-        map.pop()
+  @Test
+  fun testPopSize() {
+    val map = LeveledMap<Int, Int>()
+    map.push()
+    map.put(1, 1)
+    map.pop()
 
-        assertEquals(0, map.size)
-    }
+    assertEquals(0, map.size)
+  }
 
-    @Test
-    fun testPutAll() {
-        val map = LeveledMap<Int, Int>()
-        map.putAll(listOf(Pair(1, 1), Pair(2, 2)))
+  @Test
+  fun testPutAll() {
+    val map = LeveledMap<Int, Int>()
+    map.putAll(listOf(Pair(1, 1), Pair(2, 2)))
 
-        assertEquals(1, map[1])
-        assertEquals(2, map[2])
-    }
+    assertEquals(1, map[1])
+    assertEquals(2, map[2])
+  }
 
-    @Test
-    fun testSize() {
-        val map = LeveledMap<Int, Int>()
-        map.put(1, 1)
-        map.push()
-        map.put(2, 2)
+  @Test
+  fun testSize() {
+    val map = LeveledMap<Int, Int>()
+    map.put(1, 1)
+    map.push()
+    map.put(2, 2)
 
-        assertEquals(2, map.size)
-    }
+    assertEquals(2, map.size)
+  }
 
-    @Test
-    fun testContainsKey() {
-        val map = LeveledMap<Int, Int>()
-        map.put(1, 2)
+  @Test
+  fun testContainsKey() {
+    val map = LeveledMap<Int, Int>()
+    map.put(1, 2)
 
-        assertTrue(map.containsKey(1))
-    }
+    assertTrue(map.containsKey(1))
+  }
 
-    @Test
-    fun testContainsValue() {
-        val map = LeveledMap<Int, Int>()
-        map.put(1, 2)
+  @Test
+  fun testContainsValue() {
+    val map = LeveledMap<Int, Int>()
+    map.put(1, 2)
 
-        assertTrue(map.containsValue(2))
-    }
+    assertTrue(map.containsValue(2))
+  }
 
-    @Test
-    fun testClear() {
-
-    }
+  @Test fun testClear() {}
 }

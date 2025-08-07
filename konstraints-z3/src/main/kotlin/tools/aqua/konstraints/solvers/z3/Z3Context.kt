@@ -21,8 +21,8 @@ package tools.aqua.konstraints.solvers.z3
 import com.microsoft.z3.Context
 import com.microsoft.z3.Expr
 import com.microsoft.z3.FuncDecl
-import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import com.microsoft.z3.Sort as Z3Sort
+import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.SMTFunction
 import tools.aqua.konstraints.smt.Sort
@@ -99,15 +99,18 @@ class Z3Context {
   }
 
   fun <T : Z3Sort> getConstant(expr: Expression<*>): Expr<T> {
-    //val constant = constants[expr] ?: (functions[expr.func]?.apply() ?: throw UnknownFunctionException(expr.name as Symbol))
+    // val constant = constants[expr] ?: (functions[expr.func]?.apply() ?: throw
+    // UnknownFunctionException(expr.name as Symbol))
 
-    // constant may have been declared via declare-fun as function of arity 0 or via declare-constant
+    // constant may have been declared via declare-fun as function of arity 0 or via
+    // declare-constant
     // so we have to search in both the constant and function lookup
-    val constant = if(expr.func is UserDeclaredSMTFunction0) {
-      functions[expr.func]?.apply()
-    } else {
-      constants[expr]
-    } ?: throw UnknownFunctionException(expr.name as Symbol)
+    val constant =
+        if (expr.func is UserDeclaredSMTFunction0) {
+          functions[expr.func]?.apply()
+        } else {
+          constants[expr]
+        } ?: throw UnknownFunctionException(expr.name as Symbol)
 
     // FIXME this sort here might be wrong
     if (constant.sort != sorts[expr.sort]) {
