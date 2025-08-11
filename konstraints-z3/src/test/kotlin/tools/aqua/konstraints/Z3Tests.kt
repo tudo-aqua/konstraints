@@ -125,7 +125,32 @@ class Z3Tests {
   @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_FP(file: File) = solve(file)
 
-  fun getQFFPFile(): Stream<Arguments> = loadResource("/QF_FP/")
+  @ParameterizedTest
+  @MethodSource("getQFFPFile")
+  @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  fun QF_FP_Model(file: File) {
+    assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
+
+    val solver = Z3Solver()
+    val result =
+        Parser()
+            .parse(
+                file.bufferedReader().use(BufferedReader::readLines).joinToString("\n") +
+                    "\n(get-model)")
+
+    assumeTrue(
+        (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
+            .symbol
+            .toString() == "sat",
+        "Skipped due to unknown or unsat status.")
+
+    solver.use {
+      solver.solve(result)
+      print(solver.model.definitions)
+    }
+  }
+
+  fun getQFFPFile(): Stream<Arguments> = loadResource("/QF_FP/aqua/")
 
   @ParameterizedTest
   @MethodSource("getQFALIAFile")
