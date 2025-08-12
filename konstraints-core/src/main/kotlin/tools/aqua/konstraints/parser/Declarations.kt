@@ -1260,6 +1260,173 @@ internal object RotateRightDecl :
   }
 }
 
+internal object BVNegODecl :
+    SMTTheoryFunction<BoolSort>(
+        "bvnego".toSymbolWithQuotes(), listOf(BVSort.fromSymbol("m")), Bool, Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BoolSort> {
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return BVNegO(args[0] as Expression<BVSort>)
+  }
+}
+
+internal object BVUAddODecl :
+    SMTTheoryFunction<BoolSort>(
+        "bvuaddo".toSymbolWithQuotes(), listOf(BVSort.fromSymbol("m")), Bool, Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BoolSort> {
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return BVUAddO(args[0] as Expression<BVSort>)
+  }
+}
+
+internal object BVSAddODecl :
+    SMTTheoryFunction<BoolSort>(
+        "bvsaddo".toSymbolWithQuotes(), listOf(BVSort.fromSymbol("m")), Bool, Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BoolSort> {
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return BVSAddO(args[0] as Expression<BVSort>)
+  }
+}
+
+internal object BVUMulODecl :
+    SMTTheoryFunction<BoolSort>(
+        "bvumulo".toSymbolWithQuotes(), listOf(BVSort.fromSymbol("m")), Bool, Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BoolSort> {
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return BVUMulO(args[0] as Expression<BVSort>)
+  }
+}
+
+internal object BVSMulODecl :
+    SMTTheoryFunction<BoolSort>(
+        "bvsmulo".toSymbolWithQuotes(), listOf(BVSort.fromSymbol("m")), Bool, Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BoolSort> {
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return BVSMulO(args[0] as Expression<BVSort>)
+  }
+}
+
+internal object UBVToIntDecl :
+    SMTTheoryFunction<IntSort>(
+        "ubv_to_int".toSymbolWithQuotes(),
+        listOf(BVSort.fromSymbol("m")),
+        SMTInt,
+        Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<IntSort> {
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return UBVToInt(args[0] as Expression<BVSort>)
+  }
+}
+
+internal object SBVToIntDecl :
+    SMTTheoryFunction<IntSort>(
+        "sbv_to_int".toSymbolWithQuotes(),
+        listOf(BVSort.fromSymbol("m")),
+        SMTInt,
+        Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<IntSort> {
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return SBVToInt(args[0] as Expression<BVSort>)
+  }
+}
+
+internal object IntToBVDecl :
+    SMTTheoryFunction<BVSort>(
+        "int_to_bv".toSymbolWithQuotes(),
+        listOf(SMTInt),
+        BVSort.fromSymbol("m"),
+        Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BVSort> {
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 1) {
+      "One index expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+    require(indices.single() is NumeralIndex) {
+      "Expected index of $symbol to be numeral but was ${indices.single()}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return IntToBV((indices.single() as NumeralIndex).numeral, args[0] as Expression<IntSort>)
+  }
+}
+
 /** Ints theory internal object */
 internal object IntsTheory : Theory {
   override val functions =
