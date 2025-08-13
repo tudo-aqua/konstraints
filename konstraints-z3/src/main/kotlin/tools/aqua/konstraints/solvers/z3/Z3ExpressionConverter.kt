@@ -18,15 +18,23 @@
 
 package tools.aqua.konstraints.solvers.z3
 
+import com.microsoft.z3.ArrayExpr
 import com.microsoft.z3.ArraySort as Z3ArraySort
+import com.microsoft.z3.BitVecExpr
 import com.microsoft.z3.BitVecNum
 import com.microsoft.z3.BitVecSort
+import com.microsoft.z3.BoolExpr
 import com.microsoft.z3.BoolSort as Z3BoolSort
 import com.microsoft.z3.Expr
+import com.microsoft.z3.FPExpr
+import com.microsoft.z3.FPNum
+import com.microsoft.z3.FPRMExpr
 import com.microsoft.z3.FPRMSort as Z3RMSort
 import com.microsoft.z3.FPSort as Z3FPSort
+import com.microsoft.z3.IntExpr
 import com.microsoft.z3.IntNum
 import com.microsoft.z3.IntSort as Z3IntSort
+import com.microsoft.z3.RealExpr
 import com.microsoft.z3.RealSort as Z3RealSort
 import com.microsoft.z3.Sort as Z3Sort
 import com.microsoft.z3.enumerations.Z3_decl_kind
@@ -47,19 +55,19 @@ fun Z3Sort.aquaify(): Sort =
 @JvmName("aquaifyAny")
 fun Expr<*>.aquaify(): Expression<*> =
     @Suppress("UNCHECKED_CAST")
-    when (this.sort) {
-      is Z3BoolSort -> (this as Expr<Z3BoolSort>).aquaify()
-      is Z3IntSort -> (this as Expr<Z3IntSort>).aquaify()
-      is Z3RealSort -> (this as Expr<Z3RealSort>).aquaify()
-      is BitVecSort -> (this as Expr<BitVecSort>).aquaify()
-      is Z3FPSort -> (this as Expr<Z3FPSort>).aquaify()
-      is Z3RMSort -> (this as Expr<Z3RMSort>).aquaify()
-      is Z3ArraySort<*, *> -> (this as Expr<Z3ArraySort<*, *>>).aquaify()
+    when (this) {
+      is BoolExpr -> this.aquaify()
+      is IntExpr -> this.aquaify()
+      is RealExpr -> this.aquaify()
+      is BitVecExpr -> this.aquaify()
+      is FPExpr -> this.aquaify()
+      is FPRMExpr -> this.aquaify()
+      is ArrayExpr<*, *> -> this.aquaify()
       else -> throw RuntimeException("Unknown or unsupported Z3 sort $sort")
     }
 
 @JvmName("aquaifyBool")
-fun Expr<Z3BoolSort>.aquaify(): Expression<BoolSort> =
+fun BoolExpr.aquaify(): Expression<BoolSort> =
     if (isTrue) {
       True
     } else if (isFalse) {
@@ -153,7 +161,7 @@ fun Expr<Z3BoolSort>.aquaify(): Expression<BoolSort> =
     }
 
 @JvmName("aquaifyInt")
-fun Expr<Z3IntSort>.aquaify(): Expression<IntSort> =
+fun IntExpr.aquaify(): Expression<IntSort> =
     if (isUMinus) {
       IntNeg(args[0].aquaify().cast())
     } else if (isSub) {
@@ -177,7 +185,7 @@ fun Expr<Z3IntSort>.aquaify(): Expression<IntSort> =
     }
 
 @JvmName("aquaifyReal")
-fun Expr<Z3RealSort>.aquaify(): Expression<RealSort> =
+fun RealExpr.aquaify(): Expression<RealSort> =
     if (isUMinus) {
       RealNeg(args[0].aquaify().cast())
     } else if (isSub) {
@@ -199,7 +207,7 @@ fun Expr<Z3RealSort>.aquaify(): Expression<RealSort> =
     }
 
 @JvmName("aquaifyBitVec")
-fun Expr<BitVecSort>.aquaify(): Expression<BVSort> =
+fun BitVecExpr.aquaify(): Expression<BVSort> =
     if (isBVNOT) {
       BVNot(args[0].aquaify().cast())
     } else if (isBVAND) {
@@ -221,7 +229,7 @@ fun Expr<BitVecSort>.aquaify(): Expression<BVSort> =
     } else if (isConcat) {
       BVConcat(args[0].aquaify().cast(), args[1].aquaify().cast())
     } else if (isBVExtract) {
-      TODO("Find indices")
+      BVExtract(funcDecl.parameters[0].int, funcDecl.parameters[1].int, args[0].aquaify().cast())
     } else if (isBVNAND) {
       BVNAnd(args[0].aquaify().cast(), args[1].aquaify().cast())
     } else if (isBVNOR) {
@@ -243,31 +251,39 @@ fun Expr<BitVecSort>.aquaify(): Expression<BVSort> =
     } else if (isBVShiftRightArithmetic) {
       BVAShr(args[0].aquaify().cast(), args[1].aquaify().cast())
     } else if (isBVRepeat) {
-      TODO("Find indices")
+      Repeat(funcDecl.parameters[0].int, args[0].aquaify().cast())
     } else if (isBVZeroExtension) {
-      TODO("Find indices")
+      ZeroExtend(funcDecl.parameters[0].int, args[0].aquaify().cast())
     } else if (isBVSignExtension) {
-      TODO("Find indices")
+      SignExtend(funcDecl.parameters[0].int, args[0].aquaify().cast())
     } else if (isBVRotateLeft) {
-      TODO("Find indices")
+      RotateLeft(funcDecl.parameters[0].int, args[0].aquaify().cast())
     } else if (isBVRotateRight) {
-      TODO("Find indices")
+      RotateRight(funcDecl.parameters[0].int, args[0].aquaify().cast())
     } else if (funcDecl.declKind == Z3_decl_kind.Z3_OP_FPA_TO_UBV) {
-      TODO("Find indices")
+      FPToUBitVec(args[0].aquaify().cast(), args[1].aquaify().cast(), funcDecl.parameters[0].int)
     } else if (funcDecl.declKind == Z3_decl_kind.Z3_OP_FPA_TO_SBV) {
-      TODO("Find indices")
+      FPToSBitVec(args[0].aquaify().cast(), args[1].aquaify().cast(), funcDecl.parameters[0].int)
     } else if (this is BitVecNum) {
       // its important that we pass the number of bits here to ensure sort compatibility with the
       // declared function
       BVLiteral("#x${bigInteger.toString(16)}", sort.size)
+    } else if (funcDecl.declKind == Z3_decl_kind.Z3_OP_BNUM) {
+      BVLiteral(toString(), sort.size)
     } else {
       throw RuntimeException("Unknown or unsupported bitvec expression $this")
     }
 
 @JvmName("aquaifyFloatingPoint")
-fun Expr<Z3FPSort>.aquaify(): Expression<FPSort> =
+fun FPExpr.aquaify(): Expression<FPSort> =
     when (funcDecl.declKind) {
-      Z3_decl_kind.Z3_OP_FPA_NUM -> TODO()
+      Z3_decl_kind.Z3_OP_FPA_NUM ->
+          (this as FPNum).let { fpNum ->
+            FPLiteral(
+                fpNum.signBV.aquaify().cast(),
+                fpNum.getExponentBV(false).aquaify().cast(),
+                fpNum.significandBV.aquaify().cast())
+          }
       Z3_decl_kind.Z3_OP_FPA_FP ->
           FPLiteral(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
       Z3_decl_kind.Z3_OP_FPA_PLUS_INF -> FPInfinity(sort.eBits, sort.sBits)
@@ -319,8 +335,19 @@ fun Expr<Z3FPSort>.aquaify(): Expression<FPSort> =
               "Unknown or unsupported floating point expression $this (decl kind ${this.funcDecl.declKind})")
     }
 
+@JvmName("aquaifyRoundingMode")
+fun FPRMExpr.aquaify(): Expression<RoundingModeSort> =
+    when (funcDecl.declKind) {
+      Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_ZERO -> RoundTowardZero
+      Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_NEGATIVE -> RoundTowardNegative
+      Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_POSITIVE -> RoundTowardPositive
+      Z3_decl_kind.Z3_OP_FPA_RM_NEAREST_TIES_TO_AWAY -> RoundNearestTiesToAway
+      Z3_decl_kind.Z3_OP_FPA_RM_NEAREST_TIES_TO_EVEN -> RoundNearestTiesToEven
+      else -> throw RuntimeException("Unknown or unsupported rounding mode expression $this.")
+    }
+
 @JvmName("aquaifyArraysEx")
-fun Expr<Z3ArraySort<*, *>>.aquaify(): Expression<ArraySort<*, *>> =
+fun ArrayExpr<*, *>.aquaify(): Expression<ArraySort<*, *>> =
     if (isStore) {
       ArrayStore(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
     } else if (isSelect) {

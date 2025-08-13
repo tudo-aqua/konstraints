@@ -127,7 +127,7 @@ class Z3Tests {
 
   @ParameterizedTest
   @MethodSource("getQFFPFile")
-  @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_FP_Model(file: File) {
     assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
 

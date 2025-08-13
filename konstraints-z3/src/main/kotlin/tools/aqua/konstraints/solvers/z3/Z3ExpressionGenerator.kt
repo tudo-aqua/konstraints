@@ -275,6 +275,14 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
       is StrContains -> this.z3ify(context)
       is StrIsDigit -> this.z3ify(context)
       is ArraySelect<*, BoolSort> -> this.z3ify(context)
+      is BVNegO -> this.z3ify(context)
+      is BVUAddO -> this.z3ify(context)
+      is BVSAddO -> this.z3ify(context)
+      is BVUSubO -> this.z3ify(context)
+      is BVSSubO -> this.z3ify(context)
+      is BVUMulO -> this.z3ify(context)
+      is BVSMulO -> this.z3ify(context)
+      is BVSDivO -> this.z3ify(context)
       /* free constant and function symbols */
       is UserDeclaredExpression ->
           // prevent case where function without parameters is registered as SMTFunctionN thus
@@ -503,6 +511,30 @@ fun StrContains.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkContains(string.z3ify(context), substring.z3ify(context))
 
 fun StrIsDigit.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
+
+fun BVNegO.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkBVNegNoOverflow(inner.z3ify(context))
+
+fun BVUAddO.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkBVAddNoOverflow(lhs.z3ify(context), rhs.z3ify(context), false)
+
+fun BVSAddO.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkBVAddNoOverflow(lhs.z3ify(context), rhs.z3ify(context), true)
+
+fun BVUSubO.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkBVSubNoOverflow(lhs.z3ify(context), rhs.z3ify(context))
+
+fun BVSSubO.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkBVSubNoOverflow(lhs.z3ify(context), rhs.z3ify(context))
+
+fun BVUMulO.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkBVMulNoOverflow(lhs.z3ify(context), rhs.z3ify(context), false)
+
+fun BVSMulO.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkBVMulNoOverflow(lhs.z3ify(context), rhs.z3ify(context), true)
+
+fun BVSDivO.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkBVSDivNoOverflow(lhs.z3ify(context), rhs.z3ify(context))
 
 @JvmName("z3ifyBitVec")
 fun Expression<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
