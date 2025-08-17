@@ -57,7 +57,7 @@ class SMTProgramBuilder(logic: Logic) {
     }
   }
 
-  internal fun <T : DeclaredSMTFunction<S>, S : Sort> declareFun(func: T): T {
+  internal fun <T : UserDeclaredSMTFunction<S>, S : Sort> declareFun(func: T): T {
     program.declareFun(func)
 
     return func

@@ -18,37 +18,7 @@
 
 package tools.aqua.konstraints.smt
 
-import java.math.BigInteger
 import tools.aqua.konstraints.parser.*
-
-/** Int sort */
-sealed class IntSort : Sort("Int") {
-  override val theories = setOf(Theories.INTS, Theories.REALS_INTS, Theories.STRINGS)
-}
-
-object SMTInt : IntSort()
-
-/**
- * Integer literals
- *
- * (NUMERAL Int)
- */
-class IntLiteral(val value: BigInteger) :
-    Literal<IntSort>(LiteralString(value.toString()), SMTInt) {
-  override val theories = INTS_REALS_INTS_MARKER_SET
-
-  constructor(value: Byte) : this(value.toInt().toBigInteger())
-
-  constructor(value: Short) : this(value.toInt().toBigInteger())
-
-  constructor(value: Int) : this(value.toBigInteger())
-
-  constructor(value: Long) : this(value.toBigInteger())
-
-  override fun toString(): String = value.toString()
-
-  override fun copy(children: List<Expression<*>>): Expression<IntSort> = this
-}
 
 /**
  * Integer negation
@@ -278,7 +248,7 @@ class IntGreater(val terms: List<Expression<IntSort>>) :
 }
 
 /**
- * Divisible predicate,
+ * Divisible predicate
  *
  * @throws IllegalArgumentException if [n] <= 0
  *

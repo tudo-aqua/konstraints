@@ -21,11 +21,12 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.parser.Parser
 
 /**
- * Quoting rules for SMT String
+ * Quoting rules for SMT String, used when serializing program
  *
- * @property NONE no modification will be done
- * @property SMART automatically determines whether the string needs quoting or not
- * @property FORCED quotes the string if it is not already quoted
+ * @property NEVER will never quote any symbol, even if the constructing string is quoted
+ * @property SAME_AS_INPUT no modification will be done
+ * @property WHEN_NEEDED automatically determines whether the symbol needs quoting or not
+ * @property ALWAYS quotes all symbols
  */
 enum class QuotingRule {
   /**
@@ -47,7 +48,6 @@ enum class QuotingRule {
 /**
  * Representation of an SMT Symbol
  *
- * @param raw String containing the SMT Symbol
  * @throws IllegalSymbolException if [raw] is not a valid SMT Symbol
  */
 // constructor is internal to prevent external subclassing of Symbol

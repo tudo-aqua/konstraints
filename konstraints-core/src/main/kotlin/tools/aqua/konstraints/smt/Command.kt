@@ -39,20 +39,12 @@ data class Assert(val expr: Expression<BoolSort>) : Command("assert $expr") {
   override fun toString(): String = super.toString()
 }
 
-/**
- * SMT (declare-const [name] [sort]) command
- *
- * Declares a new a constant function of [sort] with the given [name]
- */
+/** SMT (declare-const [name] [sort]) command */
 data class DeclareConst(val name: Symbol, val sort: Sort) : Command("declare-const $name $sort") {
   override fun toString(): String = super.toString()
 }
 
-/**
- * SMT (declare-fun [name] ([parameters]) [sort]) command
- *
- * Declares a new a function of [sort] with the given [name] and [parameters]
- */
+/** SMT (declare-fun [name] ([parameters]) [sort]) command */
 data class DeclareFun(val name: Symbol, val parameters: List<Sort>, val sort: Sort) :
     Command("declare-fun $name (${parameters.joinToString(" ")}) $sort") {
   override fun toString(): String = super.toString()
@@ -60,25 +52,30 @@ data class DeclareFun(val name: Symbol, val parameters: List<Sort>, val sort: So
 
 /** SMT (set-info [Attribute.keyword] [Attribute.value]) command */
 data class SetInfo(val attribute: Attribute) :
-    Command("set-info ${attribute.keyword} ${attribute.value})")
+    Command("set-info ${attribute.keyword} ${attribute.value})") {
+  /** SMT (set-info [keyword] [value]) command */
+  constructor(keyword: String, value: AttributeValue?) : this(Attribute(keyword, value))
+}
 
+/** SMT Attribute use by [SetInfo] */
 data class Attribute(val keyword: String, val value: AttributeValue?)
 
+/** Attribute value base class */
 sealed interface AttributeValue
 
+/** Attribute value of type [SpecConstant] */
 data class ConstantAttributeValue(val constant: SpecConstant) : AttributeValue
 
+/** Symbolic attribute value */
 data class SymbolAttributeValue(val symbol: Symbol) : AttributeValue
 
+/** SExpression attribute value */
 data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : AttributeValue
 
-/**
- * SMT (declare-sort [name] [arity]) command
- *
- * Declare a new sort with the given [name] and [arity]
- */
+/** SMT (declare-sort [name] [arity]) command */
 data class DeclareSort(val name: Symbol, val arity: Int) : Command("declare-sort $name $arity")
 
+/** SMT (define-sort [name] ([sortParameters]) [sort]) command */
 data class DefineSort(val name: Symbol, var sortParameters: List<Symbol>, val sort: Sort) :
     Command("define-sort $name ($sortParameters) $sort")
 
@@ -86,14 +83,19 @@ data class DefineSort(val name: Symbol, var sortParameters: List<Symbol>, val so
 /** SMT (set-option [name] [OptionValue]) command */
 data class SetOption(val name: String, val value: OptionValue) : Command("set-option $name $value")
 
+/** SMT Option value used by [SetOption] */
 sealed interface OptionValue
 
+/** Boolean option value */
 data class BooleanOptionValue(val bool: Boolean) : OptionValue
 
+/** String option value */
 data class StringOptionValue(val sting: String) : OptionValue
 
+/** Numeral option value */
 data class NumeralOptionValue(val numeral: BigInteger) : OptionValue
 
+/** Attribute option value */
 data class AttributeOptionValue(val attribute: Attribute) : OptionValue
 
 /** SMT (set-logic [logic]) command */
@@ -149,6 +151,8 @@ data class FunctionDef<out S : Sort>(
   }
 }
 
+/** SMT (push [n]) command */
 data class Push(val n: Int) : Command("push $n")
 
+/** SMT (pop [n]) command */
 data class Pop(val n: Int) : Command("pop $n")

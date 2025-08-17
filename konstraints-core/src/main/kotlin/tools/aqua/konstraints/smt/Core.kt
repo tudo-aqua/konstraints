@@ -39,11 +39,7 @@ object False : ConstantExpression<BoolSort>("false".toSymbolWithQuotes(), Bool) 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
 }
 
-/**
- * Implements not according to Core theory (not Bool Bool)
- *
- * @param inner [Expression] of [BoolSort] to be negated
- */
+/** (not [inner]) */
 class Not(override val inner: Expression<BoolSort>) :
     UnaryExpression<BoolSort, BoolSort>("not".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
@@ -54,11 +50,7 @@ class Not(override val inner: Expression<BoolSort>) :
       NotDecl.constructDynamic(children, emptyList())
 }
 
-/**
- * Implements implication according to Core theory (=> Bool Bool Bool :right-assoc)
- *
- * @param statements multiple [Expression] of [BoolSort] to be checked in implies statement
- */
+/** (=> [statements] :right-assoc) */
 class Implies(val statements: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("=>".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
@@ -71,11 +63,7 @@ class Implies(val statements: List<Expression<BoolSort>>) :
       ImpliesDecl.constructDynamic(children, emptyList())
 }
 
-/**
- * Implements and according to Core theory (and Bool Bool Bool :left-assoc)
- *
- * @param conjuncts multiple [Expression] of [BoolSort] to be joined in and statement
- */
+/** (and [conjuncts] :left-assoc) */
 class And(val conjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("and".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
@@ -88,11 +76,7 @@ class And(val conjuncts: List<Expression<BoolSort>>) :
       AndDecl.constructDynamic(children, emptyList())
 }
 
-/**
- * Implements or according to Core theory (or Bool Bool Bool :left-assoc)
- *
- * @param disjuncts multiple [Expression] of [BoolSort] to be joined in or statement
- */
+/** (or [disjuncts] :left-assoc) */
 class Or(val disjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("or".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
@@ -105,11 +89,7 @@ class Or(val disjuncts: List<Expression<BoolSort>>) :
       OrDecl.constructDynamic(children, emptyList())
 }
 
-/**
- * Implements xor according to Core theory (xor Bool Bool Bool :left-assoc)
- *
- * @param disjuncts multiple [Expression] of [BoolSort] to be joined in xor statement
- */
+/** (xor [disjuncts] :left-assoc) */
 class XOr(val disjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("xor".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
@@ -122,11 +102,7 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) :
       XOrDecl.constructDynamic(children, emptyList())
 }
 
-/**
- * Implements equals according to Core theory (par (A) (= A A Bool :chainable))
- *
- * @param statements multiple [Expression] of [BoolSort] to be checked in equals statement
- */
+/** (par (A) (= [statements] :chainable)) */
 class Equals<T : Sort>(val statements: List<Expression<T>>) :
     HomogenousExpression<BoolSort, Sort>("=".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
@@ -139,11 +115,7 @@ class Equals<T : Sort>(val statements: List<Expression<T>>) :
       EqualsDecl.constructDynamic(children, emptyList())
 }
 
-/**
- * Implements distinct according to Core theory (par (A) (distinct A A Bool :pairwise))
- *
- * @param statements multiple [Expression] of [BoolSort] to be checked in distinct statement
- */
+/** (par (A) (distinct [statements] :pairwise)) */
 class Distinct<T : Sort>(val statements: List<Expression<T>>) :
     HomogenousExpression<BoolSort, T>("distinct".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
@@ -155,10 +127,3 @@ class Distinct<T : Sort>(val statements: List<Expression<T>>) :
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       DistinctDecl.constructDynamic(children, emptyList())
 }
-
-/** Bool sort */
-sealed class BoolSort : Sort("Bool") {
-  override val theories = CORE_MARKER_SET
-}
-
-object Bool : BoolSort()

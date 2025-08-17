@@ -22,14 +22,20 @@ import org.petitparser.context.Token
 
 // S-Expression
 
+/** Base class for explicit SExpressions */
 sealed interface SExpression
 
+/** SubSExpression */
 data class SubSExpression(val subExpressions: List<SExpression>) : SExpression
 
+/** SExpressionConstant */
 data class SExpressionConstant(val constant: SpecConstant) : SExpression
 
+/** SExpressionSymbol */
 data class SExpressionSymbol(val symbol: Symbol) : SExpression
 
+/** SExpressionReserved */
 data class SExpressionReserved(val reserved: Token) : SExpression
 
+/** SExpressionKeyword */
 data class SExpressionKeyword(val keyword: Token) : SExpression

@@ -134,7 +134,7 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     return func
   }
 
-  fun <T : Sort> declareFun(func: DeclaredSMTFunction<T>): DeclaredSMTFunction<T> {
+  fun <T : Sort> declareFun(func: UserDeclaredSMTFunction<T>): UserDeclaredSMTFunction<T> {
     context.addFun(func)
     _commands.add(DeclareFun(func.symbol, func.parameters, func.sort))
 

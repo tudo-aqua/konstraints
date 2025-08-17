@@ -18,10 +18,6 @@
 
 package tools.aqua.konstraints.util
 
-/* parametricBindings.putIfAbsent(symbolic, actual)?.let {
-    require(it == actual) //TODO nice exception
-} */
-
 /**
  * Returns a list of pairs built from the elements of this collection and other collection with the
  * same index. Enforces that both lists have the same length.

@@ -633,3 +633,95 @@ class UserDefinedArraySort<X : Sort, Y : Sort>(override val definedSymbol: Symbo
     ArraySort<X, Y>(x, y) {
   override fun toString() = definedSymbol.toString()
 }
+
+/** Default implementation of Array sort */
+sealed class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) :
+    Sort("Array".toSymbolWithQuotes()) {
+  override val parameters = listOf(x, y)
+
+  override fun toString(): String = "(Array $x $y)"
+
+  override val theories = ARRAYS_EX_MARKER_SET
+}
+
+/** Base class for all ArraySorts */
+class SMTArray<X : Sort, Y : Sort>(x: X, y: Y) : ArraySort<X, Y>(x, y)
+
+/** Bitvector sort with [bits] length */
+sealed class BVSort(index: Index) : Sort("BitVec") {
+  companion object {
+    /**
+     * Get BitVec sort with the given number of [bits].
+     *
+     * Currently, this generates a new BitVec every time it is invoked, this should only create a
+     * single instance for each length
+     */
+    operator fun invoke(bits: Int): BVSort = BitVecFactory.build(bits)
+
+    /**
+     * Get a BitVec sort with an unknown number of bits, this is not a valid BitVec sort for SMT but
+     * rather just a placeholder for function definitions that take arguments of any BitVec length
+     */
+    internal fun fromSymbol(symbol: String): BVSort = SymbolicBitVec(symbol)
+  }
+
+  override val indices = listOf(index)
+
+  val bits: Int
+  override val theories = setOf(Theories.FIXED_SIZE_BIT_VECTORS, Theories.FLOATING_POINT)
+
+  init {
+    // indices must either be single numeral index or a symbolic index
+    // if the index is symbolic we set the number of bits to 0 to indicate
+    // that this is not a valid BitVec sort in the SMT sense, but rather used internally as
+    // placeholder
+    if (indices.single() is NumeralIndex) {
+      bits = (indices.single() as NumeralIndex).numeral
+      require(bits > 0)
+    } else {
+      bits = 0
+    }
+  }
+
+  internal fun isSymbolic() = (indices.single() is SymbolIndex)
+}
+
+/** Default implementation of bitvectors in smt */
+class BitVec(bits: Int) : BVSort(bits.idx())
+
+internal class SymbolicBitVec(bits: String) : BVSort(bits.idx())
+
+/** Bool sort */
+sealed class BoolSort : Sort("Bool") {
+  override val theories = CORE_MARKER_SET
+}
+
+object Bool : BoolSort()
+
+/** Int sort */
+sealed class IntSort : Sort("Int") {
+  override val theories = setOf(Theories.INTS, Theories.REALS_INTS, Theories.STRINGS)
+}
+
+object SMTInt : IntSort()
+
+/** Real sort */
+sealed class RealSort : Sort("Real") {
+  override val theories = REALS_REALS_INTS_MARKER_SET.plus(FLOATING_POINT_MARKER_SET)
+}
+
+object Real : RealSort()
+
+/** String sort */
+sealed class StringSort : Sort("String") {
+  override val theories = STRINGS_MARKER_SET
+}
+
+object SMTString : StringSort()
+
+/** Regular expression sort */
+sealed class RegLanSort : Sort("RegLan") {
+  override val theories = STRINGS_MARKER_SET
+}
+
+object RegLan : RegLanSort()

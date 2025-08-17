@@ -663,7 +663,7 @@ data class UserDeclaredSMTFunctionN<T : Sort>(
     override val symbol: Symbol,
     override val sort: T,
     override val parameters: List<Sort>,
-) : DeclaredSMTFunction<T>()
+) : UserDeclaredSMTFunction<T>()
 
 /**
  * SMTFunction of arity 0.
@@ -673,7 +673,7 @@ data class UserDeclaredSMTFunctionN<T : Sort>(
 data class UserDeclaredSMTFunction0<T : Sort>(
     override val symbol: Symbol,
     override val sort: T,
-) : DeclaredSMTFunction<T>() {
+) : UserDeclaredSMTFunction<T>() {
   override val parameters = emptyList<Sort>()
 
   operator fun invoke() = UserDeclaredExpression(symbol, sort, this)
@@ -688,7 +688,7 @@ data class UserDeclaredSMTFunction1<T : Sort, S : Sort>(
     override val symbol: Symbol,
     override val sort: T,
     val parameter: S,
-) : DeclaredSMTFunction<T>() {
+) : UserDeclaredSMTFunction<T>() {
   override val parameters = listOf(parameter)
 
   operator fun invoke(arg: Expression<S>) = UserDeclaredExpression(symbol, sort, listOf(arg), this)
@@ -704,7 +704,7 @@ data class UserDeclaredSMTFunction2<T : Sort, S1 : Sort, S2 : Sort>(
     override val sort: T,
     val parameter1: S1,
     val parameter2: S2,
-) : DeclaredSMTFunction<T>() {
+) : UserDeclaredSMTFunction<T>() {
   override val parameters = listOf(parameter1, parameter2)
 
   operator fun invoke(arg1: Expression<S1>, arg2: Expression<S2>) =
@@ -722,7 +722,7 @@ data class UserDeclaredSMTFunction3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val parameter1: S1,
     val parameter2: S2,
     val parameter3: S3,
-) : DeclaredSMTFunction<T>() {
+) : UserDeclaredSMTFunction<T>() {
   override val parameters = listOf(parameter1, parameter2, parameter3)
 
   operator fun invoke(arg1: Expression<S1>, arg2: Expression<S2>, arg3: Expression<S3>) =
@@ -741,7 +741,7 @@ data class UserDeclaredSMTFunction4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S
     val parameter2: S2,
     val parameter3: S3,
     val parameter4: S4,
-) : DeclaredSMTFunction<T>() {
+) : UserDeclaredSMTFunction<T>() {
   override val parameters = listOf(parameter1, parameter2, parameter3, parameter4)
 
   operator fun invoke(
@@ -766,7 +766,7 @@ data class UserDeclaredSMTFunction5<
     val parameter3: S3,
     val parameter4: S4,
     val parameter5: S5,
-) : DeclaredSMTFunction<T>() {
+) : UserDeclaredSMTFunction<T>() {
   override val parameters = listOf(parameter1, parameter2, parameter3, parameter4, parameter5)
 
   operator fun invoke(
