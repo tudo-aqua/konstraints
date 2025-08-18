@@ -25,21 +25,21 @@ import tools.aqua.konstraints.parser.*
  * http://smtlib.cs.uiowa.edu/theories-Core.shtml
  */
 
-/** Object for SMT true */
+/** Object for SMT true. */
 object True : ConstantExpression<BoolSort>("true".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
 }
 
-/** Object for SMT false */
+/** Object for SMT false. */
 object False : ConstantExpression<BoolSort>("false".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
 }
 
-/** (not [inner]) */
+/** (not [inner]). */
 class Not(override val inner: Expression<BoolSort>) :
     UnaryExpression<BoolSort, BoolSort>("not".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
@@ -50,7 +50,7 @@ class Not(override val inner: Expression<BoolSort>) :
       NotDecl.constructDynamic(children, emptyList())
 }
 
-/** (=> [statements] :right-assoc) */
+/** (=> [statements] :right-assoc). */
 class Implies(val statements: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("=>".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
@@ -63,7 +63,7 @@ class Implies(val statements: List<Expression<BoolSort>>) :
       ImpliesDecl.constructDynamic(children, emptyList())
 }
 
-/** (and [conjuncts] :left-assoc) */
+/** (and [conjuncts] :left-assoc). */
 class And(val conjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("and".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
@@ -76,7 +76,7 @@ class And(val conjuncts: List<Expression<BoolSort>>) :
       AndDecl.constructDynamic(children, emptyList())
 }
 
-/** (or [disjuncts] :left-assoc) */
+/** (or [disjuncts] :left-assoc). */
 class Or(val disjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("or".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
@@ -89,7 +89,7 @@ class Or(val disjuncts: List<Expression<BoolSort>>) :
       OrDecl.constructDynamic(children, emptyList())
 }
 
-/** (xor [disjuncts] :left-assoc) */
+/** (xor [disjuncts] :left-assoc). */
 class XOr(val disjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("xor".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
@@ -102,7 +102,7 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) :
       XOrDecl.constructDynamic(children, emptyList())
 }
 
-/** (par (A) (= [statements] :chainable)) */
+/** (par (A) (= [statements] :chainable)). */
 class Equals<T : Sort>(val statements: List<Expression<T>>) :
     HomogenousExpression<BoolSort, Sort>("=".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
@@ -115,7 +115,7 @@ class Equals<T : Sort>(val statements: List<Expression<T>>) :
       EqualsDecl.constructDynamic(children, emptyList())
 }
 
-/** (par (A) (distinct [statements] :pairwise)) */
+/** (par (A) (distinct [statements] :pairwise)). */
 class Distinct<T : Sort>(val statements: List<Expression<T>>) :
     HomogenousExpression<BoolSort, T>("distinct".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET

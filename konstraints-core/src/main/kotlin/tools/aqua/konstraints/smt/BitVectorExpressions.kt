@@ -20,22 +20,22 @@ package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.*
 
-/** Convert [this] into SMT bitvector literal */
+/** Convert [this] into SMT bitvector literal. */
 fun String.bitvec() = BVLiteral(this)
 
-/** Convert [this] into SMT bitvector literal of sort (_ BitVec [bits]) */
+/** Convert [this] into SMT bitvector literal of sort (_ BitVec [bits]). */
 fun String.bitvec(bits: Int) = BVLiteral(this, bits)
 
-/** Returns true iff [this] is of form #bX, where X is any valid binary number */
+/** Returns true iff [this] is of form #bX, where X is any valid binary number. */
 fun String.isSMTBinary() = this.startsWith("#b") && this.substring(2).all { ch -> ch in "01" }
 
-/** Returns true iff [this] is of form #xX, where X is any valid hexadecimal number */
+/** Returns true iff [this] is of form #xX, where X is any valid hexadecimal number. */
 fun String.isSMTHex() =
     this.startsWith("#x") && this.substring(2).all { ch -> ch in "0123456789abcdefABCDEF" }
 
 /**
  * Returns true iff [this] is of form (_ bv numeral) where numeral is any decimal number not
- * starting with 0
+ * starting with 0.
  */
 fun String.isSMTBitvecShorthand(): Boolean {
   if (!this.startsWith("(_ bv")) return false
@@ -46,14 +46,14 @@ fun String.isSMTBitvecShorthand(): Boolean {
       token[2][0] != '0'
 }
 
-/** Returns true iff [this] is either #bX or #xX */
+/** Returns true iff [this] is either #bX or #xX. */
 fun String.isBitvecLiteral() = this.isSMTBinary() || this.isSMTHex()
 
 /**
- * (bvconcat [lhs] [rhs])
- *
  * concatenation of [lhs] and [rhs] of size i and j to get a new bitvector of size m, where m = i +
- * j
+ * j.
+ *
+ * (concat (_ BitVec i) (_ BitVec j) (_ BitVec m)) (bvconcat [lhs] [rhs])
  */
 class BVConcat(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>(
@@ -72,7 +72,7 @@ class BVConcat(override val lhs: Expression<BVSort>, override val rhs: Expressio
 }
 
 /**
- * ((_ extract [i] [j]) [inner])
+ * ((_ extract [i] [j]) [inner]).
  *
  * extraction of bits [i] down to [j] from [inner] to yield a new bitvector of size n, where n = i -
  * j + 1
@@ -100,7 +100,11 @@ class BVExtract(val i: Int, val j: Int, override val inner: Expression<BVSort>) 
       ExtractDecl.constructDynamic(children, listOf(i.idx(), j.idx()))
 }
 
-/** Bitwise negation (bvnot [inner]) */
+/**
+ * Bitwise negation.
+ *
+ * (bvnot [inner])
+ */
 class BVNot(override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("bvnot".toSymbolWithQuotes(), inner.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
@@ -113,7 +117,11 @@ class BVNot(override val inner: Expression<BVSort>) :
       BVNotDecl.constructDynamic(children, emptyList())
 }
 
-/** 2's complement unary minus (bvneg [inner]) */
+/**
+ * 2's complement unary minus.
+ *
+ * (bvneg [inner])
+ */
 class BVNeg(override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("bvneg".toSymbolWithQuotes(), inner.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
@@ -127,7 +135,9 @@ class BVNeg(override val inner: Expression<BVSort>) :
 }
 
 /**
- * Bitwise and (bvand [conjuncts])
+ * Bitwise and.
+ *
+ * (bvand [conjuncts])
  *
  * @throws [IllegalArgumentException] if two [conjuncts] do not have the same number of bits
  */
@@ -136,7 +146,9 @@ class BVAnd(val conjuncts: List<Expression<BVSort>>) :
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   /**
-   * Bitwise and (bvand [conjuncts])
+   * Bitwise and.
+   *
+   * (bvand [conjuncts])
    *
    * @throws [IllegalArgumentException] if two [conjuncts] do not have the same number of bits
    */
@@ -157,7 +169,9 @@ class BVAnd(val conjuncts: List<Expression<BVSort>>) :
 }
 
 /**
- * Bitwise or (bvor [disjuncts])
+ * Bitwise or.
+ *
+ * (bvor [disjuncts])
  *
  * @throws [IllegalArgumentException] if two [disjuncts] do not have the same number of bits
  */
@@ -166,7 +180,9 @@ class BVOr(val disjuncts: List<Expression<BVSort>>) :
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   /**
-   * Bitwise or (bvor [disjuncts])
+   * Bitwise or.
+   *
+   * (bvor [disjuncts])
    *
    * @throws [IllegalArgumentException] if two [disjuncts] do not have the same number of bits
    */
@@ -189,7 +205,9 @@ class BVOr(val disjuncts: List<Expression<BVSort>>) :
 }
 
 /**
- * Addition modulo 2^m (bvadd [summands])
+ * Addition modulo 2^m.
+ *
+ * (bvadd [summands])
  *
  * @throws [IllegalArgumentException] if two [summands] do not have the same number of bits
  */
@@ -198,7 +216,9 @@ class BVAdd(val summands: List<Expression<BVSort>>) :
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   /**
-   * Addition modulo 2^m (bvadd [summands])
+   * Addition modulo 2^m.
+   *
+   * (bvadd [summands])
    *
    * @throws [IllegalArgumentException] if two [summands] do not have the same number of bits
    */
@@ -219,7 +239,9 @@ class BVAdd(val summands: List<Expression<BVSort>>) :
 }
 
 /**
- * Multiplication modulo 2^m (bvmul [factors])
+ * Multiplication modulo 2^m.
+ *
+ * (bvmul [factors])
  *
  * @throws [IllegalArgumentException] if two [factors] do not have the same number of bits
  */
@@ -228,7 +250,9 @@ class BVMul(val factors: List<Expression<BVSort>>) :
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   /**
-   * Multiplication modulo 2^m (bvmul [factors])
+   * Multiplication modulo 2^m.
+   *
+   * (bvmul [factors])
    *
    * @throws [IllegalArgumentException] if two [factors] do not have the same number of bits
    */
@@ -249,7 +273,9 @@ class BVMul(val factors: List<Expression<BVSort>>) :
 }
 
 /**
- * Unsigned division, truncating towards 0 (bvudiv [numerator] [denominator])
+ * Unsigned division, truncating towards 0.
+ *
+ * (bvudiv [numerator] [denominator])
  *
  * @throws [IllegalArgumentException] if [numerator] and [denominator] do not have the same number
  *   of bits
@@ -276,7 +302,9 @@ class BVUDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
 }
 
 /**
- * Unsigned remainder from truncating division (bvurem [numerator] [denominator])
+ * Unsigned remainder from truncating division.
+ *
+ * (bvurem [numerator] [denominator])
  *
  * @throws [IllegalArgumentException] if [numerator] and [denominator] do not have the same number
  *   of bits
@@ -300,8 +328,10 @@ class BVURem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
 }
 
 /**
- * shift left (bvshl [value] [distance])
+ * shift left.
  * - equivalent to multiplication by 2^x where x is the value of the second argument
+ *
+ * (bvshl [value] [distance])
  *
  * @throws [IllegalArgumentException] if [value] and [distance] do not have the same number of bits
  */
@@ -326,8 +356,10 @@ class BVShl(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
 }
 
 /**
- * Logical shift right (bvlshr [value] [distance])
+ * Logical shift right.
  * - equivalent to unsigned division by 2^x where x is the value of the second argument
+ *
+ * (bvlshr [value] [distance])
  *
  * @throws [IllegalArgumentException] if [value] and [distance] do not have the same number of bits
  */
@@ -352,7 +384,9 @@ class BVLShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
 }
 
 /**
- * Unsigned less-than (bvult [lhs] [rhs])
+ * Unsigned less-than.
+ *
+ * (bvult [lhs] [rhs])
  *
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
@@ -373,7 +407,9 @@ class BVUlt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 }
 
 /**
- * Bitwise nand (bvnand [lhs] [rhs])
+ * Bitwise nand.
+ *
+ * (bvnand [lhs] [rhs])
  *
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
@@ -388,11 +424,14 @@ class BVNAnd(override val lhs: Expression<BVSort>, override val rhs: Expression<
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
       BVNAndDecl.constructDynamic(children, emptyList())
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() = BVNot(BVAnd(lhs, rhs))
 }
 
 /**
- * Bitwise nor (bvnor [lhs] [rhs])
+ * Bitwise nor.
+ *
+ * (bvnor [lhs] [rhs])
  *
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
@@ -407,11 +446,14 @@ class BVNOr(override val lhs: Expression<BVSort>, override val rhs: Expression<B
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
       BVNOrDecl.constructDynamic(children, emptyList())
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() = BVNot(BVOr(lhs, rhs))
 }
 
 /**
- * Bitwise xor (bvxor [disjuncts])
+ * Bitwise xor.
+ *
+ * (bvxor [disjuncts])
  *
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
@@ -442,6 +484,7 @@ class BVXOr(val disjuncts: List<Expression<BVSort>>) :
    * (bvxor (bvxor (bvor (bvand s_1 (bvnot s_2)) (bvand (bvnot s_1) s_2)) s_3) s_4)
    * (bvxor (bvor (bvand (bvor (bvand s_1 (bvnot s_2)) (bvand (bvnot s_1) s_2)) (bvnot s_3)) (bvand (bvnot (bvor (bvand s_1 (bvnot s_2)) (bvand (bvnot s_1) s_2))) s_3)) s_4)
    */
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() =
       disjuncts.slice(2..<disjuncts.size).fold(
           BVOr(
@@ -452,7 +495,9 @@ class BVXOr(val disjuncts: List<Expression<BVSort>>) :
 }
 
 /**
- * Bitwise xnor (bvxnor [lhs] [rhs])
+ * Bitwise xnor.
+ *
+ * (bvxnor [lhs] [rhs])
  *
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
@@ -467,11 +512,14 @@ class BVXNOr(override val lhs: Expression<BVSort>, override val rhs: Expression<
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
       BVXNOrDecl.constructDynamic(children, emptyList())
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() = BVOr(BVAnd(lhs, rhs), BVAnd(BVNot(lhs), BVNot(rhs)))
 }
 
 /**
- * Bit comparator: equals #b1 iff all bits are equal (bvcomp [lhs] [rhs])
+ * Bit comparator: equals #b1 iff all bits are equal.
+ *
+ * (bvcomp [lhs] [rhs])
  *
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
@@ -486,7 +534,7 @@ class BVComp(override val lhs: Expression<BVSort>, override val rhs: Expression<
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
       BVCompDecl.constructDynamic(children, emptyList())
 
-  // recursive expansion as specified in the extension of QF_BV logic
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand(): Expression<BVSort> =
       if (this.sort.bits == 1) {
         BVXNOr(lhs, rhs)
@@ -501,7 +549,9 @@ class BVComp(override val lhs: Expression<BVSort>, override val rhs: Expression<
 }
 
 /**
- * 2's complement subtraction modulo 2^m (bvsub [lhs] [rhs])
+ * 2's complement subtraction modulo 2^m.
+ *
+ * (bvsub [lhs] [rhs])
  *
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
@@ -516,11 +566,14 @@ class BVSub(override val lhs: Expression<BVSort>, override val rhs: Expression<B
   override fun copy(children: List<Expression<*>>) =
       BVSubDecl.constructDynamic(children, emptyList())
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() = BVAdd(lhs, BVNeg(rhs))
 }
 
 /**
- * 2's complement signed division (bvsdiv [numerator] [denominator])
+ * 2's complement signed division.
+ *
+ * (bvsdiv [numerator] [denominator])
  *
  * @throws [IllegalArgumentException] if [numerator] and [denominator] do not have the same number
  *   of bits
@@ -539,6 +592,7 @@ class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
   override fun copy(children: List<Expression<*>>) =
       BVSDivDecl.constructDynamic(children, emptyList())
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand(): Expression<BVSort> {
     val msb_s =
         VarBinding(
@@ -567,8 +621,10 @@ class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
 }
 
 /**
- * 2's complement signed remainder (bvsrem [numerator] [denominator])
+ * 2's complement signed remainder.
  * - sign follows [numerator]
+ *
+ * (bvsrem [numerator] [denominator])
  *
  * @throws [IllegalArgumentException] if [numerator] and [denominator] do not have the same number
  *   of bits
@@ -587,6 +643,7 @@ class BVSRem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
   override fun copy(children: List<Expression<*>>) =
       BVSRemDecl.constructDynamic(children, emptyList())
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand(): Expression<BVSort> {
     val msb_s =
         VarBinding(
@@ -615,8 +672,10 @@ class BVSRem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
 }
 
 /**
- * 2's complement signed remainder (bvsmod [lhs] [rhs])
+ * 2's complement signed remainder.
  * - sign follows [rhs]
+ *
+ * (bvsmod [lhs] [rhs])
  *
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
@@ -631,6 +690,7 @@ class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<
   override fun copy(children: List<Expression<*>>) =
       BVSModDecl.constructDynamic(children, emptyList())
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand(): Expression<BVSort> {
     val msb_s =
         VarBinding("?msb_s".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, lhs))
@@ -675,7 +735,7 @@ class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<
 }
 
 /**
- * (bvule [lhs] [rhs])
+ * (bvule [lhs] [rhs]).
  *
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
@@ -690,11 +750,12 @@ class BVULe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
   override fun copy(children: List<Expression<*>>) =
       BVULeDecl.constructDynamic(children, emptyList())
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() = Or(BVUlt(lhs, rhs), Equals(lhs, rhs))
 }
 
 /**
- * (bvugt [lhs] [rhs])
+ * (bvugt [lhs] [rhs]).
  *
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
@@ -714,11 +775,12 @@ class BVUGt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
   override fun copy(children: List<Expression<*>>) =
       BVUGtDecl.constructDynamic(children, emptyList())
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() = BVUlt(rhs, lhs)
 }
 
 /**
- * (bvuge [lhs] [rhs])
+ * (bvuge [lhs] [rhs]).
  *
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
@@ -733,11 +795,12 @@ class BVUGe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
   override fun copy(children: List<Expression<*>>) =
       BVUGeDecl.constructDynamic(children, emptyList())
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() = Or(BVUlt(rhs, lhs), Equals(lhs, rhs))
 }
 
 /**
- * (bvslt [lhs] [rhs])
+ * (bvslt [lhs] [rhs]).
  *
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
@@ -752,6 +815,7 @@ class BVSLt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
   override fun copy(children: List<Expression<*>>) =
       BVSLtDecl.constructDynamic(children, emptyList())
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() =
       Or(
           And(
@@ -765,7 +829,7 @@ class BVSLt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 }
 
 /**
- * (bvsle [lhs] [rhs])
+ * (bvsle [lhs] [rhs]).
  *
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
@@ -780,6 +844,7 @@ class BVSLe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
   override fun copy(children: List<Expression<*>>) =
       BVSLeDecl.constructDynamic(children, emptyList())
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() =
       Or(
           And(
@@ -793,7 +858,7 @@ class BVSLe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
 }
 
 /**
- * (bvsgt [lhs] [rhs])
+ * (bvsgt [lhs] [rhs]).
  *
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
@@ -808,11 +873,12 @@ class BVSGt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
   override fun copy(children: List<Expression<*>>) =
       BVSGtDecl.constructDynamic(children, emptyList())
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() = BVSLt(rhs, lhs).expand()
 }
 
 /**
- * (bvsge [lhs] [rhs])
+ * (bvsge [lhs] [rhs]).
  *
  * @throws [IllegalArgumentException] if [lhs] and [rhs] do not have the same number of bits
  */
@@ -827,12 +893,16 @@ class BVSGe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
   override fun copy(children: List<Expression<*>>) =
       BVSGeDecl.constructDynamic(children, emptyList())
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() = BVSLe(rhs, lhs).expand()
 }
 
 /**
- * Arithmetic shift right (bvashr [value] [distance]) like logical shift right except that the most
- * significant bits of the result always copy the most significant bit of the first argument.
+ * Arithmetic shift right.
+ * - like logical shift right except that the most significant bits of the result always copy the
+ *   most significant bit of the first argument.
+ *
+ * (bvashr [value] [distance])
  *
  * @throws [IllegalArgumentException] if [value] and [distance] do not have the same number of bits
  */
@@ -850,6 +920,7 @@ class BVAShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
   override fun copy(children: List<Expression<*>>) =
       BVAShrDecl.constructDynamic(children, emptyList())
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() =
       Ite(
           Equals(BVExtract(sort.bits - 1, sort.bits - 1, value), BVLiteral("#b0")),
@@ -858,7 +929,7 @@ class BVAShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
 }
 
 /**
- * ((_ repeat [i]) [inner])
+ * ((_ repeat [i]) [inner]).
  * - concatenate [i] copies of [inner]
  *
  * @throws [IllegalArgumentException] if [i] <= 0
@@ -871,8 +942,10 @@ class Repeat(val i: Int, override val inner: Expression<BVSort>) :
     require(i > 0)
   }
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() = expand(i)
 
+  /** Expansion for repeat is defined recursively. */
   private fun expand(i: Int): Expression<BVSort> =
       if (i == 1) {
         BVConcat(inner, inner)
@@ -885,7 +958,7 @@ class Repeat(val i: Int, override val inner: Expression<BVSort>) :
 }
 
 /**
- * ((_ zero_extend [i]) [inner])
+ * ((_ zero_extend [i]) [inner]).
  * - extend [inner] with zeroes to the (unsigned) equivalent bitvector of size m+i
  *
  * @throws [IllegalArgumentException] if [i] < 0
@@ -899,6 +972,7 @@ class ZeroExtend(val i: Int, override val inner: Expression<BVSort>) :
     require(i >= 0)
   }
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() =
       if (i == 0) {
         inner
@@ -911,7 +985,7 @@ class ZeroExtend(val i: Int, override val inner: Expression<BVSort>) :
 }
 
 /**
- * ((_ sign_extend [i]) [inner])
+ * ((_ sign_extend [i]) [inner]).
  * - extend [inner] to the (signed) equivalent bitvector of size m+i
  *
  * @throws [IllegalArgumentException] if [i] < 0
@@ -925,6 +999,7 @@ class SignExtend(val i: Int, override val inner: Expression<BVSort>) :
     require(i >= 0)
   }
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() =
       if (i == 0) {
         inner
@@ -937,7 +1012,7 @@ class SignExtend(val i: Int, override val inner: Expression<BVSort>) :
 }
 
 /**
- * ((_ rotate_left [i]) [inner])
+ * ((_ rotate_left [i]) [inner]).
  * - rotate bits of [inner] to the left [i] times
  *
  * @throws [IllegalArgumentException] if [i] < 0
@@ -953,6 +1028,7 @@ class RotateLeft(val i: Int, override val inner: Expression<BVSort>) :
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
       RotateLeftDecl.constructDynamic(children, listOf(i.idx()))
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() =
       if (i == 0 || sort.bits == 1 || sort.bits == i) {
         inner
@@ -966,7 +1042,7 @@ class RotateLeft(val i: Int, override val inner: Expression<BVSort>) :
 }
 
 /**
- * ((_ rotate_right [i]) [inner])
+ * ((_ rotate_right [i]) [inner]).
  * - rotate bits of [inner] to the right [i] times
  *
  * @throws [IllegalArgumentException] if [i] < 0
@@ -982,5 +1058,6 @@ class RotateRight(val i: Int, override val inner: Expression<BVSort>) :
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
       RotateRightDecl.constructDynamic(children, listOf(i.idx()))
 
+  /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand(): Expression<BVSort> = TODO()
 }

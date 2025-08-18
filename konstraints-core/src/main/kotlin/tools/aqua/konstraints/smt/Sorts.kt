@@ -437,15 +437,11 @@ object ArraySortFactory : SortFactory {
 }
 
 /**
- * Base class for each SMT sort
+ * Base class for each SMT sort.
  *
  * @param symbol sort name
- * @param indices indices of indexed sorts (e.g. (_ BitVec m))
- * @param parameters parameters of parameterized sorts (e.g. (Array 2))
  */
-sealed class Sort(
-    open val symbol: Symbol,
-) {
+sealed class Sort(open val symbol: Symbol) {
   constructor(name: String) : this(name.toSymbolWithQuotes())
 
   open val indices: List<Index> = emptyList()
@@ -634,7 +630,7 @@ class UserDefinedArraySort<X : Sort, Y : Sort>(override val definedSymbol: Symbo
   override fun toString() = definedSymbol.toString()
 }
 
-/** Default implementation of Array sort */
+/** Default implementation of Array sort. */
 sealed class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) :
     Sort("Array".toSymbolWithQuotes()) {
   override val parameters = listOf(x, y)
@@ -644,10 +640,10 @@ sealed class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) :
   override val theories = ARRAYS_EX_MARKER_SET
 }
 
-/** Base class for all ArraySorts */
+/** Base class for all ArraySorts. */
 class SMTArray<X : Sort, Y : Sort>(x: X, y: Y) : ArraySort<X, Y>(x, y)
 
-/** Bitvector sort with [bits] length */
+/** Bitvector sort with [bits] length. */
 sealed class BVSort(index: Index) : Sort("BitVec") {
   companion object {
     /**
@@ -660,7 +656,7 @@ sealed class BVSort(index: Index) : Sort("BitVec") {
 
     /**
      * Get a BitVec sort with an unknown number of bits, this is not a valid BitVec sort for SMT but
-     * rather just a placeholder for function definitions that take arguments of any BitVec length
+     * rather just a placeholder for function definitions that take arguments of any BitVec length.
      */
     internal fun fromSymbol(symbol: String): BVSort = SymbolicBitVec(symbol)
   }
@@ -686,42 +682,126 @@ sealed class BVSort(index: Index) : Sort("BitVec") {
   internal fun isSymbolic() = (indices.single() is SymbolIndex)
 }
 
-/** Default implementation of bitvectors in smt */
+/** Default implementation of bitvectors in smt. */
 class BitVec(bits: Int) : BVSort(bits.idx())
 
 internal class SymbolicBitVec(bits: String) : BVSort(bits.idx())
 
-/** Bool sort */
+/** Bool sort. */
 sealed class BoolSort : Sort("Bool") {
   override val theories = CORE_MARKER_SET
 }
 
 object Bool : BoolSort()
 
-/** Int sort */
+/** Int sort. */
 sealed class IntSort : Sort("Int") {
   override val theories = setOf(Theories.INTS, Theories.REALS_INTS, Theories.STRINGS)
 }
 
 object SMTInt : IntSort()
 
-/** Real sort */
+/** Real sort. */
 sealed class RealSort : Sort("Real") {
   override val theories = REALS_REALS_INTS_MARKER_SET.plus(FLOATING_POINT_MARKER_SET)
 }
 
 object Real : RealSort()
 
-/** String sort */
+/** String sort. */
 sealed class StringSort : Sort("String") {
   override val theories = STRINGS_MARKER_SET
 }
 
 object SMTString : StringSort()
 
-/** Regular expression sort */
+/** Regular expression sort. */
 sealed class RegLanSort : Sort("RegLan") {
   override val theories = STRINGS_MARKER_SET
 }
 
 object RegLan : RegLanSort()
+
+/** RoundingMode sort object. */
+sealed class RoundingModeSort : Sort("RoundingMode") {
+  override val theories = FLOATING_POINT_MARKER_SET
+}
+
+/** Default implementation of rounding mode sort. */
+object RoundingMode : RoundingModeSort()
+
+/**
+ * FloatingPoint sort with any positive number of bits.
+ *
+ * (_ FloatingPoint eb sb)
+ *
+ * @param eb exponent bits
+ * @param sb significant bits
+ */
+sealed class FPSort(eb: Index, sb: Index) : Sort("FloatingPoint") {
+  companion object {
+    operator fun invoke(eb: Int, sb: Int): FPSort = FloatingPoint(eb, sb)
+
+    operator fun invoke(eb: SymbolIndex, sb: SymbolIndex): FPSort = SymbolicFloatingPoint(eb, sb)
+  }
+
+  override val indices = listOf(eb, sb)
+
+  val exponentBits: Int
+  val significantBits: Int
+
+  init {
+    if (indices.all { index -> index is NumeralIndex }) {
+      exponentBits = (eb as NumeralIndex).numeral
+      significantBits = (sb as NumeralIndex).numeral
+
+      require(exponentBits > 1)
+      require(significantBits > 1)
+    } else {
+      exponentBits = 0
+      significantBits = 0
+    }
+  }
+
+  override val theories = FLOATING_POINT_MARKER_SET
+
+  override fun equals(other: Any?): Boolean =
+      when {
+        this === other -> true
+        other !is FPSort -> false
+        else ->
+            this.exponentBits == other.exponentBits && this.significantBits == other.significantBits
+      }
+
+  override fun hashCode(): Int {
+    var result = super.hashCode()
+    result = 31 * result + exponentBits
+    result = 31 * result + significantBits
+    return result
+  }
+
+  /*
+  val zero = FPZero(exponentBits, significantBits)
+  val minusZero = FPMinusZero(exponentBits, significantBits)
+  val infinity = FPInfinity(exponentBits, significantBits)
+  val minusInfinity = FPMinusInfinity(exponentBits, significantBits)
+  val nan = FPNaN(exponentBits, significantBits)
+  */
+}
+
+/** Standard 16-bit FloatingPoint sort. */
+object FP16 : FPSort(5.idx(), 11.idx())
+
+/** Standard 32-bit FloatingPoint sort. */
+object FP32 : FPSort(8.idx(), 24.idx())
+
+/** Standard 64-bit FloatingPoint sort. */
+object FP64 : FPSort(11.idx(), 53.idx())
+
+/** Standard 128-bit FloatingPoint sort. */
+object FP128 : FPSort(15.idx(), 113.idx())
+
+/** Default floating point sort implementation. */
+class FloatingPoint(eb: Int, sb: Int) : FPSort(eb.idx(), sb.idx())
+
+internal class SymbolicFloatingPoint(eb: SymbolIndex, sb: SymbolIndex) : FPSort(eb, sb)

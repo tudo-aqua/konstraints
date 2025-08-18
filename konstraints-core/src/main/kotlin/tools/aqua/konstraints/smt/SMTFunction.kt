@@ -40,7 +40,7 @@ abstract class SMTFunction<out T : Sort> {
 
   /**
    * Returns true if [this] and [other] match in [symbol], [sort] and have pairwise equal
-   * [parameters]
+   * [parameters].
    */
   final override fun equals(other: Any?): Boolean {
     if (this === other) return true
@@ -79,7 +79,7 @@ abstract class SMTFunction<out T : Sort> {
   }
 }
 
-/** Base class for all functions declared by the user */
+/** Base class for all functions declared by the user. */
 abstract class UserDeclaredSMTFunction<T : Sort> : SMTFunction<T>() {
 
   /**
@@ -104,7 +104,7 @@ abstract class UserDeclaredSMTFunction<T : Sort> : SMTFunction<T>() {
   }
 }
 
-/** Base class for all functions defined by the user */
+/** Base class for all functions defined by the user. */
 abstract class DefinedSMTFunction<T : Sort> : SMTFunction<T>() {
   abstract val term: Expression<T>
   abstract val sortedVars: List<SortedVar<*>>
@@ -132,11 +132,11 @@ abstract class DefinedSMTFunction<T : Sort> : SMTFunction<T>() {
   }
 }
 
-/** Specialization of [ClassCastException], thrown when casting functions to an illegal sort */
+/** Specialization of [ClassCastException], thrown when casting functions to an illegal sort. */
 class FunctionCastException(from: Sort, to: String) :
     ClassCastException("Can not cast expression from $from to $to")
 
-/** Variable bound inside a let */
+/** Variable bound inside a let. */
 class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>) :
     SMTFunction<T>() {
 
@@ -151,7 +151,7 @@ class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>)
   val instance = LocalExpression(symbol, sort, term, this)
 }
 
-/** Variable bound by exists or forall quantifier */
+/** Variable bound by exists or forall quantifier. */
 class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T) :
     SMTFunction<T>() {
   operator fun invoke(args: List<Expression<*>>) = instance

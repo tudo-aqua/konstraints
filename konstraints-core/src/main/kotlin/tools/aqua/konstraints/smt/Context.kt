@@ -28,13 +28,13 @@ import tools.aqua.konstraints.parser.RealsTheory
 import tools.aqua.konstraints.parser.StringsTheory
 import tools.aqua.konstraints.util.Stack
 
-/** Holds all [SMTFunction]s and [SortFactory]s of the current signature */
+/** Holds all [SMTFunction]s and [SortFactory]s of the current signature. */
 private class CurrentContext {
   val functions = mutableMapOf<Symbol, SMTFunction<*>>()
   val sorts = mutableMapOf<Symbol, SortFactory>()
 }
 
-/** Manages all legal smt function and sort symbols by modelling smts sort and function stack */
+/** Manages all legal smt function and sort symbols by modelling smts sort and function stack. */
 class Context {
   private val forbiddenNames = mutableSetOf<Symbol>()
   private val currentContext = CurrentContext()
@@ -49,7 +49,7 @@ class Context {
   private var activeBinderState = false
 
   /**
-   * Add [func] to the context or do nothing if [func] can not be added
+   * Add [func] to the context or do nothing if [func] can not be added.
    *
    * @return [func] or null if func could not be added
    */
@@ -64,7 +64,7 @@ class Context {
   }
 
   /**
-   * Add [func] to the context
+   * Add [func] to the context.
    *
    * @return [func]
    * @throws [IllegalArgumentException] if [func.symbol] is already a function in this context
@@ -92,7 +92,7 @@ class Context {
   }
 
   /**
-   * Add [sort] to the context or do nothing if sort is already in this context
+   * Add [sort] to the context or do nothing if sort is already in this context.
    *
    * @return [sort] or null if sort could not be added
    */
@@ -107,7 +107,7 @@ class Context {
   }
 
   /**
-   * Add sort declared by [declareSort] to the context
+   * Add sort declared by [declareSort] to the context.
    *
    * @return newly constructed [UserDeclaredSortFactory]
    * @throws [IllegalArgumentException] if a sort with [decl.name] is already present in the context
@@ -117,7 +117,7 @@ class Context {
   fun declareSort(decl: DeclareSort) = declareSort(UserDeclaredSortFactory(decl.name, decl.arity))
 
   /**
-   * Add sort (declare-sort [name] [arity]) to the context
+   * Add sort (declare-sort [name] [arity]) to the context.
    *
    * @return newly constructed [UserDeclaredSortFactory]
    * @throws [IllegalArgumentException] if a sort with [name] is already present in the context
@@ -127,10 +127,10 @@ class Context {
   fun declareSort(name: Symbol, arity: Int) = declareSort(UserDeclaredSortFactory(name, arity))
 
   /**
-   * Add [sort] to the context and associate it with [symbol]
+   * Add [sort] to the context and associate it with [sort.symbol].
    *
    * @return [sort]
-   * @throws [IllegalArgumentException] if a sort with name [symbol] is already present in the
+   * @throws [IllegalArgumentException] if a sort with name [sort.symbol] is already present in the
    *   context
    * @throws [IllegalSymbolException] if this context is currently in a binder state (e.g. forall,
    *   exists etc.)
@@ -139,7 +139,7 @@ class Context {
       addSort(sort, sort.symbol) as UserDeclaredSortFactory
 
   /**
-   * Add [sort] to the context and associate it with [symbol]
+   * Add [sort] to the context and associate it with [symbol].
    *
    * @return [sort]
    * @throws [IllegalArgumentException] if a sort with name [symbol] is already present in the
@@ -161,25 +161,25 @@ class Context {
     return sort
   }
 
-  /** Add sort [parameters] to the context */
+  /** Add sort [parameters] to the context. */
   fun addSortParameters(parameters: List<Symbol>) =
       parameters.map { symbol -> addSortParameter(symbol) }
 
-  /** add sort [parameter] to the context */
+  /** add sort [parameter] to the context. */
   fun addSortParameter(parameter: Symbol): SortParameterFactory {
     sortParameters.add(parameter)
 
     return addSort(SortParameterFactory(parameter), parameter) as SortParameterFactory
   }
 
-  /** Clear all current sort parameters */
+  /** Clear all current sort parameters. */
   fun clearSortParameters() {
     currentContext.sorts.keys.removeAll(sortParameters)
     sortParameters.clear()
   }
 
   /**
-   * (define-sort [def.name] ([def.sortParameters]) [def.sort])
+   * (define-sort [def.name] ([def.sortParameters]) [def.sort]).
    *
    * @return newly constructed [SortFactory]
    * @throws [IllegalArgumentException] if a sort with name [symbol] is already present
@@ -189,7 +189,7 @@ class Context {
   fun defineSort(def: DefineSort) = defineSort(def.name, def.sortParameters, def.sort)
 
   /**
-   * (define-sort [name] ([sortParameters]) [sort])
+   * (define-sort [name] ([sortParameters]) [sort]).
    *
    * @return newly constructed [SortFactory]
    * @throws [IllegalArgumentException] if a sort with name [symbol] is already present
@@ -220,7 +220,7 @@ class Context {
       }
 
   /**
-   * Define sort with name [symbol] and definition [factory]
+   * Define sort with name [symbol] and definition [factory].
    *
    * @return newly constructed [SortFactory]
    * @throws [IllegalArgumentException] if a sort with name [symbol] is already present
@@ -242,7 +242,7 @@ class Context {
   }
 
   /**
-   * Add sort defined by [factory]
+   * Add sort defined by [factory].
    *
    * @return [factory]
    * @throws [IllegalArgumentException] if a sort with name [factory.symbol] is already present
@@ -252,21 +252,21 @@ class Context {
   fun defineSort(factory: UserDefinedSortFactory) =
       defineSort(factory.symbol, factory) as UserDefinedSortFactory
 
-  /** Returns true if a function with name [func] is present */
+  /** Returns true if a function with name [func] is present. */
   operator fun contains(func: Symbol) = currentContext.functions[func] != null
 
   // TODO this function should probably not exist look into checkContext
-  /** Returns true if the function that created [expression] is present */
+  /** Returns true if the function that created [expression] is present. */
   operator fun contains(expression: Expression<*>) =
       expression.func?.symbol in currentContext.functions
 
-  /** Returns true if [sort] is present in the context */
+  /** Returns true if [sort] is present in the context. */
   operator fun contains(sort: Sort): Boolean = sort.symbol in currentContext.sorts
 
-  /** Returns true if a sort with name [sort] is present in the context */
+  /** Returns true if a sort with name [sort] is present in the context. */
   fun containsSort(sort: Symbol): Boolean = sort in currentContext.sorts
 
-  /** @return function matching [name] and [sort] or null if no such function is present */
+  /** @return function matching [name] and [sort] or null if no such function is present. */
   fun <T : Sort> getFuncOrNull(name: Symbol, sort: T) =
       try {
         getFunc(name, sort)
@@ -275,7 +275,7 @@ class Context {
       }
 
   /**
-   * Retrieve function matching [name] and [sort]
+   * Retrieve function matching [name] and [sort].
    *
    * @throws [FunctionNotFoundException] if no such function exists
    * @throws [ClassCastException] if function does not match [sort]
@@ -283,7 +283,7 @@ class Context {
   fun <T : Sort> getFunc(name: Symbol, sort: T) =
       currentContext.functions[name]?.castTo(sort) ?: throw FunctionNotFoundException(name)
 
-  /** @return function matching [name] or null if no such function is present */
+  /** @return function matching [name] or null if no such function is present. */
   fun getFuncOrNull(name: Symbol): SMTFunction<*>? {
     return try {
       getFunc(name)
@@ -293,7 +293,7 @@ class Context {
   }
 
   /**
-   * Retrieve function matching [name]
+   * Retrieve function matching [name].
    *
    * @throws [FunctionNotFoundException] if no such function exists
    */
@@ -304,19 +304,19 @@ class Context {
         locals.find { it -> it.symbol == name } ?: throw FunctionNotFoundException(name)
       }
 
-  /** Push [n] empty levels on top of the function and sort stack */
+  /** Push [n] empty levels on top of the function and sort stack. */
   fun push(n: Int) = repeat(n) { _ -> push() }
 
   // use if you have to pop manually or the operation can not be completed within the lambda passed
   // to push
-  /** Push one level on top of the function and sort stack */
+  /** Push one level on top of the function and sort stack. */
   fun push() {
     functionUndoStack.push(mutableSetOf<Symbol>())
     sortUndoStack.push(mutableSetOf<Symbol>())
   }
 
   /**
-   * Retrieve sort matching [name] or null if no such sort exists
+   * Retrieve sort matching [name] or null if no such sort exists.
    *
    * @return [SortFactory]
    */
@@ -329,7 +329,7 @@ class Context {
   }
 
   /**
-   * Retrieve sort matching [name]
+   * Retrieve sort matching [name].
    *
    * @return [SortFactory]
    * @throws [SortNotFoundException] if no such sort exists
@@ -338,7 +338,7 @@ class Context {
       currentContext.sorts[name] ?: throw SortNotFoundException(name)
 
   // auto pops after block
-  /** Creates a new stack level and executes [block], afterwards pop the new stack level */
+  /** Creates a new stack level and executes [block], afterwards pop the new stack level. */
   fun push(block: Context.() -> Unit) {
     functionUndoStack.push(mutableSetOf<Symbol>())
     sortUndoStack.push(mutableSetOf<Symbol>())
@@ -347,7 +347,7 @@ class Context {
   }
 
   /**
-   * pop the top [n] levels of the stack
+   * pop the top [n] levels of the stack.
    *
    * @throws [IllegalStateException] if the stack has less than [n] levels or the context is
    *   currently in a binder state
@@ -457,7 +457,8 @@ class Context {
   }
 
   /**
-   * Set the logic for this context and load all functions and sorts from the corresponding theories
+   * Set the logic for this context and load all functions and sorts from the corresponding
+   * theories.
    */
   fun setLogic(logic: Logic) {
     this.logic = logic
@@ -481,18 +482,18 @@ class Context {
   }
 }
 
-/** Returns true if the context contains a function name matching [func] */
+/** Returns true if the context contains a function name matching [func]. */
 fun Context.contains(func: String) = contains(func.toSymbolWithQuotes())
 
-/** Returns the function matching [name] and [sort] or null if no such function exists */
+/** Returns the function matching [name] and [sort] or null if no such function exists. */
 fun <T : Sort> Context.getFuncOrNull(name: String, sort: T) =
     getFuncOrNull(name.toSymbolWithQuotes(), sort)
 
-/** Returns the function matching [name] or null if no such function exists */
+/** Returns the function matching [name] or null if no such function exists. */
 fun Context.getFuncOrNull(name: String) = getFuncOrNull(name.toSymbolWithQuotes())
 
 /**
- * Returns the function matching [name]
+ * Returns the function matching [name].
  *
  * @throws [FunctionNotFoundException] if no such function exists
  */
@@ -500,7 +501,7 @@ fun Context.getFunc(name: String) = getFunc(name.toSymbolWithQuotes())
 
 /**
  * Binds all variables declared in [varBindings] and executes [block] with parameters [varBindings]
- * and [this], automatically unbinds [varBindings] after [block] exits
+ * and [this], automatically unbinds [varBindings] after [block] exits.
  */
 fun <T : Sort> Context.let(
     varBindings: List<VarBinding<*>>,
@@ -608,7 +609,7 @@ fun <T : Sort> Context.let(
     block: (List<Expression<*>>, Context) -> Expression<T>
 ) =
     let(
-        varBindings.mapIndexed { idx, expr ->
+        terms.mapIndexed { idx, expr ->
           VarBinding("local${expr.sort}${idx}".toSymbolWithQuotes(), expr)
         },
         block)

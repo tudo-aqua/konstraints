@@ -18,7 +18,11 @@
 
 package tools.aqua.konstraints.smt
 
-/** Model class holding the data of solver return get-model */
+/** Model class holding the data of solver return get-model. */
 data class Model(val definitions: List<FunctionDef<*>>) {
+  /**
+   * This will later hold the functions to convert from solver models to a generic konstraints
+   * model.
+   */
   companion object
 }

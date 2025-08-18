@@ -21,9 +21,9 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.parser.*
 
 /**
- * Convert an integer [inner] to real
- *
- * (to_real Int Real)
+ * Convert an integer [inner] to real.
+ * - (to_real Int Real)
+ * - (to_real [inner])
  */
 class ToReal(override val inner: Expression<IntSort>) :
     UnaryExpression<RealSort, IntSort>("to_real".toSymbolWithQuotes(), Real) {
@@ -34,9 +34,9 @@ class ToReal(override val inner: Expression<IntSort>) :
 }
 
 /**
- * Convert a real [inner] to int
- *
- * (to_int Real Int)
+ * Convert a real [inner] to int.
+ * - (to_int Real Int)
+ * - (to_int [inner])
  */
 class ToInt(override val inner: Expression<RealSort>) :
     UnaryExpression<IntSort, RealSort>("to_int".toSymbolWithQuotes(), SMTInt) {
@@ -46,7 +46,7 @@ class ToInt(override val inner: Expression<RealSort>) :
       ToIntDecl.constructDynamic(children, emptyList())
 }
 
-/** (is_int Real Bool) */
+/** (is_int Real Bool). */
 class IsInt(override val inner: Expression<RealSort>) :
     UnaryExpression<BoolSort, RealSort>("is_int".toSymbolWithQuotes(), Bool) {
   override val theories = REALS_INTS_MARKER_SET

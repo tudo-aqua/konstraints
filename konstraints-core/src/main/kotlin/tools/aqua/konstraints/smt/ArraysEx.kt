@@ -21,9 +21,9 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.parser.*
 
 /**
- * Array selection operation
- *
- * (par (X Y) (select (Array X Y) X Y)
+ * Array selection operation.
+ * - (par (X Y) (select (Array X Y) X Y)
+ * - (select [array] [index])
  */
 class ArraySelect<X : Sort, Y : Sort>(
     val array: Expression<ArraySort<X, Y>>,
@@ -45,9 +45,9 @@ class ArraySelect<X : Sort, Y : Sort>(
 }
 
 /**
- * Array store operation
- *
- * (par (X Y) (store (Array X Y) X Y (Array X Y)))
+ * Array store operation.
+ * - (par (X Y) (store (Array X Y) X Y (Array X Y)))
+ * - (store [array] [index] [value]).
  */
 class ArrayStore<X : Sort, Y : Sort>(
     val array: Expression<ArraySort<X, Y>>,

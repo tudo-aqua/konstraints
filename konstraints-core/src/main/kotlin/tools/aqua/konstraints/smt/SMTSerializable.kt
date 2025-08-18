@@ -22,14 +22,14 @@ import tools.aqua.konstraints.parser.Parser
 
 interface SMTSerializable
 
-/** String representation of a smt keyword */
+/** String representation of a smt keyword. */
 class Keyword(val value: String) : SMTSerializable {
   init {
     Parser.reserved.parse(value)
   }
 }
 
-/** String representation of a smt literal */
+/** String representation of a smt literal. */
 class LiteralString(val value: String) : SMTSerializable {
   override fun toString() = value
 }

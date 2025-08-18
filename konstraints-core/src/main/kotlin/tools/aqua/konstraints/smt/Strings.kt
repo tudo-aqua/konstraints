@@ -25,7 +25,7 @@ import tools.aqua.konstraints.parser.*
  */
 
 /**
- * String concatenation
+ * String concatenation.
  *
  * (str.++ String String String :left-assoc)
  */
@@ -42,7 +42,7 @@ class StrConcat(val strings: List<Expression<StringSort>>) :
 }
 
 /**
- * String length
+ * String length.
  *
  * (str.len String Int)
  */
@@ -55,7 +55,7 @@ class StrLength(override val inner: Expression<StringSort>) :
 }
 
 /**
- * Lexicographic ordering
+ * Lexicographic ordering.
  *
  * (str.< String String Bool :chainable)
  */
@@ -82,7 +82,7 @@ class StrLexOrder(val strings: List<Expression<StringSort>>) :
  */
 
 /**
- * String to RE injection
+ * String to RE injection.
  *
  * (str.to_re String RegLan)
  */
@@ -95,7 +95,7 @@ class ToRegex(override val inner: Expression<StringSort>) :
 }
 
 /**
- * RE membership
+ * RE membership.
  *
  * (str.in_re String RegLan Bool)
  */
@@ -112,7 +112,7 @@ class InRegex(val inner: Expression<StringSort>, val regex: Expression<RegLanSor
 }
 
 /**
- * Constant denoting the empty set of strings
+ * Constant denoting the empty set of strings.
  *
  * (re.none RegLan)
  */
@@ -123,7 +123,7 @@ object RegexNone : ConstantExpression<RegLanSort>("re.none".toSymbolWithQuotes()
 }
 
 /**
- * Constant denoting the set of all strings
+ * Constant denoting the set of all strings.
  *
  * (re.all RegLan)
  */
@@ -134,7 +134,7 @@ object RegexAll : ConstantExpression<RegLanSort>("re.all".toSymbolWithQuotes(), 
 }
 
 /**
- * Constant denoting the set of all strings of length 1
+ * Constant denoting the set of all strings of length 1.
  *
  * (re.allchar RegLan)
  */
@@ -145,7 +145,7 @@ object RegexAllChar : ConstantExpression<RegLanSort>("re.allchar".toSymbolWithQu
 }
 
 /**
- * RE concatenation
+ * RE concatenation.
  *
  * (re.++ RegLan RegLan RegLan :left-assoc)
  */
@@ -162,7 +162,7 @@ class RegexConcat(val regex: List<Expression<RegLanSort>>) :
 }
 
 /**
- * RE union
+ * RE union.
  *
  * (re.union RegLan RegLan RegLan :left-assoc)
  */
@@ -179,7 +179,7 @@ class RegexUnion(val regex: List<Expression<RegLanSort>>) :
 }
 
 /**
- * RE intersection
+ * RE intersection.
  *
  * (re.inter RegLan RegLan RegLan :left-assoc)
  */
@@ -196,7 +196,7 @@ class RegexIntersec(val regex: List<Expression<RegLanSort>>) :
 }
 
 /**
- * Kleene Closure
+ * Kleene Closure.
  *
  * (re.* RegLan RegLan)
  */
@@ -213,7 +213,7 @@ class RegexStar(override val inner: Expression<RegLanSort>) :
  */
 
 /**
- * Reflexive closure of lexicographic ordering
+ * Reflexive closure of lexicographic ordering.
  *
  * (str.<= String String Bool :chainable)
  */
@@ -248,7 +248,7 @@ class StrAt(val inner: Expression<StringSort>, val position: Expression<IntSort>
 }
 
 /**
- * Substring
+ * Substring.
  *
  * (str.substr String Int Int String)
  */
@@ -272,7 +272,7 @@ class StrSubstring(
 }
 
 /**
- * [prefix] is a prefix of [inner]
+ * [prefix] is a prefix of [inner].
  *
  * (str.prefixof String String Bool)
  */
@@ -289,7 +289,7 @@ class StrPrefixOf(val prefix: Expression<StringSort>, val inner: Expression<Stri
 }
 
 /**
- * [suffix] is a suffix of [inner]
+ * [suffix] is a suffix of [inner].
  *
  * (str.suffixof String String Bool)
  */
@@ -306,7 +306,7 @@ class StrSuffixOf(val suffix: Expression<StringSort>, val inner: Expression<Stri
 }
 
 /**
- * [string] contains [substring]
+ * [string] contains [substring].
  *
  * (str.contains String String Bool)
  */
@@ -323,7 +323,7 @@ class StrContains(val string: Expression<StringSort>, val substring: Expression<
 }
 
 /**
- * Index of first occurrence of [substring] in [string] starting at [start]
+ * Index of first occurrence of [substring] in [string] starting at [start].
  *
  * (str.indexof String String Int Int)
  */
@@ -347,7 +347,7 @@ class StrIndexOf(
 }
 
 /**
- * String Replace
+ * String Replace.
  *
  * (str.replace String String String String)
  */
@@ -371,7 +371,7 @@ class StrReplace(
 }
 
 /**
- * String Replace All
+ * String Replace All.
  *
  * (str.replace_all String String String String)
  */
@@ -394,7 +394,7 @@ class StrReplaceAll(
       StrReplaceAllDecl.constructDynamic(children, emptyList())
 }
 
-/** (str.replace_re String RegLan String String) */
+/** (str.replace_re String RegLan String String). */
 class StrReplaceRegex(
     val inner: Expression<StringSort>,
     val old: Expression<RegLanSort>,
@@ -414,7 +414,7 @@ class StrReplaceRegex(
       StrReplaceRegexDecl.constructDynamic(children, emptyList())
 }
 
-/** (str.replace_re_all String RegLan String String) */
+/** (str.replace_re_all String RegLan String String). */
 class StrReplaceAllRegex(
     val inner: Expression<StringSort>,
     val old: Expression<RegLanSort>,
@@ -435,7 +435,7 @@ class StrReplaceAllRegex(
 }
 
 /**
- * RE complement
+ * RE complement.
  *
  * (re.comp RegLan RegLan)
  */
@@ -448,7 +448,7 @@ class RegexComp(override val inner: Expression<RegLanSort>) :
 }
 
 /**
- * RE difference
+ * RE difference.
  *
  * (re.diff RegLan RegLan RegLan :left-assoc)
  */
@@ -465,7 +465,7 @@ class RegexDiff(val regex: List<Expression<RegLanSort>>) :
 }
 
 /**
- * RE Kleene cross
+ * RE Kleene cross.
  *
  * (re.+ RegLan RegLan)
  */
@@ -478,7 +478,7 @@ class RegexPlus(override val inner: Expression<RegLanSort>) :
 }
 
 /**
- * RE option
+ * RE option.
  *
  * (re.opt RegLan RegLan)
  */
@@ -491,7 +491,7 @@ class RegexOption(override val inner: Expression<RegLanSort>) :
 }
 
 /**
- * RE range
+ * RE range.
  *
  * (re.range String String RegLan)
  */
@@ -505,7 +505,7 @@ class RegexRange(
       RegexRangeDecl.constructDynamic(children, emptyList())
 }
 
-/** ((_ re.^ n) RegLan RegLan) */
+/** ((_ re.^ n) RegLan RegLan). */
 class RegexPower(override val inner: Expression<RegLanSort>, val n: Int) :
     UnaryExpression<RegLanSort, RegLanSort>("re.^".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
@@ -516,7 +516,7 @@ class RegexPower(override val inner: Expression<RegLanSort>, val n: Int) :
       RegexPowerDecl.constructDynamic(children, emptyList())
 }
 
-/** ((_ re.loop n₁ n₂) RegLan RegLan) */
+/** ((_ re.loop n₁ n₂) RegLan RegLan). */
 class RegexLoop(override val inner: Expression<RegLanSort>, val n: Int, val m: Int) :
     UnaryExpression<RegLanSort, RegLanSort>("re.loop".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
@@ -533,7 +533,7 @@ class RegexLoop(override val inner: Expression<RegLanSort>, val n: Int, val m: I
 
 // TODO enforce inner is a single digit string
 /**
- * Digit check
+ * Digit check.
  *
  * (str.is_digit String Bool)
  */
@@ -545,7 +545,7 @@ class StrIsDigit(override val inner: Expression<StringSort>) :
       StrIsDigitDecl.constructDynamic(children, emptyList())
 }
 
-/** (str.to_code String Int) */
+/** (str.to_code String Int). */
 class StrToCode(override val inner: Expression<StringSort>) :
     UnaryExpression<IntSort, StringSort>("str.to_code".toSymbolWithQuotes(), SMTInt) {
   override val theories = STRINGS_MARKER_SET
@@ -554,7 +554,7 @@ class StrToCode(override val inner: Expression<StringSort>) :
       StrToCodeDecl.constructDynamic(children, emptyList())
 }
 
-/** (str.from_code Int String) */
+/** (str.from_code Int String). */
 class StrFromCode(override val inner: Expression<IntSort>) :
     UnaryExpression<StringSort, IntSort>("str.from_code".toSymbolWithQuotes(), SMTString) {
   override val theories = STRINGS_MARKER_SET
@@ -564,7 +564,7 @@ class StrFromCode(override val inner: Expression<IntSort>) :
 }
 
 /**
- * Conversion to integers
+ * Conversion to integers.
  *
  * (str.to_int String Int)
  */
@@ -577,7 +577,7 @@ class StrToInt(override val inner: Expression<StringSort>) :
 }
 
 /**
- * Conversion from integers
+ * Conversion from integers.
  *
  * (str.from_int Int String)
  */

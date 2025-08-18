@@ -29,7 +29,7 @@ infix fun <T, R> Iterable<T>.zipWithSameLength(other: Iterable<R>): List<Pair<T,
   return zip(other)
 }
 
-/** Reduce collection or return default value if collection is empty */
+/** Reduce collection or return default value if collection is empty. */
 inline fun <S, T : S> Iterable<T>.reduceOrDefault(default: S, operation: (acc: S, T) -> S): S {
   return reduceOrNull(operation) ?: default
 }

@@ -24,14 +24,15 @@ import tools.aqua.konstraints.smt.BoolSort
 
 @DslMarker annotation class SMTDSL
 
+/** Builder for [SMTProgram] class. */
 @SMTDSL
 class SMTProgramBuilder(logic: Logic) {
   private val program = MutableSMTProgram(emptyList()).also { program -> program.setLogic(logic) }
 
-  /** Adds a new assertion: (assert [block]) */
+  /** Adds a new assertion: (assert [block]). */
   fun assert(block: () -> Expression<BoolSort>) = assert(block())
 
-  /** Adds a new assertion: (assert [expr]) */
+  /** Adds a new assertion: (assert [expr]). */
   fun assert(expr: Expression<BoolSort>) {
     program.assert(expr)
   }
@@ -72,11 +73,11 @@ class SMTProgramBuilder(logic: Logic) {
   /** Registers a new constant smt function with the given [sort] and auto generated name. */
   fun <T : Sort> const(sort: T) = const("|const!${UUID.randomUUID()}|", sort)
 
-  /** Registers a new constant smt function with the given [name] and [sort] */
+  /** Registers a new constant smt function with the given [name] and [sort]. */
   fun <T : Sort> const(name: String, sort: T) =
       program.declareConst(name.toSymbolWithQuotes(), sort)()
 
-  /** Converts this [SMTProgramBuilder] to a finished [DefaultSMTProgram] */
+  /** Converts this [SMTProgramBuilder] to a finished [DefaultSMTProgram]. */
   fun finalize() = program.apply { add(CheckSat) }
 }
 

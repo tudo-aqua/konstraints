@@ -18,7 +18,7 @@
 
 package tools.aqua.konstraints.smt
 
-/** Constants for all theories */
+/** Constants for all theories. */
 enum class Theories {
   ARRAYS_EX,
   FIXED_SIZE_BIT_VECTORS,
@@ -30,26 +30,26 @@ enum class Theories {
   STRINGS
 }
 
-/** Marks all [SMTFunction]s that are part of ArraysEx theory */
+/** Marks all [SMTFunction]s that are part of ArraysEx theory. */
 val ARRAYS_EX_MARKER_SET = setOf(Theories.ARRAYS_EX)
 
-/** Marks all [SMTFunction]s that are part of FixedSizeBitVectors theory */
+/** Marks all [SMTFunction]s that are part of FixedSizeBitVectors theory. */
 val FIXED_SIZE_BIT_VECTORS_MARKER_SET = setOf(Theories.FIXED_SIZE_BIT_VECTORS)
 
-/** Marks all [SMTFunction]s that are part of Core theory */
+/** Marks all [SMTFunction]s that are part of Core theory. */
 val CORE_MARKER_SET = setOf(Theories.CORE)
 
-/** Marks all [SMTFunction]s that are part of FloatingPoint theory */
+/** Marks all [SMTFunction]s that are part of FloatingPoint theory. */
 val FLOATING_POINT_MARKER_SET = setOf(Theories.FLOATING_POINT)
 
-/** Marks all [SMTFunction]s that are part of IntsReals and Ints theory */
+/** Marks all [SMTFunction]s that are part of IntsReals and Ints theory. */
 val INTS_REALS_INTS_MARKER_SET = setOf(Theories.INTS, Theories.REALS_INTS)
 
-/** Marks all [SMTFunction]s that are part of IntsReals and Reals theory */
+/** Marks all [SMTFunction]s that are part of IntsReals and Reals theory. */
 val REALS_REALS_INTS_MARKER_SET = setOf(Theories.REALS, Theories.REALS_INTS)
 
-/** Marks all [SMTFunction]s that are part of RealsInts theory */
+/** Marks all [SMTFunction]s that are part of RealsInts theory. */
 val REALS_INTS_MARKER_SET = setOf(Theories.REALS_INTS)
 
-/** Marks all [SMTFunction]s that are part of Strings theory */
+/** Marks all [SMTFunction]s that are part of Strings theory. */
 val STRINGS_MARKER_SET = setOf(Theories.STRINGS)
