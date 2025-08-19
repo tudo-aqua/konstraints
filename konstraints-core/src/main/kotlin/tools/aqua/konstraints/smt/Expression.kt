@@ -72,25 +72,6 @@ sealed interface Expression<out T : Sort> {
     children.forEach { yieldAll(it.asSequence()) }
   }
 
-  /**
-   * Transform all [this] and all [children] by applying [transformation].
-   *
-   * @return transformed expression
-   */
-  fun transform(transformation: (Expression<T>) -> Expression<@UnsafeVariance T>): Expression<T> {
-    // transform all children
-    val transformedChildren = this.children.map { it.transform(transformation) }
-
-    // check if any child was copied
-    return if ((transformedChildren zip this.children).any { (new, old) -> new !== old }) {
-      // return copied expression with new children
-      transformation(this.copy(transformedChildren))
-    } else {
-      // transform this expression, prevent it from changing the sort
-      transformation(this)
-    }
-  }
-
   /** Create a copy of [this] using the provided [children]. */
   fun copy(children: List<Expression<*>>): Expression<T>
 
@@ -404,4 +385,23 @@ inline fun <reified T : Sort> Expression<*>.cast(): Expression<T> {
 
   @Suppress("UNCHECKED_CAST")
   return this as Expression<T>
+}
+
+/**
+ * Transform [this] and all [this.children] by applying [transformation].
+ *
+ * @return transformed expression
+ */
+fun<T : Sort> Expression<T>.transform(transformation: (Expression<T>) -> Expression<T>): Expression<T> {
+    // transform all children
+    val transformedChildren = this.children.map { it.transform(transformation) }
+
+    // check if any child was copied
+    return if ((transformedChildren zip this.children).any { (new, old) -> new !== old }) {
+        // return copied expression with new children
+        transformation(this.copy(transformedChildren))
+    } else {
+        // transform this expression, prevent it from changing the sort
+        transformation(this)
+    }
 }
