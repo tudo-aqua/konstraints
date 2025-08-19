@@ -672,9 +672,9 @@ class Parser {
                 is DecimalConstant -> RealLiteral(constant.decimal)
                 is HexConstant -> BVLiteral(constant.hexadecimal)
                 is NumeralConstant ->
-                    if (Theories.INTS in program.logic!!.theories) IntLiteral(constant.numeral)
-                    else if (Theories.REALS in program.logic!!.theories ||
-                        Theories.REALS_INTS in program.logic!!.theories)
+                    if (Theories.INTS in program.logic!!.theories ||
+                        Theories.REALS_INTS in program.logic!!.theories) IntLiteral(constant.numeral)
+                    else if (Theories.REALS in program.logic!!.theories)
                         RealLiteral(BigDecimal(constant.numeral))
                     else throw RuntimeException("Unsupported numeral literal!")
 

@@ -21,8 +21,10 @@ package tools.aqua.konstraints.smt
 import java.math.BigInteger
 import tools.aqua.konstraints.parser.*
 
+sealed class NumeralSort(name: String) : Sort(name)
+
 /** Int sort */
-sealed class IntSort : Sort("Int") {
+sealed class IntSort : NumeralSort("Int") {
   override val theories = setOf(Theories.INTS, Theories.REALS_INTS, Theories.STRINGS)
 }
 

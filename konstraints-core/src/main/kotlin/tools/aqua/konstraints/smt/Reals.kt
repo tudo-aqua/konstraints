@@ -23,7 +23,7 @@ import java.math.BigInteger
 import tools.aqua.konstraints.parser.*
 
 /** Real sort */
-sealed class RealSort : Sort("Real") {
+sealed class RealSort : NumeralSort("Real") {
   override val theories = REALS_REALS_INTS_MARKER_SET.plus(FLOATING_POINT_MARKER_SET)
 }
 

@@ -1662,17 +1662,13 @@ internal object RealGreaterDecl :
 internal object RealsIntsTheory : Theory {
   override val functions =
       listOf(
-              IntNegSubDecl,
-              IntAddDecl,
-              IntMulDecl,
-              IntDivDecl,
+          IntRealNegSubDecl,
               ModDecl,
               AbsDecl,
               DivisibleDecl,
-              RealNegSubDecl,
-              RealAddDecl,
-              RealMulDecl,
-              RealDivDecl,
+              IntRealAddDecl,
+              IntRealMulDecl,
+              IntRealDivDecl,
               ToRealDecl,
               ToIntDecl,
               IsIntDecl,
@@ -1683,6 +1679,102 @@ internal object RealsIntsTheory : Theory {
           .associateBy { it.symbol }
 
   override val sorts = mapOf(SMTInt.symbol to IntFactory, Real.symbol to RealFactory)
+}
+
+internal object IntRealNegSubDecl :
+    SMTTheoryFunction<NumeralSort>("-".toSymbolWithQuotes(), listOf(Real), Real, Associativity.NONE) {
+
+    override fun constructDynamic(
+        args: List<Expression<*>>,
+        indices: List<Index>
+    ): Expression<NumeralSort> {
+        require(args[0].sort is IntSort || args[0].sort is RealSort) {
+            "Expected args to be Int or Real, but got ${args[0].sort}"
+        }
+
+        if(args.size == 2)
+            require(args[0].sort == args[1].sort) {
+                "Expected args to be (Int Int) or (Real Real), but got (${args[0].sort} ${args[1].sort})"
+            }
+
+        return if(args[0].sort is IntSort) {
+            IntNegSubDecl.constructDynamic(args, indices)
+        } else {
+            RealNegSubDecl.constructDynamic(args, indices)
+        }
+    }
+}
+
+internal object IntRealAddDecl :
+    SMTTheoryFunction<NumeralSort>(
+        "+".toSymbolWithQuotes(), listOf(Real, Real), Real, Associativity.LEFT_ASSOC) {
+
+    override fun constructDynamic(
+        args: List<Expression<*>>,
+        indices: List<Index>
+    ): Expression<NumeralSort> {
+        require(args.size >= 2) {
+            "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+        }
+
+        require(args[0].sort == args[1].sort && (args[0].sort is IntSort || args[0].sort is RealSort)) {
+            "Expected args to be (Int Int) or (Real Real), but got (${args[0].sort} ${args[1].sort})"
+        }
+
+        return if(args[0].sort is IntSort) {
+            IntAdd(args.map { expr -> expr.cast() })
+        } else {
+            RealAdd(args.map { expr -> expr.cast() })
+        }
+    }
+}
+
+internal object IntRealMulDecl :
+    SMTTheoryFunction<NumeralSort>(
+        "*".toSymbolWithQuotes(), listOf(Real, Real), Real, Associativity.LEFT_ASSOC) {
+
+    override fun constructDynamic(
+        args: List<Expression<*>>,
+        indices: List<Index>
+    ): Expression<NumeralSort> {
+        require(args.size >= 2) {
+            "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+        }
+
+        require(args[0].sort == args[1].sort && (args[0].sort is IntSort || args[0].sort is RealSort)) {
+            "Expected args to be (Int Int) or (Real Real), but got (${args[0].sort} ${args[1].sort})"
+        }
+
+        return if(args[0].sort is IntSort) {
+            IntMul(args.map { expr -> expr.cast() })
+        } else {
+            RealMul(args.map { expr -> expr.cast() })
+        }
+    }
+}
+
+internal object IntRealDivDecl :
+    SMTTheoryFunction<NumeralSort>(
+        "/".toSymbolWithQuotes(), listOf(Real, Real), Real, Associativity.LEFT_ASSOC) {
+
+    override fun constructDynamic(
+        args: List<Expression<*>>,
+        indices: List<Index>
+    ): Expression<NumeralSort> {
+        require(args.size >= 2) {
+            "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+        }
+
+        require(args[0].sort == args[1].sort && (args[0].sort is IntSort || args[0].sort is RealSort)) {
+            "Expected args to be (Int Int) or (Real Real), but got (${args[0].sort} ${args[1].sort})"
+        }
+
+        return if(args[0].sort is IntSort) {
+            IntDiv(args.map { expr -> expr.cast() })
+        } else {
+            RealDiv(args.map { expr -> expr.cast() })
+        }
+    }
 }
 
 internal object ToRealDecl :
@@ -1770,7 +1862,7 @@ internal object IntRealLessEqDecl :
         RealLessEqDecl.constructDynamic(args, indices)
     else
         throw IllegalArgumentException(
-            "Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})")
+            "Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")}), (<= ${args[0]} ${args[1].name})")
   }
 }
 
