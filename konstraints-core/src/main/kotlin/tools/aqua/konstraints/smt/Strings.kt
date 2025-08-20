@@ -21,13 +21,17 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.parser.*
 
 /*
+ * This file implements the SMT Strings theory
+ * https://smt-lib.org/theories-UnicodeStrings.shtml
+ */
+
+/*
  * String functions
  */
 
 /**
  * String concatenation.
- *
- * (str.++ String String String :left-assoc)
+ * - `(str.++ String String String :left-assoc)`
  */
 class StrConcat(val strings: List<Expression<StringSort>>) :
     HomogenousExpression<StringSort, StringSort>("str.++".toSymbolWithQuotes(), SMTString) {
@@ -43,8 +47,7 @@ class StrConcat(val strings: List<Expression<StringSort>>) :
 
 /**
  * String length.
- *
- * (str.len String Int)
+ * - `(str.len String Int)`
  */
 class StrLength(override val inner: Expression<StringSort>) :
     UnaryExpression<IntSort, StringSort>("str.len".toSymbolWithQuotes(), SMTInt) {
@@ -56,8 +59,7 @@ class StrLength(override val inner: Expression<StringSort>) :
 
 /**
  * Lexicographic ordering.
- *
- * (str.< String String Bool :chainable)
+ * - `(str.< String String Bool :chainable)`
  */
 class StrLexOrder(val strings: List<Expression<StringSort>>) :
     HomogenousExpression<BoolSort, StringSort>("str.<".toSymbolWithQuotes(), Bool) {
@@ -83,8 +85,7 @@ class StrLexOrder(val strings: List<Expression<StringSort>>) :
 
 /**
  * String to RE injection.
- *
- * (str.to_re String RegLan)
+ * - `(str.to_re String RegLan)`
  */
 class ToRegex(override val inner: Expression<StringSort>) :
     UnaryExpression<RegLanSort, StringSort>("str.to_reg".toSymbolWithQuotes(), RegLan) {
@@ -96,8 +97,7 @@ class ToRegex(override val inner: Expression<StringSort>) :
 
 /**
  * RE membership.
- *
- * (str.in_re String RegLan Bool)
+ * - `(str.in_re String RegLan Bool)`
  */
 class InRegex(val inner: Expression<StringSort>, val regex: Expression<RegLanSort>) :
     BinaryExpression<BoolSort, StringSort, RegLanSort>("str.in_reg".toSymbolWithQuotes(), Bool) {
@@ -113,8 +113,7 @@ class InRegex(val inner: Expression<StringSort>, val regex: Expression<RegLanSor
 
 /**
  * Constant denoting the empty set of strings.
- *
- * (re.none RegLan)
+ * - `(re.none RegLan)`
  */
 object RegexNone : ConstantExpression<RegLanSort>("re.none".toSymbolWithQuotes(), RegLan) {
   override val theories = setOf(Theories.STRINGS)
@@ -124,8 +123,7 @@ object RegexNone : ConstantExpression<RegLanSort>("re.none".toSymbolWithQuotes()
 
 /**
  * Constant denoting the set of all strings.
- *
- * (re.all RegLan)
+ * - `(re.all RegLan)`
  */
 object RegexAll : ConstantExpression<RegLanSort>("re.all".toSymbolWithQuotes(), RegLan) {
   override val theories = setOf(Theories.STRINGS)
@@ -135,8 +133,7 @@ object RegexAll : ConstantExpression<RegLanSort>("re.all".toSymbolWithQuotes(), 
 
 /**
  * Constant denoting the set of all strings of length 1.
- *
- * (re.allchar RegLan)
+ * - `(re.allchar RegLan)`
  */
 object RegexAllChar : ConstantExpression<RegLanSort>("re.allchar".toSymbolWithQuotes(), RegLan) {
   override val theories = setOf(Theories.STRINGS)
@@ -146,8 +143,7 @@ object RegexAllChar : ConstantExpression<RegLanSort>("re.allchar".toSymbolWithQu
 
 /**
  * RE concatenation.
- *
- * (re.++ RegLan RegLan RegLan :left-assoc)
+ * - `(re.++ RegLan RegLan RegLan :left-assoc)`
  */
 class RegexConcat(val regex: List<Expression<RegLanSort>>) :
     HomogenousExpression<RegLanSort, RegLanSort>("re.++".toSymbolWithQuotes(), RegLan) {
@@ -163,8 +159,7 @@ class RegexConcat(val regex: List<Expression<RegLanSort>>) :
 
 /**
  * RE union.
- *
- * (re.union RegLan RegLan RegLan :left-assoc)
+ * - `(re.union RegLan RegLan RegLan :left-assoc)`
  */
 class RegexUnion(val regex: List<Expression<RegLanSort>>) :
     HomogenousExpression<RegLanSort, RegLanSort>("re.union".toSymbolWithQuotes(), RegLan) {
@@ -180,8 +175,7 @@ class RegexUnion(val regex: List<Expression<RegLanSort>>) :
 
 /**
  * RE intersection.
- *
- * (re.inter RegLan RegLan RegLan :left-assoc)
+ * - `(re.inter RegLan RegLan RegLan :left-assoc)`
  */
 class RegexIntersec(val regex: List<Expression<RegLanSort>>) :
     HomogenousExpression<RegLanSort, RegLanSort>("re.inter".toSymbolWithQuotes(), RegLan) {
@@ -197,8 +191,7 @@ class RegexIntersec(val regex: List<Expression<RegLanSort>>) :
 
 /**
  * Kleene Closure.
- *
- * (re.* RegLan RegLan)
+ * - `(re.* RegLan RegLan)`
  */
 class RegexStar(override val inner: Expression<RegLanSort>) :
     UnaryExpression<RegLanSort, RegLanSort>("re.*".toSymbolWithQuotes(), RegLan) {
@@ -214,8 +207,7 @@ class RegexStar(override val inner: Expression<RegLanSort>) :
 
 /**
  * Reflexive closure of lexicographic ordering.
- *
- * (str.<= String String Bool :chainable)
+ * - `(str.<= String String Bool :chainable)`
  */
 class StrRefLexOrder(val strings: List<Expression<StringSort>>) :
     HomogenousExpression<BoolSort, StringSort>("str.<=".toSymbolWithQuotes(), Bool) {
@@ -232,8 +224,7 @@ class StrRefLexOrder(val strings: List<Expression<StringSort>>) :
 /**
  * Singleton string containing a character at given position or empty string when position is out of
  * range. The leftmost position is 0.
- *
- * (str.at String Int String)
+ * - `(str.at String Int String)`
  */
 class StrAt(val inner: Expression<StringSort>, val position: Expression<IntSort>) :
     BinaryExpression<StringSort, StringSort, IntSort>("str.at".toSymbolWithQuotes(), SMTString) {
@@ -249,8 +240,7 @@ class StrAt(val inner: Expression<StringSort>, val position: Expression<IntSort>
 
 /**
  * Substring.
- *
- * (str.substr String Int Int String)
+ * - `(str.substr String Int Int String)`
  */
 class StrSubstring(
     val inner: Expression<StringSort>,
@@ -273,8 +263,7 @@ class StrSubstring(
 
 /**
  * [prefix] is a prefix of [inner].
- *
- * (str.prefixof String String Bool)
+ * - `(str.prefixof String String Bool)`
  */
 class StrPrefixOf(val prefix: Expression<StringSort>, val inner: Expression<StringSort>) :
     BinaryExpression<BoolSort, StringSort, StringSort>("str.prefixof".toSymbolWithQuotes(), Bool) {
@@ -290,8 +279,7 @@ class StrPrefixOf(val prefix: Expression<StringSort>, val inner: Expression<Stri
 
 /**
  * [suffix] is a suffix of [inner].
- *
- * (str.suffixof String String Bool)
+ * - `(str.suffixof String String Bool)`
  */
 class StrSuffixOf(val suffix: Expression<StringSort>, val inner: Expression<StringSort>) :
     BinaryExpression<BoolSort, StringSort, StringSort>("str.suffixof".toSymbolWithQuotes(), Bool) {
@@ -307,8 +295,7 @@ class StrSuffixOf(val suffix: Expression<StringSort>, val inner: Expression<Stri
 
 /**
  * [string] contains [substring].
- *
- * (str.contains String String Bool)
+ * - `(str.contains String String Bool)`
  */
 class StrContains(val string: Expression<StringSort>, val substring: Expression<StringSort>) :
     BinaryExpression<BoolSort, StringSort, StringSort>("str.contains".toSymbolWithQuotes(), Bool) {
@@ -324,8 +311,7 @@ class StrContains(val string: Expression<StringSort>, val substring: Expression<
 
 /**
  * Index of first occurrence of [substring] in [string] starting at [start].
- *
- * (str.indexof String String Int Int)
+ * - `(str.indexof String String Int Int)`
  */
 class StrIndexOf(
     val string: Expression<StringSort>,
@@ -348,8 +334,7 @@ class StrIndexOf(
 
 /**
  * String Replace.
- *
- * (str.replace String String String String)
+ * - `(str.replace String String String String)`
  */
 class StrReplace(
     val inner: Expression<StringSort>,
@@ -372,8 +357,7 @@ class StrReplace(
 
 /**
  * String Replace All.
- *
- * (str.replace_all String String String String)
+ * - `(str.replace_all String String String String)`
  */
 class StrReplaceAll(
     val inner: Expression<StringSort>,
@@ -436,8 +420,7 @@ class StrReplaceAllRegex(
 
 /**
  * RE complement.
- *
- * (re.comp RegLan RegLan)
+ * - `(re.comp RegLan RegLan)`
  */
 class RegexComp(override val inner: Expression<RegLanSort>) :
     UnaryExpression<RegLanSort, RegLanSort>("re.comp".toSymbolWithQuotes(), RegLan) {
@@ -449,8 +432,7 @@ class RegexComp(override val inner: Expression<RegLanSort>) :
 
 /**
  * RE difference.
- *
- * (re.diff RegLan RegLan RegLan :left-assoc)
+ * - `(re.diff RegLan RegLan RegLan :left-assoc)`
  */
 class RegexDiff(val regex: List<Expression<RegLanSort>>) :
     HomogenousExpression<RegLanSort, RegLanSort>("re.diff".toSymbolWithQuotes(), RegLan) {
@@ -466,8 +448,7 @@ class RegexDiff(val regex: List<Expression<RegLanSort>>) :
 
 /**
  * RE Kleene cross.
- *
- * (re.+ RegLan RegLan)
+ * - `(re.+ RegLan RegLan)`
  */
 class RegexPlus(override val inner: Expression<RegLanSort>) :
     UnaryExpression<RegLanSort, RegLanSort>("re.+".toSymbolWithQuotes(), RegLan) {
@@ -479,8 +460,7 @@ class RegexPlus(override val inner: Expression<RegLanSort>) :
 
 /**
  * RE option.
- *
- * (re.opt RegLan RegLan)
+ * - `(re.opt RegLan RegLan)`
  */
 class RegexOption(override val inner: Expression<RegLanSort>) :
     UnaryExpression<RegLanSort, RegLanSort>("re.opt".toSymbolWithQuotes(), RegLan) {
@@ -492,8 +472,7 @@ class RegexOption(override val inner: Expression<RegLanSort>) :
 
 /**
  * RE range.
- *
- * (re.range String String RegLan)
+ * - `(re.range String String RegLan)`
  */
 class RegexRange(
     override val lhs: Expression<StringSort>,
@@ -534,8 +513,7 @@ class RegexLoop(override val inner: Expression<RegLanSort>, val n: Int, val m: I
 // TODO enforce inner is a single digit string
 /**
  * Digit check.
- *
- * (str.is_digit String Bool)
+ * - `(str.is_digit String Bool)`
  */
 class StrIsDigit(override val inner: Expression<StringSort>) :
     UnaryExpression<BoolSort, StringSort>("str.is_digit".toSymbolWithQuotes(), Bool) {
@@ -565,8 +543,7 @@ class StrFromCode(override val inner: Expression<IntSort>) :
 
 /**
  * Conversion to integers.
- *
- * (str.to_int String Int)
+ * - `(str.to_int String Int)`
  */
 class StrToInt(override val inner: Expression<StringSort>) :
     UnaryExpression<IntSort, StringSort>("str.to_int".toSymbolWithQuotes(), SMTInt) {
@@ -578,8 +555,7 @@ class StrToInt(override val inner: Expression<StringSort>) :
 
 /**
  * Conversion from integers.
- *
- * (str.from_int Int String)
+ * - `(str.from_int Int String)`
  */
 class StrFromInt(override val inner: Expression<IntSort>) :
     UnaryExpression<StringSort, IntSort>("str.from_int".toSymbolWithQuotes(), SMTString) {

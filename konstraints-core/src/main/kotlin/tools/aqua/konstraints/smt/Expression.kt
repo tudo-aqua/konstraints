@@ -18,7 +18,6 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.IteDecl
 import tools.aqua.konstraints.util.reduceOrDefault
 
 /** Interface for all sorted SMT terms. */
@@ -163,36 +162,6 @@ abstract class HomogenousExpression<out T : Sort, out S : Sort>(
   override fun toString() =
       if (children.isNotEmpty()) "($name ${children.joinToString(" ")})"
       else name.toSMTString(QuotingRule.SAME_AS_INPUT)
-}
-
-/**
- * Implements ite according to Core theory (par (A) (ite Bool A A A)).
- *
- * @param statement indicates whether [then] or [otherwise] should be returned
- * @param then value to be returned if [statement] is true
- * @param otherwise value to be returned if [statement] is false
- */
-class Ite<out T : Sort>(
-    val statement: Expression<BoolSort>,
-    val then: Expression<T>,
-    val otherwise: Expression<T>
-) : Expression<T> {
-  init {
-    require(then.sort == otherwise.sort)
-  }
-
-  override val sort: T = then.sort
-  override val theories = CORE_MARKER_SET
-  override val func = null
-
-  override fun copy(children: List<Expression<*>>): Expression<T> =
-      IteDecl.constructDynamic(children, emptyList()) as Expression<T>
-
-  override val name: Symbol = "ite".toSymbolWithQuotes()
-
-  override val children: List<Expression<*>> = listOf(statement, then, otherwise)
-
-  override fun toString(): String = "(ite $statement $then $otherwise)"
 }
 
 /** Base class of all expressions with any number of children. */
@@ -392,16 +361,18 @@ inline fun <reified T : Sort> Expression<*>.cast(): Expression<T> {
  *
  * @return transformed expression
  */
-fun<T : Sort> Expression<T>.transform(transformation: (Expression<T>) -> Expression<T>): Expression<T> {
-    // transform all children
-    val transformedChildren = this.children.map { it.transform(transformation) }
+fun <T : Sort> Expression<T>.transform(
+    transformation: (Expression<T>) -> Expression<T>
+): Expression<T> {
+  // transform all children
+  val transformedChildren = this.children.map { it.transform(transformation) }
 
-    // check if any child was copied
-    return if ((transformedChildren zip this.children).any { (new, old) -> new !== old }) {
-        // return copied expression with new children
-        transformation(this.copy(transformedChildren))
-    } else {
-        // transform this expression, prevent it from changing the sort
-        transformation(this)
-    }
+  // check if any child was copied
+  return if ((transformedChildren zip this.children).any { (new, old) -> new !== old }) {
+    // return copied expression with new children
+    transformation(this.copy(transformedChildren))
+  } else {
+    // transform this expression, prevent it from changing the sort
+    transformation(this)
+  }
 }

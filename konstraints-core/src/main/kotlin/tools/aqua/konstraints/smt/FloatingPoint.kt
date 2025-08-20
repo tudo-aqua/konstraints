@@ -21,6 +21,11 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.parser.*
 
 /*
+ * This file implements the SMT FloatingPoint theory
+ * https://smt-lib.org/theories-FloatingPoint.shtml
+ */
+
+/*
  * RoundingMode functions
  */
 
@@ -107,8 +112,7 @@ object RTZ : ConstantExpression<RoundingModeSort>("RTZ".toSymbolWithQuotes(), Ro
 
 /**
  * Representation of plus infinity for a given number of bits.
- *
- * ((_ +oo [eb] [sb]) (_ FloatingPoint [eb] [sb]))
+ * - `((_ +oo [eb] [sb]) (_ FloatingPoint [eb] [sb]))`
  */
 class FPInfinity(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("+oo".toSymbolWithQuotes(), FPSort(eb, sb)) {
@@ -121,8 +125,7 @@ class FPInfinity(val eb: Int, val sb: Int) :
 
 /**
  * Representation of minus infinity for a given number of bits.
- *
- * ((_ -oo [eb] [sb]) (_ FloatingPoint [eb] [sb]))
+ * - `((_ -oo [eb] [sb]) (_ FloatingPoint [eb] [sb]))`
  */
 class FPMinusInfinity(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("-oo".toSymbolWithQuotes(), FPSort(eb, sb)) {
@@ -135,8 +138,7 @@ class FPMinusInfinity(val eb: Int, val sb: Int) :
 
 /**
  * Representation of plus zero for a given number of bits.
- *
- * ((_ +zero [eb] [sb]) (_ FloatingPoint [eb] [sb]))
+ * - `((_ +zero [eb] [sb]) (_ FloatingPoint [eb] [sb]))`
  */
 class FPZero(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("+zero".toSymbolWithQuotes(), FPSort(eb, sb)) {
@@ -149,8 +151,7 @@ class FPZero(val eb: Int, val sb: Int) :
 
 /**
  * Representation of minus zero for a given number of bits.
- *
- * ((_ -zero [eb] [sb]) (_ FloatingPoint [eb] [sb]))
+ * - `((_ -zero [eb] [sb]) (_ FloatingPoint [eb] [sb]))`
  */
 class FPMinusZero(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("-zero".toSymbolWithQuotes(), FPSort(eb, sb)) {
@@ -163,8 +164,7 @@ class FPMinusZero(val eb: Int, val sb: Int) :
 
 /**
  * Representation of NaN for a given number of bits.
- *
- * ((_ NaN [eb] [sb]) (_ FloatingPoint [eb] [sb]))
+ * - `((_ NaN [eb] [sb]) (_ FloatingPoint [eb] [sb]))`
  */
 class FPNaN(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("NaN".toSymbolWithQuotes(), FPSort(eb, sb)) {
@@ -181,8 +181,7 @@ class FPNaN(val eb: Int, val sb: Int) :
 
 /**
  * Floating point absolute value, sort will be automatically determined from [inner].
- *
- * (fp.abs (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ * - `(fp.abs (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))`
  */
 class FPAbs(override val inner: Expression<FPSort>) :
     UnaryExpression<FPSort, FPSort>("fp.abs".toSymbolWithQuotes(), inner.sort) {
@@ -194,8 +193,7 @@ class FPAbs(override val inner: Expression<FPSort>) :
 
 /**
  * Floating point negation, sort will be automatically determined from [inner].
- *
- * (fp.neg (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ * - `(fp.neg (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))`
  */
 class FPNeg(override val inner: Expression<FPSort>) :
     UnaryExpression<FPSort, FPSort>("fp.neg".toSymbolWithQuotes(), inner.sort) {
@@ -209,8 +207,7 @@ class FPNeg(override val inner: Expression<FPSort>) :
  * Floating point addition, sort will be automatically determined from [leftTerm].
  *
  * @throws IllegalArgumentException if [leftTerm] and [rightTerm] do not have the same sort
- *
- * (fp.add RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ * - `(fp.add RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))`
  */
 class FPAdd(
     val roundingMode: Expression<RoundingModeSort>,
@@ -240,8 +237,7 @@ class FPAdd(
  * Floating point subtraction, sort will be automatically determined from [minuend].
  *
  * @throws IllegalArgumentException if [minuend] and [subtrahend] do not have the same sort
- *
- * (fp.sub RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ * - `(fp.sub RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))`
  */
 class FPSub(
     val roundingMode: Expression<RoundingModeSort>,
@@ -271,8 +267,7 @@ class FPSub(
  * Floating point multiplication, sort will be automatically determined from [multiplier].
  *
  * @throws IllegalArgumentException if [multiplier] and [multiplicand] do not have the same sort
- *
- * (fp.mul RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ * - `(fp.mul RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))`
  */
 class FPMul(
     val roundingMode: Expression<RoundingModeSort>,
@@ -302,8 +297,7 @@ class FPMul(
  * Floating point division, sort will be automatically determined from [dividend].
  *
  * @throws IllegalArgumentException if [dividend] and [divisor] do not have the same sort
- *
- * (fp.div RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ * - `(fp.div RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))`
  */
 class FPDiv(
     val roundingMode: Expression<RoundingModeSort>,
@@ -335,8 +329,7 @@ class FPDiv(
  *
  * @throws IllegalArgumentException if [multiplier], [multiplicand] and [summand] do not have the
  *   same sort
- *
- * (fp.fma RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ * - `(fp.fma RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))`
  */
 class FPFma(
     val roundingMode: Expression<RoundingModeSort>,
@@ -362,8 +355,7 @@ class FPFma(
 
 /**
  * Floating point square root, sort will be automatically determined from [inner].
- *
- * (fp.sqrt RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ * - `(fp.sqrt RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))`
  */
 class FPSqrt(val roundingMode: Expression<RoundingModeSort>, val inner: Expression<FPSort>) :
     BinaryExpression<FPSort, RoundingModeSort, FPSort>("fp.sqrt".toSymbolWithQuotes(), inner.sort) {
@@ -382,8 +374,7 @@ class FPSqrt(val roundingMode: Expression<RoundingModeSort>, val inner: Expressi
  * [dividend]/[divisor], sort will be automatically determined from [dividend].
  *
  * @throws IllegalArgumentException if [dividend] and [divisor] do not have the same sort
- *
- * (fp.rem (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ * - `(fp.rem (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))`
  */
 class FPRem(val dividend: Expression<FPSort>, val divisor: Expression<FPSort>) :
     BinaryExpression<FPSort, FPSort, FPSort>("fp.rem".toSymbolWithQuotes(), dividend.sort) {
@@ -405,8 +396,7 @@ class FPRem(val dividend: Expression<FPSort>, val divisor: Expression<FPSort>) :
 
 /**
  * Floating point rounding to integral, sort will be automatically determined from [inner].
- *
- * (fp.roundToIntegral RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ * - `(fp.roundToIntegral RoundingMode (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))`
  */
 class FPRoundToIntegral(
     val roundingMode: Expression<RoundingModeSort>,
@@ -428,8 +418,7 @@ class FPRoundToIntegral(
  * Floating point minimum, sort will be automatically determined from [lhs].
  *
  * @throws IllegalArgumentException if [lhs] and [rhs] do not have the same sort
- *
- * (fp.min (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ * - `(fp.min (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))`
  */
 class FPMin(override val lhs: Expression<FPSort>, override val rhs: Expression<FPSort>) :
     BinaryExpression<FPSort, FPSort, FPSort>("fp.min".toSymbolWithQuotes(), lhs.sort) {
@@ -447,8 +436,7 @@ class FPMin(override val lhs: Expression<FPSort>, override val rhs: Expression<F
  * Floating point maximum, sort will be automatically determined from [lhs].
  *
  * @throws IllegalArgumentException if [lhs] and [rhs] do not have the same sort
- *
- * (fp.max (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))
+ * - `(fp.max (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) (_ FloatingPoint eb sb))`
  */
 class FPMax(override val lhs: Expression<FPSort>, override val rhs: Expression<FPSort>) :
     BinaryExpression<FPSort, FPSort, FPSort>("fp.max".toSymbolWithQuotes(), lhs.sort) {
@@ -467,8 +455,7 @@ class FPMax(override val lhs: Expression<FPSort>, override val rhs: Expression<F
  *
  * @throws IllegalArgumentException if less than 2 [terms] are provided
  * @throws IllegalArgumentException if two [terms] have different sorts
- *
- * (fp.leq (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)
+ * - `(fp.leq (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)`
  */
 class FPLeq(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.leq".toSymbolWithQuotes(), Bool) {
@@ -494,8 +481,7 @@ class FPLeq(val terms: List<Expression<FPSort>>) :
  *
  * @throws IllegalArgumentException if less than 2 [terms] are provided
  * @throws IllegalArgumentException if two [terms] have different sorts
- *
- * (fp.lt (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)
+ * - `(fp.lt (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)`
  */
 class FPLt(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.lt".toSymbolWithQuotes(), Bool) {
@@ -521,8 +507,7 @@ class FPLt(val terms: List<Expression<FPSort>>) :
  *
  * @throws IllegalArgumentException if less than 2 [terms] are provided
  * @throws IllegalArgumentException if two [terms] have different sorts
- *
- * (fp.geq (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)
+ * - `(fp.geq (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)`
  */
 class FPGeq(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.geq".toSymbolWithQuotes(), Bool) {
@@ -548,8 +533,7 @@ class FPGeq(val terms: List<Expression<FPSort>>) :
  *
  * @throws IllegalArgumentException if less than 2 [terms] are provided
  * @throws IllegalArgumentException if two [terms] have different sorts
- *
- * (fp.gt (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)
+ * - `(fp.gt (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)`
  */
 class FPGt(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.gt".toSymbolWithQuotes(), Bool) {
@@ -575,8 +559,7 @@ class FPGt(val terms: List<Expression<FPSort>>) :
  *
  * @throws IllegalArgumentException if less than 2 [terms] are provided
  * @throws IllegalArgumentException if two [terms] have different sorts
- *
- * (fp.eq (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)
+ * - `(fp.eq (_ FloatingPoint eb sb) (_ FloatingPoint eb sb) Bool :chainable)`
  */
 class FPEq(val terms: List<Expression<FPSort>>) :
     HomogenousExpression<BoolSort, FPSort>("fp.eq".toSymbolWithQuotes(), Bool) {
@@ -667,8 +650,7 @@ class FPIsPositive(override val inner: Expression<FPSort>) :
  *
  * @throws IllegalArgumentException if number of bits in [inner.sort] is not
  *   [sort.exponentBits] + [sort.significantBits]
- *
- * ((_ to_fp eb sb) (_ BitVec m) (_ FloatingPoint eb sb)), with m = eb + sb
+ * - `((_ to_fp eb sb) (_ BitVec m) (_ FloatingPoint eb sb))`, with m = eb + sb
  */
 class BitVecToFP(override val inner: Expression<BVSort>, sort: FPSort) :
     UnaryExpression<FPSort, BVSort>("to_fp".toSymbolWithQuotes(), sort) {
@@ -686,8 +668,7 @@ class BitVecToFP(override val inner: Expression<BVSort>, sort: FPSort) :
 
 /**
  * Convert a floating point [inner] to a different floating point [sort].
- *
- * ((_ to_fp eb sb) RoundingMode (_ FloatingPoint mb nb) (_ FloatingPoint eb sb))
+ * - `((_ to_fp eb sb) RoundingMode (_ FloatingPoint mb nb) (_ FloatingPoint eb sb))`
  */
 class FPToFP(
     val roundingMode: Expression<RoundingModeSort>,
@@ -716,8 +697,7 @@ class FPToFP(
 
 /**
  * Convert a real [inner] to a floating point with the given [sort].
- *
- * ((_ to_fp eb sb) RoundingMode Real (_ FloatingPoint eb sb))
+ * - `((_ to_fp eb sb) RoundingMode Real (_ FloatingPoint eb sb))`
  */
 class RealToFP(
     val roundingMode: Expression<RoundingModeSort>,
@@ -747,8 +727,7 @@ class RealToFP(
 /**
  * Convert a signed machine integer, represented as a 2's complement bit vector, [inner] to a
  * floating point with the given [sort].
- *
- * ((_ to_fp eb sb) RoundingMode (_ BitVec m) (_ FloatingPoint eb sb))
+ * - `((_ to_fp eb sb) RoundingMode (_ BitVec m) (_ FloatingPoint eb sb))`
  */
 class SBitVecToFP(
     val roundingMode: Expression<RoundingModeSort>,
@@ -778,8 +757,7 @@ class SBitVecToFP(
 /**
  * Convert an unsigned machine integer, represented as bit vector, [inner] to a floating point with
  * the given [sort].
- *
- * ((_ to_fp_unsigned eb sb) RoundingMode (_ BitVec m) (_ FloatingPoint eb sb))
+ * - `((_ to_fp_unsigned eb sb) RoundingMode (_ BitVec m) (_ FloatingPoint eb sb))`
  */
 class UBitVecToFP(
     val roundingMode: Expression<RoundingModeSort>,
@@ -815,8 +793,7 @@ class UBitVecToFP(
 /**
  * Convert a floating point [inner] to an unsigned machine integer, represented as a bit vector of
  * length [m].
- *
- * ((_ fp.to_ubv m) RoundingMode (_ FloatingPoint eb sb) (_ BitVec m))
+ * - `((_ fp.to_ubv m) RoundingMode (_ FloatingPoint eb sb) (_ BitVec m))`
  */
 class FPToUBitVec(
     val roundingMode: Expression<RoundingModeSort>,
@@ -840,8 +817,7 @@ class FPToUBitVec(
 /**
  * Convert a floating point [inner] to a signed machine integer, represented as a 2's complement bit
  * vector of length [m].
- *
- * ((_ fp.to_ubv m) RoundingMode (_ FloatingPoint eb sb) (_ BitVec m))
+ * - `((_ fp.to_ubv m) RoundingMode (_ FloatingPoint eb sb) (_ BitVec m))`
  */
 class FPToSBitVec(
     val roundingMode: Expression<RoundingModeSort>,
@@ -864,8 +840,7 @@ class FPToSBitVec(
 
 /**
  * Convert a floating point [inner] to real.
- *
- * (fp.to_real (_ FloatingPoint eb sb) Real)
+ * - `(fp.to_real (_ FloatingPoint eb sb) Real)`
  */
 class FPToReal(override val inner: Expression<FPSort>) :
     UnaryExpression<RealSort, FPSort>("fp.to_real".toSymbolWithQuotes(), Real) {

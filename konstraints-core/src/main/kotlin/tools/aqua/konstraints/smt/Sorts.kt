@@ -19,12 +19,12 @@
 package tools.aqua.konstraints.smt
 
 sealed interface SortFactory {
-  abstract fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort
+  fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort
 
-  abstract fun isInstanceOf(sort: Sort): Boolean
+  fun isInstanceOf(sort: Sort): Boolean
 
-  abstract val isIndexed: Boolean
-  abstract val numIndicies: Int
+  val isIndexed: Boolean
+  val numIndicies: Int
 }
 
 object BoolFactory : SortFactory {

@@ -20,10 +20,15 @@ package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.*
 
+/*
+ * This file implements the SMT Reals theory
+ * https://smt-lib.org/theories-Reals.shtml
+ */
+
 /**
  * Real negation.
- * - (- Real Real)
- * - (- [inner])
+ * - `(- Real Real)`
+ * - `(- [inner])`
  */
 class RealNeg(override val inner: Expression<RealSort>) :
     UnaryExpression<RealSort, RealSort>("-".toSymbolWithQuotes(), Real) {
@@ -35,8 +40,8 @@ class RealNeg(override val inner: Expression<RealSort>) :
 
 /**
  * Real subtraction.
- * - (- Real Real Real :left-assoc)
- * - (- [terms])
+ * - `(- Real Real Real :left-assoc)`
+ * - `(- [terms])`
  */
 class RealSub(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<RealSort, RealSort>("-".toSymbolWithQuotes(), Real) {
@@ -58,8 +63,8 @@ class RealSub(val terms: List<Expression<RealSort>>) :
 
 /**
  * Real addition.
- * - (+ Real Real Real :left-assoc)
- * - (+ [terms])
+ * - `(+ Real Real Real :left-assoc)`
+ * - `(+ [terms])`
  */
 class RealAdd(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<RealSort, RealSort>("+".toSymbolWithQuotes(), Real) {
@@ -81,8 +86,8 @@ class RealAdd(val terms: List<Expression<RealSort>>) :
 
 /**
  * Real multiplication.
- * - (* Real Real Real :left-assoc)
- * - (* [factors])
+ * - `(* Real Real Real :left-assoc)`
+ * - `(* [factors])`
  */
 class RealMul(val factors: List<Expression<RealSort>>) :
     HomogenousExpression<RealSort, RealSort>("*".toSymbolWithQuotes(), Real) {
@@ -104,8 +109,8 @@ class RealMul(val factors: List<Expression<RealSort>>) :
 
 /**
  * Real division.
- * - (/ Real Real Real :left-assoc)
- * - (/ [terms])
+ * - `(/ Real Real Real :left-assoc)`
+ * - `(/ [terms])`
  */
 class RealDiv(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<RealSort, RealSort>("/".toSymbolWithQuotes(), Real) {
@@ -127,8 +132,8 @@ class RealDiv(val terms: List<Expression<RealSort>>) :
 
 /**
  * Real less equals.
- * - (<= Real Real Bool :chainable)
- * - (<= [terms])
+ * - `(<= Real Real Bool :chainable)`
+ * - `(<= [terms])`
  */
 class RealLessEq(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<BoolSort, RealSort>("<=".toSymbolWithQuotes(), Bool) {
@@ -150,8 +155,8 @@ class RealLessEq(val terms: List<Expression<RealSort>>) :
 
 /**
  * Real less.
- * - (<= Real Real Bool :chainable)
- * - (<= [terms])
+ * - `(<= Real Real Bool :chainable)`
+ * - `(<= [terms])`
  */
 class RealLess(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<BoolSort, RealSort>("<".toSymbolWithQuotes(), Bool) {
@@ -173,8 +178,8 @@ class RealLess(val terms: List<Expression<RealSort>>) :
 
 /**
  * Real greater equals.
- * - (<= Real Real Bool :chainable)
- * - (<= [terms])
+ * - `(<= Real Real Bool :chainable)`
+ * - `(<= [terms])`
  */
 class RealGreaterEq(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<BoolSort, RealSort>(">=".toSymbolWithQuotes(), Bool) {
@@ -196,8 +201,8 @@ class RealGreaterEq(val terms: List<Expression<RealSort>>) :
 
 /**
  * Real greater.
- * - (<= Real Real Bool :chainable)
- * - (<= [terms])
+ * - `(<= Real Real Bool :chainable)`
+ * - `(<= [terms])`
  */
 class RealGreater(val terms: List<Expression<RealSort>>) :
     HomogenousExpression<BoolSort, RealSort>(">".toSymbolWithQuotes(), Bool) {
