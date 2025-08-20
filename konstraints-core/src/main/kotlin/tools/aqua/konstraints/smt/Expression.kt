@@ -18,7 +18,6 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.IteDecl
 import tools.aqua.konstraints.util.reduceOrDefault
 
 /** Interface for all sorted SMT terms. */
@@ -175,36 +174,6 @@ abstract class HomogenousExpression<out T : Sort, out S : Sort>(
   override fun toString() =
       if (children.isNotEmpty()) "($name ${children.joinToString(" ")})"
       else name.toSMTString(QuotingRule.SAME_AS_INPUT)
-}
-
-/**
- * Implements ite according to Core theory (par (A) (ite Bool A A A))
- *
- * @param statement indicates whether [then] or [otherwise] should be returned
- * @param then value to be returned if [statement] is true
- * @param otherwise value to be returned if [statement] is false
- */
-class Ite<out T : Sort>(
-    val statement: Expression<BoolSort>,
-    val then: Expression<T>,
-    val otherwise: Expression<T>
-) : Expression<T> {
-  init {
-    require(then.sort == otherwise.sort)
-  }
-
-  override val sort: T = then.sort
-  override val theories = CORE_MARKER_SET
-  override val func = null
-
-  override fun copy(children: List<Expression<*>>): Expression<T> =
-      IteDecl.constructDynamic(children, emptyList()) as Expression<T>
-
-  override val name: Symbol = "ite".toSymbolWithQuotes()
-
-  override val children: List<Expression<*>> = listOf(statement, then, otherwise)
-
-  override fun toString(): String = "(ite $statement $then $otherwise)"
 }
 
 /** Base class of all expressions with any number of children */
@@ -378,32 +347,6 @@ class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: Lis
 }
 
 class ExpressionCastException(msg: String) : ClassCastException(msg)
-
-class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>) :
-    SMTFunction<T>() {
-
-  operator fun invoke(args: List<Expression<*>>) = instance
-
-  override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>) = instance
-
-  val name = symbol.toString()
-  override val sort: T = term.sort
-  override val parameters = emptyList<Sort>()
-
-  val instance = LocalExpression(symbol, sort, term, this)
-}
-
-class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T) :
-    SMTFunction<T>() {
-  operator fun invoke(args: List<Expression<*>>) = instance
-
-  override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>) = instance
-
-  override fun toString(): String = "($symbol $sort)"
-
-  val instance = BoundVariable(symbol, sort, this)
-  override val parameters: List<Sort> = emptyList()
-}
 
 /**
  * Safely cast this expression to an Expression of Sort T.
