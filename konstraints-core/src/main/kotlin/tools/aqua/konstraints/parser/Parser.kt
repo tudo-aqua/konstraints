@@ -180,7 +180,7 @@ class Parser {
             range('\u0020', '\\' - 1) +
             range('\\' + 1, '|' - 1) +
             range('|' + 1, '\u007E') +
-            range('\u0080', '\u00FF')
+            range('\u0080', '\uFFFF')
     internal val quotedSymbol = of('|') * anythingButPipeOrBackslash.star() * of('|')
 
     private val symbol =
@@ -678,7 +678,7 @@ class Parser {
                         RealLiteral(BigDecimal(constant.numeral))
                     else throw RuntimeException("Unsupported numeral literal!")
 
-                is StringConstant -> TODO("String constant not implemented yet!")
+                is StringConstant -> StringLiteral(constant.string)
               }
             } + /* maps to Literal */
             qualIdentifier.map { results: List<Any> ->
@@ -834,18 +834,19 @@ class Parser {
    * the string representation to correctly filter out comments in the smt code
    */
   fun parse(program: String): SMTProgram {
+      script.parse(program)
     // TODO parse each command individually, fail on the first command that can not be parsed
     // this will lead to better error messages but requires some preprocessing to split the input
     // into individual commands (this may be done in linear time by searching the input from
     // left to right counting the number of opening an closing brackets)
     // filter out all comments (all lines are truncated after ';')
-    splitInput(program.split("\n").joinToString(" ") { line -> line.substringBefore(';') })
+    /* splitInput(program.split("\n").joinToString(" ") { line -> line.substringBefore(';') })
         .forEach { cmd ->
           val temp = command.parse(cmd)
           if (!temp.isSuccess) {
             throw ParseException(temp.message, temp.position, temp.buffer)
           }
-        }
+        } */
 
     return this.program
   }
@@ -877,4 +878,4 @@ class Parser {
 
 class ParseException(message: String, position: Int, buffer: String) :
     RuntimeException(
-        "Parser failed with message $message at position $position: ${buffer.substring(position)}")
+        "Parser failed with message $message at position $position: ${buffer.substring(0,position)}")

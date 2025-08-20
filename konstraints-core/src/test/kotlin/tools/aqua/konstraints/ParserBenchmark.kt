@@ -25,8 +25,10 @@ import java.util.stream.Stream
 import kotlin.streams.asStream
 import kotlin.use
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
@@ -37,6 +39,7 @@ import tools.aqua.konstraints.parser.Parser
 @Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserBenchmark {
+
   private fun loadResource(path: String) =
       File(javaClass.getResource(path)!!.file)
           .walk()
@@ -54,470 +57,473 @@ class ParserBenchmark {
     }
   }
 
-  @Disabled @ParameterizedTest @MethodSource("getABVFiles") fun parseABV(file: File) = parse(file)
+  /* @Disabled */ @ParameterizedTest @MethodSource("getABVFiles") fun parseABV(file: File) = parse(file)
 
-  fun getABVFiles(): Stream<Arguments> = loadResource("/full/ABV/")
+  fun getABVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/ABV/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getABVFPFiles")
   fun parseABVFP(file: File) = parse(file)
 
-  fun getABVFPFiles(): Stream<Arguments> = loadResource("/full/ABVFP/")
+  fun getABVFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/ABVFP/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getABVFPLRAFiles")
   fun parseABVFPLRA(file: File) = parse(file)
 
-  fun getABVFPLRAFiles(): Stream<Arguments> = loadResource("/full/ABVFPLRA/")
+  fun getABVFPLRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/ABVFPLRA/")
 
-  @Disabled @ParameterizedTest @MethodSource("getALIAFiles") fun parseALIA(file: File) = parse(file)
+  /* @Disabled */ @ParameterizedTest @MethodSource("getALIAFiles") fun parseALIA(file: File) = parse(file)
 
-  fun getALIAFiles(): Stream<Arguments> = loadResource("/full/ALIA/")
+  fun getALIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/ALIA/")
 
-  @Disabled @ParameterizedTest @MethodSource("getANIAFiles") fun parseANIA(file: File) = parse(file)
+  /* @Disabled */
+  @ParameterizedTest
+  @MethodSource("getANIAFiles")
+  fun parseANIA(file: File) = parse(file)
 
-  fun getANIAFiles(): Stream<Arguments> = loadResource("/full/ANIA/")
+  fun getANIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/ANIA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getAUFBVFiles")
   fun parseAUFBV(file: File) = parse(file)
 
-  fun getAUFBVFiles(): Stream<Arguments> = loadResource("/full/AUFBV/")
+  fun getAUFBVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFBV/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getAUFBVDTLIAFiles")
   fun parseAUFBVDTLIA(file: File) = parse(file)
 
-  fun getAUFBVDTLIAFiles(): Stream<Arguments> = loadResource("/full/AUFBVDTLIA/")
+  fun getAUFBVDTLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFBVDTLIA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getAUFBVDTNIAFiles")
   fun parseAUFBVDTNIA(file: File) = parse(file)
 
-  fun getAUFBVDTNIAFiles(): Stream<Arguments> = loadResource("/full/AUFBVDTNIA/")
+  fun getAUFBVDTNIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFBVDTNIA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getAUFBVDTNIRAFiles")
   fun parseAUFBVDTNIRA(file: File) = parse(file)
 
-  fun getAUFBVDTNIRAFiles(): Stream<Arguments> = loadResource("/full/AUFBVDTNIRA/")
+  fun getAUFBVDTNIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFBVDTNIRA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getAUFBVFPFiles")
   fun parseAUFBVFP(file: File) = parse(file)
 
-  fun getAUFBVFPFiles(): Stream<Arguments> = loadResource("/full/AUFBVFP/")
+  fun getAUFBVFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFBVFP/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getAUFDTLIAFiles")
   fun parseAUFDTLIA(file: File) = parse(file)
 
-  fun getAUFDTLIAFiles(): Stream<Arguments> = loadResource("/full/AUFDTLIA/")
+  fun getAUFDTLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFDTLIA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getAUFDTLIRAFiles")
   fun parseAUFDTLIRA(file: File) = parse(file)
 
-  fun getAUFDTLIRAFiles(): Stream<Arguments> = loadResource("/full/AUFDTLIRA/")
+  fun getAUFDTLIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFDTLIRA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getAUFDTNIRAFiles")
   fun parseAUFDTNIRA(file: File) = parse(file)
 
-  fun getAUFDTNIRAFiles(): Stream<Arguments> = loadResource("/full/AUFDTNIRA/")
+  fun getAUFDTNIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFDTNIRA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getAUFFPDTNIRAFiles")
   fun parseAUFFPDTNIRA(file: File) = parse(file)
 
-  fun getAUFFPDTNIRAFiles(): Stream<Arguments> = loadResource("/full/AUFFPDTNIRA/")
+  fun getAUFFPDTNIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFFPDTNIRA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getAUFLIAFiles")
   fun parseAUFLIA(file: File) = parse(file)
 
-  fun getAUFLIAFiles(): Stream<Arguments> = loadResource("/full/AUFLIA/")
+  fun getAUFLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFLIA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getAUFLIRAFiles")
   fun parseAUFLIRA(file: File) = parse(file)
 
-  fun getAUFLIRAFiles(): Stream<Arguments> = loadResource("/full/AUFLIRA/")
+  fun getAUFLIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFLIRA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getAUFNIAFiles")
   fun parseAUFNIA(file: File) = parse(file)
 
-  fun getAUFNIAFiles(): Stream<Arguments> = loadResource("/full/AUFNIA/")
+  fun getAUFNIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFNIA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getAUFNIRAFiles")
   fun parseAUFNIRA(file: File) = parse(file)
 
-  fun getAUFNIRAFiles(): Stream<Arguments> = loadResource("/full/AUFNIRA/")
+  fun getAUFNIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFNIRA/")
 
   @ParameterizedTest @MethodSource("getBVFiles") fun parseBV(file: File) = parse(file)
 
-  fun getBVFiles(): Stream<Arguments> = loadResource("/BV/")
+  fun getBVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/BV/")
 
-  @Disabled @ParameterizedTest @MethodSource("getBVFPFiles") fun parseBVFP(file: File) = parse(file)
+  /* @Disabled */ @ParameterizedTest @MethodSource("getBVFPFiles") fun parseBVFP(file: File) = parse(file)
 
-  fun getBVFPFiles(): Stream<Arguments> = loadResource("/full/BVFP/")
+  fun getBVFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/BVFP/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getBVFPLRAFiles")
   fun parseBVFPLRA(file: File) = parse(file)
 
-  fun getBVFPLRAFiles(): Stream<Arguments> = loadResource("/full/BVFPLRA/")
+  fun getBVFPLRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/BVFPLRA/")
 
   @ParameterizedTest @MethodSource("getFPFiles") fun parseFP(file: File) = parse(file)
 
-  fun getFPFiles(): Stream<Arguments> = loadResource("/full/FP/")
+  fun getFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/FP/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getFPLRAFiles")
   fun parseFPLRA(file: File) = parse(file)
 
-  fun getFPLRAFiles(): Stream<Arguments> = loadResource("/full/FPLRA/")
+  fun getFPLRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/FPLRA/")
 
-  @Disabled @ParameterizedTest @MethodSource("getLIAFiles") fun parseLIA(file: File) = parse(file)
+  /* @Disabled */ @ParameterizedTest @MethodSource("getLIAFiles") fun parseLIA(file: File) = parse(file)
 
-  fun getLIAFiles(): Stream<Arguments> = loadResource("/full/LIA/")
+  fun getLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/LIA/")
 
-  @Disabled @ParameterizedTest @MethodSource("getLRAFiles") fun parseLRA(file: File) = parse(file)
+  /* @Disabled */ @ParameterizedTest @MethodSource("getLRAFiles") fun parseLRA(file: File) = parse(file)
 
-  fun getLRAFiles(): Stream<Arguments> = loadResource("/full/LRA/")
+  fun getLRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/LRA/")
 
-  @Disabled @ParameterizedTest @MethodSource("getNIAFiles") fun parseNIA(file: File) = parse(file)
+  /* @Disabled */ @ParameterizedTest @MethodSource("getNIAFiles") fun parseNIA(file: File) = parse(file)
 
-  fun getNIAFiles(): Stream<Arguments> = loadResource("/full/NIA/")
+  fun getNIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/NIA/")
 
-  @Disabled @ParameterizedTest @MethodSource("getNRAFiles") fun parseNRA(file: File) = parse(file)
+  /* @Disabled */ @ParameterizedTest @MethodSource("getNRAFiles") fun parseNRA(file: File) = parse(file)
 
-  fun getNRAFiles(): Stream<Arguments> = loadResource("/full/NRA/")
+  fun getNRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/NRA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_ABVFiles")
   @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun parseQF_ABV(file: File) = parse(file)
 
-  fun getQF_ABVFiles(): Stream<Arguments> = loadResource("/full/QF_ABV/")
+  fun getQF_ABVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_ABV/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_ABVFPFiles")
   fun parseQF_ABVFP(file: File) = parse(file)
 
-  fun getQF_ABVFPFiles(): Stream<Arguments> = loadResource("/full/QF_ABVFP/")
+  fun getQF_ABVFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_ABVFP/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_ABVFPLRAFiles")
   fun parseQF_ABVFPLRA(file: File) = parse(file)
 
-  fun getQF_ABVFPLRAFiles(): Stream<Arguments> = loadResource("/full/QF_ABVFPLRA/")
+  fun getQF_ABVFPLRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_ABVFPLRA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_ALIAFiles")
   fun parseQF_ALIA(file: File) = parse(file)
 
-  fun getQF_ALIAFiles(): Stream<Arguments> = loadResource("/full/QF_ALIA/")
+  fun getQF_ALIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_ALIA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_ANIAFiles")
   fun parseQF_ANIA(file: File) = parse(file)
 
-  fun getQF_ANIAFiles(): Stream<Arguments> = loadResource("/full/QF_ANIA/")
+  fun getQF_ANIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_ANIA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_AUFBVFiles")
   fun parseQF_AUFBV(file: File) = parse(file)
 
-  fun getQF_AUFBVFiles(): Stream<Arguments> = loadResource("/full/QF_AUFBV/")
+  fun getQF_AUFBVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_AUFBV/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_AUFBVFPFiles")
   fun parseQF_AUFBVFP(file: File) = parse(file)
 
-  fun getQF_AUFBVFPFiles(): Stream<Arguments> = loadResource("/full/QF_AUFBVFP/")
+  fun getQF_AUFBVFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_AUFBVFP/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_AUFLIAFiles")
   fun parseQF_AUFLIA(file: File) = parse(file)
 
-  fun getQF_AUFLIAFiles(): Stream<Arguments> = loadResource("/full/QF_AUFLIA/")
+  fun getQF_AUFLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_AUFLIA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_AUFNIAFiles")
   fun parseQF_AUFNIA(file: File) = parse(file)
 
-  fun getQF_AUFNIAFiles(): Stream<Arguments> = loadResource("/full/QF_AUFNIA/")
+  fun getQF_AUFNIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_AUFNIA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_AXFiles")
   fun parseQF_AX(file: File) = parse(file)
 
-  fun getQF_AXFiles(): Stream<Arguments> = loadResource("/full/QF_AX/")
+  fun getQF_AXFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_AX/")
 
   @ParameterizedTest
   @MethodSource("getQF_BVFiles")
   @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun parseQF_BV(file: File) = parse(file)
 
-  fun getQF_BVFiles(): Stream<Arguments> = loadResource("/full/QF_BV/sage/")
+  fun getQF_BVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_BV/sage/")
 
   @ParameterizedTest @MethodSource("getQF_BVFPFiles") fun parseQF_BVFP(file: File) = parse(file)
 
-  fun getQF_BVFPFiles(): Stream<Arguments> = loadResource("/full/QF_BVFP/")
+  fun getQF_BVFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_BVFP/")
 
   @ParameterizedTest
   @MethodSource("getQF_BVFPLRAFiles")
   fun parseQF_BVFPLRA(file: File) = parse(file)
 
-  fun getQF_BVFPLRAFiles(): Stream<Arguments> = loadResource("/full/QF_BVFPLRA/")
+  fun getQF_BVFPLRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_BVFPLRA/")
 
   @ParameterizedTest @MethodSource("getQF_DTFiles") fun parseQF_DT(file: File) = parse(file)
 
-  fun getQF_DTFiles(): Stream<Arguments> = loadResource("/full/QF_DT/")
+  fun getQF_DTFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_DT/")
 
   @ParameterizedTest @MethodSource("getQF_FPFiles") fun parseQF_FP(file: File) = parse(file)
 
-  fun getQF_FPFiles(): Stream<Arguments> = loadResource("/full/QF_FP/")
+  fun getQF_FPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_FP/")
 
   @ParameterizedTest @MethodSource("getQF_FPLRAFiles") fun parseQF_FPLRA(file: File) = parse(file)
 
-  fun getQF_FPLRAFiles(): Stream<Arguments> = loadResource("/full/QF_FPLRA/")
+  fun getQF_FPLRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_FPLRA/")
 
   @ParameterizedTest @MethodSource("getQF_IDLFiles") fun parseQF_IDL(file: File) = parse(file)
 
-  fun getQF_IDLFiles(): Stream<Arguments> = loadResource("/full/QF_IDL/")
+  fun getQF_IDLFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_IDL/")
 
   @ParameterizedTest @MethodSource("getQF_LIAFiles") fun parseQF_LIA(file: File) = parse(file)
 
-  fun getQF_LIAFiles(): Stream<Arguments> = loadResource("/full/QF_LIA/")
+  fun getQF_LIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_LIA/")
 
   @ParameterizedTest @MethodSource("getQF_LIRAFiles") fun parseQF_LIRA(file: File) = parse(file)
 
-  fun getQF_LIRAFiles(): Stream<Arguments> = loadResource("/full/QF_LIRA/")
+  fun getQF_LIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_LIRA/")
 
   @ParameterizedTest @MethodSource("getQF_LRAFiles") fun parseQF_LRA(file: File) = parse(file)
 
-  fun getQF_LRAFiles(): Stream<Arguments> = loadResource("/full/QF_LRA/")
+  fun getQF_LRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_LRA/")
 
   @ParameterizedTest @MethodSource("getQF_NIAFiles") fun parseQF_NIA(file: File) = parse(file)
 
-  fun getQF_NIAFiles(): Stream<Arguments> = loadResource("/full/QF_NIA/")
+  fun getQF_NIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_NIA/")
 
   @ParameterizedTest @MethodSource("getQF_NIRAFiles") fun parseQF_NIRA(file: File) = parse(file)
 
-  fun getQF_NIRAFiles(): Stream<Arguments> = loadResource("/full/QF_NIRA/")
+  fun getQF_NIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_NIRA/")
 
   @ParameterizedTest @MethodSource("getQF_NRAFiles") fun parseQF_NRA(file: File) = parse(file)
 
-  fun getQF_NRAFiles(): Stream<Arguments> = loadResource("/full/QF_NRA/")
+  fun getQF_NRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_NRA/")
 
   @ParameterizedTest @MethodSource("getQF_RDLFiles") fun parseQF_RDL(file: File) = parse(file)
 
-  fun getQF_RDLFiles(): Stream<Arguments> = loadResource("/full/QF_RDL/")
+  fun getQF_RDLFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_RDL/")
 
   @ParameterizedTest @MethodSource("getQF_SFiles") fun parseQF_S(file: File) = parse(file)
 
-  fun getQF_SFiles(): Stream<Arguments> = loadResource("/full/QF_S/")
+  fun getQF_SFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_S/20230329-automatark-lu/")
 
   @ParameterizedTest @MethodSource("getQF_SLIAFiles") fun parseQF_SLIA(file: File) = parse(file)
 
-  fun getQF_SLIAFiles(): Stream<Arguments> = loadResource("/full/QF_SLIA/")
+  fun getQF_SLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_SLIA/")
 
   @ParameterizedTest @MethodSource("getQF_SNIAFiles") fun parseQF_SNIA(file: File) = parse(file)
 
-  fun getQF_SNIAFiles(): Stream<Arguments> = loadResource("/full/QF_SNIA/")
+  fun getQF_SNIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_SNIA/")
 
   @ParameterizedTest @MethodSource("getQF_UFFiles") fun parseQF_UF(file: File) = parse(file)
 
-  fun getQF_UFFiles(): Stream<Arguments> = loadResource("/full/QF_UF/")
+  fun getQF_UFFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UF/")
 
   @ParameterizedTest @MethodSource("getQF_UFBVFiles") fun parseQF_UFBV(file: File) = parse(file)
 
-  fun getQF_UFBVFiles(): Stream<Arguments> = loadResource("/full/QF_UFBV/")
+  fun getQF_UFBVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFBV/")
 
   @ParameterizedTest @MethodSource("getQF_UFBVDTFiles") fun parseQF_UFBVDT(file: File) = parse(file)
 
-  fun getQF_UFBVDTFiles(): Stream<Arguments> = loadResource("/full/QF_UFBVDT/")
+  fun getQF_UFBVDTFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFBVDT/")
 
   @ParameterizedTest @MethodSource("getQF_UFDTFiles") fun parseQF_UFDT(file: File) = parse(file)
 
-  fun getQF_UFDTFiles(): Stream<Arguments> = loadResource("/full/QF_UFDT/")
+  fun getQF_UFDTFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFDT/")
 
   @ParameterizedTest
   @MethodSource("getQF_UFDTLIAFiles")
   fun parseQF_UFDTLIA(file: File) = parse(file)
 
-  fun getQF_UFDTLIAFiles(): Stream<Arguments> = loadResource("/full/QF_UFDTLIA/")
+  fun getQF_UFDTLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFDTLIA/")
 
   @ParameterizedTest
   @MethodSource("getQF_UFDTLIRAFiles")
   fun parseQF_UFDTLIRA(file: File) = parse(file)
 
-  fun getQF_UFDTLIRAFiles(): Stream<Arguments> = loadResource("/full/QF_UFDTLIRA/")
+  fun getQF_UFDTLIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFDTLIRA/")
 
   @ParameterizedTest
   @MethodSource("getQF_UFDTNIAFiles")
   fun parseQF_UFDTNIA(file: File) = parse(file)
 
-  fun getQF_UFDTNIAFiles(): Stream<Arguments> = loadResource("/full/QF_UFDTNIA/")
+  fun getQF_UFDTNIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFDTNIA/")
 
   @ParameterizedTest @MethodSource("getQF_UFFPFiles") fun parseQF_UFFP(file: File) = parse(file)
 
-  fun getQF_UFFPFiles(): Stream<Arguments> = loadResource("/full/QF_UFFP/")
+  fun getQF_UFFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFFP/")
 
   @ParameterizedTest
   @MethodSource("getQF_UFFPDTNIRAFiles")
   fun parseQF_UFFPDTNIRA(file: File) = parse(file)
 
-  fun getQF_UFFPDTNIRAFiles(): Stream<Arguments> = loadResource("/full/QF_UFFPDTNIRA/")
+  fun getQF_UFFPDTNIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFFPDTNIRA/")
 
   @ParameterizedTest @MethodSource("getQF_UFIDLFiles") fun parseQF_UFIDL(file: File) = parse(file)
 
-  fun getQF_UFIDLFiles(): Stream<Arguments> = loadResource("/full/QF_UFIDL/")
+  fun getQF_UFIDLFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFIDL/")
 
   @ParameterizedTest @MethodSource("getQF_UFLIAFiles") fun parseQF_UFLIA(file: File) = parse(file)
 
-  fun getQF_UFLIAFiles(): Stream<Arguments> = loadResource("/full/QF_UFLIA/")
+  fun getQF_UFLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFLIA/")
 
   @ParameterizedTest @MethodSource("getQF_UFLRAFiles") fun parseQF_UFLRA(file: File) = parse(file)
 
-  fun getQF_UFLRAFiles(): Stream<Arguments> = loadResource("/full/QF_UFLRA/")
+  fun getQF_UFLRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFLRA/")
 
   @ParameterizedTest @MethodSource("getQF_UFNIAFiles") fun parseQF_UFNIA(file: File) = parse(file)
 
-  fun getQF_UFNIAFiles(): Stream<Arguments> = loadResource("/full/QF_UFNIA/")
+  fun getQF_UFNIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFNIA/")
 
   @ParameterizedTest @MethodSource("getQF_UFNRAFiles") fun parseQF_UFNRA(file: File) = parse(file)
 
-  fun getQF_UFNRAFiles(): Stream<Arguments> = loadResource("/full/QF_UFNRA/")
+  fun getQF_UFNRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFNRA/")
 
   @ParameterizedTest @MethodSource("getUFFiles") fun parseUF(file: File) = parse(file)
 
-  fun getUFFiles(): Stream<Arguments> = loadResource("/full/UF/")
+  fun getUFFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UF/")
 
-  @Disabled @ParameterizedTest @MethodSource("getUFBVFiles") fun parseUFBV(file: File) = parse(file)
+  /* @Disabled */ @ParameterizedTest @MethodSource("getUFBVFiles") fun parseUFBV(file: File) = parse(file)
 
-  fun getUFBVFiles(): Stream<Arguments> = loadResource("/full/UFBV/")
+  fun getUFBVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFBV/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getUFBVDTFiles")
   fun parseUFBVDT(file: File) = parse(file)
 
-  fun getUFBVDTFiles(): Stream<Arguments> = loadResource("/full/UFBVDT/")
+  fun getUFBVDTFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFBVDT/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getUFBVFPFiles")
   fun parseUFBVFP(file: File) = parse(file)
 
-  fun getUFBVFPFiles(): Stream<Arguments> = loadResource("/full/UFBVFP/")
+  fun getUFBVFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFBVFP/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getUFBVLIAFiles")
   fun parseUFBVLIA(file: File) = parse(file)
 
-  fun getUFBVLIAFiles(): Stream<Arguments> = loadResource("/full/UFBVLIA/")
+  fun getUFBVLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFBVLIA/")
 
-  @Disabled @ParameterizedTest @MethodSource("getUFDTFiles") fun parseUFDT(file: File) = parse(file)
+  /* @Disabled */ @ParameterizedTest @MethodSource("getUFDTFiles") fun parseUFDT(file: File) = parse(file)
 
-  fun getUFDTFiles(): Stream<Arguments> = loadResource("/full/UFDT/")
+  fun getUFDTFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFDT/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getUFDTLIAFiles")
   fun parseUFDTLIA(file: File) = parse(file)
 
-  fun getUFDTLIAFiles(): Stream<Arguments> = loadResource("/full/UFDTLIA/")
+  fun getUFDTLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFDTLIA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getUFDTLIRAFiles")
   fun parseUFDTLIRA(file: File) = parse(file)
 
-  fun getUFDTLIRAFiles(): Stream<Arguments> = loadResource("/full/UFDTLIRA/")
+  fun getUFDTLIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFDTLIRA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getUFDTNIAFiles")
   fun parseUFDTNIA(file: File) = parse(file)
 
-  fun getUFDTNIAFiles(): Stream<Arguments> = loadResource("/full/UFDTNIA/")
+  fun getUFDTNIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFDTNIA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getUFDTNIRAFiles")
   fun parseUFDTNIRA(file: File) = parse(file)
 
-  fun getUFDTNIRAFiles(): Stream<Arguments> = loadResource("/full/UFDTNIRA/")
+  fun getUFDTNIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFDTNIRA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getUFFPDTNIRAFiles")
   fun parseUFFPDTNIRA(file: File) = parse(file)
 
-  fun getUFFPDTNIRAFiles(): Stream<Arguments> = loadResource("/full/UFFPDTNIRA/")
+  fun getUFFPDTNIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFFPDTNIRA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getUFIDLFiles")
   fun parseUFIDL(file: File) = parse(file)
 
-  fun getUFIDLFiles(): Stream<Arguments> = loadResource("/full/UFIDL/")
+  fun getUFIDLFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFIDL/")
 
   @ParameterizedTest @MethodSource("getUFLIAFiles") fun parseUFLIA(file: File) = parse(file)
 
-  fun getUFLIAFiles(): Stream<Arguments> = loadResource("/full/UFLIA/")
+  fun getUFLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFLIA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getUFLRAFiles")
   fun parseUFLRA(file: File) = parse(file)
 
-  fun getUFLRAFiles(): Stream<Arguments> = loadResource("/full/UFLRA/")
+  fun getUFLRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFLRA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getUFNIAFiles")
   fun parseUFNIA(file: File) = parse(file)
 
-  fun getUFNIAFiles(): Stream<Arguments> = loadResource("/full/UFNIA/")
+  fun getUFNIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFNIA/")
 
-  @Disabled
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getUFNIRAFiles")
   fun parseUFNIRA(file: File) = parse(file)
 
-  fun getUFNIRAFiles(): Stream<Arguments> = loadResource("/full/UFNIRA/")
+  fun getUFNIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFNIRA/")
 }

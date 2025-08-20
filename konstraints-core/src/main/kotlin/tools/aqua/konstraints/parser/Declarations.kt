@@ -1794,7 +1794,7 @@ internal object ToRealDecl :
 
 internal object ToIntDecl :
     SMTTheoryFunction<IntSort>(
-        "to_real".toSymbolWithQuotes(), listOf(Real), SMTInt, Associativity.NONE) {
+        "to_int".toSymbolWithQuotes(), listOf(Real), SMTInt, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -1809,7 +1809,7 @@ internal object ToIntDecl :
 
 internal object IsIntDecl :
     SMTTheoryFunction<BoolSort>(
-        "to_real".toSymbolWithQuotes(), listOf(Real), Bool, Associativity.NONE) {
+        "is_int".toSymbolWithQuotes(), listOf(Real), Bool, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -3271,7 +3271,9 @@ internal object StringsTheory : Theory {
               RegexOptionDecl,
               RegexRangeDecl,
               RegexPowerDecl,
-              RegexLoopDecl)
+              RegexLoopDecl,
+          InRegexDecl,
+          ToRegexDecl)
           .associateBy { it.symbol }
 
   override val sorts =
@@ -3370,7 +3372,7 @@ internal object StrLexOrderDecl :
 
 internal object ToRegexDecl :
     SMTTheoryFunction<RegLanSort>(
-        "str.to_reg".toSymbolWithQuotes(), listOf(SMTString), RegLan, Associativity.NONE) {
+        "str.to_re".toSymbolWithQuotes(), listOf(SMTString), RegLan, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -3390,7 +3392,7 @@ internal object ToRegexDecl :
 
 internal object InRegexDecl :
     SMTTheoryFunction<BoolSort>(
-        "str.in_reg".toSymbolWithQuotes(), listOf(SMTString, RegLan), Bool, Associativity.NONE) {
+        "str.in_re".toSymbolWithQuotes(), listOf(SMTString, RegLan), Bool, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -3739,7 +3741,7 @@ internal object StrReplaceDecl :
 
 internal object StrReplaceAllDecl :
     SMTTheoryFunction<StringSort>(
-        "str.replace".toSymbolWithQuotes(),
+        "str.replace_all".toSymbolWithQuotes(),
         listOf(SMTString, SMTString, SMTString),
         SMTString,
         Associativity.NONE) {
@@ -4022,7 +4024,7 @@ internal object StrFromCodeDecl :
 
 internal object StrToIntDecl :
     SMTTheoryFunction<IntSort>(
-        "str.to_code".toSymbolWithQuotes(), listOf(SMTString), SMTInt, Associativity.NONE) {
+        "str.to_int".toSymbolWithQuotes(), listOf(SMTString), SMTInt, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -4042,7 +4044,7 @@ internal object StrToIntDecl :
 
 internal object StrFromIntDecl :
     SMTTheoryFunction<StringSort>(
-        "str.from_code".toSymbolWithQuotes(), listOf(SMTInt), SMTString, Associativity.NONE) {
+        "str.from_int".toSymbolWithQuotes(), listOf(SMTInt), SMTString, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
