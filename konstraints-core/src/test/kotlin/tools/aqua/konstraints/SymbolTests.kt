@@ -156,11 +156,10 @@ class SymbolTests {
     assertEquals(lhs, rhs)
   }
 
-  private fun getEqualSymbols(): Stream<Arguments> {
-    return Stream.of(
-        arguments("A".toSymbolWithQuotes(), "A".toSymbolWithQuotes()),
-        arguments("A".toSymbolWithQuotes(), "|A|".toSymbolWithQuotes()))
-  }
+  private fun getEqualSymbols(): Stream<Arguments> =
+      Stream.of(
+          arguments("A".toSymbolWithQuotes(), "A".toSymbolWithQuotes()),
+          arguments("A".toSymbolWithQuotes(), "|A|".toSymbolWithQuotes()))
 
   @ParameterizedTest
   @MethodSource("getUnequalSymbols")
@@ -168,7 +167,6 @@ class SymbolTests {
     assertNotEquals(lhs, rhs)
   }
 
-  private fun getUnequalSymbols(): Stream<Arguments> {
-    return Stream.of(arguments("A".toSymbolWithQuotes(), "B".toSymbolWithQuotes()))
-  }
+  private fun getUnequalSymbols(): Stream<Arguments> =
+      Stream.of(arguments("A".toSymbolWithQuotes(), "B".toSymbolWithQuotes()))
 }

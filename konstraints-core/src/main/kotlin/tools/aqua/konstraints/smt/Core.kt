@@ -25,14 +25,14 @@ import tools.aqua.konstraints.parser.*
  * http://smtlib.cs.uiowa.edu/theories-Core.shtml
  */
 
-/** Object for SMT true */
+/** Object for SMT true. */
 object True : ConstantExpression<BoolSort>("true".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
 }
 
-/** Object for SMT false */
+/** Object for SMT false. */
 object False : ConstantExpression<BoolSort>("false".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
 
@@ -40,9 +40,9 @@ object False : ConstantExpression<BoolSort>("false".toSymbolWithQuotes(), Bool) 
 }
 
 /**
- * Implements not according to Core theory (not Bool Bool)
- *
- * @param inner [Expression] of [BoolSort] to be negated
+ * Boolean negation.
+ * - `(not Bool Bool)`
+ * - `(not [inner])`.
  */
 class Not(override val inner: Expression<BoolSort>) :
     UnaryExpression<BoolSort, BoolSort>("not".toSymbolWithQuotes(), Bool) {
@@ -55,9 +55,9 @@ class Not(override val inner: Expression<BoolSort>) :
 }
 
 /**
- * Implements implication according to Core theory (=> Bool Bool Bool :right-assoc)
- *
- * @param statements multiple [Expression] of [BoolSort] to be checked in implies statement
+ * Boolean implication.
+ * - `(=> Bool Bool Bool :right-assoc)`
+ * - `(=> [statements])`.
  */
 class Implies(val statements: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("=>".toSymbolWithQuotes(), Bool) {
@@ -72,9 +72,9 @@ class Implies(val statements: List<Expression<BoolSort>>) :
 }
 
 /**
- * Implements and according to Core theory (and Bool Bool Bool :left-assoc)
- *
- * @param conjuncts multiple [Expression] of [BoolSort] to be joined in and statement
+ * Boolean conjunction.
+ * - `(and Bool Bool Bool :left-assoc)`
+ * - `(and [conjuncts])`.
  */
 class And(val conjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("and".toSymbolWithQuotes(), Bool) {
@@ -89,9 +89,9 @@ class And(val conjuncts: List<Expression<BoolSort>>) :
 }
 
 /**
- * Implements or according to Core theory (or Bool Bool Bool :left-assoc)
- *
- * @param disjuncts multiple [Expression] of [BoolSort] to be joined in or statement
+ * Boolean disjunction.
+ * - `(or Bool Bool Bool :left-assoc)`
+ * - `(or [disjuncts])`.
  */
 class Or(val disjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("or".toSymbolWithQuotes(), Bool) {
@@ -106,9 +106,9 @@ class Or(val disjuncts: List<Expression<BoolSort>>) :
 }
 
 /**
- * Implements xor according to Core theory (xor Bool Bool Bool :left-assoc)
- *
- * @param disjuncts multiple [Expression] of [BoolSort] to be joined in xor statement
+ * Boolean exclusive or.
+ * - `(xor Bool Bool Bool :left-assoc)`
+ * - `(xor [disjuncts])`.
  */
 class XOr(val disjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("xor".toSymbolWithQuotes(), Bool) {
@@ -123,9 +123,9 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) :
 }
 
 /**
- * Implements equals according to Core theory (par (A) (= A A Bool :chainable))
- *
- * @param statements multiple [Expression] of [BoolSort] to be checked in equals statement
+ * Equality.
+ * - `(par (A) (= A A :chainable))`
+ * - `(= [statements])`
  */
 class Equals<T : Sort>(val statements: List<Expression<T>>) :
     HomogenousExpression<BoolSort, Sort>("=".toSymbolWithQuotes(), Bool) {
@@ -140,9 +140,9 @@ class Equals<T : Sort>(val statements: List<Expression<T>>) :
 }
 
 /**
- * Implements distinct according to Core theory (par (A) (distinct A A Bool :pairwise))
- *
- * @param statements multiple [Expression] of [BoolSort] to be checked in distinct statement
+ * Distinct.
+ * - `(par (A) (distinct A A :pairwise))`
+ * - `(distinct [statements])`
  */
 class Distinct<T : Sort>(val statements: List<Expression<T>>) :
     HomogenousExpression<BoolSort, T>("distinct".toSymbolWithQuotes(), Bool) {
@@ -156,9 +156,30 @@ class Distinct<T : Sort>(val statements: List<Expression<T>>) :
       DistinctDecl.constructDynamic(children, emptyList())
 }
 
-/** Bool sort */
-sealed class BoolSort : Sort("Bool") {
-  override val theories = CORE_MARKER_SET
-}
+/**
+ * If-then-else.
+ * - `(par (A) (ite Bool A A A))`
+ * - `(ite [statement] [then] [otherwise])`
+ */
+class Ite<out T : Sort>(
+    val statement: Expression<BoolSort>,
+    val then: Expression<T>,
+    val otherwise: Expression<T>
+) : Expression<T> {
+  init {
+    require(then.sort == otherwise.sort)
+  }
 
-object Bool : BoolSort()
+  override val sort: T = then.sort
+  override val theories = CORE_MARKER_SET
+  override val func = null
+
+  override fun copy(children: List<Expression<*>>): Expression<T> =
+      IteDecl.constructDynamic(children, emptyList()) as Expression<T>
+
+  override val name: Symbol = "ite".toSymbolWithQuotes()
+
+  override val children: List<Expression<*>> = listOf(statement, then, otherwise)
+
+  override fun toString(): String = "(ite $statement $then $otherwise)"
+}

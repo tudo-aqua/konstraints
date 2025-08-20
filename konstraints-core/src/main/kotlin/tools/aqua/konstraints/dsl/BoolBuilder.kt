@@ -177,18 +177,23 @@ infix fun <T : Sort> Expression<T>.eq(other: Expression<T>) =
     }
 
 // allow chaining of equals
+/** Creates (eq [this] [other]). */
 infix fun <T : Sort> Equals<T>.eq(other: Expression<T>) = Equals(children + other)
 
+/** Creates (eq [this] [other]). */
 infix fun <T : Sort> Expression<T>.eq(other: () -> Expression<T>) = this eq other()
 
+/** Creates (eq [this] [other]). */
 infix fun <T : Sort> (() -> Expression<T>).eq(other: Expression<T>) = this() eq other
 
+/** Creates (eq [this] [other]). */
 infix fun <T : Sort> (() -> Expression<T>).eq(other: () -> Expression<T>) = this() eq other()
 
 /** Creates a distinct: [this] distinct [other]. */
 infix fun <T : Sort> Expression<T>.distinct(other: Expression<T>): Distinct<T> =
     Distinct(this, other)
 
+/** Creates a distinct: [this] distinct [other]. */
 infix fun <T : Sort> Distinct<T>.distinct(other: Expression<T>): Distinct<T> =
     Distinct(this.children + other)
 
@@ -247,8 +252,8 @@ fun <T : Sort> distinct(init: Builder<T>.() -> Unit): Distinct<T> {
   return Distinct(builder.children)
 }
 
-/** Implements logical not operation */
+/** Implements logical not operation. */
 fun not(block: () -> Expression<BoolSort>): Not = Not(block())
 
-/** Implements logical not operation */
+/** Implements logical not operation. */
 fun not(expr: Expression<BoolSort>): Not = Not(expr)

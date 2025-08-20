@@ -35,15 +35,23 @@ import tools.aqua.konstraints.smt.IntLiteral
 import tools.aqua.konstraints.smt.RealLiteral
 import tools.aqua.konstraints.smt.Theories
 
+/** Cleaner syntax for [ChoiceParser]. */
 operator fun Parser.plus(other: Parser): ChoiceParser = or(other)
 
+/** Cleaner syntax for [SequenceParser] */
 operator fun Parser.times(other: Parser): SequenceParser = seq(other)
 
+/** Infix syntax for [trim] parser. */
 infix fun Parser.trim(both: Parser): Parser = trim(both)
 
+/** Parse an SMT Program from string. */
 class Parser {
   val program = MutableSMTProgram()
 
+  /**
+   * Companion object holding all static parser elements (all sub-parsers that do not directly
+   * modify the program).
+   */
   companion object {
     private val whitespaceCat = anyOf(" \t\r\n", "space, tab, or newline expected")
     private val printableCat = range('\u0020', '\u007E') + range('\u0080', '\u00FF')
@@ -831,7 +839,7 @@ class Parser {
 
   /**
    * Parses an SMTProgram in string format IMPORTANT linebreak characters ('\n') must be present in
-   * the string representation to correctly filter out comments in the smt code
+   * the string representation to correctly filter out comments in the smt code.
    */
   fun parse(program: String): SMTProgram {
       script.parse(program)
@@ -876,6 +884,10 @@ class Parser {
   }
 }
 
+/**
+ * Exception thrown by the parser detailing the exception [message] and [position] in the input
+ * [buffer].
+ */
 class ParseException(message: String, position: Int, buffer: String) :
     RuntimeException(
         "Parser failed with message $message at position $position: ${buffer.substring(0,position)}")

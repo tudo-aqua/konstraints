@@ -624,7 +624,7 @@ fun BVAShr.z3ify(context: Z3Context): Expr<BitVecSort> =
     context.context.mkBVASHR(lhs.z3ify(context), rhs.z3ify(context))
 
 fun Repeat.z3ify(context: Z3Context): Expr<BitVecSort> =
-    context.context.mkRepeat(j, inner.z3ify(context))
+    context.context.mkRepeat(i, inner.z3ify(context))
 
 fun ZeroExtend.z3ify(context: Z3Context): Expr<BitVecSort> =
     context.context.mkZeroExt(i, inner.z3ify(context))

@@ -34,6 +34,9 @@ object SMTInt : IntSort()
  * Integer literals
  *
  * (NUMERAL Int)
+/*
+ * This file implements the SMT Ints theory
+ * https://smt-lib.org/theories-Ints.shtml
  */
 class IntLiteral(val value: BigInteger) :
     Literal<IntSort>(LiteralString(value.toString()), SMTInt) {

@@ -20,22 +20,15 @@ package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.parser.*
 
-/** Array sort */
-sealed class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) :
-    Sort("Array".toSymbolWithQuotes()) {
-  override val parameters = listOf(x, y)
-
-  override fun toString(): String = "(Array $x $y)"
-
-  override val theories = ARRAYS_EX_MARKER_SET
-}
-
-class SMTArray<X : Sort, Y : Sort>(x: X, y: Y) : ArraySort<X, Y>(x, y)
+/*
+ * This file implements the SMT ArraysEx theory
+ * https://smt-lib.org/theories-ArraysEx.shtml
+ */
 
 /**
- * Array selection operation
- *
- * (par (X Y) (select (Array X Y) X Y)
+ * Array selection operation.
+ * - `(par (X Y) (select (Array X Y) X Y)`
+ * - `(select [array] [index])`
  */
 class ArraySelect<X : Sort, Y : Sort>(
     val array: Expression<ArraySort<X, Y>>,
@@ -51,14 +44,15 @@ class ArraySelect<X : Sort, Y : Sort>(
 
   override val rhs: Expression<X> = index
 
+  @Suppress("UNCHECKED_CAST")
   override fun copy(children: List<Expression<*>>): Expression<Y> =
       ArraySelectDecl.constructDynamic(children, emptyList()) as Expression<Y>
 }
 
 /**
- * Array store operation
- *
- * (par (X Y) (store (Array X Y) X Y (Array X Y)))
+ * Array store operation.
+ * - `(par (X Y) (store (Array X Y) X Y (Array X Y)))`
+ * - `(store [array] [index] [value])`
  */
 class ArrayStore<X : Sort, Y : Sort>(
     val array: Expression<ArraySort<X, Y>>,
@@ -80,6 +74,7 @@ class ArrayStore<X : Sort, Y : Sort>(
 
   override val children: List<Expression<*>> = listOf(array, index, value)
 
+  @Suppress("UNCHECKED_CAST")
   override fun copy(children: List<Expression<*>>): Expression<ArraySort<X, Y>> =
       ArrayStoreDecl.constructDynamic(children, emptyList()) as Expression<ArraySort<X, Y>>
 }

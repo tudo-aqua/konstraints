@@ -20,6 +20,7 @@ package tools.aqua.konstraints.dsl
 
 import java.math.BigInteger
 
+/** Builder for smt set-options command. */
 class OptionsBuilder {
   val stringOptions = mutableMapOf<String, String>()
   val boolOptions = mutableMapOf<String, Boolean>()

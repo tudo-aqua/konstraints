@@ -45,7 +45,7 @@ class SMTProgramTests {
   val bvProgram =
       MutableSMTProgram().apply {
         setLogic(BV)
-        declareFun(coreFunA.func as DeclaredSMTFunction<BoolSort>)
+        declareFun(coreFunA.func as UserDeclaredSMTFunction<BoolSort>)
       }
   val bvFunA = bvProgram.declareConst("A!bitvec".toSymbolWithQuotes(), BVSort(8))()
   val bvFunB = bvProgram.declareConst("B!bitvec".toSymbolWithQuotes(), BVSort(8))()
@@ -60,10 +60,10 @@ class SMTProgramTests {
   val bvfpProgram =
       MutableSMTProgram().apply {
         setLogic(QF_BVFP)
-        declareFun(fpFunA.func as DeclaredSMTFunction<FPSort>)
-        declareFun(fpFunB.func as DeclaredSMTFunction<FPSort>)
-        declareFun(bvFunA.func as DeclaredSMTFunction<BVSort>)
-        declareFun(bvFunB.func as DeclaredSMTFunction<BVSort>)
+        declareFun(fpFunA.func as UserDeclaredSMTFunction<FPSort>)
+        declareFun(fpFunB.func as UserDeclaredSMTFunction<FPSort>)
+        declareFun(bvFunA.func as UserDeclaredSMTFunction<BVSort>)
+        declareFun(bvFunB.func as UserDeclaredSMTFunction<BVSort>)
       }
   val bvfpExpressionA =
       (fpFunA.toUBV(8) concat fpFunB.toUBV(8)) eq (bvneg(bvFunA) concat bvneg(bvFunB))

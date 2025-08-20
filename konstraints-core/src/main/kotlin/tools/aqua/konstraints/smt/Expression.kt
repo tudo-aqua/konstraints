@@ -21,47 +21,51 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.parser.IteDecl
 import tools.aqua.konstraints.util.reduceOrDefault
 
-/** Interface for all sorted SMT terms */
+/** Interface for all sorted SMT terms. */
 sealed interface Expression<out T : Sort> {
   val name: SMTSerializable
   val sort: T
   val theories: Set<Theories>
   val func: SMTFunction<T>?
 
+  /**
+   * Recursive all implementation fun all(predicate: (Expression<*>) -> Boolean): Boolean { return
+   * predicate(this) and subexpressions.map { it.all(predicate) }.reduceOrDefault(true) { t1, t2 ->
+   * t1 and t2 } }
+   */
 
   // TODO implement more operations like filter, filterIsInstance, filterIsSort, forEach, onEach
   // etc.
 
-
-  fun all(predicate: (Expression<*>) -> Boolean): Boolean = when (this) {
-          is ConstantExpression -> predicate(this)
-          is UnaryExpression<*, *> -> predicate(this) and inner.all(predicate)
-          is BinaryExpression<*, *, *> ->
-              predicate(this) and lhs.all(predicate) and rhs.all(predicate)
-          is HomogenousExpression<*, *> ->
-              predicate(this) and
-                      children.map { it.all(predicate) }.reduceOrDefault(true) { t1, t2 -> t1 and t2 }
-          is Ite ->
-              predicate(statement) and
-                      predicate(then) and
-                      predicate(otherwise) and
-                      statement.all(predicate) and
-                      then.all(predicate) and
-                      otherwise.all(predicate)
-          is Literal -> predicate(this)
-          is NAryExpression ->
-              predicate(this) and
-                      children.map { it.all(predicate) }.reduceOrDefault(true) { t1, t2 -> t1 and t2 }
-          is TernaryExpression<*, *, *, *> ->
-              predicate(this) and lhs.all(predicate) and mid.all(predicate) and rhs.all(predicate)
-          is LetExpression -> inner.all(predicate) // TODO maybe this should also check all bindings
-          is LocalExpression -> predicate(this)
-          is BoundVariable -> predicate(this)
-          is ExistsExpression -> term.all(predicate)
-          is ForallExpression -> term.all(predicate)
-          is AnnotatedExpression -> predicate(this) and term.all(predicate)
+  fun all(predicate: (Expression<*>) -> Boolean): Boolean =
+      when (this) {
+        is ConstantExpression -> predicate(this)
+        is UnaryExpression<*, *> -> predicate(this) and inner.all(predicate)
+        is BinaryExpression<*, *, *> ->
+            predicate(this) and lhs.all(predicate) and rhs.all(predicate)
+        is HomogenousExpression<*, *> ->
+            predicate(this) and
+                children.map { it.all(predicate) }.reduceOrDefault(true) { t1, t2 -> t1 and t2 }
+        is Ite ->
+            predicate(statement) and
+                predicate(then) and
+                predicate(otherwise) and
+                statement.all(predicate) and
+                then.all(predicate) and
+                otherwise.all(predicate)
+        is Literal -> predicate(this)
+        is NAryExpression ->
+            predicate(this) and
+                children.map { it.all(predicate) }.reduceOrDefault(true) { t1, t2 -> t1 and t2 }
+        is TernaryExpression<*, *, *, *> ->
+            predicate(this) and lhs.all(predicate) and mid.all(predicate) and lhs.all(predicate)
+        is LetExpression -> inner.all(predicate) // TODO maybe this should also check all bindings
+        is LocalExpression -> predicate(this)
+        is BoundVariable -> predicate(this)
+        is ExistsExpression -> term.all(predicate)
+        is ForallExpression -> term.all(predicate)
+        is AnnotatedExpression -> predicate(this) and term.all(predicate)
       }
-
 
   fun asSequence(): Sequence<Expression<*>> = sequence {
     yield(this@Expression)

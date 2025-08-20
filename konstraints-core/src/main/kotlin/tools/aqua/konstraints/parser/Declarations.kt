@@ -20,6 +20,7 @@ package tools.aqua.konstraints.parser
 
 import tools.aqua.konstraints.smt.*
 
+/** Enum for all associativity types. */
 enum class Associativity {
   LEFT_ASSOC,
   RIGHT_ASSOC,
@@ -28,6 +29,7 @@ enum class Associativity {
   NONE
 }
 
+/** Base class for all smt functions defined by a theory. */
 abstract class SMTTheoryFunction<T : Sort>(
     override val symbol: Symbol,
     override val parameters: List<Sort>,
@@ -35,12 +37,13 @@ abstract class SMTTheoryFunction<T : Sort>(
     val associativity: Associativity
 ) : SMTFunction<T>()
 
+/** Base class for all smt theories. */
 interface Theory {
   val functions: Map<Symbol, SMTFunction<*>>
   val sorts: Map<Symbol, SortFactory>
 }
 
-/** Core theory internal object */
+/** Core theory internal object. */
 internal object CoreTheory : Theory {
   override val functions =
       listOf(
@@ -94,7 +97,7 @@ internal object FalseDecl :
   }
 }
 
-/** Not declaration internal object */
+/** Not declaration internal object. */
 internal object NotDecl :
     SMTTheoryFunction<BoolSort>(
         "not".toSymbolWithQuotes(), listOf(Bool), Bool, Associativity.NONE) {
@@ -113,7 +116,7 @@ internal object NotDecl :
   }
 }
 
-/** Implies declaration internal object */
+/** Implies declaration internal object. */
 internal object ImpliesDecl :
     SMTTheoryFunction<BoolSort>(
         "=>".toSymbolWithQuotes(), listOf(Bool, Bool), Bool, Associativity.CHAINABLE) {
@@ -138,7 +141,7 @@ internal object ImpliesDecl :
   }
 }
 
-/** And declaration internal object */
+/** And declaration internal object. */
 internal object AndDecl :
     SMTTheoryFunction<BoolSort>(
         "and".toSymbolWithQuotes(), listOf(Bool, Bool), Bool, Associativity.LEFT_ASSOC) {
@@ -162,7 +165,7 @@ internal object AndDecl :
   }
 }
 
-/** Or declaration internal object */
+/** Or declaration internal object. */
 internal object OrDecl :
     SMTTheoryFunction<BoolSort>(
         "or".toSymbolWithQuotes(), listOf(Bool, Bool), Bool, Associativity.LEFT_ASSOC) {
@@ -187,7 +190,7 @@ internal object OrDecl :
   }
 }
 
-/** Xor declaration internal object */
+/** Xor declaration internal object. */
 internal object XOrDecl :
     SMTTheoryFunction<BoolSort>(
         "xor".toSymbolWithQuotes(), listOf(Bool, Bool), Bool, Associativity.LEFT_ASSOC) {
@@ -212,7 +215,7 @@ internal object XOrDecl :
   }
 }
 
-/** Equals declaration internal object */
+/** Equals declaration internal object. */
 internal object EqualsDecl :
     SMTTheoryFunction<Sort>(
         "=".toSymbolWithQuotes(),
@@ -238,7 +241,7 @@ internal object EqualsDecl :
   }
 }
 
-/** Distinct declaration internal object */
+/** Distinct declaration internal object. */
 internal object DistinctDecl :
     SMTTheoryFunction<Sort>(
         "distinct".toSymbolWithQuotes(),
@@ -264,7 +267,7 @@ internal object DistinctDecl :
   }
 }
 
-/** Ite declaration internal object */
+/** Ite declaration internal object. */
 internal object IteDecl :
     SMTTheoryFunction<Sort>(
         "ite".toSymbolWithQuotes(),
@@ -284,7 +287,7 @@ internal object IteDecl :
   }
 }
 
-/** FixedSizeBitVectors theory internal object */
+/** FixedSizeBitVectors theory internal object. */
 internal object BitVectorExpressionTheory : Theory {
   override val functions =
       listOf(
@@ -3175,14 +3178,14 @@ internal object FPToRealDecl :
   }
 }
 
-/** Array extension theory internal object */
+/** Array extension theory internal object. */
 internal object ArrayExTheory : Theory {
   override val functions = listOf(ArraySelectDecl, ArrayStoreDecl).associateBy { it.symbol }
 
   override val sorts = mapOf("Array".toSymbolWithQuotes() to ArraySortFactory)
 }
 
-/** Array selection declaration internal object */
+/** Array selection declaration internal object. */
 internal object ArraySelectDecl :
     SMTTheoryFunction<Sort>(
         "select".toSymbolWithQuotes(),
@@ -3206,7 +3209,7 @@ internal object ArraySelectDecl :
   }
 }
 
-/** Array store declaration internal object */
+/** Array store declaration internal object. */
 internal object ArrayStoreDecl :
     SMTTheoryFunction<ArraySort<Sort, Sort>>(
         "store".toSymbolWithQuotes(),
@@ -3235,7 +3238,7 @@ internal object ArrayStoreDecl :
   }
 }
 
-/** Strings theory internal object */
+/** Strings theory internal object. */
 internal object StringsTheory : Theory {
   override val functions =
       listOf(

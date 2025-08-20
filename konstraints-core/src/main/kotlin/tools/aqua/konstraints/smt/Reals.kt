@@ -22,17 +22,9 @@ import java.math.BigDecimal
 import java.math.BigInteger
 import tools.aqua.konstraints.parser.*
 
-/** Real sort */
-sealed class RealSort : NumeralSort("Real") {
-  override val theories = REALS_REALS_INTS_MARKER_SET.plus(FLOATING_POINT_MARKER_SET)
-}
-
-object Real : RealSort()
-
-/**
- * Real literal
- *
- * (NUMERAL Real) (DECIMAL Real)
+/*
+ * This file implements the SMT Reals theory
+ * https://smt-lib.org/theories-Reals.shtml
  */
 class RealLiteral(val value: BigDecimal) :
     Literal<RealSort>(LiteralString(value.toString()), Real) {

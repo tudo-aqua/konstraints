@@ -114,37 +114,34 @@ class StackTests {
     assertThrows<NoSuchElementException> { stack.pop() }
   }
 
-  private fun getIntegerLists(): Stream<Arguments> {
-    return Stream.of(
-        arguments(listOf(10, 94, 81, 36, 71, 80, 66, 34, 52, 2)),
-        arguments(listOf(68, 56, 35, 78, 92, 54, 45, 77, 99, 58)),
-        arguments(listOf(57, 41, 51, 5, 37, 7, 16, 75, 88, 32)),
-        arguments(listOf(1, 76, 26, 12, 44, 79, 86, 25, 74, 8)),
-        arguments(listOf(85, 9, 63, 49, 87, 55, 31, 64, 65, 23)),
-        arguments(listOf(62, 38, 69, 30, 14, 47, 29, 95, 97, 18)),
-        arguments(listOf(50, 20, 96, 72, 17, 13, 89, 93, 33, 73)),
-        arguments(listOf(24, 98, 84, 42, 60, 70, 19, 21, 22, 48)),
-        arguments(listOf(11, 39, 4, 90, 46, 59, 91, 6, 40, 43)),
-        arguments(listOf(15, 3, 83, 27, 61, 53, 82, 67, 28)))
-  }
+  private fun getIntegerLists(): Stream<Arguments> =
+      Stream.of(
+          arguments(listOf(10, 94, 81, 36, 71, 80, 66, 34, 52, 2)),
+          arguments(listOf(68, 56, 35, 78, 92, 54, 45, 77, 99, 58)),
+          arguments(listOf(57, 41, 51, 5, 37, 7, 16, 75, 88, 32)),
+          arguments(listOf(1, 76, 26, 12, 44, 79, 86, 25, 74, 8)),
+          arguments(listOf(85, 9, 63, 49, 87, 55, 31, 64, 65, 23)),
+          arguments(listOf(62, 38, 69, 30, 14, 47, 29, 95, 97, 18)),
+          arguments(listOf(50, 20, 96, 72, 17, 13, 89, 93, 33, 73)),
+          arguments(listOf(24, 98, 84, 42, 60, 70, 19, 21, 22, 48)),
+          arguments(listOf(11, 39, 4, 90, 46, 59, 91, 6, 40, 43)),
+          arguments(listOf(15, 3, 83, 27, 61, 53, 82, 67, 28)))
 
-  private fun getIntergerListsWithEmpty(): Stream<Arguments> {
-    return Stream.of(
-        arguments(emptyList<Int>()),
-        arguments(listOf<Int>()),
-        arguments(listOf(10, 94, 81, 36, 71, 80, 66, 34, 52, 2)),
-        arguments(listOf(68, 56, 35, 78, 92, 54, 45, 77, 99, 58)),
-        arguments(listOf(57, 41, 51, 5, 37, 7, 16, 75, 88, 32)),
-        arguments(listOf(1, 76, 26, 12, 44, 79, 86, 25, 74, 8)),
-        arguments(listOf(85, 9, 63, 49, 87, 55, 31, 64, 65, 23)),
-        arguments(listOf(62, 38, 69, 30, 14, 47, 29, 95, 97, 18)),
-        arguments(listOf(50, 20, 96, 72, 17, 13, 89, 93, 33, 73)),
-        arguments(listOf(24, 98, 84, 42, 60, 70, 19, 21, 22, 48)),
-        arguments(listOf(11, 39, 4, 90, 46, 59, 91, 6, 40, 43)),
-        arguments(listOf(15, 3, 83, 27, 61, 53, 82, 67, 28)))
-  }
+  private fun getIntergerListsWithEmpty(): Stream<Arguments> =
+      Stream.of(
+          arguments(emptyList<Int>()),
+          arguments(listOf<Int>()),
+          arguments(listOf(10, 94, 81, 36, 71, 80, 66, 34, 52, 2)),
+          arguments(listOf(68, 56, 35, 78, 92, 54, 45, 77, 99, 58)),
+          arguments(listOf(57, 41, 51, 5, 37, 7, 16, 75, 88, 32)),
+          arguments(listOf(1, 76, 26, 12, 44, 79, 86, 25, 74, 8)),
+          arguments(listOf(85, 9, 63, 49, 87, 55, 31, 64, 65, 23)),
+          arguments(listOf(62, 38, 69, 30, 14, 47, 29, 95, 97, 18)),
+          arguments(listOf(50, 20, 96, 72, 17, 13, 89, 93, 33, 73)),
+          arguments(listOf(24, 98, 84, 42, 60, 70, 19, 21, 22, 48)),
+          arguments(listOf(11, 39, 4, 90, 46, 59, 91, 6, 40, 43)),
+          arguments(listOf(15, 3, 83, 27, 61, 53, 82, 67, 28)))
 
-  private fun getEmptyLists(): Stream<Arguments> {
-    return Stream.of(arguments(emptyList<Int>()), arguments(listOf<Int>()))
-  }
+  private fun getEmptyLists(): Stream<Arguments> =
+      Stream.of(arguments(emptyList<Int>()), arguments(listOf<Int>()))
 }

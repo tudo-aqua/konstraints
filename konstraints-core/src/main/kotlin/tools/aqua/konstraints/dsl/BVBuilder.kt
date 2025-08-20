@@ -634,16 +634,16 @@ fun extract(i: Int, j: Int, expr: Expression<BVSort>) = BVExtract(i, j, expr)
  * Unary bitvector operations
  */
 
-/** Bitwise negation operator */
+/** Bitwise negation operator. */
 fun bvnot(block: () -> Expression<BVSort>) = BVNot(block())
 
-/** Bitwise negation operator */
+/** Bitwise negation operator. */
 fun bvnot(expr: Expression<BVSort>) = BVNot(expr)
 
-/** 2's complement unary minus */
+/** 2's complement unary minus. */
 fun bvneg(block: () -> Expression<BVSort>) = BVNeg(block())
 
-/** 2's complement unary minus */
+/** 2's complement unary minus. */
 fun bvneg(expr: Expression<BVSort>) = BVNeg(expr)
 
 /*
