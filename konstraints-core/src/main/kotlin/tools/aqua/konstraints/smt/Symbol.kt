@@ -21,38 +21,38 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.parser.Parser
 
 /**
- * Quoting rules for SMT String
+ * Quoting rules for SMT String, used when serializing program.
  *
- * @property NONE no modification will be done
- * @property SMART automatically determines whether the string needs quoting or not
- * @property FORCED quotes the string if it is not already quoted
+ * @property NEVER will never quote any symbol, even if the constructing string is quoted
+ * @property SAME_AS_INPUT no modification will be done
+ * @property WHEN_NEEDED automatically determines whether the symbol needs quoting or not
+ * @property ALWAYS quotes all symbols
  */
 enum class QuotingRule {
   /**
    * No Symbol will be quoted, note this will result in exceptions if symbols must be quoted to be
-   * valid
+   * valid.
    */
   NEVER,
 
-  /** No modification will be done */
+  /** No modification will be done. */
   SAME_AS_INPUT,
 
-  /** Automatically determines whether the string needs quoting or not */
+  /** Automatically determines whether the string needs quoting or not. */
   WHEN_NEEDED,
 
-  /** Quotes the string if it is not already quoted */
+  /** Quotes the string if it is not already quoted. */
   ALWAYS
 }
 
 /**
- * Representation of an SMT Symbol
+ * Representation of an SMT Symbol.
  *
- * @param raw String containing the SMT Symbol
  * @throws IllegalSymbolException if [raw] is not a valid SMT Symbol
  */
 // constructor is internal to prevent external subclassing of Symbol
 open class Symbol internal constructor(raw: String, val wasQuoted: Boolean) : SMTSerializable {
-  /** If true the Symbol is only a valid SMT Symbol if it is quoted */
+  /** If true the Symbol is only a valid SMT Symbol if it is quoted. */
   // Parser must consume the entire string so .end() is needed
   val mustQuote: Boolean =
       // check if we have a simple symbol (that is a symbol that is valid without quotes)
@@ -78,12 +78,12 @@ open class Symbol internal constructor(raw: String, val wasQuoted: Boolean) : SM
 
   /**
    * Internal representation of the symbol without quotes, quoting will be reconstructed by
-   * [toSMTString] before giving the symbol to a solver
+   * [toSMTString] before giving the symbol to a solver.
    */
   val value: String = raw.trim('|')
 
   companion object {
-    /** public substitute for constructor */
+    /** public substitute for constructor. */
     operator fun invoke(symbol: String, wasQuoted: Boolean): Symbol = this(symbol, wasQuoted)
   }
 
@@ -98,10 +98,10 @@ open class Symbol internal constructor(raw: String, val wasQuoted: Boolean) : SM
         else -> value == other.value
       }
 
-  /** Returns the internal representation of the symbol without any quotes */
+  /** Returns the internal representation of the symbol without any quotes. */
   override fun toString() = value
 
-  /** Returns a valid SMT String with reconstructed quoting */
+  /** Returns a valid SMT String with reconstructed quoting. */
   fun toSMTString(rule: QuotingRule = QuotingRule.SAME_AS_INPUT) =
       when (rule) {
         QuotingRule.NEVER -> if (mustQuote) throw IllegalSymbolException(value) else value

@@ -24,7 +24,7 @@ import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.util.SimpleDelegate
 
 /**
- * Declares an SMT constant: (declare-const |const!sort!UUID| [sort])
+ * Declares an SMT constant: (declare-const |const!sort!UUID| [sort]).
  *
  * The name of the constant is automatically generated as '|const!sort!UUID|'
  *
@@ -34,7 +34,7 @@ fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T) =
     Const(sort, this, "|const!$sort!${UUID.randomUUID()}|")
 
 /**
- * Declares an SMT constant: (declare-const [name] [sort])
+ * Declares an SMT constant: (declare-const [name] [sort]).
  *
  * If the name is empty, the function automatically generates a name as '|const!sort!UUID|'
  *
@@ -43,7 +43,7 @@ fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T) =
 fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T, name: String) = Const(sort, this, name)
 
 /**
- * Declares an SMT function without any parameters: (declare-fun symbol () [sort])
+ * Declares an SMT function without any parameters: (declare-fun symbol () [sort]).
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * For functions of arity 0, prefer [declaringConst]. The functions name will be the same as the
@@ -54,7 +54,7 @@ fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T, name: String) = Const(s
 fun <T : Sort> SMTProgramBuilder.declaring(sort: T) = Declare0(sort, this)
 
 /**
- * Declares an SMT function with one parameter: (declare-fun symbol ([par]) [sort])
+ * Declares an SMT function with one parameter: (declare-fun symbol ([par]) [sort]).
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * The functions name will be the same as the variables name.
@@ -64,7 +64,7 @@ fun <T : Sort> SMTProgramBuilder.declaring(sort: T) = Declare0(sort, this)
 fun <T : Sort, S : Sort> SMTProgramBuilder.declaring(sort: T, par: S) = Declare1(sort, par, this)
 
 /**
- * Declares an SMT function with two parameters: (declare-fun symbol ([par1] [par2]) [sort])
+ * Declares an SMT function with two parameters: (declare-fun symbol ([par1] [par2]) [sort]).
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * The functions name will be the same as the variables name.
@@ -75,7 +75,7 @@ fun <T : Sort, S1 : Sort, S2 : Sort> SMTProgramBuilder.declaring(sort: T, par1: 
     Declare2(sort, par1, par2, this)
 
 /**
- * Declares an SMT function with three parameters: (declare-fun symbol ([par1] [par2] [par3])
+ * Declares an SMT function with three parameters: (declare-fun symbol ([par1] [par2] [par3]).
  * [sort])
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
@@ -91,7 +91,7 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort> SMTProgramBuilder.declaring(
 ) = Declare3(sort, par1, par2, par3, this)
 
 /**
- * Declares an SMT function with four parameters: (declare-fun symbol ([par1] [par2] [par3] [par4])
+ * Declares an SMT function with four parameters: (declare-fun symbol ([par1] [par2] [par3] [par4]).
  * [sort])
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
@@ -109,7 +109,7 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> SMTProgramBuilder.dec
 
 /**
  * Declares an SMT function with five parameters: (declare-fun symbol ([par1] [par2] [par3] [par4]
- * [par5]) [sort])
+ * [par5]) [sort]).
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * The functions name will be the same as the variables name.
@@ -126,7 +126,7 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> SMTProgram
 ) = Declare5(sort, par1, par2, par3, par4, par5, this)
 
 /**
- * Define an SMT function: (define-fun symbol () [sort] [block])
+ * Define an SMT function: (define-fun symbol () [sort] [block]).
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * The functions name will be the same as the variables name.
@@ -137,7 +137,7 @@ fun <T : Sort> SMTProgramBuilder.defining(sort: T, block: (List<Expression<*>>) 
     Define(sort, block, this)
 
 /**
- * Define an SMT function: (define-fun symbol ([par]) [sort] [block])
+ * Define an SMT function: (define-fun symbol ([par]) [sort] [block]).
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * The functions name will be the same as the variables name.
@@ -151,7 +151,7 @@ fun <T : Sort, S : Sort> SMTProgramBuilder.defining(
 ) = Define1(sort, block, par, this)
 
 /**
- * Define an SMT function: (define-fun symbol ([par1] [par2]) [sort] [block])
+ * Define an SMT function: (define-fun symbol ([par1] [par2]) [sort] [block]).
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * The functions name will be the same as the variables name.
@@ -166,7 +166,7 @@ fun <T : Sort, S1 : Sort, S2 : Sort> SMTProgramBuilder.defining(
 ) = Define2(sort, block, par1, par2, this)
 
 /**
- * Define an SMT function: (define-fun symbol ([par1] [par2] [par3]) [sort] [block])
+ * Define an SMT function: (define-fun symbol ([par1] [par2] [par3]) [sort] [block]).
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * The functions name will be the same as the variables name.
@@ -182,7 +182,7 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort> SMTProgramBuilder.defining(
 ) = Define3(sort, block, par1, par2, par3, this)
 
 /**
- * Define an SMT function: (define-fun symbol ([par1] [par2] [par3] [par4]) [sort] [block])
+ * Define an SMT function: (define-fun symbol ([par1] [par2] [par3] [par4]) [sort] [block]).
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * The functions name will be the same as the variables name.
@@ -199,7 +199,7 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> SMTProgramBuilder.def
 ) = Define4(sort, block, par1, par2, par3, par4, this)
 
 /**
- * Define an SMT function: (define-fun symbol ([par1] [par2] [par3] [par4] [par5]) [sort] [block])
+ * Define an SMT function: (define-fun symbol ([par1] [par2] [par3] [par4] [par5]) [sort] [block]).
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * The functions name will be the same as the variables name.
@@ -659,11 +659,12 @@ class Define5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
   }
 }
 
+/** User declared smt function with any number of arguments. */
 data class UserDeclaredSMTFunctionN<T : Sort>(
     override val symbol: Symbol,
     override val sort: T,
     override val parameters: List<Sort>,
-) : DeclaredSMTFunction<T>()
+) : UserDeclaredSMTFunction<T>()
 
 /**
  * SMTFunction of arity 0.
@@ -673,9 +674,10 @@ data class UserDeclaredSMTFunctionN<T : Sort>(
 data class UserDeclaredSMTFunction0<T : Sort>(
     override val symbol: Symbol,
     override val sort: T,
-) : DeclaredSMTFunction<T>() {
+) : UserDeclaredSMTFunction<T>() {
   override val parameters = emptyList<Sort>()
 
+  /** Create instance. */
   operator fun invoke() = UserDeclaredExpression(symbol, sort, this)
 }
 
@@ -688,9 +690,10 @@ data class UserDeclaredSMTFunction1<T : Sort, S : Sort>(
     override val symbol: Symbol,
     override val sort: T,
     val parameter: S,
-) : DeclaredSMTFunction<T>() {
+) : UserDeclaredSMTFunction<T>() {
   override val parameters = listOf(parameter)
 
+  /** Create instance by applying [arg] to [this]. */
   operator fun invoke(arg: Expression<S>) = UserDeclaredExpression(symbol, sort, listOf(arg), this)
 }
 
@@ -704,9 +707,10 @@ data class UserDeclaredSMTFunction2<T : Sort, S1 : Sort, S2 : Sort>(
     override val sort: T,
     val parameter1: S1,
     val parameter2: S2,
-) : DeclaredSMTFunction<T>() {
+) : UserDeclaredSMTFunction<T>() {
   override val parameters = listOf(parameter1, parameter2)
 
+  /** Create instance by applying [arg1], [arg2] to [this]. */
   operator fun invoke(arg1: Expression<S1>, arg2: Expression<S2>) =
       UserDeclaredExpression(symbol, sort, listOf(arg1, arg2), this)
 }
@@ -722,9 +726,10 @@ data class UserDeclaredSMTFunction3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val parameter1: S1,
     val parameter2: S2,
     val parameter3: S3,
-) : DeclaredSMTFunction<T>() {
+) : UserDeclaredSMTFunction<T>() {
   override val parameters = listOf(parameter1, parameter2, parameter3)
 
+  /** Create instance by applying [arg1], [arg2], [arg3] to [this]. */
   operator fun invoke(arg1: Expression<S1>, arg2: Expression<S2>, arg3: Expression<S3>) =
       UserDeclaredExpression(symbol, sort, listOf(arg1, arg2, arg3), this)
 }
@@ -741,9 +746,10 @@ data class UserDeclaredSMTFunction4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S
     val parameter2: S2,
     val parameter3: S3,
     val parameter4: S4,
-) : DeclaredSMTFunction<T>() {
+) : UserDeclaredSMTFunction<T>() {
   override val parameters = listOf(parameter1, parameter2, parameter3, parameter4)
 
+  /** Create instance by applying [arg1], [arg2], [arg3], [arg4] to [this]. */
   operator fun invoke(
       arg1: Expression<S1>,
       arg2: Expression<S2>,
@@ -766,9 +772,10 @@ data class UserDeclaredSMTFunction5<
     val parameter3: S3,
     val parameter4: S4,
     val parameter5: S5,
-) : DeclaredSMTFunction<T>() {
+) : UserDeclaredSMTFunction<T>() {
   override val parameters = listOf(parameter1, parameter2, parameter3, parameter4, parameter5)
 
+  /** Create instance by applying [arg1], [arg2], [arg3], [arg4], [arg5] to [this]. */
   operator fun invoke(
       arg1: Expression<S1>,
       arg2: Expression<S2>,
@@ -778,13 +785,16 @@ data class UserDeclaredSMTFunction5<
   ) = UserDeclaredExpression(symbol, sort, listOf(arg1, arg2, arg3, arg4, arg5), this)
 }
 
+/** User defined smt function with any number of arguments. */
 data class UserDefinedSMTFunctionN<T : Sort>(
     override val symbol: Symbol,
     override val sort: T,
     override val sortedVars: List<SortedVar<*>>,
     override val term: Expression<T>
 ) : DefinedSMTFunction<T>() {
+  /** Companion object for pseudo constructor. */
   companion object {
+    /** Pseudo constructor. */
     operator fun <T : Sort> invoke(
         symbol: Symbol,
         sort: T,
@@ -816,6 +826,7 @@ data class UserDefinedSMTFunction0<T : Sort>(
   override val parameters = emptyList<Sort>()
   override val sortedVars = emptyList<SortedVar<*>>()
 
+  /** Create instance. */
   operator fun invoke() =
       UserDefinedExpression(
           symbol, sort, emptyList(), FunctionDef(symbol, sortedVars, sort, term), this)
@@ -842,6 +853,7 @@ data class UserDefinedSMTFunction1<T : Sort, S : Sort>(
   override val parameters = listOf(parameter.sort)
   override val sortedVars = listOf(parameter)
 
+  /** Create instance by applying [arg] to [this]. */
   operator fun invoke(arg: Expression<S>) =
       UserDefinedExpression(
           symbol, sort, listOf(arg), FunctionDef(symbol, sortedVars, sort, term), this)
@@ -875,6 +887,7 @@ data class UserDefinedSMTFunction2<T : Sort, S1 : Sort, S2 : Sort>(
   override val parameters = listOf(parameter1.sort, parameter2.sort)
   override val sortedVars = listOf(parameter1, parameter2)
 
+  /** Create instance by applying [arg1], [arg2] to [this]. */
   operator fun invoke(arg1: Expression<S1>, arg2: Expression<S2>) =
       UserDefinedExpression(
           symbol, sort, listOf(arg1, arg2), FunctionDef(symbol, sortedVars, sort, term), this)
@@ -911,6 +924,7 @@ data class UserDefinedSMTFunction3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
       SortedVar("|local!$sort!3|".toSymbolWithQuotes(), parameter3),
       term)
 
+  /** Create instance by applying [arg1], [arg2], [arg3] to [this]. */
   operator fun invoke(arg1: Expression<S1>, arg2: Expression<S2>, arg3: Expression<S3>) =
       UserDefinedExpression(
           symbol, sort, listOf(arg1, arg2, arg3), FunctionDef(symbol, sortedVars, sort, term), this)
@@ -951,6 +965,7 @@ data class UserDefinedSMTFunction4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4
       SortedVar("|local!$sort!4|".toSymbolWithQuotes(), parameter4),
       term)
 
+  /** Create instance by applying [arg1], [arg2], [arg3], [arg4] to [this]. */
   operator fun invoke(
       arg1: Expression<S1>,
       arg2: Expression<S2>,
@@ -1003,6 +1018,7 @@ data class UserDefinedSMTFunction5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4
       SortedVar("|local!$sort!5|".toSymbolWithQuotes(), parameter5),
       term)
 
+  /** Create instance by applying [arg1], [arg2], [arg3], [arg4], [arg5] to [this]. */
   operator fun invoke(
       arg1: Expression<S1>,
       arg2: Expression<S2>,

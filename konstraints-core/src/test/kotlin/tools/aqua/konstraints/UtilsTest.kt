@@ -39,13 +39,12 @@ class UtilsTest {
     assertThrows<IllegalArgumentException> { lhs zipWithSameLength rhs }
   }
 
-  private fun getUnequalLengthLists(): Stream<Arguments> {
-    return Stream.of(
-        arguments(listOf(1, 2, 3), listOf(1, 2)),
-        arguments(listOf(1, 2), emptyList<Any>()),
-        arguments(emptyList<Any>(), listOf(1, 2)),
-    )
-  }
+  private fun getUnequalLengthLists(): Stream<Arguments> =
+      Stream.of(
+          arguments(listOf(1, 2, 3), listOf(1, 2)),
+          arguments(listOf(1, 2), emptyList<Any>()),
+          arguments(emptyList<Any>(), listOf(1, 2)),
+      )
 
   @ParameterizedTest
   @MethodSource("getEqualLengthList")
@@ -53,11 +52,10 @@ class UtilsTest {
     assertEquals(lhs zip rhs, lhs zipWithSameLength rhs)
   }
 
-  private fun getEqualLengthList(): Stream<Arguments> {
-    return Stream.of(
-        arguments(listOf(1, 2, 3), listOf(4, 5, 6)),
-        arguments(listOf(1), listOf(2)),
-        arguments(emptyList<Any>(), emptyList<Any>()),
-    )
-  }
+  private fun getEqualLengthList(): Stream<Arguments> =
+      Stream.of(
+          arguments(listOf(1, 2, 3), listOf(4, 5, 6)),
+          arguments(listOf(1), listOf(2)),
+          arguments(emptyList<Any>(), emptyList<Any>()),
+      )
 }
