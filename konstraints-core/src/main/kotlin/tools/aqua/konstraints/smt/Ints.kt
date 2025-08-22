@@ -26,9 +26,9 @@ import tools.aqua.konstraints.parser.*
  */
 
 /**
- * Integer negation.
- * - `(- Int Int)`
- * - `(- [inner])`
+ * Integer negation
+ *
+ * (- Int Int)
  */
 class IntNeg(override val inner: Expression<IntSort>) :
     UnaryExpression<IntSort, IntSort>("-".toSymbolWithQuotes(), SMTInt) {
@@ -39,9 +39,9 @@ class IntNeg(override val inner: Expression<IntSort>) :
 }
 
 /**
- * Integer subtraction.
- * - `(- Int Int Int :left-assoc)`
- * - `(- [terms])`
+ * Integer subtraction
+ *
+ * (- Int Int Int :left-assoc)
  */
 class IntSub(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<IntSort, IntSort>("-".toSymbolWithQuotes(), SMTInt) {
@@ -62,9 +62,9 @@ class IntSub(val terms: List<Expression<IntSort>>) :
 }
 
 /**
- * Integer addition.
- * - `(+ Int Int Int :left-assoc)`
- * - `(+ [terms])`
+ * Integer addition
+ *
+ * (+ Int Int Int :left-assoc)
  */
 class IntAdd(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<IntSort, IntSort>("+".toSymbolWithQuotes(), SMTInt) {
@@ -85,9 +85,9 @@ class IntAdd(val terms: List<Expression<IntSort>>) :
 }
 
 /**
- * Integer multiplication.
- * - `(* Int Int Int :left-assoc)`
- * - `(* [factors])`
+ * Integer multiplication
+ *
+ * (* Int Int Int :left-assoc)
  */
 class IntMul(val factors: List<Expression<IntSort>>) :
     HomogenousExpression<IntSort, IntSort>("*".toSymbolWithQuotes(), SMTInt) {
@@ -108,9 +108,9 @@ class IntMul(val factors: List<Expression<IntSort>>) :
 }
 
 /**
- * Integer division.
- * - `(div Int Int Int :left-assoc)`
- * - `(div [terms])`
+ * Integer division
+ *
+ * (div Int Int Int :left-assoc)
  */
 class IntDiv(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<IntSort, IntSort>("/".toSymbolWithQuotes(), SMTInt) {
@@ -131,9 +131,9 @@ class IntDiv(val terms: List<Expression<IntSort>>) :
 }
 
 /**
- * Modulo.
- * - `(mod Int Int Int)`
- * - `(mod [dividend] [divisor])`
+ * Modulo
+ *
+ * (mod Int Int Int)
  */
 class Mod(val dividend: Expression<IntSort>, val divisor: Expression<IntSort>) :
     BinaryExpression<IntSort, IntSort, IntSort>("mod".toSymbolWithQuotes(), SMTInt) {
@@ -148,9 +148,9 @@ class Mod(val dividend: Expression<IntSort>, val divisor: Expression<IntSort>) :
 }
 
 /**
- * Absolute value.
- * - `(abs Int Int)`
- * - `(abs [inner])`
+ * Absolute value
+ *
+ * (abs Int Int)
  */
 class Abs(override val inner: Expression<IntSort>) :
     UnaryExpression<IntSort, IntSort>("abs".toSymbolWithQuotes(), SMTInt) {
@@ -161,9 +161,9 @@ class Abs(override val inner: Expression<IntSort>) :
 }
 
 /**
- * Integer less equals.
- * - `(<= Int Int Bool :chainable)`
- * - `(<= [terms])`
+ * Integer less equals
+ *
+ * (<= Int Int Bool :chainable)
  */
 class IntLessEq(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<BoolSort, IntSort>("<=".toSymbolWithQuotes(), Bool) {
@@ -184,9 +184,9 @@ class IntLessEq(val terms: List<Expression<IntSort>>) :
 }
 
 /**
- * Integer less.
- * - `(< Int Int Bool :chainable)`
- * - `(< [terms])`
+ * Integer less
+ *
+ * (< Int Int Bool :chainable)
  */
 class IntLess(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<BoolSort, IntSort>("<".toSymbolWithQuotes(), Bool) {
@@ -207,9 +207,9 @@ class IntLess(val terms: List<Expression<IntSort>>) :
 }
 
 /**
- * Integer greater equals.
- * - `(>= Int Int Bool :chainable)`
- * - `(>= [terms])`
+ * Integer greater equals
+ *
+ * (>= Int Int Bool :chainable)
  */
 class IntGreaterEq(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<BoolSort, IntSort>(">=".toSymbolWithQuotes(), Bool) {
@@ -230,9 +230,9 @@ class IntGreaterEq(val terms: List<Expression<IntSort>>) :
 }
 
 /**
- * Integer greater.
- * - `(> Int Int Bool :chainable)`
- * - `(> [terms])`
+ * Integer greater
+ *
+ * (> Int Int Bool :chainable)
  */
 class IntGreater(val terms: List<Expression<IntSort>>) :
     HomogenousExpression<BoolSort, IntSort>(">".toSymbolWithQuotes(), Bool) {
@@ -253,11 +253,11 @@ class IntGreater(val terms: List<Expression<IntSort>>) :
 }
 
 /**
- * Divisible predicate.
+ * Divisible predicate,
  *
  * @throws IllegalArgumentException if [n] <= 0
- * - `((_ divisible n) Int Bool)`
- * - `((_ divisible [n]) [inner])`
+ *
+ * ((_ divisible n) Int Bool)
  */
 class Divisible(val n: Int, override val inner: Expression<IntSort>) :
     UnaryExpression<BoolSort, IntSort>("divisible".toSymbolWithQuotes(), Bool) {

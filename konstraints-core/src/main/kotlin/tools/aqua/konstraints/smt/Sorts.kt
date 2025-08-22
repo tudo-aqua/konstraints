@@ -805,3 +805,10 @@ object FP128 : FPSort(15.idx(), 113.idx())
 class FloatingPoint(eb: Int, sb: Int) : FPSort(eb.idx(), sb.idx())
 
 internal class SymbolicFloatingPoint(eb: SymbolIndex, sb: SymbolIndex) : FPSort(eb, sb)
+
+/** Common base class for IntSort and RealSort used by common operations in Ints_Reals theory. */
+sealed class NumeralSort(name: String) : Sort(name)
+
+internal object NumeralSortInstance : NumeralSort("Numeral") {
+  override val theories: Set<Theories> = INTS_REALS_INTS_MARKER_SET
+}

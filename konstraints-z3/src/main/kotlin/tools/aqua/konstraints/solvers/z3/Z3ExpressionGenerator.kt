@@ -82,6 +82,7 @@ fun Expression<*>.z3ify(context: Z3Context): Expr<*> {
     is UserDeclaredSort -> this.cast<UserDeclaredSort>().z3ify(context)
     is ArraySort<*, *> -> this.cast<ArraySort<*, *>>().z3ify(context)
     is SortParameter -> TODO()
+    else -> throw IllegalStateException("Unknown sort $sort")
   }
 }
 
