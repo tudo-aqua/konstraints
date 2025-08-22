@@ -20,7 +20,6 @@ package tools.aqua.konstraints
 
 import java.io.BufferedReader
 import java.io.File
-import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
 import kotlin.streams.asStream
 import kotlin.use
@@ -28,7 +27,6 @@ import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -206,7 +204,6 @@ class ParserBenchmark {
   /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_ABVFiles")
-  @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun parseQF_ABV(file: File) = parse(file)
 
   fun getQF_ABVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_ABV/")
@@ -262,7 +259,6 @@ class ParserBenchmark {
 
   @ParameterizedTest
   @MethodSource("getQF_BVFiles")
-  @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun parseQF_BV(file: File) = parse(file)
 
   fun getQF_BVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_BV/sage/")

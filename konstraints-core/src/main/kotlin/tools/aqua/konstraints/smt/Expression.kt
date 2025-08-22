@@ -57,7 +57,7 @@ sealed interface Expression<out T : Sort> {
             predicate(this) and
                 children.map { it.all(predicate) }.reduceOrDefault(true) { t1, t2 -> t1 and t2 }
         is TernaryExpression<*, *, *, *> ->
-            predicate(this) and lhs.all(predicate) and mid.all(predicate) and lhs.all(predicate)
+            predicate(this) and lhs.all(predicate) and mid.all(predicate) and rhs.all(predicate)
         is LetExpression -> inner.all(predicate) // TODO maybe this should also check all bindings
         is LocalExpression -> predicate(this)
         is BoundVariable -> predicate(this)
