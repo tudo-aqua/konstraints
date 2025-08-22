@@ -18,46 +18,12 @@
 
 package tools.aqua.konstraints.smt
 
-import java.math.BigDecimal
-import java.math.BigInteger
 import tools.aqua.konstraints.parser.*
 
-/** Real sort */
-sealed class RealSort : Sort("Real") {
-  override val theories = REALS_REALS_INTS_MARKER_SET.plus(FLOATING_POINT_MARKER_SET)
-}
-
-object Real : RealSort()
-
-/**
- * Real literal
- *
- * (NUMERAL Real) (DECIMAL Real)
+/*
+ * This file implements the SMT Reals theory
+ * https://smt-lib.org/theories-Reals.shtml
  */
-class RealLiteral(val value: BigDecimal) :
-    Literal<RealSort>(LiteralString(value.toString()), Real) {
-  override val theories = REALS_REALS_INTS_MARKER_SET.plus(FLOATING_POINT_MARKER_SET)
-
-  constructor(value: Byte) : this(value.toInt().toBigDecimal())
-
-  constructor(value: Short) : this(value.toInt().toBigDecimal())
-
-  constructor(value: Int) : this(value.toBigDecimal())
-
-  constructor(value: Long) : this(value.toBigDecimal())
-
-  constructor(value: BigInteger) : this(value.toBigDecimal())
-
-  constructor(value: Float) : this(value.toBigDecimal())
-
-  constructor(value: Double) : this(value.toBigDecimal())
-
-  override val sort: RealSort = Real
-
-  override fun toString(): String = value.toString()
-
-  override fun copy(children: List<Expression<*>>): Expression<RealSort> = this
-}
 
 /**
  * Real negation

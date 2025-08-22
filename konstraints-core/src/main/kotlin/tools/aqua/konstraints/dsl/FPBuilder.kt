@@ -3252,7 +3252,7 @@ fun Expression<BVSort>.toFPUnsigned(sort: FPSort, roundingMode: Expression<Round
     UBitVecToFP(roundingMode, this, sort)
 
 /**
- * Conversion operator to unsigned machine integer, represented as a bit vector (_ BitVec [bits])
+ * Conversion operator to unsigned machine integer, represented as a bit vector (_ BitVec [bits]).
  */
 fun toUBV(
     bits: Int,
@@ -3261,24 +3261,24 @@ fun toUBV(
 ) = FPToUBitVec(roundingMode, block(), bits)
 
 /**
- * Conversion operator to unsigned machine integer, represented as a bit vector (_ BitVec [bits])
+ * Conversion operator to unsigned machine integer, represented as a bit vector (_ BitVec [bits]).
  */
 fun toUBV(bits: Int, roundingMode: Expression<RoundingModeSort> = RNE, expr: Expression<FPSort>) =
     FPToUBitVec(roundingMode, expr, bits)
 
 /**
- * Conversion operator to unsigned machine integer, represented as a bit vector (_ BitVec [bits])
+ * Conversion operator to unsigned machine integer, represented as a bit vector (_ BitVec [bits]).
  */
 fun Expression<FPSort>.toUBV(bits: Int, roundingMode: Expression<RoundingModeSort> = RNE) =
     FPToUBitVec(roundingMode, this, bits)
 
-/** Conversion operator to unsigned machine integer, represented as a bit vector [sort] */
+/** Conversion operator to unsigned machine integer, represented as a bit vector [sort]. */
 fun Expression<FPSort>.toUBV(sort: BVSort, roundingMode: Expression<RoundingModeSort> = RNE) =
     FPToUBitVec(roundingMode, this, sort.bits)
 
 /**
  * Conversion operator to signed machine integer, represented as a 2's complement bit vector (_
- * BitVec [bits])
+ * BitVec [bits]).
  */
 fun toSBV(
     bits: Int,
@@ -3288,32 +3288,32 @@ fun toSBV(
 
 /**
  * Conversion operator to signed machine integer, represented as a 2's complement bit vector (_
- * BitVec [bits])
+ * BitVec [bits]).
  */
 fun toSBV(bits: Int, roundingMode: Expression<RoundingModeSort> = RNE, expr: Expression<FPSort>) =
     FPToSBitVec(roundingMode, expr, bits)
 
 /**
  * Conversion operator to signed machine integer, represented as a 2's complement bit vector (_
- * BitVec [bits])
+ * BitVec [bits]).
  */
 fun Expression<FPSort>.toSBV(bits: Int, roundingMode: Expression<RoundingModeSort> = RNE) =
     FPToSBitVec(roundingMode, this, bits)
 
 /**
  * Conversion operator to signed machine integer, represented as a 2's complement bit vector (_
- * BitVec [bits])
+ * BitVec [sort.bits]).
  */
 fun Expression<FPSort>.toSBV(sort: BVSort, roundingMode: Expression<RoundingModeSort> = RNE) =
     FPToSBitVec(roundingMode, this, sort.bits)
 
-/** Conversion operator to real sort */
+/** Conversion operator to real sort. */
 fun toReal(block: () -> Expression<FPSort>) = FPToReal(block())
 
-/** Conversion operator to real sort */
+/** Conversion operator to real sort. */
 @JvmName("toReal1") fun toReal(expr: Expression<FPSort>) = FPToReal(expr)
 
-/** Conversion operator to real sort */
+/** Conversion operator to real sort. */
 @JvmName("toReal2") fun Expression<FPSort>.toReal() = FPToReal(this)
 
 /*
@@ -3338,6 +3338,11 @@ fun fpfma(roundingMode: Expression<RoundingModeSort> = RNE, multiplier: () -> Ex
 fun fpfma(roundingMode: Expression<RoundingModeSort> = RNE, multiplier: Expression<FPSort>) =
     FPFMA1(roundingMode, multiplier)
 
+/**
+ * Multiplication stage of fp.fma.
+ *
+ * Must be followed by [FPFMA2].
+ */
 class FPFMA1(val roundingMode: Expression<RoundingModeSort>, val multiplier: Expression<FPSort>) {
 
   /**
@@ -3358,6 +3363,7 @@ class FPFMA1(val roundingMode: Expression<RoundingModeSort>, val multiplier: Exp
       FPFMA2(roundingMode, multiplier, multiplicand())
 }
 
+/** Addition stage of fp.fma. */
 class FPFMA2(
     val roundingMode: Expression<RoundingModeSort>,
     val multiplier: Expression<FPSort>,
@@ -3379,44 +3385,44 @@ class FPFMA2(
       FPFma(roundingMode, multiplier, multiplicand, summand())
 }
 
-/** Implements floating point isNormal operation */
+/** Implements floating point isNormal operation. */
 fun isNormal(expr: Expression<FPSort>) = FPIsNormal(expr)
 
-/** Implements floating point isNormal operation */
+/** Implements floating point isNormal operation. */
 fun isNormal(block: () -> Expression<FPSort>) = FPIsNormal(block())
 
-/** Implements floating point isSubnormal operation */
+/** Implements floating point isSubnormal operation. */
 fun isSubnormal(expr: Expression<FPSort>) = FPIsSubnormal(expr)
 
-/** Implements floating point isSubnormal operation */
+/** Implements floating point isSubnormal operation. */
 fun isSubnormal(block: () -> Expression<FPSort>) = FPIsSubnormal(block())
 
-/** Implements floating point isZero operation */
+/** Implements floating point isZero operation. */
 fun isZero(expr: Expression<FPSort>) = FPIsZero(expr)
 
-/** Implements floating point isZero operation */
+/** Implements floating point isZero operation. */
 fun isZero(block: () -> Expression<FPSort>) = FPIsZero(block())
 
-/** Implements floating point isInfinite operation */
+/** Implements floating point isInfinite operation. */
 fun isInfinite(expr: Expression<FPSort>) = FPIsInfinite(expr)
 
-/** Implements floating point isInfinite operation */
+/** Implements floating point isInfinite operation. */
 fun isInfinite(block: () -> Expression<FPSort>) = FPIsInfinite(block())
 
-/** Implements floating point isNaN operation */
+/** Implements floating point isNaN operation. */
 fun isNaN(expr: Expression<FPSort>) = FPIsNaN(expr)
 
-/** Implements floating point isNaN operation */
+/** Implements floating point isNaN operation. */
 fun isNaN(block: () -> Expression<FPSort>) = FPIsNaN(block())
 
-/** Implements floating point isNegative operation */
+/** Implements floating point isNegative operation. */
 fun isNegative(expr: Expression<FPSort>) = FPIsNegative(expr)
 
-/** Implements floating point isNegative operation */
+/** Implements floating point isNegative operation. */
 fun isNegative(block: () -> Expression<FPSort>) = FPIsNegative(block())
 
-/** Implements floating point isPositive operation */
+/** Implements floating point isPositive operation. */
 fun isPositive(expr: Expression<FPSort>) = FPIsPositive(expr)
 
-/** Implements floating point isPositive operation */
+/** Implements floating point isPositive operation. */
 fun isPositive(block: () -> Expression<FPSort>) = FPIsPositive(block())

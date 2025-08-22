@@ -18,29 +18,29 @@
 
 package tools.aqua.konstraints.smt
 
-/** Extension method to conveniently create a [NumeralIndex] from an Integer */
+/** Extension method to conveniently create a [NumeralIndex] from an Integer. */
 fun Int.idx(): NumeralIndex = NumeralIndex(this)
 
 /**
- * Extension method to conveniently create a [SymbolIndex] from a String
+ * Extension method to conveniently create a [SymbolIndex] from a String.
  *
  * @throws IllegalSymbolException if the string is not a valid SMT Symbol
  */
 fun String.idx(): SymbolIndex = SymbolIndex(this)
 
-/** Interface for all SMT Indices */
+/** Interface for all SMT Indices. */
 sealed interface Index
 
-/** SMT Index containing a Numeral */
+/** SMT Index containing a Numeral. */
 data class NumeralIndex(val numeral: Int) : Index {
   override fun toString() = numeral.toString()
 }
 
-/** SMT Index containing an SMT [Symbol] */
+/** SMT Index containing an SMT [Symbol]. */
 data class SymbolIndex(val symbol: Symbol) : Index {
 
   /**
-   * Directly construct the Index from a String
+   * Directly construct the Index from a String.
    *
    * @throws IllegalSymbolException if the string is not a valid SMT Symbol
    */

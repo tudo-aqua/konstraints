@@ -21,10 +21,12 @@ package tools.aqua.konstraints.dsl
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.Sort
 
+/** Builder base class. */
 @SMTDSL
 class Builder<T : Sort> {
   val children: MutableList<Expression<T>> = mutableListOf()
 
+  /** Allows adding children expressions. */
   operator fun Expression<T>.unaryPlus() {
     this@Builder.children.add(this)
   }

@@ -35,15 +35,23 @@ import tools.aqua.konstraints.smt.IntLiteral
 import tools.aqua.konstraints.smt.RealLiteral
 import tools.aqua.konstraints.smt.Theories
 
+/** Cleaner syntax for [ChoiceParser]. */
 operator fun Parser.plus(other: Parser): ChoiceParser = or(other)
 
+/** Cleaner syntax for [SequenceParser] */
 operator fun Parser.times(other: Parser): SequenceParser = seq(other)
 
+/** Infix syntax for [trim] parser. */
 infix fun Parser.trim(both: Parser): Parser = trim(both)
 
+/** Parse an SMT Program from string. */
 class Parser {
   val program = MutableSMTProgram()
 
+  /**
+   * Companion object holding all static parser elements (all sub-parsers that do not directly
+   * modify the program).
+   */
   companion object {
     private val whitespaceCat = anyOf(" \t\r\n", "space, tab, or newline expected")
     private val printableCat = range('\u0020', '\u007E') + range('\u0080', '\u00FF')
@@ -180,7 +188,7 @@ class Parser {
             range('\u0020', '\\' - 1) +
             range('\\' + 1, '|' - 1) +
             range('|' + 1, '\u007E') +
-            range('\u0080', '\u00FF')
+            range('\u0080', '\uFFFF')
     internal val quotedSymbol = of('|') * anythingButPipeOrBackslash.star() * of('|')
 
     private val symbol =
@@ -673,13 +681,14 @@ class Parser {
                 is DecimalConstant -> RealLiteral(constant.decimal)
                 is HexConstant -> BVLiteral(constant.hexadecimal)
                 is NumeralConstant ->
-                    if (Theories.INTS in program.logic!!.theories) IntLiteral(constant.numeral)
-                    else if (Theories.REALS in program.logic!!.theories ||
+                    if (Theories.INTS in program.logic!!.theories ||
                         Theories.REALS_INTS in program.logic!!.theories)
+                        IntLiteral(constant.numeral)
+                    else if (Theories.REALS in program.logic!!.theories)
                         RealLiteral(BigDecimal(constant.numeral))
                     else throw RuntimeException("Unsupported numeral literal!")
 
-                is StringConstant -> TODO("String constant not implemented yet!")
+                is StringConstant -> StringLiteral(constant.string)
               }
             } + /* maps to Literal */
             qualIdentifier.map { results: List<Any> ->
@@ -832,21 +841,23 @@ class Parser {
 
   /**
    * Parses an SMTProgram in string format IMPORTANT linebreak characters ('\n') must be present in
-   * the string representation to correctly filter out comments in the smt code
+   * the string representation to correctly filter out comments in the smt code.
    */
   fun parse(program: String): SMTProgram {
+    // filter out comments at the end of the lines
+    script.parse(program.split("\n").joinToString(" ") { line -> line.substringBefore(';') })
     // TODO parse each command individually, fail on the first command that can not be parsed
     // this will lead to better error messages but requires some preprocessing to split the input
     // into individual commands (this may be done in linear time by searching the input from
     // left to right counting the number of opening an closing brackets)
     // filter out all comments (all lines are truncated after ';')
-    splitInput(program.split("\n").joinToString(" ") { line -> line.substringBefore(';') })
-        .forEach { cmd ->
-          val temp = command.parse(cmd)
-          if (!temp.isSuccess) {
-            throw ParseException(temp.message, temp.position, temp.buffer)
-          }
-        }
+    /*splitInput(program.split("\n").joinToString(" ") { line -> line.substringBefore(';') })
+    .forEach { cmd ->
+      val temp = command.parse(cmd)
+      if (!temp.isSuccess) {
+        throw ParseException(temp.message, temp.position, temp.buffer)
+      }
+    }*/
 
     return this.program
   }
@@ -876,6 +887,10 @@ class Parser {
   }
 }
 
+/**
+ * Exception thrown by the parser detailing the exception [message] and [position] in the input
+ * [buffer].
+ */
 class ParseException(message: String, position: Int, buffer: String) :
     RuntimeException(
-        "Parser failed with message $message at position $position: ${buffer.substring(position)}")
+        "Parser failed with message $message at position $position: ${buffer.substring(0,position)}")

@@ -25,6 +25,7 @@ import tools.aqua.konstraints.dsl.UserDeclaredSMTFunctionN
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunction0
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunctionN
 
+/** Sat status of an smt program. */
 enum class SatStatus {
   SAT, // program is satisfiable
   UNSAT, // program is unsatisfiable
@@ -40,6 +41,7 @@ enum class SatStatus {
       }
 }
 
+/** Base class for all types of smt program. */
 abstract class SMTProgram(commands: List<Command>) {
   var model: Model? = null
   var status = SatStatus.PENDING
@@ -54,12 +56,13 @@ abstract class SMTProgram(commands: List<Command>) {
     get() = _commands.toList()
 }
 
+/** SMT Program with a mutable command list. */
 class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
 
   constructor() : this(emptyList())
 
   /**
-   * Inserts [command] at the end of the program
+   * Inserts [command] at the end of the program.
    *
    * Checks if [command] is legal w.r.t. the [context]
    */
@@ -70,7 +73,7 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
   }
 
   /**
-   * Inserts [command] at [index] into the program
+   * Inserts [command] at [index] into the program.
    *
    * Checks if [command] is legal w.r.t. the [context]
    */
@@ -135,7 +138,7 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     return func
   }
 
-  fun <T : Sort> declareFun(func: DeclaredSMTFunction<T>): DeclaredSMTFunction<T> {
+  fun <T : Sort> declareFun(func: UserDeclaredSMTFunction<T>): UserDeclaredSMTFunction<T> {
     context.addFun(func)
     _commands.add(DeclareFun(func))
 

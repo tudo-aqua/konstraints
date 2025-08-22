@@ -21,6 +21,7 @@ package tools.aqua.konstraints.smt
 import kotlin.collections.component1
 import kotlin.collections.component2
 
+/** Interface for all logics. */
 sealed interface Logic {
   val theories: Set<Theories>
   val datatypes: Boolean
