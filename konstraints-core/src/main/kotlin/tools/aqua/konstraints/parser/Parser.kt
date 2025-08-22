@@ -843,19 +843,20 @@ class Parser {
    * the string representation to correctly filter out comments in the smt code.
    */
   fun parse(program: String): SMTProgram {
-      script.parse(program)
+    // filter out comments at the end of the lines
+    script.parse(program.split("\n").joinToString(" ") { line -> line.substringBefore(';') })
     // TODO parse each command individually, fail on the first command that can not be parsed
     // this will lead to better error messages but requires some preprocessing to split the input
     // into individual commands (this may be done in linear time by searching the input from
     // left to right counting the number of opening an closing brackets)
     // filter out all comments (all lines are truncated after ';')
     /*splitInput(program.split("\n").joinToString(" ") { line -> line.substringBefore(';') })
-        .forEach { cmd ->
-          val temp = command.parse(cmd)
-          if (!temp.isSuccess) {
-            throw ParseException(temp.message, temp.position, temp.buffer)
-          }
-        }*/
+    .forEach { cmd ->
+      val temp = command.parse(cmd)
+      if (!temp.isSuccess) {
+        throw ParseException(temp.message, temp.position, temp.buffer)
+      }
+    }*/
 
     return this.program
   }

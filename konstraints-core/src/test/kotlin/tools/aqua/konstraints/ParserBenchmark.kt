@@ -202,9 +202,7 @@ class ParserBenchmark {
   fun getNRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/NRA/")
 
   /* @Disabled */
-  @ParameterizedTest
-  @MethodSource("getQF_ABVFiles")
-  fun parseQF_ABV(file: File) = parse(file)
+  @ParameterizedTest @MethodSource("getQF_ABVFiles") fun parseQF_ABV(file: File) = parse(file)
 
   fun getQF_ABVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_ABV/")
 
@@ -257,9 +255,7 @@ class ParserBenchmark {
 
   fun getQF_AXFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_AX/")
 
-  @ParameterizedTest
-  @MethodSource("getQF_BVFiles")
-  fun parseQF_BV(file: File) = parse(file)
+  @ParameterizedTest @MethodSource("getQF_BVFiles") fun parseQF_BV(file: File) = parse(file)
 
   fun getQF_BVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_BV/sage/")
 

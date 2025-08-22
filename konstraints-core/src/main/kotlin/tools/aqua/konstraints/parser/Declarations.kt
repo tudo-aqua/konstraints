@@ -3269,7 +3269,7 @@ internal object StringsTheory : Theory {
               StrReplaceDecl,
               StrReplaceAllDecl,
               StrReplaceRegexDecl,
-                StrReplaceAllRegexDecl,
+              StrReplaceAllRegexDecl,
               StrIsDigitDecl,
               StrToCodeDecl,
               StrToIntDecl,
