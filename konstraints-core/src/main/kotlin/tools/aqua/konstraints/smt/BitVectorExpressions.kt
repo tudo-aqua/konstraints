@@ -1088,104 +1088,104 @@ fun String.isBitvecLiteral() = this.isSMTBinary() || this.isSMTHex()
 
 class BVNegO(override val inner: Expression<BVSort>) :
     UnaryExpression<BoolSort, BVSort>("bvnego".toSymbolWithQuotes(), Bool) {
-    override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
-    override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-        BVNegODecl.constructDynamic(children, emptyList())
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      BVNegODecl.constructDynamic(children, emptyList())
 
-    fun expand(): Expression<BoolSort> = TODO()
+  fun expand(): Expression<BoolSort> = TODO()
 }
 
 class BVUAddO(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BoolSort, BVSort, BVSort>("bvuaddo".toSymbolWithQuotes(), Bool) {
-    override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
-    override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-        BVUAddODecl.constructDynamic(children, emptyList())
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      BVUAddODecl.constructDynamic(children, emptyList())
 
-    fun expand(): Expression<BoolSort> = TODO()
+  fun expand(): Expression<BoolSort> = TODO()
 }
 
 class BVSAddO(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BoolSort, BVSort, BVSort>("bvsaddo".toSymbolWithQuotes(), Bool) {
-    override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
-    override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-        BVSAddODecl.constructDynamic(children, emptyList())
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      BVSAddODecl.constructDynamic(children, emptyList())
 
-    fun expand(): Expression<BoolSort> = TODO()
+  fun expand(): Expression<BoolSort> = TODO()
 }
 
 class BVUSubO(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BoolSort, BVSort, BVSort>("bvusubo".toSymbolWithQuotes(), Bool) {
-    override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
-    override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-        BVUSubODecl.constructDynamic(children, emptyList())
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      BVUSubODecl.constructDynamic(children, emptyList())
 
-    fun expand(): Expression<BoolSort> = TODO()
+  fun expand(): Expression<BoolSort> = TODO()
 }
 
 class BVSSubO(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BoolSort, BVSort, BVSort>("bvssubo".toSymbolWithQuotes(), Bool) {
-    override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
-    override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-        BVSSubODecl.constructDynamic(children, emptyList())
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      BVSSubODecl.constructDynamic(children, emptyList())
 
-    fun expand(): Expression<BoolSort> = TODO()
+  fun expand(): Expression<BoolSort> = TODO()
 }
 
 class BVUMulO(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BoolSort, BVSort, BVSort>("bvumulo".toSymbolWithQuotes(), Bool) {
-    override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
-    override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-        BVUMulODecl.constructDynamic(children, emptyList())
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      BVUMulODecl.constructDynamic(children, emptyList())
 
-    fun expand(): Expression<BoolSort> = TODO()
+  fun expand(): Expression<BoolSort> = TODO()
 }
 
 class BVSMulO(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BoolSort, BVSort, BVSort>("bvsmulo".toSymbolWithQuotes(), Bool) {
-    override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
-    override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-        BVSMulODecl.constructDynamic(children, emptyList())
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      BVSMulODecl.constructDynamic(children, emptyList())
 
-    fun expand(): Expression<BoolSort> = TODO()
+  fun expand(): Expression<BoolSort> = TODO()
 }
 
 class BVSDivO(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BoolSort, BVSort, BVSort>("bvsdivo".toSymbolWithQuotes(), Bool) {
-    override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
-    override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
-        BVSDivODecl.constructDynamic(children, emptyList())
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      BVSDivODecl.constructDynamic(children, emptyList())
 
-    fun expand(): Expression<BoolSort> = TODO()
+  fun expand(): Expression<BoolSort> = TODO()
 }
 
 class UBVToInt(override val inner: Expression<BVSort>) :
     UnaryExpression<IntSort, BVSort>("ubv_to_int".toSymbolWithQuotes(), SMTInt) {
-    override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
-    override fun copy(children: List<Expression<*>>): Expression<IntSort> =
-        UBVToIntDecl.constructDynamic(children, emptyList())
+  override fun copy(children: List<Expression<*>>): Expression<IntSort> =
+      UBVToIntDecl.constructDynamic(children, emptyList())
 }
 
 class SBVToInt(override val inner: Expression<BVSort>) :
     UnaryExpression<IntSort, BVSort>("sbv_to_int".toSymbolWithQuotes(), SMTInt) {
-    override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
-    override fun copy(children: List<Expression<*>>): Expression<IntSort> =
-        SBVToIntDecl.constructDynamic(children, emptyList())
+  override fun copy(children: List<Expression<*>>): Expression<IntSort> =
+      SBVToIntDecl.constructDynamic(children, emptyList())
 }
 
 class IntToBV(val m: Int, override val inner: Expression<IntSort>) :
     UnaryExpression<BVSort, IntSort>("int_to_bv".toSymbolWithQuotes(), BVSort(m)) {
-    override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
-    override fun copy(children: List<Expression<*>>): Expression<BVSort> =
-        IntToBVDecl.constructDynamic(children, emptyList())
+  override fun copy(children: List<Expression<*>>): Expression<BVSort> =
+      IntToBVDecl.constructDynamic(children, emptyList())
 }

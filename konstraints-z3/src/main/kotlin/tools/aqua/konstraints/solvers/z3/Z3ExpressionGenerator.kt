@@ -275,6 +275,7 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
       is StrSuffixOf -> this.z3ify(context)
       is StrContains -> this.z3ify(context)
       is StrIsDigit -> this.z3ify(context)
+      is StrInRe -> this.z3ify(context)
       is ArraySelect<*, BoolSort> -> this.z3ify(context)
       is BVNegO -> this.z3ify(context)
       is BVUAddO -> this.z3ify(context)
@@ -297,7 +298,7 @@ fun Expression<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
           }
       is UserDefinedExpression ->
           context.bind(this.func.sortedVars) { this.func.term.z3ify(context) }
-      else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
+      else -> throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
 
 fun True.z3ify(context: Z3Context): Expr<Z3BoolSort> = context.context.mkTrue()
@@ -511,7 +512,11 @@ fun StrSuffixOf.z3ify(context: Z3Context): Expr<Z3BoolSort> =
 fun StrContains.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkContains(string.z3ify(context), substring.z3ify(context))
 
-fun StrIsDigit.z3ify(context: Z3Context): Expr<Z3BoolSort> = TODO()
+fun StrIsDigit.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    TODO() // context.context.mkIsDigit(inner.z3ify(context))
+
+fun StrInRe.z3ify(context: Z3Context): Expr<Z3BoolSort> =
+    context.context.mkInRe(inner.z3ify(context), rhs.z3ify(context) as ReExpr<SeqSort<CharSort>>)
 
 fun BVNegO.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkBVNegNoOverflow(inner.z3ify(context))
@@ -1027,6 +1032,7 @@ fun Expression<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
       is BoundVariable -> context.boundVariable(this.func, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
+      is StringLiteral -> this.z3ify(context)
       is StrConcat -> this.z3ify(context)
       is StrAt -> this.z3ify(context)
       is StrSubstring -> this.z3ify(context)
@@ -1051,6 +1057,9 @@ fun Expression<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
       is UserDefinedExpression -> this.expand().z3ify(context).cast<SeqSort<CharSort>>()
       else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
     }
+
+fun StringLiteral.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
+    context.context.mkString(value)
 
 fun StrConcat.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
     context.context.mkConcat(*this.strings.map { it.z3ify(context) }.toTypedArray())
@@ -1085,6 +1094,7 @@ fun Expression<RegLanSort>.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSo
       is LocalExpression -> context.localVariable(this.func, this.sort.z3ify(context))
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
       is BoundVariable -> context.boundVariable(this.func, this.sort.z3ify(context))
+      is StrToRe -> this.z3ify(context)
       is RegexNone -> this.z3ify(context)
       is RegexAll -> this.z3ify(context)
       is RegexAllChar -> this.z3ify(context)
@@ -1111,8 +1121,11 @@ fun Expression<RegLanSort>.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSo
                 this.func, this.children.map { it.z3ify(context) }, this.sort.z3ify(context))
           }
       is UserDefinedExpression -> this.expand().z3ify(context).cast<ReSort<SeqSort<CharSort>>>()
-      else -> throw IllegalArgumentException("Z3 can not visit expression $this.expression!")
+      else -> throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
+
+fun StrToRe.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
+    context.context.mkToRe(inner.z3ify(context))
 
 fun RegexNone.z3ify(context: Z3Context): Expr<ReSort<SeqSort<CharSort>>> =
     context.context.mkEmptyRe(context.context.mkReSort(context.context.stringSort))

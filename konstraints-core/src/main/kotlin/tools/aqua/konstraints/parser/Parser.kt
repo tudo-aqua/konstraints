@@ -20,6 +20,7 @@ package tools.aqua.konstraints.parser
 
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.math.max
 import org.petitparser.context.Token
 import org.petitparser.parser.Parser
 import org.petitparser.parser.combinators.ChoiceParser
@@ -166,18 +167,22 @@ class Parser {
         (of("#x") * (digitCat + range('A', 'F') + range('a', 'f')).plus()).flatten()
     private val binary = (of("#b") * range('0', '1').plus()).flatten()
 
-    // all printable characters that are not double quotes
+    // all printable characters that are not double quotes (note that 7E is also excluded)
     private val anythingButQuotes =
         whitespaceCat +
             range('\u0020', '"' - 1) +
             range('"' + 1, '\u007E') +
-            range('\u0080', '\u00FF')
+            range('\u0080', '\uFFFF')
     internal val string =
         (of("\"") *
                 (anythingButQuotes.star() +
                     ((anythingButQuotes.star() * of("\"\"") * anythingButQuotes.star()).star())) *
                 of("\""))
             .flatten()
+            .map { str: String ->
+              str.drop(1).dropLast(1)
+            } // parser keeps leading and trailing '"' when flattening in the string so we need to
+    // drop the first and last character
 
     private val symbolSymbols = anyOf("+-/*=%?!.\$_~&^<>@")
     internal val simpleSymbol =
@@ -375,7 +380,7 @@ class Parser {
     // S-Expressions
 
     /* maps to an implementation of SpecConstant */
-    private val specConstant =
+    val specConstant =
         (decimal.map { decimal: String -> DecimalConstant(decimal.toBigDecimal()) } +
             numeral.map { numeral: String -> NumeralConstant(numeral.toBigInteger()) } +
             hexadecimal.map { hexadecimal: String -> HexConstant(hexadecimal) } +
@@ -686,6 +691,8 @@ class Parser {
                         IntLiteral(constant.numeral)
                     else if (Theories.REALS in program.logic!!.theories)
                         RealLiteral(BigDecimal(constant.numeral))
+                    else if (Theories.STRINGS in program.logic!!.theories)
+                        IntLiteral(constant.numeral)
                     else throw RuntimeException("Unsupported numeral literal!")
 
                 is StringConstant -> StringLiteral(constant.string)
@@ -753,7 +760,7 @@ class Parser {
         program.declareConst(results[2] as ParseSymbol, results[3] as Sort)
       }
 
-  private val declareFunCMD =
+  val declareFunCMD =
       (lparen * declareFunKW * symbol * lparen * sort.star() * rparen * sort * rparen).map {
           results: ArrayList<Any> ->
         program.declareFun(results[2] as ParseSymbol, results[4] as List<Sort>, results[6] as Sort)
@@ -819,6 +826,26 @@ class Parser {
         program.pop((results[2] as String).toInt())
       }
 
+  private val declareDatatypeCMD =
+      (lparen *
+              declareDatatypeKW.map { t: Any -> TODO("Datatype are not implemented yet") } *
+              symbol *
+              datatypeDec *
+              rparen)
+          .map { results: ArrayList<Any> -> TODO("Datatypes are not implemented yet") }
+
+  private val declareDatatypesCMD =
+      (lparen *
+              declareDatatypesKW.map { t: Any -> TODO("Datatypes are not implemented yet") } *
+              lparen *
+              sortDec.plus() *
+              rparen *
+              lparen *
+              datatypeDec.plus() *
+              rparen *
+              rparen)
+          .map { results: ArrayList<Any> -> TODO("Datatypes are not implemented yet") }
+
   val command =
       ChoiceParser(
           FailureJoiner.SelectFarthest(),
@@ -835,7 +862,9 @@ class Parser {
           defineFunCMD,
           setOptionCMD,
           pushCMD,
-          popCMD)
+          popCMD,
+          declareDatatypeCMD,
+          declareDatatypesCMD)
 
   internal val script = command.star().end()
 
@@ -845,19 +874,57 @@ class Parser {
    */
   fun parse(program: String): SMTProgram {
     // filter out comments at the end of the lines
-    script.parse(program.split("\n").joinToString(" ") { line -> line.substringBefore(';') })
+    val result =
+        script.parse(
+            program.split("\n").joinToString(" ") { line ->
+              // line only contains comment (this is not true if a line inside a quoted symbol
+              // starts with a ';' but I hope no one does that :))
+              // find first ';' that is not inside string literal or quoted symbol
+              if (line.startsWith(';')) {
+                ""
+              }
+              // string literals or quoted symbols are present so comment detection needs to change
+              else if (line.contains('"') || line.contains('|')) {
+                // check if semicolon is after the last '"' or '|' to detekt the start of a comment
+                if (line.indexOfLast { c -> c == ';' } <
+                    max(line.indexOfLast { c -> c == '"' }, line.indexOfLast { c -> c == '|' })) {
+                  line // no comment is present in line
+                } else {
+                  line.substringBefore(';') // truncate comment
+                }
+              } else { // no string literals remove comments at the end of all lines
+                line.substringBefore(';')
+              }
+            })
+
+    if (!result.isSuccess) {
+      throw ParseException(result.message, result.position, result.buffer)
+    }
     // TODO parse each command individually, fail on the first command that can not be parsed
     // this will lead to better error messages but requires some preprocessing to split the input
     // into individual commands (this may be done in linear time by searching the input from
     // left to right counting the number of opening an closing brackets)
     // filter out all comments (all lines are truncated after ';')
-    /*splitInput(program.split("\n").joinToString(" ") { line -> line.substringBefore(';') })
+    /* splitInput(program.split("\n").joinToString(" ") { line ->
+        // string literals are present so comment detection needs to change
+        if(line.contains('"')) {
+            if(line.indexOfLast { c -> c == ';' } < line.indexOfLast { c -> c == '"' }) {
+                line // no comment is present in line
+            } else {
+                line.substringBefore(';') // truncate comment
+            }
+        } else { // no string literals remove comments at the end of all lines
+            line.substringBefore(';')
+        }
+
+    }
+    )
     .forEach { cmd ->
       val temp = command.parse(cmd)
       if (!temp.isSuccess) {
         throw ParseException(temp.message, temp.position, temp.buffer)
       }
-    }*/
+    } */
 
     return this.program
   }
@@ -866,15 +933,28 @@ class Parser {
     val commands = mutableListOf<String>()
     var count = 0
     var position = 0
+    var inStringLiteral = false
 
     program.forEachIndexed { index, c ->
-      if (c == '(') {
+      if (c == '"') {
+        // beginning of a string literal
+        if (!inStringLiteral) {
+          inStringLiteral = true
+        } else /* end of string literal or escape sequence '""' */ {
+          // we can just set this to false because its either the end of the literal
+          // or an escape sequence in that case the next char is also '"' and sets inStringLiteral
+          // back to true
+          inStringLiteral = false
+        }
+      }
+      // if we are in a string literal the bracket char doesnt count towards our bracket matching
+      else if (c == '(' && !inStringLiteral) {
         if (count == 0) {
           position = index
         }
 
         count++
-      } else if (c == ')') {
+      } else if (c == ')' && !inStringLiteral) {
         count--
 
         if (count == 0) {

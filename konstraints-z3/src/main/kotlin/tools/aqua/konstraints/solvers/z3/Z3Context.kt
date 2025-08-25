@@ -22,7 +22,6 @@ import com.microsoft.z3.Context
 import com.microsoft.z3.Expr
 import com.microsoft.z3.FuncDecl
 import com.microsoft.z3.Sort as Z3Sort
-import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.SMTFunction
 import tools.aqua.konstraints.smt.Sort
@@ -106,7 +105,7 @@ class Z3Context {
     // declare-constant
     // so we have to search in both the constant and function lookup
     val constant =
-        if (expr.func is UserDeclaredSMTFunction0) {
+        if (functions[expr.func] != null) {
           functions[expr.func]?.apply()
         } else {
           constants[expr]

@@ -1930,16 +1930,13 @@ internal object RealsIntsTheory : Theory {
 }
 
 internal object IntRealNegSubDecl :
-    SMTTheoryFunction<NumeralSort>(
+    SMTTheoryFunction<Sort>(
         "-".toSymbolWithQuotes(),
         listOf(NumeralSortInstance),
         NumeralSortInstance,
         Associativity.NONE) {
 
-  override fun constructDynamic(
-      args: List<Expression<*>>,
-      indices: List<Index>
-  ): Expression<NumeralSort> {
+  override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<Sort> {
     require(args[0].sort is IntSort || args[0].sort is RealSort) {
       "Expected args to be Int or Real, but got ${args[0].sort}"
     }
@@ -1950,24 +1947,21 @@ internal object IntRealNegSubDecl :
         }
 
     return if (args[0].sort is IntSort) {
-      IntNegSubDecl.constructDynamic(args, indices).cast()
+      IntNegSubDecl.constructDynamic(args, indices)
     } else {
-      RealNegSubDecl.constructDynamic(args, indices).cast()
+      RealNegSubDecl.constructDynamic(args, indices)
     }
   }
 }
 
 internal object IntRealAddDecl :
-    SMTTheoryFunction<NumeralSort>(
+    SMTTheoryFunction<Sort>(
         "+".toSymbolWithQuotes(),
         listOf(NumeralSortInstance, NumeralSortInstance),
         NumeralSortInstance,
         Associativity.LEFT_ASSOC) {
 
-  override fun constructDynamic(
-      args: List<Expression<*>>,
-      indices: List<Index>
-  ): Expression<NumeralSort> {
+  override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<Sort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -1977,24 +1971,21 @@ internal object IntRealAddDecl :
     }
 
     return if (args[0].sort is IntSort) {
-      IntAdd(args.map { expr -> expr.cast() }).cast()
+      IntAdd(args.map { expr -> expr.cast() })
     } else {
-      RealAdd(args.map { expr -> expr.cast() }).cast()
+      RealAdd(args.map { expr -> expr.cast() })
     }
   }
 }
 
 internal object IntRealMulDecl :
-    SMTTheoryFunction<NumeralSort>(
+    SMTTheoryFunction<Sort>(
         "*".toSymbolWithQuotes(),
         listOf(NumeralSortInstance, NumeralSortInstance),
         NumeralSortInstance,
         Associativity.LEFT_ASSOC) {
 
-  override fun constructDynamic(
-      args: List<Expression<*>>,
-      indices: List<Index>
-  ): Expression<NumeralSort> {
+  override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<Sort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -2004,24 +1995,21 @@ internal object IntRealMulDecl :
     }
 
     return if (args[0].sort is IntSort) {
-      IntMul(args.map { expr -> expr.cast() }).cast()
+      IntMul(args.map { expr -> expr.cast() })
     } else {
-      RealMul(args.map { expr -> expr.cast() }).cast()
+      RealMul(args.map { expr -> expr.cast() })
     }
   }
 }
 
 internal object IntRealDivDecl :
-    SMTTheoryFunction<NumeralSort>(
+    SMTTheoryFunction<Sort>(
         "/".toSymbolWithQuotes(),
         listOf(NumeralSortInstance, NumeralSortInstance),
-        NumeralSortInstance,
+        Real,
         Associativity.LEFT_ASSOC) {
 
-  override fun constructDynamic(
-      args: List<Expression<*>>,
-      indices: List<Index>
-  ): Expression<NumeralSort> {
+  override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<Sort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -2031,9 +2019,9 @@ internal object IntRealDivDecl :
     }
 
     return if (args[0].sort is IntSort) {
-      IntDiv(args.map { expr -> expr.cast() }).cast()
+      IntDiv(args.map { expr -> expr.cast() })
     } else {
-      RealDiv(args.map { expr -> expr.cast() }).cast()
+      RealDiv(args.map { expr -> expr.cast<RealSort>() })
     }
   }
 }
@@ -3648,7 +3636,7 @@ internal object ToRegexDecl :
     }
     require(args.single().sort is StringSort)
 
-    return ToRegex(args.single().cast())
+    return StrToRe(args.single().cast())
   }
 }
 
@@ -3669,7 +3657,7 @@ internal object InRegexDecl :
     require(args[0].sort is StringSort)
     require(args[1].sort is RegLanSort)
 
-    return InRegex(args[0].cast(), args[1].cast())
+    return StrInRe(args[0].cast(), args[1].cast())
   }
 }
 

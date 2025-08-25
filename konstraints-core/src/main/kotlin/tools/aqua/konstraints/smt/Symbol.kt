@@ -18,8 +18,6 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.Parser
-
 /**
  * Quoting rules for SMT String, used when serializing program.
  *
@@ -54,25 +52,25 @@ enum class QuotingRule {
 open class Symbol internal constructor(raw: String, val wasQuoted: Boolean) : SMTSerializable {
   /** If true the Symbol is only a valid SMT Symbol if it is quoted. */
   // Parser must consume the entire string so .end() is needed
-  val mustQuote: Boolean =
-      // check if we have a simple symbol (that is a symbol that is valid without quotes)
-      // TODO this isnt very performant there should be a faster solution (regex? or linear scan on
-      // input)
-      if (Parser.simpleSymbol.end().accept(raw) && !Parser.reserved.end().accept(raw)) {
-        false
-      }
-      // check if we have a quoted symbol that is already quoted (raw is of the form "|symbol|" and
-      // is not a simple symbol)
-      else if (Parser.quotedSymbol.end().accept(raw)) {
-        true
-      }
-      // check if we have a quoted symbol that is not already quoted (raw is of the form "symbol"
-      // and is not a simple symbol)
-      else if (Parser.quotedSymbol.end().accept("|$raw|")) {
-        true
-      } else {
-        throw IllegalSymbolException(raw)
-      }
+  val mustQuote: Boolean = false
+  // check if we have a simple symbol (that is a symbol that is valid without quotes)
+  // TODO this isnt very performant there should be a faster solution (regex? or linear scan on
+  // input)
+  /*if (Parser.simpleSymbol.end().accept(raw) && !Parser.reserved.end().accept(raw)) {
+    false
+  }
+  // check if we have a quoted symbol that is already quoted (raw is of the form "|symbol|" and
+  // is not a simple symbol)
+  else if (Parser.quotedSymbol.end().accept(raw)) {
+    true
+  }
+  // check if we have a quoted symbol that is not already quoted (raw is of the form "symbol"
+  // and is not a simple symbol)
+  else if (Parser.quotedSymbol.end().accept("|$raw|")) {
+    true
+  } else {
+    throw IllegalSymbolException(raw)
+  }*/
 
   val isSimple = !mustQuote
 

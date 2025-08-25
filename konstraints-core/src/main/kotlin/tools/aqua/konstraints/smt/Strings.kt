@@ -87,7 +87,7 @@ class StrLexOrder(val strings: List<Expression<StringSort>>) :
  * String to RE injection.
  * - `(str.to_re String RegLan)`
  */
-class ToRegex(override val inner: Expression<StringSort>) :
+class StrToRe(override val inner: Expression<StringSort>) :
     UnaryExpression<RegLanSort, StringSort>("str.to_reg".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
 
@@ -99,7 +99,7 @@ class ToRegex(override val inner: Expression<StringSort>) :
  * RE membership.
  * - `(str.in_re String RegLan Bool)`
  */
-class InRegex(val inner: Expression<StringSort>, val regex: Expression<RegLanSort>) :
+class StrInRe(val inner: Expression<StringSort>, val regex: Expression<RegLanSort>) :
     BinaryExpression<BoolSort, StringSort, RegLanSort>("str.in_reg".toSymbolWithQuotes(), Bool) {
   override val theories = STRINGS_MARKER_SET
 

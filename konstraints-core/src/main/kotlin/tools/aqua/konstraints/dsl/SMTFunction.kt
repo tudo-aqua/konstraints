@@ -679,7 +679,7 @@ data class UserDeclaredSMTFunction0<T : Sort>(
 
   val instance = UserDeclaredExpression(symbol, sort, this)
 
-    /** Get instance. */
+  /** Get instance. */
   operator fun invoke() = instance
 }
 

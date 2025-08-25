@@ -165,7 +165,7 @@ class Ite<out T : Sort>(
     val statement: Expression<BoolSort>,
     val then: Expression<T>,
     val otherwise: Expression<T>
-) : Expression<T> {
+) : Expression<T>() {
   init {
     require(then.sort == otherwise.sort)
   }

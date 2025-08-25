@@ -21,11 +21,12 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.util.reduceOrDefault
 
 /** Interface for all sorted SMT terms. */
-sealed interface Expression<out T : Sort> {
-  val name: SMTSerializable
-  val sort: T
-  val theories: Set<Theories>
-  val func: SMTFunction<T>?
+sealed class Expression<out T : Sort> {
+  abstract val name: SMTSerializable
+  abstract val sort: T
+  abstract val theories: Set<Theories>
+  abstract val func: SMTFunction<T>?
+  abstract val children: List<Expression<*>>
 
   /**
    * Recursive all implementation fun all(predicate: (Expression<*>) -> Boolean): Boolean { return
@@ -58,7 +59,7 @@ sealed interface Expression<out T : Sort> {
                 children.map { it.all(predicate) }.reduceOrDefault(true) { t1, t2 -> t1 and t2 }
         is TernaryExpression<*, *, *, *> ->
             predicate(this) and lhs.all(predicate) and mid.all(predicate) and rhs.all(predicate)
-        is LetExpression -> inner.all(predicate) // TODO maybe this should also check all bindings
+        is LetExpression -> inner.all(predicate)
         is LocalExpression -> predicate(this)
         is BoundVariable -> predicate(this)
         is ExistsExpression -> term.all(predicate)
@@ -90,14 +91,25 @@ sealed interface Expression<out T : Sort> {
     }
   }
 
-  fun copy(children: List<Expression<*>>): Expression<T>
+  override fun equals(other: Any?): Boolean {
+    return if (this === other) true
+    else if (other !is Expression<*>) false
+    else
+        sort == other.sort &&
+            name == other.name &&
+            func == other.func &&
+            (children zip other.children).all { (lhs, rhs) -> lhs == rhs }
+  }
 
-  val children: List<Expression<*>>
+  abstract fun copy(children: List<Expression<*>>): Expression<T>
+
+  // use only name for hashcode as names are almost unique and thus mostly conflict free
+  override fun hashCode() = name.hashCode()
 }
 
 /** SMT Literal */
 abstract class Literal<out T : Sort>(override val name: LiteralString, override val sort: T) :
-    Expression<T> {
+    Expression<T>() {
   override val func = null
 
   override val children: List<Expression<*>> = emptyList()
@@ -106,7 +118,7 @@ abstract class Literal<out T : Sort>(override val name: LiteralString, override 
 }
 
 abstract class ConstantExpression<out T : Sort>(override val name: Symbol, override val sort: T) :
-    Expression<T> {
+    Expression<T>() {
   override val func = null
 
   override val children: List<Expression<*>> = emptyList()
@@ -118,7 +130,7 @@ abstract class ConstantExpression<out T : Sort>(override val name: Symbol, overr
 abstract class UnaryExpression<out T : Sort, out S : Sort>(
     override val name: Symbol,
     override val sort: T
-) : Expression<T> {
+) : Expression<T>() {
   override val func = null
 
   abstract val inner: Expression<S>
@@ -133,7 +145,7 @@ abstract class UnaryExpression<out T : Sort, out S : Sort>(
 abstract class BinaryExpression<out T : Sort, out S1 : Sort, out S2 : Sort>(
     override val name: Symbol,
     override val sort: T
-) : Expression<T> {
+) : Expression<T>() {
   override val func = null
 
   abstract val lhs: Expression<S1>
@@ -150,7 +162,7 @@ abstract class BinaryExpression<out T : Sort, out S1 : Sort, out S2 : Sort>(
 abstract class TernaryExpression<out T : Sort, out S1 : Sort, out S2 : Sort, out S3 : Sort>(
     override val name: Symbol,
     override val sort: T
-) : Expression<T> {
+) : Expression<T>() {
   override val func = null
 
   abstract val lhs: Expression<S1>
@@ -172,7 +184,7 @@ abstract class TernaryExpression<out T : Sort, out S1 : Sort, out S2 : Sort, out
 abstract class HomogenousExpression<out T : Sort, out S : Sort>(
     override val name: Symbol,
     override val sort: T
-) : Expression<T> {
+) : Expression<T>() {
   override val func = null
   abstract override val children: List<Expression<S>>
 
@@ -183,7 +195,7 @@ abstract class HomogenousExpression<out T : Sort, out S : Sort>(
 
 /** Base class of all expressions with any number of children */
 abstract class NAryExpression<out T : Sort>(override val name: Symbol, override val sort: T) :
-    Expression<T> {
+    Expression<T>() {
 
   override fun toString() =
       if (children.isNotEmpty()) "($name ${children.joinToString(" ")})"
@@ -192,7 +204,7 @@ abstract class NAryExpression<out T : Sort>(override val name: Symbol, override 
 
 /** Let expression */
 class LetExpression<out T : Sort>(val bindings: List<VarBinding<*>>, val inner: Expression<T>) :
-    Expression<T> {
+    Expression<T>() {
   override val sort = inner.sort
   override val name = Keyword("let")
   override val theories = emptySet<Theories>()
@@ -274,7 +286,7 @@ class LocalExpression<T : Sort>(
     override val sort: T,
     val term: Expression<T>,
     override val func: VarBinding<T>
-) : Expression<T> {
+) : Expression<T>() {
   override val theories = emptySet<Theories>()
 
   override fun copy(children: List<Expression<*>>): Expression<T> {
@@ -289,7 +301,7 @@ class LocalExpression<T : Sort>(
 }
 
 class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSort>) :
-    Expression<BoolSort> {
+    Expression<BoolSort>() {
   override val theories = emptySet<Theories>()
   override val func = null
 
@@ -307,7 +319,7 @@ class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
 }
 
 class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSort>) :
-    Expression<BoolSort> {
+    Expression<BoolSort>() {
   override val theories = emptySet<Theories>()
   override val func = null
 
@@ -326,7 +338,7 @@ class BoundVariable<out T : Sort>(
     override val name: Symbol,
     override val sort: T,
     override val func: SortedVar<T>
-) : Expression<T> {
+) : Expression<T>() {
   override val theories = emptySet<Theories>()
 
   override val children: List<Expression<*>> = emptyList()
@@ -335,7 +347,7 @@ class BoundVariable<out T : Sort>(
 }
 
 class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: List<Attribute>) :
-    Expression<T> {
+    Expression<T>() {
   override val theories = emptySet<Theories>()
   override val func = null
 

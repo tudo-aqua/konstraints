@@ -70,10 +70,14 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
   override fun toString() = name.toString()
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> = this
+
+  override fun equals(other: Any?) =
+      if (this === other) true
+      else if (other !is BVLiteral) false else sort.bits == other.sort.bits && value == other.value
 }
 
 /**
- * Floating-point literal.
+ * d Floating-point literal.
  *
  * (fp [sign] [exponent] [significand])
  */
@@ -118,6 +122,16 @@ data class FPLiteral(
     get() = theoriesSet
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> = this
+
+  override fun equals(other: Any?) =
+      if (this === other) true
+      else if (other !is FPLiteral) false
+      else
+          sort.exponentBits == other.sort.exponentBits &&
+              sort.significantBits == other.sort.significantBits &&
+              sign == other.sign &&
+              exponent == other.exponent &&
+              significand == other.significand
 }
 
 /**
@@ -127,7 +141,7 @@ data class FPLiteral(
  */
 class IntLiteral(val value: BigInteger) :
     Literal<IntSort>(LiteralString(value.toString()), SMTInt) {
-  override val theories = INTS_REALS_INTS_MARKER_SET
+  override val theories = INTS_REALS_INTS_MARKER_SET + STRINGS_MARKER_SET
 
   constructor(value: Byte) : this(value.toInt().toBigInteger())
 
@@ -140,6 +154,9 @@ class IntLiteral(val value: BigInteger) :
   override fun toString(): String = value.toString()
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> = this
+
+  override fun equals(other: Any?) =
+      if (this === other) true else if (other !is IntLiteral) false else value == other.value
 }
 
 /**
@@ -170,6 +187,9 @@ class RealLiteral(val value: BigDecimal) :
   override fun toString(): String = value.toString()
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> = this
+
+  override fun equals(other: Any?) =
+      if (this === other) true else if (other !is RealLiteral) false else value == other.value
 }
 
 /**
@@ -191,15 +211,19 @@ class Char(val value: String) : Literal<StringSort>(LiteralString("char"), SMTSt
   val character = Char(Integer.parseInt(value.substring(2)))
 
   override fun copy(children: List<Expression<*>>): Expression<StringSort> = this
+
+  override fun equals(other: Any?) =
+      if (this === other) true else if (other !is Char) false else character == other.character
 }
 
 class StringLiteral(val value: String) : Literal<StringSort>(LiteralString(value), SMTString) {
   override val theories = STRINGS_MARKER_SET
 
-  // TODO the symbol needs a different value, probably should not be a symbol here
-
   // use symbol.toString here to get the unquoted string literal
-  override fun toString(): String = name.toString()
+  override fun toString(): String = "\"$value\""
 
   override fun copy(children: List<Expression<*>>): Expression<StringSort> = this
+
+  override fun equals(other: Any?) =
+      if (this === other) true else if (other !is StringLiteral) false else value == other.value
 }

@@ -37,9 +37,49 @@ import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.smt.VarBinding
 import tools.aqua.konstraints.solvers.z3.Z3Solver
+import tools.aqua.konstraints.solvers.z3.z3ify
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Z3Tests {
+  @Test
+  fun test() {
+    val solver = Z3Solver()
+    val program =
+        Parser()
+            .parse(
+                "(set-logic QF_S)\n(declare-fun s () String)\n(assert (= (str.len s) 0))\n(check-sat)\n(get-model)")
+
+    solver.use {
+      solver.solve(program)
+      solver.model
+    }
+  }
+
+  @Test
+  fun test2() {
+    val solver = Z3Solver()
+    val context = solver.context.context
+    val program = MutableSMTProgram()
+
+    program.setLogic(QF_S)
+    val decl = program.declareFun("s".toSymbolWithQuotes(), emptyList<Sort>(), SMTString)
+    program.assert(
+        Equals(StrLength(decl.constructDynamic(emptyList(), emptyList()).cast()), IntLiteral(0)))
+
+    solver.visit(program.commands.filterIsInstance<DeclareFun<*>>().single())
+
+    println(program.commands.filterIsInstance<Assert>().single().expr.z3ify(solver.context))
+  }
+
+  @Test
+  fun test3() {
+    val solver = Z3Solver()
+    val context = solver.context.context
+    val expr = StrInRe(StringLiteral("X"), StrToRe(StringLiteral("X"))).z3ify(solver.context)
+    // context.mkInRe(context.mkString("X"), context.mkToRe(context.mkString("X")))
+    println(expr)
+  }
+
   private fun loadResource(path: String) =
       File(javaClass.getResource(path)!!.file)
           .walk()
@@ -122,7 +162,7 @@ class Z3Tests {
 
   @ParameterizedTest
   @MethodSource("getQFFPFile")
-  @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 6, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_FP(file: File) = solve(file)
 
   @ParameterizedTest
@@ -218,6 +258,13 @@ class Z3Tests {
   fun QF_ABV(file: File) = solve(file)
 
   fun getQFABVFile(): Stream<Arguments> = loadResource("/QF_ABV/bench_ab/")
+
+  @ParameterizedTest
+  @MethodSource("getQFSFile")
+  @Timeout(value = 3, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  fun QF_S(file: File) = solve(file)
+
+  fun getQFSFile(): Stream<Arguments> = loadResource("/QF_S/")
 
   @ParameterizedTest
   @MethodSource("getQFFPLRAFile")

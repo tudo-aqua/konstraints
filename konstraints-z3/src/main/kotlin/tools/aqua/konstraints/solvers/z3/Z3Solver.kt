@@ -74,11 +74,10 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
   }
 
   override fun visit(declareConst: DeclareConst<*>) {
-    if (context.constants.put(
-        declareConst.instance,
-        context.context
-            .mkConstDecl(declareConst.name.toSMTString(), getOrCreateSort(declareConst.sort))
-            .apply()) != null) {
+    if (context.functions.put(
+        declareConst.func,
+        context.context.mkConstDecl(
+            declareConst.name.toSMTString(), getOrCreateSort(declareConst.sort))) != null) {
       /*
        * if the smt program we are solving is correct (which we assume since otherwise there is a bug somewhere
        * in the construction of said program) this exception SHOULD never be reached
@@ -120,6 +119,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
           is FPSort -> context.context.mkFPSort(sort.exponentBits, sort.significantBits)
           is ArraySort<*, *> ->
               context.context.mkArraySort(getOrCreateSort(sort.x), getOrCreateSort(sort.y))
+          is StringSort -> context.context.mkStringSort()
           else -> context.context.mkUninterpretedSort(sort.toSMTString())
         }
       }
