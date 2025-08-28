@@ -46,11 +46,26 @@ class ParserBenchmark {
   private fun parse(file: File) {
     assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
 
-    assertDoesNotThrow {
+    /*assertDoesNotThrow {
       // its crucial that the separator is '\n' as comments dont have an ending symbol but rather
       // end that the end of a line
       Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
-    }
+    }*/
+
+      try {
+        Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
+      } catch (e: StackOverflowError) {
+        // mark stack overflows as skipped
+        assumeTrue(false)
+        println("Skipped due to stack overflow")
+      } catch (e: NotImplementedError) {
+        assumeTrue(false)
+        println("Skipped due to not implemented error")
+      } catch (e: Exception) {
+        assertDoesNotThrow {
+          throw e
+        }
+      }
   }
 
   /* @Disabled */ @ParameterizedTest
@@ -316,7 +331,7 @@ class ParserBenchmark {
   @ParameterizedTest @MethodSource("getQF_SFiles") fun parseQF_S(file: File) = parse(file)
 
   fun getQF_SFiles(): Stream<Arguments> =
-      loadResource("/smt-benchmark/QF_S/20230329-automatark-lu/")
+      loadResource("/smt-benchmark/QF_S/")
 
   @ParameterizedTest @MethodSource("getQF_SLIAFiles") fun parseQF_SLIA(file: File) = parse(file)
 

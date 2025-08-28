@@ -24,6 +24,7 @@ import com.microsoft.z3.BitVecExpr
 import com.microsoft.z3.BitVecNum
 import com.microsoft.z3.BitVecSort
 import com.microsoft.z3.BoolExpr
+import com.microsoft.z3.CharSort
 import com.microsoft.z3.BoolSort as Z3BoolSort
 import com.microsoft.z3.Expr
 import com.microsoft.z3.FPExpr
@@ -33,8 +34,11 @@ import com.microsoft.z3.FPRMSort as Z3RMSort
 import com.microsoft.z3.FPSort as Z3FPSort
 import com.microsoft.z3.IntExpr
 import com.microsoft.z3.IntNum
+import com.microsoft.z3.ReExpr
 import com.microsoft.z3.IntSort as Z3IntSort
 import com.microsoft.z3.RealExpr
+import com.microsoft.z3.SeqExpr
+import com.microsoft.z3.SeqSort
 import com.microsoft.z3.RealSort as Z3RealSort
 import com.microsoft.z3.Sort as Z3Sort
 import com.microsoft.z3.enumerations.Z3_decl_kind
@@ -63,6 +67,12 @@ fun Expr<*>.aquaify(): Expression<*> =
       is FPExpr -> this.aquaify()
       is FPRMExpr -> this.aquaify()
       is ArrayExpr<*, *> -> this.aquaify()
+        is ReExpr<*> -> this.aquaify()
+        is SeqExpr<*> -> if(sort.toString() == "String") {
+            this.aquaify()
+        } else {
+            throw RuntimeException("Unknown or unsupported Z3 sort $sort")
+        }
       else -> throw RuntimeException("Unknown or unsupported Z3 sort $sort")
     }
 
@@ -354,4 +364,12 @@ fun ArrayExpr<*, *>.aquaify(): Expression<ArraySort<*, *>> =
       ArraySelect(args[0].aquaify().cast(), args[1].aquaify().cast())
     } else {
       throw RuntimeException("Unknown or unsupported array expression $this")
+    }
+
+@JvmName("aquaifyString")
+fun SeqExpr<SeqSort<CharSort>>.aquaify(): Expression<StringSort> =
+    when(funcDecl.declKind) {
+        Z3_decl_kind.Z3_OP_SEQ_AT -> TODO()
+        Z3_decl_kind.Z3_OP_SEQ_MAP -> TODO()
+
     }
