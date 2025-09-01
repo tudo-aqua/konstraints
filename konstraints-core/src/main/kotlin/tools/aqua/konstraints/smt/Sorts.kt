@@ -583,7 +583,7 @@ class UserDefinedFloatingPointFactory(
     return sort
   }
 
-  private val sort = FPSort(eb, sb)
+  private val sort = UserDefinedFloatingPointSort(symbol, eb, sb)
 
   override fun isInstanceOf(sort: Sort) =
       sort is UserDefinedFloatingPointSort && sort.exponentBits == eb && sort.significantBits == sb

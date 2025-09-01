@@ -25,15 +25,21 @@ import java.math.BigInteger
 sealed interface SpecConstant
 
 /** SMT String constant. */
-data class StringConstant(val string: String) : SpecConstant
+data class StringConstant(val string: String) : SpecConstant {
+  override fun toString(): String = "\"$string\""
+}
 
 /** SMT Numeral constant. */
-data class NumeralConstant(val numeral: BigInteger) : SpecConstant
+data class NumeralConstant(val numeral: BigInteger) : SpecConstant {
+  override fun toString(): String = "$numeral"
+}
 
 /** BinaryConstant of the form #b followed by a non-empty sequence of 0 and 1 characters. */
 data class BinaryConstant(val binary: String) : SpecConstant {
   /* Number of bits for this binary */
   val bits = binary.length - 2
+
+  override fun toString(): String = binary
 }
 
 /**
@@ -43,7 +49,11 @@ data class BinaryConstant(val binary: String) : SpecConstant {
 data class HexConstant(val hexadecimal: String) : SpecConstant {
   /* Number of bits for this hexadecimal */
   val bits = (hexadecimal.length - 2) * 4
+
+  override fun toString(): String = hexadecimal
 }
 
 /** Decimal smt constant. */
-data class DecimalConstant(val decimal: BigDecimal) : SpecConstant
+data class DecimalConstant(val decimal: BigDecimal) : SpecConstant {
+  override fun toString(): String = "$decimal"
+}

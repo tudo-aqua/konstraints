@@ -149,6 +149,8 @@ class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>)
   override val parameters = emptyList<Sort>()
 
   val instance = LocalExpression(symbol, sort, term, this)
+
+  override fun toString() = "($symbol $term)"
 }
 
 /** Variable bound by exists or forall quantifier. */

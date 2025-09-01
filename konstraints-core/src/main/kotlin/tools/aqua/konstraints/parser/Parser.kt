@@ -769,7 +769,7 @@ class Parser {
         // results[4] is guaranteed to be a List of Sort
       }
 
-  private val exitCMD = (lparen * exitKW * rparen).map { results: ArrayList<Any> -> Exit }
+  private val exitCMD = (lparen * exitKW * rparen).map { results: ArrayList<Any> -> program.add(Exit) }
 
   private val setInfoCMD =
       (lparen * setInfoKW * attribute * rparen).map { results: ArrayList<Any> ->
