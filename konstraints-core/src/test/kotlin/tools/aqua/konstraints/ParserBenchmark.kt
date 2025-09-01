@@ -52,20 +52,18 @@ class ParserBenchmark {
       Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
     }*/
 
-      try {
-        Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
-      } catch (e: StackOverflowError) {
-        // mark stack overflows as skipped
-        assumeTrue(false)
-        println("Skipped due to stack overflow")
-      } catch (e: NotImplementedError) {
-        assumeTrue(false)
-        println("Skipped due to not implemented error")
-      } catch (e: Exception) {
-        assertDoesNotThrow {
-          throw e
-        }
-      }
+    try {
+      Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
+    } catch (e: StackOverflowError) {
+      // mark stack overflows as skipped
+      assumeTrue(false)
+      println("Skipped due to stack overflow")
+    } catch (e: NotImplementedError) {
+      assumeTrue(false)
+      println("Skipped due to not implemented error")
+    } catch (e: Exception) {
+      assertDoesNotThrow { throw e }
+    }
   }
 
   /* @Disabled */ @ParameterizedTest
@@ -330,8 +328,7 @@ class ParserBenchmark {
 
   @ParameterizedTest @MethodSource("getQF_SFiles") fun parseQF_S(file: File) = parse(file)
 
-  fun getQF_SFiles(): Stream<Arguments> =
-      loadResource("/smt-benchmark/QF_S/")
+  fun getQF_SFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_S/")
 
   @ParameterizedTest @MethodSource("getQF_SLIAFiles") fun parseQF_SLIA(file: File) = parse(file)
 

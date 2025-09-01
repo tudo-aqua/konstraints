@@ -20,7 +20,7 @@ package tools.aqua.konstraints.parser
 
 import java.math.BigDecimal
 import java.math.BigInteger
-import kotlin.math.max
+import kotlin.text.forEach
 import org.petitparser.context.Token
 import org.petitparser.parser.Parser
 import org.petitparser.parser.combinators.ChoiceParser
@@ -35,7 +35,6 @@ import tools.aqua.konstraints.smt.BVSort
 import tools.aqua.konstraints.smt.IntLiteral
 import tools.aqua.konstraints.smt.RealLiteral
 import tools.aqua.konstraints.smt.Theories
-import kotlin.text.forEach
 
 /** Cleaner syntax for [ChoiceParser]. */
 operator fun Parser.plus(other: Parser): ChoiceParser = or(other)
@@ -177,9 +176,7 @@ class Parser {
     internal val string =
         ((of("\"") *
                 ((anythingButQuotes.star() * of("\"\"") * anythingButQuotes.star()).star()) *
-                of("\"")) + (
-                of("\"") * anythingButQuotes.star() * of("\"")
-                ))
+                of("\"")) + (of("\"") * anythingButQuotes.star() * of("\"")))
             .flatten()
             .map { str: String ->
               str.drop(1).dropLast(1)
@@ -870,8 +867,15 @@ class Parser {
 
   internal val script = command.star().end()
 
-    internal val modelResponse = (lparen * defineFunCMD /* defineFunRecCMD + defineFunsRecCMD */ * rparen).map { results : ArrayList<Any> -> results[1] }
-    val getModelResponse = (lparen * modelResponse.star() * rparen).map { results: ArrayList<Any> -> results.subList(1, results.size) }
+  internal val modelResponse =
+      (lparen * defineFunCMD /* defineFunRecCMD + defineFunsRecCMD */ * rparen).map {
+          results: ArrayList<Any> ->
+        results[1]
+      }
+  val getModelResponse =
+      (lparen * modelResponse.star() * rparen).map { results: ArrayList<Any> ->
+        results.subList(1, results.size)
+      }
 
   /**
    * Parses an SMTProgram in string format IMPORTANT linebreak characters ('\n') must be present in
@@ -880,29 +884,29 @@ class Parser {
   fun parse(program: String): MutableSMTProgram {
     // filter out comments at the end of the lines
     /*val result =
-        script.parse(
-            program.split("\n").joinToString(" ") { line ->
-              // line only contains comment (this is not true if a line inside a quoted symbol
-              // starts with a ';' but I hope no one does that :))
-              // find first ';' that is not inside string literal or quoted symbol
-              if (line.startsWith(';')) {
-                ""
-              }
-              // string literals or quoted symbols are present so comment detection needs to change
-              else if (line.contains('"') || line.contains('|')) {
-                // check if semicolon is after the last '"' or '|' to detekt the start of a comment
-                if (line.indexOfLast { c -> c == ';' } <
-                    max(line.indexOfLast { c -> c == '"' }, line.indexOfLast { c -> c == '|' })) {
-                  line // no comment is present in line
-                } else {
-                  line.substringBefore(';') // truncate comment
-                }
-              } else { // no string literals remove comments at the end of all lines
-                line.substringBefore(';')
-              }
-            })*/
+    script.parse(
+        program.split("\n").joinToString(" ") { line ->
+          // line only contains comment (this is not true if a line inside a quoted symbol
+          // starts with a ';' but I hope no one does that :))
+          // find first ';' that is not inside string literal or quoted symbol
+          if (line.startsWith(';')) {
+            ""
+          }
+          // string literals or quoted symbols are present so comment detection needs to change
+          else if (line.contains('"') || line.contains('|')) {
+            // check if semicolon is after the last '"' or '|' to detekt the start of a comment
+            if (line.indexOfLast { c -> c == ';' } <
+                max(line.indexOfLast { c -> c == '"' }, line.indexOfLast { c -> c == '|' })) {
+              line // no comment is present in line
+            } else {
+              line.substringBefore(';') // truncate comment
+            }
+          } else { // no string literals remove comments at the end of all lines
+            line.substringBefore(';')
+          }
+        })*/
 
-      val result = script.parse(removeComments2(program))
+    val result = script.parse(removeComments2(program))
 
     if (!result.isSuccess) {
       throw ParseException(result.message, result.position, result.buffer)
@@ -936,60 +940,59 @@ class Parser {
     return this.program
   }
 
-    private fun removeComments(program: String): String {
-        var inQuotedSymbol = false
-        var inStringLiteral = false
-        var inComment = false
-        var prg = ""
+  private fun removeComments(program: String): String {
+    var inQuotedSymbol = false
+    var inStringLiteral = false
+    var inComment = false
+    var prg = ""
 
-        program.forEach { c ->
-
-            if(c == '|' && !inStringLiteral) { // beginning or end of quoted symbol
-                inQuotedSymbol = !inQuotedSymbol
-                prg += c
-            } else if (c == '"' && !inQuotedSymbol) { // beginning or end of string literal
-                inStringLiteral = !inStringLiteral
-                prg += c
-            } else if (c == ';' && !inQuotedSymbol && !inStringLiteral) { // beginning of comment
-                inComment = true
-            } else if(c == '\n' && inComment) { // end of comment
-                inComment = false
-                prg += c
-            } else if(!inComment) { // normal character
-                prg += c
-            }
-        }
-
-        return prg
+    program.forEach { c ->
+      if (c == '|' && !inStringLiteral) { // beginning or end of quoted symbol
+        inQuotedSymbol = !inQuotedSymbol
+        prg += c
+      } else if (c == '"' && !inQuotedSymbol) { // beginning or end of string literal
+        inStringLiteral = !inStringLiteral
+        prg += c
+      } else if (c == ';' && !inQuotedSymbol && !inStringLiteral) { // beginning of comment
+        inComment = true
+      } else if (c == '\n' && inComment) { // end of comment
+        inComment = false
+        prg += c
+      } else if (!inComment) { // normal character
+        prg += c
+      }
     }
 
-    val tokenizer = Regex("(?<=[\n|\";])|(?=[\n|\";])")
+    return prg
+  }
 
-    fun removeComments2(program: String): String {
-        var inQuotedSymbol = false
-        var inStringLiteral = false
-        var inComment = false
-        var prg = ""
+  val tokenizer = Regex("(?<=[\n|\";])|(?=[\n|\";])")
 
-        tokenizer.split(program).forEach { token ->
-            if(token == "|" && !inStringLiteral) { // beginning or end of quoted symbol
-                inQuotedSymbol = !inQuotedSymbol
-                prg += token
-            } else if (token == "\"" && !inQuotedSymbol) { // beginning or end of string literal
-                inStringLiteral = !inStringLiteral
-                prg += token
-            } else if (token == ";" && !inQuotedSymbol && !inStringLiteral) { // beginning of comment
-                inComment = true
-            } else if(token == "\n" && inComment) { // end of comment
-                inComment = false
-                prg += token
-            } else if(!inComment) { // normal character
-                prg += token
-            }
-        }
+  fun removeComments2(program: String): String {
+    var inQuotedSymbol = false
+    var inStringLiteral = false
+    var inComment = false
+    var prg = ""
 
-        return prg.replace('\n', ' ')
+    tokenizer.split(program).forEach { token ->
+      if (token == "|" && !inStringLiteral) { // beginning or end of quoted symbol
+        inQuotedSymbol = !inQuotedSymbol
+        prg += token
+      } else if (token == "\"" && !inQuotedSymbol) { // beginning or end of string literal
+        inStringLiteral = !inStringLiteral
+        prg += token
+      } else if (token == ";" && !inQuotedSymbol && !inStringLiteral) { // beginning of comment
+        inComment = true
+      } else if (token == "\n" && inComment) { // end of comment
+        inComment = false
+        prg += token
+      } else if (!inComment) { // normal character
+        prg += token
+      }
     }
+
+    return prg.replace('\n', ' ')
+  }
 
   private fun splitInput(program: String): List<String> {
     val commands = mutableListOf<String>()

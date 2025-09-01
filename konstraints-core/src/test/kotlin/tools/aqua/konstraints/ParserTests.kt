@@ -20,7 +20,6 @@ package tools.aqua.konstraints
 
 import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
@@ -30,7 +29,6 @@ import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.petitparser.context.ParseError
-import org.petitparser.context.Success
 import org.petitparser.parser.primitive.StringParser.of
 import tools.aqua.konstraints.parser.*
 import tools.aqua.konstraints.parser.Parser.Companion.anythingButQuotes
@@ -40,49 +38,41 @@ import tools.aqua.konstraints.smt.*
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserTests {
 
-    @ParameterizedTest
-    @ValueSource(strings = [
-        "(set-logic QF_S)\n"+
-                "(set-info :source |\n" +
-                "this is a;\n" +
-                "multiline symbol\" containing\n" +
-                "problematic ; characters|)\n" +
-                "(set-info :status sat)\n" +
-                "(declare-fun s () String)\n" +
-                "(assert (\n" +
-                "= ( ;this is a comment\n" +
-                "str.length \";\"\"|;\"\"||;\")\n" +
-                "10))" +
-                "(check-sat)\n(exit)"
-    ])
-    fun testCommentRemoval(program : String) {
-        val clean = Parser().removeComments2(program)
-        println(clean)
-    }
+  @ParameterizedTest
+  @ValueSource(
+      strings =
+          [
+              "(set-logic QF_S)\n" +
+                  "(set-info :source |\n" +
+                  "this is a;\n" +
+                  "multiline symbol\" containing\n" +
+                  "problematic ; characters|)\n" +
+                  "(set-info :status sat)\n" +
+                  "(declare-fun s () String)\n" +
+                  "(assert (\n" +
+                  "= ( ;this is a comment\n" +
+                  "str.length \";\"\"|;\"\"||;\")\n" +
+                  "10))" +
+                  "(check-sat)\n(exit)"])
+  fun testCommentRemoval(program: String) {
+    val clean = Parser().removeComments2(program)
+    println(clean)
+  }
 
-    @ParameterizedTest
-    @ValueSource(strings = [
-        "\"\"\"\"",
-        "\"\"",
-        "\"foo\"\"\"",
-        "\"bar\"",
-        "\"\"\"bar\""
-    ])
-    fun testStringParsing(string : String) {
-        val parser = ((of("\"") *
+  @ParameterizedTest
+  @ValueSource(strings = ["\"\"\"\"", "\"\"", "\"foo\"\"\"", "\"bar\"", "\"\"\"bar\""])
+  fun testStringParsing(string: String) {
+    val parser =
+        ((of("\"") *
                 ((anythingButQuotes.star() * of("\"\"") * anythingButQuotes.star()).star()) *
-                of("\"")) + (
-                        of("\"") * anythingButQuotes.star() * of("\"")
-                        ))
+                of("\"")) + (of("\"") * anythingButQuotes.star() * of("\"")))
             .flatten()
-            .map { str: String ->
-                str.drop(1).dropLast(1)
-            }
+            .map { str: String -> str.drop(1).dropLast(1) }
 
-        val result = parser.parse(string).get<String>()
+    val result = parser.parse(string).get<String>()
 
-        assertEquals(string.drop(1).dropLast(1), result)
-    }
+    assertEquals(string.drop(1).dropLast(1), result)
+  }
 
   @ParameterizedTest
   @ValueSource(

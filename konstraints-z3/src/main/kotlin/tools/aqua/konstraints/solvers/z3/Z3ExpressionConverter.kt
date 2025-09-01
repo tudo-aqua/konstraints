@@ -24,8 +24,8 @@ import com.microsoft.z3.BitVecExpr
 import com.microsoft.z3.BitVecNum
 import com.microsoft.z3.BitVecSort
 import com.microsoft.z3.BoolExpr
-import com.microsoft.z3.CharSort
 import com.microsoft.z3.BoolSort as Z3BoolSort
+import com.microsoft.z3.CharSort
 import com.microsoft.z3.Expr
 import com.microsoft.z3.FPExpr
 import com.microsoft.z3.FPNum
@@ -34,12 +34,13 @@ import com.microsoft.z3.FPRMSort as Z3RMSort
 import com.microsoft.z3.FPSort as Z3FPSort
 import com.microsoft.z3.IntExpr
 import com.microsoft.z3.IntNum
-import com.microsoft.z3.ReExpr
 import com.microsoft.z3.IntSort as Z3IntSort
+import com.microsoft.z3.ReExpr
+import com.microsoft.z3.ReSort as Z3ReSort
 import com.microsoft.z3.RealExpr
+import com.microsoft.z3.RealSort as Z3RealSort
 import com.microsoft.z3.SeqExpr
 import com.microsoft.z3.SeqSort
-import com.microsoft.z3.RealSort as Z3RealSort
 import com.microsoft.z3.Sort as Z3Sort
 import com.microsoft.z3.enumerations.Z3_decl_kind
 import tools.aqua.konstraints.smt.*
@@ -53,6 +54,13 @@ fun Z3Sort.aquaify(): Sort =
       is Z3FPSort -> FloatingPoint(eBits, sBits)
       is Z3RMSort -> RoundingMode
       is Z3ArraySort<*, *> -> SMTArray(domain.aquaify(), range.aquaify())
+      is Z3ReSort<*> -> RegLan
+      is SeqSort<*> ->
+          if (toString() == "String") {
+            SMTString
+          } else {
+            throw RuntimeException("Unknown or unsupported Z3 sort $this")
+          }
       else -> throw RuntimeException("Unknown or unsupported Z3 sort $this")
     }
 
@@ -67,12 +75,13 @@ fun Expr<*>.aquaify(): Expression<*> =
       is FPExpr -> this.aquaify()
       is FPRMExpr -> this.aquaify()
       is ArrayExpr<*, *> -> this.aquaify()
-        is ReExpr<*> -> this.aquaify()
-        is SeqExpr<*> -> if(sort.toString() == "String") {
-            this.aquaify()
-        } else {
+      is ReExpr<*> -> this.aquaify()
+      is SeqExpr<*> ->
+          if (sort.toString() == "String") {
+            (this as SeqExpr<SeqSort<CharSort>>).aquaify()
+          } else {
             throw RuntimeException("Unknown or unsupported Z3 sort $sort")
-        }
+          }
       else -> throw RuntimeException("Unknown or unsupported Z3 sort $sort")
     }
 
@@ -166,6 +175,20 @@ fun BoolExpr.aquaify(): Expression<BoolSort> =
       FPIsNegative(args[0].aquaify().cast())
     } else if (funcDecl.declKind == Z3_decl_kind.Z3_OP_FPA_IS_POSITIVE) {
       FPIsPositive(args[0].aquaify().cast())
+    } else if (isApp && funcDecl.declKind == Z3_decl_kind.Z3_OP_STRING_LT) {
+      StrLexOrder(args.map { expr -> expr.aquaify().cast() })
+    } else if (isApp && funcDecl.declKind == Z3_decl_kind.Z3_OP_STRING_LE) {
+      StrRefLexOrder(args.map { expr -> expr.aquaify().cast() })
+    } else if (isApp && funcDecl.declKind == Z3_decl_kind.Z3_OP_SEQ_IN_RE) {
+      StrInRe(args[0].aquaify().cast(), args[1].aquaify().cast())
+    } else if (isApp && funcDecl.declKind == Z3_decl_kind.Z3_OP_SEQ_PREFIX) {
+      StrPrefixOf(args[0].aquaify().cast(), args[1].aquaify().cast())
+    } else if (isApp && funcDecl.declKind == Z3_decl_kind.Z3_OP_SEQ_SUFFIX) {
+      StrSuffixOf(args[0].aquaify().cast(), args[1].aquaify().cast())
+    } else if (isApp && funcDecl.declKind == Z3_decl_kind.Z3_OP_SEQ_CONTAINS) {
+      StrContains(args[0].aquaify().cast(), args[1].aquaify().cast())
+    } else if (isApp && funcDecl.declKind == Z3_decl_kind.Z3_OP_CHAR_IS_DIGIT) {
+      StrIsDigit(args[0].aquaify().cast())
     } else {
       throw RuntimeException("Unknown or unsupported bool expression $this")
     }
@@ -190,6 +213,14 @@ fun IntExpr.aquaify(): Expression<IntSort> =
       ToInt(args[0].aquaify().cast())
     } else if (isBVToInt) {
       TODO("Missing")
+    } else if (isApp && funcDecl.declKind == Z3_decl_kind.Z3_OP_SEQ_LENGTH) {
+      StrLength(args[0].aquaify().cast())
+    } else if (isApp && funcDecl.declKind == Z3_decl_kind.Z3_OP_SEQ_INDEX) {
+      StrIndexOf(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+    } else if (isApp && funcDecl.declKind == Z3_decl_kind.Z3_OP_STR_TO_INT) {
+      StrToInt(args[0].aquaify().cast())
+    } else if (isApp && funcDecl.declKind == Z3_decl_kind.Z3_OP_STR_TO_CODE) {
+      StrToCode(args[0].aquaify().cast())
     } else {
       throw RuntimeException("Unknown or unsupported int expression $this")
     }
@@ -366,10 +397,49 @@ fun ArrayExpr<*, *>.aquaify(): Expression<ArraySort<*, *>> =
       throw RuntimeException("Unknown or unsupported array expression $this")
     }
 
-@JvmName("aquaifyString")
-fun SeqExpr<SeqSort<CharSort>>.aquaify(): Expression<StringSort> =
-    when(funcDecl.declKind) {
-        Z3_decl_kind.Z3_OP_SEQ_AT -> TODO()
-        Z3_decl_kind.Z3_OP_SEQ_MAP -> TODO()
+@JvmName("aquaifyRegLan")
+fun ReExpr<*>.aquaify(): Expression<RegLanSort> =
+    when (funcDecl.declKind) {
+      Z3_decl_kind.Z3_OP_SEQ_TO_RE -> StrToRe(args[0].aquaify().cast())
+      Z3_decl_kind.Z3_OP_RE_EMPTY_SET -> RegexNone
+      Z3_decl_kind.Z3_OP_RE_FULL_SET -> RegexAll
+      Z3_decl_kind.Z3_OP_RE_FULL_CHAR_SET -> RegexAllChar
+      Z3_decl_kind.Z3_OP_RE_CONCAT -> RegexConcat(args.map { expr -> expr.aquaify().cast() })
+      Z3_decl_kind.Z3_OP_RE_UNION -> RegexUnion(args.map { expr -> expr.aquaify().cast() })
+      Z3_decl_kind.Z3_OP_RE_INTERSECT -> RegexIntersec(args.map { expr -> expr.aquaify().cast() })
+      Z3_decl_kind.Z3_OP_RE_STAR -> RegexStar(args[0].aquaify().cast())
+      Z3_decl_kind.Z3_OP_RE_COMPLEMENT -> RegexComp(args[0].aquaify().cast())
+      Z3_decl_kind.Z3_OP_RE_DIFF -> RegexDiff(args.map { expr -> expr.aquaify().cast() })
+      Z3_decl_kind.Z3_OP_RE_PLUS -> RegexPlus(args[0].aquaify().cast())
+      Z3_decl_kind.Z3_OP_RE_OPTION -> RegexOption(args[0].aquaify().cast())
+      Z3_decl_kind.Z3_OP_RE_RANGE -> RegexRange(args[0].aquaify().cast(), args[1].aquaify().cast())
+      Z3_decl_kind.Z3_OP_RE_POWER ->
+          RegexPower(args[0].aquaify().cast(), funcDecl.parameters[0].int)
+      Z3_decl_kind.Z3_OP_RE_LOOP ->
+          RegexLoop(
+              args[0].aquaify().cast(), funcDecl.parameters[0].int, funcDecl.parameters[1].int)
+      else -> throw IllegalStateException("Unknown or unsupported reglan expression $this!")
+    }
 
+@JvmName("aquaifySting")
+fun SeqExpr<SeqSort<CharSort>>.aquaify(): Expression<StringSort> =
+    when (funcDecl.declKind) {
+      Z3_decl_kind.Z3_OP_SEQ_CONCAT -> StrConcat(args.map { expr -> expr.aquaify().cast() })
+      Z3_decl_kind.Z3_OP_SEQ_AT -> StrAt(args[0].aquaify().cast(), args[1].aquaify().cast())
+      Z3_decl_kind.Z3_OP_SEQ_EXTRACT ->
+          StrSubstring(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+      Z3_decl_kind.Z3_OP_SEQ_REPLACE ->
+          StrReplace(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+      Z3_decl_kind.Z3_OP_SEQ_REPLACE_ALL ->
+          StrReplaceAll(
+              args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+      Z3_decl_kind.Z3_OP_SEQ_REPLACE_RE ->
+          StrReplaceRegex(
+              args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+      Z3_decl_kind.Z3_OP_SEQ_REPLACE_RE_ALL ->
+          StrReplaceAllRegex(
+              args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+      Z3_decl_kind.Z3_OP_STR_TO_CODE -> StrFromCode(args[0].aquaify().cast())
+      Z3_decl_kind.Z3_OP_STR_FROM_CODE -> StrFromInt(args[0].aquaify().cast())
+      else -> throw IllegalStateException("Unknown or unsupported reglan expression $this!")
     }
