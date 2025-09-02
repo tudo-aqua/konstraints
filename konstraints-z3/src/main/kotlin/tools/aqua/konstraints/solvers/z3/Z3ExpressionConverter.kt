@@ -422,24 +422,35 @@ fun ReExpr<*>.aquaify(): Expression<RegLanSort> =
     }
 
 @JvmName("aquaifySting")
-fun SeqExpr<SeqSort<CharSort>>.aquaify(): Expression<StringSort> =
-    when (funcDecl.declKind) {
-      Z3_decl_kind.Z3_OP_SEQ_CONCAT -> StrConcat(args.map { expr -> expr.aquaify().cast() })
-      Z3_decl_kind.Z3_OP_SEQ_AT -> StrAt(args[0].aquaify().cast(), args[1].aquaify().cast())
-      Z3_decl_kind.Z3_OP_SEQ_EXTRACT ->
-          StrSubstring(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
-      Z3_decl_kind.Z3_OP_SEQ_REPLACE ->
-          StrReplace(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
-      Z3_decl_kind.Z3_OP_SEQ_REPLACE_ALL ->
-          StrReplaceAll(
-              args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
-      Z3_decl_kind.Z3_OP_SEQ_REPLACE_RE ->
-          StrReplaceRegex(
-              args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
-      Z3_decl_kind.Z3_OP_SEQ_REPLACE_RE_ALL ->
-          StrReplaceAllRegex(
-              args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
-      Z3_decl_kind.Z3_OP_STR_TO_CODE -> StrFromCode(args[0].aquaify().cast())
-      Z3_decl_kind.Z3_OP_STR_FROM_CODE -> StrFromInt(args[0].aquaify().cast())
-      else -> throw IllegalStateException("Unknown or unsupported reglan expression $this!")
-    }
+fun SeqExpr<SeqSort<CharSort>>.aquaify(): Expression<StringSort> {
+  if (this.isString) {
+    return StringLiteral(this.string)
+  }
+
+  return when (funcDecl.declKind) {
+    Z3_decl_kind.Z3_OP_SEQ_CONCAT -> StrConcat(args.map { expr -> expr.aquaify().cast() })
+    Z3_decl_kind.Z3_OP_SEQ_AT -> StrAt(args[0].aquaify().cast(), args[1].aquaify().cast())
+    Z3_decl_kind.Z3_OP_SEQ_EXTRACT ->
+        StrSubstring(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+
+    Z3_decl_kind.Z3_OP_SEQ_REPLACE ->
+        StrReplace(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+
+    Z3_decl_kind.Z3_OP_SEQ_REPLACE_ALL ->
+        StrReplaceAll(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+
+    Z3_decl_kind.Z3_OP_SEQ_REPLACE_RE ->
+        StrReplaceRegex(
+            args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+
+    Z3_decl_kind.Z3_OP_SEQ_REPLACE_RE_ALL ->
+        StrReplaceAllRegex(
+            args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+
+    Z3_decl_kind.Z3_OP_STR_TO_CODE -> StrFromCode(args[0].aquaify().cast())
+    Z3_decl_kind.Z3_OP_STR_FROM_CODE -> StrFromInt(args[0].aquaify().cast())
+    else ->
+        throw IllegalStateException(
+            "Unknown or unsupported string expression $this! (decl kind ${this.funcDecl.declKind})")
+  }
+}

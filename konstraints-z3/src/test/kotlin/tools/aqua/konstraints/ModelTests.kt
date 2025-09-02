@@ -26,6 +26,7 @@ import kotlin.streams.asStream
 import kotlin.use
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions.assumeTrue
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
@@ -79,4 +80,18 @@ class ModelTests {
   fun QF_BV(file: File) = solve(file)
 
   fun getQFBVFile(): Stream<Arguments> = loadResource("/QF_BV/20190311-bv-term-small-rw-Noetzli/")
+
+  @Test
+  fun test() {
+    val solver = Z3Solver()
+    val program =
+        Parser()
+            .parse(
+                "(set-logic QF_S)(declare-fun foo () String)(declare-fun bar () String)(assert (= (str.len foo) 0))(assert (= bar \"bar\"))(check-sat)(get-model)(exit)")
+
+    solver.use {
+      solver.solve(program)
+      solver.model
+    }
+  }
 }
