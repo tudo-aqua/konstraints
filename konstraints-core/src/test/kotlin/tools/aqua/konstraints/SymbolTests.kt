@@ -102,7 +102,7 @@ class SymbolTests {
   @ValueSource(strings = ["32", "3bitvec", "assert", "(check-sat)"])
   fun `test that symbol sets must quote for symbols that must be quoted`(symbol: String) {
     val test = symbol.toSymbolWithQuotes()
-    assertTrue(test.mustQuote)
+    assertTrue(!test.isSimple)
   }
 
   @ParameterizedTest

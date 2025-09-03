@@ -18,19 +18,10 @@
 
 package tools.aqua.konstraints.parser
 
-import org.petitparser.context.Token
 import tools.aqua.konstraints.smt.*
-
-/** Symbol wrapper holding additional information from parser. */
-class ParseSymbol(val token: Token) :
-    Symbol(
-        token.getValue(),
-        token.getValue<String>().startsWith('|') && token.getValue<String>().endsWith('|')) {
-  val symbol: String = token.getValue()
-}
 
 // Terms
 
-data class Pattern(val symbols: List<ParseSymbol>)
+data class Pattern(val symbols: List<Symbol>)
 
 data class MatchCase(val pattern: Pattern, val term: Expression<*>)
