@@ -55,5 +55,5 @@ data class HexConstant(val hexadecimal: String) : SpecConstant {
 
 /** Decimal smt constant. */
 data class DecimalConstant(val decimal: BigDecimal) : SpecConstant {
-  override fun toString(): String = "$decimal"
+  override fun toString() = decimal.toPlainString()
 }

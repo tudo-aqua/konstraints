@@ -128,7 +128,7 @@ abstract class DefinedSMTFunction<T : Sort> : SMTFunction<T>() {
     }
 
     return UserDefinedExpression(
-        symbol, sort, emptyList(), FunctionDef(symbol, sortedVars, sort, term), this)
+        symbol, sort, args, FunctionDef(symbol, sortedVars, sort, term), this)
   }
 }
 
@@ -150,7 +150,7 @@ class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>)
 
   val instance = LocalExpression(symbol, sort, term, this)
 
-  override fun toString() = "($symbol $term)"
+  override fun toString() = "(${symbol.toSMTString()} $term)"
 }
 
 /** Variable bound by exists or forall quantifier. */
@@ -160,7 +160,7 @@ class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T)
 
   override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>) = instance
 
-  override fun toString(): String = "($symbol $sort)"
+  override fun toString(): String = "(${symbol.toSMTString()} $sort)"
 
   val instance = BoundVariable(symbol, sort, this)
   override val parameters: List<Sort> = emptyList()

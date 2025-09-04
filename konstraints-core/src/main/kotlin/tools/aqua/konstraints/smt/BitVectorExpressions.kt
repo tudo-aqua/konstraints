@@ -556,7 +556,7 @@ class BVSub(override val lhs: Expression<BVSort>, override val rhs: Expression<B
  *   of bits
  */
 class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("bvsub".toSymbolWithQuotes(), numerator.sort) {
+    BinaryExpression<BVSort, BVSort, BVSort>("bvsdiv".toSymbolWithQuotes(), numerator.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -607,7 +607,7 @@ class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
  *   of bits
  */
 class BVSRem(val numerator: Expression<BVSort>, val denominator: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("bvsub".toSymbolWithQuotes(), numerator.sort) {
+    BinaryExpression<BVSort, BVSort, BVSort>("bvsrem".toSymbolWithQuotes(), numerator.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -770,6 +770,8 @@ class Repeat(val i: Int, override val inner: Expression<BVSort>) :
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
       RepeatDecl.constructDynamic(children, listOf(i.idx()))
+
+  override fun toString() = "((_ repeat $i) $inner)"
 }
 
 /**
@@ -798,6 +800,8 @@ class ZeroExtend(val i: Int, override val inner: Expression<BVSort>) :
 
   override fun copy(children: List<Expression<*>>) =
       ZeroExtendDecl.constructDynamic(children, emptyList())
+
+  override fun toString() = "((_ zero_extend $i) $inner)"
 }
 
 /**
@@ -826,6 +830,8 @@ class SignExtend(val i: Int, override val inner: Expression<BVSort>) :
 
   override fun copy(children: List<Expression<*>>) =
       SignExtendDecl.constructDynamic(children, emptyList())
+
+  override fun toString() = "((_ sign_extend $i) $inner)"
 }
 
 /**
@@ -857,6 +863,8 @@ class RotateLeft(val i: Int, override val inner: Expression<BVSort>) :
             BVExtract(sort.bits - distance - 1, 0, inner),
             BVExtract(sort.bits - 1, sort.bits - distance, inner))
       }
+
+  override fun toString() = "((_ rotate_left $i) $inner)"
 }
 
 /**
@@ -878,6 +886,8 @@ class RotateRight(val i: Int, override val inner: Expression<BVSort>) :
 
   /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand(): Expression<BVSort> = TODO()
+
+  override fun toString() = "((_ rotate_right $i) $inner)"
 }
 
 /**

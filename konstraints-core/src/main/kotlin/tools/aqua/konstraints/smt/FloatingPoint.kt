@@ -664,6 +664,8 @@ class BitVecToFP(override val inner: Expression<BVSort>, sort: FPSort) :
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
       BitVecToFPDecl.constructDynamic(children, emptyList())
+
+  override fun toString() = "((_ to_fp ${sort.exponentBits} ${sort.significantBits}) $inner)"
 }
 
 /**

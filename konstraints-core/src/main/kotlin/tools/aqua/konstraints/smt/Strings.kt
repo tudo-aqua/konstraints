@@ -88,7 +88,7 @@ class StrLexOrder(val strings: List<Expression<StringSort>>) :
  * - `(str.to_re String RegLan)`
  */
 class StrToRe(override val inner: Expression<StringSort>) :
-    UnaryExpression<RegLanSort, StringSort>("str.to_reg".toSymbolWithQuotes(), RegLan) {
+    UnaryExpression<RegLanSort, StringSort>("str.to_re".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RegLanSort> =
@@ -100,7 +100,7 @@ class StrToRe(override val inner: Expression<StringSort>) :
  * - `(str.in_re String RegLan Bool)`
  */
 class StrInRe(val inner: Expression<StringSort>, val regex: Expression<RegLanSort>) :
-    BinaryExpression<BoolSort, StringSort, RegLanSort>("str.in_reg".toSymbolWithQuotes(), Bool) {
+    BinaryExpression<BoolSort, StringSort, RegLanSort>("str.in_re".toSymbolWithQuotes(), Bool) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = inner

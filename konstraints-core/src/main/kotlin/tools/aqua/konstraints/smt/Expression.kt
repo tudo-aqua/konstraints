@@ -48,7 +48,7 @@ sealed class Expression<out T : Sort> {
                 children.map { it.all(predicate) }.reduceOrDefault(true) { t1, t2 -> t1 and t2 }
         is Ite ->
             predicate(this) and
-            predicate(statement) and
+                predicate(statement) and
                 predicate(then) and
                 predicate(otherwise) and
                 statement.all(predicate) and
@@ -107,7 +107,8 @@ sealed class Expression<out T : Sort> {
   // use only name for hashcode as names are almost unique and thus mostly conflict free
   override fun hashCode() = name.hashCode()
 
-    override fun toString() = if(children.isEmpty()) name.toString() else "$(name ${children.joinToString(" ")})"
+  override fun toString() =
+      if (children.isEmpty()) name.toString() else "$($name ${children.joinToString(" ")})"
 }
 
 /** SMT Literal */
@@ -126,7 +127,7 @@ abstract class ConstantExpression<out T : Sort>(override val name: Symbol, overr
 
   override val children: List<Expression<*>> = emptyList()
 
-  override fun toString() = "$name"
+  override fun toString() = name.toSMTString()
 }
 
 /** Base class of all expressions with exactly one child */
@@ -244,7 +245,7 @@ class LetExpression<out T : Sort>(val bindings: List<VarBinding<*>>, val inner: 
 
   override val children: List<Expression<*>> = listOf(inner)
 
-    override fun toString() = "(let (${bindings.joinToString(" ")}) $inner)"
+  override fun toString() = "(let (${bindings.joinToString(" ")}) $inner)"
 }
 
 class UserDeclaredExpression<out T : Sort>(
@@ -303,6 +304,8 @@ class LocalExpression<T : Sort>(
   }
 
   override val children: List<Expression<*>> = emptyList()
+
+  override fun toString() = name.toString()
 }
 
 class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSort>) :
@@ -322,7 +325,7 @@ class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
     return ExistsExpression(vars, children.single().cast<BoolSort>())
   }
 
-    override fun toString() = "(exists (${vars.joinToString(" ")}) $term)"
+  override fun toString() = "(exists (${vars.joinToString(" ")}) $term)"
 }
 
 class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSort>) :
@@ -340,12 +343,10 @@ class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
     return ForallExpression(vars, children.single().cast<BoolSort>())
   }
 
-    override fun toString() = "(forall (${vars.joinToString(" ")}) $term)"
+  override fun toString() = "(forall (${vars.joinToString(" ")}) $term)"
 }
 
-/**
- * Instance of a sorted var
- */
+/** Instance of a sorted var */
 class BoundVariable<out T : Sort>(
     override val name: Symbol,
     override val sort: T,
@@ -356,6 +357,8 @@ class BoundVariable<out T : Sort>(
   override val children: List<Expression<*>> = emptyList()
 
   override fun copy(children: List<Expression<*>>): Expression<T> = BoundVariable(name, sort, func)
+
+  override fun toString() = name.toString()
 }
 
 class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: List<Attribute>) :
@@ -374,7 +377,7 @@ class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: Lis
 
   override val children: List<Expression<*>> = listOf(term)
 
-    override fun toString() = "(! $term ${annoations.joinToString(" ")})"
+  override fun toString() = "(! $term ${annoations.joinToString(" ")})"
 }
 
 class ExpressionCastException(msg: String) : ClassCastException(msg)

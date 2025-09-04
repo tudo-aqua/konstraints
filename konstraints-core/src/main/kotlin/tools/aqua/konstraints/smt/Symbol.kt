@@ -173,7 +173,7 @@ internal constructor(
       }
 
   /** Returns the internal representation of the symbol without any quotes. */
-  override fun toString() = value
+  override fun toString() = toSMTString()
 
   /** Returns a valid SMT String with reconstructed quoting. */
   fun toSMTString(rule: QuotingRule = QuotingRule.SAME_AS_INPUT) =

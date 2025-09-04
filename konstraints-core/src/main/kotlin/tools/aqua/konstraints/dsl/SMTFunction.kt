@@ -795,11 +795,9 @@ data class UserDefinedSMTFunctionN<T : Sort>(
     override val term: Expression<T>
 ) : DefinedSMTFunction<T>() {
 
-    /** Pseudo constructor. */
-    operator fun <T : Sort> invoke(
-        parameters: List<Expression<*>>
-    ) =
-        constructDynamic(parameters, emptyList())
+  /** Pseudo constructor. */
+  operator fun <T : Sort> invoke(parameters: List<Expression<*>>) =
+      constructDynamic(parameters, emptyList())
 
   override val parameters = sortedVars.map { it.sort }
 }

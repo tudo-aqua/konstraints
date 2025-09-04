@@ -78,19 +78,18 @@ class Parser {
 
     internal val reservedGeneral =
         (exclamationKW +
-                underscoreKW +
-                asKW +
-                binaryKW +
-                decimalKW +
-                existsKW +
-                hexadecimalKW +
-                forallKW +
-                letKW +
-                matchKW +
-                numeralKW +
-                parKW +
-                stringKW)
-            .token()
+            underscoreKW +
+            asKW +
+            binaryKW +
+            decimalKW +
+            existsKW +
+            hexadecimalKW +
+            forallKW +
+            letKW +
+            matchKW +
+            numeralKW +
+            parKW +
+            stringKW)
 
     // Tokens: Reserved Words: Command names
 
@@ -126,35 +125,34 @@ class Parser {
 
     internal val reservedCommands =
         (assertKW +
-                checkSatKW +
-                checkSatAssumingKW +
-                declareConstKW +
-                declareDatatypeKW +
-                declareDatatypesKW +
-                declareFunKW +
-                declareSortKW +
-                defineFunKW +
-                defineFunRecKW +
-                defineSortKW +
-                echoKW +
-                exitKW +
-                getAssertionsKW +
-                getAssignmentKW +
-                getInfoKW +
-                getModelKW +
-                getOptionKW +
-                getProofKW +
-                getUnsatAssumptionsKW +
-                getUnsatCoreKW +
-                getValueKW +
-                popKW +
-                pushKW +
-                resetKW +
-                resetAssertionsKW +
-                setInfoKW +
-                setLogicKW +
-                setOptionKW)
-            .token()
+            checkSatKW +
+            checkSatAssumingKW +
+            declareConstKW +
+            declareDatatypeKW +
+            declareDatatypesKW +
+            declareFunKW +
+            declareSortKW +
+            defineFunKW +
+            defineFunRecKW +
+            defineSortKW +
+            echoKW +
+            exitKW +
+            getAssertionsKW +
+            getAssignmentKW +
+            getInfoKW +
+            getModelKW +
+            getOptionKW +
+            getProofKW +
+            getUnsatAssumptionsKW +
+            getUnsatCoreKW +
+            getValueKW +
+            popKW +
+            pushKW +
+            resetKW +
+            resetAssertionsKW +
+            setInfoKW +
+            setLogicKW +
+            setOptionKW)
 
     // Tokens: Other tokens
 
@@ -201,9 +199,9 @@ class Parser {
           Symbol(raw, false, true)
         }) +
             (quotedSymbol.flatten().trim(whitespaceCat).map { raw: String ->
-              Symbol(raw, false, false)
+              Symbol(raw, true, false)
             })
-    private val keyword = (of(':') * simpleSymbol).flatten().trim(whitespaceCat).token()
+    private val keyword = (of(':') * simpleSymbol).flatten().trim(whitespaceCat)
 
     // Logics
 
@@ -396,12 +394,13 @@ class Parser {
       /* maps to an implementation of SExpression */
       sExpression.set(
           ((specConstant.map { constant: SpecConstant -> SExpressionConstant(constant) } +
-              reserved.map { reserved: Token -> SExpressionReserved(reserved) } +
+              reserved.map { reserved: String -> SExpressionReserved(reserved) } +
               symbol.map { symbol: Symbol -> SExpressionSymbol(symbol) } +
-              keyword.map { keyword: Token -> SExpressionKeyword(keyword) }) trim whitespaceCat) +
+              keyword.map { keyword: String -> SExpressionKeyword(keyword) }) trim whitespaceCat) +
               ((lparen * sExpression.star() * rparen).map { results: List<Any> ->
-                SubSExpression(results.slice(1..results.size - 2) as List<SExpression>)
-                // results is guaranteed to be a list of SExpression except the first and last entry
+                SubSExpression(results[1] as List<SExpression>)
+                // results is guaranteed to be 3 elements where the middle one is a list of
+                // SExpression
               } trim whitespaceCat))
     }
 
@@ -431,7 +430,7 @@ class Parser {
         specConstant.map { constant: SpecConstant -> ConstantAttributeValue(constant) } +
             symbol.map { symbol: Symbol -> SymbolAttributeValue(symbol) } +
             (lparen * sExpression.star() * rparen).map { results: List<Any> ->
-              SExpressionAttributeValue(results.slice(1..results.size - 2) as List<SExpression>)
+              SExpressionAttributeValue(results[1] as List<SExpression>)
             }
 
     /*
@@ -441,7 +440,7 @@ class Parser {
      */
     internal val attribute =
         (keyword * attributeValue).map { results: List<Any> ->
-          Attribute((results[0] as Token).getValue(), results[1] as AttributeValue)
+          Attribute(results[0] as String, results[1] as AttributeValue)
         } + keyword.map { keyword: Token -> Attribute(keyword.getValue(), null) }
 
     /* maps to pattern */
@@ -578,9 +577,7 @@ class Parser {
                   require(args.isEmpty())
                   require(indices.size == 1)
 
-                  return BVLiteral(
-                      "#b${identifier.symbol.value.substring(2).toBigInteger().toString(2)}",
-                      sort.bits)
+                  return BVLiteral(identifier.symbol.value, sort.bits)
                 }
               },
               identifier.indices)
@@ -768,7 +765,8 @@ class Parser {
         // results[4] is guaranteed to be a List of Sort
       }
 
-  private val exitCMD = (lparen * exitKW * rparen).map { results: ArrayList<Any> -> program.add(Exit) }
+  private val exitCMD =
+      (lparen * exitKW * rparen).map { results: ArrayList<Any> -> program.add(Exit) }
 
   private val setInfoCMD =
       (lparen * setInfoKW * attribute * rparen).map { results: ArrayList<Any> ->
@@ -849,23 +847,24 @@ class Parser {
 
   val command =
       ChoiceParser(
-          FailureJoiner.SelectFarthest(),
-          assertCMD,
-          checkSatCMD,
-          declareConstCMD,
-          declareFunCMD,
-          exitCMD,
-          setInfoCMD,
-          setLogicCMD,
-          declareSortCMD,
-          defineSortCMD,
-          getModelCMD,
-          defineFunCMD,
-          setOptionCMD,
-          pushCMD,
-          popCMD,
-          declareDatatypeCMD,
-          declareDatatypesCMD)
+              FailureJoiner.SelectFarthest(),
+              assertCMD,
+              checkSatCMD,
+              declareConstCMD,
+              declareFunCMD,
+              exitCMD,
+              setInfoCMD,
+              setLogicCMD,
+              declareSortCMD,
+              defineSortCMD,
+              getModelCMD,
+              defineFunCMD,
+              setOptionCMD,
+              pushCMD,
+              popCMD,
+              declareDatatypeCMD,
+              declareDatatypesCMD)
+          .trim(whitespaceCat)
 
   internal val script = command.star().end()
 
@@ -883,7 +882,7 @@ class Parser {
    * Parses an SMTProgram in string format IMPORTANT linebreak characters ('\n') must be present in
    * the string representation to correctly filter out comments in the smt code.
    */
-  fun parse(program: String): MutableSMTProgram {
+  fun parse(program: String, removeComments: Boolean = true): MutableSMTProgram {
     // filter out comments at the end of the lines
     /*val result =
     script.parse(
@@ -908,7 +907,8 @@ class Parser {
           }
         })*/
 
-    val result = script.parse(removeComments2(program))
+    val result =
+        if (removeComments) script.parse(removeComments3(program)) else script.parse(program)
 
     if (!result.isSuccess) {
       throw ParseException(result.message, result.position, result.buffer)
@@ -994,6 +994,34 @@ class Parser {
     }
 
     return prg.replace('\n', ' ')
+  }
+
+  fun removeComments3(program: String): String {
+    var inQuotedSymbol = false
+    var inStringLiteral = false
+    var inComment = false
+
+    return tokenizer.split(program).joinToString(separator = "") { token ->
+      if (token == "|" && !inStringLiteral && !inComment) { // beginning or end of quoted symbol
+        inQuotedSymbol = !inQuotedSymbol
+        token
+      } else if (token == "\"" &&
+          !inQuotedSymbol &&
+          !inComment) { // beginning or end of string literal
+        inStringLiteral = !inStringLiteral
+        token
+      } else if (token == ";" && !inQuotedSymbol && !inStringLiteral) { // beginning of comment
+        inComment = true
+        ""
+      } else if (token == "\n" && inComment) { // end of comment
+        inComment = false
+        token
+      } else if (!inComment) { // normal character
+        token
+      } else {
+        ""
+      }
+    }
   }
 
   private fun splitInput(program: String): List<String> {

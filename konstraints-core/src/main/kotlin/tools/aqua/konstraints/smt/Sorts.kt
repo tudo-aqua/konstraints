@@ -357,7 +357,7 @@ object Float16Factory : SortFactory {
     return build()
   }
 
-  fun build() = FPSort(5, 11)
+  fun build() = FP16
 
   override fun isInstanceOf(sort: Sort) =
       (sort is FPSort) && (sort.exponentBits == 5) && (sort.significantBits == 11)
@@ -375,7 +375,7 @@ object Float32Factory : SortFactory {
     return build()
   }
 
-  fun build() = FPSort(8, 24)
+  fun build() = FP32
 
   override fun isInstanceOf(sort: Sort) =
       (sort is FPSort) && (sort.exponentBits == 8) && (sort.significantBits == 24)
@@ -393,7 +393,7 @@ object Float64Factory : SortFactory {
     return build()
   }
 
-  fun build() = FPSort(11, 53)
+  fun build() = FP64
 
   override fun isInstanceOf(sort: Sort) =
       (sort is FPSort) && (sort.exponentBits == 11) && (sort.significantBits == 53)
@@ -411,7 +411,7 @@ object Float128Factory : SortFactory {
     return build()
   }
 
-  fun build() = FPSort(15, 113)
+  fun build() = FP128
 
   override fun isInstanceOf(sort: Sort) =
       (sort is FPSort) && (sort.exponentBits == 15) && (sort.significantBits == 113)
@@ -790,16 +790,24 @@ sealed class FPSort(eb: Index, sb: Index) : Sort("FloatingPoint") {
 }
 
 /** Standard 16-bit FloatingPoint sort. */
-object FP16 : FPSort(5.idx(), 11.idx())
+object FP16 : FPSort(5.idx(), 11.idx()) {
+  override fun toString() = "Float16"
+}
 
 /** Standard 32-bit FloatingPoint sort. */
-object FP32 : FPSort(8.idx(), 24.idx())
+object FP32 : FPSort(8.idx(), 24.idx()) {
+  override fun toString() = "Float32"
+}
 
 /** Standard 64-bit FloatingPoint sort. */
-object FP64 : FPSort(11.idx(), 53.idx())
+object FP64 : FPSort(11.idx(), 53.idx()) {
+  override fun toString() = "Float64"
+}
 
 /** Standard 128-bit FloatingPoint sort. */
-object FP128 : FPSort(15.idx(), 113.idx())
+object FP128 : FPSort(15.idx(), 113.idx()) {
+  override fun toString() = "Float128"
+}
 
 /** Default floating point sort implementation. */
 class FloatingPoint(eb: Int, sb: Int) : FPSort(eb.idx(), sb.idx())

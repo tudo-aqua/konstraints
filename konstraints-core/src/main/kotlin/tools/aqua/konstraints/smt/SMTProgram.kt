@@ -55,7 +55,7 @@ abstract class SMTProgram(commands: List<Command>) {
   val commands: List<Command>
     get() = _commands.toList()
 
-    override fun toString() = commands.joinToString("\n")
+  final override fun toString() = _commands.joinToString(separator = "\n")
 }
 
 /** SMT Program with a mutable command list. */
@@ -224,7 +224,7 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     this.logic = logic
     context.setLogic(logic)
 
-      _commands.add(SetLogic(logic))
+    _commands.add(SetLogic(logic))
   }
 }
 
@@ -239,12 +239,12 @@ fun MutableSMTProgram.declareFun(name: Symbol, parameters: List<Sort>, sort: Sor
       declareFun(UserDeclaredSMTFunctionN(name, sort, parameters))
     }
 
-fun <T : Sort> MutableSMTProgram.defineFun(
+/*fun <T : Sort> MutableSMTProgram.defineFun(
     name: Symbol,
     parameters: List<Sort>,
     sort: T,
     term: Expression<T>
-) = defineFun(UserDefinedSMTFunctionN(name, sort, parameters.mapIndexed { idx, sort -> SortedVar("|local!$sort!$idx|".toSymbolWithQuotes(), sort) }, term))
+) = defineFun(UserDefinedSMTFunctionN(name, sort, parameters, term))*/
 
 fun <T : Sort> MutableSMTProgram.defineFun(def: FunctionDef<T>) =
     defineFun(UserDefinedSMTFunctionN(def.name, def.sort, def.parameters, def.term))

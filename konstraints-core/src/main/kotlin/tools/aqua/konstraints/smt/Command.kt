@@ -55,22 +55,22 @@ data class DeclareConst<T : Sort>(val instance: UserDeclaredExpression<T>) :
  * Declares a new a function of [sort] with the given [name] and [parameters]
  */
 data class DeclareFun<T : Sort>(val func: SMTFunction<T>) :
-    Command("declare-fun ${func.symbol.toSMTString()} (${func.parameters.joinToString(" ")}) ${func.sort}") {
+    Command(
+        "declare-fun ${func.symbol.toSMTString()} (${func.parameters.joinToString(" ")}) ${func.sort}") {
   val name = func.symbol
   val parameters = func.parameters
   val sort = func.sort
 }
 
 /** SMT (set-info [Attribute.keyword] [Attribute.value]) command. */
-data class SetInfo(val attribute: Attribute) :
-    Command("set-info $attribute") {
+data class SetInfo(val attribute: Attribute) : Command("set-info $attribute") {
   /** SMT (set-info [keyword] [value]) command */
   constructor(keyword: String, value: AttributeValue?) : this(Attribute(keyword, value))
 }
 
 /** SMT Attribute use by [SetInfo]. */
 data class Attribute(val keyword: String, val value: AttributeValue?) {
-    override fun toString() = "$keyword $value"
+  override fun toString() = "$keyword $value"
 }
 
 /** Attribute value base class. */
@@ -78,16 +78,18 @@ sealed interface AttributeValue
 
 /** Attribute value of type [SpecConstant]. */
 data class ConstantAttributeValue(val constant: SpecConstant) : AttributeValue {
-    override fun toString(): String = "$constant"
+  override fun toString(): String = "$constant"
 }
 
 /** Symbolic attribute value. */
 data class SymbolAttributeValue(val symbol: Symbol) : AttributeValue {
-    override fun toString(): String = symbol.toSMTString()
+  override fun toString(): String = symbol.toSMTString()
 }
 
 /** SExpression attribute value. */
-data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : AttributeValue
+data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : AttributeValue {
+  override fun toString() = sExpressions.joinToString(separator = " ", prefix = "(", postfix = ")")
+}
 
 /** SMT (declare-sort [name] [arity]) command. */
 data class DeclareSort(val name: Symbol, val arity: Int) : Command("declare-sort $name $arity")
@@ -147,7 +149,7 @@ data class FunctionDef<out S : Sort>(
     val sort: S,
     val term: Expression<S>
 ) {
-  override fun toString(): String = "$name (${parameters.joinToString(" ")}) $sort $term)"
+  override fun toString(): String = "$name (${parameters.joinToString(" ")}) $sort $term"
 
   fun expand(args: List<Expression<*>>): Expression<*> {
     // term is a placeholder expression using the parameters as expressions

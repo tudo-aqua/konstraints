@@ -133,7 +133,7 @@ data class FPLiteral(
               exponent == other.exponent &&
               significand == other.significand
 
-    override fun toString() = "(fp $sign $exponent $significand)"
+  override fun toString() = "(fp $sign $exponent $significand)"
 }
 
 /**
@@ -159,7 +159,6 @@ class IntLiteral(val value: BigInteger) :
 
   override fun equals(other: Any?) =
       if (this === other) true else if (other !is IntLiteral) false else value == other.value
-
 }
 
 /**
@@ -168,7 +167,7 @@ class IntLiteral(val value: BigInteger) :
  * (NUMERAL Real) (DECIMAL Real)
  */
 class RealLiteral(val value: BigDecimal) :
-    Literal<RealSort>(LiteralString(value.toString()), Real) {
+    Literal<RealSort>(LiteralString(value.toPlainString()), Real) {
   override val theories = REALS_REALS_INTS_MARKER_SET.plus(FLOATING_POINT_MARKER_SET)
 
   constructor(value: Byte) : this(value.toInt().toBigDecimal())
@@ -187,7 +186,7 @@ class RealLiteral(val value: BigDecimal) :
 
   override val sort: RealSort = Real
 
-  override fun toString(): String = value.toString()
+  override fun toString(): String = value.toPlainString()
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> = this
 

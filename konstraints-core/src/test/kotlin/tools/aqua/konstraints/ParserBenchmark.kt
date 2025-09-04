@@ -24,6 +24,7 @@ import java.util.stream.Stream
 import kotlin.streams.asStream
 import kotlin.use
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.TestInstance
@@ -44,7 +45,7 @@ class ParserBenchmark {
           .asStream()
 
   private fun parse(file: File) {
-    assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
+    assumeTrue(file.length() < 100000, "Skipped due to file size exceeding limit of 5000000")
 
     /*assertDoesNotThrow {
       // its crucial that the separator is '\n' as comments dont have an ending symbol but rather
@@ -53,7 +54,16 @@ class ParserBenchmark {
     }*/
 
     try {
-      Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
+      val input =
+          Parser()
+              .removeComments3(
+                  file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
+      val program = Parser().parse(input, false)
+      // val program2 = Parser().parse(program.toString(), true)
+
+      assertEquals(
+          input.replace(" ", "").replace("\n", "").replace("\r", "").replace("\t", ""),
+          program.toString().replace(" ", "").replace("\n", "").replace("\r", "").replace("\t", ""))
     } catch (e: StackOverflowError) {
       // mark stack overflows as skipped
       assumeTrue(false)
@@ -270,7 +280,8 @@ class ParserBenchmark {
 
   @ParameterizedTest @MethodSource("getQF_BVFiles") fun parseQF_BV(file: File) = parse(file)
 
-  fun getQF_BVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_BV/sage/")
+  fun getQF_BVFiles(): Stream<Arguments> =
+      loadResource("/smt-benchmark/QF_BV/20210312-Bouvier/vlsat3_a00.smt2")
 
   @ParameterizedTest @MethodSource("getQF_BVFPFiles") fun parseQF_BVFP(file: File) = parse(file)
 

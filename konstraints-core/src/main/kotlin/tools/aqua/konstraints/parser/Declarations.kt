@@ -736,8 +736,8 @@ internal object BVXOrDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2) {
-      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
@@ -746,8 +746,7 @@ internal object BVXOrDecl :
       "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
     }
 
-    @Suppress("UNCHECKED_CAST")
-    return BVXOr(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    return BVXOr(args.map { expression -> expression.cast() })
   }
 }
 
@@ -1916,7 +1915,8 @@ internal object RealsIntsTheory : Theory {
               DivisibleDecl,
               IntRealAddDecl,
               IntRealMulDecl,
-              IntRealDivDecl,
+              IntDivDecl,
+              RealDivDecl,
               ToRealDecl,
               ToIntDecl,
               IsIntDecl,
@@ -1998,30 +1998,6 @@ internal object IntRealMulDecl :
       IntMul(args.map { expr -> expr.cast() })
     } else {
       RealMul(args.map { expr -> expr.cast() })
-    }
-  }
-}
-
-internal object IntRealDivDecl :
-    SMTTheoryFunction<Sort>(
-        "/".toSymbolWithQuotes(),
-        listOf(NumeralSortInstance, NumeralSortInstance),
-        Real,
-        Associativity.LEFT_ASSOC) {
-
-  override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<Sort> {
-    require(args.size >= 2) {
-      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
-    }
-
-    require(args[0].sort == args[1].sort && (args[0].sort is IntSort || args[0].sort is RealSort)) {
-      "Expected args to be (Int Int) or (Real Real), but got (${args[0].sort} ${args[1].sort})"
-    }
-
-    return if (args[0].sort is IntSort) {
-      IntDiv(args.map { expr -> expr.cast() })
-    } else {
-      RealDiv(args.map { expr -> expr.cast<RealSort>() })
     }
   }
 }
