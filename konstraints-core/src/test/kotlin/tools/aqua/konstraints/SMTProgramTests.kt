@@ -19,6 +19,7 @@
 package tools.aqua.konstraints
 
 // import dsl to construct test expressions
+import org.junit.jupiter.api.Assertions.assertEquals
 import java.util.stream.Stream
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertDoesNotThrow
@@ -28,11 +29,17 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.dsl.*
+import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.smt.BVSort
 import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.FPSort
 import tools.aqua.konstraints.smt.bitvec
+import java.io.BufferedReader
+import java.io.File
+import kotlin.io.bufferedReader
+import kotlin.streams.asStream
+import kotlin.use
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SMTProgramTests {
@@ -119,4 +126,64 @@ class SMTProgramTests {
             coreProgram,
             UserDeclaredSMTFunction0("Unregistered!bool".toSymbolWithQuotes(), Bool)()))
   }
+
+    @ParameterizedTest
+    @MethodSource("provideCustom")
+    fun testSerialization(program : SMTProgram) {
+        println(program.toString())
+
+        val exprMap = mutableMapOf<String, Int>()
+
+        program.commands.filterIsInstance<Assert>().forEach { assertion ->
+            assertion.expr.all { expression ->
+                when (expression) {
+                    is AnnotatedExpression<*> -> exprMap.compute("Annotated") { k, v -> v?.plus(1) ?: 1 }
+                    is BinaryExpression<*, *, *> -> exprMap.compute("Binary") { k, v -> v?.plus(1) ?: 1 }
+                    is BoundVariable<*> -> exprMap.compute("BoundVar") { k, v -> v?.plus(1) ?: 1 }
+                    is ConstantExpression<*> -> exprMap.compute("ConstExpr") { k, v -> v?.plus(1) ?: 1 }
+                    is ExistsExpression -> exprMap.compute("Exists") { k, v -> v?.plus(1) ?: 1 }
+                    is ForallExpression -> exprMap.compute("Forall") { k, v -> v?.plus(1) ?: 1 }
+                    is HomogenousExpression<*, *> -> exprMap.compute("Homogenous") { k, v -> v?.plus(1) ?: 1 }
+                    is Ite<*> -> exprMap.compute("Ite") { k, v -> v?.plus(1) ?: 1 }
+                    is LetExpression<*> -> exprMap.compute("Let") { k, v -> v?.plus(1) ?: 1 }
+                    is Literal<*> -> exprMap.compute("Literal") { k, v -> v?.plus(1) ?: 1 }
+                    is LocalExpression<*> -> exprMap.compute("Local") { k, v -> v?.plus(1) ?: 1 }
+                    is NAryExpression<*> -> exprMap.compute("NAry") { k, v -> v?.plus(1) ?: 1 }
+                    is TernaryExpression<*, *, *, *> -> exprMap.compute("Ternary") { k, v -> v?.plus(1) ?: 1 }
+                    is UnaryExpression<*, *> -> exprMap.compute("Unary") { k, v -> v?.plus(1) ?: 1 }
+                }
+                true
+            }
+        }
+
+        println(exprMap.toString().replace(",", ",\n"))
+
+        assertEquals(program.toString(), Parser().parse(program.toString()).toString())
+    }
+
+    private fun providePrograms(path : String) =
+        File(javaClass.getResource(path)!!.file)
+            .walk()
+            .filter { file: File -> file.isFile }
+            .map { file: File -> arguments(Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))) }.
+                asStream()
+
+    private fun provideQF_BV() = providePrograms("/QF_BV/20190311-bv-term-small-rw-Noetzli/")
+    private fun provideQF_IDL() = providePrograms("/QF_IDL/")
+    private fun provideQF_RDL() = providePrograms("/QF_RDL/")
+    private fun provideUF() = providePrograms("/UF/")
+    private fun provideFP() = providePrograms("/FP/")
+    private fun provideCustom() = Stream.of(arguments(Parser().parse("(set-logic BVFP)\n" +
+            "(define-sort bitvec () (_ BitVec 8))\n" +
+            "(declare-const foo bitvec)\n" +
+            "(declare-const bar bitvec)\n" +
+            "(declare-const fpfoo Float16)\n" +
+            "(declare-const fpbar Float16)\n" +
+            "(declare-const rm RoundingMode)\n" +
+            "(assert (! (forall ((a bitvec)) (exists ((b bitvec)) (let ((c (bvand a b))) (and (= c #b00000000) (not (= a #b00000000)) (not (= b #b00000000)))))) :comment |Check that forall a there exists an inverse element w.r.t. addition|))\n" +
+            "(assert (= (bvneg foo) (bvxor foo bar)))\n" +
+            "(assert (bvult #b00000000 (ite (bvult foo bar) (bvneg foo) (bvneg bar))))\n" +
+            "(assert (not (fp.eq (fp.neg fpfoo) (fp.fma rm fpfoo fpbar fpfoo) (fp.add rm fpfoo fpbar))))\n" +
+            "(assert (fp.eq (fp.roundToIntegral RTZ fpfoo) (fp.roundToIntegral RTP fpfoo)))\n" +
+            "(check-sat)")))
 }

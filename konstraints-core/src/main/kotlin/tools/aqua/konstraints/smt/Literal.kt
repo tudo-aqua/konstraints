@@ -132,6 +132,8 @@ data class FPLiteral(
               sign == other.sign &&
               exponent == other.exponent &&
               significand == other.significand
+
+    override fun toString() = "(fp $sign $exponent $significand)"
 }
 
 /**
@@ -157,6 +159,7 @@ class IntLiteral(val value: BigInteger) :
 
   override fun equals(other: Any?) =
       if (this === other) true else if (other !is IntLiteral) false else value == other.value
+
 }
 
 /**

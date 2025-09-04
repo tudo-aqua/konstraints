@@ -22,7 +22,7 @@ import java.math.BigInteger
 
 /** Base class for each SMT command. */
 sealed class Command(val command: String) {
-  override fun toString(): String = "($command)"
+  final override fun toString(): String = "($command)"
 }
 
 /** SMT (check-sat) command. */
@@ -35,9 +35,7 @@ object Exit : Command("exit")
 object GetModel : Command("get-model")
 
 /** SMT (assert) command. */
-data class Assert(val expr: Expression<BoolSort>) : Command("assert $expr") {
-  override fun toString(): String = super.toString()
-}
+data class Assert(val expr: Expression<BoolSort>) : Command("assert $expr")
 
 /**
  * SMT (declare-const [name] [sort]) command.
@@ -46,8 +44,6 @@ data class Assert(val expr: Expression<BoolSort>) : Command("assert $expr") {
  */
 data class DeclareConst<T : Sort>(val instance: UserDeclaredExpression<T>) :
     Command("declare-const ${instance.name} ${instance.sort}") {
-  override fun toString(): String = super.toString()
-
   val func = instance.func
   val name = instance.name
   val sort = instance.sort
@@ -59,9 +55,7 @@ data class DeclareConst<T : Sort>(val instance: UserDeclaredExpression<T>) :
  * Declares a new a function of [sort] with the given [name] and [parameters]
  */
 data class DeclareFun<T : Sort>(val func: SMTFunction<T>) :
-    Command("declare-fun ${func.symbol} (${func.parameters.joinToString(" ")}) ${func.sort}") {
-  override fun toString(): String = super.toString()
-
+    Command("declare-fun ${func.symbol.toSMTString()} (${func.parameters.joinToString(" ")}) ${func.sort}") {
   val name = func.symbol
   val parameters = func.parameters
   val sort = func.sort
@@ -69,22 +63,28 @@ data class DeclareFun<T : Sort>(val func: SMTFunction<T>) :
 
 /** SMT (set-info [Attribute.keyword] [Attribute.value]) command. */
 data class SetInfo(val attribute: Attribute) :
-    Command("set-info ${attribute.keyword} ${attribute.value})") {
+    Command("set-info $attribute") {
   /** SMT (set-info [keyword] [value]) command */
   constructor(keyword: String, value: AttributeValue?) : this(Attribute(keyword, value))
 }
 
 /** SMT Attribute use by [SetInfo]. */
-data class Attribute(val keyword: String, val value: AttributeValue?)
+data class Attribute(val keyword: String, val value: AttributeValue?) {
+    override fun toString() = "$keyword $value"
+}
 
 /** Attribute value base class. */
 sealed interface AttributeValue
 
 /** Attribute value of type [SpecConstant]. */
-data class ConstantAttributeValue(val constant: SpecConstant) : AttributeValue
+data class ConstantAttributeValue(val constant: SpecConstant) : AttributeValue {
+    override fun toString(): String = "$constant"
+}
 
 /** Symbolic attribute value. */
-data class SymbolAttributeValue(val symbol: Symbol) : AttributeValue
+data class SymbolAttributeValue(val symbol: Symbol) : AttributeValue {
+    override fun toString(): String = symbol.toSMTString()
+}
 
 /** SExpression attribute value. */
 data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : AttributeValue
@@ -94,7 +94,7 @@ data class DeclareSort(val name: Symbol, val arity: Int) : Command("declare-sort
 
 /** SMT (define-sort [name] ([sortParameters]) [sort]) command. */
 data class DefineSort(val name: Symbol, var sortParameters: List<Symbol>, val sort: Sort) :
-    Command("define-sort $name ($sortParameters) $sort")
+    Command("define-sort $name (${sortParameters.joinToString(" ")}) $sort")
 
 // TODO string serialization of OptionValue
 /** SMT (set-option [name] [OptionValue]) command. */
