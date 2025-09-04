@@ -18,16 +18,13 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.ParseSymbol
-
 /** Base class of all SMT Identifiers. */
 sealed interface Identifier {
   val symbol: Symbol
 }
 
 /** Symbolic identifier. */
-data class SymbolIdentifier(override val symbol: ParseSymbol) : Identifier
+data class SymbolIdentifier(override val symbol: Symbol) : Identifier
 
 /** Numeral identifier. */
-data class IndexedIdentifier(override val symbol: ParseSymbol, val indices: List<Index>) :
-    Identifier
+data class IndexedIdentifier(override val symbol: Symbol, val indices: List<Index>) : Identifier

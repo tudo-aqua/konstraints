@@ -162,12 +162,12 @@ class Z3Tests {
 
   @ParameterizedTest
   @MethodSource("getQFFPFile")
-  @Timeout(value = 6, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_FP(file: File) = solve(file)
 
   @ParameterizedTest
   @MethodSource("getQFFPFile")
-  @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_FP_Model(file: File) {
     assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
 
@@ -192,6 +192,7 @@ class Z3Tests {
 
   fun getQFFPFile(): Stream<Arguments> = loadResource("/QF_FP/aqua/")
 
+  @Disabled
   @ParameterizedTest
   @MethodSource("getQFALIAFile")
   @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)

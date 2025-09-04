@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints
 
+import java.io.BufferedReader
 import java.io.File
 import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
@@ -41,11 +42,11 @@ class SMTProgramTests {
   @MethodSource("getQFBVModelFiles")
   @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun testModelGeneration(file: File) {
-    val program = Parser().parse(file.bufferedReader().readLines().joinToString(" "))
+    val program =
+        Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
 
     assumeTrue(
-        (program.info.find { attribute -> attribute.keyword == ":status" }?.value
-                as SymbolAttributeValue)
+        (program.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
             .symbol
             .toString() == "sat")
 
