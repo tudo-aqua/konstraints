@@ -554,7 +554,8 @@ class Parser {
   /* maps to an instance of SMTFunction and a list of indices */
   private val qualIdentifier =
       identifier.map { identifier: Identifier ->
-        if (identifier.symbol.value.startsWith("bv") &&
+        if (identifier is IndexedIdentifier && //prevents case where functions named bv register as literal
+            identifier.symbol.value.startsWith("bv") &&
             // this prevents us from creating bitvectors when normal smt functions are named bv in
             // logics without bitvectors
             program.context.containsSort("BitVec".toSymbolAsIs()) &&
@@ -1023,6 +1024,95 @@ class Parser {
       }
     }
   }
+
+    fun removeComments4(program: String): String {
+        var inQuotedSymbol = false
+        var inStringLiteral = false
+        var inComment = false
+        val builder = StringBuilder(program.length)
+
+        tokenizer.split(program).forEach { token ->
+            if (token == "|" && !inStringLiteral && !inComment) { // beginning or end of quoted symbol
+                inQuotedSymbol = !inQuotedSymbol
+                builder.append(token)
+            } else if (token == "\"" &&
+                !inQuotedSymbol &&
+                !inComment) { // beginning or end of string literal
+                inStringLiteral = !inStringLiteral
+                builder.append(token)
+            } else if (token == ";" && !inQuotedSymbol && !inStringLiteral) { // beginning of comment
+                inComment = true
+            } else if (token == "\n" && inComment) { // end of comment
+                inComment = false
+                builder.append(token)
+            } else if (!inComment) { // normal character
+                builder.append(token)
+            }
+        }
+
+        return builder.toString()
+    }
+
+    fun removeComments5(program: String): String {
+        var inQuotedSymbol = false
+        var inStringLiteral = false
+        var inComment = false
+        val builder = StringBuilder(program.length)
+
+        program.forEach { c ->
+            if (c == '|' && !inStringLiteral && !inComment) { // beginning or end of quoted symbol
+                inQuotedSymbol = !inQuotedSymbol
+                builder.append(c)
+            } else if (c == '"' && !inQuotedSymbol && !inComment) { // beginning or end of string literal
+                inStringLiteral = !inStringLiteral
+                builder.append(c)
+            } else if (c == ';' && !inQuotedSymbol && !inStringLiteral) { // beginning of comment
+                inComment = true
+            } else if (c == '\n' && inComment) { // end of comment
+                inComment = false
+                builder.append(c)
+            } else if (!inComment) { // normal character
+                builder.append(c)
+            }
+        }
+
+        return builder.toString()
+    }
+
+    fun removeComments6(program: String): String {
+        var inQuotedSymbol = false
+        var inStringLiteral = false
+        var inComment = false
+        var finished = false
+        var low = 0
+        val builder = StringBuilder(program.length)
+
+        program.forEachIndexed { i, c ->
+            if (c == '|' && !inStringLiteral && !inComment) { // beginning or end of quoted symbol
+                inQuotedSymbol = !inQuotedSymbol
+            } else if (c == '"' && !inQuotedSymbol && !inComment) { // beginning or end of string literal
+                inStringLiteral = !inStringLiteral
+            } else if (c == ';' && !inQuotedSymbol && !inStringLiteral && !inComment) { // beginning of comment we need to check we are not already in a comment or any appearance of ';' will duplicate the last substring
+                inComment = true
+                // add all previous chars to builder unless string starts with comment
+                builder.append(program.substring(low, i))
+                finished = true
+
+            } else if (c == '\n' && inComment) { // end of comment
+                inComment = false
+                // set index of new first character to be included in the program later
+                low = i
+                finished = false
+            }
+        }
+
+        if (!finished) {
+            builder.append(program.substring(low))
+        }
+
+        // if we have no comment nothing is ever added to the builder so we just return the input
+        return if (builder.isNotEmpty()) builder.toString() else program
+    }
 
   private fun splitInput(program: String): List<String> {
     val commands = mutableListOf<String>()

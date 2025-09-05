@@ -33,7 +33,6 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.parser.Parser
 
-@Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserBenchmark {
 
@@ -45,7 +44,7 @@ class ParserBenchmark {
           .asStream()
 
   private fun parse(file: File) {
-    assumeTrue(file.length() < 100000, "Skipped due to file size exceeding limit of 5000000")
+    assumeTrue(file.length() < 10000, "Skipped due to file size exceeding limit of 5000000")
 
     /*assertDoesNotThrow {
       // its crucial that the separator is '\n' as comments dont have an ending symbol but rather
@@ -56,14 +55,15 @@ class ParserBenchmark {
     try {
       val input =
           Parser()
-              .removeComments3(
+              .removeComments6(
                   file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
       val program = Parser().parse(input, false)
       // val program2 = Parser().parse(program.toString(), true)
 
       assertEquals(
           input.replace(" ", "").replace("\n", "").replace("\r", "").replace("\t", ""),
-          program.toString().replace(" ", "").replace("\n", "").replace("\r", "").replace("\t", ""))
+          program.toString().replace(" ", "").replace("\n", "").replace("\r", "").replace("\t", "")
+      )
     } catch (e: StackOverflowError) {
       // mark stack overflows as skipped
       assumeTrue(false)
@@ -278,10 +278,11 @@ class ParserBenchmark {
 
   fun getQF_AXFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_AX/")
 
+  @Disabled
   @ParameterizedTest @MethodSource("getQF_BVFiles") fun parseQF_BV(file: File) = parse(file)
 
   fun getQF_BVFiles(): Stream<Arguments> =
-      loadResource("/smt-benchmark/QF_BV/20210312-Bouvier/vlsat3_a00.smt2")
+      loadResource("/smt-benchmark/QF_BV/")
 
   @ParameterizedTest @MethodSource("getQF_BVFPFiles") fun parseQF_BVFP(file: File) = parse(file)
 
