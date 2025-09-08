@@ -657,6 +657,7 @@ class BitVecToFP(override val inner: Expression<BVSort>, sort: FPSort) :
   constructor(inner: Expression<BVSort>, eb: Int, sb: Int) : this(inner, FPSort(eb, sb))
 
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(sort.exponentBits, sort.significantBits)
 
   init {
     require(inner.sort.bits == sort.exponentBits + sort.significantBits)
@@ -685,6 +686,7 @@ class FPToFP(
   ) : this(roundingMode, inner, FPSort(eb, sb))
 
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(sort.exponentBits, sort.significantBits)
 
   override val lhs: Expression<RoundingModeSort> = roundingMode
 
@@ -714,6 +716,7 @@ class RealToFP(
   ) : this(roundingMode, inner, FPSort(eb, sb))
 
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(sort.exponentBits, sort.significantBits)
 
   override val lhs: Expression<RoundingModeSort> = roundingMode
 
@@ -744,6 +747,7 @@ class SBitVecToFP(
   ) : this(roundingMode, inner, FPSort(eb, sb))
 
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(sort.exponentBits, sort.significantBits)
 
   override val lhs: Expression<RoundingModeSort> = roundingMode
 
@@ -776,6 +780,7 @@ class UBitVecToFP(
   ) : this(roundingMode, inner, FPSort(eb, sb))
 
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(sort.exponentBits, sort.significantBits)
 
   override val lhs: Expression<RoundingModeSort> = roundingMode
 
@@ -805,6 +810,7 @@ class FPToUBitVec(
     BinaryExpression<BVSort, RoundingModeSort, FPSort>(
         "fp.to_ubv".toSymbolWithQuotes(), BVSort(m)) {
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(m)
 
   override val lhs: Expression<RoundingModeSort> = roundingMode
 
@@ -829,6 +835,7 @@ class FPToSBitVec(
     BinaryExpression<BVSort, RoundingModeSort, FPSort>(
         "fp.to_sbv".toSymbolWithQuotes(), BVSort(m)) {
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(m)
 
   override val lhs: Expression<RoundingModeSort> = roundingMode
 

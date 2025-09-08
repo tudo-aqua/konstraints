@@ -441,7 +441,7 @@ object ArraySortFactory : SortFactory {
  *
  * @param symbol sort name
  */
-sealed class Sort(open val symbol: Symbol) {
+sealed class Sort(open val symbol: Symbol) : SMTSerializable {
   constructor(name: String) : this(name.toSymbolWithQuotes())
 
   open val indices: List<Index> = emptyList()
@@ -478,6 +478,22 @@ sealed class Sort(open val symbol: Symbol) {
       }
 
   fun toSMTString() = symbol.toSMTString(QuotingRule.SAME_AS_INPUT)
+
+  override fun toSMTString(quotingRule: QuotingRule) =
+      if (this.isIndexed()) {
+        "(_ ${symbol.toSMTString(quotingRule)} ${indices.joinToString(" ")})"
+      } else {
+        symbol.toSMTString(quotingRule)
+      }
+
+  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule) =
+      if (this.isIndexed()) {
+        builder.append("(_ ")
+        symbol.toSMTString(builder, quotingRule)
+        builder.append(" ${indices.joinToString(" ")})")
+      } else {
+        symbol.toSMTString(builder, quotingRule)
+      }
 }
 
 class SortParameter(name: Symbol) : Sort(name) {

@@ -21,12 +21,13 @@ package tools.aqua.konstraints.smt
 import tools.aqua.konstraints.util.reduceOrDefault
 
 /** Interface for all sorted SMT terms. */
-sealed class Expression<out T : Sort> {
-  abstract val name: SMTSerializable
+sealed class Expression<out T : Sort> : SMTSerializable {
+  abstract val name: BaseSymbol
   abstract val sort: T
   abstract val theories: Set<Theories>
   abstract val func: SMTFunction<T>?
   abstract val children: List<Expression<*>>
+  open val indices = emptyList<Int>()
 
   /**
    * Recursive all implementation fun all(predicate: (Expression<*>) -> Boolean): Boolean { return
@@ -109,6 +110,31 @@ sealed class Expression<out T : Sort> {
 
   override fun toString() =
       if (children.isEmpty()) name.toString() else "$($name ${children.joinToString(" ")})"
+
+  override fun toSMTString(quotingRule: QuotingRule): String =
+      if (children.isEmpty()) name.toSMTString(quotingRule)
+      else
+          "$(${name.toSMTString(quotingRule)} ${
+            children.joinToString(" ") { expr: Expression<*> ->
+                expr.toSMTString(
+                    quotingRule
+                )
+            }
+        })"
+
+  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder =
+      if (children.isEmpty()) name.toSMTString(builder, quotingRule)
+      else {
+        builder.append("(")
+        name.toSMTString(builder, quotingRule)
+
+        children.forEach {
+          builder.append(" ")
+          it.toSMTString(builder, quotingRule)
+        }
+
+        builder.append(")")
+      }
 }
 
 /** SMT Literal */

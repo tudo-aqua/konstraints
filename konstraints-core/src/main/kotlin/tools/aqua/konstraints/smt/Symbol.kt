@@ -19,31 +19,6 @@
 package tools.aqua.konstraints.smt
 
 /**
- * Quoting rules for SMT String, used when serializing program.
- *
- * @property NEVER will never quote any symbol, even if the constructing string is quoted
- * @property SAME_AS_INPUT no modification will be done
- * @property WHEN_NEEDED automatically determines whether the symbol needs quoting or not
- * @property ALWAYS quotes all symbols
- */
-enum class QuotingRule {
-  /**
-   * No Symbol will be quoted, note this will result in exceptions if symbols must be quoted to be
-   * valid.
-   */
-  NEVER,
-
-  /** No modification will be done. */
-  SAME_AS_INPUT,
-
-  /** Automatically determines whether the string needs quoting or not. */
-  WHEN_NEEDED,
-
-  /** Quotes the string if it is not already quoted. */
-  ALWAYS
-}
-
-/**
  * Representation of an SMT Symbol.
  *
  * @throws IllegalSymbolException if [raw] is not a valid SMT Symbol
@@ -58,7 +33,7 @@ internal constructor(
     raw: String,
     val wasQuoted: Boolean,
     val isSimple: Boolean = checkIsSimple(raw)
-) : SMTSerializable {
+) : BaseSymbol {
   /**
    * Internal representation of the symbol without quotes, quoting will be reconstructed by
    * [toSMTString] before giving the symbol to a solver.
@@ -173,16 +148,19 @@ internal constructor(
       }
 
   /** Returns the internal representation of the symbol without any quotes. */
-  override fun toString() = toSMTString()
+  override fun toString() = toSMTString(QuotingRule.SAME_AS_INPUT)
 
   /** Returns a valid SMT String with reconstructed quoting. */
-  fun toSMTString(rule: QuotingRule = QuotingRule.SAME_AS_INPUT) =
+  override fun toSMTString(rule: QuotingRule) =
       when (rule) {
         QuotingRule.NEVER -> if (!isSimple) throw IllegalSymbolException(value) else value
         QuotingRule.SAME_AS_INPUT -> if (!isSimple) "|$value|" else value
         QuotingRule.WHEN_NEEDED -> if (wasQuoted || !isSimple) "|$value|" else value
         QuotingRule.ALWAYS -> "|$value|"
       }
+
+  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule) =
+      builder.append(toSMTString(quotingRule))
 }
 
 class IllegalSymbolException(val symbol: String) :
