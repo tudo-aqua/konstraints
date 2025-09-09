@@ -42,7 +42,7 @@ enum class SatStatus {
 }
 
 /** Base class for all types of smt program. */
-abstract class SMTProgram(commands: List<Command>) {
+abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
   var model: Model? = null
   var status = SatStatus.PENDING
   val info = mutableListOf<Attribute>()
@@ -56,6 +56,19 @@ abstract class SMTProgram(commands: List<Command>) {
     get() = _commands.toList()
 
   final override fun toString() = _commands.joinToString(separator = "\n")
+
+  override fun toSMTString(quotingRule: QuotingRule) =
+      _commands.joinToString(separator = "\n") { it.toSMTString(quotingRule) }
+
+  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+    var counter = 0
+    _commands.forEach {
+      if (++counter > 1) builder.append("\n")
+      it.toSMTString(builder, quotingRule)
+    }
+
+    return builder
+  }
 }
 
 /** SMT Program with a mutable command list. */

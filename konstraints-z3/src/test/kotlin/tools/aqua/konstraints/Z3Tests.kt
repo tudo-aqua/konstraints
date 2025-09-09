@@ -202,7 +202,7 @@ class Z3Tests {
 
   @Test
   fun count() {
-    val countMap = mutableMapOf<SMTSerializable, Int>()
+    val countMap = mutableMapOf<BaseSymbol, Int>()
     val context = Context()
     context.setLogic(UF)
     context.currentContext.functions.forEach { t, u -> countMap.put(t, 0) }

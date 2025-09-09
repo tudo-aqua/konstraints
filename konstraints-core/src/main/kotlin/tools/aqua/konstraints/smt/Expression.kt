@@ -114,7 +114,7 @@ sealed class Expression<out T : Sort> : SMTSerializable {
   override fun toSMTString(quotingRule: QuotingRule): String =
       if (children.isEmpty()) name.toSMTString(quotingRule)
       else
-          "$(${name.toSMTString(quotingRule)} ${
+          "(${name.toSMTString(quotingRule)} ${
             children.joinToString(" ") { expr: Expression<*> ->
                 expr.toSMTString(
                     quotingRule
@@ -153,7 +153,7 @@ abstract class ConstantExpression<out T : Sort>(override val name: Symbol, overr
 
   override val children: List<Expression<*>> = emptyList()
 
-  override fun toString() = name.toSMTString()
+  override fun toString() = name.toSMTString(QuotingRule.SAME_AS_INPUT)
 }
 
 /** Base class of all expressions with exactly one child */
@@ -272,6 +272,24 @@ class LetExpression<out T : Sort>(val bindings: List<VarBinding<*>>, val inner: 
   override val children: List<Expression<*>> = listOf(inner)
 
   override fun toString() = "(let (${bindings.joinToString(" ")}) $inner)"
+
+  override fun toSMTString(quotingRule: QuotingRule) =
+      "(let (${bindings.joinToString(" "){it.toSMTString(quotingRule)}}) ${inner.toSMTString(quotingRule)})"
+
+  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+    builder.append("(let (")
+
+    var counter = 0
+    bindings.forEach {
+      if (counter++ > 1) builder.append(" ")
+      it.toSMTString(builder, quotingRule)
+    }
+
+    builder.append(") ")
+    inner.toSMTString(builder, quotingRule)
+
+    return builder.append(")")
+  }
 }
 
 class UserDeclaredExpression<out T : Sort>(
@@ -352,6 +370,24 @@ class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
   }
 
   override fun toString() = "(exists (${vars.joinToString(" ")}) $term)"
+
+  override fun toSMTString(quotingRule: QuotingRule) =
+      "(forall (${vars.joinToString(" "){it.toSMTString(quotingRule)}}) ${term.toSMTString(quotingRule)})"
+
+  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+    builder.append("(forall (")
+
+    var counter = 0
+    vars.forEach {
+      if (counter++ > 1) builder.append(" ")
+      it.toSMTString(builder, quotingRule)
+    }
+
+    builder.append(") ")
+    term.toSMTString(builder, quotingRule)
+
+    return builder.append(")")
+  }
 }
 
 class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSort>) :
@@ -370,6 +406,24 @@ class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
   }
 
   override fun toString() = "(forall (${vars.joinToString(" ")}) $term)"
+
+  override fun toSMTString(quotingRule: QuotingRule) =
+      "(forall (${vars.joinToString(" "){it.toSMTString(quotingRule)}}) ${term.toSMTString(quotingRule)})"
+
+  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+    builder.append("(forall (")
+
+    var counter = 0
+    vars.forEach {
+      if (counter++ > 1) builder.append(" ")
+      it.toSMTString(builder, quotingRule)
+    }
+
+    builder.append(") ")
+    term.toSMTString(builder, quotingRule)
+
+    return builder.append(")")
+  }
 }
 
 /** Instance of a sorted var */

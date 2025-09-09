@@ -36,7 +36,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.smt.BVLiteral
 import tools.aqua.konstraints.smt.Expression
-import tools.aqua.konstraints.smt.FPLiteral
 import tools.aqua.konstraints.smt.FPMinusZero
 import tools.aqua.konstraints.smt.FPNaN
 import tools.aqua.konstraints.smt.FPZero
@@ -44,10 +43,8 @@ import tools.aqua.konstraints.smt.GetModel
 import tools.aqua.konstraints.smt.IntLiteral
 import tools.aqua.konstraints.smt.RealDiv
 import tools.aqua.konstraints.smt.RealLiteral
-import tools.aqua.konstraints.smt.SMTProgram
 import tools.aqua.konstraints.smt.StringLiteral
 import tools.aqua.konstraints.smt.SymbolAttributeValue
-import tools.aqua.konstraints.smt.bitvec
 import tools.aqua.konstraints.solvers.z3.Z3Solver
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -94,42 +91,52 @@ class ModelTests {
 
   fun getQFBVFile(): Stream<Arguments> = loadResource("/QF_BV/20190311-bv-term-small-rw-Noetzli/")
 
-    @ParameterizedTest
-    @MethodSource("provideProgramAndModel")
-    fun testModel(program : String, term : Expression<*>) {
-        val prg = Parser().parse(program)
-        val solver = Z3Solver()
+  @ParameterizedTest
+  @MethodSource("provideProgramAndModel")
+  fun testModel(program: String, term: Expression<*>) {
+    val prg = Parser().parse(program)
+    val solver = Z3Solver()
 
-        solver.use {
-            solver.solve(prg)
-            assertEquals(term, solver.model.definitions.single().term)
-        }
+    solver.use {
+      solver.solve(prg)
+      assertEquals(term, solver.model.definitions.single().term)
     }
+  }
 
-    fun provideProgramAndModel(): Stream<Arguments> = Stream.of(
-        arguments("(set-logic QF_BV)(declare-fun foo () (_ BitVec 8))(assert (= foo #b00000000))(check-sat)(get-model)",
-            BVLiteral("#b00000000")),
-        arguments("(set-logic QF_FP)(declare-fun foo () Float16)(assert (= foo (_ +zero 5 11)))(check-sat)(get-model)",
-            FPZero(5, 11)),
-        arguments("(set-logic QF_FP)(declare-fun foo () Float16)(assert (= foo (fp #b0 #b00000 #b0000000000)))(check-sat)(get-model)",
-            FPZero(5, 11)),
-        /*arguments("(set-logic QF_FP)(declare-fun foo () Float16)(assert (= foo (fp #b0 #b00000 #b0000000000)))(check-sat)(get-model)",
-            FPLiteral("#b0".bitvec(), "#b00000".bitvec(), "#b0000000000".bitvec())),*/
-        arguments("(set-logic QF_FP)(declare-fun foo () Float16)(assert (= foo (fp #b1 #b00000 #b0000000000)))(check-sat)(get-model)",
-            FPMinusZero(5, 11)),
-        arguments("(set-logic QF_S)(declare-fun foo () String)(assert (= (str.len foo) 0))(check-sat)(get-model)",
-            StringLiteral("")),
-        arguments("(set-logic QF_LIA)(declare-fun foo () Int)(assert (= foo 0))(check-sat)(get-model)",
-            IntLiteral(0)),
-        arguments("(set-logic QF_FP)(declare-fun foo () Float16)(assert (= foo (fp.add roundTowardZero foo (fp #b0 #b00000 #b0000000001))))(check-sat)(get-model)",
-            FPNaN(5, 11)),
-        arguments("(set-logic QF_LRA)(declare-fun foo () Real)(assert (= foo 0.0))(check-sat)(get-model)",
-            RealLiteral(0)),
-        arguments("(set-logic QF_LIRA)(declare-fun foo () Real)(assert (= foo (/ 2.0 5.0)))(check-sat)(get-model)",
-            RealDiv(RealLiteral(2), RealLiteral(5))),
-        /*arguments("(set-logic QF_LIRA)(declare-fun foo () Real)(assert (= foo 0.000000000000000000001))(check-sat)(get-model)",
-            RealDiv(RealLiteral(1), RealLiteral(1000000000000000000000.0)))*/
-    )
+  fun provideProgramAndModel(): Stream<Arguments> =
+      Stream.of(
+          arguments(
+              "(set-logic QF_BV)(declare-fun foo () (_ BitVec 8))(assert (= foo #b00000000))(check-sat)(get-model)",
+              BVLiteral("#b00000000")),
+          arguments(
+              "(set-logic QF_FP)(declare-fun foo () Float16)(assert (= foo (_ +zero 5 11)))(check-sat)(get-model)",
+              FPZero(5, 11)),
+          arguments(
+              "(set-logic QF_FP)(declare-fun foo () Float16)(assert (= foo (fp #b0 #b00000 #b0000000000)))(check-sat)(get-model)",
+              FPZero(5, 11)),
+          /*arguments("(set-logic QF_FP)(declare-fun foo () Float16)(assert (= foo (fp #b0 #b00000 #b0000000000)))(check-sat)(get-model)",
+          FPLiteral("#b0".bitvec(), "#b00000".bitvec(), "#b0000000000".bitvec())),*/
+          arguments(
+              "(set-logic QF_FP)(declare-fun foo () Float16)(assert (= foo (fp #b1 #b00000 #b0000000000)))(check-sat)(get-model)",
+              FPMinusZero(5, 11)),
+          arguments(
+              "(set-logic QF_S)(declare-fun foo () String)(assert (= (str.len foo) 0))(check-sat)(get-model)",
+              StringLiteral("")),
+          arguments(
+              "(set-logic QF_LIA)(declare-fun foo () Int)(assert (= foo 0))(check-sat)(get-model)",
+              IntLiteral(0)),
+          arguments(
+              "(set-logic QF_FP)(declare-fun foo () Float16)(assert (= foo (fp.add roundTowardZero foo (fp #b0 #b00000 #b0000000001))))(check-sat)(get-model)",
+              FPNaN(5, 11)),
+          arguments(
+              "(set-logic QF_LRA)(declare-fun foo () Real)(assert (= foo 0.0))(check-sat)(get-model)",
+              RealLiteral(0)),
+          arguments(
+              "(set-logic QF_LIRA)(declare-fun foo () Real)(assert (= foo (/ 2.0 5.0)))(check-sat)(get-model)",
+              RealDiv(RealLiteral(2), RealLiteral(5))),
+          /*arguments("(set-logic QF_LIRA)(declare-fun foo () Real)(assert (= foo 0.000000000000000000001))(check-sat)(get-model)",
+          RealDiv(RealLiteral(1), RealLiteral(1000000000000000000000.0)))*/
+      )
 
   @Test
   fun test() {
