@@ -17,7 +17,6 @@
  */
 
 plugins {
-  id("kotlin")
   id("org.jetbrains.kotlinx.benchmark") version "0.4.14"
   id("konstraints.developer-utilities")
   id("konstraints.kotlin-library")
