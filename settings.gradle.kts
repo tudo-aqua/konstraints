@@ -39,3 +39,4 @@ develocity {
     }
   }
 }
+include("konstraints-benchmark")
