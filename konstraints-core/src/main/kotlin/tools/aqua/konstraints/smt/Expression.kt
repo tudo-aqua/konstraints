@@ -111,10 +111,30 @@ sealed class Expression<out T : Sort> : SMTSerializable {
   override fun toString() =
       if (children.isEmpty()) name.toString() else "$($name ${children.joinToString(" ")})"
 
+  fun nameStringWithIndices(quotingRule: QuotingRule) =
+      if (indices.isEmpty()) {
+        name.toSMTString(quotingRule)
+      } else {
+        "(_ ${name.toSMTString(quotingRule)} ${indices.joinToString(" ")})"
+      }
+
+  fun nameStringWithIndices(builder: Appendable, quotingRule: QuotingRule) =
+      if (indices.isEmpty()) {
+        name.toSMTString(builder, quotingRule)
+      } else {
+        builder.append("(_ ")
+        name.toSMTString(builder, quotingRule)
+
+        indices.forEach { builder.append(" $it") }
+
+        builder.append(")")
+      }
+
   override fun toSMTString(quotingRule: QuotingRule): String =
-      if (children.isEmpty()) name.toSMTString(quotingRule)
-      else
-          "(${name.toSMTString(quotingRule)} ${
+      if (children.isEmpty()) {
+        nameStringWithIndices(quotingRule)
+      } else
+          "(${nameStringWithIndices(quotingRule)} ${
             children.joinToString(" ") { expr: Expression<*> ->
                 expr.toSMTString(
                     quotingRule
@@ -122,11 +142,11 @@ sealed class Expression<out T : Sort> : SMTSerializable {
             }
         })"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder =
-      if (children.isEmpty()) name.toSMTString(builder, quotingRule)
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
+      if (children.isEmpty()) nameStringWithIndices(builder, quotingRule)
       else {
         builder.append("(")
-        name.toSMTString(builder, quotingRule)
+        nameStringWithIndices(builder, quotingRule)
 
         children.forEach {
           builder.append(" ")
@@ -276,7 +296,7 @@ class LetExpression<out T : Sort>(val bindings: List<VarBinding<*>>, val inner: 
   override fun toSMTString(quotingRule: QuotingRule) =
       "(let (${bindings.joinToString(" "){it.toSMTString(quotingRule)}}) ${inner.toSMTString(quotingRule)})"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
     builder.append("(let (")
 
     var counter = 0
@@ -372,10 +392,10 @@ class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
   override fun toString() = "(exists (${vars.joinToString(" ")}) $term)"
 
   override fun toSMTString(quotingRule: QuotingRule) =
-      "(forall (${vars.joinToString(" "){it.toSMTString(quotingRule)}}) ${term.toSMTString(quotingRule)})"
+      "(exists (${vars.joinToString(" "){it.toSMTString(quotingRule)}}) ${term.toSMTString(quotingRule)})"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
-    builder.append("(forall (")
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+    builder.append("(exists (")
 
     var counter = 0
     vars.forEach {
@@ -410,7 +430,7 @@ class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
   override fun toSMTString(quotingRule: QuotingRule) =
       "(forall (${vars.joinToString(" "){it.toSMTString(quotingRule)}}) ${term.toSMTString(quotingRule)})"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
     builder.append("(forall (")
 
     var counter = 0
@@ -458,6 +478,21 @@ class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: Lis
   override val children: List<Expression<*>> = listOf(term)
 
   override fun toString() = "(! $term ${annoations.joinToString(" ")})"
+
+  override fun toSMTString(quotingRule: QuotingRule): String =
+      "(! ${term.toSMTString(quotingRule)} ${annoations.joinToString(" ") { it.toSMTString(quotingRule) }})"
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+    builder.append("(! ")
+    term.toSMTString(builder, quotingRule)
+
+    annoations.forEach {
+      builder.append(" ")
+      it.toSMTString(builder, quotingRule)
+    }
+
+    return builder.append(")")
+  }
 }
 
 class ExpressionCastException(msg: String) : ClassCastException(msg)

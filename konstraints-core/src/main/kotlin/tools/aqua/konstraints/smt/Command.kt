@@ -19,7 +19,6 @@
 package tools.aqua.konstraints.smt
 
 import java.math.BigInteger
-import java.util.Arrays.sort
 
 /** Base class for each SMT command. */
 sealed class Command(val command: String) : SMTSerializable {
@@ -30,7 +29,7 @@ sealed class Command(val command: String) : SMTSerializable {
 object CheckSat : Command("check-sat") {
   override fun toSMTString(quotingRule: QuotingRule) = "($command)"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule) =
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
       builder.append("($command)")
 }
 
@@ -38,7 +37,7 @@ object CheckSat : Command("check-sat") {
 object Exit : Command("exit") {
   override fun toSMTString(quotingRule: QuotingRule) = "($command)"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule) =
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
       builder.append("($command)")
 }
 
@@ -46,7 +45,7 @@ object Exit : Command("exit") {
 object GetModel : Command("get-model") {
   override fun toSMTString(quotingRule: QuotingRule) = "($command)"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule) =
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
       builder.append("($command)")
 }
 
@@ -56,7 +55,7 @@ data class Assert(val expr: Expression<BoolSort>) : Command("assert") {
 
   override fun toSMTString(quotingRule: QuotingRule) = "(assert ${expr.toSMTString(quotingRule)})"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
     builder.append("(assert ")
     expr.toSMTString(builder, quotingRule)
     return builder.append(")")
@@ -79,7 +78,7 @@ data class DeclareConst<T : Sort>(val instance: UserDeclaredExpression<T>) :
   override fun toSMTString(quotingRule: QuotingRule) =
       "(declare-const ${instance.name.toSMTString(quotingRule)} ${instance.sort.toSMTString(quotingRule)})"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
     builder.append("(declare-const ")
     name.toSMTString(builder, quotingRule)
     builder.append(" ")
@@ -104,15 +103,17 @@ data class DeclareFun<T : Sort>(val func: SMTFunction<T>) : Command("declare-fun
   override fun toSMTString(quotingRule: QuotingRule) =
       "(declare-fun ${func.symbol.toSMTString(quotingRule)} (${func.parameters.joinToString(" ") {it.toSMTString(quotingRule)}}) ${func.sort.toSMTString(quotingRule)})"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
     builder.append("(declare-fun ")
     func.symbol.toSMTString(builder, quotingRule)
-    builder.append(" ")
+    builder.append(" (")
 
-    func.parameters.onEach {
+    var counter = 0
+    func.parameters.forEach {
+      if (++counter > 1) builder.append(" ")
       it.toSMTString(builder, quotingRule)
-      builder.append(" ")
     }
+    builder.append(") ")
 
     sort.toSMTString(builder, quotingRule)
     return builder.append(")")
@@ -129,7 +130,7 @@ data class SetInfo(val attribute: Attribute) : Command("set-info") {
   override fun toSMTString(quotingRule: QuotingRule) =
       "(set-info ${attribute.toSMTString(quotingRule)})"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
     builder.append("(set-info ")
     attribute.toSMTString(builder, quotingRule)
     return builder.append(")")
@@ -143,7 +144,7 @@ data class Attribute(val keyword: String, val value: AttributeValue?) : SMTSeria
   override fun toSMTString(quotingRule: QuotingRule) =
       "$keyword ${value?.toSMTString(quotingRule) ?: ""}"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
     builder.append(keyword)
     value?.let {
       builder.append(" ")
@@ -162,7 +163,7 @@ data class ConstantAttributeValue(val constant: SpecConstant) : AttributeValue {
 
   override fun toSMTString(quotingRule: QuotingRule) = constant.toString()
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule) =
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
       builder.append(constant.toString())
 }
 
@@ -172,7 +173,7 @@ data class SymbolAttributeValue(val symbol: Symbol) : AttributeValue {
 
   override fun toSMTString(quotingRule: QuotingRule) = symbol.toSMTString(quotingRule)
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule) =
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
       symbol.toSMTString(builder, quotingRule)
 }
 
@@ -184,7 +185,7 @@ data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : Attr
     TODO("Not yet implemented")
   }
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
     TODO("Not yet implemented")
   }
 }
@@ -196,7 +197,7 @@ data class DeclareSort(val name: Symbol, val arity: Int) : Command("declare-sort
   override fun toSMTString(quotingRule: QuotingRule) =
       "(declare-sort ${name.toSMTString(quotingRule)} $arity)"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
     builder.append("(declare-sort ")
     name.toSMTString(builder, quotingRule)
     return builder.append(" $arity)")
@@ -211,7 +212,7 @@ data class DefineSort(val name: Symbol, var sortParameters: List<Symbol>, val so
   override fun toSMTString(quotingRule: QuotingRule) =
       "(define-sort ${name.toSMTString(quotingRule)} (${sortParameters.joinToString(" "){ it.toSMTString(quotingRule) }}) ${sort.toSMTString(quotingRule)})"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
     builder.append(" (define-sort ")
     name.toSMTString(builder, quotingRule)
     builder.append(" (")
@@ -233,10 +234,14 @@ data class DefineSort(val name: Symbol, var sortParameters: List<Symbol>, val so
 data class SetOption(val name: String, val value: OptionValue) : Command("set-option") {
   override fun toString() = "(set-option $name $value)"
 
-  override fun toSMTString(quotingRule: QuotingRule) = "(set-option $name $value)"
+  override fun toSMTString(quotingRule: QuotingRule) =
+      "(set-option $name ${value.toSMTString(quotingRule)})"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule) =
-      builder.append(toString())
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+    builder.append("(set-option $name ")
+    value.toSMTString(builder, quotingRule)
+    return builder.append(")")
+  }
 }
 
 /** SMT Option value used by [SetOption]. */
@@ -244,20 +249,17 @@ sealed interface OptionValue : SMTSerializable
 
 /** Boolean option value. */
 data class BooleanOptionValue(val bool: Boolean) : OptionValue {
-  override fun toSMTString(quotingRule: QuotingRule): String {
-    TODO("Not yet implemented")
-  }
+  override fun toSMTString(quotingRule: QuotingRule) = bool.toString()
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
-    TODO("Not yet implemented")
-  }
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+      builder.append(bool.toString())
 }
 
 /** String option value. */
 data class StringOptionValue(val string: String) : OptionValue {
   override fun toSMTString(quotingRule: QuotingRule) = string
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule) =
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
       builder.append(string)
 }
 
@@ -265,7 +267,7 @@ data class StringOptionValue(val string: String) : OptionValue {
 data class NumeralOptionValue(val numeral: BigInteger) : OptionValue {
   override fun toSMTString(quotingRule: QuotingRule) = numeral.toString()
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule) =
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
       builder.append(numeral.toString())
 }
 
@@ -273,7 +275,7 @@ data class NumeralOptionValue(val numeral: BigInteger) : OptionValue {
 data class AttributeOptionValue(val attribute: Attribute) : OptionValue {
   override fun toSMTString(quotingRule: QuotingRule) = attribute.toSMTString(quotingRule)
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule) =
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
       attribute.toSMTString(builder, quotingRule)
 }
 
@@ -283,7 +285,7 @@ data class SetLogic(val logic: Logic) : Command("set-logic") {
 
   override fun toSMTString(quotingRule: QuotingRule) = toString()
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule) =
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
       builder.append(toString())
 }
 
@@ -295,7 +297,7 @@ data class DefineConst(val name: Symbol, val sort: Sort, val term: Expression<So
   override fun toSMTString(quotingRule: QuotingRule) =
       "(define-const ${name.toSMTString(quotingRule)} ${sort.toSMTString(quotingRule)} ${term.toSMTString(quotingRule)})"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
     builder.append("(define-const ")
 
     name.toSMTString(builder, quotingRule)
@@ -327,7 +329,7 @@ data class DefineFun(val functionDef: FunctionDef<*>) : Command("define-fun $fun
   override fun toSMTString(quotingRule: QuotingRule) =
       "(define-fun ${functionDef.name.toSMTString(quotingRule)} (${functionDef.parameters.joinToString(" "){it.toSMTString(quotingRule)}}) ${functionDef.sort.toSMTString(quotingRule)} ${functionDef.term.toSMTString(quotingRule)})"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
     builder.append("(define-fun ")
     functionDef.name.toSMTString(builder, quotingRule)
     builder.append(" (")
@@ -383,7 +385,7 @@ data class Push(val n: Int) : Command("push") {
 
   override fun toSMTString(quotingRule: QuotingRule) = toString()
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule) =
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
       builder.append(toString())
 }
 
@@ -393,6 +395,6 @@ data class Pop(val n: Int) : Command("pop") {
 
   override fun toSMTString(quotingRule: QuotingRule) = toString()
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule) =
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
       builder.append(toString())
 }

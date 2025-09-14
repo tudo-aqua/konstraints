@@ -224,6 +224,11 @@ class StringLiteral(val value: String) : Literal<StringSort>(LiteralString(value
   // use symbol.toString here to get the unquoted string literal
   override fun toString(): String = "\"$value\""
 
+  override fun toSMTString(quotingRule: QuotingRule) = toString()
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+      builder.append(toString())
+
   override fun copy(children: List<Expression<*>>): Expression<StringSort> = this
 
   override fun equals(other: Any?) =

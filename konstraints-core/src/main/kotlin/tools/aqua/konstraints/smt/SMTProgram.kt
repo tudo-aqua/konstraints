@@ -60,7 +60,7 @@ abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
   override fun toSMTString(quotingRule: QuotingRule) =
       _commands.joinToString(separator = "\n") { it.toSMTString(quotingRule) }
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
     var counter = 0
     _commands.forEach {
       if (++counter > 1) builder.append("\n")

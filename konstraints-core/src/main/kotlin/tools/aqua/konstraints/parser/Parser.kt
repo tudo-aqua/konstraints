@@ -847,6 +847,12 @@ class Parser {
               rparen)
           .map { results: ArrayList<Any> -> TODO("Datatypes are not implemented yet") }
 
+  private val getValueCMD =
+      (lparen * getValueKW * lparen * term.plus() * rparen * rparen).map { results: ArrayList<Any>
+        ->
+        TODO("get-value not implemented yet")
+      }
+
   val command =
       ChoiceParser(
               FailureJoiner.SelectFarthest(),
@@ -865,7 +871,8 @@ class Parser {
               pushCMD,
               popCMD,
               declareDatatypeCMD,
-              declareDatatypesCMD)
+              declareDatatypesCMD,
+              getValueCMD)
           .trim(whitespaceCat)
 
   internal val script = command.star().end()

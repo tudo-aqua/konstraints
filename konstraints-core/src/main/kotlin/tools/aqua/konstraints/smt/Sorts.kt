@@ -60,7 +60,14 @@ class UserDefinedBoolFactory(symbol: Symbol, val parameters: List<Symbol>) :
 }
 
 class UserDefinedBoolSort(override val definedSymbol: Symbol, override val parameters: List<Sort>) :
-    BoolSort()
+    BoolSort() {
+  override fun toString() = definedSymbol.toString()
+
+  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+      definedSymbol.toSMTString(builder, quotingRule)
+}
 
 class UserDefinedRealFactory(symbol: Symbol, val parameters: List<Symbol>) :
     UserDefinedSortFactory(symbol) {
@@ -79,7 +86,14 @@ class UserDefinedRealFactory(symbol: Symbol, val parameters: List<Symbol>) :
 }
 
 class UserDefinedRealSort(override val definedSymbol: Symbol, override val parameters: List<Sort>) :
-    RealSort()
+    RealSort() {
+  override fun toString() = definedSymbol.toString()
+
+  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+      definedSymbol.toSMTString(builder, quotingRule)
+}
 
 class UserDefinedIntFactory(symbol: Symbol, val parameters: List<Symbol>) :
     UserDefinedSortFactory(symbol) {
@@ -97,7 +111,14 @@ class UserDefinedIntFactory(symbol: Symbol, val parameters: List<Symbol>) :
 }
 
 class UserDefinedIntSort(override val definedSymbol: Symbol, override val parameters: List<Sort>) :
-    IntSort()
+    IntSort() {
+  override fun toString() = definedSymbol.toString()
+
+  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+      definedSymbol.toSMTString(builder, quotingRule)
+}
 
 class UserDefinedStringFactory(symbol: Symbol, val parameters: List<Symbol>) :
     UserDefinedSortFactory(symbol) {
@@ -118,7 +139,14 @@ class UserDefinedStringFactory(symbol: Symbol, val parameters: List<Symbol>) :
 class UserDefinedStringSort(
     override val definedSymbol: Symbol,
     override val parameters: List<Sort>
-) : StringSort()
+) : StringSort() {
+  override fun toString() = definedSymbol.toString()
+
+  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+      definedSymbol.toSMTString(builder, quotingRule)
+}
 
 class UserDefinedRegLanFactory(symbol: Symbol, val parameters: List<Symbol>) :
     UserDefinedSortFactory(symbol) {
@@ -139,7 +167,14 @@ class UserDefinedRegLanFactory(symbol: Symbol, val parameters: List<Symbol>) :
 class UserDefinedRegLanSort(
     override val definedSymbol: Symbol,
     override val parameters: List<Sort>
-) : RegLanSort()
+) : RegLanSort() {
+  override fun toString() = definedSymbol.toString()
+
+  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+      definedSymbol.toSMTString(builder, quotingRule)
+}
 
 class UserDefinedRoundingModeFactory(symbol: Symbol, val parameters: List<Symbol>) :
     UserDefinedSortFactory(symbol) {
@@ -160,7 +195,14 @@ class UserDefinedRoundingModeFactory(symbol: Symbol, val parameters: List<Symbol
 class UserDefinedRoundingModeSort(
     override val definedSymbol: Symbol,
     override val parameters: List<Sort>
-) : RoundingModeSort()
+) : RoundingModeSort() {
+  override fun toString() = definedSymbol.toString()
+
+  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+      definedSymbol.toSMTString(builder, quotingRule)
+}
 
 object IntFactory : SortFactory {
   override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): IntSort {
@@ -473,24 +515,39 @@ sealed class Sort(open val symbol: Symbol) : SMTSerializable {
   override fun toString() =
       if (this.isIndexed()) {
         "(_ $symbol ${indices.joinToString(" ")})"
+      } else if (parameters.isNotEmpty()) {
+        "($symbol ${parameters.joinToString(" ")})"
       } else {
         symbol.toString()
       }
 
   fun toSMTString() = symbol.toSMTString(QuotingRule.SAME_AS_INPUT)
 
-  override fun toSMTString(quotingRule: QuotingRule) =
+  override fun toSMTString(quotingRule: QuotingRule): String =
       if (this.isIndexed()) {
         "(_ ${symbol.toSMTString(quotingRule)} ${indices.joinToString(" ")})"
+      } else if (parameters.isNotEmpty()) {
+        "($symbol ${parameters.joinToString(" ") { it.toSMTString(quotingRule) }})"
       } else {
         symbol.toSMTString(quotingRule)
       }
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule) =
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
       if (this.isIndexed()) {
         builder.append("(_ ")
         symbol.toSMTString(builder, quotingRule)
         builder.append(" ${indices.joinToString(" ")})")
+      } else if (parameters.isNotEmpty()) {
+        builder.append("(")
+        symbol.toSMTString(builder, quotingRule)
+
+        parameters.forEach {
+          builder.append(" ")
+          it.toSMTString(builder, quotingRule)
+        }
+        builder.append(")")
+
+        builder
       } else {
         symbol.toSMTString(builder, quotingRule)
       }
@@ -547,7 +604,14 @@ class UserDefinedUserDeclaredSort(
     override val definedSymbol: Symbol,
     name: Symbol,
     parameters: List<Sort>
-) : UserDeclaredSort(name, parameters)
+) : UserDeclaredSort(name, parameters) {
+  override fun toString() = definedSymbol.toString()
+
+  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+      definedSymbol.toSMTString(builder, quotingRule)
+}
 
 abstract class UserDefinedSortFactory(val symbol: Symbol) : SortFactory {
   override val isIndexed = false
@@ -584,6 +648,11 @@ class UserDefinedBitVectorFactory(symbol: Symbol, val bits: Int, val parameters:
 
 class UserDefinedBitVectorSort(override val definedSymbol: Symbol, bits: Int) : BVSort(bits.idx()) {
   override fun toString() = definedSymbol.toString()
+
+  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+      definedSymbol.toSMTString(builder, quotingRule)
 }
 
 class UserDefinedFloatingPointFactory(
@@ -608,6 +677,11 @@ class UserDefinedFloatingPointFactory(
 class UserDefinedFloatingPointSort(override val definedSymbol: Symbol, eb: Int, sb: Int) :
     FPSort(eb.idx(), sb.idx()) {
   override fun toString() = definedSymbol.toString()
+
+  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+      definedSymbol.toSMTString(builder, quotingRule)
 }
 
 class UserDefinedArrayFactory(
@@ -808,21 +882,41 @@ sealed class FPSort(eb: Index, sb: Index) : Sort("FloatingPoint") {
 /** Standard 16-bit FloatingPoint sort. */
 object FP16 : FPSort(5.idx(), 11.idx()) {
   override fun toString() = "Float16"
+
+  override fun toSMTString(quotingRule: QuotingRule) = toString()
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+      builder.append(toString())
 }
 
 /** Standard 32-bit FloatingPoint sort. */
 object FP32 : FPSort(8.idx(), 24.idx()) {
   override fun toString() = "Float32"
+
+  override fun toSMTString(quotingRule: QuotingRule) = toString()
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+      builder.append(toString())
 }
 
 /** Standard 64-bit FloatingPoint sort. */
 object FP64 : FPSort(11.idx(), 53.idx()) {
   override fun toString() = "Float64"
+
+  override fun toSMTString(quotingRule: QuotingRule) = toString()
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+      builder.append(toString())
 }
 
 /** Standard 128-bit FloatingPoint sort. */
 object FP128 : FPSort(15.idx(), 113.idx()) {
   override fun toString() = "Float128"
+
+  override fun toSMTString(quotingRule: QuotingRule) = toString()
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+      builder.append(toString())
 }
 
 /** Default floating point sort implementation. */

@@ -18,7 +18,6 @@
 
 package tools.aqua.konstraints.smt
 
-import java.util.*
 import tools.aqua.konstraints.util.zipWithSameLength
 
 /**
@@ -156,7 +155,7 @@ class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>)
   override fun toSMTString(quotingRule: QuotingRule) =
       "(${symbol.toSMTString(quotingRule)} ${term.toSMTString(quotingRule)})"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
     builder.append("(")
     builder.append(symbol.toSMTString(quotingRule))
     builder.append(" ")
@@ -180,7 +179,7 @@ class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T)
   override fun toSMTString(quotingRule: QuotingRule) =
       "(${symbol.toSMTString(quotingRule)} ${sort.toSMTString(quotingRule)})"
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule): StringBuilder {
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
     builder.append("(")
     builder.append(symbol.toSMTString(quotingRule))
     builder.append(" ")

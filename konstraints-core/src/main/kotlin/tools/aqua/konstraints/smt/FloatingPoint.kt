@@ -117,6 +117,7 @@ object RTZ : ConstantExpression<RoundingModeSort>("RTZ".toSymbolWithQuotes(), Ro
 class FPInfinity(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("+oo".toSymbolWithQuotes(), FPSort(eb, sb)) {
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(eb, sb)
 
   override fun toString(): String = "(_ +oo $eb $sb)"
 
@@ -130,6 +131,7 @@ class FPInfinity(val eb: Int, val sb: Int) :
 class FPMinusInfinity(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("-oo".toSymbolWithQuotes(), FPSort(eb, sb)) {
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(eb, sb)
 
   override fun toString(): String = "(_ -oo $eb $sb)"
 
@@ -143,6 +145,7 @@ class FPMinusInfinity(val eb: Int, val sb: Int) :
 class FPZero(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("+zero".toSymbolWithQuotes(), FPSort(eb, sb)) {
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(eb, sb)
 
   override fun toString(): String = "(_ +zero $eb $sb)"
 
@@ -156,6 +159,7 @@ class FPZero(val eb: Int, val sb: Int) :
 class FPMinusZero(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("-zero".toSymbolWithQuotes(), FPSort(eb, sb)) {
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(eb, sb)
 
   override fun toString(): String = "(_ -zero $eb $sb)"
 
@@ -169,6 +173,7 @@ class FPMinusZero(val eb: Int, val sb: Int) :
 class FPNaN(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("NaN".toSymbolWithQuotes(), FPSort(eb, sb)) {
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(eb, sb)
 
   override fun toString(): String = "(_ NaN $eb $sb)"
 

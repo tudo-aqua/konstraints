@@ -159,7 +159,7 @@ internal constructor(
         QuotingRule.ALWAYS -> "|$value|"
       }
 
-  override fun toSMTString(builder: StringBuilder, quotingRule: QuotingRule) =
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
       builder.append(toSMTString(quotingRule))
 }
 

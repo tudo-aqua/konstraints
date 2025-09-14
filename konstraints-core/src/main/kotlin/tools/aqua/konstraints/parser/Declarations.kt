@@ -325,7 +325,15 @@ internal object BitVectorExpressionTheory : Theory {
               BVSLtDecl,
               BVSLeDecl,
               BVSGtDecl,
-              BVSGeDecl)
+              BVSGeDecl,
+              UBVToIntDecl,
+              SBVToIntDecl,
+              IntToBVDecl,
+              BVNegODecl,
+              BVUAddODecl,
+              BVSAddODecl,
+              BVUMulODecl,
+              BVSMulODecl)
           .associateBy { it.symbol }
   override val sorts = mapOf("BitVec".toSymbolWithQuotes() to BitVecFactory)
 }
@@ -1495,7 +1503,7 @@ internal object IntToBVDecl :
     require(indices.size == 1) {
       "One index expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.single().sort is BVSort) {
+    require(args.single().sort is IntSort) {
       "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
     }
     require(indices.single() is NumeralIndex) {
