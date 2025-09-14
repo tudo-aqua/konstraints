@@ -34,8 +34,8 @@ import com.microsoft.z3.FPRMSort as Z3RMSort
 import com.microsoft.z3.FPSort as Z3FPSort
 import com.microsoft.z3.IntExpr
 import com.microsoft.z3.IntNum
-import com.microsoft.z3.RatNum
 import com.microsoft.z3.IntSort as Z3IntSort
+import com.microsoft.z3.RatNum
 import com.microsoft.z3.ReExpr
 import com.microsoft.z3.ReSort as Z3ReSort
 import com.microsoft.z3.RealExpr
@@ -44,9 +44,9 @@ import com.microsoft.z3.SeqExpr
 import com.microsoft.z3.SeqSort
 import com.microsoft.z3.Sort as Z3Sort
 import com.microsoft.z3.enumerations.Z3_decl_kind
-import tools.aqua.konstraints.smt.*
 import java.math.BigDecimal
 import java.math.BigInteger
+import tools.aqua.konstraints.smt.*
 
 fun Z3Sort.aquaify(): Sort =
     when (this) {
@@ -241,11 +241,11 @@ fun RealExpr.aquaify(): Expression<RealSort> =
     } else if (isDiv) {
       RealDiv(args.map { expr -> expr.aquaify().cast() })
     } else if (isRatNum) {
-        // if we have a number without any decimal places we can construct the literal from string
-      if((this as RatNum).bigIntDenominator == BigInteger.ONE) {
-          RealLiteral(BigDecimal(toDecimalString(0)))
+      // if we have a number without any decimal places we can construct the literal from string
+      if ((this as RatNum).bigIntDenominator == BigInteger.ONE) {
+        RealLiteral(BigDecimal(toDecimalString(0)))
       } else {
-          RealDiv(RealLiteral(this.bigIntNumerator), RealLiteral(this.bigIntDenominator))
+        RealDiv(RealLiteral(this.bigIntNumerator), RealLiteral(this.bigIntDenominator))
       }
     } else if (isIntToReal) {
       ToReal(args[0].aquaify().cast())
