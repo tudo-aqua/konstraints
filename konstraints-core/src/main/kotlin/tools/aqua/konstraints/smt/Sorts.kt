@@ -881,42 +881,50 @@ sealed class FPSort(eb: Index, sb: Index) : Sort("FloatingPoint") {
 
 /** Standard 16-bit FloatingPoint sort. */
 object FP16 : FPSort(5.idx(), 11.idx()) {
-  override fun toString() = "Float16"
+  override val definedSymbol: Symbol = "Float16".toSymbolWithQuotes()
 
-  override fun toSMTString(quotingRule: QuotingRule) = toString()
+  override fun toString() = definedSymbol.toString()
+
+  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
 
   override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
-      builder.append(toString())
+      definedSymbol.toSMTString(builder, quotingRule)
 }
 
 /** Standard 32-bit FloatingPoint sort. */
 object FP32 : FPSort(8.idx(), 24.idx()) {
-  override fun toString() = "Float32"
+  override val definedSymbol: Symbol = "Float32".toSymbolWithQuotes()
 
-  override fun toSMTString(quotingRule: QuotingRule) = toString()
+  override fun toString() = definedSymbol.toString()
+
+  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
 
   override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
-      builder.append(toString())
+      definedSymbol.toSMTString(builder, quotingRule)
 }
 
 /** Standard 64-bit FloatingPoint sort. */
 object FP64 : FPSort(11.idx(), 53.idx()) {
-  override fun toString() = "Float64"
+  override val definedSymbol: Symbol = "Float64".toSymbolWithQuotes()
 
-  override fun toSMTString(quotingRule: QuotingRule) = toString()
+  override fun toString() = definedSymbol.toString()
+
+  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
 
   override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
-      builder.append(toString())
+      definedSymbol.toSMTString(builder, quotingRule)
 }
 
 /** Standard 128-bit FloatingPoint sort. */
 object FP128 : FPSort(15.idx(), 113.idx()) {
-  override fun toString() = "Float128"
+  override val definedSymbol: Symbol = "Float128".toSymbolWithQuotes()
 
-  override fun toSMTString(quotingRule: QuotingRule) = toString()
+  override fun toString() = definedSymbol.toString()
+
+  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
 
   override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
-      builder.append(toString())
+      definedSymbol.toSMTString(builder, quotingRule)
 }
 
 /** Default floating point sort implementation. */

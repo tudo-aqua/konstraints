@@ -154,7 +154,7 @@ internal constructor(
       when (rule) {
         QuotingRule.NEVER -> if (!isSimple) throw IllegalSymbolException(value) else value
         QuotingRule.SAME_AS_INPUT -> if (isQuoted) "|$value|" else value
-        QuotingRule.WHEN_NEEDED -> if (isQuoted || !isSimple) "|$value|" else value
+        QuotingRule.WHEN_NEEDED -> if (!isSimple) "|$value|" else value
         QuotingRule.ALWAYS -> "|$value|"
       }
 
