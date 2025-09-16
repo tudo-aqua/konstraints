@@ -193,6 +193,7 @@ operator fun Model.Companion.invoke(model: Z3Model, context: Z3Context) =
         } +
             context.functions.map { (aqua, z3) ->
               if (aqua.parameters.isEmpty()) {
+                  // z3 treats functions with arity 0 as constants
                 FunctionDef(aqua.symbol, emptyList(), aqua.sort, model.getConstInterp(z3).aquaify())
               } else {
                 model.getFuncInterp(z3).let { interp ->
@@ -212,6 +213,8 @@ operator fun Model.Companion.invoke(model: Z3Model, context: Z3Context) =
                   //    (ite (and (= x!0 0) (= x!1 1)) 1
                   //      2)))))
                   val term =
+                      // interp entries holds pairs of arguments -> function value
+                      // here e.g. (1, 0) -> 1, (0, 0) -> 0 etc.
                       interp.entries
                           .map { entry ->
                             // if the condition has more than two arguments chain them by using and
@@ -220,7 +223,8 @@ operator fun Model.Companion.invoke(model: Z3Model, context: Z3Context) =
                                   // build the equality conditions
                                   (arguments zip entry.args).map { (local, value) ->
                                     Equals(local.instance, value.aquaify())
-                                  }) to entry.value.aquaify()
+                                  }) to
+                                  entry.value.aquaify() // and pair them with their associated value
                             } else {
                               // we only have a single condition here since the functions is arity 1
                               Equals(arguments.single().instance, entry.args.single().aquaify()) to
@@ -228,11 +232,11 @@ operator fun Model.Companion.invoke(model: Z3Model, context: Z3Context) =
                             }
                           }
                           // build the chain 'bottom up' to get the same order as Z3
-                          .reversed()
-                          // fold the list of condition, value pairs into ITE where the 'else' is
-                          // the next
-                          // ITE in the chain
-                          .fold(interp.`else`.aquaify()) { acc, (condition, value) ->
+                          // (so we use foldRight instead of fold)
+                          // fold the list of condition, value pairs into the ITE chain where the
+                          // interp.`else` is
+                          // the final `else` value
+                          .foldRight(interp.`else`.aquaify()) { (condition, value), acc ->
                             Ite(condition, value, acc)
                           }
 
