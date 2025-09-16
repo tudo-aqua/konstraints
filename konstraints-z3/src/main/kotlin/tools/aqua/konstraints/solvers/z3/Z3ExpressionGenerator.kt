@@ -106,47 +106,47 @@ fun Expression<*>.z3ify(context: Z3Context): Expr<*> {
 @JvmName("z3ifyIteBool")
 fun Ite<BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =
     context.context.mkITE(
-        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+        this.condition.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
 @JvmName("z3ifyIteBitVec")
 fun Ite<BVSort>.z3ify(context: Z3Context): Expr<BitVecSort> =
     context.context.mkITE(
-        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+        this.condition.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
 @JvmName("z3ifyIteInt")
 fun Ite<IntSort>.z3ify(context: Z3Context): Expr<Z3IntSort> =
     context.context.mkITE(
-        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+        this.condition.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
 @JvmName("z3ifyIteReal")
 fun Ite<RealSort>.z3ify(context: Z3Context): Expr<Z3RealSort> =
     context.context.mkITE(
-        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+        this.condition.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
 @JvmName("z3ifyIteFP")
 fun Ite<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
     context.context.mkITE(
-        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+        this.condition.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
 @JvmName("z3ifyIteRM")
 fun Ite<RoundingModeSort>.z3ify(context: Z3Context): Expr<FPRMSort> =
     context.context.mkITE(
-        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+        this.condition.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
 @JvmName("z3ifyIteString")
 fun Ite<StringSort>.z3ify(context: Z3Context): Expr<SeqSort<CharSort>> =
     context.context.mkITE(
-        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+        this.condition.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
 @JvmName("z3ifyIteFreeSort")
 fun Ite<UserDeclaredSort>.z3ify(context: Z3Context): Expr<UninterpretedSort> =
     context.context.mkITE(
-        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+        this.condition.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
 @JvmName("z3ifyIteArraySort")
 fun Ite<ArraySort<*, *>>.z3ify(context: Z3Context): Expr<Z3ArraySort<Z3Sort, Z3Sort>> =
     context.context.mkITE(
-        this.statement.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
+        this.condition.z3ify(context), this.then.z3ify(context), this.otherwise.z3ify(context))
 
 @JvmName("z3ifyArraySelectBool")
 fun ArraySelect<*, BoolSort>.z3ify(context: Z3Context): Expr<Z3BoolSort> =

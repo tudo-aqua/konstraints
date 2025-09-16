@@ -26,16 +26,22 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
+import tools.aqua.konstraints.dsl.*
 import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.smt.BVLiteral
+import tools.aqua.konstraints.smt.Bool
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.FPMinusZero
 import tools.aqua.konstraints.smt.FPNaN
 import tools.aqua.konstraints.smt.FPZero
+import tools.aqua.konstraints.smt.False
 import tools.aqua.konstraints.smt.IntLiteral
 import tools.aqua.konstraints.smt.RealDiv
 import tools.aqua.konstraints.smt.RealLiteral
+import tools.aqua.konstraints.smt.SMTInt
+import tools.aqua.konstraints.smt.SortedVar
 import tools.aqua.konstraints.smt.StringLiteral
+import tools.aqua.konstraints.smt.toSymbolWithQuotes
 import tools.aqua.konstraints.solvers.z3.Z3Solver
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -54,6 +60,38 @@ class ModelTests {
 
   fun provideProgramAndModel(): Stream<Arguments> =
       Stream.of(
+          arguments(
+              "(set-logic QF_LIA)(declare-fun foo (Int Int) Int)(assert (and (= (foo 2 0) 2) (= (foo 1 0) 1) (= (foo 0 0) 0) (= (foo 2 1) 3) (= (foo 1 1) 2) (= (foo 0 1) 1)))(check-sat)(get-model)",
+              listOf(
+                      SortedVar("x!0".toSymbolWithQuotes(), SMTInt),
+                      SortedVar("x!1".toSymbolWithQuotes(), SMTInt))
+                  .let {
+                    val x0 = it[0].instance
+                    val x1 = it[1].instance
+                    ite((x0 eq 1) and (x1 eq 0)) then
+                        IntLiteral(1) otherwise
+                        (ite((x0 eq 0) and (x1 eq 0)) then
+                            IntLiteral(0) otherwise
+                            (ite((x0 eq 2) and (x1 eq 1)) then
+                                IntLiteral(3) otherwise
+                                (ite((x0 eq 0) and (x1 eq 1)) then
+                                    IntLiteral(1) otherwise
+                                    IntLiteral(2))))
+                  }),
+          arguments(
+              "(set-logic QF_LIA)(declare-fun foo (Int) Int)(assert (and (= (foo 2) 2) (= (foo 1) 1) (= (foo 0) 0)))(check-sat)(get-model)",
+              listOf(SortedVar("x!0".toSymbolWithQuotes(), SMTInt)).let {
+                val x0 = it[0].instance
+                ite(x0 eq 1) then
+                    IntLiteral(1) otherwise
+                    (ite(x0 eq 0) then IntLiteral(0) otherwise IntLiteral(2))
+              }),
+          arguments(
+              "(set-logic QF_LIA)(declare-fun foo (Bool) Int)(assert (and (= (foo true) 1) (= (foo false) 0)))(check-sat)(get-model)",
+              listOf(SortedVar("x!0".toSymbolWithQuotes(), Bool)).let {
+                val x0 = it[0].instance
+                ite(x0 eq False) then IntLiteral(0) otherwise IntLiteral(1)
+              }),
           arguments(
               "(set-logic QF_BV)(declare-fun foo () (_ BitVec 8))(assert (= foo #b00000000))(check-sat)(get-model)",
               BVLiteral("#b00000000")),

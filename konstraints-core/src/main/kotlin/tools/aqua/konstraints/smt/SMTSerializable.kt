@@ -32,6 +32,8 @@ class Keyword(val value: String) : SMTSerializable {
       if (this === other) true else if (other !is Keyword) false else value == other.value
 
   override fun hashCode() = value.hashCode()
+
+  override fun toString() = value
 }
 
 /** String representation of a smt literal. */
