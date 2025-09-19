@@ -224,6 +224,8 @@ fun IntExpr.aquaify(): Expression<IntSort> =
       StrToInt(args[0].aquaify().cast())
     } else if (isApp && funcDecl.declKind == Z3_decl_kind.Z3_OP_STR_TO_CODE) {
       StrToCode(args[0].aquaify().cast())
+    } else if (isITE) {
+      Ite(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
     } else {
       throw RuntimeException("Unknown or unsupported int expression $this")
     }
@@ -251,6 +253,8 @@ fun RealExpr.aquaify(): Expression<RealSort> =
       ToReal(args[0].aquaify().cast())
     } else if (funcDecl.declKind == Z3_decl_kind.Z3_OP_FPA_TO_REAL) {
       FPToReal(args[0].aquaify().cast())
+    } else if (isITE) {
+      Ite(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
     } else {
       throw RuntimeException("Unknown or unsupported real expression $this")
     }
@@ -319,85 +323,109 @@ fun BitVecExpr.aquaify(): Expression<BVSort> =
       BVLiteral("#x${bigInteger.toString(16)}", sort.size)
     } else if (funcDecl.declKind == Z3_decl_kind.Z3_OP_BNUM) {
       BVLiteral(toString(), sort.size)
+    } else if (isITE) {
+      Ite(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
     } else {
       throw RuntimeException("Unknown or unsupported bitvec expression $this")
     }
 
 @JvmName("aquaifyFloatingPoint")
-fun FPExpr.aquaify(): Expression<FPSort> =
-    when (funcDecl.declKind) {
-      Z3_decl_kind.Z3_OP_FPA_NUM ->
-          (this as FPNum).let { fpNum ->
-            FPLiteral(
-                fpNum.signBV.aquaify().cast(),
-                fpNum.getExponentBV(false).aquaify().cast(),
-                fpNum.significandBV.aquaify().cast())
-          }
-      Z3_decl_kind.Z3_OP_FPA_FP ->
-          FPLiteral(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
-      Z3_decl_kind.Z3_OP_FPA_PLUS_INF -> FPInfinity(sort.eBits, sort.sBits)
-      Z3_decl_kind.Z3_OP_FPA_MINUS_INF -> FPMinusInfinity(sort.eBits, sort.sBits)
-      Z3_decl_kind.Z3_OP_FPA_PLUS_ZERO -> FPZero(sort.eBits, sort.sBits)
-      Z3_decl_kind.Z3_OP_FPA_MINUS_ZERO -> FPMinusZero(sort.eBits, sort.sBits)
-      Z3_decl_kind.Z3_OP_FPA_NAN -> FPNaN(sort.eBits, sort.sBits)
-      Z3_decl_kind.Z3_OP_FPA_ABS -> FPAbs(args[0].aquaify().cast())
-      Z3_decl_kind.Z3_OP_FPA_NEG -> FPNeg(args[0].aquaify().cast())
-      Z3_decl_kind.Z3_OP_FPA_ADD ->
-          FPAdd(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
-      Z3_decl_kind.Z3_OP_FPA_SUB ->
-          FPSub(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
-      Z3_decl_kind.Z3_OP_FPA_MUL ->
-          FPMul(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
-      Z3_decl_kind.Z3_OP_FPA_DIV ->
-          FPDiv(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
-      Z3_decl_kind.Z3_OP_FPA_FMA ->
-          FPFma(
-              args[0].aquaify().cast(),
-              args[1].aquaify().cast(),
-              args[2].aquaify().cast(),
-              args[3].aquaify().cast())
-      Z3_decl_kind.Z3_OP_FPA_SQRT -> FPSqrt(args[0].aquaify().cast(), args[1].aquaify().cast())
-      Z3_decl_kind.Z3_OP_FPA_REM -> FPRem(args[0].aquaify().cast(), args[1].aquaify().cast())
-      Z3_decl_kind.Z3_OP_FPA_ROUND_TO_INTEGRAL ->
-          FPRoundToIntegral(args[0].aquaify().cast(), args[1].aquaify().cast())
-      Z3_decl_kind.Z3_OP_FPA_MIN -> FPMin(args[0].aquaify().cast(), args[1].aquaify().cast())
-      Z3_decl_kind.Z3_OP_FPA_MAX -> FPMax(args[0].aquaify().cast(), args[1].aquaify().cast())
-      Z3_decl_kind.Z3_OP_FPA_TO_FP -> {
-        val inner = args[1].aquaify()
+fun FPExpr.aquaify(): Expression<FPSort> {
+  if (isITE) {
+    return Ite(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+  }
 
-        if (args.size == 1) {
-          BitVecToFP(args[0].aquaify().cast(), sort.aquaify() as FPSort)
-        } else if (inner.sort is FPSort) {
-          FPToFP(args[0].aquaify().cast(), inner.cast(), sort.aquaify() as FPSort)
-        } else if (inner.sort is RealSort) {
-          RealToFP(args[0].aquaify().cast(), inner.cast(), sort.aquaify() as FPSort)
-        } else if (inner.sort is BVSort) {
-          SBitVecToFP(args[0].aquaify().cast(), inner.cast(), sort.aquaify() as FPSort)
-        } else {
-          throw IllegalStateException()
+  return when (funcDecl.declKind) {
+    Z3_decl_kind.Z3_OP_FPA_NUM ->
+        (this as FPNum).let { fpNum ->
+          FPLiteral(
+              fpNum.signBV.aquaify().cast(),
+              fpNum.getExponentBV(false).aquaify().cast(),
+              fpNum.significandBV.aquaify().cast())
         }
+
+    Z3_decl_kind.Z3_OP_FPA_FP ->
+        FPLiteral(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+
+    Z3_decl_kind.Z3_OP_FPA_PLUS_INF -> FPInfinity(sort.eBits, sort.sBits)
+    Z3_decl_kind.Z3_OP_FPA_MINUS_INF -> FPMinusInfinity(sort.eBits, sort.sBits)
+    Z3_decl_kind.Z3_OP_FPA_PLUS_ZERO -> FPZero(sort.eBits, sort.sBits)
+    Z3_decl_kind.Z3_OP_FPA_MINUS_ZERO -> FPMinusZero(sort.eBits, sort.sBits)
+    Z3_decl_kind.Z3_OP_FPA_NAN -> FPNaN(sort.eBits, sort.sBits)
+    Z3_decl_kind.Z3_OP_FPA_ABS -> FPAbs(args[0].aquaify().cast())
+    Z3_decl_kind.Z3_OP_FPA_NEG -> FPNeg(args[0].aquaify().cast())
+    Z3_decl_kind.Z3_OP_FPA_ADD ->
+        FPAdd(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+
+    Z3_decl_kind.Z3_OP_FPA_SUB ->
+        FPSub(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+
+    Z3_decl_kind.Z3_OP_FPA_MUL ->
+        FPMul(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+
+    Z3_decl_kind.Z3_OP_FPA_DIV ->
+        FPDiv(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+
+    Z3_decl_kind.Z3_OP_FPA_FMA ->
+        FPFma(
+            args[0].aquaify().cast(),
+            args[1].aquaify().cast(),
+            args[2].aquaify().cast(),
+            args[3].aquaify().cast())
+
+    Z3_decl_kind.Z3_OP_FPA_SQRT -> FPSqrt(args[0].aquaify().cast(), args[1].aquaify().cast())
+    Z3_decl_kind.Z3_OP_FPA_REM -> FPRem(args[0].aquaify().cast(), args[1].aquaify().cast())
+    Z3_decl_kind.Z3_OP_FPA_ROUND_TO_INTEGRAL ->
+        FPRoundToIntegral(args[0].aquaify().cast(), args[1].aquaify().cast())
+
+    Z3_decl_kind.Z3_OP_FPA_MIN -> FPMin(args[0].aquaify().cast(), args[1].aquaify().cast())
+    Z3_decl_kind.Z3_OP_FPA_MAX -> FPMax(args[0].aquaify().cast(), args[1].aquaify().cast())
+    Z3_decl_kind.Z3_OP_FPA_TO_FP -> {
+      val inner = args[1].aquaify()
+
+      if (args.size == 1) {
+        BitVecToFP(args[0].aquaify().cast(), sort.aquaify() as FPSort)
+      } else if (inner.sort is FPSort) {
+        FPToFP(args[0].aquaify().cast(), inner.cast(), sort.aquaify() as FPSort)
+      } else if (inner.sort is RealSort) {
+        RealToFP(args[0].aquaify().cast(), inner.cast(), sort.aquaify() as FPSort)
+      } else if (inner.sort is BVSort) {
+        SBitVecToFP(args[0].aquaify().cast(), inner.cast(), sort.aquaify() as FPSort)
+      } else {
+        throw IllegalStateException()
       }
-      Z3_decl_kind.Z3_OP_FPA_TO_FP_UNSIGNED ->
-          SBitVecToFP(args[0].aquaify().cast(), args[1].aquaify().cast(), sort.aquaify() as FPSort)
-      else ->
-          throw RuntimeException(
-              "Unknown or unsupported floating point expression $this (decl kind ${this.funcDecl.declKind})")
     }
+
+    Z3_decl_kind.Z3_OP_FPA_TO_FP_UNSIGNED ->
+        SBitVecToFP(args[0].aquaify().cast(), args[1].aquaify().cast(), sort.aquaify() as FPSort)
+
+    else ->
+        throw RuntimeException(
+            "Unknown or unsupported floating point expression $this (decl kind ${this.funcDecl.declKind})")
+  }
+}
 
 @JvmName("aquaifyRoundingMode")
-fun FPRMExpr.aquaify(): Expression<RoundingModeSort> =
-    when (funcDecl.declKind) {
-      Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_ZERO -> RoundTowardZero
-      Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_NEGATIVE -> RoundTowardNegative
-      Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_POSITIVE -> RoundTowardPositive
-      Z3_decl_kind.Z3_OP_FPA_RM_NEAREST_TIES_TO_AWAY -> RoundNearestTiesToAway
-      Z3_decl_kind.Z3_OP_FPA_RM_NEAREST_TIES_TO_EVEN -> RoundNearestTiesToEven
-      else -> throw RuntimeException("Unknown or unsupported rounding mode expression $this.")
-    }
+fun FPRMExpr.aquaify(): Expression<RoundingModeSort> {
+  if (isITE) {
+    return Ite(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+  }
+
+  return when (funcDecl.declKind) {
+    Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_ZERO -> RoundTowardZero
+    Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_NEGATIVE -> RoundTowardNegative
+    Z3_decl_kind.Z3_OP_FPA_RM_TOWARD_POSITIVE -> RoundTowardPositive
+    Z3_decl_kind.Z3_OP_FPA_RM_NEAREST_TIES_TO_AWAY -> RoundNearestTiesToAway
+    Z3_decl_kind.Z3_OP_FPA_RM_NEAREST_TIES_TO_EVEN -> RoundNearestTiesToEven
+    else -> throw RuntimeException("Unknown or unsupported rounding mode expression $this.")
+  }
+}
 
 @JvmName("aquaifyArraysEx")
 fun ArrayExpr<*, *>.aquaify(): Expression<ArraySort<*, *>> =
-    if (isStore) {
+    if (isITE) {
+      Ite(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+    } else if (isStore) {
       ArrayStore(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
     } else if (isSelect) {
       ArraySelect(args[0].aquaify().cast(), args[1].aquaify().cast())
@@ -406,33 +434,38 @@ fun ArrayExpr<*, *>.aquaify(): Expression<ArraySort<*, *>> =
     }
 
 @JvmName("aquaifyRegLan")
-fun ReExpr<*>.aquaify(): Expression<RegLanSort> =
-    when (funcDecl.declKind) {
-      Z3_decl_kind.Z3_OP_SEQ_TO_RE -> StrToRe(args[0].aquaify().cast())
-      Z3_decl_kind.Z3_OP_RE_EMPTY_SET -> RegexNone
-      Z3_decl_kind.Z3_OP_RE_FULL_SET -> RegexAll
-      Z3_decl_kind.Z3_OP_RE_FULL_CHAR_SET -> RegexAllChar
-      Z3_decl_kind.Z3_OP_RE_CONCAT -> RegexConcat(args.map { expr -> expr.aquaify().cast() })
-      Z3_decl_kind.Z3_OP_RE_UNION -> RegexUnion(args.map { expr -> expr.aquaify().cast() })
-      Z3_decl_kind.Z3_OP_RE_INTERSECT -> RegexIntersec(args.map { expr -> expr.aquaify().cast() })
-      Z3_decl_kind.Z3_OP_RE_STAR -> RegexStar(args[0].aquaify().cast())
-      Z3_decl_kind.Z3_OP_RE_COMPLEMENT -> RegexComp(args[0].aquaify().cast())
-      Z3_decl_kind.Z3_OP_RE_DIFF -> RegexDiff(args.map { expr -> expr.aquaify().cast() })
-      Z3_decl_kind.Z3_OP_RE_PLUS -> RegexPlus(args[0].aquaify().cast())
-      Z3_decl_kind.Z3_OP_RE_OPTION -> RegexOption(args[0].aquaify().cast())
-      Z3_decl_kind.Z3_OP_RE_RANGE -> RegexRange(args[0].aquaify().cast(), args[1].aquaify().cast())
-      Z3_decl_kind.Z3_OP_RE_POWER ->
-          RegexPower(args[0].aquaify().cast(), funcDecl.parameters[0].int)
-      Z3_decl_kind.Z3_OP_RE_LOOP ->
-          RegexLoop(
-              args[0].aquaify().cast(), funcDecl.parameters[0].int, funcDecl.parameters[1].int)
-      else -> throw IllegalStateException("Unknown or unsupported reglan expression $this!")
-    }
+fun ReExpr<*>.aquaify(): Expression<RegLanSort> {
+  if (isITE) {
+    return Ite(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+  }
 
-@JvmName("aquaifySting")
+  return when (funcDecl.declKind) {
+    Z3_decl_kind.Z3_OP_SEQ_TO_RE -> StrToRe(args[0].aquaify().cast())
+    Z3_decl_kind.Z3_OP_RE_EMPTY_SET -> RegexNone
+    Z3_decl_kind.Z3_OP_RE_FULL_SET -> RegexAll
+    Z3_decl_kind.Z3_OP_RE_FULL_CHAR_SET -> RegexAllChar
+    Z3_decl_kind.Z3_OP_RE_CONCAT -> RegexConcat(args.map { expr -> expr.aquaify().cast() })
+    Z3_decl_kind.Z3_OP_RE_UNION -> RegexUnion(args.map { expr -> expr.aquaify().cast() })
+    Z3_decl_kind.Z3_OP_RE_INTERSECT -> RegexIntersec(args.map { expr -> expr.aquaify().cast() })
+    Z3_decl_kind.Z3_OP_RE_STAR -> RegexStar(args[0].aquaify().cast())
+    Z3_decl_kind.Z3_OP_RE_COMPLEMENT -> RegexComp(args[0].aquaify().cast())
+    Z3_decl_kind.Z3_OP_RE_DIFF -> RegexDiff(args.map { expr -> expr.aquaify().cast() })
+    Z3_decl_kind.Z3_OP_RE_PLUS -> RegexPlus(args[0].aquaify().cast())
+    Z3_decl_kind.Z3_OP_RE_OPTION -> RegexOption(args[0].aquaify().cast())
+    Z3_decl_kind.Z3_OP_RE_RANGE -> RegexRange(args[0].aquaify().cast(), args[1].aquaify().cast())
+    Z3_decl_kind.Z3_OP_RE_POWER -> RegexPower(args[0].aquaify().cast(), funcDecl.parameters[0].int)
+    Z3_decl_kind.Z3_OP_RE_LOOP ->
+        RegexLoop(args[0].aquaify().cast(), funcDecl.parameters[0].int, funcDecl.parameters[1].int)
+    else -> throw IllegalStateException("Unknown or unsupported reglan expression $this!")
+  }
+}
+
+@JvmName("aquaifyString")
 fun SeqExpr<SeqSort<CharSort>>.aquaify(): Expression<StringSort> {
   if (this.isString) {
     return StringLiteral(this.string)
+  } else if (isITE) {
+    return Ite(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
   }
 
   return when (funcDecl.declKind) {

@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.solvers.z3
 
+import com.microsoft.z3.FuncInterp
 import com.microsoft.z3.Model as Z3Model
 import com.microsoft.z3.Sort
 import com.microsoft.z3.Status
@@ -193,7 +194,7 @@ operator fun Model.Companion.invoke(model: Z3Model, context: Z3Context) =
         } +
             context.functions.map { (aqua, z3) ->
               if (aqua.parameters.isEmpty()) {
-                  // z3 treats functions with arity 0 as constants
+                // z3 treats functions with arity 0 as constants
                 FunctionDef(aqua.symbol, emptyList(), aqua.sort, model.getConstInterp(z3).aquaify())
               } else {
                 model.getFuncInterp(z3).let { interp ->
@@ -203,45 +204,43 @@ operator fun Model.Companion.invoke(model: Z3Model, context: Z3Context) =
                         SortedVar("|x!$i|".toSymbolWithQuotes(), sort)
                       }
 
-                  // build the chained ITE that z3 gives as interpretation for functions with arity
-                  // > 0
-                  // example interpretation for a function (declare-fun foo (Int Int) Int)
-                  //   (define-fun foo ((x!0 Int) (x!1 Int)) Int
-                  //    (ite (and (= x!0 1) (= x!1 0)) 1
-                  //    (ite (and (= x!0 0) (= x!1 0)) 0
-                  //    (ite (and (= x!0 2) (= x!1 1)) 3
-                  //    (ite (and (= x!0 0) (= x!1 1)) 1
-                  //      2)))))
-                  val term =
-                      // interp entries holds pairs of arguments -> function value
-                      // here e.g. (1, 0) -> 1, (0, 0) -> 0 etc.
-                      interp.entries
-                          .map { entry ->
-                            // if the condition has more than two arguments chain them by using and
-                            if (entry.numArgs >= 2) {
-                              And(
-                                  // build the equality conditions
-                                  (arguments zip entry.args).map { (local, value) ->
-                                    Equals(local.instance, value.aquaify())
-                                  }) to
-                                  entry.value.aquaify() // and pair them with their associated value
-                            } else {
-                              // we only have a single condition here since the functions is arity 1
-                              Equals(arguments.single().instance, entry.args.single().aquaify()) to
-                                  entry.value.aquaify()
-                            }
-                          }
-                          // build the chain 'bottom up' to get the same order as Z3
-                          // (so we use foldRight instead of fold)
-                          // fold the list of condition, value pairs into the ITE chain where the
-                          // interp.`else` is
-                          // the final `else` value
-                          .foldRight(interp.`else`.aquaify()) { (condition, value), acc ->
-                            Ite(condition, value, acc)
-                          }
-
                   // finally construct the function definition
-                  FunctionDef(aqua.symbol, arguments, aqua.sort, term)
+                  FunctionDef(aqua.symbol, arguments, aqua.sort, interp.aquaify(arguments))
                 }
               }
             })
+
+// build the chained ITE that z3 gives as interpretation for functions with arity
+// > 0
+// example interpretation for a function (declare-fun foo (Int Int) Int)
+//   (define-fun foo ((x!0 Int) (x!1 Int)) Int
+//    (ite (and (= x!0 1) (= x!1 0)) 1
+//    (ite (and (= x!0 0) (= x!1 0)) 0
+//    (ite (and (= x!0 2) (= x!1 1)) 3
+//    (ite (and (= x!0 0) (= x!1 1)) 1
+//      2)))))
+fun FuncInterp<*>.aquaify(arguments: List<SortedVar<*>>): Expression<*> =
+    if (entries.isEmpty()) {
+      `else`.aquaify()
+    } else {
+      entries
+          .map { entry -> entry.aquaify(arguments) }
+          // build the chain 'bottom up' to get the same order as Z3
+          // (so we use foldRight instead of fold)
+          // fold the list of condition, value pairs into the ITE chain where the
+          // interp.`else` is
+          // the final `else` value
+          .foldRight(`else`.aquaify()) { (condition, value), acc -> Ite(condition, value, acc) }
+    }
+
+fun FuncInterp.Entry<*>.aquaify(arguments: List<SortedVar<*>>) =
+    // if the condition has more than two arguments chain them by using and
+    if (numArgs >= 2) {
+      And(
+          // build the equality conditions
+          (arguments zip args).map { (local, value) -> Equals(local.instance, value.aquaify()) }) to
+          value.aquaify() // and pair them with their associated value
+    } else {
+      // we only have a single condition here since the functions is arity 1
+      Equals(arguments.single().instance, args.single().aquaify()) to value.aquaify()
+    }

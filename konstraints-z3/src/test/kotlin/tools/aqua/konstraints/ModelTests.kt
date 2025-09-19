@@ -61,6 +61,12 @@ class ModelTests {
   fun provideProgramAndModel(): Stream<Arguments> =
       Stream.of(
           arguments(
+              "(set-logic QF_LIA)(declare-fun foo (Int) Bool)(define-fun bar ((x Int)) Int (- (* x x) 4))(assert (forall ((x Int)) (ite (= (bar x) 0) (= (foo x) true) (= (foo x) false))))(check-sat)(get-model)",
+              RealLiteral(1)),
+          arguments(
+              "(set-logic QF_LIA)(define-fun x1 ((a Int) (b Int)) Int (+ a b))(declare-fun y (Int Int) Int)(assert (forall ((a Int) (b Int))(=> (and (< a 40) (>= a 0)) (= (y a b) (x1 a b)))))(assert (forall ((a Int) (b Int))(=> (>= a 40) (= (y a b) 42))))(assert (forall ((a Int) (b Int))(=> (< a 0) (= (y a b) 23))))(check-sat)(get-model)",
+              RealLiteral(1)),
+          arguments(
               "(set-logic QF_LIA)(declare-fun foo (Int Int) Int)(assert (and (= (foo 2 0) 2) (= (foo 1 0) 1) (= (foo 0 0) 0) (= (foo 2 1) 3) (= (foo 1 1) 2) (= (foo 0 1) 1)))(check-sat)(get-model)",
               listOf(
                       SortedVar("x!0".toSymbolWithQuotes(), SMTInt),
