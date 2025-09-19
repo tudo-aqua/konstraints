@@ -18,79 +18,34 @@
 
 package tools.aqua.konstraints
 
-import java.io.BufferedReader
-import java.io.File
-import java.util.concurrent.TimeUnit
 import java.util.stream.Stream
-import kotlin.streams.asStream
 import kotlin.use
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assumptions.assumeTrue
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
+import tools.aqua.konstraints.dsl.*
 import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.smt.BVLiteral
+import tools.aqua.konstraints.smt.Bool
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.FPMinusZero
 import tools.aqua.konstraints.smt.FPNaN
 import tools.aqua.konstraints.smt.FPZero
-import tools.aqua.konstraints.smt.GetModel
+import tools.aqua.konstraints.smt.False
 import tools.aqua.konstraints.smt.IntLiteral
 import tools.aqua.konstraints.smt.RealDiv
 import tools.aqua.konstraints.smt.RealLiteral
+import tools.aqua.konstraints.smt.SMTInt
+import tools.aqua.konstraints.smt.SortedVar
 import tools.aqua.konstraints.smt.StringLiteral
-import tools.aqua.konstraints.smt.SymbolAttributeValue
+import tools.aqua.konstraints.smt.toSymbolWithQuotes
 import tools.aqua.konstraints.solvers.z3.Z3Solver
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ModelTests {
-  private fun loadResource(path: String) =
-      File(javaClass.getResource(path)!!.file)
-          .walk()
-          .filter { file: File -> file.isFile }
-          .map { file: File -> Arguments.arguments(file) }
-          .asStream()
-
-  private fun solve(file: File) {
-    assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
-
-    // TODO this creates a massiv memory leak (solver is not closed properly)
-    val solver = Z3Solver()
-    val result =
-        Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
-
-    result.add(GetModel)
-
-    assumeTrue(
-        (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-            .symbol
-            .toString() == "sat",
-        "Skipped due to unknown or unsat status.")
-
-    solver.use {
-      solver.solve(result)
-
-      // verify we get the correct status for the test
-      assertEquals(
-          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-              .symbol
-              .toString(),
-          solver.status.toString())
-    }
-  }
-
-  @ParameterizedTest
-  @MethodSource("getQFBVFile")
-  @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-  fun QF_BV(file: File) = solve(file)
-
-  fun getQFBVFile(): Stream<Arguments> = loadResource("/QF_BV/20190311-bv-term-small-rw-Noetzli/")
-
   @ParameterizedTest
   @MethodSource("provideProgramAndModel")
   fun testModel(program: String, term: Expression<*>) {
@@ -105,6 +60,44 @@ class ModelTests {
 
   fun provideProgramAndModel(): Stream<Arguments> =
       Stream.of(
+          arguments(
+              "(set-logic QF_LIA)(declare-fun foo (Int) Bool)(define-fun bar ((x Int)) Int (- (* x x) 4))(assert (forall ((x Int)) (ite (= (bar x) 0) (= (foo x) true) (= (foo x) false))))(check-sat)(get-model)",
+              RealLiteral(1)),
+          arguments(
+              "(set-logic QF_LIA)(define-fun x1 ((a Int) (b Int)) Int (+ a b))(declare-fun y (Int Int) Int)(assert (forall ((a Int) (b Int))(=> (and (< a 40) (>= a 0)) (= (y a b) (x1 a b)))))(assert (forall ((a Int) (b Int))(=> (>= a 40) (= (y a b) 42))))(assert (forall ((a Int) (b Int))(=> (< a 0) (= (y a b) 23))))(check-sat)(get-model)",
+              RealLiteral(1)),
+          arguments(
+              "(set-logic QF_LIA)(declare-fun foo (Int Int) Int)(assert (and (= (foo 2 0) 2) (= (foo 1 0) 1) (= (foo 0 0) 0) (= (foo 2 1) 3) (= (foo 1 1) 2) (= (foo 0 1) 1)))(check-sat)(get-model)",
+              listOf(
+                      SortedVar("x!0".toSymbolWithQuotes(), SMTInt),
+                      SortedVar("x!1".toSymbolWithQuotes(), SMTInt))
+                  .let {
+                    val x0 = it[0].instance
+                    val x1 = it[1].instance
+                    ite((x0 eq 1) and (x1 eq 0)) then
+                        IntLiteral(1) otherwise
+                        (ite((x0 eq 0) and (x1 eq 0)) then
+                            IntLiteral(0) otherwise
+                            (ite((x0 eq 2) and (x1 eq 1)) then
+                                IntLiteral(3) otherwise
+                                (ite((x0 eq 0) and (x1 eq 1)) then
+                                    IntLiteral(1) otherwise
+                                    IntLiteral(2))))
+                  }),
+          arguments(
+              "(set-logic QF_LIA)(declare-fun foo (Int) Int)(assert (and (= (foo 2) 2) (= (foo 1) 1) (= (foo 0) 0)))(check-sat)(get-model)",
+              listOf(SortedVar("x!0".toSymbolWithQuotes(), SMTInt)).let {
+                val x0 = it[0].instance
+                ite(x0 eq 1) then
+                    IntLiteral(1) otherwise
+                    (ite(x0 eq 0) then IntLiteral(0) otherwise IntLiteral(2))
+              }),
+          arguments(
+              "(set-logic QF_LIA)(declare-fun foo (Bool) Int)(assert (and (= (foo true) 1) (= (foo false) 0)))(check-sat)(get-model)",
+              listOf(SortedVar("x!0".toSymbolWithQuotes(), Bool)).let {
+                val x0 = it[0].instance
+                ite(x0 eq False) then IntLiteral(0) otherwise IntLiteral(1)
+              }),
           arguments(
               "(set-logic QF_BV)(declare-fun foo () (_ BitVec 8))(assert (= foo #b00000000))(check-sat)(get-model)",
               BVLiteral("#b00000000")),
@@ -137,18 +130,4 @@ class ModelTests {
           /*arguments("(set-logic QF_LIRA)(declare-fun foo () Real)(assert (= foo 0.000000000000000000001))(check-sat)(get-model)",
           RealDiv(RealLiteral(1), RealLiteral(1000000000000000000000.0)))*/
       )
-
-  @Test
-  fun test() {
-    val solver = Z3Solver()
-    val program =
-        Parser()
-            .parse(
-                "(set-logic QF_S)(declare-fun foo () String)(declare-fun bar () String)(assert (= (str.len foo) 0))(assert (= bar \"bar\"))(check-sat)(get-model)(exit)")
-
-    solver.use {
-      solver.solve(program)
-      solver.model
-    }
-  }
 }

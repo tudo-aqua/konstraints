@@ -49,10 +49,10 @@ sealed class Expression<out T : Sort> : SMTSerializable {
                 children.map { it.all(predicate) }.reduceOrDefault(true) { t1, t2 -> t1 and t2 }
         is Ite ->
             predicate(this) and
-                predicate(statement) and
+                predicate(condition) and
                 predicate(then) and
                 predicate(otherwise) and
-                statement.all(predicate) and
+                condition.all(predicate) and
                 then.all(predicate) and
                 otherwise.all(predicate)
         is Literal -> predicate(this)

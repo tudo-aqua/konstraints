@@ -24,6 +24,8 @@ import tools.aqua.konstraints.smt.Distinct
 import tools.aqua.konstraints.smt.Equals
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.Implies
+import tools.aqua.konstraints.smt.IntLiteral
+import tools.aqua.konstraints.smt.IntSort
 import tools.aqua.konstraints.smt.Not
 import tools.aqua.konstraints.smt.Or
 import tools.aqua.konstraints.smt.Sort
@@ -188,6 +190,19 @@ infix fun <T : Sort> (() -> Expression<T>).eq(other: Expression<T>) = this() eq 
 
 /** Creates (eq [this] [other]). */
 infix fun <T : Sort> (() -> Expression<T>).eq(other: () -> Expression<T>) = this() eq other()
+
+/**
+ * Creates an equals: [this] equals [other].
+ *
+ * If [this] is an [tools.aqua.konstraints.smt.Equals] object, unpacks the children and returns a
+ * new combined Equals.
+ */
+infix fun Expression<IntSort>.eq(other: Int) =
+    if (this is Equals<*>) {
+      Equals(this.children + IntLiteral(other))
+    } else {
+      Equals(this, IntLiteral(other))
+    }
 
 /** Creates a distinct: [this] distinct [other]. */
 infix fun <T : Sort> Expression<T>.distinct(other: Expression<T>): Distinct<T> =

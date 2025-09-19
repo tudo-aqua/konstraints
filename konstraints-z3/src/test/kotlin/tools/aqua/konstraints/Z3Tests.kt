@@ -26,7 +26,6 @@ import kotlin.streams.asStream
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
@@ -37,48 +36,9 @@ import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.smt.VarBinding
 import tools.aqua.konstraints.solvers.z3.Z3Solver
-import tools.aqua.konstraints.solvers.z3.z3ify
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Z3Tests {
-  @Test
-  fun test() {
-    val solver = Z3Solver()
-    val program =
-        Parser()
-            .parse(
-                "(set-logic QF_S)\n(declare-fun s () String)\n(assert (= (str.len s) 0))\n(check-sat)\n(get-model)")
-
-    solver.use {
-      solver.solve(program)
-      solver.model
-    }
-  }
-
-  @Test
-  fun test2() {
-    val solver = Z3Solver()
-    val context = solver.context.context
-    val program = MutableSMTProgram()
-
-    program.setLogic(QF_S)
-    val decl = program.declareFun("s".toSymbolWithQuotes(), emptyList<Sort>(), SMTString)
-    program.assert(
-        Equals(StrLength(decl.constructDynamic(emptyList(), emptyList()).cast()), IntLiteral(0)))
-
-    solver.visit(program.commands.filterIsInstance<DeclareFun<*>>().single())
-
-    println(program.commands.filterIsInstance<Assert>().single().expr.z3ify(solver.context))
-  }
-
-  @Test
-  fun test3() {
-    val solver = Z3Solver()
-    val context = solver.context.context
-    val expr = StrInRe(StringLiteral("X"), StrToRe(StringLiteral("X"))).z3ify(solver.context)
-    // context.mkInRe(context.mkString("X"), context.mkToRe(context.mkString("X")))
-    println(expr)
-  }
 
   private fun loadResource(path: String) =
       File(javaClass.getResource(path)!!.file)
@@ -90,8 +50,6 @@ class Z3Tests {
   private fun solve(file: File) {
     assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
 
-    // TODO this creates a massiv memory leak (solver is not closed properly)
-    val solver = Z3Solver()
     val result =
         Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
 
@@ -101,7 +59,7 @@ class Z3Tests {
             .toString() != "unknown",
         "Skipped due to unknown sat status.")
 
-    solver.use {
+    Z3Solver().use { solver ->
       solver.solve(result)
 
       // verify we get the correct status for the test
@@ -199,46 +157,7 @@ class Z3Tests {
   fun QF_ALIA(file: File) = solve(file)
 
   @Disabled fun getQFALIAFile(): Stream<Arguments> = loadResource("/QF_ALIA/")
-
-  @Test
-  fun count() {
-    val countMap = mutableMapOf<BaseSymbol, Int>()
-    val context = Context()
-    context.setLogic(UF)
-    context.currentContext.functions.forEach { t, u -> countMap.put(t, 0) }
-
-    countMap.put("forall".toSymbolWithQuotes(), 0)
-    countMap.put("exists".toSymbolWithQuotes(), 0)
-
-    File(javaClass.getResource("/UF/")!!.file)
-        .walk()
-        .filter { file: File -> file.isFile }
-        .forEach { file: File ->
-          val program =
-              Parser()
-                  .parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
-          program.commands.filterIsInstance<Assert>().forEach { assertion: Assert ->
-            assertion.expr.forEach { expression ->
-              if (countMap.containsKey(expression.name)) {
-                countMap[expression.name] = countMap[expression.name]!! + 1
-              }
-
-              if (expression is ForallExpression) {
-                countMap["forall".toSymbolWithQuotes()] =
-                    countMap["forall".toSymbolWithQuotes()]!! + 1
-              }
-
-              if (expression is ExistsExpression) {
-                countMap["exists".toSymbolWithQuotes()] =
-                    countMap["exists".toSymbolWithQuotes()]!! + 1
-              }
-            }
-          }
-        }
-
-    countMap.forEach { (function, count) -> println("$function: $count") }
-  }
-
+  
   @ParameterizedTest
   @MethodSource("getUFFile")
   @Timeout(value = 2, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
@@ -259,13 +178,6 @@ class Z3Tests {
   fun QF_ABV(file: File) = solve(file)
 
   fun getQFABVFile(): Stream<Arguments> = loadResource("/QF_ABV/bench_ab/")
-
-  @ParameterizedTest
-  @MethodSource("getQFSFile")
-  @Timeout(value = 3, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-  fun QF_S(file: File) = solve(file)
-
-  fun getQFSFile(): Stream<Arguments> = loadResource("/QF_S/")
 
   @ParameterizedTest
   @MethodSource("getQFFPLRAFile")

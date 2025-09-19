@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.solvers.z3
 
+import com.microsoft.z3.FuncInterp
 import com.microsoft.z3.Model as Z3Model
 import com.microsoft.z3.Sort
 import com.microsoft.z3.Status
@@ -62,7 +63,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
   }
 
   override val modelOrNull: Model?
-    get() = z3model?.let { Model(it) }
+    get() = z3model?.let { Model(it, context) }
 
   override val isModelAvailable: Boolean
     get() = z3model != null
@@ -80,7 +81,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
             declareConst.name.toString(), getOrCreateSort(declareConst.sort))) != null) {
       /*
        * if the smt program we are solving is correct (which we assume since otherwise there is a bug somewhere
-       * in the construction of said program) this exception SHOULD never be reached
+       * in the construction of the program) this exception SHOULD never be reached
        */
 
       throw IllegalStateException("Function ${declareConst.func} was already declared!")
@@ -96,7 +97,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
             getOrCreateSort(declareFun.sort))) != null) {
       /*
        * if the smt program we are solving is correct (which we assume since otherwise there is a bug somewhere
-       * in the construction of said program) this exception SHOULD never be reached
+       * in the construction of the program) this exception SHOULD never be reached
        */
 
       throw IllegalStateException("Function ${declareFun.func} was already declared!")
@@ -174,7 +175,6 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     context.reset()
   }
 
-  // this should later be part of solver interface
   override fun close() {
     solver.reset()
     context.context.close()
@@ -185,30 +185,62 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
  * Extension function creating a model from a z3 model obtained from solver.model this extends the
  * invoke function of the companion object to emulate constructor syntax
  */
-operator fun Model.Companion.invoke(model: Z3Model): Model {
-  // TODO implement handling of uninterpreted sorts from model.sorts
+// TODO implement handling of uninterpreted sorts from model.sorts
+operator fun Model.Companion.invoke(model: Z3Model, context: Z3Context) =
+    Model(
+        context.constants.map { (aqua, z3) ->
+          FunctionDef(
+              aqua.name as Symbol, emptyList(), aqua.sort, model.getConstInterp(z3).aquaify())
+        } +
+            context.functions.map { (aqua, z3) ->
+              if (aqua.parameters.isEmpty()) {
+                // z3 treats functions with arity 0 as constants
+                FunctionDef(aqua.symbol, emptyList(), aqua.sort, model.getConstInterp(z3).aquaify())
+              } else {
+                model.getFuncInterp(z3).let { interp ->
+                  // construct sorted vars that are needed for the function definition
+                  val arguments =
+                      aqua.parameters.mapIndexed { i, sort ->
+                        SortedVar("|x!$i|".toSymbolWithQuotes(), sort)
+                      }
 
-  val temp = mutableListOf<FunctionDef<*>>()
+                  // finally construct the function definition
+                  FunctionDef(aqua.symbol, arguments, aqua.sort, interp.aquaify(arguments))
+                }
+              }
+            })
 
-  temp.addAll(
-      model.constDecls.map { decl ->
-        FunctionDef(
-            decl.name.toString().toSymbolWithQuotes(),
-            emptyList(),
-            decl.range.aquaify(),
-            model.getConstInterp(decl).aquaify())
-      })
+// build the chained ITE that z3 gives as interpretation for functions with arity
+// > 0
+// example interpretation for a function (declare-fun foo (Int Int) Int)
+//   (define-fun foo ((x!0 Int) (x!1 Int)) Int
+//    (ite (and (= x!0 1) (= x!1 0)) 1
+//    (ite (and (= x!0 0) (= x!1 0)) 0
+//    (ite (and (= x!0 2) (= x!1 1)) 3
+//    (ite (and (= x!0 0) (= x!1 1)) 1
+//      2)))))
+fun FuncInterp<*>.aquaify(arguments: List<SortedVar<*>>): Expression<*> =
+    if (entries.isEmpty()) {
+      `else`.aquaify()
+    } else {
+      entries
+          .map { entry -> entry.aquaify(arguments) }
+          // build the chain 'bottom up' to get the same order as Z3
+          // (so we use foldRight instead of fold)
+          // fold the list of condition, value pairs into the ITE chain where the
+          // interp.`else` is
+          // the final `else` value
+          .foldRight(`else`.aquaify()) { (condition, value), acc -> Ite(condition, value, acc) }
+    }
 
-  temp.addAll(
-      model.funcDecls.map { decl ->
-        FunctionDef(
-            decl.name.toString().toSymbolWithQuotes(),
-            (decl.domain zip 0..<decl.domainSize).map { (sort, index) ->
-              SortedVar("x$index".toSymbolWithQuotes(), sort.aquaify())
-            },
-            decl.range.aquaify(),
-            model.getFuncInterp(decl).`else`.aquaify())
-      })
-
-  return Model(temp)
-}
+fun FuncInterp.Entry<*>.aquaify(arguments: List<SortedVar<*>>) =
+    // if the condition has more than two arguments chain them by using and
+    if (numArgs >= 2) {
+      And(
+          // build the equality conditions
+          (arguments zip args).map { (local, value) -> Equals(local.instance, value.aquaify()) }) to
+          value.aquaify() // and pair them with their associated value
+    } else {
+      // we only have a single condition here since the functions is arity 1
+      Equals(arguments.single().instance, args.single().aquaify()) to value.aquaify()
+    }
