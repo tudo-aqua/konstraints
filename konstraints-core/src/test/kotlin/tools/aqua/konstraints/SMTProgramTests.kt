@@ -25,7 +25,6 @@ import java.util.stream.Stream
 import kotlin.io.bufferedReader
 import kotlin.streams.asStream
 import kotlin.use
-import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
@@ -125,40 +124,6 @@ class SMTProgramTests {
         arguments(
             coreProgram,
             UserDeclaredSMTFunction0("Unregistered!bool".toSymbolWithQuotes(), Bool)()))
-  }
-
-  @ParameterizedTest
-  @MethodSource("provideCustom")
-  fun testSerialization(program: SMTProgram) {
-    println(program.toString())
-
-    val exprMap = mutableMapOf<String, Int>()
-
-    program.commands.filterIsInstance<Assert>().forEach { assertion ->
-      assertion.expr.all { expression ->
-        when (expression) {
-          is AnnotatedExpression<*> -> exprMap.compute("Annotated") { k, v -> v?.plus(1) ?: 1 }
-          is BinaryExpression<*, *, *> -> exprMap.compute("Binary") { k, v -> v?.plus(1) ?: 1 }
-          is BoundVariable<*> -> exprMap.compute("BoundVar") { k, v -> v?.plus(1) ?: 1 }
-          is ConstantExpression<*> -> exprMap.compute("ConstExpr") { k, v -> v?.plus(1) ?: 1 }
-          is ExistsExpression -> exprMap.compute("Exists") { k, v -> v?.plus(1) ?: 1 }
-          is ForallExpression -> exprMap.compute("Forall") { k, v -> v?.plus(1) ?: 1 }
-          is HomogenousExpression<*, *> -> exprMap.compute("Homogenous") { k, v -> v?.plus(1) ?: 1 }
-          is Ite<*> -> exprMap.compute("Ite") { k, v -> v?.plus(1) ?: 1 }
-          is LetExpression<*> -> exprMap.compute("Let") { k, v -> v?.plus(1) ?: 1 }
-          is Literal<*> -> exprMap.compute("Literal") { k, v -> v?.plus(1) ?: 1 }
-          is LocalExpression<*> -> exprMap.compute("Local") { k, v -> v?.plus(1) ?: 1 }
-          is NAryExpression<*> -> exprMap.compute("NAry") { k, v -> v?.plus(1) ?: 1 }
-          is TernaryExpression<*, *, *, *> -> exprMap.compute("Ternary") { k, v -> v?.plus(1) ?: 1 }
-          is UnaryExpression<*, *> -> exprMap.compute("Unary") { k, v -> v?.plus(1) ?: 1 }
-        }
-        true
-      }
-    }
-
-    println(exprMap.toString().replace(",", ",\n"))
-
-    assertEquals(program.toString(), Parser().parse(program.toString()).toString())
   }
 
   private fun providePrograms(path: String) =

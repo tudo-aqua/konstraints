@@ -18,7 +18,6 @@
 
 package tools.aqua.konstraints.smt
 
-import java.util.*
 import tools.aqua.konstraints.util.zipWithSameLength
 
 /**
@@ -138,7 +137,7 @@ class FunctionCastException(from: Sort, to: String) :
 
 /** Variable bound inside a let. */
 class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>) :
-    SMTFunction<T>() {
+    SMTFunction<T>(), SMTSerializable {
 
   operator fun invoke(args: List<Expression<*>>) = instance
 
@@ -150,18 +149,41 @@ class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>)
 
   val instance = LocalExpression(symbol, sort, term, this)
 
-  override fun toString() = "(${symbol.toSMTString()} $term)"
+  override fun toString() =
+      "(${symbol.toSMTString(QuotingRule.SAME_AS_INPUT)} ${term.toSMTString(QuotingRule.SAME_AS_INPUT)})"
+
+  override fun toSMTString(quotingRule: QuotingRule) =
+      "(${symbol.toSMTString(quotingRule)} ${term.toSMTString(quotingRule)})"
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+    builder.append("(")
+    builder.append(symbol.toSMTString(quotingRule))
+    builder.append(" ")
+    builder.append(term.toSMTString(quotingRule))
+    return builder.append(")")
+  }
 }
 
 /** Variable bound by exists or forall quantifier. */
 class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T) :
-    SMTFunction<T>() {
+    SMTFunction<T>(), SMTSerializable {
   operator fun invoke(args: List<Expression<*>>) = instance
 
   override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>) = instance
 
-  override fun toString(): String = "(${symbol.toSMTString()} $sort)"
+  override fun toString(): String = "(${symbol.toSMTString(QuotingRule.SAME_AS_INPUT)} $sort)"
 
   val instance = BoundVariable(symbol, sort, this)
   override val parameters: List<Sort> = emptyList()
+
+  override fun toSMTString(quotingRule: QuotingRule) =
+      "(${symbol.toSMTString(quotingRule)} ${sort.toSMTString(quotingRule)})"
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+    builder.append("(")
+    builder.append(symbol.toSMTString(quotingRule))
+    builder.append(" ")
+    builder.append(sort.toSMTString(quotingRule))
+    return builder.append(")")
+  }
 }

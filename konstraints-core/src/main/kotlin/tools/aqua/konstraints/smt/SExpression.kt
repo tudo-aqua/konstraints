@@ -36,7 +36,7 @@ data class SExpressionConstant(val constant: SpecConstant) : SExpression {
 
 /** SExpressionSymbol. */
 data class SExpressionSymbol(val symbol: Symbol) : SExpression {
-  override fun toString() = symbol.toSMTString()
+  override fun toString() = TODO()
 }
 
 /** SExpressionReserved. */

@@ -62,6 +62,7 @@ class BVConcat(override val lhs: Expression<BVSort>, override val rhs: Expressio
 class BVExtract(val i: Int, val j: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("extract".toSymbolWithQuotes(), BVSort(i - j + 1)) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val indices = listOf(i, j)
 
   init {
     require(j >= 0) { "j needs to be greater or equal to 0, but was $j" }
@@ -752,6 +753,7 @@ class BVAShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
 class Repeat(val i: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("repeat".toSymbolWithQuotes(), BVSort(inner.sort.bits * i)) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val indices = listOf(i)
 
   init {
     require(i > 0)
@@ -785,6 +787,7 @@ class ZeroExtend(val i: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>(
         "zero_extend".toSymbolWithQuotes(), BVSort(inner.sort.bits + i)) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val indices = listOf(i)
 
   init {
     require(i >= 0)
@@ -815,6 +818,7 @@ class SignExtend(val i: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>(
         "sign_extend".toSymbolWithQuotes(), BVSort(inner.sort.bits + i)) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val indices = listOf(i)
 
   init {
     require(i >= 0)
@@ -844,6 +848,7 @@ class SignExtend(val i: Int, override val inner: Expression<BVSort>) :
 class RotateLeft(val i: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("rotate_left".toSymbolWithQuotes(), inner.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val indices = listOf(i)
 
   init {
     require(i >= 0)
@@ -876,6 +881,7 @@ class RotateLeft(val i: Int, override val inner: Expression<BVSort>) :
 class RotateRight(val i: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("rotate_right".toSymbolWithQuotes(), inner.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val indices = listOf(i)
 
   init {
     require(i >= 0)

@@ -157,7 +157,7 @@ class Z3Tests {
   fun QF_ALIA(file: File) = solve(file)
 
   @Disabled fun getQFALIAFile(): Stream<Arguments> = loadResource("/QF_ALIA/")
-
+  
   @ParameterizedTest
   @MethodSource("getUFFile")
   @Timeout(value = 2, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)

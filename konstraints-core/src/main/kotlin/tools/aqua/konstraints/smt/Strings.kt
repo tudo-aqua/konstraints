@@ -488,6 +488,7 @@ class RegexRange(
 class RegexPower(override val inner: Expression<RegLanSort>, val n: Int) :
     UnaryExpression<RegLanSort, RegLanSort>("re.^".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
+  override val indices = listOf(n)
 
   override fun toString(): String = "((_ re.^ $n) $inner)"
 
@@ -499,6 +500,7 @@ class RegexPower(override val inner: Expression<RegLanSort>, val n: Int) :
 class RegexLoop(override val inner: Expression<RegLanSort>, val n: Int, val m: Int) :
     UnaryExpression<RegLanSort, RegLanSort>("re.loop".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
+  override val indices = listOf(n, m)
 
   override fun toString(): String = "((_ re.loop $n $m) $inner)"
 

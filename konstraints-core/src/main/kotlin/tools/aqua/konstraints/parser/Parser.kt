@@ -195,11 +195,15 @@ class Parser {
 
     private val symbol =
         (simpleSymbol.flatten().trim(whitespaceCat).map { raw: String ->
+          // simple symbol can not be a reserved word
+          require(raw !in Symbol.reservedSet)
           // directly construct symbol using internal constructor to skip second check for isSimple
           Symbol(raw, false, true)
         }) +
             (quotedSymbol.flatten().trim(whitespaceCat).map { raw: String ->
-              Symbol(raw, true, false)
+              // the isSimple check needs to be run here as the symbol may also be valid without
+              // quotes
+              Symbol(raw, true)
             })
     private val keyword = (of(':') * simpleSymbol).flatten().trim(whitespaceCat)
 
@@ -847,7 +851,11 @@ class Parser {
               rparen)
           .map { results: ArrayList<Any> -> TODO("Datatypes are not implemented yet") }
 
-  private val getValueCMD = (lparen * getValueKW * lparen * term.plus() * rparen * rparen)
+  private val getValueCMD =
+      (lparen * getValueKW * lparen * term.plus() * rparen * rparen).map { results: ArrayList<Any>
+        ->
+        TODO("get-value not implemented yet")
+      }
 
   val command =
       ChoiceParser(

@@ -54,7 +54,7 @@ class Z3Context {
   fun <T> bind(sortedVars: List<SortedVar<*>>, block: (List<Expr<*>>) -> T): T {
     val vars =
         sortedVars.map { sortedVar ->
-          context.mkConst(sortedVar.symbol.toSMTString(), sortedVar.sort.z3ify(this))
+          context.mkConst(sortedVar.symbol.toString(), sortedVar.sort.z3ify(this))
         }
 
     boundVars.push()

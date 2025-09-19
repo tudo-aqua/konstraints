@@ -78,7 +78,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     if (context.functions.put(
         declareConst.func,
         context.context.mkConstDecl(
-            declareConst.name.toSMTString(), getOrCreateSort(declareConst.sort))) != null) {
+            declareConst.name.toString(), getOrCreateSort(declareConst.sort))) != null) {
       /*
        * if the smt program we are solving is correct (which we assume since otherwise there is a bug somewhere
        * in the construction of the program) this exception SHOULD never be reached
@@ -92,7 +92,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     if (context.functions.put(
         declareFun.func,
         context.context.mkFuncDecl(
-            declareFun.name.toSMTString(),
+            declareFun.name.toString(),
             declareFun.parameters.map { getOrCreateSort(it) }.toTypedArray(),
             getOrCreateSort(declareFun.sort))) != null) {
       /*
@@ -141,7 +141,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
   override fun visit(setLogic: SetLogic) {}
 
   override fun visit(declareSort: DeclareSort) {
-    context.context.mkUninterpretedSort(declareSort.name.toSMTString())
+    context.context.mkUninterpretedSort(declareSort.name.toString())
   }
 
   override fun visit(getModel: GetModel) {
