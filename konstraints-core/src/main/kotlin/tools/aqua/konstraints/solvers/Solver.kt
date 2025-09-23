@@ -24,7 +24,7 @@ import tools.aqua.konstraints.smt.SatStatus
 
 interface Solver : AutoCloseable {
   /** Solves the provided program using this solver. */
-  fun solve(program: SMTProgram): SatStatus
+  suspend fun solve(program: SMTProgram): SatStatus
 
   /** A model if available, else null. */
   val modelOrNull: Model?

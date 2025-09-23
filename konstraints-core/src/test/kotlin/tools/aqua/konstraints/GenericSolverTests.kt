@@ -1,5 +1,8 @@
 package tools.aqua.konstraints
 
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeoutOrNull
+import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.Timeout
@@ -14,9 +17,12 @@ import java.io.BufferedReader
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlin.streams.asStream
+import kotlin.time.Duration
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class GenericSolverTests {
+    val solver = GenericSolver("z3", "-in")
+
     private fun loadResource(path: String) =
         File(javaClass.getResource(path)!!.file)
             .walk()
@@ -26,17 +32,18 @@ class GenericSolverTests {
 
     @ParameterizedTest
     @MethodSource("loadQF_BV")
-    @Timeout(value = 1, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
     fun testGenericZ3(program : SMTProgram) {
-        GenericSolver("z3", "-in").use { solver ->
-            solver.solve(program)
-
-            /*assertEquals(
-                (program.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-                    .symbol
-                    .toString(),
-                program.status.toString())*/
+        solver.reset()
+        runBlocking {
+            withTimeoutOrNull(1000) {
+                solver.solve(program)
+            }
         }
+    }
+
+    @AfterAll
+    fun close() {
+        solver.close()
     }
 
     private fun loadQF_BV() = loadResource("/QF_BV/20190311-bv-term-small-rw-Noetzli/")

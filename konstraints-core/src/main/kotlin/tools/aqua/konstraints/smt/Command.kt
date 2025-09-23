@@ -98,7 +98,7 @@ data class DeclareFun<T : Sort>(val func: SMTFunction<T>) : Command("declare-fun
   val sort = func.sort
 
   override fun toString() =
-      "declare-fun ${func.symbol} (${func.parameters.joinToString(" ")}) ${func.sort}"
+      "(declare-fun ${func.symbol} (${func.parameters.joinToString(" ")}) ${func.sort})"
 
   override fun toSMTString(quotingRule: QuotingRule) =
       "(declare-fun ${func.symbol.toSMTString(quotingRule)} (${func.parameters.joinToString(" ") {it.toSMTString(quotingRule)}}) ${func.sort.toSMTString(quotingRule)})"
@@ -125,7 +125,7 @@ data class SetInfo(val attribute: Attribute) : Command("set-info") {
   /** SMT (set-info [keyword] [value]) command */
   constructor(keyword: String, value: AttributeValue?) : this(Attribute(keyword, value))
 
-  override fun toString() = "set-info $attribute"
+  override fun toString() = "(set-info $attribute)"
 
   override fun toSMTString(quotingRule: QuotingRule) =
       "(set-info ${attribute.toSMTString(quotingRule)})"
@@ -142,7 +142,7 @@ data class Attribute(val keyword: String, val value: AttributeValue?) : SMTSeria
   override fun toString() = "$keyword $value"
 
   override fun toSMTString(quotingRule: QuotingRule) =
-      "$keyword ${value?.toSMTString(quotingRule) ?: ""}"
+      "($keyword ${value?.toSMTString(quotingRule) ?: ""})"
 
   override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
     builder.append(keyword)
@@ -192,7 +192,7 @@ data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : Attr
 
 /** SMT (declare-sort [name] [arity]) command. */
 data class DeclareSort(val name: Symbol, val arity: Int) : Command("declare-sort") {
-  override fun toString() = "declare-sort $name $arity"
+  override fun toString() = "(declare-sort $name $arity)"
 
   override fun toSMTString(quotingRule: QuotingRule) =
       "(declare-sort ${name.toSMTString(quotingRule)} $arity)"
@@ -207,7 +207,7 @@ data class DeclareSort(val name: Symbol, val arity: Int) : Command("declare-sort
 /** SMT (define-sort [name] ([sortParameters]) [sort]) command. */
 data class DefineSort(val name: Symbol, var sortParameters: List<Symbol>, val sort: Sort) :
     Command("define-sort") {
-  override fun toString() = "define-sort $name (${sortParameters.joinToString(" ")}) $sort"
+  override fun toString() = "(define-sort $name (${sortParameters.joinToString(" ")}) $sort)"
 
   override fun toSMTString(quotingRule: QuotingRule) =
       "(define-sort ${name.toSMTString(quotingRule)} (${sortParameters.joinToString(" "){ it.toSMTString(quotingRule) }}) ${sort.toSMTString(quotingRule)})"
@@ -229,7 +229,7 @@ data class DefineSort(val name: Symbol, var sortParameters: List<Symbol>, val so
   }
 }
 
-// TODO string serialization of OptionValue
+// TODO secondary constructors for each option value type
 /** SMT (set-option [name] [OptionValue]) command. */
 data class SetOption(val name: String, val value: OptionValue) : Command("set-option") {
   override fun toString() = "(set-option $name $value)"
