@@ -221,7 +221,8 @@ operator fun Model.Companion.invoke(model: Z3Model, context: Z3Context) =
 //      2)))))
 fun FuncInterp<*>.aquaify(arguments: List<SortedVar<*>>): Expression<*> =
     if (entries.isEmpty()) {
-      `else`.aquaify()
+      TODO("This type of z3 model is not implemented yet!")
+      // `else`.aquaify()
     } else {
       entries
           .map { entry -> entry.aquaify(arguments) }
