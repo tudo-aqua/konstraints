@@ -19,46 +19,21 @@
 package tools.aqua.konstraints.smt
 
 /**
- * Quoting rules for SMT String, used when serializing program.
- *
- * @property NEVER will never quote any symbol, even if the constructing string is quoted
- * @property SAME_AS_INPUT no modification will be done
- * @property WHEN_NEEDED automatically determines whether the symbol needs quoting or not
- * @property ALWAYS quotes all symbols
- */
-enum class QuotingRule {
-  /**
-   * No Symbol will be quoted, note this will result in exceptions if symbols must be quoted to be
-   * valid.
-   */
-  NEVER,
-
-  /** No modification will be done. */
-  SAME_AS_INPUT,
-
-  /** Automatically determines whether the string needs quoting or not. */
-  WHEN_NEEDED,
-
-  /** Quotes the string if it is not already quoted. */
-  ALWAYS
-}
-
-/**
  * Representation of an SMT Symbol.
  *
  * @throws IllegalSymbolException if [raw] is not a valid SMT Symbol
  */
-// constructor is internal to prevent external subclassing of Symbol
+// constructor is internal to prevent construction of illegal symbols by skipping isSimple check
 // is simple has default value checkIsSimple(raw) this function returns true for simple symbols,
 // false for all other symbols and throws for invalid strings
 // this can be used to skip the legal symbol check internally by directly constructing a symbol and
-// setting this manually (e.g. when the parser already verified that a symbol is simple)
-open class Symbol
+// setting this manually (e.g. when the parser already verified that a symbol is legal and simple)
+class Symbol
 internal constructor(
     raw: String,
-    val wasQuoted: Boolean,
+    val isQuoted: Boolean,
     val isSimple: Boolean = checkIsSimple(raw)
-) : SMTSerializable {
+) : BaseSymbol {
   /**
    * Internal representation of the symbol without quotes, quoting will be reconstructed by
    * [toSMTString] before giving the symbol to a solver.
@@ -66,34 +41,32 @@ internal constructor(
   val value: String = raw.trim('|')
 
   companion object {
-    /** public substitute for constructor. */
-    operator fun invoke(symbol: String, wasQuoted: Boolean): Symbol = this(symbol, wasQuoted)
+    operator fun invoke(raw: String) = Symbol(raw, raw.startsWith('|') && raw.endsWith('|'))
 
     /**
      * @return true if [raw] is a simple symbol, false if [raw] is only valid as quoted symbol
      * @throws [IllegalSymbolException] if [raw] is not a legal symbol
      */
-    private fun checkIsSimple(raw: String) =
-        // check if we have a simple symbol (that is a symbol that is valid without quotes)
-        if (!raw[0].isDigit() && raw.all { ch -> ch in simpleSet } && raw !in reservedSet) {
-          true
-        }
-        // quoted symbols start and end with '|'
-        else if (raw.startsWith('|') &&
-            raw.endsWith('|') &&
-            raw.drop(1).dropLast(1).all { ch -> ch in quotedSet }) {
-          false
-        }
-        // check if we have a quoted symbol that is not already quoted (raw is of the form "symbol"
-        // and is not a simple symbol)
-        else if (raw.all { ch -> ch in quotedSet }) {
-          false
-        } else {
-          throw IllegalSymbolException(raw)
-        }
+    private fun checkIsSimple(raw: String): Boolean {
+      val stripped = raw.removePrefix("|").removeSuffix("|")
+
+      // simple symbols can not be empty and can not start with a digit
+      return if (stripped.isNotEmpty() &&
+          !stripped.first().isDigit() &&
+          stripped.all { ch -> ch in simpleSet } &&
+          stripped !in reservedSet) {
+        true
+      }
+      // quoted symbols start and end with '|'
+      else if (raw.startsWith('|') && raw.endsWith('|') && stripped.all { ch -> ch in quotedSet }) {
+        false
+      } else {
+        throw IllegalSymbolException(raw)
+      }
+    }
 
     // set of all smt reserved words
-    private val reservedSet =
+    internal val reservedSet =
         setOf(
             "!",
             "_",
@@ -152,11 +125,12 @@ internal constructor(
             .union(letterSet)
 
     // set of all legal characters in a quoted symbol
+    // quoted symbols all for ascii characters beyond 0x00FF
     // 92 is skipped as '\' is not allowed
     // 124 is skipped as '|' is not allowed
     private val quotedSet =
-        ((32..91) + (93..123) + (125..126) + (128..255))
-            .map { n -> n.toChar() }
+        ((32..91) + (93..123) + (125..126) + (128..0xFFFF))
+            .map(Int::toChar)
             .toSet()
             .union(whitespaceSet)
   }
@@ -173,16 +147,19 @@ internal constructor(
       }
 
   /** Returns the internal representation of the symbol without any quotes. */
-  override fun toString() = value
+  override fun toString() = toSMTString(QuotingRule.SAME_AS_INPUT)
 
   /** Returns a valid SMT String with reconstructed quoting. */
-  fun toSMTString(rule: QuotingRule = QuotingRule.SAME_AS_INPUT) =
+  override fun toSMTString(rule: QuotingRule) =
       when (rule) {
         QuotingRule.NEVER -> if (!isSimple) throw IllegalSymbolException(value) else value
-        QuotingRule.SAME_AS_INPUT -> if (!isSimple) "|$value|" else value
-        QuotingRule.WHEN_NEEDED -> if (wasQuoted || !isSimple) "|$value|" else value
+        QuotingRule.SAME_AS_INPUT -> if (isQuoted) "|$value|" else value
+        QuotingRule.WHEN_NEEDED -> if (!isSimple) "|$value|" else value
         QuotingRule.ALWAYS -> "|$value|"
       }
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
+      builder.append(toSMTString(quotingRule))
 }
 
 class IllegalSymbolException(val symbol: String) :

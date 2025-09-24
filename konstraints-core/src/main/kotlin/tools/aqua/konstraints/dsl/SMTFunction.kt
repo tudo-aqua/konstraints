@@ -677,8 +677,10 @@ data class UserDeclaredSMTFunction0<T : Sort>(
 ) : UserDeclaredSMTFunction<T>() {
   override val parameters = emptyList<Sort>()
 
-  /** Create instance. */
-  operator fun invoke() = UserDeclaredExpression(symbol, sort, this)
+  val instance = UserDeclaredExpression(symbol, sort, this)
+
+  /** Get instance. */
+  operator fun invoke() = instance
 }
 
 /**
@@ -792,23 +794,10 @@ data class UserDefinedSMTFunctionN<T : Sort>(
     override val sortedVars: List<SortedVar<*>>,
     override val term: Expression<T>
 ) : DefinedSMTFunction<T>() {
-  /** Companion object for pseudo constructor. */
-  companion object {
-    /** Pseudo constructor. */
-    operator fun <T : Sort> invoke(
-        symbol: Symbol,
-        sort: T,
-        parameters: List<Sort>,
-        term: Expression<T>
-    ) =
-        UserDefinedSMTFunctionN(
-            symbol,
-            sort,
-            parameters.mapIndexed { index, sort ->
-              SortedVar("|local!$sort!$index|".toSymbolWithQuotes(), sort)
-            },
-            term)
-  }
+
+  /** Pseudo constructor. */
+  operator fun <T : Sort> invoke(parameters: List<Expression<*>>) =
+      constructDynamic(parameters, emptyList())
 
   override val parameters = sortedVars.map { it.sort }
 }
@@ -848,7 +837,7 @@ data class UserDefinedSMTFunction1<T : Sort, S : Sort>(
       sort: T,
       parameter: S,
       term: Expression<T>
-  ) : this(symbol, sort, SortedVar("|local!$parameter!2|".toSymbolWithQuotes(), parameter), term)
+  ) : this(symbol, sort, SortedVar("|local!$parameter!1|".toSymbolWithQuotes(), parameter), term)
 
   override val parameters = listOf(parameter.sort)
   override val sortedVars = listOf(parameter)

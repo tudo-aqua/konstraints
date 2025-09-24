@@ -18,18 +18,33 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.Parser
+/**
+ * Quoting rules for SMT String, used when serializing program.
+ *
+ * @property NEVER will never quote any symbol, even if the constructing string is quoted
+ * @property SAME_AS_INPUT no modification will be done
+ * @property WHEN_NEEDED automatically determines whether the symbol needs quoting or not
+ * @property ALWAYS quotes all symbols
+ */
+enum class QuotingRule {
+  /**
+   * No Symbol will be quoted, note this will result in exceptions if symbols must be quoted to be
+   * valid.
+   */
+  NEVER,
 
-interface SMTSerializable
+  /** No modification will be done. */
+  SAME_AS_INPUT,
 
-/** String representation of a smt keyword. */
-class Keyword(val value: String) : SMTSerializable {
-  init {
-    Parser.reserved.parse(value)
-  }
+  /** Automatically determines whether the string needs quoting or not. */
+  WHEN_NEEDED,
+
+  /** Quotes the string if it is not already quoted. */
+  ALWAYS
 }
 
-/** String representation of a smt literal. */
-class LiteralString(val value: String) : SMTSerializable {
-  override fun toString() = value
+interface SMTSerializable {
+  fun toSMTString(quotingRule: QuotingRule): String
+
+  fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable
 }

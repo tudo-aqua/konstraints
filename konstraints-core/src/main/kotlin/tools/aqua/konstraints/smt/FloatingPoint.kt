@@ -117,6 +117,7 @@ object RTZ : ConstantExpression<RoundingModeSort>("RTZ".toSymbolWithQuotes(), Ro
 class FPInfinity(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("+oo".toSymbolWithQuotes(), FPSort(eb, sb)) {
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(eb, sb)
 
   override fun toString(): String = "(_ +oo $eb $sb)"
 
@@ -130,6 +131,7 @@ class FPInfinity(val eb: Int, val sb: Int) :
 class FPMinusInfinity(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("-oo".toSymbolWithQuotes(), FPSort(eb, sb)) {
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(eb, sb)
 
   override fun toString(): String = "(_ -oo $eb $sb)"
 
@@ -143,6 +145,7 @@ class FPMinusInfinity(val eb: Int, val sb: Int) :
 class FPZero(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("+zero".toSymbolWithQuotes(), FPSort(eb, sb)) {
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(eb, sb)
 
   override fun toString(): String = "(_ +zero $eb $sb)"
 
@@ -156,6 +159,7 @@ class FPZero(val eb: Int, val sb: Int) :
 class FPMinusZero(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("-zero".toSymbolWithQuotes(), FPSort(eb, sb)) {
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(eb, sb)
 
   override fun toString(): String = "(_ -zero $eb $sb)"
 
@@ -169,6 +173,7 @@ class FPMinusZero(val eb: Int, val sb: Int) :
 class FPNaN(val eb: Int, val sb: Int) :
     ConstantExpression<FPSort>("NaN".toSymbolWithQuotes(), FPSort(eb, sb)) {
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(eb, sb)
 
   override fun toString(): String = "(_ NaN $eb $sb)"
 
@@ -657,6 +662,7 @@ class BitVecToFP(override val inner: Expression<BVSort>, sort: FPSort) :
   constructor(inner: Expression<BVSort>, eb: Int, sb: Int) : this(inner, FPSort(eb, sb))
 
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(sort.exponentBits, sort.significantBits)
 
   init {
     require(inner.sort.bits == sort.exponentBits + sort.significantBits)
@@ -664,6 +670,8 @@ class BitVecToFP(override val inner: Expression<BVSort>, sort: FPSort) :
 
   override fun copy(children: List<Expression<*>>): Expression<FPSort> =
       BitVecToFPDecl.constructDynamic(children, emptyList())
+
+  override fun toString() = "((_ to_fp ${sort.exponentBits} ${sort.significantBits}) $inner)"
 }
 
 /**
@@ -683,6 +691,7 @@ class FPToFP(
   ) : this(roundingMode, inner, FPSort(eb, sb))
 
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(sort.exponentBits, sort.significantBits)
 
   override val lhs: Expression<RoundingModeSort> = roundingMode
 
@@ -712,6 +721,7 @@ class RealToFP(
   ) : this(roundingMode, inner, FPSort(eb, sb))
 
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(sort.exponentBits, sort.significantBits)
 
   override val lhs: Expression<RoundingModeSort> = roundingMode
 
@@ -742,6 +752,7 @@ class SBitVecToFP(
   ) : this(roundingMode, inner, FPSort(eb, sb))
 
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(sort.exponentBits, sort.significantBits)
 
   override val lhs: Expression<RoundingModeSort> = roundingMode
 
@@ -774,6 +785,7 @@ class UBitVecToFP(
   ) : this(roundingMode, inner, FPSort(eb, sb))
 
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(sort.exponentBits, sort.significantBits)
 
   override val lhs: Expression<RoundingModeSort> = roundingMode
 
@@ -803,6 +815,7 @@ class FPToUBitVec(
     BinaryExpression<BVSort, RoundingModeSort, FPSort>(
         "fp.to_ubv".toSymbolWithQuotes(), BVSort(m)) {
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(m)
 
   override val lhs: Expression<RoundingModeSort> = roundingMode
 
@@ -827,6 +840,7 @@ class FPToSBitVec(
     BinaryExpression<BVSort, RoundingModeSort, FPSort>(
         "fp.to_sbv".toSymbolWithQuotes(), BVSort(m)) {
   override val theories = FLOATING_POINT_MARKER_SET
+  override val indices = listOf(m)
 
   override val lhs: Expression<RoundingModeSort> = roundingMode
 

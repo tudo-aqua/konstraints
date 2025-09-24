@@ -29,7 +29,7 @@ import tools.aqua.konstraints.parser.StringsTheory
 import tools.aqua.konstraints.util.Stack
 
 /** Holds all [SMTFunction]s and [SortFactory]s of the current signature. */
-private class CurrentContext {
+class CurrentContext {
   val functions = mutableMapOf<Symbol, SMTFunction<*>>()
   val sorts = mutableMapOf<Symbol, SortFactory>()
 }
@@ -37,7 +37,7 @@ private class CurrentContext {
 /** Manages all legal smt function and sort symbols by modelling smts sort and function stack. */
 class Context {
   private val forbiddenNames = mutableSetOf<Symbol>()
-  private val currentContext = CurrentContext()
+  val currentContext = CurrentContext()
   private val shadowingMap = Stack<MutableMap<SMTFunction<*>, SMTFunction<*>>>()
   private val functionUndoStack = Stack<MutableSet<Symbol>>()
   private val sortUndoStack = Stack<MutableSet<Symbol>>()

@@ -18,24 +18,33 @@
 
 package tools.aqua.konstraints.smt
 
-import org.petitparser.context.Token
-
 // S-Expression
 
 /** Base class for explicit SExpressions. */
 sealed interface SExpression
 
 /** SubSExpression. */
-data class SubSExpression(val subExpressions: List<SExpression>) : SExpression
+data class SubSExpression(val subExpressions: List<SExpression>) : SExpression {
+  override fun toString() =
+      subExpressions.joinToString(separator = " ", prefix = "(", postfix = ")")
+}
 
 /** SExpressionConstant. */
-data class SExpressionConstant(val constant: SpecConstant) : SExpression
+data class SExpressionConstant(val constant: SpecConstant) : SExpression {
+  override fun toString() = constant.toString()
+}
 
 /** SExpressionSymbol. */
-data class SExpressionSymbol(val symbol: Symbol) : SExpression
+data class SExpressionSymbol(val symbol: Symbol) : SExpression {
+  override fun toString() = TODO()
+}
 
 /** SExpressionReserved. */
-data class SExpressionReserved(val reserved: Token) : SExpression
+data class SExpressionReserved(val reserved: String) : SExpression {
+  override fun toString() = reserved
+}
 
 /** SExpressionKeyword. */
-data class SExpressionKeyword(val keyword: Token) : SExpression
+data class SExpressionKeyword(val keyword: String) : SExpression {
+  override fun toString() = keyword
+}

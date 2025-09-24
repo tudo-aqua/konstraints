@@ -42,7 +42,7 @@ enum class SatStatus {
 }
 
 /** Base class for all types of smt program. */
-abstract class SMTProgram(commands: List<Command>) {
+abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
   var model: Model? = null
   var status = SatStatus.PENDING
   val info = mutableListOf<Attribute>()
@@ -54,6 +54,21 @@ abstract class SMTProgram(commands: List<Command>) {
   protected val _commands: MutableList<Command> = commands.toMutableList()
   val commands: List<Command>
     get() = _commands.toList()
+
+  final override fun toString() = _commands.joinToString(separator = "\n")
+
+  override fun toSMTString(quotingRule: QuotingRule) =
+      _commands.joinToString(separator = "\n") { it.toSMTString(quotingRule) }
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+    var counter = 0
+    _commands.forEach {
+      if (++counter > 1) builder.append("\n")
+      it.toSMTString(builder, quotingRule)
+    }
+
+    return builder
+  }
 }
 
 /** SMT Program with a mutable command list. */
@@ -131,15 +146,16 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
 
   fun <T : Sort> declareConst(name: Symbol, sort: T): UserDeclaredSMTFunction0<T> {
     val func = UserDeclaredSMTFunction0(name, sort)
+
     context.addFun(func)
-    _commands.add(DeclareConst(name, sort))
+    _commands.add(DeclareConst(func()))
 
     return func
   }
 
   fun <T : Sort> declareFun(func: UserDeclaredSMTFunction<T>): UserDeclaredSMTFunction<T> {
     context.addFun(func)
-    _commands.add(DeclareFun(func.symbol, func.parameters, func.sort))
+    _commands.add(DeclareFun(func))
 
     return func
   }
@@ -220,6 +236,8 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
 
     this.logic = logic
     context.setLogic(logic)
+
+    _commands.add(SetLogic(logic))
   }
 }
 
@@ -228,14 +246,18 @@ class DefaultSMTProgram(commands: List<Command>) : SMTProgram(commands)
 fun MutableSMTProgram.assert(expr: Expression<BoolSort>) = assert(Assert(expr))
 
 fun MutableSMTProgram.declareFun(name: Symbol, parameters: List<Sort>, sort: Sort) =
-    declareFun(UserDeclaredSMTFunctionN(name, sort, parameters))
+    if (parameters.isEmpty()) {
+      declareFun(UserDeclaredSMTFunction0(name, sort))
+    } else {
+      declareFun(UserDeclaredSMTFunctionN(name, sort, parameters))
+    }
 
-fun <T : Sort> MutableSMTProgram.defineFun(
+/*fun <T : Sort> MutableSMTProgram.defineFun(
     name: Symbol,
     parameters: List<Sort>,
     sort: T,
     term: Expression<T>
-) = defineFun(UserDefinedSMTFunctionN(name, sort, parameters, term))
+) = defineFun(UserDefinedSMTFunctionN(name, sort, parameters, term))*/
 
 fun <T : Sort> MutableSMTProgram.defineFun(def: FunctionDef<T>) =
     defineFun(UserDefinedSMTFunctionN(def.name, def.sort, def.parameters, def.term))

@@ -325,7 +325,15 @@ internal object BitVectorExpressionTheory : Theory {
               BVSLtDecl,
               BVSLeDecl,
               BVSGtDecl,
-              BVSGeDecl)
+              BVSGeDecl,
+              UBVToIntDecl,
+              SBVToIntDecl,
+              IntToBVDecl,
+              BVNegODecl,
+              BVUAddODecl,
+              BVSAddODecl,
+              BVUMulODecl,
+              BVSMulODecl)
           .associateBy { it.symbol }
   override val sorts = mapOf("BitVec".toSymbolWithQuotes() to BitVecFactory)
 }
@@ -736,8 +744,8 @@ internal object BVXOrDecl :
       args: List<Expression<*>>,
       indices: List<Index>
   ): Expression<BVSort> {
-    require(args.size == 2) {
-      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    require(args.size >= 2) {
+      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
@@ -746,8 +754,7 @@ internal object BVXOrDecl :
       "Expected all args of $symbol to be of sort BitVec but was (${args.map { it.sort }.joinToString(" ")})"
     }
 
-    @Suppress("UNCHECKED_CAST")
-    return BVXOr(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+    return BVXOr(args.map { expression -> expression.cast() })
   }
 }
 
@@ -1263,6 +1270,251 @@ internal object RotateRightDecl :
   }
 }
 
+internal object BVNegODecl :
+    SMTTheoryFunction<BoolSort>(
+        "bvnego".toSymbolWithQuotes(), listOf(BVSort.fromSymbol("m")), Bool, Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BoolSort> {
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return BVNegO(args[0] as Expression<BVSort>)
+  }
+}
+
+internal object BVUAddODecl :
+    SMTTheoryFunction<BoolSort>(
+        "bvuaddo".toSymbolWithQuotes(),
+        listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
+        Bool,
+        Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BoolSort> {
+    require(args.size == 2) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return BVUAddO(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+  }
+}
+
+internal object BVSAddODecl :
+    SMTTheoryFunction<BoolSort>(
+        "bvsaddo".toSymbolWithQuotes(),
+        listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
+        Bool,
+        Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BoolSort> {
+    require(args.size == 2) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return BVSAddO(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+  }
+}
+
+internal object BVUSubODecl :
+    SMTTheoryFunction<BoolSort>(
+        "bvusubo".toSymbolWithQuotes(),
+        listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
+        Bool,
+        Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BoolSort> {
+    require(args.size == 2) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return BVUSubO(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+  }
+}
+
+internal object BVSSubODecl :
+    SMTTheoryFunction<BoolSort>(
+        "bvsaddo".toSymbolWithQuotes(),
+        listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
+        Bool,
+        Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BoolSort> {
+    require(args.size == 2) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return BVSSubO(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+  }
+}
+
+internal object BVUMulODecl :
+    SMTTheoryFunction<BoolSort>(
+        "bvumulo".toSymbolWithQuotes(),
+        listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
+        Bool,
+        Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BoolSort> {
+    require(args.size == 2) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return BVUMulO(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+  }
+}
+
+internal object BVSMulODecl :
+    SMTTheoryFunction<BoolSort>(
+        "bvsmulo".toSymbolWithQuotes(),
+        listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
+        Bool,
+        Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BoolSort> {
+    require(args.size == 2) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return BVSMulO(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+  }
+}
+
+internal object BVSDivODecl :
+    SMTTheoryFunction<BoolSort>(
+        "bvsdivo".toSymbolWithQuotes(),
+        listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
+        Bool,
+        Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BoolSort> {
+    require(args.size == 2) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return BVSDivO(args[0] as Expression<BVSort>, args[1] as Expression<BVSort>)
+  }
+}
+
+internal object UBVToIntDecl :
+    SMTTheoryFunction<IntSort>(
+        "ubv_to_int".toSymbolWithQuotes(),
+        listOf(BVSort.fromSymbol("m")),
+        SMTInt,
+        Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<IntSort> {
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return UBVToInt(args[0] as Expression<BVSort>)
+  }
+}
+
+internal object SBVToIntDecl :
+    SMTTheoryFunction<IntSort>(
+        "sbv_to_int".toSymbolWithQuotes(),
+        listOf(BVSort.fromSymbol("m")),
+        SMTInt,
+        Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<IntSort> {
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is BVSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return SBVToInt(args[0] as Expression<BVSort>)
+  }
+}
+
+internal object IntToBVDecl :
+    SMTTheoryFunction<BVSort>(
+        "int_to_bv".toSymbolWithQuotes(),
+        listOf(SMTInt),
+        BVSort.fromSymbol("m"),
+        Associativity.NONE) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>
+  ): Expression<BVSort> {
+    require(args.size == 1) {
+      "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(indices.size == 1) {
+      "One index expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
+    }
+    require(args.single().sort is IntSort) {
+      "Expected arg of $symbol to be BitVec but was ${args.single().sort}"
+    }
+    require(indices.single() is NumeralIndex) {
+      "Expected index of $symbol to be numeral but was ${indices.single()}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return IntToBV((indices.single() as NumeralIndex).numeral, args[0] as Expression<IntSort>)
+  }
+}
+
 /** Ints theory internal object */
 internal object IntsTheory : Theory {
   override val functions =
@@ -1671,7 +1923,8 @@ internal object RealsIntsTheory : Theory {
               DivisibleDecl,
               IntRealAddDecl,
               IntRealMulDecl,
-              IntRealDivDecl,
+              IntDivDecl,
+              RealDivDecl,
               ToRealDecl,
               ToIntDecl,
               IsIntDecl,
@@ -1685,16 +1938,13 @@ internal object RealsIntsTheory : Theory {
 }
 
 internal object IntRealNegSubDecl :
-    SMTTheoryFunction<NumeralSort>(
+    SMTTheoryFunction<Sort>(
         "-".toSymbolWithQuotes(),
         listOf(NumeralSortInstance),
         NumeralSortInstance,
         Associativity.NONE) {
 
-  override fun constructDynamic(
-      args: List<Expression<*>>,
-      indices: List<Index>
-  ): Expression<NumeralSort> {
+  override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<Sort> {
     require(args[0].sort is IntSort || args[0].sort is RealSort) {
       "Expected args to be Int or Real, but got ${args[0].sort}"
     }
@@ -1705,24 +1955,21 @@ internal object IntRealNegSubDecl :
         }
 
     return if (args[0].sort is IntSort) {
-      IntNegSubDecl.constructDynamic(args, indices).cast()
+      IntNegSubDecl.constructDynamic(args, indices)
     } else {
-      RealNegSubDecl.constructDynamic(args, indices).cast()
+      RealNegSubDecl.constructDynamic(args, indices)
     }
   }
 }
 
 internal object IntRealAddDecl :
-    SMTTheoryFunction<NumeralSort>(
+    SMTTheoryFunction<Sort>(
         "+".toSymbolWithQuotes(),
         listOf(NumeralSortInstance, NumeralSortInstance),
         NumeralSortInstance,
         Associativity.LEFT_ASSOC) {
 
-  override fun constructDynamic(
-      args: List<Expression<*>>,
-      indices: List<Index>
-  ): Expression<NumeralSort> {
+  override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<Sort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -1732,24 +1979,21 @@ internal object IntRealAddDecl :
     }
 
     return if (args[0].sort is IntSort) {
-      IntAdd(args.map { expr -> expr.cast() }).cast()
+      IntAdd(args.map { expr -> expr.cast() })
     } else {
-      RealAdd(args.map { expr -> expr.cast() }).cast()
+      RealAdd(args.map { expr -> expr.cast() })
     }
   }
 }
 
 internal object IntRealMulDecl :
-    SMTTheoryFunction<NumeralSort>(
+    SMTTheoryFunction<Sort>(
         "*".toSymbolWithQuotes(),
         listOf(NumeralSortInstance, NumeralSortInstance),
         NumeralSortInstance,
         Associativity.LEFT_ASSOC) {
 
-  override fun constructDynamic(
-      args: List<Expression<*>>,
-      indices: List<Index>
-  ): Expression<NumeralSort> {
+  override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<Sort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -1759,36 +2003,9 @@ internal object IntRealMulDecl :
     }
 
     return if (args[0].sort is IntSort) {
-      IntMul(args.map { expr -> expr.cast() }).cast()
+      IntMul(args.map { expr -> expr.cast() })
     } else {
-      RealMul(args.map { expr -> expr.cast() }).cast()
-    }
-  }
-}
-
-internal object IntRealDivDecl :
-    SMTTheoryFunction<NumeralSort>(
-        "/".toSymbolWithQuotes(),
-        listOf(NumeralSortInstance, NumeralSortInstance),
-        NumeralSortInstance,
-        Associativity.LEFT_ASSOC) {
-
-  override fun constructDynamic(
-      args: List<Expression<*>>,
-      indices: List<Index>
-  ): Expression<NumeralSort> {
-    require(args.size >= 2) {
-      "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
-    }
-
-    require(args[0].sort == args[1].sort && (args[0].sort is IntSort || args[0].sort is RealSort)) {
-      "Expected args to be (Int Int) or (Real Real), but got (${args[0].sort} ${args[1].sort})"
-    }
-
-    return if (args[0].sort is IntSort) {
-      IntDiv(args.map { expr -> expr.cast() }).cast()
-    } else {
-      RealDiv(args.map { expr -> expr.cast() }).cast()
+      RealMul(args.map { expr -> expr.cast() })
     }
   }
 }
@@ -3403,7 +3620,7 @@ internal object ToRegexDecl :
     }
     require(args.single().sort is StringSort)
 
-    return ToRegex(args.single().cast())
+    return StrToRe(args.single().cast())
   }
 }
 
@@ -3424,7 +3641,7 @@ internal object InRegexDecl :
     require(args[0].sort is StringSort)
     require(args[1].sort is RegLanSort)
 
-    return InRegex(args[0].cast(), args[1].cast())
+    return StrInRe(args[0].cast(), args[1].cast())
   }
 }
 

@@ -29,11 +29,28 @@ import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.petitparser.context.ParseError
+import org.petitparser.parser.primitive.StringParser.of
 import tools.aqua.konstraints.parser.*
+import tools.aqua.konstraints.parser.Parser.Companion.anythingButQuotes
+import tools.aqua.konstraints.parser.times
 import tools.aqua.konstraints.smt.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserTests {
+  @ParameterizedTest
+  @ValueSource(strings = ["\"\"\"\"", "\"\"", "\"foo\"\"\"", "\"bar\"", "\"\"\"bar\""])
+  fun testStringParsing(string: String) {
+    val parser =
+        ((of("\"") *
+                ((anythingButQuotes.star() * of("\"\"") * anythingButQuotes.star()).star()) *
+                of("\"")) + (of("\"") * anythingButQuotes.star() * of("\"")))
+            .flatten()
+            .map { str: String -> str.drop(1).dropLast(1) }
+
+    val result = parser.parse(string).get<String>()
+
+    assertEquals(string.drop(1).dropLast(1), result)
+  }
 
   @ParameterizedTest
   @ValueSource(

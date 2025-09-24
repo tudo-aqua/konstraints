@@ -77,19 +77,18 @@ class Parser {
 
     internal val reservedGeneral =
         (exclamationKW +
-                underscoreKW +
-                asKW +
-                binaryKW +
-                decimalKW +
-                existsKW +
-                hexadecimalKW +
-                forallKW +
-                letKW +
-                matchKW +
-                numeralKW +
-                parKW +
-                stringKW)
-            .token()
+            underscoreKW +
+            asKW +
+            binaryKW +
+            decimalKW +
+            existsKW +
+            hexadecimalKW +
+            forallKW +
+            letKW +
+            matchKW +
+            numeralKW +
+            parKW +
+            stringKW)
 
     // Tokens: Reserved Words: Command names
 
@@ -125,35 +124,34 @@ class Parser {
 
     internal val reservedCommands =
         (assertKW +
-                checkSatKW +
-                checkSatAssumingKW +
-                declareConstKW +
-                declareDatatypeKW +
-                declareDatatypesKW +
-                declareFunKW +
-                declareSortKW +
-                defineFunKW +
-                defineFunRecKW +
-                defineSortKW +
-                echoKW +
-                exitKW +
-                getAssertionsKW +
-                getAssignmentKW +
-                getInfoKW +
-                getModelKW +
-                getOptionKW +
-                getProofKW +
-                getUnsatAssumptionsKW +
-                getUnsatCoreKW +
-                getValueKW +
-                popKW +
-                pushKW +
-                resetKW +
-                resetAssertionsKW +
-                setInfoKW +
-                setLogicKW +
-                setOptionKW)
-            .token()
+            checkSatKW +
+            checkSatAssumingKW +
+            declareConstKW +
+            declareDatatypeKW +
+            declareDatatypesKW +
+            declareFunKW +
+            declareSortKW +
+            defineFunKW +
+            defineFunRecKW +
+            defineSortKW +
+            echoKW +
+            exitKW +
+            getAssertionsKW +
+            getAssignmentKW +
+            getInfoKW +
+            getModelKW +
+            getOptionKW +
+            getProofKW +
+            getUnsatAssumptionsKW +
+            getUnsatCoreKW +
+            getValueKW +
+            popKW +
+            pushKW +
+            resetKW +
+            resetAssertionsKW +
+            setInfoKW +
+            setLogicKW +
+            setOptionKW)
 
     // Tokens: Other tokens
 
@@ -166,18 +164,21 @@ class Parser {
         (of("#x") * (digitCat + range('A', 'F') + range('a', 'f')).plus()).flatten()
     private val binary = (of("#b") * range('0', '1').plus()).flatten()
 
-    // all printable characters that are not double quotes
-    private val anythingButQuotes =
+    // all printable characters that are not double quotes (note that 7E is also excluded)
+    val anythingButQuotes =
         whitespaceCat +
             range('\u0020', '"' - 1) +
             range('"' + 1, '\u007E') +
-            range('\u0080', '\u00FF')
+            range('\u0080', '\uFFFF')
     internal val string =
-        (of("\"") *
-                (anythingButQuotes.star() +
-                    ((anythingButQuotes.star() * of("\"\"") * anythingButQuotes.star()).star())) *
-                of("\""))
+        ((of("\"") *
+                ((anythingButQuotes.star() * of("\"\"") * anythingButQuotes.star()).star()) *
+                of("\"")) + (of("\"") * anythingButQuotes.star() * of("\"")))
             .flatten()
+            .map { str: String ->
+              str.drop(1).dropLast(1)
+            } // parser keeps leading and trailing '"' when flattening in the string so we need to
+    // drop the first and last character
 
     private val symbolSymbols = anyOf("+-/*=%?!.\$_~&^<>@")
     internal val simpleSymbol =
@@ -193,13 +194,17 @@ class Parser {
 
     private val symbol =
         (simpleSymbol.flatten().trim(whitespaceCat).map { raw: String ->
+          // simple symbol can not be a reserved word
+          require(raw !in Symbol.reservedSet)
           // directly construct symbol using internal constructor to skip second check for isSimple
           Symbol(raw, false, true)
         }) +
             (quotedSymbol.flatten().trim(whitespaceCat).map { raw: String ->
-              Symbol(raw, false, false)
+              // the isSimple check needs to be run here as the symbol may also be valid without
+              // quotes
+              Symbol(raw, true)
             })
-    private val keyword = (of(':') * simpleSymbol).flatten().trim(whitespaceCat).token()
+    private val keyword = (of(':') * simpleSymbol).flatten().trim(whitespaceCat)
 
     // Logics
 
@@ -379,7 +384,7 @@ class Parser {
     // S-Expressions
 
     /* maps to an implementation of SpecConstant */
-    private val specConstant =
+    val specConstant =
         (decimal.map { decimal: String -> DecimalConstant(decimal.toBigDecimal()) } +
             numeral.map { numeral: String -> NumeralConstant(numeral.toBigInteger()) } +
             hexadecimal.map { hexadecimal: String -> HexConstant(hexadecimal) } +
@@ -392,12 +397,13 @@ class Parser {
       /* maps to an implementation of SExpression */
       sExpression.set(
           ((specConstant.map { constant: SpecConstant -> SExpressionConstant(constant) } +
-              reserved.map { reserved: Token -> SExpressionReserved(reserved) } +
+              reserved.map { reserved: String -> SExpressionReserved(reserved) } +
               symbol.map { symbol: Symbol -> SExpressionSymbol(symbol) } +
-              keyword.map { keyword: Token -> SExpressionKeyword(keyword) }) trim whitespaceCat) +
+              keyword.map { keyword: String -> SExpressionKeyword(keyword) }) trim whitespaceCat) +
               ((lparen * sExpression.star() * rparen).map { results: List<Any> ->
-                SubSExpression(results.slice(1..results.size - 2) as List<SExpression>)
-                // results is guaranteed to be a list of SExpression except the first and last entry
+                SubSExpression(results[1] as List<SExpression>)
+                // results is guaranteed to be 3 elements where the middle one is a list of
+                // SExpression
               } trim whitespaceCat))
     }
 
@@ -427,7 +433,7 @@ class Parser {
         specConstant.map { constant: SpecConstant -> ConstantAttributeValue(constant) } +
             symbol.map { symbol: Symbol -> SymbolAttributeValue(symbol) } +
             (lparen * sExpression.star() * rparen).map { results: List<Any> ->
-              SExpressionAttributeValue(results.slice(1..results.size - 2) as List<SExpression>)
+              SExpressionAttributeValue(results[1] as List<SExpression>)
             }
 
     /*
@@ -437,7 +443,7 @@ class Parser {
      */
     internal val attribute =
         (keyword * attributeValue).map { results: List<Any> ->
-          Attribute((results[0] as Token).getValue(), results[1] as AttributeValue)
+          Attribute(results[0] as String, results[1] as AttributeValue)
         } + keyword.map { keyword: Token -> Attribute(keyword.getValue(), null) }
 
     /* maps to pattern */
@@ -551,10 +557,13 @@ class Parser {
   /* maps to an instance of SMTFunction and a list of indices */
   private val qualIdentifier =
       identifier.map { identifier: Identifier ->
-        if (identifier.symbol.value.startsWith("bv") &&
+        if (identifier is
+            IndexedIdentifier && // prevents case where functions named bv register as literal
+            identifier.symbol.value.startsWith("bv") &&
+            // this prevents us from creating bitvectors when normal smt functions are named bv in
+            // logics without bitvectors
+            program.context.containsSort("BitVec".toSymbolAsIs()) &&
             identifier.symbol.value.substring(2).all { ch -> ch.isDigit() }) {
-          require(program.context.containsSort("BitVec".toSymbolAsIs()))
-
           listOf(
               /*
                * On the fly construction of BVLiteral factory as such an object does not exist since literals are no
@@ -573,9 +582,7 @@ class Parser {
                   require(args.isEmpty())
                   require(indices.size == 1)
 
-                  return BVLiteral(
-                      "#b${identifier.symbol.value.substring(2).toBigInteger().toString(2)}",
-                      sort.bits)
+                  return BVLiteral(identifier.symbol.value, sort.bits)
                 }
               },
               identifier.indices)
@@ -687,6 +694,8 @@ class Parser {
                         IntLiteral(constant.numeral)
                     else if (Theories.REALS in program.logic!!.theories)
                         RealLiteral(BigDecimal(constant.numeral))
+                    else if (Theories.STRINGS in program.logic!!.theories)
+                        IntLiteral(constant.numeral)
                     else throw RuntimeException("Unsupported numeral literal!")
 
                 is StringConstant -> StringLiteral(constant.string)
@@ -754,14 +763,15 @@ class Parser {
         program.declareConst(results[2] as Symbol, results[3] as Sort)
       }
 
-  private val declareFunCMD =
+  val declareFunCMD =
       (lparen * declareFunKW * symbol * lparen * sort.star() * rparen * sort * rparen).map {
           results: ArrayList<Any> ->
         program.declareFun(results[2] as Symbol, results[4] as List<Sort>, results[6] as Sort)
         // results[4] is guaranteed to be a List of Sort
       }
 
-  private val exitCMD = (lparen * exitKW * rparen).map { results: ArrayList<Any> -> Exit }
+  private val exitCMD =
+      (lparen * exitKW * rparen).map { results: ArrayList<Any> -> program.add(Exit) }
 
   private val setInfoCMD =
       (lparen * setInfoKW * attribute * rparen).map { results: ArrayList<Any> ->
@@ -820,71 +830,166 @@ class Parser {
         program.pop((results[2] as String).toInt())
       }
 
+  private val declareDatatypeCMD =
+      (lparen *
+              declareDatatypeKW.map { t: Any -> TODO("Datatype are not implemented yet") } *
+              symbol *
+              datatypeDec *
+              rparen)
+          .map { results: ArrayList<Any> -> TODO("Datatypes are not implemented yet") }
+
+  private val declareDatatypesCMD =
+      (lparen *
+              declareDatatypesKW.map { t: Any -> TODO("Datatypes are not implemented yet") } *
+              lparen *
+              sortDec.plus() *
+              rparen *
+              lparen *
+              datatypeDec.plus() *
+              rparen *
+              rparen)
+          .map { results: ArrayList<Any> -> TODO("Datatypes are not implemented yet") }
+
+  private val getValueCMD =
+      (lparen * getValueKW * lparen * term.plus() * rparen * rparen).map { results: ArrayList<Any>
+        ->
+        TODO("get-value not implemented yet")
+      }
+
   val command =
       ChoiceParser(
-          FailureJoiner.SelectFarthest(),
-          assertCMD,
-          checkSatCMD,
-          declareConstCMD,
-          declareFunCMD,
-          exitCMD,
-          setInfoCMD,
-          setLogicCMD,
-          declareSortCMD,
-          defineSortCMD,
-          getModelCMD,
-          defineFunCMD,
-          setOptionCMD,
-          pushCMD,
-          popCMD)
+              FailureJoiner.SelectFarthest(),
+              assertCMD,
+              checkSatCMD,
+              declareConstCMD,
+              declareFunCMD,
+              exitCMD,
+              setInfoCMD,
+              setLogicCMD,
+              declareSortCMD,
+              defineSortCMD,
+              getModelCMD,
+              defineFunCMD,
+              setOptionCMD,
+              pushCMD,
+              popCMD,
+              declareDatatypeCMD,
+              declareDatatypesCMD,
+              getValueCMD)
+          .trim(whitespaceCat)
 
   internal val script = command.star().end()
+
+  internal val modelResponse =
+      (lparen * defineFunCMD /* defineFunRecCMD + defineFunsRecCMD */ * rparen).map {
+          results: ArrayList<Any> ->
+        results[1]
+      }
+  val getModelResponse =
+      (lparen * modelResponse.star() * rparen).map { results: ArrayList<Any> ->
+        results.subList(1, results.size)
+      }
 
   /**
    * Parses an SMTProgram in string format IMPORTANT linebreak characters ('\n') must be present in
    * the string representation to correctly filter out comments in the smt code.
    */
-  fun parse(program: String): SMTProgram {
+  fun parse(program: String, removeComments: Boolean = true): MutableSMTProgram {
     // filter out comments at the end of the lines
-    script.parse(program.split("\n").joinToString(" ") { line -> line.substringBefore(';') })
+    /*val result =
+    script.parse(
+        program.split("\n").joinToString(" ") { line ->
+          // line only contains comment (this is not true if a line inside a quoted symbol
+          // starts with a ';' but I hope no one does that :))
+          // find first ';' that is not inside string literal or quoted symbol
+          if (line.startsWith(';')) {
+            ""
+          }
+          // string literals or quoted symbols are present so comment detection needs to change
+          else if (line.contains('"') || line.contains('|')) {
+            // check if semicolon is after the last '"' or '|' to detekt the start of a comment
+            if (line.indexOfLast { c -> c == ';' } <
+                max(line.indexOfLast { c -> c == '"' }, line.indexOfLast { c -> c == '|' })) {
+              line // no comment is present in line
+            } else {
+              line.substringBefore(';') // truncate comment
+            }
+          } else { // no string literals remove comments at the end of all lines
+            line.substringBefore(';')
+          }
+        })*/
+
+    val result =
+        if (removeComments) script.parse(removeComments(program)) else script.parse(program)
+
+    if (!result.isSuccess) {
+      throw ParseException(result.message, result.position, result.buffer)
+    }
     // TODO parse each command individually, fail on the first command that can not be parsed
     // this will lead to better error messages but requires some preprocessing to split the input
     // into individual commands (this may be done in linear time by searching the input from
     // left to right counting the number of opening an closing brackets)
     // filter out all comments (all lines are truncated after ';')
-    /*splitInput(program.split("\n").joinToString(" ") { line -> line.substringBefore(';') })
+    /* splitInput(program.split("\n").joinToString(" ") { line ->
+        // string literals are present so comment detection needs to change
+        if(line.contains('"')) {
+            if(line.indexOfLast { c -> c == ';' } < line.indexOfLast { c -> c == '"' }) {
+                line // no comment is present in line
+            } else {
+                line.substringBefore(';') // truncate comment
+            }
+        } else { // no string literals remove comments at the end of all lines
+            line.substringBefore(';')
+        }
+
+    }
+    )
     .forEach { cmd ->
       val temp = command.parse(cmd)
       if (!temp.isSuccess) {
         throw ParseException(temp.message, temp.position, temp.buffer)
       }
-    }*/
+    } */
 
     return this.program
   }
 
-  private fun splitInput(program: String): List<String> {
-    val commands = mutableListOf<String>()
-    var count = 0
-    var position = 0
+  fun removeComments(program: String): String {
+    var inQuotedSymbol = false
+    var inStringLiteral = false
+    var inComment = false
+    var finished = false
+    var low = 0
+    val builder = StringBuilder(program.length)
 
-    program.forEachIndexed { index, c ->
-      if (c == '(') {
-        if (count == 0) {
-          position = index
-        }
-
-        count++
-      } else if (c == ')') {
-        count--
-
-        if (count == 0) {
-          commands.add(program.substring(position, index + 1))
-        }
+    program.forEachIndexed { i, c ->
+      if (c == '|' && !inStringLiteral && !inComment) { // beginning or end of quoted symbol
+        inQuotedSymbol = !inQuotedSymbol
+      } else if (c == '"' && !inQuotedSymbol && !inComment) { // beginning or end of string literal
+        inStringLiteral = !inStringLiteral
+      } else if (c == ';' &&
+          !inQuotedSymbol &&
+          !inStringLiteral &&
+          !inComment) { // beginning of comment we need to check we are not already in a comment or
+        // any appearance of ';' will duplicate the last substring
+        inComment = true
+        // add all previous chars to builder unless string starts with comment
+        builder.append(program.substring(low, i))
+        finished = true
+      } else if (c == '\n' && inComment) { // end of comment
+        inComment = false
+        // set index of new first character to be included in the program later
+        low = i
+        finished = false
       }
     }
 
-    return commands
+    if (!finished) {
+      builder.append(program.substring(low))
+    }
+
+    // if we have no comment nothing is ever added to the builder so we just return the input
+    return if (builder.isNotEmpty()) builder.toString() else program
   }
 }
 
