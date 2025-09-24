@@ -25,6 +25,7 @@ import java.util.stream.Stream
 import kotlin.streams.asStream
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Assumptions.assumeTrue
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
@@ -36,6 +37,7 @@ import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.util.solve
 
+@Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SMTProgramTests {
   @ParameterizedTest

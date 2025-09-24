@@ -38,29 +38,6 @@ import tools.aqua.konstraints.smt.*
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserTests {
   @ParameterizedTest
-  @ValueSource(
-      strings =
-          [
-              "(set-logic QF_S)\n" +
-                  "(set-info :source |\n" +
-                  "this is a;\n" +
-                  "multiline symbol\" containing\n" +
-                  "problematic ; characters|)\n" +
-                  "(set-info :status sat)\n" +
-                  "(declare-fun s () String)\n" +
-                  "\n\n" +
-                  "; full line comment\n" +
-                  "(assert (\n" +
-                  "= ( ;this is a comment\n" +
-                  "str.length \";\"\"|;\"\"||;\")\n" +
-                  "10))" +
-                  "(check-sat)\n(exit)"])
-  fun testCommentRemoval(program: String) {
-    val clean = Parser().removeComments3(program)
-    println(clean)
-  }
-
-  @ParameterizedTest
   @ValueSource(strings = ["\"\"\"\"", "\"\"", "\"foo\"\"\"", "\"bar\"", "\"\"\"bar\""])
   fun testStringParsing(string: String) {
     val parser =

@@ -20,7 +20,6 @@ package tools.aqua.konstraints.parser
 
 import java.math.BigDecimal
 import java.math.BigInteger
-import kotlin.text.forEach
 import org.petitparser.context.Token
 import org.petitparser.parser.Parser
 import org.petitparser.parser.combinators.ChoiceParser
@@ -921,7 +920,7 @@ class Parser {
         })*/
 
     val result =
-        if (removeComments) script.parse(removeComments3(program)) else script.parse(program)
+        if (removeComments) script.parse(removeComments(program)) else script.parse(program)
 
     if (!result.isSuccess) {
       throw ParseException(result.message, result.position, result.buffer)
@@ -955,143 +954,7 @@ class Parser {
     return this.program
   }
 
-  private fun removeComments(program: String): String {
-    var inQuotedSymbol = false
-    var inStringLiteral = false
-    var inComment = false
-    var prg = ""
-
-    program.forEach { c ->
-      if (c == '|' && !inStringLiteral) { // beginning or end of quoted symbol
-        inQuotedSymbol = !inQuotedSymbol
-        prg += c
-      } else if (c == '"' && !inQuotedSymbol) { // beginning or end of string literal
-        inStringLiteral = !inStringLiteral
-        prg += c
-      } else if (c == ';' && !inQuotedSymbol && !inStringLiteral) { // beginning of comment
-        inComment = true
-      } else if (c == '\n' && inComment) { // end of comment
-        inComment = false
-        prg += c
-      } else if (!inComment) { // normal character
-        prg += c
-      }
-    }
-
-    return prg
-  }
-
-  val tokenizer = Regex("(?<=[\n|\";])|(?=[\n|\";])")
-
-  fun removeComments2(program: String): String {
-    var inQuotedSymbol = false
-    var inStringLiteral = false
-    var inComment = false
-    var prg = ""
-
-    tokenizer.split(program).forEach { token ->
-      if (token == "|" && !inStringLiteral) { // beginning or end of quoted symbol
-        inQuotedSymbol = !inQuotedSymbol
-        prg += token
-      } else if (token == "\"" && !inQuotedSymbol) { // beginning or end of string literal
-        inStringLiteral = !inStringLiteral
-        prg += token
-      } else if (token == ";" && !inQuotedSymbol && !inStringLiteral) { // beginning of comment
-        inComment = true
-      } else if (token == "\n" && inComment) { // end of comment
-        inComment = false
-        prg += token
-      } else if (!inComment) { // normal character
-        prg += token
-      }
-    }
-
-    return prg.replace('\n', ' ')
-  }
-
-  fun removeComments3(program: String): String {
-    var inQuotedSymbol = false
-    var inStringLiteral = false
-    var inComment = false
-
-    return tokenizer.split(program).joinToString(separator = "") { token ->
-      if (token == "|" && !inStringLiteral && !inComment) { // beginning or end of quoted symbol
-        inQuotedSymbol = !inQuotedSymbol
-        token
-      } else if (token == "\"" &&
-          !inQuotedSymbol &&
-          !inComment) { // beginning or end of string literal
-        inStringLiteral = !inStringLiteral
-        token
-      } else if (token == ";" && !inQuotedSymbol && !inStringLiteral) { // beginning of comment
-        inComment = true
-        ""
-      } else if (token == "\n" && inComment) { // end of comment
-        inComment = false
-        token
-      } else if (!inComment) { // normal character
-        token
-      } else {
-        ""
-      }
-    }
-  }
-
-  fun removeComments4(program: String): String {
-    var inQuotedSymbol = false
-    var inStringLiteral = false
-    var inComment = false
-    val builder = StringBuilder(program.length)
-
-    tokenizer.split(program).forEach { token ->
-      if (token == "|" && !inStringLiteral && !inComment) { // beginning or end of quoted symbol
-        inQuotedSymbol = !inQuotedSymbol
-        builder.append(token)
-      } else if (token == "\"" &&
-          !inQuotedSymbol &&
-          !inComment) { // beginning or end of string literal
-        inStringLiteral = !inStringLiteral
-        builder.append(token)
-      } else if (token == ";" && !inQuotedSymbol && !inStringLiteral) { // beginning of comment
-        inComment = true
-      } else if (token == "\n" && inComment) { // end of comment
-        inComment = false
-        builder.append(token)
-      } else if (!inComment) { // normal character
-        builder.append(token)
-      }
-    }
-
-    return builder.toString()
-  }
-
-  fun removeComments5(program: String): String {
-    var inQuotedSymbol = false
-    var inStringLiteral = false
-    var inComment = false
-    val builder = StringBuilder(program.length)
-
-    program.forEach { c ->
-      if (c == '|' && !inStringLiteral && !inComment) { // beginning or end of quoted symbol
-        inQuotedSymbol = !inQuotedSymbol
-        builder.append(c)
-      } else if (c == '"' && !inQuotedSymbol && !inComment) { // beginning or end of string literal
-        inStringLiteral = !inStringLiteral
-        builder.append(c)
-      } else if (c == ';' && !inQuotedSymbol && !inStringLiteral) { // beginning of comment
-        inComment = true
-      } else if (c == '\n' && inComment) { // end of comment
-        inComment = false
-        builder.append(c)
-      } else if (!inComment) { // normal character
-        builder.append(c)
-      }
-    }
-
-    return builder.toString()
-  }
-
-  fun removeComments6(program: String): String {
+  fun removeComments(program: String): String {
     var inQuotedSymbol = false
     var inStringLiteral = false
     var inComment = false
@@ -1127,43 +990,6 @@ class Parser {
 
     // if we have no comment nothing is ever added to the builder so we just return the input
     return if (builder.isNotEmpty()) builder.toString() else program
-  }
-
-  private fun splitInput(program: String): List<String> {
-    val commands = mutableListOf<String>()
-    var count = 0
-    var position = 0
-    var inStringLiteral = false
-
-    program.forEachIndexed { index, c ->
-      if (c == '"') {
-        // beginning of a string literal
-        if (!inStringLiteral) {
-          inStringLiteral = true
-        } else /* end of string literal or escape sequence '""' */ {
-          // we can just set this to false because its either the end of the literal
-          // or an escape sequence in that case the next char is also '"' and sets inStringLiteral
-          // back to true
-          inStringLiteral = false
-        }
-      }
-      // if we are in a string literal the bracket char doesnt count towards our bracket matching
-      else if (c == '(' && !inStringLiteral) {
-        if (count == 0) {
-          position = index
-        }
-
-        count++
-      } else if (c == ')' && !inStringLiteral) {
-        count--
-
-        if (count == 0) {
-          commands.add(program.substring(position, index + 1))
-        }
-      }
-    }
-
-    return commands
   }
 }
 

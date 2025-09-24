@@ -57,7 +57,7 @@ class ParserBenchmark {
     try {
       val input =
           Parser()
-              .removeComments6(
+              .removeComments(
                   file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
       val program = Parser().parse(input, false)
       // val program2 = Parser().parse(program.toString(), true)
