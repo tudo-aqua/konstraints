@@ -1,11 +1,14 @@
 package tools.aqua.konstraints
 
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeoutOrNull
 import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.Timeout
+import org.junit.jupiter.api.assertThrows
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -13,6 +16,7 @@ import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.smt.SMTProgram
 import tools.aqua.konstraints.smt.SymbolAttributeValue
 import tools.aqua.konstraints.solvers.GenericSolver
+import tools.aqua.konstraints.solvers.SolverTimeoutException
 import java.io.BufferedReader
 import java.io.File
 import java.util.concurrent.TimeUnit
@@ -34,10 +38,15 @@ class GenericSolverTests {
     @MethodSource("loadQF_BV")
     fun testGenericZ3(program : SMTProgram) {
         solver.reset()
-        runBlocking {
-            withTimeoutOrNull(1000) {
-                solver.solve(program)
-            }
+        solver.solve(program, 1000)
+    }
+
+    @Test
+    fun testTimeout() {
+        assertThrows<SolverTimeoutException> {
+            val program = File(javaClass.getResource("/QF_BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_1299.smt2")!!.file).bufferedReader().use(
+                BufferedReader::readLines).joinToString("\n")
+            solver.solve(Parser().parse(program), 1000)
         }
     }
 

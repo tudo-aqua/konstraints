@@ -31,18 +31,6 @@ class BVTermSmallRWNoetzliTests {
   @ParameterizedTest
   @MethodSource("getInts")
   fun testQF_BV(id: Int) {
-    /*
-     * These test are currently not working with Z3 as the solver is not capable of solving them yet
-     */
-    if (id in listOf(524, 928, 1105, 1299, 1323, 1492)) {
-      return
-    }
-
-    // For some reason these cases time out sometimes, skip them for now
-    if (id in listOf(382, 426, 433, 672, 737, 776)) {
-      return
-    }
-
     val temp =
         javaClass
             .getResourceAsStream(

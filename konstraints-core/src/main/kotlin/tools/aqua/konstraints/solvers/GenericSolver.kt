@@ -1,27 +1,16 @@
 package tools.aqua.konstraints.solvers
 
+import kotlinx.coroutines.TimeoutCancellationException
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.runInterruptible
+import kotlinx.coroutines.withTimeout
 import org.petitparser.parser.Parser
 import org.petitparser.parser.combinators.ChoiceParser
 import org.petitparser.parser.combinators.SequenceParser
-import tools.aqua.konstraints.smt.Assert
-import tools.aqua.konstraints.smt.CheckSat
-import tools.aqua.konstraints.smt.DeclareConst
-import tools.aqua.konstraints.smt.DeclareFun
-import tools.aqua.konstraints.smt.DeclareSort
-import tools.aqua.konstraints.smt.DefineConst
-import tools.aqua.konstraints.smt.DefineFun
-import tools.aqua.konstraints.smt.DefineSort
-import tools.aqua.konstraints.smt.Exit
-import tools.aqua.konstraints.smt.GetModel
 import tools.aqua.konstraints.smt.Model
-import tools.aqua.konstraints.smt.Pop
-import tools.aqua.konstraints.smt.Push
 import tools.aqua.konstraints.smt.SMTProgram
 import tools.aqua.konstraints.smt.SatStatus
-import tools.aqua.konstraints.smt.SetInfo
-import tools.aqua.konstraints.smt.SetLogic
 import tools.aqua.konstraints.smt.SetOption
-import tools.aqua.konstraints.visitors.CommandVisitor
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
@@ -32,7 +21,15 @@ import tools.aqua.konstraints.parser.plus
 import tools.aqua.konstraints.parser.times
 import tools.aqua.konstraints.smt.BooleanOptionValue
 import tools.aqua.konstraints.smt.Command
+import tools.aqua.konstraints.smt.Exit
 import tools.aqua.konstraints.smt.QuotingRule
+import java.lang.Thread.sleep
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
+import kotlin.jvm.javaClass
+import tools.aqua.konstraints.parser.Parser as SMTParser
+import java.nio.channels.Pipe
 
 /** Cleaner syntax for [ChoiceParser]. */
 operator fun Parser.plus(other: Parser): ChoiceParser = or(other)
@@ -51,7 +48,7 @@ enum class SolverResponseType {
     CHECK_SAT
 }
 
-interface SolverResponse {
+sealed interface SolverResponse {
     val type: SolverResponseType
 }
 
@@ -75,19 +72,28 @@ object ResponseParser {
     private val lparen = of("(")
     private val rparen = of(")")
 
-    val success = of("success").map { _: Any -> SuccessResponse }
-    val unsupported = of("unsupported").map { _: Any -> UnsupportedResponse }
-    val error = (lparen * of("error") * string * rparen).map { results : ArrayList<Any> -> ErrorResponse(results[2] as String) }
-    val generelResponse = success + unsupported + error
+    private val success = of("success").map { _: Any -> SuccessResponse }
+    private val unsupported = of("unsupported").map { _: Any -> UnsupportedResponse }
+    private val error = (lparen * of("error") * string * rparen).map { results : ArrayList<Any> -> ErrorResponse(results[2] as String) }
 
-    val checkSat = of("sat").map { _: Any -> SatStatus.SAT } +
-            of("unsat").map { _: Any -> SatStatus.UNSAT } +
-            of("unknown").map { _: Any -> SatStatus.UNKNOWN }
-    val checkSatResponse = checkSat.map { status: SatStatus -> CheckSatResponse(status) } + error
+    private val checkSatResponse = of("sat").map { _: Any -> CheckSatResponse(SatStatus.SAT) } +
+            of("unsat").map { _: Any -> CheckSatResponse(SatStatus.UNSAT) } +
+            of("unknown").map { _: Any -> CheckSatResponse(SatStatus.UNKNOWN) }
+
+    private val generelResponse = success + unsupported + error + checkSatResponse
+
+    fun parse(response: String) : SolverResponse {
+        val result = generelResponse.parse(response)
+
+        if(result.isSuccess) {
+            return result.get<SolverResponse>()
+        } else {
+            throw UnexpectedSolverResponseException(response)
+        }
+    }
 }
 
-// TODO CommandVisitor should maybe be removed in favor of moving its functionality to the solver interface
-class GenericSolver(val name : String, vararg solverOptions: String) : Solver, CommandVisitor<Unit> {
+open class GenericSolver(val name : String, vararg solverOptions: String) : Solver {
 
     // TODO this should have more exception handling
     val process: Process = ProcessBuilder(name, *solverOptions).redirectErrorStream(true).start()
@@ -96,26 +102,51 @@ class GenericSolver(val name : String, vararg solverOptions: String) : Solver, C
     val reader = BufferedReader(InputStreamReader(process.inputStream, Charsets.UTF_8))
 
     private fun sendCommand(cmd: Command) {
-        writer.write(cmd.toSMTString(QuotingRule.SAME_AS_INPUT) + "\n")
+        cmd.toSMTString(writer, QuotingRule.SAME_AS_INPUT)
         writer.flush()
     }
 
-    private fun waitResponse(): String {
-        // wait for new input
-        while (!reader.ready());
+    /**
+     * Wait for a solver response, kill the solver after [timeout] milliseconds and throw a [SolverTimeoutException]
+     */
+    private fun waitResponse(timeout: Long): String = runBlocking {
+        try {
+            withTimeout(timeout) {
+                runInterruptible {
+                    while (!reader.ready()) {
+                        sleep(1)
+                    }
 
-        return reader.readLine()
+                    // TODO multiline output
+                    reader.readLine()
+                }
+            }
+        } catch (e: TimeoutCancellationException) {
+            process.destroyForcibly()
+
+            throw SolverTimeoutException(timeout)
+        }
     }
 
-    // TODO this should probably be suspending to allow for timeouts
-    override suspend fun solve(program: SMTProgram): SatStatus {
-        // so we can listen for the success or error response after every command
-        // alternatively maybe wait for x amount of time for response then assume success?
-        sendCommand(SetOption(":print-success", BooleanOptionValue(true)))
-        program.commands.forEach(::visit)
+    private fun processCommand(cmd: Command, program: SMTProgram, timeout: Long) {
+        sendCommand(cmd)
+        processResponse(ResponseParser.parse(waitResponse(timeout)), program)
+    }
 
-        // program.toSMTString(writer, QuotingRule.SAME_AS_INPUT)
-        // writer.flush()
+    protected open fun processResponse(response: SolverResponse, program: SMTProgram) {
+        when (response) {
+            is CheckSatResponse -> program.status = response.status
+            is ErrorResponse -> throw SolverException(response.msg)
+            is SuccessResponse -> Unit
+            is UnsupportedResponse -> throw SolverUnsupportedOperationException()
+        }
+    }
+
+    override fun solve(program: SMTProgram, timeout: Long): SatStatus {
+        sendCommand(SetOption(":print-success", BooleanOptionValue(true)))
+        program.commands.forEach {
+            processCommand(it, program, timeout)
+        }
 
         return program.status
     }
@@ -135,65 +166,12 @@ class GenericSolver(val name : String, vararg solverOptions: String) : Solver, C
         writer.write("(reset)\n")
         writer.flush()
     }
-
-    override fun visit(assert: Assert) {
-        sendCommand(assert)
-    }
-
-    override fun visit(declareConst: DeclareConst<*>) {
-        sendCommand(declareConst)
-    }
-
-    override fun visit(declareFun: DeclareFun<*>) {
-        sendCommand(declareFun)
-    }
-
-    override fun visit(checkSat: CheckSat) {
-        sendCommand(checkSat)
-    }
-
-    // TODO this maybe should call close since the solver is shutdown
-    override fun visit(exit: Exit) {
-        sendCommand(exit)
-    }
-
-    override fun visit(setInfo: SetInfo) {
-        sendCommand(setInfo)
-    }
-
-    override fun visit(setOption: SetOption) {
-        sendCommand(setOption)
-    }
-
-    override fun visit(setLogic: SetLogic) {
-        sendCommand(setLogic)
-    }
-
-    override fun visit(declareSort: DeclareSort) {
-        sendCommand(declareSort)
-    }
-
-    override fun visit(getModel: GetModel) {
-        sendCommand(getModel)
-    }
-
-    override fun visit(defineConst: DefineConst) {
-        sendCommand(defineConst)
-    }
-
-    override fun visit(defineFun: DefineFun) {
-        sendCommand(defineFun)
-    }
-
-    override fun visit(push: Push) {
-        sendCommand(push)
-    }
-
-    override fun visit(pop: Pop) {
-        sendCommand(pop)
-    }
-
-    override fun visit(defineSort: DefineSort) {
-        sendCommand(defineSort)
-    }
 }
+
+open class SolverException(message: String) : RuntimeException(message)
+
+class SolverTimeoutException(duration: Long) : SolverException("Solver timed out after $duration ms")
+
+class UnexpectedSolverResponseException(response: String) : SolverException("Unexpected solver response: $response")
+
+class SolverUnsupportedOperationException() : SolverException("Unsupported")

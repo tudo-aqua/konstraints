@@ -142,7 +142,7 @@ data class Attribute(val keyword: String, val value: AttributeValue?) : SMTSeria
   override fun toString() = "$keyword $value"
 
   override fun toSMTString(quotingRule: QuotingRule) =
-      "($keyword ${value?.toSMTString(quotingRule) ?: ""})"
+      "$keyword ${value?.toSMTString(quotingRule) ?: ""}"
 
   override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
     builder.append(keyword)

@@ -854,7 +854,8 @@ class Parser {
   private val getValueCMD =
       (lparen * getValueKW * lparen * term.plus() * rparen * rparen).map { results: ArrayList<Any>
         ->
-        TODO("get-value not implemented yet")
+        //TODO("get-value not implemented yet")
+          Unit
       }
 
   val command =
