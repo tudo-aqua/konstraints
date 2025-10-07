@@ -20,8 +20,17 @@ package tools.aqua.konstraints.dsl
 
 import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Expression
+import tools.aqua.konstraints.smt.FPLiteral
+import tools.aqua.konstraints.smt.FPSort
+import tools.aqua.konstraints.smt.True
+import tools.aqua.konstraints.smt.IntLiteral
+import tools.aqua.konstraints.smt.IntSort
 import tools.aqua.konstraints.smt.Ite
+import tools.aqua.konstraints.smt.RealLiteral
+import tools.aqua.konstraints.smt.RealSort
 import tools.aqua.konstraints.smt.Sort
+import java.math.BigDecimal
+import java.math.BigInteger
 
 @SMTDSL
 class ITE1(val condition: Expression<BoolSort>) {
@@ -78,3 +87,32 @@ fun ite(condition: () -> Expression<BoolSort>): ITE1 = ITE1(condition())
  * @param condition: Expression<BoolSort> used as condition for the if-statement.
  */
 fun ite(condition: Expression<BoolSort>): ITE1 = ITE1(condition)
+
+/*
+// IntSort extensions
+infix fun ITE2<IntSort>.otherwise(numeral: Byte) = otherwise(IntLiteral(numeral))
+infix fun ITE2<IntSort>.otherwise(numeral: Short) = otherwise(IntLiteral(numeral))
+infix fun ITE2<IntSort>.otherwise(numeral: Int) = otherwise(IntLiteral(numeral))
+infix fun ITE2<IntSort>.otherwise(numeral: Long) = otherwise(IntLiteral(numeral))
+infix fun ITE2<IntSort>.otherwise(numeral: BigInteger) = otherwise(IntLiteral(numeral))
+
+//RealSort extensions
+infix fun ITE2<RealSort>.otherwise(numeral: Byte) = otherwise(RealLiteral(numeral))
+infix fun ITE2<RealSort>.otherwise(numeral: Short) = otherwise(RealLiteral(numeral))
+infix fun ITE2<RealSort>.otherwise(numeral: Int) = otherwise(RealLiteral(numeral))
+infix fun ITE2<RealSort>.otherwise(numeral: Long) = otherwise(RealLiteral(numeral))
+infix fun ITE2<RealSort>.otherwise(numeral: BigInteger) = otherwise(RealLiteral(numeral))
+infix fun ITE2<RealSort>.otherwise(numeral: Float) = otherwise(RealLiteral(numeral))
+infix fun ITE2<RealSort>.otherwise(numeral: BigDecimal) = otherwise(RealLiteral(numeral))
+
+//Float extensions
+infix fun ITE2<FPSort>.otherwise(numeral: Float) = otherwise(FPLiteral(numeral))
+infix fun ITE2<FPSort>.otherwise(numeral: Double) = otherwise(FPLiteral(numeral))
+
+fun main(){
+    val expr = IntLiteral(1)
+
+    val cond = ite(True) then expr otherwise 2
+    val cond2 = ite(True) then IntLiteral(2) otherwise expr
+}
+*/
