@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.dsl
 
+import tools.aqua.konstraints.dsl.IntStoreBuilder
 import tools.aqua.konstraints.smt.*
 
 /** Select value stored in [array] at location [index]. */
@@ -112,58 +113,164 @@ fun <X : Sort, Y : Sort> ArrayStore<X, Y>.store(
     value: () -> Expression<Y>
 ) = store(this, index, value)
 
-// Represents a single store operation: value and index
-data class StoreOperation<X : Sort, Y : Sort>(val value: Expression<X>, val index: Expression<Y>)
+data class StoreOperation<X : Sort, Y : Sort>(val value: Expression<Y>, val index: Expression<X>)
 
-// A builder to chain multiple store operations
-class StoreBuilder<X : Sort, Y : Sort>(private val operations: MutableList<StoreOperation<X, Y>> = mutableListOf()) {
-
-    // Adds a new operation
-    infix fun Expression<X>.at(index: Expression<Y>): StoreOperation<X, Y> = StoreOperation(this, index)
-
-    // Allows chaining: add another StoreOperation and returns this builder
-    infix fun StoreOperation<X, Y>.then(next: StoreOperation<X, Y>): StoreBuilder<X, Y> {
-        operations.add(this)
-        operations.add(next)
-        return this@StoreBuilder
-    }
-
-    // Overload to chain more than two: StoreBuilder and StoreOperation
-    infix fun StoreBuilder<X, Y>.then(next: StoreOperation<X, Y>): StoreBuilder<X, Y> {
-        operations.add(next)
-        return this
-    }
-
-    // Specify the target array
-    infix fun StoreBuilder<X, Y>.into(array: Expression<ArraySort<X, Y>>) {
-        //TODO map StoreOperations to ArrayStore (best do it iteratively or using deep recursive functions)
-    }
+sealed class StoreBuilder<X : Sort, Y : Sort>(
+    internal val operations: MutableList<StoreOperation<X, Y>> = mutableListOf()
+) {
+  infix fun Expression<Y>.at(index: Expression<X>) =
+      this@StoreBuilder.apply { operations.add(StoreOperation(this@at, index)) }
 }
 
-// Accepts the first StoreOperation and returns StoreBuilder for chaining
-fun<X : Sort, Y : Sort> store(first: StoreOperation<X, Y>): StoreBuilder<X, Y> {
-    val builder = StoreBuilder<X, Y>()
-    builder.apply {
-        // Add the first operation initially
-        builder.then(first)
-    }
-    return builder
+class GenericStoreBuilder<X : Sort, Y : Sort> : StoreBuilder<X, Y>()
+
+class IntStoreBuilder : StoreBuilder<IntSort, IntSort>() {
+    infix fun Int.at(index: Int) =
+        this@IntStoreBuilder.apply { operations.add(StoreOperation(IntLiteral(this@at), IntLiteral(index))) }
 }
+
+fun store(
+    init: IntStoreBuilder.() -> IntStoreBuilder
+) = IntStoreBuilder().init()
+
+
+fun <X : Sort, Y : Sort> store(
+    init: StoreBuilder<X, Y>.() -> StoreBuilder<X, Y>
+) = GenericStoreBuilder<X, Y>().init()
+
+fun <X : Sort, Y : Sort> storeAt(
+    init: StoreBuilder<X, Y>.() -> StoreBuilder<X, Y>,
+    array: Expression<ArraySort<X, Y>>
+) = GenericStoreBuilder<X, Y>().init() into array
+
+
+infix fun <X : Sort, Y : Sort> Expression<Y>.storeAt(index: Expression<X>): StoreBuilder<X, Y> =
+    GenericStoreBuilder<X, Y>().apply { operations.add(StoreOperation<X, Y>(this@storeAt, index)) }
+
+/** Store the values from [this] at the specified [indices] */
+infix fun <X : Sort, Y : Sort> List<Expression<Y>>.storeAt(
+    indices: List<Expression<X>>
+): StoreBuilder<X, Y> =
+    GenericStoreBuilder<X, Y>().apply {
+      operations.addAll(
+          (this@storeAt zip indices).map { (value, index) -> StoreOperation<X, Y>(value, index) })
+    }
+
+infix fun <X : Sort, Y : Sort> StoreBuilder<X, Y>.then(
+    next: StoreOperation<X, Y>
+): StoreBuilder<X, Y> = this.apply { operations.add(next) }
+
+infix fun <X : Sort, Y : Sort> StoreBuilder<X, Y>.then(
+    next: () -> StoreOperation<X, Y>
+): StoreBuilder<X, Y> = this.apply { operations.add(next()) }
+
+infix fun <X : Sort, Y : Sort> Expression<Y>.at(index: Expression<X>): StoreOperation<X, Y> =
+    StoreOperation(this, index)
+
+infix fun <X : Sort, Y : Sort> Expression<Y>.at(index: () -> Expression<X>): StoreOperation<X, Y> =
+    StoreOperation(this, index())
+
+infix fun <X : Sort, Y : Sort> (() -> Expression<Y>).at(index: Expression<X>): StoreOperation<X, Y> =
+    StoreOperation(this(), index)
+
+infix fun <X : Sort, Y : Sort> (() -> Expression<Y>).at(index: () -> Expression<X>): StoreOperation<X, Y> =
+    StoreOperation(this(), index())
+
+// Specify the target array
+infix fun <X : Sort, Y : Sort> StoreBuilder<X, Y>.into(array: Expression<ArraySort<X, Y>>) =
+    operations into array
+
+infix fun<X : Sort, Y : Sort> List<StoreOperation<X, Y>>.into(array: Expression<ArraySort<X, Y>>) =
+    this.foldRight(array) { operation, acc ->
+        ArrayStore(acc, operation.index, operation.value)
+    }
+
+// TODO conversion of kotlin types to smt types to allow 0 storeAt 0 then ... for numerals and
+// strings
+
+/**
+ * Creates a [StoreBuilder] for storing this [Expression] at the given [index].
+ *
+ * This infix function allows for Kotlin [Int] to be used as [index], [index] is automatically converted to [IntLiteral]
+ */
+infix fun <Y : Sort> Expression<Y>.storeAt(index: Int): StoreBuilder<IntSort, Y> =
+    GenericStoreBuilder<IntSort, Y>().apply { operations.add(StoreOperation<IntSort, Y>(this@storeAt, IntLiteral(index))) }
+
+/**
+ * Store the values from [this] list at the specified [indices]
+ *
+ * This infix function allows for Kotlin [Int] to be used as index, [indices] are automatically converted to [IntLiteral]
+ **/
+infix fun <Y : Sort> List<Expression<Y>>.storeAt(
+    indices: List<Int>
+): StoreBuilder<IntSort, Y> =
+    GenericStoreBuilder<IntSort, Y>().apply {
+        operations.addAll(
+            (this@storeAt zip indices).map { (value, index) -> StoreOperation<IntSort, Y>(value, IntLiteral(index)) })
+    }
+
+/**
+ * Store [this] at [index], index is automatically converted to [IntLiteral]
+ */
+infix fun <Y : Sort> Expression<Y>.at(index: Int): StoreOperation<IntSort, Y> =
+    StoreOperation(this, IntLiteral(index))
+
+/**
+ * Store [this] at [index], index is automatically converted to [IntLiteral]
+ */
+infix fun <Y : Sort> Expression<Y>.at(index: () -> Int): StoreOperation<IntSort, Y> =
+    StoreOperation(this, IntLiteral(index()))
+
+/**
+ * Store [this] at [index], index is automatically converted to [IntLiteral]
+ */
+infix fun <Y : Sort> (() -> Expression<Y>).at(index: Int): StoreOperation<IntSort, Y> =
+    StoreOperation(this(), IntLiteral(index))
+
+/**
+ * Store [this] at [index], index is automatically converted to [IntLiteral]
+ */
+infix fun <Y : Sort> (() -> Expression<Y>).at(index: () -> Int): StoreOperation<IntSort, Y> =
+    StoreOperation(this(), IntLiteral(index()))
+
+infix fun <X : Sort> Int.at(index: Expression<X>): StoreOperation<X, IntSort> =
+    StoreOperation(IntLiteral(this), index)
+
+infix fun <X : Sort> Int.at(index: () -> Expression<X>): StoreOperation<X, IntSort> =
+    StoreOperation(IntLiteral(this), index())
+
+infix fun <X : Sort> (() -> Int).at(index: Expression<X>): StoreOperation<X, IntSort> =
+    StoreOperation(IntLiteral(this()), index)
+
+infix fun <X : Sort> (() -> Int).at(index: () -> Expression<X>): StoreOperation<X, IntSort> =
+    StoreOperation(IntLiteral(this()), index())
+
+infix fun Int.at(index: Int): StoreOperation<IntSort, IntSort> =
+    StoreOperation(IntLiteral(this), IntLiteral(index))
+
+infix fun Int.at(index: () -> Int): StoreOperation<IntSort, IntSort> =
+    StoreOperation(IntLiteral(this), IntLiteral(index()))
+
+infix fun (() -> Int).at(index: Int): StoreOperation<IntSort, IntSort> =
+    StoreOperation(IntLiteral(this()), IntLiteral(index))
+
+infix fun (() -> Int).at(index: () -> Int): StoreOperation<IntSort, IntSort> =
+    StoreOperation(IntLiteral(this()), IntLiteral(index()))
 
 fun main() {
-    smt(QF_AX) {
-        val expr = True
-        val index = False
-        val array = const(SMTArray(Bool, Bool))
+  smt(QF_AX) {
+    val expr = const(Bool)
+    val index = const(Bool)
+    val array = const(SMTArray(Bool, Bool))
 
-        store(expr at index) into array
-    }
+    val expr1 = expr storeAt index then (expr at index) then (expr at index) into array
+    val expr2 = listOf(expr, expr) storeAt listOf(index, index) into array
+      val expr3 = IntLiteral(0) storeAt 0 then (1 at 1) then (2 at 2) into const(SMTArray(SMTInt, SMTInt))
+  }
 }
 
-
-// select index from array
-// store value at index then value at index then... to array
-// store values at indices to array
+// value storeAt index then (value at index) then... to array
+// values storeAt indices to array
 
 /*
  * store {
