@@ -54,9 +54,7 @@ class QF_BV {
         Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString(""))
 
     Assumptions.assumeTrue(
-        (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-            .symbol
-            .toString() != "unknown",
+        (result.info("status") as SymbolAttributeValue).symbol.toString() != "unknown",
         "Skipped due to unknown sat status.")
 
     solver.use {
@@ -64,9 +62,7 @@ class QF_BV {
 
       // verify we get the correct status for the test
       Assertions.assertEquals(
-          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-              .symbol
-              .toString(),
+          (result.info("status") as SymbolAttributeValue).symbol.toString(),
           solver.status.toString())
     }
   }
