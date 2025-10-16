@@ -18,6 +18,8 @@
 
 package tools.aqua.konstraints.dsl
 
+import java.math.BigDecimal
+import java.math.BigInteger
 import tools.aqua.konstraints.smt.And
 import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Distinct
@@ -28,7 +30,11 @@ import tools.aqua.konstraints.smt.IntLiteral
 import tools.aqua.konstraints.smt.IntSort
 import tools.aqua.konstraints.smt.Not
 import tools.aqua.konstraints.smt.Or
+import tools.aqua.konstraints.smt.RealLiteral
+import tools.aqua.konstraints.smt.RealSort
 import tools.aqua.konstraints.smt.Sort
+import tools.aqua.konstraints.smt.StringLiteral
+import tools.aqua.konstraints.smt.StringSort
 import tools.aqua.konstraints.smt.XOr
 
 /**
@@ -192,17 +198,679 @@ infix fun <T : Sort> (() -> Expression<T>).eq(other: Expression<T>) = this() eq 
 infix fun <T : Sort> (() -> Expression<T>).eq(other: () -> Expression<T>) = this() eq other()
 
 /**
- * Creates an equals: [this] equals [other].
- *
- * If [this] is an [tools.aqua.konstraints.smt.Equals] object, unpacks the children and returns a
- * new combined Equals.
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
  */
-infix fun Expression<IntSort>.eq(other: Int) =
-    if (this is Equals<*>) {
-      Equals(this.children + IntLiteral(other))
-    } else {
-      Equals(this, IntLiteral(other))
-    }
+infix fun Byte.eq(expr: Expression<IntSort>) = IntLiteral(this) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun Byte.eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this) eq expr()
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun (() -> Byte).eq(expr: Expression<IntSort>) = IntLiteral(this()) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun (() -> Byte).eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this()) eq expr()
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun Expression<IntSort>.eq(other: Byte) = this eq IntLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun Expression<IntSort>.eq(other: (() -> Byte)) = this eq IntLiteral(other())
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun (() -> Expression<IntSort>).eq(other: Byte) = this() eq IntLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun (() -> Expression<IntSort>).eq(other: (() -> Byte)) = this() eq IntLiteral(other())
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun Short.eq(expr: Expression<IntSort>) = IntLiteral(this) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun Short.eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this) eq expr()
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun (() -> Short).eq(expr: Expression<IntSort>) = IntLiteral(this()) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun (() -> Short).eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this()) eq expr()
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun Expression<IntSort>.eq(other: Short) = this eq IntLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun Expression<IntSort>.eq(other: (() -> Short)) = this eq IntLiteral(other())
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun (() -> Expression<IntSort>).eq(other: Short) = this() eq IntLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun (() -> Expression<IntSort>).eq(other: (() -> Short)) = this() eq IntLiteral(other())
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun Int.eq(expr: Expression<IntSort>) = IntLiteral(this) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun Int.eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this) eq expr()
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun (() -> Int).eq(expr: Expression<IntSort>) = IntLiteral(this()) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun (() -> Int).eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this()) eq expr()
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun Expression<IntSort>.eq(other: Int) = this eq IntLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun Expression<IntSort>.eq(other: (() -> Int)) = this eq IntLiteral(other())
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun (() -> Expression<IntSort>).eq(other: Int) = this() eq IntLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun (() -> Expression<IntSort>).eq(other: (() -> Int)) = this() eq IntLiteral(other())
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun Long.eq(expr: Expression<IntSort>) = IntLiteral(this) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun Long.eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this) eq expr()
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun (() -> Long).eq(expr: Expression<IntSort>) = IntLiteral(this()) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun (() -> Long).eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this()) eq expr()
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun Expression<IntSort>.eq(other: Long) = this eq IntLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun Expression<IntSort>.eq(other: (() -> Long)) = this eq IntLiteral(other())
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun (() -> Expression<IntSort>).eq(other: Long) = this() eq IntLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun (() -> Expression<IntSort>).eq(other: (() -> Long)) = this() eq IntLiteral(other())
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun BigInteger.eq(expr: Expression<IntSort>) = IntLiteral(this) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun BigInteger.eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this) eq expr()
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun (() -> BigInteger).eq(expr: Expression<IntSort>) = IntLiteral(this()) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [IntLiteral]
+ */
+infix fun (() -> BigInteger).eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this()) eq expr()
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun Expression<IntSort>.eq(other: BigInteger) = this eq IntLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun Expression<IntSort>.eq(other: (() -> BigInteger)) = this eq IntLiteral(other())
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun (() -> Expression<IntSort>).eq(other: BigInteger) = this() eq IntLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [IntLiteral]
+ */
+infix fun (() -> Expression<IntSort>).eq(other: (() -> BigInteger)) = this() eq IntLiteral(other())
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun Byte.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun Byte.eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this) eq expr()
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun (() -> Byte).eq(expr: Expression<RealSort>) = RealLiteral(this()) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun (() -> Byte).eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this()) eq expr()
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun Expression<RealSort>.eq(other: Byte) = this eq RealLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun Expression<RealSort>.eq(other: (() -> Byte)) = this eq RealLiteral(other())
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun (() -> Expression<RealSort>).eq(other: Byte) = this() eq RealLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun (() -> Expression<RealSort>).eq(other: (() -> Byte)) = this() eq RealLiteral(other())
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun Short.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun Short.eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this) eq expr()
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun (() -> Short).eq(expr: Expression<RealSort>) = RealLiteral(this()) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun (() -> Short).eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this()) eq expr()
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun Expression<RealSort>.eq(other: Short) = this eq RealLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun Expression<RealSort>.eq(other: (() -> Short)) = this eq RealLiteral(other())
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun (() -> Expression<RealSort>).eq(other: Short) = this() eq RealLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun (() -> Expression<RealSort>).eq(other: (() -> Short)) = this() eq RealLiteral(other())
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun Int.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun Int.eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this) eq expr()
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun (() -> Int).eq(expr: Expression<RealSort>) = RealLiteral(this()) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun (() -> Int).eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this()) eq expr()
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun Expression<RealSort>.eq(other: Int) = this eq RealLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun Expression<RealSort>.eq(other: (() -> Int)) = this eq RealLiteral(other())
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun (() -> Expression<RealSort>).eq(other: Int) = this() eq RealLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun (() -> Expression<RealSort>).eq(other: (() -> Int)) = this() eq RealLiteral(other())
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun Long.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun Long.eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this) eq expr()
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun (() -> Long).eq(expr: Expression<RealSort>) = RealLiteral(this()) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun (() -> Long).eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this()) eq expr()
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun Expression<RealSort>.eq(other: Long) = this eq RealLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun Expression<RealSort>.eq(other: (() -> Long)) = this eq RealLiteral(other())
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun (() -> Expression<RealSort>).eq(other: Long) = this() eq RealLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun (() -> Expression<RealSort>).eq(other: (() -> Long)) = this() eq RealLiteral(other())
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun BigInteger.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun BigInteger.eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this) eq expr()
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun (() -> BigInteger).eq(expr: Expression<RealSort>) = RealLiteral(this()) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun (() -> BigInteger).eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this()) eq expr()
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun Expression<RealSort>.eq(other: BigInteger) = this eq RealLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun Expression<RealSort>.eq(other: (() -> BigInteger)) = this eq RealLiteral(other())
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun (() -> Expression<RealSort>).eq(other: BigInteger) = this() eq RealLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun (() -> Expression<RealSort>).eq(other: (() -> BigInteger)) =
+    this() eq RealLiteral(other())
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun Float.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun Float.eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this) eq expr()
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun (() -> Float).eq(expr: Expression<RealSort>) = RealLiteral(this()) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun (() -> Float).eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this()) eq expr()
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun Expression<RealSort>.eq(other: Float) = this eq RealLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun Expression<RealSort>.eq(other: (() -> Float)) = this eq RealLiteral(other())
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun (() -> Expression<RealSort>).eq(other: Float) = this() eq RealLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun (() -> Expression<RealSort>).eq(other: (() -> Float)) = this() eq RealLiteral(other())
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun Double.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun Double.eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this) eq expr()
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun (() -> Double).eq(expr: Expression<RealSort>) = RealLiteral(this()) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun (() -> Double).eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this()) eq expr()
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun Expression<RealSort>.eq(other: Double) = this eq RealLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun Expression<RealSort>.eq(other: (() -> Double)) = this eq RealLiteral(other())
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun (() -> Expression<RealSort>).eq(other: Double) = this() eq RealLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun (() -> Expression<RealSort>).eq(other: (() -> Double)) = this() eq RealLiteral(other())
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun BigDecimal.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun BigDecimal.eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this) eq expr()
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun (() -> BigDecimal).eq(expr: Expression<RealSort>) = RealLiteral(this()) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [RealLiteral]
+ */
+infix fun (() -> BigDecimal).eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this()) eq expr()
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun Expression<RealSort>.eq(other: BigDecimal) = this eq RealLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun Expression<RealSort>.eq(other: (() -> BigDecimal)) = this eq RealLiteral(other())
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun (() -> Expression<RealSort>).eq(other: BigDecimal) = this() eq RealLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [RealLiteral]
+ */
+infix fun (() -> Expression<RealSort>).eq(other: (() -> BigDecimal)) =
+    this() eq RealLiteral(other())
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [StringLiteral]
+ */
+infix fun String.eq(expr: Expression<StringSort>) = StringLiteral(this) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [StringLiteral]
+ */
+infix fun String.eq(expr: (() -> Expression<StringSort>)) = StringLiteral(this) eq expr()
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [StringLiteral]
+ */
+infix fun (() -> String).eq(expr: Expression<StringSort>) = StringLiteral(this()) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [expr] is converted to [StringLiteral]
+ */
+infix fun (() -> String).eq(expr: (() -> Expression<StringSort>)) = StringLiteral(this()) eq expr()
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [StringLiteral]
+ */
+infix fun Expression<StringSort>.eq(other: String) = this eq StringLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [StringLiteral]
+ */
+infix fun Expression<StringSort>.eq(other: (() -> String)) = this eq StringLiteral(other())
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [StringLiteral]
+ */
+infix fun (() -> Expression<StringSort>).eq(other: String) = this() eq StringLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [StringLiteral]
+ */
+infix fun (() -> Expression<StringSort>).eq(other: (() -> String)) =
+    this() eq StringLiteral(other())
 
 /** Creates a distinct: [this] distinct [other]. */
 infix fun <T : Sort> Expression<T>.distinct(other: Expression<T>): Distinct<T> =
