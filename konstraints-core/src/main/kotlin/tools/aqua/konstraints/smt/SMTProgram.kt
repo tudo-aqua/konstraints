@@ -45,7 +45,6 @@ enum class SatStatus {
 abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
   var model: Model? = null
   var status = SatStatus.PENDING
-  val info = mutableListOf<Attribute>()
   var logic: Logic? = null
     protected set
 
@@ -54,6 +53,42 @@ abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
   protected val _commands: MutableList<Command> = commands.toMutableList()
   val commands: List<Command>
     get() = _commands.toList()
+
+  protected val _info = mutableMapOf<String, AttributeValue?>()
+
+  /**
+   * Get info value associated with [keyword].
+   * - [keyword] may or may not contain prefix ':' (e.g. `status` and `:status` both refer to the
+   *   same info)
+   *
+   * @throws [NoSuchInfoException] if no value is associated with [keyword]
+   */
+  fun info(keyword: String) = infoOrNull(keyword) ?: throw NoSuchInfoException(keyword)
+
+  /**
+   * Get info value associated with [keyword] or `null` if no such info exists.
+   * - [keyword] may or may not contain prefix ':' (e.g. `status` and `:status` both refer to the
+   *   same info)
+   */
+  fun infoOrNull(keyword: String) = _info[keyword.removePrefix(":")]
+
+  protected val _options = mutableMapOf<String, OptionValue>()
+
+  /**
+   * Get option value associated with [keyword].
+   * - [keyword] may or may not contain prefix ':' (e.g. `print-success` and `:print-success` both
+   *   refer to the same option)
+   *
+   * @throws [NoSuchInfoException] if no value is associated with [keyword]
+   */
+  fun option(keyword: String) = optionOrNull(keyword) ?: throw NoSuchOptionException(keyword)
+
+  /**
+   * Get option value associated with [keyword] or `null` if no such info exists.
+   * - [keyword] may or may not contain prefix ':' (e.g. `print-success` and `:print-success` both
+   *   refer to the same option)
+   */
+  fun optionOrNull(keyword: String) = _options[keyword.removePrefix(":")]
 
   final override fun toString() = _commands.joinToString(separator = "\n")
 
@@ -189,11 +224,13 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
   fun pop(n: Int) = context.pop(n)
 
   fun setOption(option: SetOption) {
+    _options[option.name.removePrefix(":")] = option.value
+
     _commands.add(option)
   }
 
   fun setInfo(info: SetInfo) {
-    this.info.add(info.attribute)
+    _info[info.attribute.keyword.removePrefix(":")] = info.attribute.value
 
     _commands.add(info)
   }
@@ -305,3 +342,7 @@ fun MutableSMTProgram.setInfo(name: String, value: Symbol) =
     setInfo(SetInfo(Attribute(name, SymbolAttributeValue(value))))
 
 class AssertionOutOfLogicBounds(msg: String) : RuntimeException(msg)
+
+class NoSuchInfoException(keyword: String) : RuntimeException("Info $keyword not found!")
+
+class NoSuchOptionException(keyword: String) : RuntimeException("Option $keyword not found!")

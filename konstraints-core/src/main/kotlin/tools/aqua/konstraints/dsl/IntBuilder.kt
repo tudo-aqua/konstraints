@@ -24,6 +24,9 @@ import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.IntAdd
 import tools.aqua.konstraints.smt.IntDiv
 import tools.aqua.konstraints.smt.IntGreater
+import tools.aqua.konstraints.smt.IntGreaterEq
+import tools.aqua.konstraints.smt.IntLess
+import tools.aqua.konstraints.smt.IntLessEq
 import tools.aqua.konstraints.smt.IntLiteral
 import tools.aqua.konstraints.smt.IntMul
 import tools.aqua.konstraints.smt.IntNeg
@@ -875,204 +878,797 @@ infix fun (() -> Expression<IntSort>).mod(divisor: Expression<IntSort>) = this()
 infix fun (() -> Expression<IntSort>).mod(divisor: () -> Expression<IntSort>) = this() mod divisor()
 
 /** Greater operator for IntSort Expressions: [this] > [other]. */
-infix fun Expression<IntSort>.greater(other: Expression<IntSort>) = IntGreater(this, other)
+infix fun Expression<IntSort>.gt(other: Expression<IntSort>) = IntGreater(this, other)
 
 /** Greater operator for IntSort Expressions: [this] > [block]. */
-infix fun Expression<IntSort>.greater(block: () -> Expression<IntSort>) = this greater block()
+infix fun Expression<IntSort>.gt(block: () -> Expression<IntSort>) = this gt block()
 
 /** Greater operator for IntSort Expressions: [this] > [other]. */
-infix fun (() -> Expression<IntSort>).greater(other: Expression<IntSort>) = this() greater other
+infix fun (() -> Expression<IntSort>).gt(other: Expression<IntSort>) = this() gt other
 
 /** Greater operator for IntSort Expressions: [this] > [block]. */
-infix fun (() -> Expression<IntSort>).greater(block: () -> Expression<IntSort>) =
-    this() greater block()
+infix fun (() -> Expression<IntSort>).gt(block: () -> Expression<IntSort>) = this() gt block()
 
 /** Greater operator for IntSort Expressions: [this] > [other]. */
-infix fun IntGreater.greater(other: Expression<IntSort>) = IntGreater(this.children + other)
+infix fun IntGreater.gt(other: Expression<IntSort>) = IntGreater(this.children + other)
 
 /** Greater operator for IntSort Expressions: [this] > [block]. */
-infix fun IntGreater.greater(block: () -> Expression<IntSort>) = IntGreater(this.children + block())
+infix fun IntGreater.gt(block: () -> Expression<IntSort>) = IntGreater(this.children + block())
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [Byte] to
  * [IntLiteral].
  */
-infix fun Expression<IntSort>.greater(other: Byte) = this greater IntLiteral(other)
+infix fun Expression<IntSort>.gt(other: Byte) = this gt IntLiteral(other)
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [Byte] to
  * [IntLiteral].
  */
-infix fun (() -> Expression<IntSort>).greater(other: Byte) = this() greater IntLiteral(other)
+infix fun (() -> Expression<IntSort>).gt(other: Byte) = this() gt IntLiteral(other)
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [Byte] to
  * [IntLiteral].
  */
-infix fun IntGreater.greater(other: Byte) = IntGreater(this.children + IntLiteral(other))
+infix fun IntGreater.gt(other: Byte) = IntGreater(this.children + IntLiteral(other))
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. [this] is converted from [Byte] to
  * [IntLiteral].
  */
-infix fun Byte.greater(other: Expression<IntSort>) = IntLiteral(this) greater other
+infix fun Byte.gt(other: Expression<IntSort>) = IntLiteral(this) gt other
 
 /**
  * Greater operator for IntSort Expressions: [this] > [block]. [this] is converted from [Byte] to
  * [IntLiteral].
  */
-infix fun Byte.greater(block: () -> Expression<IntSort>) = IntLiteral(this) greater block()
+infix fun Byte.gt(block: () -> Expression<IntSort>) = IntLiteral(this) gt block()
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. [this] is converted from [Byte] to
  * [IntLiteral].
  */
-infix fun Byte.greater(other: IntGreater) = IntGreater(listOf(IntLiteral(this)) + other.children)
+infix fun Byte.gt(other: IntGreater) = IntGreater(listOf(IntLiteral(this)) + other.children)
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [Short] to
  * [IntLiteral].
  */
-infix fun Expression<IntSort>.greater(other: Short) = this greater IntLiteral(other)
+infix fun Expression<IntSort>.gt(other: Short) = this gt IntLiteral(other)
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [Short] to
  * [IntLiteral].
  */
-infix fun (() -> Expression<IntSort>).greater(other: Short) = this() greater IntLiteral(other)
+infix fun (() -> Expression<IntSort>).gt(other: Short) = this() gt IntLiteral(other)
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [Short] to
  * [IntLiteral].
  */
-infix fun IntGreater.greater(other: Short) = IntGreater(this.children + IntLiteral(other))
+infix fun IntGreater.gt(other: Short) = IntGreater(this.children + IntLiteral(other))
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. [this] is converted from [Short] to
  * [IntLiteral].
  */
-infix fun Short.greater(other: Expression<IntSort>) = IntLiteral(this) greater other
+infix fun Short.gt(other: Expression<IntSort>) = IntLiteral(this) gt other
 
 /**
  * Greater operator for IntSort Expressions: [this] > [block]. [this] is converted from [Short] to
  * [IntLiteral].
  */
-infix fun Short.greater(block: () -> Expression<IntSort>) = IntLiteral(this) greater block()
+infix fun Short.gt(block: () -> Expression<IntSort>) = IntLiteral(this) gt block()
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. [this] is converted from [Short] to
  * [IntLiteral].
  */
-infix fun Short.greater(other: IntGreater) = IntGreater(listOf(IntLiteral(this)) + other.children)
+infix fun Short.gt(other: IntGreater) = IntGreater(listOf(IntLiteral(this)) + other.children)
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [Int] to
  * [IntLiteral].
  */
-infix fun Expression<IntSort>.greater(other: Int) = this greater IntLiteral(other)
+infix fun Expression<IntSort>.gt(other: Int) = this gt IntLiteral(other)
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [Int] to
  * [IntLiteral].
  */
-infix fun (() -> Expression<IntSort>).greater(other: Int) = this() greater IntLiteral(other)
+infix fun (() -> Expression<IntSort>).gt(other: Int) = this() gt IntLiteral(other)
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [Int] to
  * [IntLiteral].
  */
-infix fun IntGreater.greater(other: Int) = IntGreater(this.children + IntLiteral(other))
+infix fun IntGreater.gt(other: Int) = IntGreater(this.children + IntLiteral(other))
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. [this] is converted from [Int] to
  * [IntLiteral].
  */
-infix fun Int.greater(other: Expression<IntSort>) = IntLiteral(this) greater other
+infix fun Int.gt(other: Expression<IntSort>) = IntLiteral(this) gt other
 
 /**
  * Greater operator for IntSort Expressions: [this] > [block]. [this] is converted from [Int] to
  * [IntLiteral].
  */
-infix fun Int.greater(block: () -> Expression<IntSort>) = IntLiteral(this) greater block()
+infix fun Int.gt(block: () -> Expression<IntSort>) = IntLiteral(this) gt block()
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. [this] is converted from [Int] to
  * [IntLiteral].
  */
-infix fun Int.greater(other: IntGreater) = IntGreater(listOf(IntLiteral(this)) + other.children)
+infix fun Int.gt(other: IntGreater) = IntGreater(listOf(IntLiteral(this)) + other.children)
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [Long] to
  * [IntLiteral].
  */
-infix fun Expression<IntSort>.greater(other: Long) = this greater IntLiteral(other)
+infix fun Expression<IntSort>.gt(other: Long) = this gt IntLiteral(other)
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [Long] to
  * [IntLiteral].
  */
-infix fun (() -> Expression<IntSort>).greater(other: Long) = this() greater IntLiteral(other)
+infix fun (() -> Expression<IntSort>).gt(other: Long) = this() gt IntLiteral(other)
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [Long] to
  * [IntLiteral].
  */
-infix fun IntGreater.greater(other: Long) = IntGreater(this.children + IntLiteral(other))
+infix fun IntGreater.gt(other: Long) = IntGreater(this.children + IntLiteral(other))
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. [this] is converted from [Long] to
  * [IntLiteral].
  */
-infix fun Long.greater(other: Expression<IntSort>) = IntLiteral(this) greater other
+infix fun Long.gt(other: Expression<IntSort>) = IntLiteral(this) gt other
 
 /**
  * Greater operator for IntSort Expressions: [this] > [block]. [this] is converted from [Long] to
  * [IntLiteral].
  */
-infix fun Long.greater(block: () -> Expression<IntSort>) = IntLiteral(this) greater block()
+infix fun Long.gt(block: () -> Expression<IntSort>) = IntLiteral(this) gt block()
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. [this] is converted from [Long] to
  * [IntLiteral].
  */
-infix fun Long.greater(other: IntGreater) = IntGreater(listOf(IntLiteral(this)) + other.children)
+infix fun Long.gt(other: IntGreater) = IntGreater(listOf(IntLiteral(this)) + other.children)
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [BigInteger]
  * to [IntLiteral].
  */
-infix fun Expression<IntSort>.greater(other: BigInteger) = this greater IntLiteral(other)
+infix fun Expression<IntSort>.gt(other: BigInteger) = this gt IntLiteral(other)
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [BigInteger]
  * to [IntLiteral].
  */
-infix fun (() -> Expression<IntSort>).greater(other: BigInteger) = this() greater IntLiteral(other)
+infix fun (() -> Expression<IntSort>).gt(other: BigInteger) = this() gt IntLiteral(other)
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. other is converted from [BigInteger]
  * to [IntLiteral].
  */
-infix fun IntGreater.greater(other: BigInteger) = IntGreater(this.children + IntLiteral(other))
+infix fun IntGreater.gt(other: BigInteger) = IntGreater(this.children + IntLiteral(other))
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. [this] is converted from [BigInteger]
  * to [IntLiteral].
  */
-infix fun BigInteger.greater(other: Expression<IntSort>) = IntLiteral(this) greater other
+infix fun BigInteger.gt(other: Expression<IntSort>) = IntLiteral(this) gt other
 
 /**
  * Greater operator for IntSort Expressions: [this] > [block]. [this] is converted from [BigInteger]
  * to [IntLiteral].
  */
-infix fun BigInteger.greater(block: () -> Expression<IntSort>) = IntLiteral(this) greater block()
+infix fun BigInteger.gt(block: () -> Expression<IntSort>) = IntLiteral(this) gt block()
+
+/** Less operator for IntSort Expressions: [this] > [other]. */
+infix fun Expression<IntSort>.lt(other: Expression<IntSort>) = IntLess(this, other)
+
+/** Less operator for IntSort Expressions: [this] > [block]. */
+infix fun Expression<IntSort>.lt(block: () -> Expression<IntSort>) = this lt block()
+
+/** Less operator for IntSort Expressions: [this] > [other]. */
+infix fun (() -> Expression<IntSort>).lt(other: Expression<IntSort>) = this() lt other
+
+/** Less operator for IntSort Expressions: [this] > [block]. */
+infix fun (() -> Expression<IntSort>).lt(block: () -> Expression<IntSort>) = this() lt block()
+
+/** Less operator for IntSort Expressions: [this] > [other]. */
+infix fun IntLess.lt(other: Expression<IntSort>) = IntLess(this.children + other)
+
+/** Less operator for IntSort Expressions: [this] > [block]. */
+infix fun IntLess.lt(block: () -> Expression<IntSort>) = IntLess(this.children + block())
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. other is converted from [Byte] to
+ * [IntLiteral].
+ */
+infix fun Expression<IntSort>.lt(other: Byte) = this lt IntLiteral(other)
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. other is converted from [Byte] to
+ * [IntLiteral].
+ */
+infix fun (() -> Expression<IntSort>).lt(other: Byte) = this() lt IntLiteral(other)
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. other is converted from [Byte] to
+ * [IntLiteral].
+ */
+infix fun IntLess.lt(other: Byte) = IntLess(this.children + IntLiteral(other))
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. [this] is converted from [Byte] to
+ * [IntLiteral].
+ */
+infix fun Byte.lt(other: Expression<IntSort>) = IntLiteral(this) lt other
+
+/**
+ * Less operator for IntSort Expressions: [this] > [block]. [this] is converted from [Byte] to
+ * [IntLiteral].
+ */
+infix fun Byte.lt(block: () -> Expression<IntSort>) = IntLiteral(this) lt block()
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. [this] is converted from [Byte] to
+ * [IntLiteral].
+ */
+infix fun Byte.lt(other: IntLess) = IntLess(listOf(IntLiteral(this)) + other.children)
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. other is converted from [Short] to
+ * [IntLiteral].
+ */
+infix fun Expression<IntSort>.lt(other: Short) = this lt IntLiteral(other)
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. other is converted from [Short] to
+ * [IntLiteral].
+ */
+infix fun (() -> Expression<IntSort>).lt(other: Short) = this() lt IntLiteral(other)
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. other is converted from [Short] to
+ * [IntLiteral].
+ */
+infix fun IntLess.lt(other: Short) = IntLess(this.children + IntLiteral(other))
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. [this] is converted from [Short] to
+ * [IntLiteral].
+ */
+infix fun Short.lt(other: Expression<IntSort>) = IntLiteral(this) lt other
+
+/**
+ * Less operator for IntSort Expressions: [this] > [block]. [this] is converted from [Short] to
+ * [IntLiteral].
+ */
+infix fun Short.lt(block: () -> Expression<IntSort>) = IntLiteral(this) lt block()
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. [this] is converted from [Short] to
+ * [IntLiteral].
+ */
+infix fun Short.lt(other: IntLess) = IntLess(listOf(IntLiteral(this)) + other.children)
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. other is converted from [Int] to
+ * [IntLiteral].
+ */
+infix fun Expression<IntSort>.lt(other: Int) = this lt IntLiteral(other)
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. other is converted from [Int] to
+ * [IntLiteral].
+ */
+infix fun (() -> Expression<IntSort>).lt(other: Int) = this() lt IntLiteral(other)
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. other is converted from [Int] to
+ * [IntLiteral].
+ */
+infix fun IntLess.lt(other: Int) = IntLess(this.children + IntLiteral(other))
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. [this] is converted from [Int] to
+ * [IntLiteral].
+ */
+infix fun Int.lt(other: Expression<IntSort>) = IntLiteral(this) lt other
+
+/**
+ * Less operator for IntSort Expressions: [this] > [block]. [this] is converted from [Int] to
+ * [IntLiteral].
+ */
+infix fun Int.lt(block: () -> Expression<IntSort>) = IntLiteral(this) lt block()
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. [this] is converted from [Int] to
+ * [IntLiteral].
+ */
+infix fun Int.lt(other: IntLess) = IntLess(listOf(IntLiteral(this)) + other.children)
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. other is converted from [Long] to
+ * [IntLiteral].
+ */
+infix fun Expression<IntSort>.lt(other: Long) = this lt IntLiteral(other)
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. other is converted from [Long] to
+ * [IntLiteral].
+ */
+infix fun (() -> Expression<IntSort>).lt(other: Long) = this() lt IntLiteral(other)
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. other is converted from [Long] to
+ * [IntLiteral].
+ */
+infix fun IntLess.lt(other: Long) = IntLess(this.children + IntLiteral(other))
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. [this] is converted from [Long] to
+ * [IntLiteral].
+ */
+infix fun Long.lt(other: Expression<IntSort>) = IntLiteral(this) lt other
+
+/**
+ * Less operator for IntSort Expressions: [this] > [block]. [this] is converted from [Long] to
+ * [IntLiteral].
+ */
+infix fun Long.lt(block: () -> Expression<IntSort>) = IntLiteral(this) lt block()
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. [this] is converted from [Long] to
+ * [IntLiteral].
+ */
+infix fun Long.lt(other: IntLess) = IntLess(listOf(IntLiteral(this)) + other.children)
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. other is converted from [BigInteger] to
+ * [IntLiteral].
+ */
+infix fun Expression<IntSort>.lt(other: BigInteger) = this lt IntLiteral(other)
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. other is converted from [BigInteger] to
+ * [IntLiteral].
+ */
+infix fun (() -> Expression<IntSort>).lt(other: BigInteger) = this() lt IntLiteral(other)
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. other is converted from [BigInteger] to
+ * [IntLiteral].
+ */
+infix fun IntLess.lt(other: BigInteger) = IntLess(this.children + IntLiteral(other))
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. [this] is converted from [BigInteger] to
+ * [IntLiteral].
+ */
+infix fun BigInteger.lt(other: Expression<IntSort>) = IntLiteral(this) lt other
+
+/**
+ * Less operator for IntSort Expressions: [this] > [block]. [this] is converted from [BigInteger] to
+ * [IntLiteral].
+ */
+infix fun BigInteger.lt(block: () -> Expression<IntSort>) = IntLiteral(this) lt block()
+
+/**
+ * Less operator for IntSort Expressions: [this] > [other]. [this] is converted from [BigInteger] to
+ * [IntLiteral].
+ */
+infix fun BigInteger.lt(other: IntLess) = IntLess(listOf(IntLiteral(this)) + other.children)
+
+/** Less equals operator for IntSort Expressions: [this] > [other]. */
+infix fun Expression<IntSort>.leq(other: Expression<IntSort>) = IntLessEq(this, other)
+
+/** Less equals operator for IntSort Expressions: [this] > [block]. */
+infix fun Expression<IntSort>.leq(block: () -> Expression<IntSort>) = this leq block()
+
+/** Less equals operator for IntSort Expressions: [this] > [other]. */
+infix fun (() -> Expression<IntSort>).leq(other: Expression<IntSort>) = this() leq other
+
+/** Less equals operator for IntSort Expressions: [this] > [block]. */
+infix fun (() -> Expression<IntSort>).leq(block: () -> Expression<IntSort>) = this() leq block()
+
+/** Less equals operator for IntSort Expressions: [this] > [other]. */
+infix fun IntLessEq.leq(other: Expression<IntSort>) = IntLessEq(this.children + other)
+
+/** Less equals operator for IntSort Expressions: [this] > [block]. */
+infix fun IntLessEq.leq(block: () -> Expression<IntSort>) = IntLessEq(this.children + block())
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. other is converted from [Byte] to
+ * [IntLiteral].
+ */
+infix fun Expression<IntSort>.leq(other: Byte) = this leq IntLiteral(other)
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. other is converted from [Byte] to
+ * [IntLiteral].
+ */
+infix fun (() -> Expression<IntSort>).leq(other: Byte) = this() leq IntLiteral(other)
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. other is converted from [Byte] to
+ * [IntLiteral].
+ */
+infix fun IntLessEq.leq(other: Byte) = IntLessEq(this.children + IntLiteral(other))
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. [this] is converted from [Byte]
+ * to [IntLiteral].
+ */
+infix fun Byte.leq(other: Expression<IntSort>) = IntLiteral(this) leq other
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [block]. [this] is converted from [Byte]
+ * to [IntLiteral].
+ */
+infix fun Byte.leq(block: () -> Expression<IntSort>) = IntLiteral(this) leq block()
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. [this] is converted from [Byte]
+ * to [IntLiteral].
+ */
+infix fun Byte.leq(other: IntLessEq) = IntLessEq(listOf(IntLiteral(this)) + other.children)
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. other is converted from [Short]
+ * to [IntLiteral].
+ */
+infix fun Expression<IntSort>.leq(other: Short) = this leq IntLiteral(other)
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. other is converted from [Short]
+ * to [IntLiteral].
+ */
+infix fun (() -> Expression<IntSort>).leq(other: Short) = this() leq IntLiteral(other)
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. other is converted from [Short]
+ * to [IntLiteral].
+ */
+infix fun IntLessEq.leq(other: Short) = IntLessEq(this.children + IntLiteral(other))
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. [this] is converted from [Short]
+ * to [IntLiteral].
+ */
+infix fun Short.leq(other: Expression<IntSort>) = IntLiteral(this) leq other
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [block]. [this] is converted from [Short]
+ * to [IntLiteral].
+ */
+infix fun Short.leq(block: () -> Expression<IntSort>) = IntLiteral(this) leq block()
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. [this] is converted from [Short]
+ * to [IntLiteral].
+ */
+infix fun Short.leq(other: IntLessEq) = IntLessEq(listOf(IntLiteral(this)) + other.children)
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. other is converted from [Int] to
+ * [IntLiteral].
+ */
+infix fun Expression<IntSort>.leq(other: Int) = this leq IntLiteral(other)
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. other is converted from [Int] to
+ * [IntLiteral].
+ */
+infix fun (() -> Expression<IntSort>).leq(other: Int) = this() leq IntLiteral(other)
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. other is converted from [Int] to
+ * [IntLiteral].
+ */
+infix fun IntLessEq.leq(other: Int) = IntLessEq(this.children + IntLiteral(other))
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. [this] is converted from [Int] to
+ * [IntLiteral].
+ */
+infix fun Int.leq(other: Expression<IntSort>) = IntLiteral(this) leq other
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [block]. [this] is converted from [Int] to
+ * [IntLiteral].
+ */
+infix fun Int.leq(block: () -> Expression<IntSort>) = IntLiteral(this) leq block()
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. [this] is converted from [Int] to
+ * [IntLiteral].
+ */
+infix fun Int.leq(other: IntLessEq) = IntLessEq(listOf(IntLiteral(this)) + other.children)
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. other is converted from [Long] to
+ * [IntLiteral].
+ */
+infix fun Expression<IntSort>.leq(other: Long) = this leq IntLiteral(other)
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. other is converted from [Long] to
+ * [IntLiteral].
+ */
+infix fun (() -> Expression<IntSort>).leq(other: Long) = this() leq IntLiteral(other)
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. other is converted from [Long] to
+ * [IntLiteral].
+ */
+infix fun IntLessEq.leq(other: Long) = IntLessEq(this.children + IntLiteral(other))
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. [this] is converted from [Long]
+ * to [IntLiteral].
+ */
+infix fun Long.leq(other: Expression<IntSort>) = IntLiteral(this) leq other
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [block]. [this] is converted from [Long]
+ * to [IntLiteral].
+ */
+infix fun Long.leq(block: () -> Expression<IntSort>) = IntLiteral(this) leq block()
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. [this] is converted from [Long]
+ * to [IntLiteral].
+ */
+infix fun Long.leq(other: IntLessEq) = IntLessEq(listOf(IntLiteral(this)) + other.children)
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. other is converted from
+ * [BigInteger] to [IntLiteral].
+ */
+infix fun Expression<IntSort>.leq(other: BigInteger) = this leq IntLiteral(other)
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. other is converted from
+ * [BigInteger] to [IntLiteral].
+ */
+infix fun (() -> Expression<IntSort>).leq(other: BigInteger) = this() leq IntLiteral(other)
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. other is converted from
+ * [BigInteger] to [IntLiteral].
+ */
+infix fun IntLessEq.leq(other: BigInteger) = IntLessEq(this.children + IntLiteral(other))
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. [this] is converted from
+ * [BigInteger] to [IntLiteral].
+ */
+infix fun BigInteger.leq(other: Expression<IntSort>) = IntLiteral(this) leq other
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [block]. [this] is converted from
+ * [BigInteger] to [IntLiteral].
+ */
+infix fun BigInteger.leq(block: () -> Expression<IntSort>) = IntLiteral(this) leq block()
+
+/**
+ * Less equals operator for IntSort Expressions: [this] > [other]. [this] is converted from
+ * [BigInteger] to [IntLiteral].
+ */
+infix fun BigInteger.leq(other: IntLessEq) = IntLessEq(listOf(IntLiteral(this)) + other.children)
+
+/** Greater equals operator for IntSort Expressions: [this] > [other]. */
+infix fun Expression<IntSort>.geq(other: Expression<IntSort>) = IntGreaterEq(this, other)
+
+/** Greater equals operator for IntSort Expressions: [this] > [block]. */
+infix fun Expression<IntSort>.geq(block: () -> Expression<IntSort>) = this geq block()
+
+/** Greater equals operator for IntSort Expressions: [this] > [other]. */
+infix fun (() -> Expression<IntSort>).geq(other: Expression<IntSort>) = this() geq other
+
+/** Greater equals operator for IntSort Expressions: [this] > [block]. */
+infix fun (() -> Expression<IntSort>).geq(block: () -> Expression<IntSort>) = this() geq block()
+
+/** Greater equals operator for IntSort Expressions: [this] > [other]. */
+infix fun IntGreaterEq.geq(other: Expression<IntSort>) = IntGreaterEq(this.children + other)
+
+/** Greater equals operator for IntSort Expressions: [this] > [block]. */
+infix fun IntGreaterEq.geq(block: () -> Expression<IntSort>) = IntGreaterEq(this.children + block())
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. other is converted from [Byte]
+ * to [IntLiteral].
+ */
+infix fun Expression<IntSort>.geq(other: Byte) = this geq IntLiteral(other)
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. other is converted from [Byte]
+ * to [IntLiteral].
+ */
+infix fun (() -> Expression<IntSort>).geq(other: Byte) = this() geq IntLiteral(other)
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. other is converted from [Byte]
+ * to [IntLiteral].
+ */
+infix fun IntGreaterEq.geq(other: Byte) = IntGreaterEq(this.children + IntLiteral(other))
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. [this] is converted from
+ * [Byte] to [IntLiteral].
+ */
+infix fun Byte.geq(other: Expression<IntSort>) = IntLiteral(this) geq other
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [block]. [this] is converted from
+ * [Byte] to [IntLiteral].
+ */
+infix fun Byte.geq(block: () -> Expression<IntSort>) = IntLiteral(this) geq block()
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. [this] is converted from
+ * [Byte] to [IntLiteral].
+ */
+infix fun Byte.geq(other: IntGreaterEq) = IntGreaterEq(listOf(IntLiteral(this)) + other.children)
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. other is converted from
+ * [Short] to [IntLiteral].
+ */
+infix fun Expression<IntSort>.geq(other: Short) = this geq IntLiteral(other)
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. other is converted from
+ * [Short] to [IntLiteral].
+ */
+infix fun (() -> Expression<IntSort>).geq(other: Short) = this() geq IntLiteral(other)
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. other is converted from
+ * [Short] to [IntLiteral].
+ */
+infix fun IntGreaterEq.geq(other: Short) = IntGreaterEq(this.children + IntLiteral(other))
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. [this] is converted from
+ * [Short] to [IntLiteral].
+ */
+infix fun Short.geq(other: Expression<IntSort>) = IntLiteral(this) geq other
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [block]. [this] is converted from
+ * [Short] to [IntLiteral].
+ */
+infix fun Short.geq(block: () -> Expression<IntSort>) = IntLiteral(this) geq block()
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. [this] is converted from
+ * [Short] to [IntLiteral].
+ */
+infix fun Short.geq(other: IntGreaterEq) = IntGreaterEq(listOf(IntLiteral(this)) + other.children)
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. other is converted from [Int]
+ * to [IntLiteral].
+ */
+infix fun Expression<IntSort>.geq(other: Int) = this geq IntLiteral(other)
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. other is converted from [Int]
+ * to [IntLiteral].
+ */
+infix fun (() -> Expression<IntSort>).geq(other: Int) = this() geq IntLiteral(other)
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. other is converted from [Int]
+ * to [IntLiteral].
+ */
+infix fun IntGreaterEq.geq(other: Int) = IntGreaterEq(this.children + IntLiteral(other))
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. [this] is converted from [Int]
+ * to [IntLiteral].
+ */
+infix fun Int.geq(other: Expression<IntSort>) = IntLiteral(this) geq other
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [block]. [this] is converted from [Int]
+ * to [IntLiteral].
+ */
+infix fun Int.geq(block: () -> Expression<IntSort>) = IntLiteral(this) geq block()
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. [this] is converted from [Int]
+ * to [IntLiteral].
+ */
+infix fun Int.geq(other: IntGreaterEq) = IntGreaterEq(listOf(IntLiteral(this)) + other.children)
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. other is converted from [Long]
+ * to [IntLiteral].
+ */
+infix fun Expression<IntSort>.geq(other: Long) = this geq IntLiteral(other)
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. other is converted from [Long]
+ * to [IntLiteral].
+ */
+infix fun (() -> Expression<IntSort>).geq(other: Long) = this() geq IntLiteral(other)
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. other is converted from [Long]
+ * to [IntLiteral].
+ */
+infix fun IntGreaterEq.geq(other: Long) = IntGreaterEq(this.children + IntLiteral(other))
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. [this] is converted from
+ * [Long] to [IntLiteral].
+ */
+infix fun Long.geq(other: Expression<IntSort>) = IntLiteral(this) geq other
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [block]. [this] is converted from
+ * [Long] to [IntLiteral].
+ */
+infix fun Long.geq(block: () -> Expression<IntSort>) = IntLiteral(this) geq block()
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. [this] is converted from
+ * [Long] to [IntLiteral].
+ */
+infix fun Long.geq(other: IntGreaterEq) = IntGreaterEq(listOf(IntLiteral(this)) + other.children)
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. other is converted from
+ * [BigInteger] to [IntLiteral].
+ */
+infix fun Expression<IntSort>.geq(other: BigInteger) = this geq IntLiteral(other)
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. other is converted from
+ * [BigInteger] to [IntLiteral].
+ */
+infix fun (() -> Expression<IntSort>).geq(other: BigInteger) = this() geq IntLiteral(other)
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. other is converted from
+ * [BigInteger] to [IntLiteral].
+ */
+infix fun IntGreaterEq.geq(other: BigInteger) = IntGreaterEq(this.children + IntLiteral(other))
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. [this] is converted from
+ * [BigInteger] to [IntLiteral].
+ */
+infix fun BigInteger.geq(other: Expression<IntSort>) = IntLiteral(this) geq other
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [block]. [this] is converted from
+ * [BigInteger] to [IntLiteral].
+ */
+infix fun BigInteger.geq(block: () -> Expression<IntSort>) = IntLiteral(this) geq block()
+
+/**
+ * Greater equals operator for IntSort Expressions: [this] > [other]. [this] is converted from
+ * [BigInteger] to [IntLiteral].
+ */
+infix fun BigInteger.geq(other: IntGreaterEq) =
+    IntGreaterEq(listOf(IntLiteral(this)) + other.children)
 
 /**
  * Greater operator for IntSort Expressions: [this] > [other]. [this] is converted from [BigInteger]
  * to [IntLiteral].
  */
-infix fun BigInteger.greater(other: IntGreater) =
-    IntGreater(listOf(IntLiteral(this)) + other.children)
+infix fun BigInteger.gt(other: IntGreater) = IntGreater(listOf(IntLiteral(this)) + other.children)
 
 private fun makeIntOperator(
     init: Builder<IntSort>.() -> Unit,

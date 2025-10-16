@@ -54,9 +54,7 @@ class Z3Tests {
         Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
 
     assumeTrue(
-        (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-            .symbol
-            .toString() != "unknown",
+        (result.info("status") as SymbolAttributeValue).symbol.toString() != "unknown",
         "Skipped due to unknown sat status.")
 
     Z3Solver().use { solver ->
@@ -64,9 +62,7 @@ class Z3Tests {
 
       // verify we get the correct status for the test
       assertEquals(
-          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-              .symbol
-              .toString(),
+          (result.info("status") as SymbolAttributeValue).symbol.toString(),
           solver.status.toString())
     }
   }
@@ -137,9 +133,7 @@ class Z3Tests {
                     "\n(get-model)")
 
     assumeTrue(
-        (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-            .symbol
-            .toString() == "sat",
+        (result.info("status") as SymbolAttributeValue).symbol.toString() == "sat",
         "Skipped due to unknown or unsat status.")
 
     solver.use {
@@ -299,9 +293,7 @@ class Z3Tests {
 
       // verify we get the correct status for the test
       assertEquals(
-          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-              .symbol
-              .toString(),
+          (result.info("status") as SymbolAttributeValue).symbol.toString(),
           solver.status.toString())
     }
   }
@@ -321,9 +313,7 @@ class Z3Tests {
 
       // verify we get the correct status for the test
       assertEquals(
-          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-              .symbol
-              .toString(),
+          (result.info("status") as SymbolAttributeValue).symbol.toString(),
           solver.status.toString())
     }
   }
@@ -344,9 +334,7 @@ class Z3Tests {
 
       // verify we get the correct status for the test
       assertEquals(
-          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-              .symbol
-              .toString(),
+          (result.info("status") as SymbolAttributeValue).symbol.toString(),
           solver.status.toString())
     }
   }
