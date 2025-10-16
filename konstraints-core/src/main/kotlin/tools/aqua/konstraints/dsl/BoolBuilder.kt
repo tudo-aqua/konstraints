@@ -199,676 +199,777 @@ infix fun <T : Sort> (() -> Expression<T>).eq(other: () -> Expression<T>) = this
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
-infix fun Byte.eq(expr: Expression<IntSort>) = IntLiteral(this) eq expr
+@JvmName("eqByteIntSort") infix fun Byte.eq(expr: Expression<IntSort>) = IntLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
+@JvmName("eqByteIntSort")
 infix fun Byte.eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
+@JvmName("eqByteIntSort")
 infix fun (() -> Byte).eq(expr: Expression<IntSort>) = IntLiteral(this()) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
+@JvmName("eqByteIntSort")
 infix fun (() -> Byte).eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this()) eq expr()
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
-infix fun Expression<IntSort>.eq(other: Byte) = this eq IntLiteral(other)
+@JvmName("eqIntSortByte") infix fun Expression<IntSort>.eq(other: Byte) = this eq IntLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
+@JvmName("eqIntSortByte")
 infix fun Expression<IntSort>.eq(other: (() -> Byte)) = this eq IntLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
+@JvmName("eqIntSortByte")
 infix fun (() -> Expression<IntSort>).eq(other: Byte) = this() eq IntLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
+@JvmName("eqIntSortByte")
 infix fun (() -> Expression<IntSort>).eq(other: (() -> Byte)) = this() eq IntLiteral(other())
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
-infix fun Short.eq(expr: Expression<IntSort>) = IntLiteral(this) eq expr
+@JvmName("eqShortIntSort") infix fun Short.eq(expr: Expression<IntSort>) = IntLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
+@JvmName("eqShortIntSort")
 infix fun Short.eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
+@JvmName("eqShortIntSort")
 infix fun (() -> Short).eq(expr: Expression<IntSort>) = IntLiteral(this()) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
+@JvmName("eqShortIntSort")
 infix fun (() -> Short).eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this()) eq expr()
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
+@JvmName("eqIntSortShort")
 infix fun Expression<IntSort>.eq(other: Short) = this eq IntLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
+@JvmName("eqIntSortShort")
 infix fun Expression<IntSort>.eq(other: (() -> Short)) = this eq IntLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
+@JvmName("eqIntSortShort")
 infix fun (() -> Expression<IntSort>).eq(other: Short) = this() eq IntLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
+@JvmName("eqIntSortShort")
 infix fun (() -> Expression<IntSort>).eq(other: (() -> Short)) = this() eq IntLiteral(other())
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
-infix fun Int.eq(expr: Expression<IntSort>) = IntLiteral(this) eq expr
+@JvmName("eqIntIntSort") infix fun Int.eq(expr: Expression<IntSort>) = IntLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
+@JvmName("eqIntIntSort")
 infix fun Int.eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
+@JvmName("eqIntIntSort")
 infix fun (() -> Int).eq(expr: Expression<IntSort>) = IntLiteral(this()) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
+@JvmName("eqIntIntSort")
 infix fun (() -> Int).eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this()) eq expr()
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
-infix fun Expression<IntSort>.eq(other: Int) = this eq IntLiteral(other)
+@JvmName("eqIntSortInt") infix fun Expression<IntSort>.eq(other: Int) = this eq IntLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
+@JvmName("eqIntSortInt")
 infix fun Expression<IntSort>.eq(other: (() -> Int)) = this eq IntLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
+@JvmName("eqIntSortInt")
 infix fun (() -> Expression<IntSort>).eq(other: Int) = this() eq IntLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
+@JvmName("eqIntSortInt")
 infix fun (() -> Expression<IntSort>).eq(other: (() -> Int)) = this() eq IntLiteral(other())
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
-infix fun Long.eq(expr: Expression<IntSort>) = IntLiteral(this) eq expr
+@JvmName("eqLongIntSort") infix fun Long.eq(expr: Expression<IntSort>) = IntLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
+@JvmName("eqLongIntSort")
 infix fun Long.eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
+@JvmName("eqLongIntSort")
 infix fun (() -> Long).eq(expr: Expression<IntSort>) = IntLiteral(this()) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
+@JvmName("eqLongIntSort")
 infix fun (() -> Long).eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this()) eq expr()
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
-infix fun Expression<IntSort>.eq(other: Long) = this eq IntLiteral(other)
+@JvmName("eqIntSortLong") infix fun Expression<IntSort>.eq(other: Long) = this eq IntLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
+@JvmName("eqIntSortLong")
 infix fun Expression<IntSort>.eq(other: (() -> Long)) = this eq IntLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
+@JvmName("eqIntSortLong")
 infix fun (() -> Expression<IntSort>).eq(other: Long) = this() eq IntLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
+@JvmName("eqIntSortLong")
 infix fun (() -> Expression<IntSort>).eq(other: (() -> Long)) = this() eq IntLiteral(other())
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
+@JvmName("eqBigIntegerIntSort")
 infix fun BigInteger.eq(expr: Expression<IntSort>) = IntLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
+@JvmName("eqBigIntegerIntSort")
 infix fun BigInteger.eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
+@JvmName("eqBigIntegerIntSort")
 infix fun (() -> BigInteger).eq(expr: Expression<IntSort>) = IntLiteral(this()) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [IntLiteral]
+ * - [this] is converted to [IntLiteral]
  */
+@JvmName("eqBigIntegerIntSort")
 infix fun (() -> BigInteger).eq(expr: (() -> Expression<IntSort>)) = IntLiteral(this()) eq expr()
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
+@JvmName("eqIntSortBigInteger")
 infix fun Expression<IntSort>.eq(other: BigInteger) = this eq IntLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
+@JvmName("eqIntSortBigInteger")
 infix fun Expression<IntSort>.eq(other: (() -> BigInteger)) = this eq IntLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
+@JvmName("eqIntSortBigInteger")
 infix fun (() -> Expression<IntSort>).eq(other: BigInteger) = this() eq IntLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [IntLiteral]
  */
+@JvmName("eqIntSortBigInteger")
 infix fun (() -> Expression<IntSort>).eq(other: (() -> BigInteger)) = this() eq IntLiteral(other())
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
-infix fun Byte.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
+@JvmName("eqByteRealSort") infix fun Byte.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqByteRealSort")
 infix fun Byte.eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqByteRealSort")
 infix fun (() -> Byte).eq(expr: Expression<RealSort>) = RealLiteral(this()) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqByteRealSort")
 infix fun (() -> Byte).eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this()) eq expr()
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortByte")
 infix fun Expression<RealSort>.eq(other: Byte) = this eq RealLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortByte")
 infix fun Expression<RealSort>.eq(other: (() -> Byte)) = this eq RealLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortByte")
 infix fun (() -> Expression<RealSort>).eq(other: Byte) = this() eq RealLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortByte")
 infix fun (() -> Expression<RealSort>).eq(other: (() -> Byte)) = this() eq RealLiteral(other())
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqShortRealSort")
 infix fun Short.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqShortRealSort")
 infix fun Short.eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqShortRealSort")
 infix fun (() -> Short).eq(expr: Expression<RealSort>) = RealLiteral(this()) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqShortRealSort")
 infix fun (() -> Short).eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this()) eq expr()
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortShort")
 infix fun Expression<RealSort>.eq(other: Short) = this eq RealLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortShort")
 infix fun Expression<RealSort>.eq(other: (() -> Short)) = this eq RealLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortShort")
 infix fun (() -> Expression<RealSort>).eq(other: Short) = this() eq RealLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortShort")
 infix fun (() -> Expression<RealSort>).eq(other: (() -> Short)) = this() eq RealLiteral(other())
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
-infix fun Int.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
+@JvmName("eqIntRealSort") infix fun Int.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqIntRealSort")
 infix fun Int.eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqIntRealSort")
 infix fun (() -> Int).eq(expr: Expression<RealSort>) = RealLiteral(this()) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqIntRealSort")
 infix fun (() -> Int).eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this()) eq expr()
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
-infix fun Expression<RealSort>.eq(other: Int) = this eq RealLiteral(other)
+@JvmName("eqRealSortInt") infix fun Expression<RealSort>.eq(other: Int) = this eq RealLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortInt")
 infix fun Expression<RealSort>.eq(other: (() -> Int)) = this eq RealLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortInt")
 infix fun (() -> Expression<RealSort>).eq(other: Int) = this() eq RealLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortInt")
 infix fun (() -> Expression<RealSort>).eq(other: (() -> Int)) = this() eq RealLiteral(other())
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
-infix fun Long.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
+@JvmName("eqLongRealSort") infix fun Long.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqLongRealSort")
 infix fun Long.eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqLongRealSort")
 infix fun (() -> Long).eq(expr: Expression<RealSort>) = RealLiteral(this()) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqLongRealSort")
 infix fun (() -> Long).eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this()) eq expr()
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortLong")
 infix fun Expression<RealSort>.eq(other: Long) = this eq RealLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortLong")
 infix fun Expression<RealSort>.eq(other: (() -> Long)) = this eq RealLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortLong")
 infix fun (() -> Expression<RealSort>).eq(other: Long) = this() eq RealLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortLong")
 infix fun (() -> Expression<RealSort>).eq(other: (() -> Long)) = this() eq RealLiteral(other())
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqBigIntegerRealSort")
 infix fun BigInteger.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqBigIntegerRealSort")
 infix fun BigInteger.eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqBigIntegerRealSort")
 infix fun (() -> BigInteger).eq(expr: Expression<RealSort>) = RealLiteral(this()) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqBigIntegerRealSort")
 infix fun (() -> BigInteger).eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this()) eq expr()
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortBigInteger")
 infix fun Expression<RealSort>.eq(other: BigInteger) = this eq RealLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortBigInteger")
 infix fun Expression<RealSort>.eq(other: (() -> BigInteger)) = this eq RealLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortBigInteger")
 infix fun (() -> Expression<RealSort>).eq(other: BigInteger) = this() eq RealLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortBigInteger")
 infix fun (() -> Expression<RealSort>).eq(other: (() -> BigInteger)) =
     this() eq RealLiteral(other())
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqFloatRealSort")
 infix fun Float.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqFloatRealSort")
 infix fun Float.eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqFloatRealSort")
 infix fun (() -> Float).eq(expr: Expression<RealSort>) = RealLiteral(this()) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqFloatRealSort")
 infix fun (() -> Float).eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this()) eq expr()
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortFloat")
 infix fun Expression<RealSort>.eq(other: Float) = this eq RealLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortFloat")
 infix fun Expression<RealSort>.eq(other: (() -> Float)) = this eq RealLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortFloat")
 infix fun (() -> Expression<RealSort>).eq(other: Float) = this() eq RealLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortFloat")
 infix fun (() -> Expression<RealSort>).eq(other: (() -> Float)) = this() eq RealLiteral(other())
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqDoubleRealSort")
 infix fun Double.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqDoubleRealSort")
 infix fun Double.eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqDoubleRealSort")
 infix fun (() -> Double).eq(expr: Expression<RealSort>) = RealLiteral(this()) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqDoubleRealSort")
 infix fun (() -> Double).eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this()) eq expr()
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortDouble")
 infix fun Expression<RealSort>.eq(other: Double) = this eq RealLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortDouble")
 infix fun Expression<RealSort>.eq(other: (() -> Double)) = this eq RealLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortDouble")
 infix fun (() -> Expression<RealSort>).eq(other: Double) = this() eq RealLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortDouble")
 infix fun (() -> Expression<RealSort>).eq(other: (() -> Double)) = this() eq RealLiteral(other())
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqBigDecimalRealSort")
 infix fun BigDecimal.eq(expr: Expression<RealSort>) = RealLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqBigDecimalRealSort")
 infix fun BigDecimal.eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqBigDecimalRealSort")
 infix fun (() -> BigDecimal).eq(expr: Expression<RealSort>) = RealLiteral(this()) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [RealLiteral]
+ * - [this] is converted to [RealLiteral]
  */
+@JvmName("eqBigDecimalRealSort")
 infix fun (() -> BigDecimal).eq(expr: (() -> Expression<RealSort>)) = RealLiteral(this()) eq expr()
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortBigDecimal")
 infix fun Expression<RealSort>.eq(other: BigDecimal) = this eq RealLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortBigDecimal")
 infix fun Expression<RealSort>.eq(other: (() -> BigDecimal)) = this eq RealLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortBigDecimal")
 infix fun (() -> Expression<RealSort>).eq(other: BigDecimal) = this() eq RealLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [RealLiteral]
  */
+@JvmName("eqRealSortBigDecimal")
 infix fun (() -> Expression<RealSort>).eq(other: (() -> BigDecimal)) =
     this() eq RealLiteral(other())
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [StringLiteral]
+ * - [this] is converted to [StringLiteral]
  */
+@JvmName("eqStringStringSort")
 infix fun String.eq(expr: Expression<StringSort>) = StringLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [StringLiteral]
+ * - [this] is converted to [StringLiteral]
  */
+@JvmName("eqStringStringSort")
 infix fun String.eq(expr: (() -> Expression<StringSort>)) = StringLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [StringLiteral]
+ * - [this] is converted to [StringLiteral]
  */
+@JvmName("eqStringStringSort")
 infix fun (() -> String).eq(expr: Expression<StringSort>) = StringLiteral(this()) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [expr] is converted to [StringLiteral]
+ * - [this] is converted to [StringLiteral]
  */
+@JvmName("eqStringStringSort")
 infix fun (() -> String).eq(expr: (() -> Expression<StringSort>)) = StringLiteral(this()) eq expr()
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [StringLiteral]
  */
+@JvmName("eqStringSortString")
 infix fun Expression<StringSort>.eq(other: String) = this eq StringLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [StringLiteral]
  */
+@JvmName("eqStringSortString")
 infix fun Expression<StringSort>.eq(other: (() -> String)) = this eq StringLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [StringLiteral]
  */
+@JvmName("eqStringSortString")
 infix fun (() -> Expression<StringSort>).eq(other: String) = this() eq StringLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
  * - [other] is converted to [StringLiteral]
  */
+@JvmName("eqStringSortString")
 infix fun (() -> Expression<StringSort>).eq(other: (() -> String)) =
     this() eq StringLiteral(other())
 
