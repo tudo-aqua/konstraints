@@ -321,7 +321,7 @@ data class DefineFun(val functionDef: FunctionDef<*>) : Command("define-fun $fun
       name: Symbol,
       parameters: List<SortedVar<*>>,
       sort: Sort,
-      term: Expression<Sort>
+      term: Expression<Sort>,
   ) : this(FunctionDef(name, parameters, sort, term))
 
   override fun toString() = "(define-fun $functionDef)"
@@ -356,7 +356,7 @@ data class FunctionDef<out S : Sort>(
     val name: Symbol,
     val parameters: List<SortedVar<*>>,
     val sort: S,
-    val term: Expression<S>
+    val term: Expression<S>,
 ) {
   override fun toString(): String = "$name (${parameters.joinToString(" ")}) $sort $term"
 

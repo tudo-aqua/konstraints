@@ -38,7 +38,7 @@ data class BenchmarkSet(val category: String, val set: String) {
 data class BenchmarkFile(
     val name: List<String>,
     val executionSpeeds: Map<String, Double>,
-    val fileSizeInBytes: Long
+    val fileSizeInBytes: Long,
 ) {
   /** Get the solution speed on [solver] or [POSITIVE_INFINITY] if no speed is known. */
   fun speedOn(solver: String): Double = executionSpeeds[solver] ?: POSITIVE_INFINITY
@@ -73,7 +73,8 @@ fun BenchmarkDatabase.toMetadata(): BenchmarkMetadata =
                         .toSet()
               }
             }
-            .toMap())
+            .toMap()
+    )
 
 /** Remove sets from a metadata collection that do not satisfy the [predicate]. */
 inline fun BenchmarkMetadata.filterSets(
@@ -102,7 +103,8 @@ inline fun BenchmarkMetadata.filterSetFiles(
               val filtered = files.filterTo(mutableSetOf()) { predicate(set, it) }
               if (filtered.isNotEmpty()) set to filtered else null
             }
-            .toMap())
+            .toMap()
+    )
 
 /**
  * Reduce a metadata collection to files conforming to certain standards. If all files from a set
@@ -124,7 +126,7 @@ fun BenchmarkMetadata.selectTests(
     maxSize: Long = Long.MAX_VALUE,
     minPerGroup: Int = 1,
     sharePerGroup: Double = 1.0,
-    maxPerGroup: Int = Int.MAX_VALUE
+    maxPerGroup: Int = Int.MAX_VALUE,
 ): BenchmarkMetadata =
     BenchmarkMetadata(
         entries
@@ -137,10 +139,12 @@ fun BenchmarkMetadata.selectTests(
                       minPerGroup,
                       sharePerGroup,
                       maxPerGroup,
-                      *solversToConsider)
+                      *solversToConsider,
+                  )
               if (filtered.isNotEmpty()) set to filtered else null
             }
-            .toMap())
+            .toMap()
+    )
 
 private fun Collection<BenchmarkFile>.selectTests(
     maxSpeed: Double,
@@ -148,7 +152,7 @@ private fun Collection<BenchmarkFile>.selectTests(
     minPerGroup: Int,
     sharePerGroup: Double,
     maxPerGroup: Int,
-    vararg solversToConsider: String
+    vararg solversToConsider: String,
 ): Set<BenchmarkFile> {
   return groupBy { it.name.first() }
       .mapValues { (_, filesInGroup) ->
@@ -173,7 +177,7 @@ private fun Collection<BenchmarkFile>.selectTests(
 
 private fun BenchmarkFile.getSpeedRatingOrNull(
     maxSpeed: Double,
-    vararg solversToConsider: String
+    vararg solversToConsider: String,
 ): Double? {
   val speeds = solversToConsider.map { executionSpeeds[it] ?: return null }
   if (speeds.any { it > maxSpeed }) return null

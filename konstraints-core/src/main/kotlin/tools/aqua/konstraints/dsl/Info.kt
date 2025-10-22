@@ -71,7 +71,10 @@ class InfoBuilder {
         require(version.all { ch -> ch.isDigit() || ch == '.' })
         infos.add(
             SetInfo(
-                ":smt-lib-version", ConstantAttributeValue(DecimalConstant(BigDecimal(version)))))
+                ":smt-lib-version",
+                ConstantAttributeValue(DecimalConstant(BigDecimal(version))),
+            )
+        )
       }
 
   /**
@@ -83,7 +86,10 @@ class InfoBuilder {
         require(version.all { ch -> ch.isDigit() || ch == '.' })
         infos.add(
             SetInfo(
-                ":smt-lib-version", ConstantAttributeValue(DecimalConstant(BigDecimal(version)))))
+                ":smt-lib-version",
+                ConstantAttributeValue(DecimalConstant(BigDecimal(version))),
+            )
+        )
       }
 
   /**
@@ -95,7 +101,9 @@ class InfoBuilder {
         infos.add(
             SetInfo(
                 ":smt-lib-source",
-                SymbolAttributeValue("|${source.removeSurrounding("|")}|".toSymbolWithQuotes())))
+                SymbolAttributeValue("|${source.removeSurrounding("|")}|".toSymbolWithQuotes()),
+            )
+        )
       }
 
   /**
@@ -134,7 +142,9 @@ class InfoBuilder {
     infos.add(
         SetInfo(
             ":${this.removePrefix(":")}",
-            ConstantAttributeValue(NumeralConstant(numeral.toInt().toBigInteger()))))
+            ConstantAttributeValue(NumeralConstant(numeral.toInt().toBigInteger())),
+        )
+    )
     return this@InfoBuilder
   }
 
@@ -146,7 +156,9 @@ class InfoBuilder {
     infos.add(
         SetInfo(
             ":${this.removePrefix(":")}",
-            ConstantAttributeValue(NumeralConstant(numeral.toInt().toBigInteger()))))
+            ConstantAttributeValue(NumeralConstant(numeral.toInt().toBigInteger())),
+        )
+    )
     return this@InfoBuilder
   }
 
@@ -158,7 +170,9 @@ class InfoBuilder {
     infos.add(
         SetInfo(
             ":${this.removePrefix(":")}",
-            ConstantAttributeValue(NumeralConstant(numeral.toBigInteger()))))
+            ConstantAttributeValue(NumeralConstant(numeral.toBigInteger())),
+        )
+    )
     return this@InfoBuilder
   }
 
@@ -170,7 +184,9 @@ class InfoBuilder {
     infos.add(
         SetInfo(
             ":${this.removePrefix(":")}",
-            ConstantAttributeValue(NumeralConstant(numeral.toBigInteger()))))
+            ConstantAttributeValue(NumeralConstant(numeral.toBigInteger())),
+        )
+    )
     return this@InfoBuilder
   }
 
@@ -180,7 +196,8 @@ class InfoBuilder {
    */
   infix fun String.set_to(numeral: BigInteger): InfoBuilder {
     infos.add(
-        SetInfo(":${this.removePrefix(":")}", ConstantAttributeValue(NumeralConstant(numeral))))
+        SetInfo(":${this.removePrefix(":")}", ConstantAttributeValue(NumeralConstant(numeral)))
+    )
     return this@InfoBuilder
   }
 
@@ -192,7 +209,9 @@ class InfoBuilder {
     infos.add(
         SetInfo(
             ":${this.removePrefix(":")}",
-            ConstantAttributeValue(DecimalConstant(numeral.toBigDecimal()))))
+            ConstantAttributeValue(DecimalConstant(numeral.toBigDecimal())),
+        )
+    )
     return this@InfoBuilder
   }
 
@@ -204,7 +223,9 @@ class InfoBuilder {
     infos.add(
         SetInfo(
             ":${this.removePrefix(":")}",
-            ConstantAttributeValue(DecimalConstant(numeral.toBigDecimal()))))
+            ConstantAttributeValue(DecimalConstant(numeral.toBigDecimal())),
+        )
+    )
     return this@InfoBuilder
   }
 
@@ -214,7 +235,8 @@ class InfoBuilder {
    */
   infix fun String.set_to(numeral: BigDecimal): InfoBuilder {
     infos.add(
-        SetInfo(":${this.removePrefix(":")}", ConstantAttributeValue(DecimalConstant(numeral))))
+        SetInfo(":${this.removePrefix(":")}", ConstantAttributeValue(DecimalConstant(numeral)))
+    )
     return this@InfoBuilder
   }
 

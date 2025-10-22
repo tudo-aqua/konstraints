@@ -85,7 +85,8 @@ data object QF_AUFBVFP : Logic {
           Theories.CORE,
           Theories.FIXED_SIZE_BIT_VECTORS,
           Theories.FLOATING_POINT,
-          Theories.ARRAYS_EX)
+          Theories.ARRAYS_EX,
+      )
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = false
@@ -109,7 +110,8 @@ data object AUFBVFP : Logic {
           Theories.CORE,
           Theories.FIXED_SIZE_BIT_VECTORS,
           Theories.FLOATING_POINT,
-          Theories.ARRAYS_EX)
+          Theories.ARRAYS_EX,
+      )
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = false
@@ -696,7 +698,8 @@ data object QF_ABVFPLRA : Logic {
           Theories.FIXED_SIZE_BIT_VECTORS,
           Theories.FLOATING_POINT,
           Theories.ARRAYS_EX,
-          Theories.REALS)
+          Theories.REALS,
+      )
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
@@ -739,7 +742,8 @@ data object ABVFP : Logic {
           Theories.CORE,
           Theories.FIXED_SIZE_BIT_VECTORS,
           Theories.FLOATING_POINT,
-          Theories.ARRAYS_EX)
+          Theories.ARRAYS_EX,
+      )
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = false
@@ -914,7 +918,8 @@ data object ABVFPLRA : Logic {
           Theories.FIXED_SIZE_BIT_VECTORS,
           Theories.FLOATING_POINT,
           Theories.ARRAYS_EX,
-          Theories.REALS)
+          Theories.REALS,
+      )
   override val datatypes = false
   override val quantifierFree = false
   override val linearArithmetic = true
@@ -1107,7 +1112,8 @@ data object QF_ABVFP : Logic {
           Theories.CORE,
           Theories.FIXED_SIZE_BIT_VECTORS,
           Theories.FLOATING_POINT,
-          Theories.ARRAYS_EX)
+          Theories.ARRAYS_EX,
+      )
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = false

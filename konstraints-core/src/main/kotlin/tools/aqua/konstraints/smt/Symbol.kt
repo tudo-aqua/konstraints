@@ -32,7 +32,7 @@ class Symbol
 internal constructor(
     raw: String,
     val isQuoted: Boolean,
-    val isSimple: Boolean = checkIsSimple(raw)
+    val isSimple: Boolean = checkIsSimple(raw),
 ) : BaseSymbol {
   /**
    * Internal representation of the symbol without quotes, quoting will be reconstructed by
@@ -51,10 +51,12 @@ internal constructor(
       val stripped = raw.removePrefix("|").removeSuffix("|")
 
       // simple symbols can not be empty and can not start with a digit
-      return if (stripped.isNotEmpty() &&
-          !stripped.first().isDigit() &&
-          stripped.all { ch -> ch in simpleSet } &&
-          stripped !in reservedSet) {
+      return if (
+          stripped.isNotEmpty() &&
+              !stripped.first().isDigit() &&
+              stripped.all { ch -> ch in simpleSet } &&
+              stripped !in reservedSet
+      ) {
         true
       }
       // quoted symbols start and end with '|'
@@ -112,7 +114,8 @@ internal constructor(
             "reset-assertions",
             "set-info",
             "set-logic",
-            "set-option")
+            "set-option",
+        )
 
     private val whitespaceSet = setOf(' ', '\t', '\r', '\n')
     private val digitSet = (0..9).map { n -> n.digitToChar() }.toSet()

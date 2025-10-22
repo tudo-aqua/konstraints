@@ -46,7 +46,8 @@ class BVTermSmallRWNoetzliTests {
     val temp =
         javaClass
             .getResourceAsStream(
-                "/QF_BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_$id.smt2")!!
+                "/QF_BV/20190311-bv-term-small-rw-Noetzli/bv-term-small-rw_$id.smt2"
+            )!!
             .bufferedReader()
             .readLines()
     val input = temp.map { it.trim('\r', '\n') }

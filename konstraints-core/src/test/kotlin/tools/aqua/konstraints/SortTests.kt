@@ -77,7 +77,8 @@ class SortTests {
     return Stream.of(
         arguments(BVSort(8), BVSort(8)),
         arguments(BVSort(16), BVSort(16)),
-        arguments(BVSort(32), BVSort(32)))
+        arguments(BVSort(32), BVSort(32)),
+    )
   }
 
   @ParameterizedTest
@@ -90,7 +91,7 @@ class SortTests {
   @MethodSource("getUnequalBVSortObjects")
   fun `test that BVSort objects with different bit length are different objects`(
       lhs: BVSort,
-      rhs: BVSort
+      rhs: BVSort,
   ) {
     assertNotSame(lhs, rhs)
   }
@@ -99,7 +100,8 @@ class SortTests {
     return Stream.of(
         arguments(BVSort(8), BVSort(16)),
         arguments(BVSort(32), BVSort(16)),
-        arguments(BVSort(16), BVSort(32)))
+        arguments(BVSort(16), BVSort(32)),
+    )
   }
 
   @ParameterizedTest

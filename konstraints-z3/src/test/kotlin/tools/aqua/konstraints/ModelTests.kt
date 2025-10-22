@@ -70,7 +70,8 @@ class ModelTests {
               "(set-logic QF_LIA)(declare-fun foo (Int Int) Int)(assert (and (= (foo 2 0) 2) (= (foo 1 0) 1) (= (foo 0 0) 0) (= (foo 2 1) 3) (= (foo 1 1) 2) (= (foo 0 1) 1)))(check-sat)(get-model)",
               listOf(
                       SortedVar("x!0".toSymbolWithQuotes(), SMTInt),
-                      SortedVar("x!1".toSymbolWithQuotes(), SMTInt))
+                      SortedVar("x!1".toSymbolWithQuotes(), SMTInt),
+                  )
                   .let {
                     val x0 = it[0].instance
                     val x1 = it[1].instance
@@ -83,7 +84,8 @@ class ModelTests {
                                 (ite((x0 eq 0) and (x1 eq 1)) then
                                     IntLiteral(1) otherwise
                                     IntLiteral(2))))
-                  }),
+                  },
+          ),
           arguments(
               "(set-logic QF_LIA)(declare-fun foo (Int) Int)(assert (and (= (foo 2) 2) (= (foo 1) 1) (= (foo 0) 0)))(check-sat)(get-model)",
               listOf(SortedVar("x!0".toSymbolWithQuotes(), SMTInt)).let {
@@ -91,42 +93,53 @@ class ModelTests {
                 ite(x0 eq 1) then
                     IntLiteral(1) otherwise
                     (ite(x0 eq 0) then IntLiteral(0) otherwise IntLiteral(2))
-              }),
+              },
+          ),
           arguments(
               "(set-logic QF_LIA)(declare-fun foo (Bool) Int)(assert (and (= (foo true) 1) (= (foo false) 0)))(check-sat)(get-model)",
               listOf(SortedVar("x!0".toSymbolWithQuotes(), Bool)).let {
                 val x0 = it[0].instance
                 ite(x0 eq False) then IntLiteral(0) otherwise IntLiteral(1)
-              }),
+              },
+          ),
           arguments(
               "(set-logic QF_BV)(declare-fun foo () (_ BitVec 8))(assert (= foo #b00000000))(check-sat)(get-model)",
-              BVLiteral("#b00000000")),
+              BVLiteral("#b00000000"),
+          ),
           arguments(
               "(set-logic QF_FP)(declare-fun foo () Float16)(assert (= foo (_ +zero 5 11)))(check-sat)(get-model)",
-              FPZero(5, 11)),
+              FPZero(5, 11),
+          ),
           arguments(
               "(set-logic QF_FP)(declare-fun foo () Float16)(assert (= foo (fp #b0 #b00000 #b0000000000)))(check-sat)(get-model)",
-              FPZero(5, 11)),
+              FPZero(5, 11),
+          ),
           /*arguments("(set-logic QF_FP)(declare-fun foo () Float16)(assert (= foo (fp #b0 #b00000 #b0000000000)))(check-sat)(get-model)",
           FPLiteral("#b0".bitvec(), "#b00000".bitvec(), "#b0000000000".bitvec())),*/
           arguments(
               "(set-logic QF_FP)(declare-fun foo () Float16)(assert (= foo (fp #b1 #b00000 #b0000000000)))(check-sat)(get-model)",
-              FPMinusZero(5, 11)),
+              FPMinusZero(5, 11),
+          ),
           arguments(
               "(set-logic QF_S)(declare-fun foo () String)(assert (= (str.len foo) 0))(check-sat)(get-model)",
-              StringLiteral("")),
+              StringLiteral(""),
+          ),
           arguments(
               "(set-logic QF_LIA)(declare-fun foo () Int)(assert (= foo 0))(check-sat)(get-model)",
-              IntLiteral(0)),
+              IntLiteral(0),
+          ),
           arguments(
               "(set-logic QF_FP)(declare-fun foo () Float16)(assert (= foo (fp.add roundTowardZero foo (fp #b0 #b00000 #b0000000001))))(check-sat)(get-model)",
-              FPNaN(5, 11)),
+              FPNaN(5, 11),
+          ),
           arguments(
               "(set-logic QF_LRA)(declare-fun foo () Real)(assert (= foo 0.0))(check-sat)(get-model)",
-              RealLiteral(0)),
+              RealLiteral(0),
+          ),
           arguments(
               "(set-logic QF_LIRA)(declare-fun foo () Real)(assert (= foo (/ 2.0 5.0)))(check-sat)(get-model)",
-              RealDiv(RealLiteral(2), RealLiteral(5))),
+              RealDiv(RealLiteral(2), RealLiteral(5)),
+          ),
           /*arguments("(set-logic QF_LIRA)(declare-fun foo () Real)(assert (= foo 0.000000000000000000001))(check-sat)(get-model)",
           RealDiv(RealLiteral(1), RealLiteral(1000000000000000000000.0)))*/
       )

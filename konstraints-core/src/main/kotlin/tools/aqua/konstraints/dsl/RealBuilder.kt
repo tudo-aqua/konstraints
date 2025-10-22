@@ -2519,7 +2519,7 @@ infix fun BigDecimal.geq(other: RealGreaterEq) =
 
 private fun makeRealOperator(
     init: Builder<RealSort>.() -> Unit,
-    op: (List<Expression<RealSort>>) -> Expression<RealSort>
+    op: (List<Expression<RealSort>>) -> Expression<RealSort>,
 ): Expression<RealSort> {
   val builder = Builder<RealSort>()
   builder.init()

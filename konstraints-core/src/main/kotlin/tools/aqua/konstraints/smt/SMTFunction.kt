@@ -48,11 +48,15 @@ abstract class SMTFunction<out T : Sort> {
     if (this !is VarBinding && other is VarBinding<*>) return false
     if (this is SortedVar && other !is SortedVar<*>) return false
     if (this !is SortedVar && other is SortedVar<*>) return false
-    else if (symbol == other.symbol && // symbol equality
-        sort == other.sort && // same sort
-        parameters.size == other.parameters.size && // same number of parameters
-        (parameters zip other.parameters).all { (s1, s2) -> s1 == s2 } // pairwise equal parameters
-    ) return true
+    else if (
+        symbol == other.symbol && // symbol equality
+            sort == other.sort && // same sort
+            parameters.size == other.parameters.size && // same number of parameters
+            (parameters zip other.parameters).all { (s1, s2) ->
+              s1 == s2
+            } // pairwise equal parameters
+    )
+        return true
     return false
 
     // does not consider definition for equality because two functions
@@ -127,7 +131,12 @@ abstract class DefinedSMTFunction<T : Sort> : SMTFunction<T>() {
     }
 
     return UserDefinedExpression(
-        symbol, sort, args, FunctionDef(symbol, sortedVars, sort, term), this)
+        symbol,
+        sort,
+        args,
+        FunctionDef(symbol, sortedVars, sort, term),
+        this,
+    )
   }
 }
 

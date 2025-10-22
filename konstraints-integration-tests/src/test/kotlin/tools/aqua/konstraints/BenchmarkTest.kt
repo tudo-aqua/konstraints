@@ -51,7 +51,8 @@ class BenchmarkTest {
     @JvmStatic
     fun streamUnitTestZ3Benchmarks(): Stream<Benchmark> =
         loadBenchmarks(
-                metadata.selectTests("z3", maxSpeed = FAST, maxSize = 1.MiB, maxPerGroup = 3))
+                metadata.selectTests("z3", maxSpeed = FAST, maxSize = 1.MiB, maxPerGroup = 3)
+            )
             .asStream()
 
     @JvmStatic
@@ -80,7 +81,8 @@ class BenchmarkTest {
 
     /* ignore the test if assumption fails, ignores all unknown tests */
     Assumptions.assumeTrue(
-        (result.info(":status") as SymbolAttributeValue).symbol.toString() != "unknown")
+        (result.info(":status") as SymbolAttributeValue).symbol.toString() != "unknown"
+    )
 
     solver.use {
       result.commands.map { solver.visit(it) }
@@ -88,7 +90,8 @@ class BenchmarkTest {
       // verify we get the correct status for the test
       Assertions.assertEquals(
           (result.info(":status") as SymbolAttributeValue).symbol.toString(),
-          solver.status.toString())
+          solver.status.toString(),
+      )
     }
   }
 }

@@ -58,7 +58,8 @@ class ExpressionTests {
 
     assertTrue(
         program.commands.filterIsInstance<Assert>().first().expr ==
-            program.commands.filterIsInstance<Assert>().first().expr)
+            program.commands.filterIsInstance<Assert>().first().expr
+    )
   }
 
   /** Test that two identical expressions with different references are considered equal */

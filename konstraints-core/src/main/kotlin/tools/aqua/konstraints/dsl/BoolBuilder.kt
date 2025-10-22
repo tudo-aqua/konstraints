@@ -1966,9 +1966,11 @@ class IntEqBuffer(lhs: Long, rhs: Long) {
               FPLiteral(it.toDouble())
             } else {
               throw RuntimeException(
-                  "Kotlin floating points can not be converted to sort ${expr.sort}, use (_ FloatingPoint 8 24) or (_ FloatingPoint 11 53).")
+                  "Kotlin floating points can not be converted to sort ${expr.sort}, use (_ FloatingPoint 8 24) or (_ FloatingPoint 11 53)."
+              )
             }
-          } + expr)
+          } + expr
+      )
 }
 
 @JvmName("eqFloatFloat")
@@ -2045,9 +2047,11 @@ class RealEqBuffer(lhs: Double, rhs: Double) {
               FPLiteral(it.toDouble())
             } else {
               throw RuntimeException(
-                  "Kotlin floating points can not be converted to sort ${expr.sort}, use (_ FloatingPoint 8 24) or (_ FloatingPoint 11 53).")
+                  "Kotlin floating points can not be converted to sort ${expr.sort}, use (_ FloatingPoint 8 24) or (_ FloatingPoint 11 53)."
+              )
             }
-          } + expr)
+          } + expr
+      )
 }
 
 fun main() {
@@ -2069,7 +2073,7 @@ infix fun <T : Sort> Distinct<T>.distinct(other: Expression<T>): Distinct<T> =
 
 private fun makeBoolOperator(
     init: Builder<BoolSort>.() -> Unit,
-    op: (List<Expression<BoolSort>>) -> Expression<BoolSort>
+    op: (List<Expression<BoolSort>>) -> Expression<BoolSort>,
 ): Expression<BoolSort> {
   val builder = Builder<BoolSort>()
   builder.init()

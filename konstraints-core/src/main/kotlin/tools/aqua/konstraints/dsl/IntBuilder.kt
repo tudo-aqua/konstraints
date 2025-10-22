@@ -1672,7 +1672,7 @@ infix fun BigInteger.gt(other: IntGreater) = IntGreater(listOf(IntLiteral(this))
 
 private fun makeIntOperator(
     init: Builder<IntSort>.() -> Unit,
-    op: (List<Expression<IntSort>>) -> Expression<IntSort>
+    op: (List<Expression<IntSort>>) -> Expression<IntSort>,
 ): Expression<IntSort> {
   val builder = Builder<IntSort>()
   builder.init()
