@@ -91,7 +91,9 @@ class ProgramDSLTests {
   @MethodSource("getInfoStringAndValue")
   fun testStringInfo(name: String, value: String) {
     assertEquals(
-        ((program.info(name) as ConstantAttributeValue).constant as StringConstant).string, value)
+        ((program.info(name) as ConstantAttributeValue).constant as StringConstant).string,
+        value,
+    )
   }
 
   fun getInfoStringAndValue(): Stream<Arguments> =
@@ -99,7 +101,8 @@ class ProgramDSLTests {
           arguments("license", "https://creativecommons.org/licenses/by/4.0/"),
           arguments("category", "crafted"),
           arguments("status", "sat"),
-          arguments("flag", "value"))
+          arguments("flag", "value"),
+      )
 
   @ParameterizedTest
   @MethodSource("getBooleanOptionsAndValue")
@@ -129,7 +132,8 @@ class ProgramDSLTests {
       Stream.of(
           arguments("diagnostic-output-channel", "stderr"),
           arguments("regular-output-channel", "stdout"),
-          arguments("option", "value"))
+          arguments("option", "value"),
+      )
 
   @ParameterizedTest
   @MethodSource("getNumeralsOptionsAndValue")

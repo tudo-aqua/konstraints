@@ -42,8 +42,8 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
       base.asSequence().filterIsInstance<UserDeclaredExpression<*>>().forEach { expr ->
         declarationsByName.computeIfAbsentAndMerge(expr.name) { _ ->
           DeclareFun(
-              UserDeclaredSMTFunctionN(
-                  expr.name, expr.sort, expr.children.map(Expression<*>::sort)))
+              UserDeclaredSMTFunctionN(expr.name, expr.sort, expr.children.map(Expression<*>::sort))
+          )
         }
       }
     }
@@ -75,10 +75,15 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
   }
 
   override fun visit(declareConst: DeclareConst<*>) {
-    if (context.functions.put(
-        declareConst.func,
-        context.context.mkConstDecl(
-            declareConst.name.toString(), getOrCreateSort(declareConst.sort))) != null) {
+    if (
+        context.functions.put(
+            declareConst.func,
+            context.context.mkConstDecl(
+                declareConst.name.toString(),
+                getOrCreateSort(declareConst.sort),
+            ),
+        ) != null
+    ) {
       /*
        * if the smt program we are solving is correct (which we assume since otherwise there is a bug somewhere
        * in the construction of the program) this exception SHOULD never be reached
@@ -89,12 +94,16 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
   }
 
   override fun visit(declareFun: DeclareFun<*>) {
-    if (context.functions.put(
-        declareFun.func,
-        context.context.mkFuncDecl(
-            declareFun.name.toString(),
-            declareFun.parameters.map { getOrCreateSort(it) }.toTypedArray(),
-            getOrCreateSort(declareFun.sort))) != null) {
+    if (
+        context.functions.put(
+            declareFun.func,
+            context.context.mkFuncDecl(
+                declareFun.name.toString(),
+                declareFun.parameters.map { getOrCreateSort(it) }.toTypedArray(),
+                getOrCreateSort(declareFun.sort),
+            ),
+        ) != null
+    ) {
       /*
        * if the smt program we are solving is correct (which we assume since otherwise there is a bug somewhere
        * in the construction of the program) this exception SHOULD never be reached
@@ -190,7 +199,11 @@ operator fun Model.Companion.invoke(model: Z3Model, context: Z3Context) =
     Model(
         context.constants.map { (aqua, z3) ->
           FunctionDef(
-              aqua.name as Symbol, emptyList(), aqua.sort, model.getConstInterp(z3).aquaify())
+              aqua.name as Symbol,
+              emptyList(),
+              aqua.sort,
+              model.getConstInterp(z3).aquaify(),
+          )
         } +
             context.functions.map { (aqua, z3) ->
               if (aqua.parameters.isEmpty()) {
@@ -208,7 +221,8 @@ operator fun Model.Companion.invoke(model: Z3Model, context: Z3Context) =
                   FunctionDef(aqua.symbol, arguments, aqua.sort, interp.aquaify(arguments))
                 }
               }
-            })
+            }
+    )
 
 // build the chained ITE that z3 gives as interpretation for functions with arity
 // > 0
@@ -239,8 +253,8 @@ fun FuncInterp.Entry<*>.aquaify(arguments: List<SortedVar<*>>) =
     if (numArgs >= 2) {
       And(
           // build the equality conditions
-          (arguments zip args).map { (local, value) -> Equals(local.instance, value.aquaify()) }) to
-          value.aquaify() // and pair them with their associated value
+          (arguments zip args).map { (local, value) -> Equals(local.instance, value.aquaify()) }
+      ) to value.aquaify() // and pair them with their associated value
     } else {
       // we only have a single condition here since the functions is arity 1
       Equals(arguments.single().instance, args.single().aquaify()) to value.aquaify()

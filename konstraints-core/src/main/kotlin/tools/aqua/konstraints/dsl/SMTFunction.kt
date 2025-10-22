@@ -87,7 +87,7 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort> SMTProgramBuilder.declaring(
     sort: T,
     par1: S1,
     par2: S2,
-    par3: S3
+    par3: S3,
 ) = Declare3(sort, par1, par2, par3, this)
 
 /**
@@ -104,7 +104,7 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> SMTProgramBuilder.dec
     par1: S1,
     par2: S2,
     par3: S3,
-    par4: S4
+    par4: S4,
 ) = Declare4(sort, par1, par2, par3, par4, this)
 
 /**
@@ -122,7 +122,7 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> SMTProgram
     par2: S2,
     par3: S3,
     par4: S4,
-    par5: S5
+    par5: S5,
 ) = Declare5(sort, par1, par2, par3, par4, par5, this)
 
 /**
@@ -147,7 +147,7 @@ fun <T : Sort> SMTProgramBuilder.defining(sort: T, block: (List<Expression<*>>) 
 fun <T : Sort, S : Sort> SMTProgramBuilder.defining(
     sort: T,
     par: S,
-    block: (Expression<S>) -> Expression<T>
+    block: (Expression<S>) -> Expression<T>,
 ) = Define1(sort, block, par, this)
 
 /**
@@ -162,7 +162,7 @@ fun <T : Sort, S1 : Sort, S2 : Sort> SMTProgramBuilder.defining(
     sort: T,
     par1: S1,
     par2: S2,
-    block: (Expression<S1>, Expression<S2>) -> Expression<T>
+    block: (Expression<S1>, Expression<S2>) -> Expression<T>,
 ) = Define2(sort, block, par1, par2, this)
 
 /**
@@ -178,7 +178,7 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort> SMTProgramBuilder.defining(
     par1: S1,
     par2: S2,
     par3: S3,
-    block: (Expression<S1>, Expression<S2>, Expression<S3>) -> Expression<T>
+    block: (Expression<S1>, Expression<S2>, Expression<S3>) -> Expression<T>,
 ) = Define3(sort, block, par1, par2, par3, this)
 
 /**
@@ -195,7 +195,7 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> SMTProgramBuilder.def
     par2: S2,
     par3: S3,
     par4: S4,
-    block: (Expression<S1>, Expression<S2>, Expression<S3>, Expression<S4>) -> Expression<T>
+    block: (Expression<S1>, Expression<S2>, Expression<S3>, Expression<S4>) -> Expression<T>,
 ) = Define4(sort, block, par1, par2, par3, par4, this)
 
 /**
@@ -219,7 +219,8 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> SMTProgram
             Expression<S2>,
             Expression<S3>,
             Expression<S4>,
-            Expression<S5>) -> Expression<T>
+            Expression<S5>,
+        ) -> Expression<T>,
 ) = Define5(sort, block, par1, par2, par3, par4, par5, this)
 
 /**
@@ -235,16 +236,21 @@ class Declare<T : Sort>(
     val sort: T,
     val program: SMTProgramBuilder,
     val parameters: List<Sort> = emptyList(),
-    val name: String? = null
+    val name: String? = null,
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
-      property: KProperty<*>
+      property: KProperty<*>,
   ): SimpleDelegate<SMTFunction<T>> =
       SimpleDelegate(
           program.declareFun(
               UserDeclaredSMTFunctionN(
-                  (name ?: "|${property.name}|").toSymbolWithQuotes(), sort, parameters)))
+                  (name ?: "|${property.name}|").toSymbolWithQuotes(),
+                  sort,
+                  parameters,
+              )
+          )
+      )
 }
 
 /**
@@ -258,14 +264,18 @@ class Declare<T : Sort>(
 class Const<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: String? = null) {
   operator fun provideDelegate(
       thisRef: Any?,
-      property: KProperty<*>
+      property: KProperty<*>,
   ): SimpleDelegate<Expression<T>> =
       SimpleDelegate(
           program
               .declareFun(
                   UserDeclaredSMTFunction0(
-                      (name ?: "|${property.name}|").toSymbolWithQuotes(), sort))
-              .invoke())
+                      (name ?: "|${property.name}|").toSymbolWithQuotes(),
+                      sort,
+                  )
+              )
+              .invoke()
+      )
 }
 
 /**
@@ -279,11 +289,13 @@ class Const<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: Str
 class Declare0<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: String? = null) {
   operator fun provideDelegate(
       thisRef: Any?,
-      property: KProperty<*>
+      property: KProperty<*>,
   ): SimpleDelegate<UserDeclaredSMTFunction0<T>> =
       SimpleDelegate(
           program.declareFun(
-              UserDeclaredSMTFunction0((name ?: "|${property.name}|").toSymbolWithQuotes(), sort)))
+              UserDeclaredSMTFunction0((name ?: "|${property.name}|").toSymbolWithQuotes(), sort)
+          )
+      )
 }
 
 /**
@@ -298,16 +310,21 @@ class Declare1<T : Sort, S : Sort>(
     val sort: T,
     val par: S,
     val program: SMTProgramBuilder,
-    val name: String? = null
+    val name: String? = null,
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
-      property: KProperty<*>
+      property: KProperty<*>,
   ): SimpleDelegate<UserDeclaredSMTFunction1<T, S>> =
       SimpleDelegate(
           program.declareFun(
               UserDeclaredSMTFunction1(
-                  (name ?: "|${property.name}|").toSymbolWithQuotes(), sort, par)))
+                  (name ?: "|${property.name}|").toSymbolWithQuotes(),
+                  sort,
+                  par,
+              )
+          )
+      )
 }
 
 /**
@@ -323,16 +340,22 @@ class Declare2<T : Sort, S1 : Sort, S2 : Sort>(
     val par1: S1,
     val par2: S2,
     val program: SMTProgramBuilder,
-    val name: String? = null
+    val name: String? = null,
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
-      property: KProperty<*>
+      property: KProperty<*>,
   ): SimpleDelegate<UserDeclaredSMTFunction2<T, S1, S2>> =
       SimpleDelegate(
           program.declareFun(
               UserDeclaredSMTFunction2(
-                  (name ?: "|${property.name}|").toSymbolWithQuotes(), sort, par1, par2)))
+                  (name ?: "|${property.name}|").toSymbolWithQuotes(),
+                  sort,
+                  par1,
+                  par2,
+              )
+          )
+      )
 }
 
 /**
@@ -350,16 +373,23 @@ class Declare3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val par2: S2,
     val par3: S3,
     val program: SMTProgramBuilder,
-    val name: String? = null
+    val name: String? = null,
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
-      property: KProperty<*>
+      property: KProperty<*>,
   ): SimpleDelegate<UserDeclaredSMTFunction3<T, S1, S2, S3>> =
       SimpleDelegate(
           program.declareFun(
               UserDeclaredSMTFunction3(
-                  (name ?: "|${property.name}|").toSymbolWithQuotes(), sort, par1, par2, par3)))
+                  (name ?: "|${property.name}|").toSymbolWithQuotes(),
+                  sort,
+                  par1,
+                  par2,
+                  par3,
+              )
+          )
+      )
 }
 
 /**
@@ -378,11 +408,11 @@ class Declare4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val par3: S3,
     val par4: S4,
     val program: SMTProgramBuilder,
-    val name: String? = null
+    val name: String? = null,
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
-      property: KProperty<*>
+      property: KProperty<*>,
   ): SimpleDelegate<UserDeclaredSMTFunction4<T, S1, S2, S3, S4>> =
       SimpleDelegate(
           program.declareFun(
@@ -392,7 +422,10 @@ class Declare4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
                   par1,
                   par2,
                   par3,
-                  par4)))
+                  par4,
+              )
+          )
+      )
 }
 
 /**
@@ -412,11 +445,11 @@ class Declare5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
     val par4: S4,
     val par5: S5,
     val program: SMTProgramBuilder,
-    val name: String? = null
+    val name: String? = null,
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
-      property: KProperty<*>
+      property: KProperty<*>,
   ): SimpleDelegate<UserDeclaredSMTFunction5<T, S1, S2, S3, S4, S5>> =
       SimpleDelegate(
           program.declareFun(
@@ -427,7 +460,10 @@ class Declare5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
                   par2,
                   par3,
                   par4,
-                  par5)))
+                  par5,
+              )
+          )
+      )
 }
 
 /**
@@ -444,11 +480,11 @@ class Define<T : Sort>(
     val block: (List<Expression<Sort>>) -> Expression<T>,
     val program: SMTProgramBuilder,
     val parameters: List<Sort> = emptyList(),
-    val name: String? = null
+    val name: String? = null,
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
-      property: KProperty<*>
+      property: KProperty<*>,
   ): SimpleDelegate<UserDefinedSMTFunctionN<T>> {
     val n = name ?: "|${property.name}|"
     val sortedVars =
@@ -458,7 +494,8 @@ class Define<T : Sort>(
     val term = block(sortedVars.map { it.instance })
 
     return SimpleDelegate(
-        program.defineFun(UserDefinedSMTFunctionN(n.toSymbolWithQuotes(), sort, sortedVars, term)))
+        program.defineFun(UserDefinedSMTFunctionN(n.toSymbolWithQuotes(), sort, sortedVars, term))
+    )
   }
 }
 
@@ -475,18 +512,19 @@ class Define1<T : Sort, S : Sort>(
     val block: (Expression<S>) -> Expression<T>,
     val par: S,
     val program: SMTProgramBuilder,
-    val name: String? = null
+    val name: String? = null,
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
-      property: KProperty<*>
+      property: KProperty<*>,
   ): SimpleDelegate<UserDefinedSMTFunction1<T, S>> {
     val n = name ?: "|${property.name}|"
     val sortedVar = SortedVar("|${property.name}!local!$par!1|".toSymbolWithQuotes(), par)
     val term = block(sortedVar.instance)
 
     return SimpleDelegate(
-        program.defineFun(UserDefinedSMTFunction1(n.toSymbolWithQuotes(), sort, sortedVar, term)))
+        program.defineFun(UserDefinedSMTFunction1(n.toSymbolWithQuotes(), sort, sortedVar, term))
+    )
   }
 }
 
@@ -505,11 +543,11 @@ class Define2<T : Sort, S1 : Sort, S2 : Sort>(
     val par1: S1,
     val par2: S2,
     val program: SMTProgramBuilder,
-    val name: String? = null
+    val name: String? = null,
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
-      property: KProperty<*>
+      property: KProperty<*>,
   ): SimpleDelegate<UserDefinedSMTFunction2<T, S1, S2>> {
     val n = name ?: "|${property.name}|"
     val sortedVar1 = SortedVar("|${property.name}!local!$par1!1|".toSymbolWithQuotes(), par1)
@@ -518,7 +556,9 @@ class Define2<T : Sort, S1 : Sort, S2 : Sort>(
 
     return SimpleDelegate(
         program.defineFun(
-            UserDefinedSMTFunction2(n.toSymbolWithQuotes(), sort, sortedVar1, sortedVar2, term)))
+            UserDefinedSMTFunction2(n.toSymbolWithQuotes(), sort, sortedVar1, sortedVar2, term)
+        )
+    )
   }
 }
 
@@ -538,11 +578,11 @@ class Define3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val par2: S2,
     val par3: S3,
     val program: SMTProgramBuilder,
-    val name: String? = null
+    val name: String? = null,
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
-      property: KProperty<*>
+      property: KProperty<*>,
   ): SimpleDelegate<UserDefinedSMTFunction3<T, S1, S2, S3>> {
     val n = name ?: "|${property.name}|"
     val sortedVar1 = SortedVar("|${property.name}!local!$par1!1|".toSymbolWithQuotes(), par1)
@@ -553,7 +593,15 @@ class Define3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     return SimpleDelegate(
         program.defineFun(
             UserDefinedSMTFunction3(
-                n.toSymbolWithQuotes(), sort, sortedVar1, sortedVar2, sortedVar3, term)))
+                n.toSymbolWithQuotes(),
+                sort,
+                sortedVar1,
+                sortedVar2,
+                sortedVar3,
+                term,
+            )
+        )
+    )
   }
 }
 
@@ -574,11 +622,11 @@ class Define4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val par3: S3,
     val par4: S4,
     val program: SMTProgramBuilder,
-    val name: String? = null
+    val name: String? = null,
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
-      property: KProperty<*>
+      property: KProperty<*>,
   ): SimpleDelegate<UserDefinedSMTFunction4<T, S1, S2, S3, S4>> {
     val n = name ?: "|${property.name}|"
     val sortedVar1 = SortedVar("|${property.name}!local!$par1!1|".toSymbolWithQuotes(), par1)
@@ -597,7 +645,10 @@ class Define4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
                 sortedVar2,
                 sortedVar3,
                 sortedVar4,
-                term)))
+                term,
+            )
+        )
+    )
   }
 }
 
@@ -618,18 +669,19 @@ class Define5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
             Expression<S2>,
             Expression<S3>,
             Expression<S4>,
-            Expression<S5>) -> Expression<T>,
+            Expression<S5>,
+        ) -> Expression<T>,
     val par1: S1,
     val par2: S2,
     val par3: S3,
     val par4: S4,
     val par5: S5,
     val program: SMTProgramBuilder,
-    val name: String? = null
+    val name: String? = null,
 ) {
   operator fun provideDelegate(
       thisRef: Any?,
-      property: KProperty<*>
+      property: KProperty<*>,
   ): SimpleDelegate<UserDefinedSMTFunction5<T, S1, S2, S3, S4, S5>> {
     val n = name ?: "|${property.name}|"
     val sortedVar1 = SortedVar("|${property.name}!local!$par1!1|".toSymbolWithQuotes(), par1)
@@ -643,7 +695,8 @@ class Define5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
             sortedVar2.instance,
             sortedVar3.instance,
             sortedVar4.instance,
-            sortedVar5.instance)
+            sortedVar5.instance,
+        )
 
     return SimpleDelegate(
         program.defineFun(
@@ -655,7 +708,10 @@ class Define5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
                 sortedVar3,
                 sortedVar4,
                 sortedVar5,
-                term)))
+                term,
+            )
+        )
+    )
   }
 }
 
@@ -756,7 +812,7 @@ data class UserDeclaredSMTFunction4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S
       arg1: Expression<S1>,
       arg2: Expression<S2>,
       arg3: Expression<S3>,
-      arg4: Expression<S4>
+      arg4: Expression<S4>,
   ) = UserDeclaredExpression(symbol, sort, listOf(arg1, arg2, arg3, arg4), this)
 }
 
@@ -766,7 +822,13 @@ data class UserDeclaredSMTFunction4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S
  * Use [invoke] to generate an expression with the given parameters applied.
  */
 data class UserDeclaredSMTFunction5<
-    T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
+    T : Sort,
+    S1 : Sort,
+    S2 : Sort,
+    S3 : Sort,
+    S4 : Sort,
+    S5 : Sort,
+>(
     override val symbol: Symbol,
     override val sort: T,
     val parameter1: S1,
@@ -783,7 +845,7 @@ data class UserDeclaredSMTFunction5<
       arg2: Expression<S2>,
       arg3: Expression<S3>,
       arg4: Expression<S4>,
-      arg5: Expression<S5>
+      arg5: Expression<S5>,
   ) = UserDeclaredExpression(symbol, sort, listOf(arg1, arg2, arg3, arg4, arg5), this)
 }
 
@@ -792,7 +854,7 @@ data class UserDefinedSMTFunctionN<T : Sort>(
     override val symbol: Symbol,
     override val sort: T,
     override val sortedVars: List<SortedVar<*>>,
-    override val term: Expression<T>
+    override val term: Expression<T>,
 ) : DefinedSMTFunction<T>() {
 
   /** Pseudo constructor. */
@@ -810,7 +872,7 @@ data class UserDefinedSMTFunctionN<T : Sort>(
 data class UserDefinedSMTFunction0<T : Sort>(
     override val symbol: Symbol,
     override val sort: T,
-    override val term: Expression<T>
+    override val term: Expression<T>,
 ) : DefinedSMTFunction<T>() {
   override val parameters = emptyList<Sort>()
   override val sortedVars = emptyList<SortedVar<*>>()
@@ -818,7 +880,12 @@ data class UserDefinedSMTFunction0<T : Sort>(
   /** Create instance. */
   operator fun invoke() =
       UserDefinedExpression(
-          symbol, sort, emptyList(), FunctionDef(symbol, sortedVars, sort, term), this)
+          symbol,
+          sort,
+          emptyList(),
+          FunctionDef(symbol, sortedVars, sort, term),
+          this,
+      )
 }
 
 /**
@@ -830,13 +897,13 @@ data class UserDefinedSMTFunction1<T : Sort, S : Sort>(
     override val symbol: Symbol,
     override val sort: T,
     val parameter: SortedVar<S>,
-    override val term: Expression<T>
+    override val term: Expression<T>,
 ) : DefinedSMTFunction<T>() {
   constructor(
       symbol: Symbol,
       sort: T,
       parameter: S,
-      term: Expression<T>
+      term: Expression<T>,
   ) : this(symbol, sort, SortedVar("|local!$parameter!1|".toSymbolWithQuotes(), parameter), term)
 
   override val parameters = listOf(parameter.sort)
@@ -845,7 +912,12 @@ data class UserDefinedSMTFunction1<T : Sort, S : Sort>(
   /** Create instance by applying [arg] to [this]. */
   operator fun invoke(arg: Expression<S>) =
       UserDefinedExpression(
-          symbol, sort, listOf(arg), FunctionDef(symbol, sortedVars, sort, term), this)
+          symbol,
+          sort,
+          listOf(arg),
+          FunctionDef(symbol, sortedVars, sort, term),
+          this,
+      )
 }
 
 /**
@@ -858,20 +930,21 @@ data class UserDefinedSMTFunction2<T : Sort, S1 : Sort, S2 : Sort>(
     override val sort: T,
     val parameter1: SortedVar<S1>,
     val parameter2: SortedVar<S2>,
-    override val term: Expression<T>
+    override val term: Expression<T>,
 ) : DefinedSMTFunction<T>() {
   constructor(
       symbol: Symbol,
       sort: T,
       parameter1: S1,
       parameter2: S2,
-      term: Expression<T>
+      term: Expression<T>,
   ) : this(
       symbol,
       sort,
       SortedVar("|$parameter1!1|".toSymbolWithQuotes(), parameter1),
       SortedVar("|$parameter2!2|".toSymbolWithQuotes(), parameter2),
-      term)
+      term,
+  )
 
   override val parameters = listOf(parameter1.sort, parameter2.sort)
   override val sortedVars = listOf(parameter1, parameter2)
@@ -879,7 +952,12 @@ data class UserDefinedSMTFunction2<T : Sort, S1 : Sort, S2 : Sort>(
   /** Create instance by applying [arg1], [arg2] to [this]. */
   operator fun invoke(arg1: Expression<S1>, arg2: Expression<S2>) =
       UserDefinedExpression(
-          symbol, sort, listOf(arg1, arg2), FunctionDef(symbol, sortedVars, sort, term), this)
+          symbol,
+          sort,
+          listOf(arg1, arg2),
+          FunctionDef(symbol, sortedVars, sort, term),
+          this,
+      )
 }
 
 /**
@@ -893,7 +971,7 @@ data class UserDefinedSMTFunction3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val parameter1: SortedVar<S1>,
     val parameter2: SortedVar<S2>,
     val parameter3: SortedVar<S3>,
-    override val term: Expression<T>
+    override val term: Expression<T>,
 ) : DefinedSMTFunction<T>() {
   override val parameters = listOf(parameter1.sort, parameter2.sort, parameter3.sort)
   override val sortedVars = listOf(parameter1, parameter2, parameter3)
@@ -904,19 +982,25 @@ data class UserDefinedSMTFunction3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
       parameter1: S1,
       parameter2: S2,
       parameter3: S3,
-      term: Expression<T>
+      term: Expression<T>,
   ) : this(
       symbol,
       sort,
       SortedVar("|local!$sort!1|".toSymbolWithQuotes(), parameter1),
       SortedVar("|local!$sort!2|".toSymbolWithQuotes(), parameter2),
       SortedVar("|local!$sort!3|".toSymbolWithQuotes(), parameter3),
-      term)
+      term,
+  )
 
   /** Create instance by applying [arg1], [arg2], [arg3] to [this]. */
   operator fun invoke(arg1: Expression<S1>, arg2: Expression<S2>, arg3: Expression<S3>) =
       UserDefinedExpression(
-          symbol, sort, listOf(arg1, arg2, arg3), FunctionDef(symbol, sortedVars, sort, term), this)
+          symbol,
+          sort,
+          listOf(arg1, arg2, arg3),
+          FunctionDef(symbol, sortedVars, sort, term),
+          this,
+      )
 }
 
 /**
@@ -931,7 +1015,7 @@ data class UserDefinedSMTFunction4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4
     val parameter2: SortedVar<S2>,
     val parameter3: SortedVar<S3>,
     val parameter4: SortedVar<S4>,
-    override val term: Expression<T>
+    override val term: Expression<T>,
 ) : DefinedSMTFunction<T>() {
   override val parameters =
       listOf(parameter1.sort, parameter2.sort, parameter3.sort, parameter4.sort)
@@ -944,7 +1028,7 @@ data class UserDefinedSMTFunction4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4
       parameter2: S2,
       parameter3: S3,
       parameter4: S4,
-      term: Expression<T>
+      term: Expression<T>,
   ) : this(
       symbol,
       sort,
@@ -952,21 +1036,23 @@ data class UserDefinedSMTFunction4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4
       SortedVar("|local!$sort!2|".toSymbolWithQuotes(), parameter2),
       SortedVar("|local!$sort!3|".toSymbolWithQuotes(), parameter3),
       SortedVar("|local!$sort!4|".toSymbolWithQuotes(), parameter4),
-      term)
+      term,
+  )
 
   /** Create instance by applying [arg1], [arg2], [arg3], [arg4] to [this]. */
   operator fun invoke(
       arg1: Expression<S1>,
       arg2: Expression<S2>,
       arg3: Expression<S3>,
-      arg4: Expression<S4>
+      arg4: Expression<S4>,
   ) =
       UserDefinedExpression(
           symbol,
           sort,
           listOf(arg1, arg2, arg3, arg4),
           FunctionDef(symbol, sortedVars, sort, term),
-          this)
+          this,
+      )
 }
 
 /**
@@ -982,7 +1068,7 @@ data class UserDefinedSMTFunction5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4
     val parameter3: SortedVar<S3>,
     val parameter4: SortedVar<S4>,
     val parameter5: SortedVar<S5>,
-    override val term: Expression<T>
+    override val term: Expression<T>,
 ) : DefinedSMTFunction<T>() {
   override val parameters =
       listOf(parameter1.sort, parameter2.sort, parameter3.sort, parameter4.sort, parameter5.sort)
@@ -996,7 +1082,7 @@ data class UserDefinedSMTFunction5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4
       parameter3: S3,
       parameter4: S4,
       parameter5: S5,
-      term: Expression<T>
+      term: Expression<T>,
   ) : this(
       symbol,
       sort,
@@ -1005,7 +1091,8 @@ data class UserDefinedSMTFunction5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4
       SortedVar("|local!$sort!3|".toSymbolWithQuotes(), parameter3),
       SortedVar("|local!$sort!4|".toSymbolWithQuotes(), parameter4),
       SortedVar("|local!$sort!5|".toSymbolWithQuotes(), parameter5),
-      term)
+      term,
+  )
 
   /** Create instance by applying [arg1], [arg2], [arg3], [arg4], [arg5] to [this]. */
   operator fun invoke(
@@ -1013,12 +1100,13 @@ data class UserDefinedSMTFunction5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4
       arg2: Expression<S2>,
       arg3: Expression<S3>,
       arg4: Expression<S4>,
-      arg5: Expression<S5>
+      arg5: Expression<S5>,
   ) =
       UserDefinedExpression(
           symbol,
           sort,
           listOf(arg1, arg2, arg3, arg4, arg5),
           FunctionDef(symbol, sortedVars, sort, term),
-          this)
+          this,
+      )
 }

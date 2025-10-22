@@ -60,6 +60,7 @@ class LogicTests {
         Arguments.arguments("QF_UFLRA", QF_UFLRA),
         Arguments.arguments("QF_UFNRA", QF_UFNRA),
         Arguments.arguments("UFLRA", UFLRA),
-        Arguments.arguments("UFNIA", UFNIA))
+        Arguments.arguments("UFNIA", UFNIA),
+    )
   }
 }

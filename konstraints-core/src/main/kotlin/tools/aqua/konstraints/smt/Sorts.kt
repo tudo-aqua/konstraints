@@ -138,7 +138,7 @@ class UserDefinedStringFactory(symbol: Symbol, val parameters: List<Symbol>) :
 
 class UserDefinedStringSort(
     override val definedSymbol: Symbol,
-    override val parameters: List<Sort>
+    override val parameters: List<Sort>,
 ) : StringSort() {
   override fun toString() = definedSymbol.toString()
 
@@ -166,7 +166,7 @@ class UserDefinedRegLanFactory(symbol: Symbol, val parameters: List<Symbol>) :
 
 class UserDefinedRegLanSort(
     override val definedSymbol: Symbol,
-    override val parameters: List<Sort>
+    override val parameters: List<Sort>,
 ) : RegLanSort() {
   override fun toString() = definedSymbol.toString()
 
@@ -194,7 +194,7 @@ class UserDefinedRoundingModeFactory(symbol: Symbol, val parameters: List<Symbol
 
 class UserDefinedRoundingModeSort(
     override val definedSymbol: Symbol,
-    override val parameters: List<Sort>
+    override val parameters: List<Sort>,
 ) : RoundingModeSort() {
   override fun toString() = definedSymbol.toString()
 
@@ -584,7 +584,7 @@ open class UserDeclaredSort(name: Symbol, override val parameters: List<Sort>) :
 class UserDefinedUserDeclaredFactory(
     symbol: Symbol,
     val parameters: List<Symbol>,
-    val sort: UserDeclaredSortFactory
+    val sort: UserDeclaredSortFactory,
 ) : UserDefinedSortFactory(symbol) {
   override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
     require(this.parameters.size == parameters.size)
@@ -603,7 +603,7 @@ class UserDefinedUserDeclaredFactory(
 class UserDefinedUserDeclaredSort(
     override val definedSymbol: Symbol,
     name: Symbol,
-    parameters: List<Sort>
+    parameters: List<Sort>,
 ) : UserDeclaredSort(name, parameters) {
   override fun toString() = definedSymbol.toString()
 
@@ -633,7 +633,7 @@ class UserDefinedBitVectorFactory(symbol: Symbol, val bits: Int, val parameters:
     UserDefinedSortFactory(symbol) {
   override fun build(
       parameters: List<Sort>,
-      indices: List<NumeralIndex>
+      indices: List<NumeralIndex>,
   ): UserDefinedBitVectorSort {
     require(parameters.size == this.parameters.size)
     require(indices.isEmpty())
@@ -659,7 +659,7 @@ class UserDefinedFloatingPointFactory(
     symbol: Symbol,
     val eb: Int,
     val sb: Int,
-    val parameters: List<Symbol>
+    val parameters: List<Symbol>,
 ) : UserDefinedSortFactory(symbol) {
   override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
     require(parameters.size == this.parameters.size)
@@ -687,7 +687,7 @@ class UserDefinedFloatingPointSort(override val definedSymbol: Symbol, eb: Int, 
 class UserDefinedArrayFactory(
     symbol: Symbol,
     val parameters: List<Sort>,
-    val sortParameters: List<Symbol>
+    val sortParameters: List<Symbol>,
 ) : UserDefinedSortFactory(symbol) {
   init {
     require(parameters.size == 2)

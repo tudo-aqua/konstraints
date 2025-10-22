@@ -179,7 +179,7 @@ abstract class ConstantExpression<out T : Sort>(override val name: Symbol, overr
 /** Base class of all expressions with exactly one child */
 abstract class UnaryExpression<out T : Sort, out S : Sort>(
     override val name: Symbol,
-    override val sort: T
+    override val sort: T,
 ) : Expression<T>() {
   override val func = null
 
@@ -194,7 +194,7 @@ abstract class UnaryExpression<out T : Sort, out S : Sort>(
 /** Base class of all expressions with exactly two children */
 abstract class BinaryExpression<out T : Sort, out S1 : Sort, out S2 : Sort>(
     override val name: Symbol,
-    override val sort: T
+    override val sort: T,
 ) : Expression<T>() {
   override val func = null
 
@@ -211,7 +211,7 @@ abstract class BinaryExpression<out T : Sort, out S1 : Sort, out S2 : Sort>(
 /** Base class of all expressions with exactly three children */
 abstract class TernaryExpression<out T : Sort, out S1 : Sort, out S2 : Sort, out S3 : Sort>(
     override val name: Symbol,
-    override val sort: T
+    override val sort: T,
 ) : Expression<T>() {
   override val func = null
 
@@ -233,7 +233,7 @@ abstract class TernaryExpression<out T : Sort, out S1 : Sort, out S2 : Sort, out
  */
 abstract class HomogenousExpression<out T : Sort, out S : Sort>(
     override val name: Symbol,
-    override val sort: T
+    override val sort: T,
 ) : Expression<T>() {
   override val func = null
   abstract override val children: List<Expression<S>>
@@ -262,7 +262,7 @@ class LetExpression<out T : Sort>(val bindings: List<VarBinding<*>>, val inner: 
 
   constructor(
       bindings: List<VarBinding<*>>,
-      inner: (List<Expression<*>>) -> Expression<T>
+      inner: (List<Expression<*>>) -> Expression<T>,
   ) : this(bindings, inner(bindings.map { it.instance }))
 
   /*constructor(
@@ -272,13 +272,13 @@ class LetExpression<out T : Sort>(val bindings: List<VarBinding<*>>, val inner: 
 
   constructor(
       binding: VarBinding<*>,
-      inner: (Expression<*>) -> Expression<T>
+      inner: (Expression<*>) -> Expression<T>,
   ) : this(listOf(binding), inner(binding.instance))
 
   constructor(
       binding1: VarBinding<*>,
       binding2: VarBinding<*>,
-      inner: (Expression<*>, Expression<*>) -> Expression<T>
+      inner: (Expression<*>, Expression<*>) -> Expression<T>,
   ) : this(listOf(binding1, binding2), inner(binding1.instance, binding2.instance))
 
   override fun copy(children: List<Expression<*>>): Expression<T> {
@@ -316,7 +316,7 @@ class UserDeclaredExpression<out T : Sort>(
     name: Symbol,
     sort: T,
     args: List<Expression<*>>,
-    override val func: SMTFunction<T>
+    override val func: SMTFunction<T>,
 ) : NAryExpression<T>(name, sort) {
   override val theories = emptySet<Theories>()
 
@@ -333,7 +333,7 @@ class UserDefinedExpression<T : Sort>(
     sort: T,
     args: List<Expression<*>>,
     val definition: FunctionDef<T>,
-    override val func: DefinedSMTFunction<T>
+    override val func: DefinedSMTFunction<T>,
 ) : NAryExpression<T>(name, sort) {
   override val theories = emptySet<Theories>()
 
@@ -355,7 +355,7 @@ class LocalExpression<T : Sort>(
     override val name: Symbol,
     override val sort: T,
     val term: Expression<T>,
-    override val func: VarBinding<T>
+    override val func: VarBinding<T>,
 ) : Expression<T>() {
   override val theories = emptySet<Theories>()
 
@@ -450,7 +450,7 @@ class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
 class BoundVariable<out T : Sort>(
     override val name: Symbol,
     override val sort: T,
-    override val func: SortedVar<T>
+    override val func: SortedVar<T>,
 ) : Expression<T>() {
   override val theories = emptySet<Theories>()
 

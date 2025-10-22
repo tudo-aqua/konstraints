@@ -82,7 +82,8 @@ class ComputeIfAbsentAndMergeTest {
             map["test"] = 42
             42
           },
-          { _, present, computed -> present + computed })
+          { _, present, computed -> present + computed },
+      )
     }
     assertEquals(84, map["test"])
   }
@@ -97,7 +98,8 @@ class ComputeIfAbsentAndMergeTest {
             map["test"] = 23
             42
           },
-          { _, present, computed -> present + computed })
+          { _, present, computed -> present + computed },
+      )
     }
     assertEquals(65, map["test"])
   }

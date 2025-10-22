@@ -117,7 +117,9 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
    * Checks if [command] is legal w.r.t. the [context]
    */
   @Deprecated(
-      "Prefer usage of specialized functions (e.g. assert)", level = DeprecationLevel.WARNING)
+      "Prefer usage of specialized functions (e.g. assert)",
+      level = DeprecationLevel.WARNING,
+  )
   fun add(command: Command) {
     add(command, _commands.size)
   }
@@ -128,7 +130,9 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
    * Checks if [command] is legal w.r.t. the [context]
    */
   @Deprecated(
-      "Prefer usage of specialized functions (e.g. assert)", level = DeprecationLevel.WARNING)
+      "Prefer usage of specialized functions (e.g. assert)",
+      level = DeprecationLevel.WARNING,
+  )
   fun add(command: Command, index: Int) {
     if (command is Assert) {
       require(command.expr.all { context.contains(it) })
@@ -144,10 +148,12 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     assertion.expr.all {
       if (!(it.theories.isEmpty() || it.theories.any { it in logic!!.theories })) {
         throw AssertionOutOfLogicBounds(
-            "$it was not in logic bounds: expected any of ${logic!!.theories} but was ${it.theories}")
+            "$it was not in logic bounds: expected any of ${logic!!.theories} but was ${it.theories}"
+        )
       } else if (!(it.sort.theories.isEmpty() || it.sort.theories.any { it in logic!!.theories })) {
         throw AssertionOutOfLogicBounds(
-            "${it.sort} was not in logic bounds: expected any of ${logic!!.theories} but was ${it.sort.theories}")
+            "${it.sort} was not in logic bounds: expected any of ${logic!!.theories} but was ${it.sort.theories}"
+        )
       }
       true
     }
@@ -173,7 +179,8 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
 
       if (!result)
           println(
-              "Not in theories ${logic?.theories}: ($expr ${expr.children.joinToString(" ")}) is in ${expr.theories}")
+              "Not in theories ${logic?.theories}: ($expr ${expr.children.joinToString(" ")}) is in ${expr.theories}"
+          )
 
       result
     }
@@ -198,7 +205,7 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
   fun <T : Sort> defineConst(
       name: Symbol,
       sort: T,
-      term: Expression<T>
+      term: Expression<T>,
   ): UserDefinedSMTFunction0<T> {
     val func = UserDefinedSMTFunction0(name, sort, term)
     context.addFun(func)
@@ -256,7 +263,9 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
    * For each command checks if it is legal w.r.t. the [context]
    */
   @Deprecated(
-      "Prefer usage of specialized functions (e.g. assert)", level = DeprecationLevel.WARNING)
+      "Prefer usage of specialized functions (e.g. assert)",
+      level = DeprecationLevel.WARNING,
+  )
   fun addAll(commands: List<Command>) = commands.forEach { add(it) }
 
   // conflicting jvm signature with setter of property logic

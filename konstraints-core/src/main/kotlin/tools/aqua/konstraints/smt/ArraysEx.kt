@@ -32,7 +32,7 @@ import tools.aqua.konstraints.parser.*
  */
 class ArraySelect<X : Sort, Y : Sort>(
     val array: Expression<ArraySort<X, Y>>,
-    val index: Expression<X>
+    val index: Expression<X>,
 ) : BinaryExpression<Y, ArraySort<X, Y>, X>("select".toSymbolWithQuotes(), array.sort.y) {
   override val theories = ARRAYS_EX_MARKER_SET
 
@@ -57,10 +57,12 @@ class ArraySelect<X : Sort, Y : Sort>(
 class ArrayStore<X : Sort, Y : Sort>(
     val array: Expression<ArraySort<X, Y>>,
     val index: Expression<X>,
-    val value: Expression<Y>
+    val value: Expression<Y>,
 ) :
     TernaryExpression<ArraySort<X, Y>, ArraySort<X, Y>, X, Y>(
-        "store".toSymbolWithQuotes(), array.sort) {
+        "store".toSymbolWithQuotes(),
+        array.sort,
+    ) {
   override val theories = ARRAYS_EX_MARKER_SET
 
   init {

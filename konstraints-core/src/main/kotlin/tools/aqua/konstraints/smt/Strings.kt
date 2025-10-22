@@ -245,10 +245,12 @@ class StrAt(val inner: Expression<StringSort>, val position: Expression<IntSort>
 class StrSubstring(
     val inner: Expression<StringSort>,
     val start: Expression<IntSort>,
-    val length: Expression<IntSort>
+    val length: Expression<IntSort>,
 ) :
     TernaryExpression<StringSort, StringSort, IntSort, IntSort>(
-        "str.substr".toSymbolWithQuotes(), SMTString) {
+        "str.substr".toSymbolWithQuotes(),
+        SMTString,
+    ) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = inner
@@ -316,10 +318,12 @@ class StrContains(val string: Expression<StringSort>, val substring: Expression<
 class StrIndexOf(
     val string: Expression<StringSort>,
     val substring: Expression<StringSort>,
-    val start: Expression<IntSort>
+    val start: Expression<IntSort>,
 ) :
     TernaryExpression<IntSort, StringSort, StringSort, IntSort>(
-        "str.indexof".toSymbolWithQuotes(), SMTInt) {
+        "str.indexof".toSymbolWithQuotes(),
+        SMTInt,
+    ) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = string
@@ -339,10 +343,12 @@ class StrIndexOf(
 class StrReplace(
     val inner: Expression<StringSort>,
     val old: Expression<StringSort>,
-    val new: Expression<StringSort>
+    val new: Expression<StringSort>,
 ) :
     TernaryExpression<StringSort, StringSort, StringSort, StringSort>(
-        "str.replace".toSymbolWithQuotes(), SMTString) {
+        "str.replace".toSymbolWithQuotes(),
+        SMTString,
+    ) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = inner
@@ -362,10 +368,12 @@ class StrReplace(
 class StrReplaceAll(
     val inner: Expression<StringSort>,
     val old: Expression<StringSort>,
-    val new: Expression<StringSort>
+    val new: Expression<StringSort>,
 ) :
     TernaryExpression<StringSort, StringSort, StringSort, StringSort>(
-        "str.replace_all".toSymbolWithQuotes(), SMTString) {
+        "str.replace_all".toSymbolWithQuotes(),
+        SMTString,
+    ) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = inner
@@ -382,10 +390,12 @@ class StrReplaceAll(
 class StrReplaceRegex(
     val inner: Expression<StringSort>,
     val old: Expression<RegLanSort>,
-    val new: Expression<StringSort>
+    val new: Expression<StringSort>,
 ) :
     TernaryExpression<StringSort, StringSort, RegLanSort, StringSort>(
-        "str.replace_re".toSymbolWithQuotes(), SMTString) {
+        "str.replace_re".toSymbolWithQuotes(),
+        SMTString,
+    ) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = inner
@@ -402,10 +412,12 @@ class StrReplaceRegex(
 class StrReplaceAllRegex(
     val inner: Expression<StringSort>,
     val old: Expression<RegLanSort>,
-    val new: Expression<StringSort>
+    val new: Expression<StringSort>,
 ) :
     TernaryExpression<StringSort, StringSort, RegLanSort, StringSort>(
-        "str.replace_re_all".toSymbolWithQuotes(), SMTString) {
+        "str.replace_re_all".toSymbolWithQuotes(),
+        SMTString,
+    ) {
   override val theories = STRINGS_MARKER_SET
 
   override val lhs: Expression<StringSort> = inner
@@ -476,7 +488,7 @@ class RegexOption(override val inner: Expression<RegLanSort>) :
  */
 class RegexRange(
     override val lhs: Expression<StringSort>,
-    override val rhs: Expression<StringSort>
+    override val rhs: Expression<StringSort>,
 ) : BinaryExpression<RegLanSort, StringSort, StringSort>("re.range".toSymbolWithQuotes(), RegLan) {
   override val theories = STRINGS_MARKER_SET
 

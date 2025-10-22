@@ -26,7 +26,7 @@ enum class Associativity {
   RIGHT_ASSOC,
   PAIRWISE,
   CHAINABLE,
-  NONE
+  NONE,
 }
 
 /** Base class for all smt functions defined by a theory. */
@@ -34,7 +34,7 @@ abstract class SMTTheoryFunction<T : Sort>(
     override val symbol: Symbol,
     override val parameters: List<Sort>,
     override val sort: T,
-    val associativity: Associativity
+    val associativity: Associativity,
 ) : SMTFunction<T>()
 
 /** Base class for all smt theories. */
@@ -56,17 +56,22 @@ internal object CoreTheory : Theory {
               EqualsDecl,
               DistinctDecl,
               IteDecl,
-              ImpliesDecl)
+              ImpliesDecl,
+          )
           .associateBy { it.symbol }
   override val sorts = mapOf(Bool.symbol to BoolFactory)
 }
 
 internal object TrueDecl :
     SMTTheoryFunction<BoolSort>(
-        "true".toSymbolWithQuotes(), emptyList(), Bool, Associativity.NONE) {
+        "true".toSymbolWithQuotes(),
+        emptyList(),
+        Bool,
+        Associativity.NONE,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -81,10 +86,14 @@ internal object TrueDecl :
 
 internal object FalseDecl :
     SMTTheoryFunction<BoolSort>(
-        "false".toSymbolWithQuotes(), emptyList(), Bool, Associativity.NONE) {
+        "false".toSymbolWithQuotes(),
+        emptyList(),
+        Bool,
+        Associativity.NONE,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -100,10 +109,14 @@ internal object FalseDecl :
 /** Not declaration internal object. */
 internal object NotDecl :
     SMTTheoryFunction<BoolSort>(
-        "not".toSymbolWithQuotes(), listOf(Bool), Bool, Associativity.NONE) {
+        "not".toSymbolWithQuotes(),
+        listOf(Bool),
+        Bool,
+        Associativity.NONE,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -119,11 +132,15 @@ internal object NotDecl :
 /** Implies declaration internal object. */
 internal object ImpliesDecl :
     SMTTheoryFunction<BoolSort>(
-        "=>".toSymbolWithQuotes(), listOf(Bool, Bool), Bool, Associativity.CHAINABLE) {
+        "=>".toSymbolWithQuotes(),
+        listOf(Bool, Bool),
+        Bool,
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -136,7 +153,8 @@ internal object ImpliesDecl :
       Implies(args.map { it.cast() })
     } catch (e: ExpressionCastException) {
       throw IllegalArgumentException(
-          "Expected all args of $symbol to be of sort Bool but was: ${args.map { expr -> expr.sort }.joinToString(", ")}")
+          "Expected all args of $symbol to be of sort Bool but was: ${args.map { expr -> expr.sort }.joinToString(", ")}"
+      )
     }
   }
 }
@@ -144,10 +162,14 @@ internal object ImpliesDecl :
 /** And declaration internal object. */
 internal object AndDecl :
     SMTTheoryFunction<BoolSort>(
-        "and".toSymbolWithQuotes(), listOf(Bool, Bool), Bool, Associativity.LEFT_ASSOC) {
+        "and".toSymbolWithQuotes(),
+        listOf(Bool, Bool),
+        Bool,
+        Associativity.LEFT_ASSOC,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -160,7 +182,8 @@ internal object AndDecl :
       And(args.map { it.cast() })
     } catch (e: ExpressionCastException) {
       throw IllegalArgumentException(
-          "Expected all args of $symbol to be of sort Bool but was: ${args.map { expr -> expr.sort }.joinToString(", ")}")
+          "Expected all args of $symbol to be of sort Bool but was: ${args.map { expr -> expr.sort }.joinToString(", ")}"
+      )
     }
   }
 }
@@ -168,11 +191,15 @@ internal object AndDecl :
 /** Or declaration internal object. */
 internal object OrDecl :
     SMTTheoryFunction<BoolSort>(
-        "or".toSymbolWithQuotes(), listOf(Bool, Bool), Bool, Associativity.LEFT_ASSOC) {
+        "or".toSymbolWithQuotes(),
+        listOf(Bool, Bool),
+        Bool,
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -185,7 +212,8 @@ internal object OrDecl :
       Or(args.map { it.cast() })
     } catch (e: ExpressionCastException) {
       throw IllegalArgumentException(
-          "Expected all args of $symbol to be of sort Bool but was: ${args.map { expr -> expr.sort }.joinToString(", ")}")
+          "Expected all args of $symbol to be of sort Bool but was: ${args.map { expr -> expr.sort }.joinToString(", ")}"
+      )
     }
   }
 }
@@ -193,11 +221,15 @@ internal object OrDecl :
 /** Xor declaration internal object. */
 internal object XOrDecl :
     SMTTheoryFunction<BoolSort>(
-        "xor".toSymbolWithQuotes(), listOf(Bool, Bool), Bool, Associativity.LEFT_ASSOC) {
+        "xor".toSymbolWithQuotes(),
+        listOf(Bool, Bool),
+        Bool,
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -210,7 +242,8 @@ internal object XOrDecl :
       XOr(args.map { it.cast() })
     } catch (e: ExpressionCastException) {
       throw IllegalArgumentException(
-          "Expected all args of $symbol to be of sort Bool but was: ${args.map { expr -> expr.sort }.joinToString(", ")}")
+          "Expected all args of $symbol to be of sort Bool but was: ${args.map { expr -> expr.sort }.joinToString(", ")}"
+      )
     }
   }
 }
@@ -221,11 +254,12 @@ internal object EqualsDecl :
         "=".toSymbolWithQuotes(),
         listOf(SortParameter("A"), SortParameter("A")),
         SortParameter("A"),
-        Associativity.CHAINABLE) {
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -247,11 +281,12 @@ internal object DistinctDecl :
         "distinct".toSymbolWithQuotes(),
         listOf(SortParameter("A"), SortParameter("A")),
         SortParameter("A"),
-        Associativity.PAIRWISE) {
+        Associativity.PAIRWISE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -273,7 +308,8 @@ internal object IteDecl :
         "ite".toSymbolWithQuotes(),
         listOf(Bool, SortParameter("A"), SortParameter("A")),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Ite<*> {
     require(args.size == 3) {
@@ -333,7 +369,8 @@ internal object BitVectorExpressionTheory : Theory {
               BVUAddODecl,
               BVSAddODecl,
               BVUMulODecl,
-              BVSMulODecl)
+              BVSMulODecl,
+          )
           .associateBy { it.symbol }
   override val sorts = mapOf("BitVec".toSymbolWithQuotes() to BitVecFactory)
 }
@@ -343,11 +380,12 @@ internal object BVConcatDecl :
         "concat".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("i"), BVSort.fromSymbol("j")),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
   @Suppress("UNCHECKED_CAST")
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -368,11 +406,12 @@ internal object ExtractDecl :
         "extract".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m")),
         BVSort.fromSymbol("n"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -391,7 +430,8 @@ internal object ExtractDecl :
     return BVExtract(
         (indices[0] as NumeralIndex).numeral,
         (indices[1] as NumeralIndex).numeral,
-        args.single() as Expression<BVSort>)
+        args.single() as Expression<BVSort>,
+    )
   }
 }
 
@@ -400,11 +440,12 @@ internal object BVNotDecl :
         "bvnot".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -426,11 +467,12 @@ internal object BVNegDecl :
         "bvneg".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -452,11 +494,12 @@ internal object BVAndDecl :
         "bvand".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.LEFT_ASSOC) {
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -478,11 +521,12 @@ internal object BVOrDecl :
         "bvor".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.LEFT_ASSOC) {
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -504,11 +548,12 @@ internal object BVAddDecl :
         "bvadd".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.LEFT_ASSOC) {
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -530,11 +575,12 @@ internal object BVMulDecl :
         "bvmul".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.LEFT_ASSOC) {
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -556,11 +602,12 @@ internal object BVUDivDecl :
         "bvudiv".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -582,11 +629,12 @@ internal object BVURemDecl :
         "bvurem".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -608,11 +656,12 @@ internal object BVShlDecl :
         "bvshl".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -634,11 +683,12 @@ internal object BVLShrDecl :
         "bvlshr".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -660,11 +710,12 @@ internal object BVUltDecl :
         "bvult".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -686,11 +737,12 @@ internal object BVNAndDecl :
         "bvnand".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -712,11 +764,12 @@ internal object BVNOrDecl :
         "bvnor".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -738,11 +791,12 @@ internal object BVXOrDecl :
         "bvxor".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.LEFT_ASSOC) {
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -763,11 +817,12 @@ internal object BVXNOrDecl :
         "bvxnor".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -789,11 +844,12 @@ internal object BVCompDecl :
         "bvcomp".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -815,11 +871,12 @@ internal object BVSubDecl :
         "bvsub".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -841,11 +898,12 @@ internal object BVSDivDecl :
         "bvsdiv".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -867,11 +925,12 @@ internal object BVSRemDecl :
         "bvsrem".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -893,11 +952,12 @@ internal object BVSModDecl :
         "bvsmod".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -919,11 +979,12 @@ internal object BVULeDecl :
         "bvule".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -945,11 +1006,12 @@ internal object BVUGtDecl :
         "bvugt".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -971,11 +1033,12 @@ internal object BVUGeDecl :
         "bvuge".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -997,11 +1060,12 @@ internal object BVSLtDecl :
         "bvslt".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1023,11 +1087,12 @@ internal object BVSLeDecl :
         "bvsle".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1049,11 +1114,12 @@ internal object BVSGtDecl :
         "bvsgt".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1075,11 +1141,12 @@ internal object BVSGeDecl :
         "bvsge".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1101,11 +1168,12 @@ internal object BVAShrDecl :
         "bvashr".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1127,10 +1195,11 @@ internal object RepeatDecl :
         "repeat".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m")),
         BVSort.fromSymbol("n"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1155,11 +1224,12 @@ internal object ZeroExtendDecl :
         "zero_extend".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m")),
         BVSort.fromSymbol("n"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1176,7 +1246,9 @@ internal object ZeroExtendDecl :
 
     @Suppress("UNCHECKED_CAST")
     return ZeroExtend(
-        (indices.single() as NumeralIndex).numeral, args.single() as Expression<BVSort>)
+        (indices.single() as NumeralIndex).numeral,
+        args.single() as Expression<BVSort>,
+    )
   }
 }
 
@@ -1185,11 +1257,12 @@ internal object SignExtendDecl :
         "sign_extend".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m")),
         BVSort.fromSymbol("n"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1206,7 +1279,9 @@ internal object SignExtendDecl :
 
     @Suppress("UNCHECKED_CAST")
     return SignExtend(
-        (indices.single() as NumeralIndex).numeral, args.single() as Expression<BVSort>)
+        (indices.single() as NumeralIndex).numeral,
+        args.single() as Expression<BVSort>,
+    )
   }
 }
 
@@ -1215,11 +1290,12 @@ internal object RotateLeftDecl :
         "rotate_left".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m")),
         BVSort.fromSymbol("n"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1236,7 +1312,9 @@ internal object RotateLeftDecl :
 
     @Suppress("UNCHECKED_CAST")
     return RotateLeft(
-        (indices.single() as NumeralIndex).numeral, args.single() as Expression<BVSort>)
+        (indices.single() as NumeralIndex).numeral,
+        args.single() as Expression<BVSort>,
+    )
   }
 }
 
@@ -1245,11 +1323,12 @@ internal object RotateRightDecl :
         "rotate_right".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m")),
         BVSort.fromSymbol("n"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1266,16 +1345,22 @@ internal object RotateRightDecl :
 
     @Suppress("UNCHECKED_CAST")
     return RotateRight(
-        (indices.single() as NumeralIndex).numeral, args.single() as Expression<BVSort>)
+        (indices.single() as NumeralIndex).numeral,
+        args.single() as Expression<BVSort>,
+    )
   }
 }
 
 internal object BVNegODecl :
     SMTTheoryFunction<BoolSort>(
-        "bvnego".toSymbolWithQuotes(), listOf(BVSort.fromSymbol("m")), Bool, Associativity.NONE) {
+        "bvnego".toSymbolWithQuotes(),
+        listOf(BVSort.fromSymbol("m")),
+        Bool,
+        Associativity.NONE,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1294,10 +1379,11 @@ internal object BVUAddODecl :
         "bvuaddo".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1316,10 +1402,11 @@ internal object BVSAddODecl :
         "bvsaddo".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1338,10 +1425,11 @@ internal object BVUSubODecl :
         "bvusubo".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1360,10 +1448,11 @@ internal object BVSSubODecl :
         "bvsaddo".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1382,10 +1471,11 @@ internal object BVUMulODecl :
         "bvumulo".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1404,10 +1494,11 @@ internal object BVSMulODecl :
         "bvsmulo".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1426,10 +1517,11 @@ internal object BVSDivODecl :
         "bvsdivo".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m"), BVSort.fromSymbol("m")),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1448,10 +1540,11 @@ internal object UBVToIntDecl :
         "ubv_to_int".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m")),
         SMTInt,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<IntSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1470,10 +1563,11 @@ internal object SBVToIntDecl :
         "sbv_to_int".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m")),
         SMTInt,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<IntSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1492,10 +1586,11 @@ internal object IntToBVDecl :
         "int_to_bv".toSymbolWithQuotes(),
         listOf(SMTInt),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1529,7 +1624,8 @@ internal object IntsTheory : Theory {
               IntLessDecl,
               IntGreaterEqDecl,
               IntGreaterDecl,
-              DivisibleDecl)
+              DivisibleDecl,
+          )
           .associateBy { it.symbol }
 
   override val sorts = mapOf(SMTInt.symbol to IntFactory)
@@ -1537,11 +1633,15 @@ internal object IntsTheory : Theory {
 
 internal object IntNegDecl :
     SMTTheoryFunction<IntSort>(
-        "-".toSymbolWithQuotes(), listOf(SMTInt), SMTInt, Associativity.NONE) {
+        "-".toSymbolWithQuotes(),
+        listOf(SMTInt),
+        SMTInt,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<IntSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1552,11 +1652,15 @@ internal object IntNegDecl :
 
 internal object IntSubDecl :
     SMTTheoryFunction<IntSort>(
-        "-".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), SMTInt, Associativity.LEFT_ASSOC) {
+        "-".toSymbolWithQuotes(),
+        listOf(SMTInt, SMTInt),
+        SMTInt,
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<IntSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1568,11 +1672,15 @@ internal object IntSubDecl :
 /** Combined function declaration for overloaded '-' operator */
 internal object IntNegSubDecl :
     SMTTheoryFunction<IntSort>(
-        "-".toSymbolWithQuotes(), listOf(SMTInt), SMTInt, Associativity.NONE) {
+        "-".toSymbolWithQuotes(),
+        listOf(SMTInt),
+        SMTInt,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<IntSort> =
       if (args.size == 1) {
         IntNegDecl.constructDynamic(args, indices)
@@ -1585,11 +1693,15 @@ internal object IntNegSubDecl :
 
 internal object IntAddDecl :
     SMTTheoryFunction<IntSort>(
-        "+".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), SMTInt, Associativity.LEFT_ASSOC) {
+        "+".toSymbolWithQuotes(),
+        listOf(SMTInt, SMTInt),
+        SMTInt,
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<IntSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1600,11 +1712,15 @@ internal object IntAddDecl :
 
 internal object IntMulDecl :
     SMTTheoryFunction<IntSort>(
-        "*".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), SMTInt, Associativity.LEFT_ASSOC) {
+        "*".toSymbolWithQuotes(),
+        listOf(SMTInt, SMTInt),
+        SMTInt,
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<IntSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1615,11 +1731,15 @@ internal object IntMulDecl :
 
 internal object IntDivDecl :
     SMTTheoryFunction<IntSort>(
-        "div".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), SMTInt, Associativity.LEFT_ASSOC) {
+        "div".toSymbolWithQuotes(),
+        listOf(SMTInt, SMTInt),
+        SMTInt,
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<IntSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1630,11 +1750,15 @@ internal object IntDivDecl :
 
 internal object ModDecl :
     SMTTheoryFunction<IntSort>(
-        "mod".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), SMTInt, Associativity.NONE) {
+        "mod".toSymbolWithQuotes(),
+        listOf(SMTInt, SMTInt),
+        SMTInt,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<IntSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1645,11 +1769,15 @@ internal object ModDecl :
 
 internal object AbsDecl :
     SMTTheoryFunction<IntSort>(
-        "abs".toSymbolWithQuotes(), listOf(SMTInt), SMTInt, Associativity.NONE) {
+        "abs".toSymbolWithQuotes(),
+        listOf(SMTInt),
+        SMTInt,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<IntSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1660,11 +1788,15 @@ internal object AbsDecl :
 
 internal object IntLessEqDecl :
     SMTTheoryFunction<BoolSort>(
-        "<=".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), Bool, Associativity.CHAINABLE) {
+        "<=".toSymbolWithQuotes(),
+        listOf(SMTInt, SMTInt),
+        Bool,
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1675,11 +1807,15 @@ internal object IntLessEqDecl :
 
 internal object IntLessDecl :
     SMTTheoryFunction<BoolSort>(
-        "<".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), Bool, Associativity.CHAINABLE) {
+        "<".toSymbolWithQuotes(),
+        listOf(SMTInt, SMTInt),
+        Bool,
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1690,11 +1826,15 @@ internal object IntLessDecl :
 
 internal object IntGreaterEqDecl :
     SMTTheoryFunction<BoolSort>(
-        ">=".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), Bool, Associativity.CHAINABLE) {
+        ">=".toSymbolWithQuotes(),
+        listOf(SMTInt, SMTInt),
+        Bool,
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1705,11 +1845,15 @@ internal object IntGreaterEqDecl :
 
 internal object IntGreaterDecl :
     SMTTheoryFunction<BoolSort>(
-        ">".toSymbolWithQuotes(), listOf(SMTInt, SMTInt), Bool, Associativity.CHAINABLE) {
+        ">".toSymbolWithQuotes(),
+        listOf(SMTInt, SMTInt),
+        Bool,
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1720,11 +1864,15 @@ internal object IntGreaterDecl :
 
 internal object DivisibleDecl :
     SMTTheoryFunction<BoolSort>(
-        "divisible".toSymbolWithQuotes(), listOf(SMTInt), Bool, Associativity.NONE) {
+        "divisible".toSymbolWithQuotes(),
+        listOf(SMTInt),
+        Bool,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1741,7 +1889,9 @@ internal object DivisibleDecl :
 
     @Suppress("UNCHECKED_CAST")
     return Divisible(
-        (indices.single() as NumeralIndex).numeral, args.single() as Expression<IntSort>)
+        (indices.single() as NumeralIndex).numeral,
+        args.single() as Expression<IntSort>,
+    )
   }
 }
 
@@ -1756,7 +1906,8 @@ internal object RealsTheory : Theory {
               RealLessEqDecl,
               RealLessDecl,
               RealGreaterEqDecl,
-              RealGreaterDecl)
+              RealGreaterDecl,
+          )
           .associateBy { it.symbol }
 
   override val sorts = mapOf(Real.symbol to RealFactory)
@@ -1767,7 +1918,7 @@ internal object RealNegDecl :
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RealSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1778,11 +1929,15 @@ internal object RealNegDecl :
 
 internal object RealSubDecl :
     SMTTheoryFunction<RealSort>(
-        "-".toSymbolWithQuotes(), listOf(Real), Real, Associativity.LEFT_ASSOC) {
+        "-".toSymbolWithQuotes(),
+        listOf(Real),
+        Real,
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RealSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1797,7 +1952,7 @@ internal object RealNegSubDecl :
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RealSort> =
       if (args.size == 1) {
         RealNegDecl.constructDynamic(args, indices)
@@ -1810,11 +1965,15 @@ internal object RealNegSubDecl :
 
 internal object RealAddDecl :
     SMTTheoryFunction<RealSort>(
-        "+".toSymbolWithQuotes(), listOf(Real, Real), Real, Associativity.LEFT_ASSOC) {
+        "+".toSymbolWithQuotes(),
+        listOf(Real, Real),
+        Real,
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RealSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1825,11 +1984,15 @@ internal object RealAddDecl :
 
 internal object RealMulDecl :
     SMTTheoryFunction<RealSort>(
-        "*".toSymbolWithQuotes(), listOf(Real, Real), Real, Associativity.LEFT_ASSOC) {
+        "*".toSymbolWithQuotes(),
+        listOf(Real, Real),
+        Real,
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RealSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1840,11 +2003,15 @@ internal object RealMulDecl :
 
 internal object RealDivDecl :
     SMTTheoryFunction<RealSort>(
-        "/".toSymbolWithQuotes(), listOf(Real, Real), Real, Associativity.LEFT_ASSOC) {
+        "/".toSymbolWithQuotes(),
+        listOf(Real, Real),
+        Real,
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RealSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1855,11 +2022,15 @@ internal object RealDivDecl :
 
 internal object RealLessEqDecl :
     SMTTheoryFunction<BoolSort>(
-        "<=".toSymbolWithQuotes(), listOf(Real, Real), Bool, Associativity.CHAINABLE) {
+        "<=".toSymbolWithQuotes(),
+        listOf(Real, Real),
+        Bool,
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1870,11 +2041,15 @@ internal object RealLessEqDecl :
 
 internal object RealLessDecl :
     SMTTheoryFunction<BoolSort>(
-        "<".toSymbolWithQuotes(), listOf(Real, Real), Bool, Associativity.CHAINABLE) {
+        "<".toSymbolWithQuotes(),
+        listOf(Real, Real),
+        Bool,
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1885,11 +2060,15 @@ internal object RealLessDecl :
 
 internal object RealGreaterEqDecl :
     SMTTheoryFunction<BoolSort>(
-        ">=".toSymbolWithQuotes(), listOf(Real, Real), Bool, Associativity.CHAINABLE) {
+        ">=".toSymbolWithQuotes(),
+        listOf(Real, Real),
+        Bool,
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1900,11 +2079,15 @@ internal object RealGreaterEqDecl :
 
 internal object RealGreaterDecl :
     SMTTheoryFunction<BoolSort>(
-        ">".toSymbolWithQuotes(), listOf(Real, Real), Bool, Associativity.CHAINABLE) {
+        ">".toSymbolWithQuotes(),
+        listOf(Real, Real),
+        Bool,
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -1931,7 +2114,8 @@ internal object RealsIntsTheory : Theory {
               IntRealLessDecl,
               IntRealLessEqDecl,
               IntRealGreaterDecl,
-              IntRealGreaterEqDecl)
+              IntRealGreaterEqDecl,
+          )
           .associateBy { it.symbol }
 
   override val sorts = mapOf(SMTInt.symbol to IntFactory, Real.symbol to RealFactory)
@@ -1942,7 +2126,8 @@ internal object IntRealNegSubDecl :
         "-".toSymbolWithQuotes(),
         listOf(NumeralSortInstance),
         NumeralSortInstance,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<Sort> {
     require(args[0].sort is IntSort || args[0].sort is RealSort) {
@@ -1967,7 +2152,8 @@ internal object IntRealAddDecl :
         "+".toSymbolWithQuotes(),
         listOf(NumeralSortInstance, NumeralSortInstance),
         NumeralSortInstance,
-        Associativity.LEFT_ASSOC) {
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<Sort> {
     require(args.size >= 2) {
@@ -1991,7 +2177,8 @@ internal object IntRealMulDecl :
         "*".toSymbolWithQuotes(),
         listOf(NumeralSortInstance, NumeralSortInstance),
         NumeralSortInstance,
-        Associativity.LEFT_ASSOC) {
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<Sort> {
     require(args.size >= 2) {
@@ -2012,11 +2199,15 @@ internal object IntRealMulDecl :
 
 internal object ToRealDecl :
     SMTTheoryFunction<RealSort>(
-        "to_real".toSymbolWithQuotes(), listOf(SMTInt), Real, Associativity.NONE) {
+        "to_real".toSymbolWithQuotes(),
+        listOf(SMTInt),
+        Real,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RealSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2027,11 +2218,15 @@ internal object ToRealDecl :
 
 internal object ToIntDecl :
     SMTTheoryFunction<IntSort>(
-        "to_int".toSymbolWithQuotes(), listOf(Real), SMTInt, Associativity.NONE) {
+        "to_int".toSymbolWithQuotes(),
+        listOf(Real),
+        SMTInt,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<IntSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2042,11 +2237,15 @@ internal object ToIntDecl :
 
 internal object IsIntDecl :
     SMTTheoryFunction<BoolSort>(
-        "is_int".toSymbolWithQuotes(), listOf(Real), Bool, Associativity.NONE) {
+        "is_int".toSymbolWithQuotes(),
+        listOf(Real),
+        Bool,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2057,11 +2256,15 @@ internal object IsIntDecl :
 
 internal object IntRealLessDecl :
     SMTTheoryFunction<BoolSort>(
-        "<".toSymbolWithQuotes(), listOf(Real, Real), Bool, Associativity.CHAINABLE) {
+        "<".toSymbolWithQuotes(),
+        listOf(Real, Real),
+        Bool,
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2073,17 +2276,22 @@ internal object IntRealLessDecl :
         RealLessDecl.constructDynamic(args, indices)
     else
         throw IllegalArgumentException(
-            "Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})")
+            "Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})"
+        )
   }
 }
 
 internal object IntRealLessEqDecl :
     SMTTheoryFunction<BoolSort>(
-        "<=".toSymbolWithQuotes(), listOf(Real, Real), Bool, Associativity.CHAINABLE) {
+        "<=".toSymbolWithQuotes(),
+        listOf(Real, Real),
+        Bool,
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2095,17 +2303,22 @@ internal object IntRealLessEqDecl :
         RealLessEqDecl.constructDynamic(args, indices)
     else
         throw IllegalArgumentException(
-            "Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")}), (<= ${args[0]} ${args[1].name})")
+            "Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")}), (<= ${args[0]} ${args[1].name})"
+        )
   }
 }
 
 internal object IntRealGreaterEqDecl :
     SMTTheoryFunction<BoolSort>(
-        ">=".toSymbolWithQuotes(), listOf(Real, Real), Bool, Associativity.CHAINABLE) {
+        ">=".toSymbolWithQuotes(),
+        listOf(Real, Real),
+        Bool,
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2117,17 +2330,22 @@ internal object IntRealGreaterEqDecl :
         RealGreaterEqDecl.constructDynamic(args, indices)
     else
         throw IllegalArgumentException(
-            "Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})")
+            "Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})"
+        )
   }
 }
 
 internal object IntRealGreaterDecl :
     SMTTheoryFunction<BoolSort>(
-        ">".toSymbolWithQuotes(), listOf(Real, Real), Bool, Associativity.CHAINABLE) {
+        ">".toSymbolWithQuotes(),
+        listOf(Real, Real),
+        Bool,
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2139,7 +2357,8 @@ internal object IntRealGreaterDecl :
         RealGreaterDecl.constructDynamic(args, indices)
     else
         throw IllegalArgumentException(
-            "Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})")
+            "Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")})"
+        )
   }
 }
 
@@ -2191,7 +2410,8 @@ internal object FloatingPointTheory : Theory {
               UBitVecToFPDecl,
               FPToUBitVecDecl,
               FPToSBitVecDecl,
-              FPToRealDecl)
+              FPToRealDecl,
+          )
           .associateBy { it.symbol }
 
   override val sorts =
@@ -2203,7 +2423,8 @@ internal object FloatingPointTheory : Theory {
           "Float16".toSymbolWithQuotes() to Float16Factory,
           "Float32".toSymbolWithQuotes() to Float32Factory,
           "Float64".toSymbolWithQuotes() to Float64Factory,
-          "Float128".toSymbolWithQuotes() to Float128Factory)
+          "Float128".toSymbolWithQuotes() to Float128Factory,
+      )
 }
 
 internal object RoundNearestTiesToEvenDecl :
@@ -2211,11 +2432,12 @@ internal object RoundNearestTiesToEvenDecl :
         "roundNearestTiesToEven".toSymbolWithQuotes(),
         emptyList(),
         RoundingMode,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RoundingModeSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2226,11 +2448,15 @@ internal object RoundNearestTiesToEvenDecl :
 
 internal object RNEDecl :
     SMTTheoryFunction<RoundingModeSort>(
-        "RNE".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
+        "RNE".toSymbolWithQuotes(),
+        emptyList(),
+        RoundingMode,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RoundingModeSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2244,11 +2470,12 @@ internal object RoundNearestTiesToAwayDecl :
         "roundNearestTiesToAway".toSymbolWithQuotes(),
         emptyList(),
         RoundingMode,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RoundingModeSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2259,11 +2486,15 @@ internal object RoundNearestTiesToAwayDecl :
 
 internal object RNADecl :
     SMTTheoryFunction<RoundingModeSort>(
-        "RNA".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
+        "RNA".toSymbolWithQuotes(),
+        emptyList(),
+        RoundingMode,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RoundingModeSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2274,11 +2505,15 @@ internal object RNADecl :
 
 internal object RoundTowardPositiveDecl :
     SMTTheoryFunction<RoundingModeSort>(
-        "roundTowardPositive".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
+        "roundTowardPositive".toSymbolWithQuotes(),
+        emptyList(),
+        RoundingMode,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RoundingModeSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2289,11 +2524,15 @@ internal object RoundTowardPositiveDecl :
 
 internal object RTPDecl :
     SMTTheoryFunction<RoundingModeSort>(
-        "RTP".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
+        "RTP".toSymbolWithQuotes(),
+        emptyList(),
+        RoundingMode,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RoundingModeSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2304,11 +2543,15 @@ internal object RTPDecl :
 
 internal object RoundTowardNegativeDecl :
     SMTTheoryFunction<RoundingModeSort>(
-        "roundTowardNegative".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
+        "roundTowardNegative".toSymbolWithQuotes(),
+        emptyList(),
+        RoundingMode,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RoundingModeSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2319,11 +2562,15 @@ internal object RoundTowardNegativeDecl :
 
 internal object RTNDecl :
     SMTTheoryFunction<RoundingModeSort>(
-        "RTN".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
+        "RTN".toSymbolWithQuotes(),
+        emptyList(),
+        RoundingMode,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RoundingModeSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2334,11 +2581,15 @@ internal object RTNDecl :
 
 internal object RoundTowardZeroDecl :
     SMTTheoryFunction<RoundingModeSort>(
-        "roundTowardZero".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
+        "roundTowardZero".toSymbolWithQuotes(),
+        emptyList(),
+        RoundingMode,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RoundingModeSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2349,11 +2600,15 @@ internal object RoundTowardZeroDecl :
 
 internal object RTZDecl :
     SMTTheoryFunction<RoundingModeSort>(
-        "RTZ".toSymbolWithQuotes(), emptyList(), RoundingMode, Associativity.NONE) {
+        "RTZ".toSymbolWithQuotes(),
+        emptyList(),
+        RoundingMode,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RoundingModeSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2367,19 +2622,23 @@ internal object FPLiteralDecl :
         "fp".toSymbolWithQuotes(),
         listOf(BVSort(1), BVSort.fromSymbol("eb"), BVSort.fromSymbol("i")),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   @Suppress("UNCHECKED_CAST")
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 3) {
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
     require(args.all { expr -> expr.sort is BVSort })
     return FPLiteral(
-        args[0] as Expression<BVSort>, args[1] as Expression<BVSort>, args[2] as Expression<BVSort>)
+        args[0] as Expression<BVSort>,
+        args[1] as Expression<BVSort>,
+        args[2] as Expression<BVSort>,
+    )
   }
 }
 
@@ -2389,10 +2648,11 @@ internal object FPInfinityDecl :
         "+oo".toSymbolWithQuotes(),
         emptyList(),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2414,11 +2674,12 @@ internal object FPMinusInfinityDecl :
         "-oo".toSymbolWithQuotes(),
         emptyList(),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2431,7 +2692,9 @@ internal object FPMinusInfinityDecl :
     }
 
     return FPMinusInfinity(
-        (indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
+        (indices[0] as NumeralIndex).numeral,
+        (indices[1] as NumeralIndex).numeral,
+    )
   }
 }
 
@@ -2441,11 +2704,12 @@ internal object FPZeroDecl :
         "+zero".toSymbolWithQuotes(),
         emptyList(),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2467,11 +2731,12 @@ internal object FPMinusZeroDecl :
         "-zero".toSymbolWithQuotes(),
         emptyList(),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2493,11 +2758,12 @@ internal object FPNaNDecl :
         "NaN".toSymbolWithQuotes(),
         emptyList(),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2519,11 +2785,12 @@ internal object FPAbsDecl :
         "fp.abs".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2546,11 +2813,12 @@ internal object FPNegDecl :
         "fp.neg".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2573,11 +2841,12 @@ internal object FPAddDecl :
         "fp.add".toSymbolWithQuotes(),
         listOf(RoundingMode, FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 3) {
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2600,11 +2869,12 @@ internal object FPSubDecl :
         "fp.sub".toSymbolWithQuotes(),
         listOf(RoundingMode, FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 3) {
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2626,11 +2896,12 @@ internal object FPMulDecl :
         "fp.mul".toSymbolWithQuotes(),
         listOf(RoundingMode, FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 3) {
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2652,11 +2923,12 @@ internal object FPDivDecl :
         "fp.div".toSymbolWithQuotes(),
         listOf(RoundingMode, FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 3) {
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2680,13 +2952,15 @@ internal object FPFmaDecl :
             RoundingMode,
             FPSort("eb".idx(), "sb".idx()),
             FPSort("eb".idx(), "sb".idx()),
-            FPSort("eb".idx(), "sb".idx())),
+            FPSort("eb".idx(), "sb".idx()),
+        ),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 4) {
       "Four arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2709,11 +2983,12 @@ internal object FPSqrtDecl :
         "fp.sqrt".toSymbolWithQuotes(),
         listOf(RoundingMode, FPSort("eb".idx(), "sb".idx())),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2734,11 +3009,12 @@ internal object FPRemDecl :
         "fp.rem".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2758,11 +3034,12 @@ internal object FPRoundToIntegralDecl :
         "fp.roundToIntegral".toSymbolWithQuotes(),
         listOf(RoundingMode, FPSort("eb".idx(), "sb".idx())),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2783,11 +3060,12 @@ internal object FPMinDecl :
         "fp.min".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2807,11 +3085,12 @@ internal object FPMaxDecl :
         "fp.max".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2831,11 +3110,12 @@ internal object FPLeqDecl :
         "fp.leq".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
         Bool,
-        Associativity.CHAINABLE) {
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2855,11 +3135,12 @@ internal object FPLtDecl :
         "fp.lt".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
         Bool,
-        Associativity.CHAINABLE) {
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2879,11 +3160,12 @@ internal object FPGeqDecl :
         "fp.geq".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
         Bool,
-        Associativity.CHAINABLE) {
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2903,11 +3185,12 @@ internal object FPGtDecl :
         "fp.gt".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
         Bool,
-        Associativity.CHAINABLE) {
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2927,11 +3210,12 @@ internal object FPEqDecl :
         "fp.eq".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
         Bool,
-        Associativity.CHAINABLE) {
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2951,11 +3235,12 @@ internal object FPIsNormalDecl :
         "fp.isNormal".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -2977,11 +3262,12 @@ internal object FPIsSubormalDecl :
         "fp.isSubnormal".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3003,11 +3289,12 @@ internal object FPIsZeroDecl :
         "fp.isZero".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3029,11 +3316,12 @@ internal object FPIsInfiniteDecl :
         "fp.isInfinite".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3055,11 +3343,12 @@ internal object FPIsNaNDecl :
         "fp.isNaN".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3081,11 +3370,12 @@ internal object FPIsNegativeDecl :
         "fp.isNegative".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3107,11 +3397,12 @@ internal object FPIsPositiveDecl :
         "fp.isPositive".toSymbolWithQuotes(),
         listOf(FPSort("eb".idx(), "sb".idx())),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3134,10 +3425,11 @@ internal object ToFPDecl :
         "to_fp".toSymbolWithQuotes(),
         emptyList(),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(indices.size == 2) {
       "Two indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
@@ -3166,11 +3458,12 @@ internal object BitVecToFPDecl :
         "to_fp".toSymbolWithQuotes(),
         listOf(BVSort.fromSymbol("m")),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3189,7 +3482,8 @@ internal object BitVecToFPDecl :
     return BitVecToFP(
         args.single() as Expression<BVSort>,
         (indices[0] as NumeralIndex).numeral,
-        (indices[1] as NumeralIndex).numeral)
+        (indices[1] as NumeralIndex).numeral,
+    )
   }
 }
 
@@ -3198,11 +3492,12 @@ internal object FPToFPDecl :
         "to_fp".toSymbolWithQuotes(),
         listOf(RoundingMode, FPSort("mb".idx(), "nb".idx())),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3221,7 +3516,8 @@ internal object FPToFPDecl :
         args[0].cast(),
         args[1].cast(),
         (indices[0] as NumeralIndex).numeral,
-        (indices[1] as NumeralIndex).numeral)
+        (indices[1] as NumeralIndex).numeral,
+    )
   }
 }
 
@@ -3230,11 +3526,12 @@ internal object RealToFPDecl :
         "to_fp".toSymbolWithQuotes(),
         listOf(RoundingMode, Real),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3253,7 +3550,8 @@ internal object RealToFPDecl :
         args[0].cast(),
         args[1] as Expression<RealSort>,
         (indices[0] as NumeralIndex).numeral,
-        (indices[1] as NumeralIndex).numeral)
+        (indices[1] as NumeralIndex).numeral,
+    )
   }
 }
 
@@ -3262,11 +3560,12 @@ internal object SBitVecToFPDecl :
         "to_fp".toSymbolWithQuotes(),
         listOf(RoundingMode, BVSort.fromSymbol("m")),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3285,7 +3584,8 @@ internal object SBitVecToFPDecl :
         args[0].cast(),
         args[1] as Expression<BVSort>,
         (indices[0] as NumeralIndex).numeral,
-        (indices[1] as NumeralIndex).numeral)
+        (indices[1] as NumeralIndex).numeral,
+    )
   }
 }
 
@@ -3297,11 +3597,12 @@ internal object UBitVecToFPDecl :
             BVSort.fromSymbol("m"),
         ),
         FPSort("eb".idx(), "sb".idx()),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<FPSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3320,7 +3621,8 @@ internal object UBitVecToFPDecl :
         args[0].cast(),
         args[1] as Expression<BVSort>,
         (indices[0] as NumeralIndex).numeral,
-        (indices[1] as NumeralIndex).numeral)
+        (indices[1] as NumeralIndex).numeral,
+    )
   }
 }
 
@@ -3329,11 +3631,12 @@ internal object FPToUBitVecDecl :
         "fp.to_ubv".toSymbolWithQuotes(),
         listOf(RoundingMode, FPSort("eb".idx(), "sb".idx())),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3357,11 +3660,12 @@ internal object FPToSBitVecDecl :
         "fp.to_sbv".toSymbolWithQuotes(),
         listOf(RoundingMode, FPSort("eb".idx(), "sb".idx())),
         BVSort.fromSymbol("m"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BVSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3387,11 +3691,12 @@ internal object FPToRealDecl :
             FPSort("eb".idx(), "sb".idx()),
         ),
         Real,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RealSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3421,7 +3726,8 @@ internal object ArraySelectDecl :
         "select".toSymbolWithQuotes(),
         listOf(SMTArray(SortParameter("X"), SortParameter("Y"))),
         SortParameter("Y"),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   // TODO can this be improved (maybe make this generic)?
   override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<Sort> {
@@ -3445,11 +3751,12 @@ internal object ArrayStoreDecl :
         "store".toSymbolWithQuotes(),
         listOf(SMTArray(SortParameter("X"), SortParameter("Y"))),
         SMTArray(SortParameter("X"), SortParameter("Y")),
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<ArraySort<Sort, Sort>> {
     require(args.size == 3) {
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3507,23 +3814,29 @@ internal object StringsTheory : Theory {
               RegexPowerDecl,
               RegexLoopDecl,
               InRegexDecl,
-              ToRegexDecl)
+              ToRegexDecl,
+          )
           .associateBy { it.symbol }
 
   override val sorts =
       mapOf(
           SMTString.symbol to StringFactory,
           RegLan.symbol to RegLanFactory,
-          SMTInt.symbol to IntFactory)
+          SMTInt.symbol to IntFactory,
+      )
 }
 
 internal object CharDecl :
     SMTTheoryFunction<StringSort>(
-        "char".toSymbolWithQuotes(), emptyList(), SMTString, Associativity.NONE) {
+        "char".toSymbolWithQuotes(),
+        emptyList(),
+        SMTString,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<StringSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3544,11 +3857,12 @@ internal object StrConcatDecl :
         "str.++".toSymbolWithQuotes(),
         listOf(SMTString, SMTString),
         SMTString,
-        Associativity.LEFT_ASSOC) {
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<StringSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3565,11 +3879,15 @@ internal object StrConcatDecl :
 
 internal object StrLengthDecl :
     SMTTheoryFunction<IntSort>(
-        "str.len".toSymbolWithQuotes(), listOf(SMTString), SMTInt, Associativity.NONE) {
+        "str.len".toSymbolWithQuotes(),
+        listOf(SMTString),
+        SMTInt,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<IntSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3585,11 +3903,15 @@ internal object StrLengthDecl :
 
 internal object StrLexOrderDecl :
     SMTTheoryFunction<BoolSort>(
-        "str.<".toSymbolWithQuotes(), listOf(SMTString, SMTString), Bool, Associativity.CHAINABLE) {
+        "str.<".toSymbolWithQuotes(),
+        listOf(SMTString, SMTString),
+        Bool,
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3606,11 +3928,15 @@ internal object StrLexOrderDecl :
 
 internal object ToRegexDecl :
     SMTTheoryFunction<RegLanSort>(
-        "str.to_re".toSymbolWithQuotes(), listOf(SMTString), RegLan, Associativity.NONE) {
+        "str.to_re".toSymbolWithQuotes(),
+        listOf(SMTString),
+        RegLan,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RegLanSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3626,11 +3952,15 @@ internal object ToRegexDecl :
 
 internal object InRegexDecl :
     SMTTheoryFunction<BoolSort>(
-        "str.in_re".toSymbolWithQuotes(), listOf(SMTString, RegLan), Bool, Associativity.NONE) {
+        "str.in_re".toSymbolWithQuotes(),
+        listOf(SMTString, RegLan),
+        Bool,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3647,11 +3977,15 @@ internal object InRegexDecl :
 
 internal object RegexNoneDecl :
     SMTTheoryFunction<RegLanSort>(
-        "re.none".toSymbolWithQuotes(), emptyList(), RegLan, Associativity.NONE) {
+        "re.none".toSymbolWithQuotes(),
+        emptyList(),
+        RegLan,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RegLanSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3666,11 +4000,15 @@ internal object RegexNoneDecl :
 
 internal object RegexAllDecl :
     SMTTheoryFunction<RegLanSort>(
-        "re.all".toSymbolWithQuotes(), emptyList(), RegLan, Associativity.NONE) {
+        "re.all".toSymbolWithQuotes(),
+        emptyList(),
+        RegLan,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RegLanSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3685,11 +4023,15 @@ internal object RegexAllDecl :
 
 internal object RegexAllCharDecl :
     SMTTheoryFunction<RegLanSort>(
-        "re.allchar".toSymbolWithQuotes(), emptyList(), RegLan, Associativity.NONE) {
+        "re.allchar".toSymbolWithQuotes(),
+        emptyList(),
+        RegLan,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RegLanSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3704,11 +4046,15 @@ internal object RegexAllCharDecl :
 
 internal object RegexConcatDecl :
     SMTTheoryFunction<RegLanSort>(
-        "re.++".toSymbolWithQuotes(), listOf(RegLan, RegLan), RegLan, Associativity.LEFT_ASSOC) {
+        "re.++".toSymbolWithQuotes(),
+        listOf(RegLan, RegLan),
+        RegLan,
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RegLanSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3725,11 +4071,15 @@ internal object RegexConcatDecl :
 
 internal object RegexUnionDecl :
     SMTTheoryFunction<RegLanSort>(
-        "re.union".toSymbolWithQuotes(), listOf(RegLan, RegLan), RegLan, Associativity.LEFT_ASSOC) {
+        "re.union".toSymbolWithQuotes(),
+        listOf(RegLan, RegLan),
+        RegLan,
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RegLanSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3746,11 +4096,15 @@ internal object RegexUnionDecl :
 
 internal object RegexIntersecDecl :
     SMTTheoryFunction<RegLanSort>(
-        "re.inter".toSymbolWithQuotes(), listOf(RegLan, RegLan), RegLan, Associativity.LEFT_ASSOC) {
+        "re.inter".toSymbolWithQuotes(),
+        listOf(RegLan, RegLan),
+        RegLan,
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RegLanSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3767,11 +4121,15 @@ internal object RegexIntersecDecl :
 
 internal object RegexStarDecl :
     SMTTheoryFunction<RegLanSort>(
-        "re.*".toSymbolWithQuotes(), listOf(RegLan), RegLan, Associativity.NONE) {
+        "re.*".toSymbolWithQuotes(),
+        listOf(RegLan),
+        RegLan,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RegLanSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3791,11 +4149,12 @@ internal object StrRefLexOrderDecl :
         "str.<=".toSymbolWithQuotes(),
         listOf(SMTString, SMTString),
         Bool,
-        Associativity.CHAINABLE) {
+        Associativity.CHAINABLE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3812,11 +4171,15 @@ internal object StrRefLexOrderDecl :
 
 internal object StrAtDecl :
     SMTTheoryFunction<StringSort>(
-        "str.at".toSymbolWithQuotes(), listOf(SMTString, SMTInt), SMTString, Associativity.NONE) {
+        "str.at".toSymbolWithQuotes(),
+        listOf(SMTString, SMTInt),
+        SMTString,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<StringSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3836,11 +4199,12 @@ internal object StrSubstringDecl :
         "str.substr".toSymbolWithQuotes(),
         listOf(SMTString, SMTInt, SMTInt),
         SMTString,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<StringSort> {
     require(args.size == 3) {
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3861,11 +4225,12 @@ internal object StrPrefixOfDecl :
         "str.prefixof".toSymbolWithQuotes(),
         listOf(SMTString, SMTString),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3884,11 +4249,12 @@ internal object StrSuffixOfDecl :
         "str.suffixof".toSymbolWithQuotes(),
         listOf(SMTString, SMTString),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3907,11 +4273,12 @@ internal object StrContainsDecl :
         "str.contains".toSymbolWithQuotes(),
         listOf(SMTString, SMTString),
         Bool,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3930,11 +4297,12 @@ internal object StrIndexOfDecl :
         "str.indexof".toSymbolWithQuotes(),
         listOf(SMTString, SMTString, SMTInt),
         SMTInt,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<IntSort> {
     require(args.size == 3) {
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3955,11 +4323,12 @@ internal object StrReplaceDecl :
         "str.replace".toSymbolWithQuotes(),
         listOf(SMTString, SMTString, SMTString),
         SMTString,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<StringSort> {
     require(args.size == 3) {
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -3978,11 +4347,12 @@ internal object StrReplaceAllDecl :
         "str.replace_all".toSymbolWithQuotes(),
         listOf(SMTString, SMTString, SMTString),
         SMTString,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<StringSort> {
     require(args.size == 3) {
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -4001,11 +4371,12 @@ internal object StrReplaceRegexDecl :
         "str.replace_re".toSymbolWithQuotes(),
         listOf(SMTString, RegLan, SMTString),
         SMTString,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<StringSort> {
     require(args.size == 3) {
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -4026,11 +4397,12 @@ internal object StrReplaceAllRegexDecl :
         "str.replace_re_all".toSymbolWithQuotes(),
         listOf(SMTString, RegLan, SMTString),
         SMTString,
-        Associativity.NONE) {
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<StringSort> {
     require(args.size == 3) {
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -4048,11 +4420,15 @@ internal object StrReplaceAllRegexDecl :
 
 internal object RegexCompDecl :
     SMTTheoryFunction<RegLanSort>(
-        "re.comp".toSymbolWithQuotes(), listOf(RegLan), RegLan, Associativity.NONE) {
+        "re.comp".toSymbolWithQuotes(),
+        listOf(RegLan),
+        RegLan,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RegLanSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -4068,11 +4444,15 @@ internal object RegexCompDecl :
 
 internal object RegexDiffDecl :
     SMTTheoryFunction<RegLanSort>(
-        "re.diff".toSymbolWithQuotes(), listOf(RegLan, RegLan), RegLan, Associativity.LEFT_ASSOC) {
+        "re.diff".toSymbolWithQuotes(),
+        listOf(RegLan, RegLan),
+        RegLan,
+        Associativity.LEFT_ASSOC,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RegLanSort> {
     require(args.size >= 2) {
       "Atleast two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -4089,11 +4469,15 @@ internal object RegexDiffDecl :
 
 internal object RegexPlusDecl :
     SMTTheoryFunction<RegLanSort>(
-        "re.+".toSymbolWithQuotes(), listOf(RegLan), RegLan, Associativity.NONE) {
+        "re.+".toSymbolWithQuotes(),
+        listOf(RegLan),
+        RegLan,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RegLanSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -4109,11 +4493,15 @@ internal object RegexPlusDecl :
 
 internal object RegexOptionDecl :
     SMTTheoryFunction<RegLanSort>(
-        "re.opt".toSymbolWithQuotes(), listOf(RegLan), RegLan, Associativity.NONE) {
+        "re.opt".toSymbolWithQuotes(),
+        listOf(RegLan),
+        RegLan,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RegLanSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -4129,11 +4517,15 @@ internal object RegexOptionDecl :
 
 internal object RegexRangeDecl :
     SMTTheoryFunction<RegLanSort>(
-        "re.range".toSymbolWithQuotes(), listOf(SMTString, SMTString), RegLan, Associativity.NONE) {
+        "re.range".toSymbolWithQuotes(),
+        listOf(SMTString, SMTString),
+        RegLan,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RegLanSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -4149,11 +4541,15 @@ internal object RegexRangeDecl :
 
 internal object RegexPowerDecl :
     SMTTheoryFunction<RegLanSort>(
-        "re.^".toSymbolWithQuotes(), listOf(RegLan), RegLan, Associativity.NONE) {
+        "re.^".toSymbolWithQuotes(),
+        listOf(RegLan),
+        RegLan,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RegLanSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -4172,11 +4568,15 @@ internal object RegexPowerDecl :
 
 internal object RegexLoopDecl :
     SMTTheoryFunction<RegLanSort>(
-        "re.loop".toSymbolWithQuotes(), listOf(RegLan), RegLan, Associativity.NONE) {
+        "re.loop".toSymbolWithQuotes(),
+        listOf(RegLan),
+        RegLan,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<RegLanSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -4190,17 +4590,24 @@ internal object RegexLoopDecl :
     }
 
     return RegexLoop(
-        args[0].cast(), (indices[0] as NumeralIndex).numeral, (indices[1] as NumeralIndex).numeral)
+        args[0].cast(),
+        (indices[0] as NumeralIndex).numeral,
+        (indices[1] as NumeralIndex).numeral,
+    )
   }
 }
 
 internal object StrIsDigitDecl :
     SMTTheoryFunction<BoolSort>(
-        "str.is_digit".toSymbolWithQuotes(), listOf(SMTString), Bool, Associativity.NONE) {
+        "str.is_digit".toSymbolWithQuotes(),
+        listOf(SMTString),
+        Bool,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<BoolSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -4216,11 +4623,15 @@ internal object StrIsDigitDecl :
 
 internal object StrToCodeDecl :
     SMTTheoryFunction<IntSort>(
-        "str.to_code".toSymbolWithQuotes(), listOf(SMTString), SMTInt, Associativity.NONE) {
+        "str.to_code".toSymbolWithQuotes(),
+        listOf(SMTString),
+        SMTInt,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<IntSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -4236,11 +4647,15 @@ internal object StrToCodeDecl :
 
 internal object StrFromCodeDecl :
     SMTTheoryFunction<StringSort>(
-        "str.from_code".toSymbolWithQuotes(), listOf(SMTInt), SMTString, Associativity.NONE) {
+        "str.from_code".toSymbolWithQuotes(),
+        listOf(SMTInt),
+        SMTString,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<StringSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -4258,11 +4673,15 @@ internal object StrFromCodeDecl :
 
 internal object StrToIntDecl :
     SMTTheoryFunction<IntSort>(
-        "str.to_int".toSymbolWithQuotes(), listOf(SMTString), SMTInt, Associativity.NONE) {
+        "str.to_int".toSymbolWithQuotes(),
+        listOf(SMTString),
+        SMTInt,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<IntSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
@@ -4278,11 +4697,15 @@ internal object StrToIntDecl :
 
 internal object StrFromIntDecl :
     SMTTheoryFunction<StringSort>(
-        "str.from_int".toSymbolWithQuotes(), listOf(SMTInt), SMTString, Associativity.NONE) {
+        "str.from_int".toSymbolWithQuotes(),
+        listOf(SMTInt),
+        SMTString,
+        Associativity.NONE,
+    ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
-      indices: List<Index>
+      indices: List<Index>,
   ): Expression<StringSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"

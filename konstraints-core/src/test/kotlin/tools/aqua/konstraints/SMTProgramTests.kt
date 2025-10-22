@@ -92,9 +92,14 @@ class SMTProgramTests {
         arguments(bvProgram, bvExpressionB),
         arguments(bvProgram, bvExpressionC),
         arguments(
-            coreProgram, exists(Bool) { local -> (local eq coreFunA) and (local eq coreFunB) }),
+            coreProgram,
+            exists(Bool) { local -> (local eq coreFunA) and (local eq coreFunB) },
+        ),
         arguments(
-            coreProgram, forall(Bool) { local -> (local eq coreFunA) and (local eq coreFunB) }))
+            coreProgram,
+            forall(Bool) { local -> (local eq coreFunA) and (local eq coreFunB) },
+        ),
+    )
   }
 
   @ParameterizedTest
@@ -114,7 +119,7 @@ class SMTProgramTests {
   @MethodSource("getUnregisteredExpressions")
   fun testUnregisteredFunctionsThrowInAssert(
       program: MutableSMTProgram,
-      expr: Expression<BoolSort>
+      expr: Expression<BoolSort>,
   ) {
     assertThrows<IllegalArgumentException> { program.assert(expr) }
   }
@@ -123,7 +128,9 @@ class SMTProgramTests {
     return Stream.of(
         arguments(
             coreProgram,
-            UserDeclaredSMTFunction0("Unregistered!bool".toSymbolWithQuotes(), Bool)()))
+            UserDeclaredSMTFunction0("Unregistered!bool".toSymbolWithQuotes(), Bool)(),
+        )
+    )
   }
 
   private fun providePrograms(path: String) =
@@ -133,7 +140,8 @@ class SMTProgramTests {
           .map { file: File ->
             arguments(
                 Parser()
-                    .parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n")))
+                    .parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
+            )
           }
           .asStream()
 
@@ -164,5 +172,8 @@ class SMTProgramTests {
                           "(assert (bvult #b00000000 (ite (bvult foo bar) (bvneg foo) (bvneg bar))))\n" +
                           "(assert (not (fp.eq (fp.neg fpfoo) (fp.fma rm fpfoo fpbar fpfoo) (fp.add rm fpfoo fpbar))))\n" +
                           "(assert (fp.eq (fp.roundToIntegral RTZ fpfoo) (fp.roundToIntegral RTP fpfoo)))\n" +
-                          "(check-sat)")))
+                          "(check-sat)"
+                  )
+          )
+      )
 }

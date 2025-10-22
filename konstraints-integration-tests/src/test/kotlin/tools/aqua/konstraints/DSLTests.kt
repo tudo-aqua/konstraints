@@ -124,7 +124,8 @@ class DSLTests {
                 }
                 checkSat()
               },
-              SatStatus.UNSAT),
+              SatStatus.UNSAT,
+          ),
           arguments(
               smt(QF_BV) {
                 val s = const(BVSort(32))
@@ -133,7 +134,8 @@ class DSLTests {
                 assert { not { (s bvand s) eq s } }
                 checkSat()
               },
-              SatStatus.UNSAT),
+              SatStatus.UNSAT,
+          ),
           arguments(
               smt(QF_BV) {
                 val s = const(BVSort(32))
@@ -142,7 +144,8 @@ class DSLTests {
                 assert { not { (s bvlshr s) eq "#b0".bitvec(32) } }
                 checkSat()
               },
-              SatStatus.UNSAT),
+              SatStatus.UNSAT,
+          ),
           arguments(
               smt(QF_BV) {
                 val s = const(BVSort(32))
@@ -151,7 +154,8 @@ class DSLTests {
                 assert { not { s bvor s eq s } }
                 checkSat()
               },
-              SatStatus.UNSAT),
+              SatStatus.UNSAT,
+          ),
           arguments(
               smt(QF_BV) {
                 val s = const(BVSort(32))
@@ -160,7 +164,8 @@ class DSLTests {
                 assert { not { s bvadd "#b0".bitvec(32) eq s } }
                 checkSat()
               },
-              SatStatus.UNSAT),
+              SatStatus.UNSAT,
+          ),
           arguments(
               smt(QF_BV) {
                 val s = const(BVSort(32))
@@ -169,7 +174,8 @@ class DSLTests {
                 assert { not { s bvmul "#b0".bitvec(32) eq "#b0".bitvec(32) } }
                 checkSat()
               },
-              SatStatus.UNSAT),
+              SatStatus.UNSAT,
+          ),
           arguments(
               smt(QF_FP) {
                 val A = const(FPSort(11, 53))
@@ -178,7 +184,8 @@ class DSLTests {
                 assert { (A fpadd B) eq (B fpadd A) }
                 checkSat()
               },
-              SatStatus.SAT),
+              SatStatus.SAT,
+          ),
           arguments(
               smt(QF_FP) {
                 val zero = FPZero(5, 11)
@@ -187,7 +194,8 @@ class DSLTests {
                 assert { (zero fpdiv zero) eq (nan) }
                 checkSat()
               },
-              SatStatus.SAT),
+              SatStatus.SAT,
+          ),
           arguments(
               smt(QF_FP) {
                 val A = const(FPSort(11, 53))
@@ -197,7 +205,8 @@ class DSLTests {
                 assert { ((A fpmul B) fpadd C) fpeq (fpfma { A } mul { B } add { C }) }
                 checkSat()
               },
-              SatStatus.SAT),
+              SatStatus.SAT,
+          ),
           arguments(
               smt(QF_FP) {
                 val A = const(FPSort(11, 53))
@@ -207,13 +216,15 @@ class DSLTests {
                 assert { ((A fpmul B) fpadd C) eq (fpfma { A } mul { B } add { C }) }
                 checkSat()
               },
-              SatStatus.SAT),
+              SatStatus.SAT,
+          ),
           arguments(
               smt(QF_BV) {
                 assert { exists(BVSort(8), BVSort(8)) { x, y -> (x bvadd y) bvult x } }
                 checkSat()
               },
-              SatStatus.SAT),
+              SatStatus.SAT,
+          ),
           arguments(
               smt(QF_BV) {
                 assert {
@@ -226,30 +237,32 @@ class DSLTests {
                       BVSort(3),
                       BVSort(3),
                       BVSort(3),
-                      BVSort(3)) { exprs ->
-                        val x1 = exprs[0] as Expression<BVSort>
-                        val x2 = exprs[0] as Expression<BVSort>
-                        val x3 = exprs[0] as Expression<BVSort>
-                        val x4 = exprs[0] as Expression<BVSort>
-                        val x5 = exprs[0] as Expression<BVSort>
-                        val x6 = exprs[0] as Expression<BVSort>
-                        val x7 = exprs[0] as Expression<BVSort>
-                        val x8 = exprs[0] as Expression<BVSort>
-                        val x9 = exprs[0] as Expression<BVSort>
-                        (x1 distinct
-                            x2 distinct
-                            x3 distinct
-                            x4 distinct
-                            x5 distinct
-                            x6 distinct
-                            x7 distinct
-                            x8 distinct
-                            x9)
-                      }
+                      BVSort(3),
+                  ) { exprs ->
+                    val x1 = exprs[0] as Expression<BVSort>
+                    val x2 = exprs[0] as Expression<BVSort>
+                    val x3 = exprs[0] as Expression<BVSort>
+                    val x4 = exprs[0] as Expression<BVSort>
+                    val x5 = exprs[0] as Expression<BVSort>
+                    val x6 = exprs[0] as Expression<BVSort>
+                    val x7 = exprs[0] as Expression<BVSort>
+                    val x8 = exprs[0] as Expression<BVSort>
+                    val x9 = exprs[0] as Expression<BVSort>
+                    (x1 distinct
+                        x2 distinct
+                        x3 distinct
+                        x4 distinct
+                        x5 distinct
+                        x6 distinct
+                        x7 distinct
+                        x8 distinct
+                        x9)
+                  }
                 }
                 checkSat()
               },
-              SatStatus.UNSAT),
+              SatStatus.UNSAT,
+          ),
           arguments(
               smt(QF_BV) {
                 assert {
@@ -262,22 +275,24 @@ class DSLTests {
                       BVSort(3),
                       BVSort(3),
                       BVSort(3),
-                      BVSort(3)) { exprs ->
-                        val x1 = exprs[0] as Expression<BVSort>
-                        val x2 = exprs[1] as Expression<BVSort>
-                        val x3 = exprs[2] as Expression<BVSort>
-                        val x4 = exprs[3] as Expression<BVSort>
-                        val x5 = exprs[4] as Expression<BVSort>
-                        val x6 = exprs[5] as Expression<BVSort>
-                        val x7 = exprs[6] as Expression<BVSort>
-                        val x8 = exprs[7] as Expression<BVSort>
-                        val x9 = exprs[8] as Expression<BVSort>
-                        (x1 eq { x2 } eq x3 eq x4 eq x5 eq x6 eq x7 eq x8 eq x9)
-                      }
+                      BVSort(3),
+                  ) { exprs ->
+                    val x1 = exprs[0] as Expression<BVSort>
+                    val x2 = exprs[1] as Expression<BVSort>
+                    val x3 = exprs[2] as Expression<BVSort>
+                    val x4 = exprs[3] as Expression<BVSort>
+                    val x5 = exprs[4] as Expression<BVSort>
+                    val x6 = exprs[5] as Expression<BVSort>
+                    val x7 = exprs[6] as Expression<BVSort>
+                    val x8 = exprs[7] as Expression<BVSort>
+                    val x9 = exprs[8] as Expression<BVSort>
+                    (x1 eq { x2 } eq x3 eq x4 eq x5 eq x6 eq x7 eq x8 eq x9)
+                  }
                 }
                 checkSat()
               },
-              SatStatus.SAT),
+              SatStatus.SAT,
+          ),
           arguments(
               smt(QF_BV) {
                 val X by declaringConst(BVSort(8))
@@ -286,7 +301,8 @@ class DSLTests {
                 assert { X bvult Y }
                 checkSat()
               },
-              SatStatus.SAT),
+              SatStatus.SAT,
+          ),
           arguments(
               smt(QF_BV) {
                 assert {
@@ -321,7 +337,8 @@ class DSLTests {
                 }
                 checkSat()
               },
-              SatStatus.SAT),
+              SatStatus.SAT,
+          ),
           arguments(
               smt(QF_BV) {
                 val bvugt2 by
@@ -331,7 +348,8 @@ class DSLTests {
                 assert { bvugt2("#b11111111".bitvec(), "#b01111111".bitvec()) }
                 checkSat()
               },
-              SatStatus.SAT),
+              SatStatus.SAT,
+          ),
           arguments(
               smt(QF_UF) {
                 val A by declaringConst(Bool)
@@ -339,7 +357,8 @@ class DSLTests {
                 assert { A implies { B } implies A }
                 checkSat()
               },
-              SatStatus.SAT),
+              SatStatus.SAT,
+          ),
           arguments(
               smt(QF_UF) {
                 val A = const(Bool)
@@ -347,7 +366,8 @@ class DSLTests {
                 assert { A implies { B } implies A }
                 checkSat()
               },
-              SatStatus.SAT),
+              SatStatus.SAT,
+          ),
           arguments(
               smt(QF_FP) {
                 val A = const(FPSort(5, 11))
@@ -359,7 +379,8 @@ class DSLTests {
                 assert { { A } fpleq { B } fpleq { C } }
                 checkSat()
               },
-              SatStatus.SAT),
+              SatStatus.SAT,
+          ),
           arguments(
               smt(QF_ABV) {
                 val x by declaringConst(SMTArray(BVSort(32), BVSort(8)))
@@ -374,5 +395,7 @@ class DSLTests {
                 }
                 checkSat()
               },
-              SatStatus.SAT))
+              SatStatus.SAT,
+          ),
+      )
 }
