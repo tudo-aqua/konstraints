@@ -53,7 +53,8 @@ spotless {
     target("buildSrc/src/*/kotlin/**/*.gradle.kts", "buildSrc/*.gradle.kts")
     licenseHeaderFile(
             rootProject.file("config/license/Apache-2.0-cstyle"),
-            "(dependencyResolutionManagement|import|plugins)")
+            "(dependencyResolutionManagement|import|plugins)",
+        )
         .updateYearWithLatest(true)
     ktfmt()
   }
@@ -110,7 +111,8 @@ spotless {
                 "parser" to "toml",
                 "alignComments" to false,
                 "printWidth" to 100,
-            ))
+            )
+        )
   }
 }
 
