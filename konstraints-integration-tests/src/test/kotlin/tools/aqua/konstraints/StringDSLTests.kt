@@ -18,9 +18,15 @@
 
 package tools.aqua.konstraints
 
+import at
+import comp
 import concat
+import contains
 import diff
+import fromCode
 import in_re
+import intersec
+import length
 import loop
 import opt
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -30,9 +36,18 @@ import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import plus
 import power
+import prefixof
+import suffixof
 import range
+import replace
+import replace_all
 import star
 import times
+import substr
+import indexof
+import isDigit
+import replace_re
+import replace_re_all
 import tools.aqua.konstraints.dsl.*
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.solvers.z3.Z3Solver
@@ -119,13 +134,173 @@ class StringDSLTests {
 
             assert { (s in_re re1) and (s in_re re2) }
             checkSat()
+          },
+          smt(QF_S) {
+              setInfo { status(SatStatus.SAT) }
+
+              val s = const("s", SMTString)
+
+              // language of all strings with length 0 or >=2
+              // (re.diff re.all re.allchar)
+              val re1 = RegexAll diff RegexAllChar
+
+              // language of all strings with length 0 or >=2
+              // (re.comp re.allchar)
+              val re2 = RegexAllChar.comp()
+
+              assert { (s in_re re1) and (s in_re re2) }
+              checkSat()
+          },
+          smt(QF_S) {
+              setInfo { status(SatStatus.SAT) }
+
+              val s = const("s", SMTString)
+
+              // (re.+ (str.to_re "a"))
+              val re1 = "a".plus()
+
+              // (re.++ (re.opt (str.to_re "b")) (re.+ (str.to_re "a")))
+              val re2 = "b".opt() * "a".plus()
+
+              assert { (s in_re re2) and not(s in_re (re2 intersec re1)) }
+              checkSat()
+          },
+          smt(QF_S) {
+              setInfo { status(SatStatus.SAT) }
+
+              val s = const("s", SMTString)
+
+              assert { s prefixof (s + s) }
+              assert { s suffixof (s + s) }
+
+              checkSat()
+          },
+          smt(QF_S) {
+              setInfo { status(SatStatus.SAT) }
+
+              val s = const("s", SMTString)
+              val u = const("u", SMTString)
+              val v = const("v", SMTString)
+
+              assert { s eq (u + v) }
+              assert { u prefixof s }
+              assert { v suffixof s }
+              assert { s contains u }
+              assert { s contains v }
+
+              checkSat()
+          },
+          smt(QF_SLIA) {
+              setInfo { status(SatStatus.SAT) }
+
+              val s = const("s", SMTString)
+              val u = const("u", SMTString)
+              val v = const("v", SMTString)
+
+              assert { s eq (u + v) }
+              assert { s.length() eq u.length() + v.length() }
+
+              checkSat()
+          },
+          smt(QF_SLIA) {
+              setInfo { status(SatStatus.SAT) }
+
+              val s = const("s", SMTString)
+              val u = const("u", SMTString)
+              val v = const("v", SMTString)
+
+              assert { s eq (u + v) }
+              assert { u eq s.substr(0, u.length()) }
+              assert { v eq s.substr(u.length() + 1, v.length()) }
+
+              checkSat()
+          },
+          smt(QF_SLIA) {
+              setInfo { status(SatStatus.SAT) }
+
+              val s = const("s", SMTString)
+              val u = const("u", SMTString)
+              val v = const("v", SMTString)
+
+              assert { s eq (u + v) }
+              assert { s.replace(u, v) eq (v + v)}
+
+              checkSat()
+          },
+          smt(QF_SLIA) {
+              setInfo { status(SatStatus.SAT) }
+
+              val s = const("s", SMTString)
+              val u = const("u", SMTString)
+              val v = const("v", SMTString)
+
+              assert { s eq (u + v + u) }
+              assert { s.replace_all(u, v) eq (v + v + v)}
+
+              checkSat()
+          },
+          smt(QF_S) {
+              setInfo { status(SatStatus.SAT) }
+
+              val s = const("s", SMTString)
+              val u = const("u", SMTString)
+              val v = const("v", SMTString)
+
+              assert { s eq (u + v) }
+              assert { s.at(0) eq u.at(0)}
+
+              checkSat()
+          },
+          smt(QF_SLIA) {
+              setInfo { status(SatStatus.SAT) }
+
+              val s = const("s", SMTString)
+              val u = const("u", SMTString)
+              val v = const("v", SMTString)
+
+              assert { s eq (u + v) }
+              assert { s.indexof(v, 0) eq u.length() }
+
+              checkSat()
+          },
+          smt(QF_SLIA) {
+              setInfo { status(SatStatus.SAT) }
+
+              val re = "b".opt() * "a".plus()
+              val s = const("s", SMTString)
+
+              assert { s eq "abaaba" }
+              assert { s.replace_re(re, "") eq "aaba" }
+
+              checkSat()
+          },
+          smt(QF_SLIA) {
+              setInfo { status(SatStatus.SAT) }
+
+              val re = "b".opt() * "a".plus()
+              val s = const("s", SMTString)
+
+              assert { s eq "abaaba" }
+              assert { s.replace_re_all(re, "") eq "aa" }
+
+              checkSat()
+          },
+          smt(QF_S) {
+              setInfo { status(SatStatus.SAT) }
+              assert { "1".isDigit() }
+              checkSat()
+          },
+          smt(QF_S) {
+              setInfo { status(SatStatus.SAT) }
+              assert { 65.fromCode() eq "A" }
+              checkSat()
           })
 
     @ParameterizedTest
     @MethodSource("providePrograms")
     fun testStringDSL(program: SMTProgram) {
         Z3Solver().use { solver ->
-            assertEquals(program.info("status").toString(), solver.solve(program).toString())
+            assertEquals(program.info("status").toString().trim('"'), solver.solve(program).toString())
         }
     }
 
