@@ -78,7 +78,8 @@ class Z3Context {
 
     if (localVar.sort != sort)
         throw RuntimeException(
-            "Local variable ${binding.name} had unexpected sort: expected $sort but was ${localVar.sort}")
+            "Local variable ${binding.name} had unexpected sort: expected $sort but was ${localVar.sort}"
+        )
 
     // conversion should not fail as we checked the sort for localVar matches expected sort
     @Suppress("UNCHECKED_CAST")
@@ -90,7 +91,8 @@ class Z3Context {
 
     if (boundVar.sort != sort)
         throw RuntimeException(
-            "Bound variable ${sortedVar.symbol} had unexpected sort: expected $sort but was ${boundVar.sort}")
+            "Bound variable ${sortedVar.symbol} had unexpected sort: expected $sort but was ${boundVar.sort}"
+        )
 
     // conversion should not fail as we checked the sort for localVar matches expected sort
     @Suppress("UNCHECKED_CAST")
@@ -114,7 +116,8 @@ class Z3Context {
     // FIXME this sort here might be wrong
     if (constant.sort != sorts[expr.sort]) {
       throw UnexpectedSortException(
-          "Constant ${expr.name} had unexpected sort: expected ${expr.sort} but was ${constant.sort}")
+          "Constant ${expr.name} had unexpected sort: expected ${expr.sort} but was ${constant.sort}"
+      )
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -138,7 +141,8 @@ class Z3Context {
 
     if (function.sort != sort) {
       throw UnexpectedSortException(
-          "Function ${func.symbol} had unexpected sort: expected $sort but was ${function.sort}")
+          "Function ${func.symbol} had unexpected sort: expected $sort but was ${function.sort}"
+      )
     }
 
     @Suppress("UNCHECKED_CAST")

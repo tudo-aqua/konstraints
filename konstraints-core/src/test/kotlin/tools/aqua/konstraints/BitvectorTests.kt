@@ -67,7 +67,7 @@ class BitvectorTests {
   @MethodSource("getBVExpressionsAndSerialization")
   fun `test that serialization of BV expressions is correct`(
       expected: String,
-      expression: Expression<BVSort>
+      expression: Expression<BVSort>,
   ) {
     assertEquals(expected, expression.toString())
   }
@@ -91,14 +91,15 @@ class BitvectorTests {
         arguments("(bvurem A B)", BVURem(A, B)),
         arguments("(bvshl A B)", BVShl(A, B)),
         arguments("(bvlshr A B)", BVLShr(A, B)),
-        arguments("(bvult A B)", BVUlt(A, B)))
+        arguments("(bvult A B)", BVUlt(A, B)),
+    )
   }
 
   @ParameterizedTest
   @MethodSource("getBVExtractParametrization")
   fun `test that BVExtract throws an exception if constraints for i and j are not matched`(
       i: Int,
-      j: Int
+      j: Int,
   ) {
     assertThrows<IllegalArgumentException> { BVExtract(i, j, A) }
   }
@@ -116,7 +117,7 @@ class BitvectorTests {
   @MethodSource("getListConstructorsAndErrorArgs")
   fun `test that an exception is thrown for different BV lengths`(
       constructor: (List<Expression<BVSort>>) -> Expression<BVSort>,
-      args: List<Expression<BVSort>>
+      args: List<Expression<BVSort>>,
   ) {
     assertThrows<IllegalArgumentException> { constructor(args) }
   }
@@ -130,7 +131,8 @@ class BitvectorTests {
         arguments(bvand, listOf(A, D)),
         arguments(bvor, listOf(A, D)),
         arguments(bvadd, listOf(A, D)),
-        arguments(bvmul, listOf(A, D)))
+        arguments(bvmul, listOf(A, D)),
+    )
   }
 
   @ParameterizedTest
@@ -138,7 +140,7 @@ class BitvectorTests {
   fun `test that an exception is thrown when lhs and rhs BV length does not match`(
       constructor: (Expression<BVSort>, Expression<BVSort>) -> Expression<BVSort>,
       lhs: Expression<BVSort>,
-      rhs: Expression<BVSort>
+      rhs: Expression<BVSort>,
   ) {
     assertThrows<IllegalArgumentException> { constructor(lhs, rhs) }
   }
@@ -148,7 +150,8 @@ class BitvectorTests {
         arguments(::BVShl, A, D),
         arguments(::BVURem, A, D),
         arguments(::BVShl, A, D),
-        arguments(::BVLShr, A, D))
+        arguments(::BVLShr, A, D),
+    )
   }
 
   @ParameterizedTest
@@ -156,7 +159,7 @@ class BitvectorTests {
   fun `test that constructor does not throw when BV length matches`(
       constructor: (Expression<BVSort>, Expression<BVSort>) -> Expression<BVSort>,
       lhs: Expression<BVSort>,
-      rhs: Expression<BVSort>
+      rhs: Expression<BVSort>,
   ) {
     assertDoesNotThrow { constructor(lhs, rhs) }
   }
@@ -166,14 +169,15 @@ class BitvectorTests {
         arguments(::BVShl, A, B),
         arguments(::BVURem, A, B),
         arguments(::BVShl, A, B),
-        arguments(::BVLShr, A, B))
+        arguments(::BVLShr, A, B),
+    )
   }
 
   @ParameterizedTest
   @MethodSource("getListConstructors")
   fun `test that list constructor does not throw when BV length matches`(
       constructor: (List<Expression<BVSort>>) -> Expression<BVSort>,
-      args: List<Expression<BVSort>>
+      args: List<Expression<BVSort>>,
   ) {
     assertDoesNotThrow { constructor(args) }
   }
@@ -187,7 +191,8 @@ class BitvectorTests {
         arguments(bvand, listOf(A, B)),
         arguments(bvor, listOf(A, B)),
         arguments(bvadd, listOf(A, B)),
-        arguments(bvmul, listOf(A, B)))
+        arguments(bvmul, listOf(A, B)),
+    )
   }
 
   @ParameterizedTest

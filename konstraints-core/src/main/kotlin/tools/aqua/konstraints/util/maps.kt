@@ -27,7 +27,7 @@ package tools.aqua.konstraints.util
 inline fun <K, V> MutableMap<K, V>.computeIfAbsentAndMerge(
     key: K,
     mapping: (K) -> V,
-    merge: (K, V, V) -> V
+    merge: (K, V, V) -> V,
 ): V {
   // key already present, return value
   this[key]?.let {

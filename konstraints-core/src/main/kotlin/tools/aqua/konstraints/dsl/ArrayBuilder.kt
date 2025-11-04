@@ -36,63 +36,63 @@ fun <X : Sort, Y : Sort> select(array: () -> Expression<ArraySort<X, Y>>, index:
 /** Select value stored in [array] at location [index]. */
 fun <X : Sort, Y : Sort> select(
     array: () -> Expression<ArraySort<X, Y>>,
-    index: () -> Expression<X>
+    index: () -> Expression<X>,
 ) = ArraySelect(array(), index())
 
 /** Store [value] in [array] at location [index]. */
 fun <X : Sort, Y : Sort> store(
     array: Expression<ArraySort<X, Y>>,
     index: Expression<X>,
-    value: Expression<Y>
+    value: Expression<Y>,
 ) = ArrayStore(array, index, value)
 
 /** Store [value] in [array] at location [index]. */
 fun <X : Sort, Y : Sort> store(
     array: Expression<ArraySort<X, Y>>,
     index: Expression<X>,
-    value: () -> Expression<Y>
+    value: () -> Expression<Y>,
 ) = ArrayStore(array, index, value())
 
 /** Store [value] in [array] at location [index]. */
 fun <X : Sort, Y : Sort> store(
     array: Expression<ArraySort<X, Y>>,
     index: () -> Expression<X>,
-    value: Expression<Y>
+    value: Expression<Y>,
 ) = ArrayStore(array, index(), value)
 
 /** Store [value] in [array] at location [index]. */
 fun <X : Sort, Y : Sort> store(
     array: Expression<ArraySort<X, Y>>,
     index: () -> Expression<X>,
-    value: () -> Expression<Y>
+    value: () -> Expression<Y>,
 ) = ArrayStore(array, index(), value())
 
 /** Store [value] in [array] at location [index]. */
 fun <X : Sort, Y : Sort> store(
     array: () -> Expression<ArraySort<X, Y>>,
     index: Expression<X>,
-    value: Expression<Y>
+    value: Expression<Y>,
 ) = ArrayStore(array(), index, value)
 
 /** Store [value] in [array] at location [index]. */
 fun <X : Sort, Y : Sort> store(
     array: () -> Expression<ArraySort<X, Y>>,
     index: Expression<X>,
-    value: () -> Expression<Y>
+    value: () -> Expression<Y>,
 ) = ArrayStore(array(), index, value())
 
 /** Store [value] in [array] at location [index]. */
 fun <X : Sort, Y : Sort> store(
     array: () -> Expression<ArraySort<X, Y>>,
     index: () -> Expression<X>,
-    value: Expression<Y>
+    value: Expression<Y>,
 ) = ArrayStore(array(), index(), value)
 
 /** Store [value] in [array] at location [index]. */
 fun <X : Sort, Y : Sort> store(
     array: () -> Expression<ArraySort<X, Y>>,
     index: () -> Expression<X>,
-    value: () -> Expression<Y>
+    value: () -> Expression<Y>,
 ) = ArrayStore(array(), index(), value())
 
 /** Store [value] at location [index]. */
@@ -110,7 +110,7 @@ fun <X : Sort, Y : Sort> ArrayStore<X, Y>.store(index: Expression<X>, value: () 
 /** Store [value] at location [index]. */
 fun <X : Sort, Y : Sort> ArrayStore<X, Y>.store(
     index: () -> Expression<X>,
-    value: () -> Expression<Y>
+    value: () -> Expression<Y>,
 ) = store(this, index, value)
 
 infix fun<X : Sort, Y : Sort> Expression<Y>.at(index : Expression<X>) = this to index

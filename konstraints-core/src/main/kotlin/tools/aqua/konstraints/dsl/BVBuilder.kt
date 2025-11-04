@@ -652,7 +652,7 @@ fun bvneg(expr: Expression<BVSort>) = BVNeg(expr)
 
 private fun makeOperation(
     init: Builder<BVSort>.() -> Unit,
-    operation: (List<Expression<BVSort>>) -> Expression<BVSort>
+    operation: (List<Expression<BVSort>>) -> Expression<BVSort>,
 ): Expression<BVSort> {
   val builder = Builder<BVSort>()
   builder.init()

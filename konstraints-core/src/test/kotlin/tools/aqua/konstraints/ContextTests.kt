@@ -78,10 +78,15 @@ class ContextTests {
           arguments(createContext(), UserDeclaredSMTFunction0("and".toSymbolWithQuotes(), Bool)),
           arguments(createContext(), UserDeclaredSMTFunction0("true".toSymbolWithQuotes(), Bool)),
           arguments(
-              createContext(), UserDeclaredSMTFunction0("distinct".toSymbolWithQuotes(), Bool)),
+              createContext(),
+              UserDeclaredSMTFunction0("distinct".toSymbolWithQuotes(), Bool),
+          ),
           arguments(createContext(), UserDeclaredSMTFunction0("bvadd".toSymbolWithQuotes(), Bool)),
           arguments(
-              createContext(), UserDeclaredSMTFunction0("extract".toSymbolWithQuotes(), Bool)))
+              createContext(),
+              UserDeclaredSMTFunction0("extract".toSymbolWithQuotes(), Bool),
+          ),
+      )
 
   @Test
   fun testPopFailsOnContextWithOnlyOneLevel() {
@@ -124,7 +129,7 @@ class ContextTests {
   @MethodSource("getContextAndShadowingBindings")
   fun testShadowedFunctionsAreInsertedBackCorrectly(
       context: Context,
-      bindings: List<VarBinding<*>>
+      bindings: List<VarBinding<*>>,
   ) {
     val function = context.getFunc(bindings[0].name)
 
@@ -162,15 +167,18 @@ class ContextTests {
           arguments(
               createContext(),
               UserDeclaredSMTFunction0("|Quoted|".toSymbolWithQuotes(), Bool),
-              "Quoted"),
+              "Quoted",
+          ),
           arguments(
               createContext(),
               UserDeclaredSMTFunction0("|Quoted|".toSymbolWithQuotes(), Bool),
-              "|Quoted|"),
+              "|Quoted|",
+          ),
           arguments(
               createContext(),
               UserDeclaredSMTFunction0("Unquoted".toSymbolWithQuotes(), Bool),
-              "|Unquoted|"),
+              "|Unquoted|",
+          ),
       )
 
   private fun createContext(): Context {

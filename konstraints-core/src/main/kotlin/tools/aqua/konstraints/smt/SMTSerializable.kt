@@ -40,7 +40,7 @@ enum class QuotingRule {
   WHEN_NEEDED,
 
   /** Quotes the string if it is not already quoted. */
-  ALWAYS
+  ALWAYS,
 }
 
 interface SMTSerializable {

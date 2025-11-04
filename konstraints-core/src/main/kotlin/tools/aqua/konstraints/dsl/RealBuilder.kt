@@ -26,6 +26,9 @@ import tools.aqua.konstraints.smt.IsInt
 import tools.aqua.konstraints.smt.RealAdd
 import tools.aqua.konstraints.smt.RealDiv
 import tools.aqua.konstraints.smt.RealGreater
+import tools.aqua.konstraints.smt.RealGreaterEq
+import tools.aqua.konstraints.smt.RealLess
+import tools.aqua.konstraints.smt.RealLessEq
 import tools.aqua.konstraints.smt.RealLiteral
 import tools.aqua.konstraints.smt.RealMul
 import tools.aqua.konstraints.smt.RealNeg
@@ -1283,323 +1286,1240 @@ infix operator fun BigDecimal.div(divisor: () -> Expression<RealSort>) =
     RealLiteral(this) div divisor()
 
 /** Greater operator for RealSort Expressions: [this] > [other]. */
-infix fun Expression<RealSort>.greater(other: Expression<RealSort>) = RealGreater(this, other)
+infix fun Expression<RealSort>.gt(other: Expression<RealSort>) = RealGreater(this, other)
 
 /** Greater operator for RealSort Expressions: [this] > [block]. */
-infix fun Expression<RealSort>.greater(block: () -> Expression<RealSort>) = this greater block()
+infix fun Expression<RealSort>.gt(block: () -> Expression<RealSort>) = this gt block()
 
 /** Greater operator for RealSort Expressions: [this] > [other]. */
-infix fun (() -> Expression<RealSort>).greater(other: Expression<RealSort>) = this() greater other
+infix fun (() -> Expression<RealSort>).gt(other: Expression<RealSort>) = this() gt other
 
 /** Greater operator for RealSort Expressions: [this] > [block]. */
-infix fun (() -> Expression<RealSort>).greater(block: () -> Expression<RealSort>) =
-    this() greater block()
+infix fun (() -> Expression<RealSort>).gt(block: () -> Expression<RealSort>) = this() gt block()
 
 /** Greater operator for RealSort Expressions: [this] > [other]. */
-infix fun RealGreater.greater(other: Expression<RealSort>) = RealGreater(this.children + other)
+infix fun RealGreater.gt(other: Expression<RealSort>) = RealGreater(this.children + other)
 
 /** Greater operator for RealSort Expressions: [this] > [block]. */
-infix fun RealGreater.greater(block: () -> Expression<RealSort>) =
-    RealGreater(this.children + block())
+infix fun RealGreater.gt(block: () -> Expression<RealSort>) = RealGreater(this.children + block())
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Byte] to
  * [RealLiteral].
  */
-infix fun Expression<RealSort>.greater(other: Byte) = this greater RealLiteral(other)
+infix fun Expression<RealSort>.gt(other: Byte) = this gt RealLiteral(other)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Byte] to
  * [RealLiteral].
  */
-infix fun (() -> Expression<RealSort>).greater(other: Byte) = this() greater RealLiteral(other)
+infix fun (() -> Expression<RealSort>).gt(other: Byte) = this() gt RealLiteral(other)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Byte] to
  * [RealLiteral].
  */
-infix fun RealGreater.greater(other: Byte) = RealGreater(this.children + RealLiteral(other))
+infix fun RealGreater.gt(other: Byte) = RealGreater(this.children + RealLiteral(other))
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Byte] to
  * [RealLiteral].
  */
-infix fun Byte.greater(other: Expression<RealSort>) = RealLiteral(this) greater other
+infix fun Byte.gt(other: Expression<RealSort>) = RealLiteral(this) gt other
 
 /**
  * Greater operator for RealSort Expressions: [this] > [block]. [this] is converted from [Byte] to
  * [RealLiteral].
  */
-infix fun Byte.greater(block: () -> Expression<RealSort>) = RealLiteral(this) greater block()
+infix fun Byte.gt(block: () -> Expression<RealSort>) = RealLiteral(this) gt block()
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Byte] to
  * [RealLiteral].
  */
-infix fun Byte.greater(other: RealGreater) = RealGreater(listOf(RealLiteral(this)) + other.children)
+infix fun Byte.gt(other: RealGreater) = RealGreater(listOf(RealLiteral(this)) + other.children)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Short] to
  * [RealLiteral].
  */
-infix fun Expression<RealSort>.greater(other: Short) = this greater RealLiteral(other)
+infix fun Expression<RealSort>.gt(other: Short) = this gt RealLiteral(other)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Short] to
  * [RealLiteral].
  */
-infix fun (() -> Expression<RealSort>).greater(other: Short) = this() greater RealLiteral(other)
+infix fun (() -> Expression<RealSort>).gt(other: Short) = this() gt RealLiteral(other)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Short] to
  * [RealLiteral].
  */
-infix fun RealGreater.greater(other: Short) = RealGreater(this.children + RealLiteral(other))
+infix fun RealGreater.gt(other: Short) = RealGreater(this.children + RealLiteral(other))
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Short] to
  * [RealLiteral].
  */
-infix fun Short.greater(other: Expression<RealSort>) = RealLiteral(this) greater other
+infix fun Short.gt(other: Expression<RealSort>) = RealLiteral(this) gt other
 
 /**
  * Greater operator for RealSort Expressions: [this] > [block]. [this] is converted from [Short] to
  * [RealLiteral].
  */
-infix fun Short.greater(block: () -> Expression<RealSort>) = RealLiteral(this) greater block()
+infix fun Short.gt(block: () -> Expression<RealSort>) = RealLiteral(this) gt block()
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Short] to
  * [RealLiteral].
  */
-infix fun Short.greater(other: RealGreater) =
-    RealGreater(listOf(RealLiteral(this)) + other.children)
+infix fun Short.gt(other: RealGreater) = RealGreater(listOf(RealLiteral(this)) + other.children)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Int] to
  * [RealLiteral].
  */
-infix fun Expression<RealSort>.greater(other: Int) = this greater RealLiteral(other)
+infix fun Expression<RealSort>.gt(other: Int) = this gt RealLiteral(other)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Int] to
  * [RealLiteral].
  */
-infix fun (() -> Expression<RealSort>).greater(other: Int) = this() greater RealLiteral(other)
+infix fun (() -> Expression<RealSort>).gt(other: Int) = this() gt RealLiteral(other)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Int] to
  * [RealLiteral].
  */
-infix fun RealGreater.greater(other: Int) = RealGreater(this.children + RealLiteral(other))
+infix fun RealGreater.gt(other: Int) = RealGreater(this.children + RealLiteral(other))
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Int] to
  * [RealLiteral].
  */
-infix fun Int.greater(other: Expression<RealSort>) = RealLiteral(this) greater other
+infix fun Int.gt(other: Expression<RealSort>) = RealLiteral(this) gt other
 
 /**
  * Greater operator for RealSort Expressions: [this] > [block]. [this] is converted from [Int] to
  * [RealLiteral].
  */
-infix fun Int.greater(block: () -> Expression<RealSort>) = RealLiteral(this) greater block()
+infix fun Int.gt(block: () -> Expression<RealSort>) = RealLiteral(this) gt block()
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Int] to
  * [RealLiteral].
  */
-infix fun Int.greater(other: RealGreater) = RealGreater(listOf(RealLiteral(this)) + other.children)
+infix fun Int.gt(other: RealGreater) = RealGreater(listOf(RealLiteral(this)) + other.children)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Long] to
  * [RealLiteral].
  */
-infix fun Expression<RealSort>.greater(other: Long) = this greater RealLiteral(other)
+infix fun Expression<RealSort>.gt(other: Long) = this gt RealLiteral(other)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Long] to
  * [RealLiteral].
  */
-infix fun (() -> Expression<RealSort>).greater(other: Long) = this() greater RealLiteral(other)
+infix fun (() -> Expression<RealSort>).gt(other: Long) = this() gt RealLiteral(other)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Long] to
  * [RealLiteral].
  */
-infix fun RealGreater.greater(other: Long) = RealGreater(this.children + RealLiteral(other))
+infix fun RealGreater.gt(other: Long) = RealGreater(this.children + RealLiteral(other))
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Long] to
  * [RealLiteral].
  */
-infix fun Long.greater(other: Expression<RealSort>) = RealLiteral(this) greater other
+infix fun Long.gt(other: Expression<RealSort>) = RealLiteral(this) gt other
 
 /**
  * Greater operator for RealSort Expressions: [this] > [block]. [this] is converted from [Long] to
  * [RealLiteral].
  */
-infix fun Long.greater(block: () -> Expression<RealSort>) = RealLiteral(this) greater block()
+infix fun Long.gt(block: () -> Expression<RealSort>) = RealLiteral(this) gt block()
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Long] to
  * [RealLiteral].
  */
-infix fun Long.greater(other: RealGreater) = RealGreater(listOf(RealLiteral(this)) + other.children)
+infix fun Long.gt(other: RealGreater) = RealGreater(listOf(RealLiteral(this)) + other.children)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [BigInteger]
  * to [RealLiteral].
  */
-infix fun Expression<RealSort>.greater(other: BigInteger) = this greater RealLiteral(other)
+infix fun Expression<RealSort>.gt(other: BigInteger) = this gt RealLiteral(other)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [BigInteger]
  * to [RealLiteral].
  */
-infix fun (() -> Expression<RealSort>).greater(other: BigInteger) =
-    this() greater RealLiteral(other)
+infix fun (() -> Expression<RealSort>).gt(other: BigInteger) = this() gt RealLiteral(other)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [BigInteger]
  * to [RealLiteral].
  */
-infix fun RealGreater.greater(other: BigInteger) = RealGreater(this.children + RealLiteral(other))
+infix fun RealGreater.gt(other: BigInteger) = RealGreater(this.children + RealLiteral(other))
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from
  * [BigInteger] to [RealLiteral].
  */
-infix fun BigInteger.greater(other: Expression<RealSort>) = RealLiteral(this) greater other
+infix fun BigInteger.gt(other: Expression<RealSort>) = RealLiteral(this) gt other
 
 /**
  * Greater operator for RealSort Expressions: [this] > [block]. [this] is converted from
  * [BigInteger] to [RealLiteral].
  */
-infix fun BigInteger.greater(block: () -> Expression<RealSort>) = RealLiteral(this) greater block()
+infix fun BigInteger.gt(block: () -> Expression<RealSort>) = RealLiteral(this) gt block()
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from
  * [BigInteger] to [RealLiteral].
  */
-infix fun BigInteger.greater(other: RealGreater) =
+infix fun BigInteger.gt(other: RealGreater) =
     RealGreater(listOf(RealLiteral(this)) + other.children)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Float] to
  * [RealLiteral].
  */
-infix fun Expression<RealSort>.greater(other: Float) = this greater RealLiteral(other)
+infix fun Expression<RealSort>.gt(other: Float) = this gt RealLiteral(other)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Float] to
  * [RealLiteral].
  */
-infix fun (() -> Expression<RealSort>).greater(other: Float) = this() greater RealLiteral(other)
+infix fun (() -> Expression<RealSort>).gt(other: Float) = this() gt RealLiteral(other)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Float] to
  * [RealLiteral].
  */
-infix fun RealGreater.greater(other: Float) = RealGreater(this.children + RealLiteral(other))
+infix fun RealGreater.gt(other: Float) = RealGreater(this.children + RealLiteral(other))
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Float] to
  * [RealLiteral].
  */
-infix fun Float.greater(other: Expression<RealSort>) = RealLiteral(this) greater other
+infix fun Float.gt(other: Expression<RealSort>) = RealLiteral(this) gt other
 
 /**
  * Greater operator for RealSort Expressions: [this] > [block]. [this] is converted from [Float] to
  * [RealLiteral].
  */
-infix fun Float.greater(block: () -> Expression<RealSort>) = RealLiteral(this) greater block()
+infix fun Float.gt(block: () -> Expression<RealSort>) = RealLiteral(this) gt block()
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Float] to
  * [RealLiteral].
  */
-infix fun Float.greater(other: RealGreater) =
-    RealGreater(listOf(RealLiteral(this)) + other.children)
+infix fun Float.gt(other: RealGreater) = RealGreater(listOf(RealLiteral(this)) + other.children)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Double] to
  * [RealLiteral].
  */
-infix fun Expression<RealSort>.greater(other: Double) = this greater RealLiteral(other)
+infix fun Expression<RealSort>.gt(other: Double) = this gt RealLiteral(other)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Double] to
  * [RealLiteral].
  */
-infix fun (() -> Expression<RealSort>).greater(other: Double) = this() greater RealLiteral(other)
+infix fun (() -> Expression<RealSort>).gt(other: Double) = this() gt RealLiteral(other)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [Double] to
  * [RealLiteral].
  */
-infix fun RealGreater.greater(other: Double) = RealGreater(this.children + RealLiteral(other))
+infix fun RealGreater.gt(other: Double) = RealGreater(this.children + RealLiteral(other))
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Double] to
  * [RealLiteral].
  */
-infix fun Double.greater(other: Expression<RealSort>) = RealLiteral(this) greater other
+infix fun Double.gt(other: Expression<RealSort>) = RealLiteral(this) gt other
 
 /**
  * Greater operator for RealSort Expressions: [this] > [block]. [this] is converted from [Double] to
  * [RealLiteral].
  */
-infix fun Double.greater(block: () -> Expression<RealSort>) = RealLiteral(this) greater block()
+infix fun Double.gt(block: () -> Expression<RealSort>) = RealLiteral(this) gt block()
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from [Double] to
  * [RealLiteral].
  */
-infix fun Double.greater(other: RealGreater) =
-    RealGreater(listOf(RealLiteral(this)) + other.children)
+infix fun Double.gt(other: RealGreater) = RealGreater(listOf(RealLiteral(this)) + other.children)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [BigDecimal]
  * to [RealLiteral].
  */
-infix fun Expression<RealSort>.greater(other: BigDecimal) = this greater RealLiteral(other)
+infix fun Expression<RealSort>.gt(other: BigDecimal) = this gt RealLiteral(other)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [BigDecimal]
  * to [RealLiteral].
  */
-infix fun (() -> Expression<RealSort>).greater(other: BigDecimal) =
-    this() greater RealLiteral(other)
+infix fun (() -> Expression<RealSort>).gt(other: BigDecimal) = this() gt RealLiteral(other)
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. other is converted from [BigDecimal]
  * to [RealLiteral].
  */
-infix fun RealGreater.greater(other: BigDecimal) = RealGreater(this.children + RealLiteral(other))
+infix fun RealGreater.gt(other: BigDecimal) = RealGreater(this.children + RealLiteral(other))
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from
  * [BigDecimal] to [RealLiteral].
  */
-infix fun BigDecimal.greater(other: Expression<RealSort>) = RealLiteral(this) greater other
+infix fun BigDecimal.gt(other: Expression<RealSort>) = RealLiteral(this) gt other
 
 /**
  * Greater operator for RealSort Expressions: [this] > [block]. [this] is converted from
  * [BigDecimal] to [RealLiteral].
  */
-infix fun BigDecimal.greater(block: () -> Expression<RealSort>) = RealLiteral(this) greater block()
+infix fun BigDecimal.gt(block: () -> Expression<RealSort>) = RealLiteral(this) gt block()
 
 /**
  * Greater operator for RealSort Expressions: [this] > [other]. [this] is converted from
  * [BigDecimal] to [RealLiteral].
  */
-infix fun BigDecimal.greater(other: RealGreater) =
+infix fun BigDecimal.gt(other: RealGreater) =
     RealGreater(listOf(RealLiteral(this)) + other.children)
+
+/** Less operator for RealSort Expressions: [this] > [other]. */
+infix fun Expression<RealSort>.lt(other: Expression<RealSort>) = RealLess(this, other)
+
+/** Less operator for RealSort Expressions: [this] > [block]. */
+infix fun Expression<RealSort>.lt(block: () -> Expression<RealSort>) = this lt block()
+
+/** Less operator for RealSort Expressions: [this] > [other]. */
+infix fun (() -> Expression<RealSort>).lt(other: Expression<RealSort>) = this() lt other
+
+/** Less operator for RealSort Expressions: [this] > [block]. */
+infix fun (() -> Expression<RealSort>).lt(block: () -> Expression<RealSort>) = this() lt block()
+
+/** Less operator for RealSort Expressions: [this] > [other]. */
+infix fun RealLess.lt(other: Expression<RealSort>) = RealLess(this.children + other)
+
+/** Less operator for RealSort Expressions: [this] > [block]. */
+infix fun RealLess.lt(block: () -> Expression<RealSort>) = RealLess(this.children + block())
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Byte] to
+ * [RealLiteral].
+ */
+infix fun Expression<RealSort>.lt(other: Byte) = this lt RealLiteral(other)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Byte] to
+ * [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).lt(other: Byte) = this() lt RealLiteral(other)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Byte] to
+ * [RealLiteral].
+ */
+infix fun RealLess.lt(other: Byte) = RealLess(this.children + RealLiteral(other))
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. [this] is converted from [Byte] to
+ * [RealLiteral].
+ */
+infix fun Byte.lt(other: Expression<RealSort>) = RealLiteral(this) lt other
+
+/**
+ * Less operator for RealSort Expressions: [this] > [block]. [this] is converted from [Byte] to
+ * [RealLiteral].
+ */
+infix fun Byte.lt(block: () -> Expression<RealSort>) = RealLiteral(this) lt block()
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. [this] is converted from [Byte] to
+ * [RealLiteral].
+ */
+infix fun Byte.lt(other: RealLess) = RealLess(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Short] to
+ * [RealLiteral].
+ */
+infix fun Expression<RealSort>.lt(other: Short) = this lt RealLiteral(other)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Short] to
+ * [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).lt(other: Short) = this() lt RealLiteral(other)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Short] to
+ * [RealLiteral].
+ */
+infix fun RealLess.lt(other: Short) = RealLess(this.children + RealLiteral(other))
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. [this] is converted from [Short] to
+ * [RealLiteral].
+ */
+infix fun Short.lt(other: Expression<RealSort>) = RealLiteral(this) lt other
+
+/**
+ * Less operator for RealSort Expressions: [this] > [block]. [this] is converted from [Short] to
+ * [RealLiteral].
+ */
+infix fun Short.lt(block: () -> Expression<RealSort>) = RealLiteral(this) lt block()
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. [this] is converted from [Short] to
+ * [RealLiteral].
+ */
+infix fun Short.lt(other: RealLess) = RealLess(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Int] to
+ * [RealLiteral].
+ */
+infix fun Expression<RealSort>.lt(other: Int) = this lt RealLiteral(other)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Int] to
+ * [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).lt(other: Int) = this() lt RealLiteral(other)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Int] to
+ * [RealLiteral].
+ */
+infix fun RealLess.lt(other: Int) = RealLess(this.children + RealLiteral(other))
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. [this] is converted from [Int] to
+ * [RealLiteral].
+ */
+infix fun Int.lt(other: Expression<RealSort>) = RealLiteral(this) lt other
+
+/**
+ * Less operator for RealSort Expressions: [this] > [block]. [this] is converted from [Int] to
+ * [RealLiteral].
+ */
+infix fun Int.lt(block: () -> Expression<RealSort>) = RealLiteral(this) lt block()
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. [this] is converted from [Int] to
+ * [RealLiteral].
+ */
+infix fun Int.lt(other: RealLess) = RealLess(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Long] to
+ * [RealLiteral].
+ */
+infix fun Expression<RealSort>.lt(other: Long) = this lt RealLiteral(other)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Long] to
+ * [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).lt(other: Long) = this() lt RealLiteral(other)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Long] to
+ * [RealLiteral].
+ */
+infix fun RealLess.lt(other: Long) = RealLess(this.children + RealLiteral(other))
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. [this] is converted from [Long] to
+ * [RealLiteral].
+ */
+infix fun Long.lt(other: Expression<RealSort>) = RealLiteral(this) lt other
+
+/**
+ * Less operator for RealSort Expressions: [this] > [block]. [this] is converted from [Long] to
+ * [RealLiteral].
+ */
+infix fun Long.lt(block: () -> Expression<RealSort>) = RealLiteral(this) lt block()
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. [this] is converted from [Long] to
+ * [RealLiteral].
+ */
+infix fun Long.lt(other: RealLess) = RealLess(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [BigInteger] to
+ * [RealLiteral].
+ */
+infix fun Expression<RealSort>.lt(other: BigInteger) = this lt RealLiteral(other)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [BigInteger] to
+ * [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).lt(other: BigInteger) = this() lt RealLiteral(other)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [BigInteger] to
+ * [RealLiteral].
+ */
+infix fun RealLess.lt(other: BigInteger) = RealLess(this.children + RealLiteral(other))
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. [this] is converted from [BigInteger]
+ * to [RealLiteral].
+ */
+infix fun BigInteger.lt(other: Expression<RealSort>) = RealLiteral(this) lt other
+
+/**
+ * Less operator for RealSort Expressions: [this] > [block]. [this] is converted from [BigInteger]
+ * to [RealLiteral].
+ */
+infix fun BigInteger.lt(block: () -> Expression<RealSort>) = RealLiteral(this) lt block()
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. [this] is converted from [BigInteger]
+ * to [RealLiteral].
+ */
+infix fun BigInteger.lt(other: RealLess) = RealLess(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Float] to
+ * [RealLiteral].
+ */
+infix fun Expression<RealSort>.lt(other: Float) = this lt RealLiteral(other)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Float] to
+ * [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).lt(other: Float) = this() lt RealLiteral(other)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Float] to
+ * [RealLiteral].
+ */
+infix fun RealLess.lt(other: Float) = RealLess(this.children + RealLiteral(other))
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. [this] is converted from [Float] to
+ * [RealLiteral].
+ */
+infix fun Float.lt(other: Expression<RealSort>) = RealLiteral(this) lt other
+
+/**
+ * Less operator for RealSort Expressions: [this] > [block]. [this] is converted from [Float] to
+ * [RealLiteral].
+ */
+infix fun Float.lt(block: () -> Expression<RealSort>) = RealLiteral(this) lt block()
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. [this] is converted from [Float] to
+ * [RealLiteral].
+ */
+infix fun Float.lt(other: RealLess) = RealLess(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Double] to
+ * [RealLiteral].
+ */
+infix fun Expression<RealSort>.lt(other: Double) = this lt RealLiteral(other)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Double] to
+ * [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).lt(other: Double) = this() lt RealLiteral(other)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [Double] to
+ * [RealLiteral].
+ */
+infix fun RealLess.lt(other: Double) = RealLess(this.children + RealLiteral(other))
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. [this] is converted from [Double] to
+ * [RealLiteral].
+ */
+infix fun Double.lt(other: Expression<RealSort>) = RealLiteral(this) lt other
+
+/**
+ * Less operator for RealSort Expressions: [this] > [block]. [this] is converted from [Double] to
+ * [RealLiteral].
+ */
+infix fun Double.lt(block: () -> Expression<RealSort>) = RealLiteral(this) lt block()
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. [this] is converted from [Double] to
+ * [RealLiteral].
+ */
+infix fun Double.lt(other: RealLess) = RealLess(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [BigDecimal] to
+ * [RealLiteral].
+ */
+infix fun Expression<RealSort>.lt(other: BigDecimal) = this lt RealLiteral(other)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [BigDecimal] to
+ * [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).lt(other: BigDecimal) = this() lt RealLiteral(other)
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. other is converted from [BigDecimal] to
+ * [RealLiteral].
+ */
+infix fun RealLess.lt(other: BigDecimal) = RealLess(this.children + RealLiteral(other))
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. [this] is converted from [BigDecimal]
+ * to [RealLiteral].
+ */
+infix fun BigDecimal.lt(other: Expression<RealSort>) = RealLiteral(this) lt other
+
+/**
+ * Less operator for RealSort Expressions: [this] > [block]. [this] is converted from [BigDecimal]
+ * to [RealLiteral].
+ */
+infix fun BigDecimal.lt(block: () -> Expression<RealSort>) = RealLiteral(this) lt block()
+
+/**
+ * Less operator for RealSort Expressions: [this] > [other]. [this] is converted from [BigDecimal]
+ * to [RealLiteral].
+ */
+infix fun BigDecimal.lt(other: RealLess) = RealLess(listOf(RealLiteral(this)) + other.children)
+
+/** Less equals operator for RealSort Expressions: [this] > [other]. */
+infix fun Expression<RealSort>.leq(other: Expression<RealSort>) = RealLessEq(this, other)
+
+/** Less equals operator for RealSort Expressions: [this] > [block]. */
+infix fun Expression<RealSort>.leq(block: () -> Expression<RealSort>) = this leq block()
+
+/** Less equals operator for RealSort Expressions: [this] > [other]. */
+infix fun (() -> Expression<RealSort>).leq(other: Expression<RealSort>) = this() leq other
+
+/** Less equals operator for RealSort Expressions: [this] > [block]. */
+infix fun (() -> Expression<RealSort>).leq(block: () -> Expression<RealSort>) = this() leq block()
+
+/** Less equals operator for RealSort Expressions: [this] > [other]. */
+infix fun RealLessEq.leq(other: Expression<RealSort>) = RealLessEq(this.children + other)
+
+/** Less equals operator for RealSort Expressions: [this] > [block]. */
+infix fun RealLessEq.leq(block: () -> Expression<RealSort>) = RealLessEq(this.children + block())
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Byte]
+ * to [RealLiteral].
+ */
+infix fun Expression<RealSort>.leq(other: Byte) = this leq RealLiteral(other)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Byte]
+ * to [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).leq(other: Byte) = this() leq RealLiteral(other)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Byte]
+ * to [RealLiteral].
+ */
+infix fun RealLessEq.leq(other: Byte) = RealLessEq(this.children + RealLiteral(other))
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. [this] is converted from [Byte]
+ * to [RealLiteral].
+ */
+infix fun Byte.leq(other: Expression<RealSort>) = RealLiteral(this) leq other
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [block]. [this] is converted from [Byte]
+ * to [RealLiteral].
+ */
+infix fun Byte.leq(block: () -> Expression<RealSort>) = RealLiteral(this) leq block()
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. [this] is converted from [Byte]
+ * to [RealLiteral].
+ */
+infix fun Byte.leq(other: RealLessEq) = RealLessEq(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Short]
+ * to [RealLiteral].
+ */
+infix fun Expression<RealSort>.leq(other: Short) = this leq RealLiteral(other)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Short]
+ * to [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).leq(other: Short) = this() leq RealLiteral(other)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Short]
+ * to [RealLiteral].
+ */
+infix fun RealLessEq.leq(other: Short) = RealLessEq(this.children + RealLiteral(other))
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. [this] is converted from [Short]
+ * to [RealLiteral].
+ */
+infix fun Short.leq(other: Expression<RealSort>) = RealLiteral(this) leq other
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [block]. [this] is converted from [Short]
+ * to [RealLiteral].
+ */
+infix fun Short.leq(block: () -> Expression<RealSort>) = RealLiteral(this) leq block()
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. [this] is converted from [Short]
+ * to [RealLiteral].
+ */
+infix fun Short.leq(other: RealLessEq) = RealLessEq(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Int] to
+ * [RealLiteral].
+ */
+infix fun Expression<RealSort>.leq(other: Int) = this leq RealLiteral(other)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Int] to
+ * [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).leq(other: Int) = this() leq RealLiteral(other)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Int] to
+ * [RealLiteral].
+ */
+infix fun RealLessEq.leq(other: Int) = RealLessEq(this.children + RealLiteral(other))
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. [this] is converted from [Int]
+ * to [RealLiteral].
+ */
+infix fun Int.leq(other: Expression<RealSort>) = RealLiteral(this) leq other
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [block]. [this] is converted from [Int]
+ * to [RealLiteral].
+ */
+infix fun Int.leq(block: () -> Expression<RealSort>) = RealLiteral(this) leq block()
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. [this] is converted from [Int]
+ * to [RealLiteral].
+ */
+infix fun Int.leq(other: RealLessEq) = RealLessEq(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Long]
+ * to [RealLiteral].
+ */
+infix fun Expression<RealSort>.leq(other: Long) = this leq RealLiteral(other)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Long]
+ * to [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).leq(other: Long) = this() leq RealLiteral(other)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Long]
+ * to [RealLiteral].
+ */
+infix fun RealLessEq.leq(other: Long) = RealLessEq(this.children + RealLiteral(other))
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. [this] is converted from [Long]
+ * to [RealLiteral].
+ */
+infix fun Long.leq(other: Expression<RealSort>) = RealLiteral(this) leq other
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [block]. [this] is converted from [Long]
+ * to [RealLiteral].
+ */
+infix fun Long.leq(block: () -> Expression<RealSort>) = RealLiteral(this) leq block()
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. [this] is converted from [Long]
+ * to [RealLiteral].
+ */
+infix fun Long.leq(other: RealLessEq) = RealLessEq(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [BigInteger] to [RealLiteral].
+ */
+infix fun Expression<RealSort>.leq(other: BigInteger) = this leq RealLiteral(other)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [BigInteger] to [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).leq(other: BigInteger) = this() leq RealLiteral(other)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [BigInteger] to [RealLiteral].
+ */
+infix fun RealLessEq.leq(other: BigInteger) = RealLessEq(this.children + RealLiteral(other))
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [BigInteger] to [RealLiteral].
+ */
+infix fun BigInteger.leq(other: Expression<RealSort>) = RealLiteral(this) leq other
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [block]. [this] is converted from
+ * [BigInteger] to [RealLiteral].
+ */
+infix fun BigInteger.leq(block: () -> Expression<RealSort>) = RealLiteral(this) leq block()
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [BigInteger] to [RealLiteral].
+ */
+infix fun BigInteger.leq(other: RealLessEq) = RealLessEq(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Float]
+ * to [RealLiteral].
+ */
+infix fun Expression<RealSort>.leq(other: Float) = this leq RealLiteral(other)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Float]
+ * to [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).leq(other: Float) = this() leq RealLiteral(other)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Float]
+ * to [RealLiteral].
+ */
+infix fun RealLessEq.leq(other: Float) = RealLessEq(this.children + RealLiteral(other))
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. [this] is converted from [Float]
+ * to [RealLiteral].
+ */
+infix fun Float.leq(other: Expression<RealSort>) = RealLiteral(this) leq other
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [block]. [this] is converted from [Float]
+ * to [RealLiteral].
+ */
+infix fun Float.leq(block: () -> Expression<RealSort>) = RealLiteral(this) leq block()
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. [this] is converted from [Float]
+ * to [RealLiteral].
+ */
+infix fun Float.leq(other: RealLessEq) = RealLessEq(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Double]
+ * to [RealLiteral].
+ */
+infix fun Expression<RealSort>.leq(other: Double) = this leq RealLiteral(other)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Double]
+ * to [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).leq(other: Double) = this() leq RealLiteral(other)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from [Double]
+ * to [RealLiteral].
+ */
+infix fun RealLessEq.leq(other: Double) = RealLessEq(this.children + RealLiteral(other))
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [Double] to [RealLiteral].
+ */
+infix fun Double.leq(other: Expression<RealSort>) = RealLiteral(this) leq other
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [block]. [this] is converted from
+ * [Double] to [RealLiteral].
+ */
+infix fun Double.leq(block: () -> Expression<RealSort>) = RealLiteral(this) leq block()
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [Double] to [RealLiteral].
+ */
+infix fun Double.leq(other: RealLessEq) = RealLessEq(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [BigDecimal] to [RealLiteral].
+ */
+infix fun Expression<RealSort>.leq(other: BigDecimal) = this leq RealLiteral(other)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [BigDecimal] to [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).leq(other: BigDecimal) = this() leq RealLiteral(other)
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [BigDecimal] to [RealLiteral].
+ */
+infix fun RealLessEq.leq(other: BigDecimal) = RealLessEq(this.children + RealLiteral(other))
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [BigDecimal] to [RealLiteral].
+ */
+infix fun BigDecimal.leq(other: Expression<RealSort>) = RealLiteral(this) leq other
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [block]. [this] is converted from
+ * [BigDecimal] to [RealLiteral].
+ */
+infix fun BigDecimal.leq(block: () -> Expression<RealSort>) = RealLiteral(this) leq block()
+
+/**
+ * Less equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [BigDecimal] to [RealLiteral].
+ */
+infix fun BigDecimal.leq(other: RealLessEq) = RealLessEq(listOf(RealLiteral(this)) + other.children)
+
+/** Greater equals operator for RealSort Expressions: [this] > [other]. */
+infix fun Expression<RealSort>.geq(other: Expression<RealSort>) = RealGreaterEq(this, other)
+
+/** Greater equals operator for RealSort Expressions: [this] > [block]. */
+infix fun Expression<RealSort>.geq(block: () -> Expression<RealSort>) = this geq block()
+
+/** Greater equals operator for RealSort Expressions: [this] > [other]. */
+infix fun (() -> Expression<RealSort>).geq(other: Expression<RealSort>) = this() geq other
+
+/** Greater equals operator for RealSort Expressions: [this] > [block]. */
+infix fun (() -> Expression<RealSort>).geq(block: () -> Expression<RealSort>) = this() geq block()
+
+/** Greater equals operator for RealSort Expressions: [this] > [other]. */
+infix fun RealGreaterEq.geq(other: Expression<RealSort>) = RealGreaterEq(this.children + other)
+
+/** Greater equals operator for RealSort Expressions: [this] > [block]. */
+infix fun RealGreaterEq.geq(block: () -> Expression<RealSort>) =
+    RealGreaterEq(this.children + block())
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [Byte] to [RealLiteral].
+ */
+infix fun Expression<RealSort>.geq(other: Byte) = this geq RealLiteral(other)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [Byte] to [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).geq(other: Byte) = this() geq RealLiteral(other)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [Byte] to [RealLiteral].
+ */
+infix fun RealGreaterEq.geq(other: Byte) = RealGreaterEq(this.children + RealLiteral(other))
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [Byte] to [RealLiteral].
+ */
+infix fun Byte.geq(other: Expression<RealSort>) = RealLiteral(this) geq other
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [block]. [this] is converted from
+ * [Byte] to [RealLiteral].
+ */
+infix fun Byte.geq(block: () -> Expression<RealSort>) = RealLiteral(this) geq block()
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [Byte] to [RealLiteral].
+ */
+infix fun Byte.geq(other: RealGreaterEq) = RealGreaterEq(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [Short] to [RealLiteral].
+ */
+infix fun Expression<RealSort>.geq(other: Short) = this geq RealLiteral(other)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [Short] to [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).geq(other: Short) = this() geq RealLiteral(other)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [Short] to [RealLiteral].
+ */
+infix fun RealGreaterEq.geq(other: Short) = RealGreaterEq(this.children + RealLiteral(other))
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [Short] to [RealLiteral].
+ */
+infix fun Short.geq(other: Expression<RealSort>) = RealLiteral(this) geq other
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [block]. [this] is converted from
+ * [Short] to [RealLiteral].
+ */
+infix fun Short.geq(block: () -> Expression<RealSort>) = RealLiteral(this) geq block()
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [Short] to [RealLiteral].
+ */
+infix fun Short.geq(other: RealGreaterEq) =
+    RealGreaterEq(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from [Int]
+ * to [RealLiteral].
+ */
+infix fun Expression<RealSort>.geq(other: Int) = this geq RealLiteral(other)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from [Int]
+ * to [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).geq(other: Int) = this() geq RealLiteral(other)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from [Int]
+ * to [RealLiteral].
+ */
+infix fun RealGreaterEq.geq(other: Int) = RealGreaterEq(this.children + RealLiteral(other))
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [Int] to [RealLiteral].
+ */
+infix fun Int.geq(other: Expression<RealSort>) = RealLiteral(this) geq other
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [block]. [this] is converted from
+ * [Int] to [RealLiteral].
+ */
+infix fun Int.geq(block: () -> Expression<RealSort>) = RealLiteral(this) geq block()
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [Int] to [RealLiteral].
+ */
+infix fun Int.geq(other: RealGreaterEq) = RealGreaterEq(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [Long] to [RealLiteral].
+ */
+infix fun Expression<RealSort>.geq(other: Long) = this geq RealLiteral(other)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [Long] to [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).geq(other: Long) = this() geq RealLiteral(other)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [Long] to [RealLiteral].
+ */
+infix fun RealGreaterEq.geq(other: Long) = RealGreaterEq(this.children + RealLiteral(other))
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [Long] to [RealLiteral].
+ */
+infix fun Long.geq(other: Expression<RealSort>) = RealLiteral(this) geq other
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [block]. [this] is converted from
+ * [Long] to [RealLiteral].
+ */
+infix fun Long.geq(block: () -> Expression<RealSort>) = RealLiteral(this) geq block()
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [Long] to [RealLiteral].
+ */
+infix fun Long.geq(other: RealGreaterEq) = RealGreaterEq(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [BigInteger] to [RealLiteral].
+ */
+infix fun Expression<RealSort>.geq(other: BigInteger) = this geq RealLiteral(other)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [BigInteger] to [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).geq(other: BigInteger) = this() geq RealLiteral(other)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [BigInteger] to [RealLiteral].
+ */
+infix fun RealGreaterEq.geq(other: BigInteger) = RealGreaterEq(this.children + RealLiteral(other))
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [BigInteger] to [RealLiteral].
+ */
+infix fun BigInteger.geq(other: Expression<RealSort>) = RealLiteral(this) geq other
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [block]. [this] is converted from
+ * [BigInteger] to [RealLiteral].
+ */
+infix fun BigInteger.geq(block: () -> Expression<RealSort>) = RealLiteral(this) geq block()
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [BigInteger] to [RealLiteral].
+ */
+infix fun BigInteger.geq(other: RealGreaterEq) =
+    RealGreaterEq(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [Float] to [RealLiteral].
+ */
+infix fun Expression<RealSort>.geq(other: Float) = this geq RealLiteral(other)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [Float] to [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).geq(other: Float) = this() geq RealLiteral(other)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [Float] to [RealLiteral].
+ */
+infix fun RealGreaterEq.geq(other: Float) = RealGreaterEq(this.children + RealLiteral(other))
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [Float] to [RealLiteral].
+ */
+infix fun Float.geq(other: Expression<RealSort>) = RealLiteral(this) geq other
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [block]. [this] is converted from
+ * [Float] to [RealLiteral].
+ */
+infix fun Float.geq(block: () -> Expression<RealSort>) = RealLiteral(this) geq block()
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [Float] to [RealLiteral].
+ */
+infix fun Float.geq(other: RealGreaterEq) =
+    RealGreaterEq(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [Double] to [RealLiteral].
+ */
+infix fun Expression<RealSort>.geq(other: Double) = this geq RealLiteral(other)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [Double] to [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).geq(other: Double) = this() geq RealLiteral(other)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [Double] to [RealLiteral].
+ */
+infix fun RealGreaterEq.geq(other: Double) = RealGreaterEq(this.children + RealLiteral(other))
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [Double] to [RealLiteral].
+ */
+infix fun Double.geq(other: Expression<RealSort>) = RealLiteral(this) geq other
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [block]. [this] is converted from
+ * [Double] to [RealLiteral].
+ */
+infix fun Double.geq(block: () -> Expression<RealSort>) = RealLiteral(this) geq block()
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [Double] to [RealLiteral].
+ */
+infix fun Double.geq(other: RealGreaterEq) =
+    RealGreaterEq(listOf(RealLiteral(this)) + other.children)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [BigDecimal] to [RealLiteral].
+ */
+infix fun Expression<RealSort>.geq(other: BigDecimal) = this geq RealLiteral(other)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [BigDecimal] to [RealLiteral].
+ */
+infix fun (() -> Expression<RealSort>).geq(other: BigDecimal) = this() geq RealLiteral(other)
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. other is converted from
+ * [BigDecimal] to [RealLiteral].
+ */
+infix fun RealGreaterEq.geq(other: BigDecimal) = RealGreaterEq(this.children + RealLiteral(other))
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [BigDecimal] to [RealLiteral].
+ */
+infix fun BigDecimal.geq(other: Expression<RealSort>) = RealLiteral(this) geq other
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [block]. [this] is converted from
+ * [BigDecimal] to [RealLiteral].
+ */
+infix fun BigDecimal.geq(block: () -> Expression<RealSort>) = RealLiteral(this) geq block()
+
+/**
+ * Greater equals operator for RealSort Expressions: [this] > [other]. [this] is converted from
+ * [BigDecimal] to [RealLiteral].
+ */
+infix fun BigDecimal.geq(other: RealGreaterEq) =
+    RealGreaterEq(listOf(RealLiteral(this)) + other.children)
 
 private fun makeRealOperator(
     init: Builder<RealSort>.() -> Unit,
-    op: (List<Expression<RealSort>>) -> Expression<RealSort>
+    op: (List<Expression<RealSort>>) -> Expression<RealSort>,
 ): Expression<RealSort> {
   val builder = Builder<RealSort>()
   builder.init()

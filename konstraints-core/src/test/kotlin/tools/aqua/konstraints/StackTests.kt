@@ -125,7 +125,8 @@ class StackTests {
           arguments(listOf(50, 20, 96, 72, 17, 13, 89, 93, 33, 73)),
           arguments(listOf(24, 98, 84, 42, 60, 70, 19, 21, 22, 48)),
           arguments(listOf(11, 39, 4, 90, 46, 59, 91, 6, 40, 43)),
-          arguments(listOf(15, 3, 83, 27, 61, 53, 82, 67, 28)))
+          arguments(listOf(15, 3, 83, 27, 61, 53, 82, 67, 28)),
+      )
 
   private fun getIntergerListsWithEmpty(): Stream<Arguments> =
       Stream.of(
@@ -140,7 +141,8 @@ class StackTests {
           arguments(listOf(50, 20, 96, 72, 17, 13, 89, 93, 33, 73)),
           arguments(listOf(24, 98, 84, 42, 60, 70, 19, 21, 22, 48)),
           arguments(listOf(11, 39, 4, 90, 46, 59, 91, 6, 40, 43)),
-          arguments(listOf(15, 3, 83, 27, 61, 53, 82, 67, 28)))
+          arguments(listOf(15, 3, 83, 27, 61, 53, 82, 67, 28)),
+      )
 
   private fun getEmptyLists(): Stream<Arguments> =
       Stream.of(arguments(emptyList<Int>()), arguments(listOf<Int>()))
