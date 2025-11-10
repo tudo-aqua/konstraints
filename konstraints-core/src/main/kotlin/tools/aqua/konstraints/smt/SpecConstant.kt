@@ -26,7 +26,7 @@ sealed interface SpecConstant
 
 /** SMT String constant. */
 data class StringConstant(val string: String) : SpecConstant {
-  override fun toString(): String = "\"$string\""
+  override fun toString(): String = "\"${string.trim('"')}\""
 }
 
 /** SMT Numeral constant. */

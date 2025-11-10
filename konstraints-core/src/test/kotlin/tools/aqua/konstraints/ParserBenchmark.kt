@@ -26,7 +26,6 @@ import kotlin.use
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions.assumeTrue
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -34,7 +33,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.smt.QuotingRule
 
-@Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserBenchmark {
 
@@ -44,6 +42,43 @@ class ParserBenchmark {
           .filter { file: File -> file.isFile }
           .map { file: File -> Arguments.arguments(file) }
           .asStream()
+
+  private fun removeComments(program: String): String {
+    var inQuotedSymbol = false
+    var inStringLiteral = false
+    var inComment = false
+    var finished = false
+    var low = 0
+    val builder = StringBuilder(program.length)
+
+    program.forEachIndexed { i, c ->
+      if (c == '|' && !inStringLiteral && !inComment) { // beginning or end of quoted symbol
+        inQuotedSymbol = !inQuotedSymbol
+      } else if (c == '"' && !inQuotedSymbol && !inComment) { // beginning or end of string literal
+        inStringLiteral = !inStringLiteral
+      } else if (
+          c == ';' && !inQuotedSymbol && !inStringLiteral && !inComment
+      ) { // beginning of comment we need to check we are not already in a comment or
+        // any appearance of ';' will duplicate the last substring
+        inComment = true
+        // add all previous chars to builder unless string starts with comment
+        builder.append(program.substring(low, i))
+        finished = true
+      } else if (c == '\n' && inComment) { // end of comment
+        inComment = false
+        // set index of new first character to be included in the program later
+        low = i
+        finished = false
+      }
+    }
+
+    if (!finished) {
+      builder.append(program.substring(low))
+    }
+
+    // if we have no comment nothing is ever added to the builder so we just return the input
+    return if (builder.isNotEmpty()) builder.toString() else program
+  }
 
   private fun parse(file: File) {
     assumeTrue(file.length() < 1000000, "Skipped due to file size exceeding limit of 5000000")
@@ -55,16 +90,16 @@ class ParserBenchmark {
     }*/
 
     try {
-      val input =
-          Parser()
-              .removeComments(
-                  file.bufferedReader().use(BufferedReader::readLines).joinToString("\n")
-              )
-      val program = Parser().parse(input, false)
-      // val program2 = Parser().parse(program.toString(), true)
+      val input = file.bufferedReader().use(BufferedReader::readLines).joinToString("\n")
+
+      val program = Parser(input)
 
       assertEquals(
-          input.replace(" ", "").replace("\n", "").replace("\r", "").replace("\t", ""),
+          removeComments(input)
+              .replace(" ", "")
+              .replace("\n", "")
+              .replace("\r", "")
+              .replace("\t", ""),
           program
               .toSMTString(StringBuilder(), QuotingRule.SAME_AS_INPUT)
               .toString()
@@ -73,10 +108,6 @@ class ParserBenchmark {
               .replace("\r", "")
               .replace("\t", ""),
       )
-    } catch (e: StackOverflowError) {
-      // mark stack overflows as skipped
-      assumeTrue(false)
-      println("Skipped due to stack overflow")
     } catch (e: NotImplementedError) {
       assumeTrue(false)
       println("Skipped due to not implemented error")

@@ -326,6 +326,8 @@ fun MutableSMTProgram.setOption(name: String, value: BigInteger) =
 fun MutableSMTProgram.setOption(name: String, value: OptionValue) =
     setOption(SetOption(name, value))
 
+fun MutableSMTProgram.setInfo(attribute: Attribute) = setInfo(SetInfo(attribute))
+
 fun MutableSMTProgram.setInfo(name: String, value: String) =
     setInfo(SetInfo(Attribute(name, ConstantAttributeValue(StringConstant(value)))))
 

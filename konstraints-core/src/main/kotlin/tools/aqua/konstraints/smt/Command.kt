@@ -98,7 +98,7 @@ data class DeclareFun<T : Sort>(val func: SMTFunction<T>) : Command("declare-fun
   val sort = func.sort
 
   override fun toString() =
-      "declare-fun ${func.symbol} (${func.parameters.joinToString(" ")}) ${func.sort}"
+      "(declare-fun ${func.symbol} (${func.parameters.joinToString(" ")}) ${func.sort})"
 
   override fun toSMTString(quotingRule: QuotingRule) =
       "(declare-fun ${func.symbol.toSMTString(quotingRule)} (${func.parameters.joinToString(" ") {it.toSMTString(quotingRule)}}) ${func.sort.toSMTString(quotingRule)})"

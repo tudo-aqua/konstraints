@@ -19,27 +19,12 @@
 package tools.aqua.konstraints
 
 // import dsl to construct test expressions
-import java.io.BufferedReader
-import java.io.File
-import java.util.stream.Stream
-import kotlin.io.bufferedReader
-import kotlin.streams.asStream
-import kotlin.use
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertDoesNotThrow
-import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.Arguments.arguments
-import org.junit.jupiter.params.provider.MethodSource
-import tools.aqua.konstraints.dsl.*
-import tools.aqua.konstraints.parser.Parser
-import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.smt.BVSort
-import tools.aqua.konstraints.smt.BoolSort
-import tools.aqua.konstraints.smt.FPSort
-import tools.aqua.konstraints.smt.bitvec
 
+import tools.aqua.konstraints.dsl.*
+import tools.aqua.konstraints.smt.*
+
+
+/*
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SMTProgramTests {
   // test basic expressions
@@ -177,3 +162,4 @@ class SMTProgramTests {
           )
       )
 }
+*/

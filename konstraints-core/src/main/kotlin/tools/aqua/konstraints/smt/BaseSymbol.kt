@@ -18,14 +18,12 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.Parser
-
 interface BaseSymbol : SMTSerializable
 
 /** String representation of a smt keyword. */
 class Keyword(val value: String) : BaseSymbol {
   init {
-    Parser.reserved.parse(value)
+    // TODO check that value is a reserved word
   }
 
   override fun equals(other: Any?): Boolean =
