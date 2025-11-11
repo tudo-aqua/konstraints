@@ -162,10 +162,10 @@ class SMTTokenizer(sourceReader: Reader, private val source: String? = null) : I
 
     return if (specifier == 'x') {
       val number = requireReadWhile("a hexadecimal number", Char::isHexadecimalDigit)
-      Hexadecimal(BigInteger(number, 16), tokenStartLocation..readerLastLocation)
+      Hexadecimal(number, tokenStartLocation..readerLastLocation)
     } else {
       val number = requireReadWhile("a binary number", Char::isBinaryDigit)
-      Binary(BigInteger(number, 2), tokenStartLocation..readerLastLocation)
+      Binary(number, tokenStartLocation..readerLastLocation)
     }
   }
 

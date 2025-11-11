@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints
 
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.params.ParameterizedTest
@@ -32,6 +33,8 @@ class ParserTests {
   fun testDeepRecursion(level: Int) {
     var program = "(set-logic QF_UF)(declare-fun foo () Bool)(assert "
     (0..<level).forEach { program += "(= foo " }
+
+    program += "(= foo foo)"
 
     (0..level).forEach { program += ")" }
 

@@ -38,6 +38,23 @@ sealed class Expression<out T : Sort> : SMTSerializable {
   // TODO implement more operations like filter, filterIsInstance, filterIsSort, forEach, onEach
   // etc.
 
+  fun all(predicate: (Expression<*>) -> Boolean): Boolean {
+      val deepAll = DeepRecursiveFunction<Expression<*>, Boolean> { expr ->
+          // Apply predicate to current node
+          if (!predicate(expr)) return@DeepRecursiveFunction false
+
+          // Recursively check all children using the DeepRecursiveScope
+          for (child in expr.children) {
+              if (!this.callRecursive(child)) return@DeepRecursiveFunction false
+          }
+
+          true
+      }
+
+      return deepAll(this)
+  }
+
+  /*
   fun all(predicate: (Expression<*>) -> Boolean): Boolean =
       when (this) {
         is ConstantExpression -> predicate(this)
@@ -68,6 +85,7 @@ sealed class Expression<out T : Sort> : SMTSerializable {
         is ForallExpression -> predicate(this) and term.all(predicate)
         is AnnotatedExpression -> predicate(this) and term.all(predicate)
       }
+    */
 
   fun asSequence(): Sequence<Expression<*>> = sequence {
     yield(this@Expression)

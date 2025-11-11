@@ -317,13 +317,14 @@ class Decimal(val number: BigDecimal, source: SourceSpan) : SpecConstantToken(so
   override fun toString(): String = number.toPlainString()
 }
 
-class Hexadecimal(number: BigInteger, source: SourceSpan) :
-    IntegerSpecConstantToken(number, source) {
-  override fun toString(): String = "#x${number.toString(16)}"
+// number is stored as string to not drop leading zeros which leads to incorrect bit width in vectors
+class Hexadecimal(val number: String, source: SourceSpan) :
+    SpecConstantToken(source) {
+  override fun toString() = "#x$number"
 }
 
-class Binary(number: BigInteger, source: SourceSpan) : IntegerSpecConstantToken(number, source) {
-  override fun toString(): String = "#b${number.toString(2)}"
+class Binary(val number: String, source: SourceSpan) : SpecConstantToken(source) {
+  override fun toString() = "#b$number"
 }
 
 class SMTString(val contents: String, source: SourceSpan) : SpecConstantToken(source) {
@@ -333,7 +334,7 @@ class SMTString(val contents: String, source: SourceSpan) : SpecConstantToken(so
     }
   }
 
-  override fun toString(): String = "\"${contents.replace("\"", "\"\"")}\""
+  override fun toString(): String = "${contents.replace("\"", "\"\"")}\""
 }
 
 sealed class SymbolToken(source: SourceSpan) : SemanticToken(source)

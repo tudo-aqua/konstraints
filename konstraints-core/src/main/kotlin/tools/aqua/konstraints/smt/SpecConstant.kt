@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.smt
 
+import java.lang.Character.isDigit
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -36,6 +37,10 @@ data class NumeralConstant(val numeral: BigInteger) : SpecConstant {
 
 /** BinaryConstant of the form #b followed by a non-empty sequence of 0 and 1 characters. */
 data class BinaryConstant(val binary: String) : SpecConstant {
+  init {
+      require(binary.isSMTBinary())
+  }
+
   /* Number of bits for this binary */
   val bits = binary.length - 2
 
@@ -47,6 +52,10 @@ data class BinaryConstant(val binary: String) : SpecConstant {
  * to F , capitalized or not.
  */
 data class HexConstant(val hexadecimal: String) : SpecConstant {
+  init {
+    require(hexadecimal.isSMTHex())
+  }
+
   /* Number of bits for this hexadecimal */
   val bits = (hexadecimal.length - 2) * 4
 

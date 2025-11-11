@@ -81,7 +81,7 @@ class ParserBenchmark {
   }
 
   private fun parse(file: File) {
-    assumeTrue(file.length() < 1000000, "Skipped due to file size exceeding limit of 5000000")
+    assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
 
     /*assertDoesNotThrow {
       // its crucial that the separator is '\n' as comments dont have an ending symbol but rather
@@ -109,8 +109,8 @@ class ParserBenchmark {
               .replace("\t", ""),
       )
     } catch (e: NotImplementedError) {
+      println("Skipped due to not implemented error ${e.message}")
       assumeTrue(false)
-      println("Skipped due to not implemented error")
     } catch (e: Exception) {
       assertDoesNotThrow { throw e }
     }
