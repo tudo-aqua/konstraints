@@ -18,8 +18,6 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.util.reduceOrDefault
-
 /** Interface for all sorted SMT terms. */
 sealed class Expression<out T : Sort> : SMTSerializable {
   abstract val name: BaseSymbol
@@ -39,19 +37,20 @@ sealed class Expression<out T : Sort> : SMTSerializable {
   // etc.
 
   fun all(predicate: (Expression<*>) -> Boolean): Boolean {
-      val deepAll = DeepRecursiveFunction<Expression<*>, Boolean> { expr ->
+    val deepAll =
+        DeepRecursiveFunction<Expression<*>, Boolean> { expr ->
           // Apply predicate to current node
           if (!predicate(expr)) return@DeepRecursiveFunction false
 
           // Recursively check all children using the DeepRecursiveScope
           for (child in expr.children) {
-              if (!this.callRecursive(child)) return@DeepRecursiveFunction false
+            if (!this.callRecursive(child)) return@DeepRecursiveFunction false
           }
 
           true
-      }
+        }
 
-      return deepAll(this)
+    return deepAll(this)
   }
 
   /*
@@ -176,7 +175,7 @@ sealed class Expression<out T : Sort> : SMTSerializable {
 }
 
 /** SMT Literal */
-abstract class Literal<out T : Sort>(override val name: LiteralString, override val sort: T) :
+sealed class Literal<out T : Sort>(override val name: LiteralString, override val sort: T) :
     Expression<T>() {
   override val func = null
 

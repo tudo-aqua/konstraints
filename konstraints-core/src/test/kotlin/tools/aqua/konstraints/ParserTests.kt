@@ -28,8 +28,96 @@ import tools.aqua.konstraints.smt.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserTests {
+  val deepRecursiveSerializer: DeepRecursiveFunction<Pair<Appendable, Expression<*>>, Appendable> =
+      DeepRecursiveFunction<Pair<Appendable, Expression<*>>, Appendable> { (builder, expr) ->
+        when (expr) {
+          is AnnotatedExpression<*> -> {
+            builder.append("(! ")
+            deepRecursiveSerializer.callRecursive(builder to expr.term)
+
+            expr.annoations.forEach {
+              builder.append(" ")
+              it.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
+            }
+
+            builder.append(")")
+          }
+          is ExistsExpression -> {
+            builder.append("(exists (")
+
+            var counter = 0
+            expr.vars.forEach {
+              if (counter++ > 1) builder.append(" ")
+              it.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
+            }
+
+            builder.append(") ")
+            deepRecursiveSerializer.callRecursive(builder to expr.term)
+
+            builder.append(")")
+          }
+          is ForallExpression -> {
+            builder.append("(forall (")
+
+            var counter = 0
+            expr.vars.forEach {
+              if (counter++ > 1) builder.append(" ")
+              it.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
+            }
+
+            builder.append(") ")
+            deepRecursiveSerializer.callRecursive(builder to expr.term)
+
+            builder.append(")")
+          }
+          is LetExpression<*> -> {
+            builder.append("(let (")
+
+            var counter = 0
+            expr.bindings.forEach {
+              if (counter++ > 1) builder.append(" ")
+              it.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
+            }
+
+            builder.append(") ")
+            deepRecursiveSerializer.callRecursive(builder to expr.inner)
+
+            builder.append(")")
+          }
+          else -> {
+            if (expr.children.isEmpty())
+                expr.nameStringWithIndices(builder, QuotingRule.SAME_AS_INPUT)
+            else {
+              builder.append("(")
+              expr.nameStringWithIndices(builder, QuotingRule.SAME_AS_INPUT)
+
+              expr.children.forEach {
+                builder.append(" ")
+                deepRecursiveSerializer.callRecursive(builder to it)
+              }
+
+              builder.append(")")
+            }
+          }
+        }
+      }
+
+  val serialize =
+      DeepRecursiveFunction<Pair<Appendable, SMTProgram>, Appendable> { (builder, program) ->
+        program.commands.forEach {
+          if (it is Assert) {
+            builder.append("(assert ")
+            deepRecursiveSerializer.callRecursive(builder to it.expr)
+            builder.append(")")
+          } else {
+            it.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
+          }
+        }
+        builder
+      }
+
   @ParameterizedTest
-  @ValueSource(ints = [8, 32, 128, 1024, 2048, 8192])
+  @ValueSource(ints = [8, 32, 128, 1024, 2048, 8192, 32768])
   fun testDeepRecursion(level: Int) {
     var program = "(set-logic QF_UF)(declare-fun foo () Bool)(assert "
     (0..<level).forEach { program += "(= foo " }
@@ -38,6 +126,16 @@ class ParserTests {
 
     (0..level).forEach { program += ")" }
 
-    assertDoesNotThrow { Parser(program) }
+    assertDoesNotThrow {
+      val program = Parser(program)
+      println(serialize(StringBuilder() to program).toString())
+    }
+  }
+
+  @Test
+  fun test() {
+    Parser(
+        "(set-logic QF_UF)(declare-fun __ADDRESS_OF_h () Bool)(assert (= __ADDRESS_OF_h __ADDRESS_OF_h))(exit)"
+    )
   }
 }

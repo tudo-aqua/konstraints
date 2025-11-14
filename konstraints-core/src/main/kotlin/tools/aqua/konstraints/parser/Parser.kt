@@ -18,63 +18,66 @@
 
 package tools.aqua.konstraints.parser
 
+import java.io.File
+import java.io.Reader
 import java.math.BigDecimal
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
-import tools.aqua.konstraints.lexer.AsWord
-import tools.aqua.konstraints.lexer.AssertWord
-import tools.aqua.konstraints.lexer.Binary
-import tools.aqua.konstraints.lexer.CheckSatAssumingWord
-import tools.aqua.konstraints.lexer.CheckSatWord
-import tools.aqua.konstraints.lexer.ClosingBracket
-import tools.aqua.konstraints.lexer.CommandName
-import tools.aqua.konstraints.lexer.Decimal
-import tools.aqua.konstraints.lexer.DeclareConstWord
-import tools.aqua.konstraints.lexer.DeclareDatatypeWord
-import tools.aqua.konstraints.lexer.DeclareDatatypesWord
-import tools.aqua.konstraints.lexer.DeclareFunWord
-import tools.aqua.konstraints.lexer.DeclareSortParameterWord
-import tools.aqua.konstraints.lexer.DeclareSortWord
-import tools.aqua.konstraints.lexer.DefineConstWord
-import tools.aqua.konstraints.lexer.DefineFunRecWord
-import tools.aqua.konstraints.lexer.DefineFunWord
-import tools.aqua.konstraints.lexer.DefineSortWord
-import tools.aqua.konstraints.lexer.EchoWord
-import tools.aqua.konstraints.lexer.ExclamationWord
-import tools.aqua.konstraints.lexer.ExistsWord
-import tools.aqua.konstraints.lexer.ExitWord
-import tools.aqua.konstraints.lexer.ForallWord
-import tools.aqua.konstraints.lexer.GetAssertionsWord
-import tools.aqua.konstraints.lexer.GetAssignmentWord
-import tools.aqua.konstraints.lexer.GetInfoWord
-import tools.aqua.konstraints.lexer.GetModelWord
-import tools.aqua.konstraints.lexer.GetOptionWord
-import tools.aqua.konstraints.lexer.GetProofWord
-import tools.aqua.konstraints.lexer.GetUnsatAssumptionsWord
-import tools.aqua.konstraints.lexer.GetUnsatCoreWord
-import tools.aqua.konstraints.lexer.GetValueWord
-import tools.aqua.konstraints.lexer.Hexadecimal
-import tools.aqua.konstraints.lexer.KeywordToken
-import tools.aqua.konstraints.lexer.LambdaWord
-import tools.aqua.konstraints.lexer.LetWord
-import tools.aqua.konstraints.lexer.MatchWord
-import tools.aqua.konstraints.lexer.Numeral
-import tools.aqua.konstraints.lexer.OpeningBracket
-import tools.aqua.konstraints.lexer.PopWord
-import tools.aqua.konstraints.lexer.PushWord
-import tools.aqua.konstraints.lexer.QuotedSymbolToken
-import tools.aqua.konstraints.lexer.ResetAssertionsWord
-import tools.aqua.konstraints.lexer.ResetWord
-import tools.aqua.konstraints.lexer.SMTString
-import tools.aqua.konstraints.lexer.SetInfoWord
-import tools.aqua.konstraints.lexer.SetLogicWord
-import tools.aqua.konstraints.lexer.SetOptionWord
-import tools.aqua.konstraints.lexer.SimpleSymbolToken
-import tools.aqua.konstraints.lexer.SpecConstantToken
-import tools.aqua.konstraints.lexer.SymbolToken
-import tools.aqua.konstraints.lexer.Token
-import tools.aqua.konstraints.lexer.UnderscoreWord
+import tools.aqua.konstraints.parser.lexer.AsWord
+import tools.aqua.konstraints.parser.lexer.AssertWord
+import tools.aqua.konstraints.parser.lexer.Binary
+import tools.aqua.konstraints.parser.lexer.CheckSatAssumingWord
+import tools.aqua.konstraints.parser.lexer.CheckSatWord
+import tools.aqua.konstraints.parser.lexer.ClosingBracket
+import tools.aqua.konstraints.parser.lexer.CommandName
+import tools.aqua.konstraints.parser.lexer.Decimal
+import tools.aqua.konstraints.parser.lexer.DeclareConstWord
+import tools.aqua.konstraints.parser.lexer.DeclareDatatypeWord
+import tools.aqua.konstraints.parser.lexer.DeclareDatatypesWord
+import tools.aqua.konstraints.parser.lexer.DeclareFunWord
+import tools.aqua.konstraints.parser.lexer.DeclareSortParameterWord
+import tools.aqua.konstraints.parser.lexer.DeclareSortWord
+import tools.aqua.konstraints.parser.lexer.DefineConstWord
+import tools.aqua.konstraints.parser.lexer.DefineFunRecWord
+import tools.aqua.konstraints.parser.lexer.DefineFunWord
+import tools.aqua.konstraints.parser.lexer.DefineSortWord
+import tools.aqua.konstraints.parser.lexer.EOFToken
+import tools.aqua.konstraints.parser.lexer.EchoWord
+import tools.aqua.konstraints.parser.lexer.ExclamationWord
+import tools.aqua.konstraints.parser.lexer.ExistsWord
+import tools.aqua.konstraints.parser.lexer.ExitWord
+import tools.aqua.konstraints.parser.lexer.ForallWord
+import tools.aqua.konstraints.parser.lexer.GetAssertionsWord
+import tools.aqua.konstraints.parser.lexer.GetAssignmentWord
+import tools.aqua.konstraints.parser.lexer.GetInfoWord
+import tools.aqua.konstraints.parser.lexer.GetModelWord
+import tools.aqua.konstraints.parser.lexer.GetOptionWord
+import tools.aqua.konstraints.parser.lexer.GetProofWord
+import tools.aqua.konstraints.parser.lexer.GetUnsatAssumptionsWord
+import tools.aqua.konstraints.parser.lexer.GetUnsatCoreWord
+import tools.aqua.konstraints.parser.lexer.GetValueWord
+import tools.aqua.konstraints.parser.lexer.Hexadecimal
+import tools.aqua.konstraints.parser.lexer.KeywordToken
+import tools.aqua.konstraints.parser.lexer.LambdaWord
+import tools.aqua.konstraints.parser.lexer.LetWord
+import tools.aqua.konstraints.parser.lexer.MatchWord
+import tools.aqua.konstraints.parser.lexer.Numeral
+import tools.aqua.konstraints.parser.lexer.OpeningBracket
+import tools.aqua.konstraints.parser.lexer.PopWord
+import tools.aqua.konstraints.parser.lexer.PushWord
+import tools.aqua.konstraints.parser.lexer.QuotedSymbolToken
+import tools.aqua.konstraints.parser.lexer.ResetAssertionsWord
+import tools.aqua.konstraints.parser.lexer.ResetWord
+import tools.aqua.konstraints.parser.lexer.SMTString
 import tools.aqua.konstraints.parser.lexer.SMTTokenizer
+import tools.aqua.konstraints.parser.lexer.SetInfoWord
+import tools.aqua.konstraints.parser.lexer.SetLogicWord
+import tools.aqua.konstraints.parser.lexer.SetOptionWord
+import tools.aqua.konstraints.parser.lexer.SimpleSymbolToken
+import tools.aqua.konstraints.parser.lexer.SpecConstantToken
+import tools.aqua.konstraints.parser.lexer.SymbolToken
+import tools.aqua.konstraints.parser.lexer.Token
+import tools.aqua.konstraints.parser.lexer.UnderscoreWord
 import tools.aqua.konstraints.smt.AnnotatedExpression
 import tools.aqua.konstraints.smt.Attribute
 import tools.aqua.konstraints.smt.AttributeValue
@@ -126,12 +129,14 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
   companion object {
     operator fun invoke(input: String) =
         Parser(SMTTokenizer(input.reader()).peekable()).parseScript()
+
+    operator fun invoke(input: Reader) = Parser(SMTTokenizer(input).peekable()).parseScript()
   }
 
   private fun parseScript(): MutableSMTProgram {
     val program = MutableSMTProgram()
 
-    while (lexer.hasNext()) {
+    while (lexer.peek() !is EOFToken) {
       parseCommand(program)
     }
 
@@ -140,6 +145,9 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
 
   @OptIn(ExperimentalContracts::class)
   private fun parseCommand(program: MutableSMTProgram) {
+    // TODO EOF token would help here as EOF is valid at this point
+    // when the input ends on a whitespace or comment we skip that token and get EOF here
+    // we are finished parsing so this state is valid
     requireIsInstance<OpeningBracket>(lexer.next())
 
     val commandName = lexer.next()
@@ -393,7 +401,6 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
     }
   }
 
-
   /*
    * Sort is defined as
    * sort ::= <identifier> | ( <identifier> <sort>+ )
@@ -403,14 +410,14 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
   @OptIn(ExperimentalContracts::class)
   private fun parseSort(program: MutableSMTProgram): Sort =
       if (lexer.peekIs { token -> token is OpeningBracket }) {
-        if(lexer.peekIs(depth=1) { token -> token is UnderscoreWord}) {
+        if (lexer.peekIs(depth = 1) { token -> token is UnderscoreWord }) {
           // indexed sort
           val identifier = parseIdentifier()
 
           require(identifier is IndexedIdentifier)
           program.context
-            .getSort(identifier.symbol)
-            .build(emptyList(), identifier.indices as List<NumeralIndex>)
+              .getSort(identifier.symbol)
+              .build(emptyList(), identifier.indices as List<NumeralIndex>)
         } else {
           // sort with arity > 0
           // parse a sort with arity > 0 or indexed sort
@@ -423,9 +430,7 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
           val sorts = plus<ClosingBracket, Sort>(program, ::parseSort)
           requireIsInstance<ClosingBracket>(lexer.next())
 
-          program.context
-            .getSort(identifier.symbol)
-            .build(sorts, emptyList())
+          program.context.getSort(identifier.symbol).build(sorts, emptyList())
         }
       } else {
         // parse a simple sort with arity 0
@@ -507,147 +512,170 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
   * by peeking at the next two tokens max we can guarantee a correct parse given a correct smt program
   */
   @OptIn(ExperimentalContracts::class)
-  val parseTerm = DeepRecursiveFunction<MutableSMTProgram, Expression<*>> {
-    program -> when (lexer.peek()) {
-    is SpecConstantToken -> {
-      // here we get a literal
-      parseSpecConstantTerm(program)
-    }
-    is SymbolToken -> {
-      // smt function invocation with arity 0
-      val symbolToken = lexer.next() as SymbolToken
-      when (symbolToken) {
-        is QuotedSymbolToken ->
-          program.context
-            .getFunc(symbolToken.toString().toSymbolWithQuotes())
-            .constructDynamic(emptyList(), emptyList())
-        is SimpleSymbolToken ->
-          program.context
-            .getFunc(symbolToken.toString().toSymbolWithQuotes())
-            .constructDynamic(emptyList(), emptyList())
-      }
-    }
-    is OpeningBracket -> {
-      val expr =
-        when (lexer.peek(depth=1)) {
-          is UnderscoreWord -> {
-            // indexed identifier
-
-            val identifier = parseIdentifier()
-
-            require(identifier is IndexedIdentifier) { "Expected indexed identifier but found ${identifier.javaClass}!" }
-
-            // there is a special pseudo function (_ bv<Numeral> <Index>) that needs to be handled here
-            if(identifier.symbol.value.startsWith("bv") && !identifier.symbol.isQuoted && program.context.containsSort("BitVec".toSymbolAsIs()) && identifier.symbol.value.substring(2).all { ch -> ch.isDigit() }) {
-              BVLiteral(identifier.symbol.value, (identifier.indices.single() as NumeralIndex).numeral)
-            } else {
-              program.context.getFunc(identifier.symbol).constructDynamic(emptyList(), identifier.indices)
-            }
+  val parseTerm =
+      DeepRecursiveFunction<MutableSMTProgram, Expression<*>> { program ->
+        when (lexer.peek()) {
+          is SpecConstantToken -> {
+            // here we get a literal
+            parseSpecConstantTerm(program)
           }
-          is AsWord -> TODO("As not implemented in konstraints yet")
-          is LetWord -> parseLet(program)
-          is LambdaWord -> TODO("Lambda not implemented in konstraints yet")
-          is ForallWord -> parseForall(program)
-          is ExistsWord -> parseExists(program)
-          is MatchWord -> TODO("Match not implemented in konstraints yet")
-          is ExclamationWord -> parseAnnotatedTerm(program)
           is SymbolToken -> {
-            // consume opening bracket
-            lexer.next()
-
-            // smt function with arity > 0 but not indexed (so e.g. not ((_ extract i j)
-            // bv_term))
-            val func = program.context.getFunc(parseSymbol())
-            val terms = mutableListOf<Expression<*>>()
-            do {
-              terms.add(callRecursive(program))
-            } while (lexer.peekIsNot { token -> token is ClosingBracket })
-
-            // discard let closing bracket
-            requireIsInstance<ClosingBracket>(lexer.next())
-
-            func.constructDynamic(terms, emptyList())
+            // smt function invocation with arity 0
+            val symbolToken = lexer.next() as SymbolToken
+            when (symbolToken) {
+              is QuotedSymbolToken ->
+                  program.context
+                      .getFunc(symbolToken.toString().toSymbolWithQuotes())
+                      .constructDynamic(emptyList(), emptyList())
+              is SimpleSymbolToken ->
+                  program.context
+                      .getFunc(symbolToken.toString().toSymbolWithQuotes())
+                      .constructDynamic(emptyList(), emptyList())
+            }
           }
           is OpeningBracket -> {
-            // discard opening bracket
-            lexer.next()
+            val expr =
+                when (lexer.peek(depth = 1)) {
+                  is UnderscoreWord -> {
+                    // indexed identifier
 
-            when (lexer.peek(depth=1)) {
-              is AsWord -> TODO("As not implemented in konstraints yet")
-              is UnderscoreWord -> {
-                // indexed function with arity > 0
-                val identifier = parseIdentifier()
+                    val identifier = parseIdentifier()
 
-                // check and smart cast identifier
-                require(identifier is IndexedIdentifier) {
-                  "Expected IndexedIdentifier but found ${identifier.javaClass}"
+                    require(identifier is IndexedIdentifier) {
+                      "Expected indexed identifier but found ${identifier.javaClass}!"
+                    }
+
+                    // there is a special pseudo function (_ bv<Numeral> <Index>) that needs to be
+                    // handled here
+                    if (
+                        identifier.symbol.value.startsWith("bv") &&
+                            !identifier.symbol.isQuoted &&
+                            program.context.containsSort("BitVec".toSymbolAsIs()) &&
+                            identifier.symbol.value.substring(2).all { ch -> ch.isDigit() }
+                    ) {
+                      BVLiteral(
+                          identifier.symbol.value,
+                          (identifier.indices.single() as NumeralIndex).numeral,
+                      )
+                    } else {
+                      program.context
+                          .getFunc(identifier.symbol)
+                          .constructDynamic(emptyList(), identifier.indices)
+                    }
+                  }
+                  is AsWord -> TODO("As not implemented in konstraints yet")
+                  is LetWord -> parseLet.callRecursive(program)
+                  is LambdaWord -> TODO("Lambda not implemented in konstraints yet")
+                  is ForallWord -> parseForall(program)
+                  is ExistsWord -> parseExists(program)
+                  is MatchWord -> TODO("Match not implemented in konstraints yet")
+                  is ExclamationWord -> parseAnnotatedTerm(program)
+                  is SymbolToken -> {
+                    // consume opening bracket
+                    lexer.next()
+
+                    // smt function with arity > 0 but not indexed (so e.g. not ((_ extract i j)
+                    // bv_term))
+                    val func = program.context.getFunc(parseSymbol())
+                    val terms = mutableListOf<Expression<*>>()
+                    do {
+                      terms.add(callRecursive(program))
+                    } while (lexer.peekIsNot { token -> token is ClosingBracket })
+
+                    // discard let closing bracket
+                    requireIsInstance<ClosingBracket>(lexer.next())
+
+                    func.constructDynamic(terms, emptyList())
+                  }
+                  is OpeningBracket -> {
+                    // discard opening bracket
+                    lexer.next()
+
+                    when (lexer.peek(depth = 1)) {
+                      is AsWord -> TODO("As not implemented in konstraints yet")
+                      is UnderscoreWord -> {
+                        // indexed function with arity > 0
+                        val identifier = parseIdentifier()
+
+                        // check and smart cast identifier
+                        require(identifier is IndexedIdentifier) {
+                          "Expected IndexedIdentifier but found ${identifier.javaClass}"
+                        }
+
+                        val indices = identifier.indices
+                        require(indices.all { index -> index is NumeralIndex }) {
+                          "Expected all indices to be numeral but found at least one symbolic"
+                        }
+
+                        // plus need to be implemented by hand here since we are in a deep recursive
+                        // function
+                        // that needs to be called inside the plus lambda
+                        val terms = mutableListOf<Expression<*>>()
+                        do {
+                          terms.add(callRecursive(program))
+                        } while (lexer.peekIsNot { token -> token is ClosingBracket })
+
+                        // consume closing bracket of the whole term not the identifier
+                        requireIsInstance<ClosingBracket>(lexer.next())
+
+                        program.context.getFunc(identifier.symbol).constructDynamic(terms, indices)
+                      }
+                      else ->
+                          throw UnexpectedTokenException(
+                              lexer.peek(depth = 1),
+                              "any of AsWord or UnderscoreWord",
+                          )
+                    }
+                  }
+                  else ->
+                      throw UnexpectedTokenException(
+                          lexer.peek(depth = 1),
+                          "any of AsWord, LetWord, LambdaWord, ForallWord, ExistsWord, MatchWord, ExclamationWord, SymbolToken or OpeningBracket",
+                      )
                 }
 
-                val indices = identifier.indices
-                require(indices.all { index -> index is NumeralIndex }) {
-                  "Expected all indices to be numeral but found at least one symbolic"
-                }
-
-                // plus need to be implemented by hand here since we are in a deep recursive function
-                // that needs to be called inside the plus lambda
-                val terms = mutableListOf<Expression<*>>()
-                do {
-                  terms.add(callRecursive(program))
-                } while (lexer.peekIsNot { token -> token is ClosingBracket })
-
-                // consume closing bracket of the whole term not the identifier
-                requireIsInstance<ClosingBracket>(lexer.next())
-
-                program.context.getFunc(identifier.symbol).constructDynamic(terms, indices)
-              }
-              else -> throw UnexpectedTokenException(lexer.peek(depth=1), "any of AsWord or UnderscoreWord")
-            }
+            expr
           }
           else ->
-            throw UnexpectedTokenException(
-              lexer.peek(depth=1),
-              "any of AsWord, LetWord, LambdaWord, ForallWord, ExistsWord, MatchWord, ExclamationWord, SymbolToken or OpeningBracket"
-            )
+              throw UnexpectedTokenException(
+                  lexer.peek(),
+                  "any of SpecConstantToken, SymbolToken or OpeningBracket",
+              )
         }
-
-      expr
-    }
-    else ->
-      throw UnexpectedTokenException(
-        lexer.peek(),
-        "any of SpecConstantToken, SymbolToken or OpeningBracket",
-      )
-  }
-  }
+      }
 
   /**
-   * Parse a let including the opening and closing bracket (importantly the opening bracket must not be consumed before calling this function)
+   * Parse a let including the opening and closing bracket (importantly the opening bracket must not
+   * be consumed before calling this function)
    */
   @OptIn(ExperimentalContracts::class)
-  private fun parseLet(program: MutableSMTProgram): LetExpression<Sort> {
-    // TODO implement discard function with depth on iterator for cleaner code
-    // consume opening bracket
-    lexer.next()
+  val parseLet: DeepRecursiveFunction<MutableSMTProgram, LetExpression<*>> =
+      DeepRecursiveFunction<MutableSMTProgram, LetExpression<*>> { program ->
+        // TODO implement discard function with depth on iterator for cleaner code
+        // consume opening bracket
+        lexer.next()
 
-    // consume let token
-    lexer.next()
+        // consume let token
+        lexer.next()
 
-    // check and consume opening bracket for bindings
-    requireIsInstance<OpeningBracket>(lexer.next())
+        // check and consume opening bracket for bindings
+        requireIsInstance<OpeningBracket>(lexer.next())
 
-    val bindings = plus<ClosingBracket, VarBinding<*>>(program, ::parseVarBinding)
+        val bindings = plus<ClosingBracket, VarBinding<*>>(program, ::parseVarBinding)
 
-    requireIsInstance<ClosingBracket>(lexer.next())
+        requireIsInstance<ClosingBracket>(lexer.next())
 
-    // bind the bindings locally note that the context automatically discards the bindings once the
-    // lambda exits
-    val term = program.context.let(bindings) { parseTerm(program) }
+        // bind the bindings locally note that we can not use program.let since this is a deep
+        // recursive scope
+        program.context.bindVariables(bindings)
+        val term = parseTerm.callRecursive<MutableSMTProgram, Expression<*>>(program)
+        program.context.unbindVariables()
 
-    // discard let closing bracket
-    requireIsInstance<ClosingBracket>(lexer.next())
+        // discard let closing bracket
+        requireIsInstance<ClosingBracket>(lexer.next())
 
-    return LetExpression(bindings, term)
-  }
+        LetExpression(bindings, term)
+      }
 
   @OptIn(ExperimentalContracts::class)
   private fun parseForall(program: MutableSMTProgram): ForallExpression {
@@ -708,7 +736,7 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
     lexer.next()
 
     val term = parseTerm(program)
-    val attributes = plus<ClosingBracket, Attribute> (::parseAttribute)
+    val attributes = plus<ClosingBracket, Attribute>(::parseAttribute)
 
     // discard let closing bracket
     requireIsInstance<ClosingBracket>(lexer.next())
@@ -738,9 +766,7 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
     return VarBinding(symbol, term)
   }
 
-  private fun parseSpecConstantTerm(
-      program: MutableSMTProgram
-  ): Expression<*> =
+  private fun parseSpecConstantTerm(program: MutableSMTProgram): Expression<*> =
       when (val constant = parseSpecConstant()) {
         is BinaryConstant -> BVLiteral(constant.binary)
         is DecimalConstant -> RealLiteral(constant.decimal)
@@ -763,14 +789,14 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
   private fun parseSpecConstant(): SpecConstant {
     val token = lexer.next()
     requireIsInstance<SpecConstantToken>(token)
-      return when (token) {
-        is Decimal -> DecimalConstant(token.number)
-        is Binary -> BinaryConstant(token.toString())
-        is Hexadecimal -> HexConstant(token.toString())
-        is Numeral -> NumeralConstant(token.number)
-        is SMTString -> StringConstant(token.contents)
-      }
+    return when (token) {
+      is Decimal -> DecimalConstant(token.number)
+      is Binary -> BinaryConstant(token.toString())
+      is Hexadecimal -> HexConstant(token.toString())
+      is Numeral -> NumeralConstant(token.number)
+      is SMTString -> StringConstant(token.contents)
     }
+  }
 }
 
 /**
@@ -787,6 +813,18 @@ inline fun <reified T : Token> requireIsInstance(actual: Token): Boolean {
   }
 
   return true
+}
+
+class Program {
+  fun run() {
+    val file = File("E:/Projects/aqua/smt-benchmark/AUFBV/20210301-Alive2/gcc/032_gcc.smt2")
+    Parser(file.bufferedReader())
+  }
+}
+
+fun main() {
+  val prg = Program()
+  prg.run()
 }
 
 class UnexpectedTokenException(actual: Token, expected: String) :

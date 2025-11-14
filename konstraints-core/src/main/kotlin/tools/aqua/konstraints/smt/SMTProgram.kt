@@ -164,27 +164,41 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     _commands.add(assertion)
   }
 
-  private fun checkContext(expr: Expression<*>): Boolean {
-    return if (expr is ExistsExpression) {
-      context.exists(expr.vars) { checkContext(expr.term) }
-    } else if (expr is ForallExpression) {
-      context.forall(expr.vars) { checkContext(expr.term) }
-    } else if (expr is LetExpression) {
-      context.let(expr.bindings) { checkContext(expr.inner) }
-    } else if (expr is AnnotatedExpression) {
-      checkContext(expr.term)
-    } else {
-      val result =
-          (expr.theories.isNotEmpty() || expr in context) && expr.children.all { checkContext(it) }
+  private val checkContext: DeepRecursiveFunction<Expression<*>, Boolean> =
+      DeepRecursiveFunction<Expression<*>, Boolean> { expr ->
+        return@DeepRecursiveFunction if (expr is ExistsExpression) {
+          context.bindVariables(expr.vars)
+          val result = checkContext.callRecursive(expr.term)
+          context.unbindVariables()
 
-      if (!result)
-          println(
-              "Not in theories ${logic?.theories}: ($expr ${expr.children.joinToString(" ")}) is in ${expr.theories}"
-          )
+          result
+        } else if (expr is ForallExpression) {
+          context.bindVariables(expr.vars)
+          val result = checkContext.callRecursive(expr.term)
+          context.unbindVariables()
 
-      result
-    }
-  }
+          result
+        } else if (expr is LetExpression) {
+          context.bindVariables(expr.bindings)
+          val result = checkContext.callRecursive(expr.inner)
+          context.unbindVariables()
+
+          result
+        } else if (expr is AnnotatedExpression) {
+          checkContext.callRecursive(expr.term)
+        } else {
+          val result =
+              (expr.theories.isNotEmpty() || expr in context) &&
+                  expr.children.all { checkContext.callRecursive(it) }
+
+          if (!result)
+              println(
+                  "Not in theories ${logic?.theories}: ($expr ${expr.children.joinToString(" ")}) is in ${expr.theories}"
+              )
+
+          result
+        }
+      }
 
   fun <T : Sort> declareConst(name: Symbol, sort: T): UserDeclaredSMTFunction0<T> {
     val func = UserDeclaredSMTFunction0(name, sort)

@@ -18,7 +18,6 @@
 
 package tools.aqua.konstraints.smt
 
-import java.lang.Character.isDigit
 import java.math.BigDecimal
 import java.math.BigInteger
 
@@ -38,7 +37,7 @@ data class NumeralConstant(val numeral: BigInteger) : SpecConstant {
 /** BinaryConstant of the form #b followed by a non-empty sequence of 0 and 1 characters. */
 data class BinaryConstant(val binary: String) : SpecConstant {
   init {
-      require(binary.isSMTBinary())
+    require(binary.isSMTBinary())
   }
 
   /* Number of bits for this binary */

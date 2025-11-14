@@ -1143,7 +1143,7 @@ fun String.isSMTBitvecShorthand(): Boolean {
 
   return token[1].substring(2).all { ch -> ch.isDigit() } &&
       token[2].all { ch -> ch.isDigit() } &&
-          token[2][0] != '0'
+      token[2][0] != '0'
 }
 
 /** Returns true iff [this] is either #bX or #xX. */

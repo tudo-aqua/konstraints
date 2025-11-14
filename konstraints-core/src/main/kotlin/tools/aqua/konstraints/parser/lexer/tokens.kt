@@ -16,10 +16,16 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.lexer
+package tools.aqua.konstraints.parser.lexer
 
 import java.math.BigDecimal
 import java.math.BigInteger
+import tools.aqua.konstraints.lexer.isNotDigit
+import tools.aqua.konstraints.lexer.isNotSMTLineBreak
+import tools.aqua.konstraints.lexer.isQuotedSymbolLetter
+import tools.aqua.konstraints.lexer.isSMTWhiteSpace
+import tools.aqua.konstraints.lexer.isSimpleSymbolLetter
+import tools.aqua.konstraints.lexer.isStringLetter
 import tools.aqua.konstraints.location.AbstractLocalizable
 import tools.aqua.konstraints.location.SourceSpan
 
@@ -227,7 +233,8 @@ internal val reservedWords =
         EXISTS to ::ExistsWord,
         HEXADECIMAL to ::HexadecimalWord,
         FORALL to ::ForallWord,
-        LAMBDA to ::LambdaWord,
+        /* LAMBDA to ::LambdaWord, */
+        // since we implement smt 2.6 and not 2.7 yet lambda is not a reserved word
         LET to ::LetWord,
         MATCH to ::MatchWord,
         NUMERAL to ::NumeralWord,
@@ -317,9 +324,9 @@ class Decimal(val number: BigDecimal, source: SourceSpan) : SpecConstantToken(so
   override fun toString(): String = number.toPlainString()
 }
 
-// number is stored as string to not drop leading zeros which leads to incorrect bit width in vectors
-class Hexadecimal(val number: String, source: SourceSpan) :
-    SpecConstantToken(source) {
+// number is stored as string to not drop leading zeros which leads to incorrect bit width in
+// vectors
+class Hexadecimal(val number: String, source: SourceSpan) : SpecConstantToken(source) {
   override fun toString() = "#x$number"
 }
 
@@ -334,7 +341,7 @@ class SMTString(val contents: String, source: SourceSpan) : SpecConstantToken(so
     }
   }
 
-  override fun toString(): String = "${contents.replace("\"", "\"\"")}\""
+  override fun toString(): String = "\"${contents}\""
 }
 
 sealed class SymbolToken(source: SourceSpan) : SemanticToken(source)
@@ -356,7 +363,8 @@ class QuotedSymbolToken(val contents: String, source: SourceSpan) : SymbolToken(
     require(contents.all(Char::isQuotedSymbolLetter)) {
       "all characters in $contents must be SMT quoted symbol letters"
     }
-    require(contents !in reservedWords) { "$contents must not be reserved" }
+    // quoted simples should be allowed to use reserved words as content
+    // require(contents !in reservedWords) { "$contents must not be reserved" }
   }
 
   override fun toString(): String = "|$contents|"

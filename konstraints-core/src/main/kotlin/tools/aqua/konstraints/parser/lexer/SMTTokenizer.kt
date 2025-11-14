@@ -22,24 +22,11 @@ import java.io.Reader
 import java.io.StringReader
 import java.math.BigDecimal
 import java.math.BigInteger
-import tools.aqua.konstraints.lexer.Binary
 import tools.aqua.konstraints.lexer.CAPITAL_LETTERS
-import tools.aqua.konstraints.lexer.ClosingBracket
-import tools.aqua.konstraints.lexer.Comment
 import tools.aqua.konstraints.lexer.DIGITS
-import tools.aqua.konstraints.lexer.Decimal
-import tools.aqua.konstraints.lexer.Hexadecimal
-import tools.aqua.konstraints.lexer.KeywordToken
 import tools.aqua.konstraints.lexer.LOWERCASE_LETTERS
-import tools.aqua.konstraints.lexer.Numeral
-import tools.aqua.konstraints.lexer.OpeningBracket
-import tools.aqua.konstraints.lexer.QuotedSymbolToken
-import tools.aqua.konstraints.lexer.SMTString
-import tools.aqua.konstraints.lexer.SimpleSymbolToken
-import tools.aqua.konstraints.lexer.Token
 import tools.aqua.konstraints.lexer.UnexpectedCharacterException
 import tools.aqua.konstraints.lexer.UnexpectedEOFException
-import tools.aqua.konstraints.lexer.Whitespace
 import tools.aqua.konstraints.lexer.isBinaryDigit
 import tools.aqua.konstraints.lexer.isDigit
 import tools.aqua.konstraints.lexer.isHexadecimalDigit
@@ -48,7 +35,6 @@ import tools.aqua.konstraints.lexer.isQuotedSymbolLetter
 import tools.aqua.konstraints.lexer.isSMTWhiteSpace
 import tools.aqua.konstraints.lexer.isSimpleSymbolLetter
 import tools.aqua.konstraints.lexer.isStringLetter
-import tools.aqua.konstraints.lexer.reservedWords
 import tools.aqua.konstraints.location.SourceLocation
 import tools.aqua.konstraints.util.lineColumnTracking
 import tools.aqua.konstraints.util.peekIsNot
@@ -71,7 +57,7 @@ class SMTTokenizer(sourceReader: Reader, private val source: String? = null) : I
   override fun next(): Token {
     // TODO maybe return EOF token here instead of throwing although this violates the iterator
     // interface
-    if (!hasNext()) throw NoSuchElementException("reader has reached EOF")
+    if (!hasNext()) return EOFToken(tokenStartLocation.asSingletonSpan())
 
     tokenStartLocation = readerNextLocation
 
@@ -105,7 +91,7 @@ class SMTTokenizer(sourceReader: Reader, private val source: String? = null) : I
             '_',
             '~',
             '&',
-            'ˆ',
+            '^',
             '<',
             '>',
             '@' -> readSimpleSymbolOrReservedWord()
@@ -118,7 +104,11 @@ class SMTTokenizer(sourceReader: Reader, private val source: String? = null) : I
                     "a valid starting symbol for a SMT token",
                 )
           }
-    } while (token is Whitespace || token is Comment)
+    } while ((token is Whitespace || token is Comment) && hasNext())
+
+    // reached EOF on whitespace tokens return EOF
+    if ((token is Whitespace || token is Comment))
+        token = EOFToken(readerNextLocation.asSingletonSpan())
 
     return token
   }
@@ -187,7 +177,7 @@ class SMTTokenizer(sourceReader: Reader, private val source: String? = null) : I
         } else {
           // quoted '"'
           requireReadChar('"') // discard second '"'
-          append('"')
+          append("\"\"")
         }
       }
     }

@@ -94,7 +94,7 @@ val Char.isSimpleSymbolLetter
         '_',
         '~',
         '&',
-        'ˆ',
+        '^',
         '<',
         '>',
         '@' -> true

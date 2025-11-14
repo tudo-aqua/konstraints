@@ -78,7 +78,8 @@ internal constructor(
             "exists",
             "HEXADECIMAL",
             "forall",
-            "lambda",
+            /* "lambda", */
+            // we do not implement smt 2.7 yet (this breaks some smt 2.6 benchmarks)
             "let",
             "match",
             "NUMERAL",
