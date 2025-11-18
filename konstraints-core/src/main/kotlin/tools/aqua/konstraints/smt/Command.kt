@@ -398,3 +398,15 @@ data class Pop(val n: Int) : Command("pop") {
   override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
       builder.append(toString())
 }
+
+class GetValue(val terms: List<Expression<*>>): Command("get-value") {
+  override fun toString() = "(get-value (${terms.joinToString(" ")}))"
+
+  override fun toSMTString(quotingRule: QuotingRule) = "(get-value (${terms.joinToString(" "){it.toSMTString(quotingRule)}}))"
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+    builder.append("(get-value (")
+    terms.forEach { it.toSMTString(builder, quotingRule) }
+    return builder.append("))")
+  }
+}

@@ -38,6 +38,7 @@ interface CommandVisitor<T> {
         is Push -> visit(command)
         is DefineConst -> visit(command)
         is DefineSort -> visit(command)
+        is GetValue -> TODO()
       }
 
   fun visit(assert: Assert): T

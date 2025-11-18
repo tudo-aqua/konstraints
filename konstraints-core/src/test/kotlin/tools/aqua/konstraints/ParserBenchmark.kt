@@ -22,6 +22,7 @@ import java.io.File
 import java.util.stream.Stream
 import kotlin.streams.asStream
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
@@ -194,7 +195,7 @@ class ParserBenchmark {
   }
 
   private fun parse(file: File) {
-    assumeTrue(file.length() < 100000, "Skipped due to file size exceeding limit of 5000000")
+    // assumeTrue(file.length() < 100000, "Skipped due to file size exceeding limit of 5000000")
 
     /*assertDoesNotThrow {
       // its crucial that the separator is '\n' as comments dont have an ending symbol but rather
@@ -203,9 +204,9 @@ class ParserBenchmark {
     }*/
 
     try {
-      assertDoesNotThrow { Parser(file.bufferedReader()) }
+      val input = file.bufferedReader().readLines().joinToString("\n")
+      val program = Parser(input)
 
-      /*
       assertEquals(
           removeComments(input)
               .replace(" ", "")
@@ -221,7 +222,6 @@ class ParserBenchmark {
             .replace("\t", "")
             .replace("|", ""),
       )
-      */
     } catch (e: NotImplementedError) {
       println("Skipped due to not implemented error ${e.message}")
       assumeTrue(false)

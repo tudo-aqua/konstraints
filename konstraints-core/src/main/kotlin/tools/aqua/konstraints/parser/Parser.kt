@@ -91,6 +91,7 @@ import tools.aqua.konstraints.smt.Exit
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.ForallExpression
 import tools.aqua.konstraints.smt.FunctionDef
+import tools.aqua.konstraints.smt.GetValue
 import tools.aqua.konstraints.smt.HexConstant
 import tools.aqua.konstraints.smt.Identifier
 import tools.aqua.konstraints.smt.Index
@@ -177,7 +178,7 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
       is GetProofWord -> TODO("GetProofWord")
       is GetUnsatAssumptionsWord -> TODO("GetUnsatAssumptionsWord")
       is GetUnsatCoreWord -> TODO("GetUnsatCoreWord")
-      is GetValueWord -> TODO("GetValueWord")
+      is GetValueWord -> parseGetValue(program)
       is PopWord -> parsePop(program)
       is PushWord -> parsePush(program)
       is ResetAssertionsWord -> TODO("ResetAssertionsWord")
@@ -188,6 +189,18 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
     }
 
     requireIsInstance<ClosingBracket>(lexer.next())
+  }
+
+  @OptIn(ExperimentalContracts::class)
+  private fun parseGetValue(program: MutableSMTProgram) {
+    requireIsInstance<OpeningBracket>(lexer.next())
+
+    val terms = plus<ClosingBracket, Expression<*>> { parseTerm(program) }
+
+    requireIsInstance<ClosingBracket>(lexer.next())
+
+    // TODO implement get value in program
+    program.add(GetValue(terms))
   }
 
   private fun parseAssert(program: MutableSMTProgram) {
