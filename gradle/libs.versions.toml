@@ -41,6 +41,6 @@ junit-launcher = { group = "org.junit.platform", name = "junit-platform-launcher
 kotlin-coroutines = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version = "1.10.2" }
 kotlin-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version = "1.9.0" }
 petitparser-core = { group = "com.github.petitparser", name = "petitparser-core", version = "2.4.0" }
-xz = { group = "org.tukaani", name = "xz", version = "1.10" }
+xz = { group = "org.tukaani", name = "xz", version = "1.11" }
 zstd = { group = "com.github.luben", name = "zstd-jni", version = "1.5.7-6" }
 z3-turnkey = { group = "tools.aqua", name = "z3-turnkey", version = "4.14.1" }
