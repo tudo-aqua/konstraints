@@ -24,8 +24,8 @@ interface CommandVisitor<T> {
   fun visit(command: Command): T =
       when (command) {
         is Assert -> visit(command)
-        is DeclareConst -> visit(command)
-        is DeclareFun -> visit(command)
+        is DeclareConst<*> -> visit(command)
+        is DeclareFun<*> -> visit(command)
         is CheckSat -> visit(command)
         is Exit -> visit(command)
         is SetInfo -> visit(command)
@@ -38,13 +38,14 @@ interface CommandVisitor<T> {
         is Push -> visit(command)
         is DefineConst -> visit(command)
         is DefineSort -> visit(command)
+        is GetValue -> TODO()
       }
 
   fun visit(assert: Assert): T
 
-  fun visit(declareConst: DeclareConst): T
+  fun visit(declareConst: DeclareConst<*>): T
 
-  fun visit(declareFun: DeclareFun): T
+  fun visit(declareFun: DeclareFun<*>): T
 
   fun visit(checkSat: CheckSat): T
 

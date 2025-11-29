@@ -42,10 +42,9 @@ enum class SatStatus {
 }
 
 /** Base class for all types of smt program. */
-abstract class SMTProgram(commands: List<Command>) {
+abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
   var model: Model? = null
   var status = SatStatus.PENDING
-  val info = mutableListOf<Attribute>()
   var logic: Logic? = null
     protected set
 
@@ -54,6 +53,57 @@ abstract class SMTProgram(commands: List<Command>) {
   protected val _commands: MutableList<Command> = commands.toMutableList()
   val commands: List<Command>
     get() = _commands.toList()
+
+  protected val _info = mutableMapOf<String, AttributeValue?>()
+
+  /**
+   * Get info value associated with [keyword].
+   * - [keyword] may or may not contain prefix ':' (e.g. `status` and `:status` both refer to the
+   *   same info)
+   *
+   * @throws [NoSuchInfoException] if no value is associated with [keyword]
+   */
+  fun info(keyword: String) = infoOrNull(keyword) ?: throw NoSuchInfoException(keyword)
+
+  /**
+   * Get info value associated with [keyword] or `null` if no such info exists.
+   * - [keyword] may or may not contain prefix ':' (e.g. `status` and `:status` both refer to the
+   *   same info)
+   */
+  fun infoOrNull(keyword: String) = _info[keyword.removePrefix(":")]
+
+  protected val _options = mutableMapOf<String, OptionValue>()
+
+  /**
+   * Get option value associated with [keyword].
+   * - [keyword] may or may not contain prefix ':' (e.g. `print-success` and `:print-success` both
+   *   refer to the same option)
+   *
+   * @throws [NoSuchInfoException] if no value is associated with [keyword]
+   */
+  fun option(keyword: String) = optionOrNull(keyword) ?: throw NoSuchOptionException(keyword)
+
+  /**
+   * Get option value associated with [keyword] or `null` if no such info exists.
+   * - [keyword] may or may not contain prefix ':' (e.g. `print-success` and `:print-success` both
+   *   refer to the same option)
+   */
+  fun optionOrNull(keyword: String) = _options[keyword.removePrefix(":")]
+
+  final override fun toString() = _commands.joinToString(separator = "\n")
+
+  override fun toSMTString(quotingRule: QuotingRule) =
+      _commands.joinToString(separator = "\n") { it.toSMTString(quotingRule) }
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+    var counter = 0
+    _commands.forEach {
+      if (++counter > 1) builder.append("\n")
+      it.toSMTString(builder, quotingRule)
+    }
+
+    return builder
+  }
 }
 
 /** SMT Program with a mutable command list. */
@@ -67,7 +117,9 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
    * Checks if [command] is legal w.r.t. the [context]
    */
   @Deprecated(
-      "Prefer usage of specialized functions (e.g. assert)", level = DeprecationLevel.WARNING)
+      "Prefer usage of specialized functions (e.g. assert)",
+      level = DeprecationLevel.WARNING,
+  )
   fun add(command: Command) {
     add(command, _commands.size)
   }
@@ -78,7 +130,9 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
    * Checks if [command] is legal w.r.t. the [context]
    */
   @Deprecated(
-      "Prefer usage of specialized functions (e.g. assert)", level = DeprecationLevel.WARNING)
+      "Prefer usage of specialized functions (e.g. assert)",
+      level = DeprecationLevel.WARNING,
+  )
   fun add(command: Command, index: Int) {
     if (command is Assert) {
       require(command.expr.all { context.contains(it) })
@@ -94,10 +148,12 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     assertion.expr.all {
       if (!(it.theories.isEmpty() || it.theories.any { it in logic!!.theories })) {
         throw AssertionOutOfLogicBounds(
-            "$it was not in logic bounds: expected any of ${logic!!.theories} but was ${it.theories}")
+            "$it was not in logic bounds: expected any of ${logic!!.theories} but was ${it.theories}"
+        )
       } else if (!(it.sort.theories.isEmpty() || it.sort.theories.any { it in logic!!.theories })) {
         throw AssertionOutOfLogicBounds(
-            "${it.sort} was not in logic bounds: expected any of ${logic!!.theories} but was ${it.sort.theories}")
+            "${it.sort} was not in logic bounds: expected any of ${logic!!.theories} but was ${it.sort.theories}"
+        )
       }
       true
     }
@@ -108,38 +164,54 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     _commands.add(assertion)
   }
 
-  private fun checkContext(expr: Expression<*>): Boolean {
-    return if (expr is ExistsExpression) {
-      context.exists(expr.vars) { checkContext(expr.term) }
-    } else if (expr is ForallExpression) {
-      context.forall(expr.vars) { checkContext(expr.term) }
-    } else if (expr is LetExpression) {
-      context.let(expr.bindings) { checkContext(expr.inner) }
-    } else if (expr is AnnotatedExpression) {
-      checkContext(expr.term)
-    } else {
-      val result =
-          (expr.theories.isNotEmpty() || expr in context) && expr.children.all { checkContext(it) }
+  private val checkContext: DeepRecursiveFunction<Expression<*>, Boolean> =
+      DeepRecursiveFunction<Expression<*>, Boolean> { expr ->
+        return@DeepRecursiveFunction if (expr is ExistsExpression) {
+          context.bindVariables(expr.vars)
+          val result = checkContext.callRecursive(expr.term)
+          context.unbindVariables()
 
-      if (!result)
-          println(
-              "Not in theories ${logic?.theories}: ($expr ${expr.children.joinToString(" ")}) is in ${expr.theories}")
+          result
+        } else if (expr is ForallExpression) {
+          context.bindVariables(expr.vars)
+          val result = checkContext.callRecursive(expr.term)
+          context.unbindVariables()
 
-      result
-    }
-  }
+          result
+        } else if (expr is LetExpression) {
+          context.bindVariables(expr.bindings)
+          val result = checkContext.callRecursive(expr.inner)
+          context.unbindVariables()
+
+          result
+        } else if (expr is AnnotatedExpression) {
+          checkContext.callRecursive(expr.term)
+        } else {
+          val result =
+              (expr.theories.isNotEmpty() || expr in context) &&
+                  expr.children.all { checkContext.callRecursive(it) }
+
+          if (!result)
+              println(
+                  "Not in theories ${logic?.theories}: ($expr ${expr.children.joinToString(" ")}) is in ${expr.theories}"
+              )
+
+          result
+        }
+      }
 
   fun <T : Sort> declareConst(name: Symbol, sort: T): UserDeclaredSMTFunction0<T> {
     val func = UserDeclaredSMTFunction0(name, sort)
+
     context.addFun(func)
-    _commands.add(DeclareConst(name, sort))
+    _commands.add(DeclareConst(func()))
 
     return func
   }
 
   fun <T : Sort> declareFun(func: UserDeclaredSMTFunction<T>): UserDeclaredSMTFunction<T> {
     context.addFun(func)
-    _commands.add(DeclareFun(func.symbol, func.parameters, func.sort))
+    _commands.add(DeclareFun(func))
 
     return func
   }
@@ -147,7 +219,7 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
   fun <T : Sort> defineConst(
       name: Symbol,
       sort: T,
-      term: Expression<T>
+      term: Expression<T>,
   ): UserDefinedSMTFunction0<T> {
     val func = UserDefinedSMTFunction0(name, sort, term)
     context.addFun(func)
@@ -173,11 +245,13 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
   fun pop(n: Int) = context.pop(n)
 
   fun setOption(option: SetOption) {
+    _options[option.name.removePrefix(":")] = option.value
+
     _commands.add(option)
   }
 
   fun setInfo(info: SetInfo) {
-    this.info.add(info.attribute)
+    _info[info.attribute.keyword.removePrefix(":")] = info.attribute.value
 
     _commands.add(info)
   }
@@ -203,7 +277,9 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
    * For each command checks if it is legal w.r.t. the [context]
    */
   @Deprecated(
-      "Prefer usage of specialized functions (e.g. assert)", level = DeprecationLevel.WARNING)
+      "Prefer usage of specialized functions (e.g. assert)",
+      level = DeprecationLevel.WARNING,
+  )
   fun addAll(commands: List<Command>) = commands.forEach { add(it) }
 
   // conflicting jvm signature with setter of property logic
@@ -220,6 +296,8 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
 
     this.logic = logic
     context.setLogic(logic)
+
+    _commands.add(SetLogic(logic))
   }
 }
 
@@ -228,14 +306,18 @@ class DefaultSMTProgram(commands: List<Command>) : SMTProgram(commands)
 fun MutableSMTProgram.assert(expr: Expression<BoolSort>) = assert(Assert(expr))
 
 fun MutableSMTProgram.declareFun(name: Symbol, parameters: List<Sort>, sort: Sort) =
-    declareFun(UserDeclaredSMTFunctionN(name, sort, parameters))
+    if (parameters.isEmpty()) {
+      declareFun(UserDeclaredSMTFunction0(name, sort))
+    } else {
+      declareFun(UserDeclaredSMTFunctionN(name, sort, parameters))
+    }
 
-fun <T : Sort> MutableSMTProgram.defineFun(
+/*fun <T : Sort> MutableSMTProgram.defineFun(
     name: Symbol,
     parameters: List<Sort>,
     sort: T,
     term: Expression<T>
-) = defineFun(UserDefinedSMTFunctionN(name, sort, parameters, term))
+) = defineFun(UserDefinedSMTFunctionN(name, sort, parameters, term))*/
 
 fun <T : Sort> MutableSMTProgram.defineFun(def: FunctionDef<T>) =
     defineFun(UserDefinedSMTFunctionN(def.name, def.sort, def.parameters, def.term))
@@ -257,6 +339,8 @@ fun MutableSMTProgram.setOption(name: String, value: BigInteger) =
 
 fun MutableSMTProgram.setOption(name: String, value: OptionValue) =
     setOption(SetOption(name, value))
+
+fun MutableSMTProgram.setInfo(attribute: Attribute) = setInfo(SetInfo(attribute))
 
 fun MutableSMTProgram.setInfo(name: String, value: String) =
     setInfo(SetInfo(Attribute(name, ConstantAttributeValue(StringConstant(value)))))
@@ -283,3 +367,7 @@ fun MutableSMTProgram.setInfo(name: String, value: Symbol) =
     setInfo(SetInfo(Attribute(name, SymbolAttributeValue(value))))
 
 class AssertionOutOfLogicBounds(msg: String) : RuntimeException(msg)
+
+class NoSuchInfoException(keyword: String) : RuntimeException("Info $keyword not found!")
+
+class NoSuchOptionException(keyword: String) : RuntimeException("Option $keyword not found!")

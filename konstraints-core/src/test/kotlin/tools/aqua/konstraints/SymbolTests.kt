@@ -62,7 +62,10 @@ class SymbolTests {
               "| so is\nthis one |",
               "||",
               """| " can occur too |""",
-              """| af klj ^*0 asfe2 (&*)&(#^ $ > > >?" ']]984|"""])
+              """| af klj ^*0 asfe2 (&*)&(#^ $ > > >?" ']]984|""",
+              "|Łukasz|",
+          ]
+  )
   fun `test that same as input returns symbols with the same quotes as the input`(symbol: String) {
     val test = symbol.toSymbolWithQuotes()
     assertEquals(symbol, test.toSMTString(QuotingRule.SAME_AS_INPUT))
@@ -92,21 +95,31 @@ class SymbolTests {
               "| so is\nthis one |",
               "||",
               """| " can occur too |""",
-              """| af klj ^*0 asfe2 (&*)&(#^ $ > > >?" ']]984|"""])
+              """| af klj ^*0 asfe2 (&*)&(#^ $ > > >?" ']]984|""",
+          ]
+  )
   fun `test that symbols internal representation is without quotes`(symbol: String) {
     val test = symbol.toSymbolWithQuotes()
     assertEquals(symbol.trim('|'), test.value)
   }
 
   @ParameterizedTest
-  @ValueSource(strings = ["32", "3bitvec", "assert", "(check-sat)"])
-  fun `test that symbol sets must quote for symbols that must be quoted`(symbol: String) {
+  @ValueSource(strings = ["|32|", "|3bitvec|", "|assert|", "|(check-sat)|"])
+  fun `test that symbol sets is simple to false for symbols that must be quoted`(symbol: String) {
     val test = symbol.toSymbolWithQuotes()
     assertTrue(!test.isSimple)
   }
 
   @ParameterizedTest
-  @ValueSource(strings = ["bit|vec"])
+  @ValueSource(
+      strings =
+          [
+              "bit|vec",
+              "|||",
+              "||symbol||",
+              "Łukasz", // ascii characters beyond 128dec are only allowed in quoted symbols
+          ]
+  )
   fun `test that symbol throws for illegal symbols`(symbol: String) {
     assertThrows<IllegalSymbolException> { symbol.toSymbolWithQuotes() }
   }
@@ -128,7 +141,9 @@ class SymbolTests {
               ".kkk",
               ".8",
               "+34",
-              "-32"])
+              "-32",
+          ]
+  )
   fun `test that quoting mode always quotes simple symbols`(symbol: String) {
     val test = symbol.toSymbolWithQuotes()
     assertEquals("|$symbol|", test.toSMTString(QuotingRule.ALWAYS))
@@ -144,7 +159,9 @@ class SymbolTests {
               "| so is\nthis one |",
               "||",
               """| " can occur too |""",
-              """| af klj ^*0 asfe2 (&*)&(#^ $ > > >?" ']]984|"""])
+              """| af klj ^*0 asfe2 (&*)&(#^ $ > > >?" ']]984|""",
+          ]
+  )
   fun `test that quoting mode always does not double quote symbols`(symbol: String) {
     val test = symbol.toSymbolWithQuotes()
     assertEquals(symbol, test.toSMTString(QuotingRule.ALWAYS))
@@ -159,7 +176,8 @@ class SymbolTests {
   private fun getEqualSymbols(): Stream<Arguments> =
       Stream.of(
           arguments("A".toSymbolWithQuotes(), "A".toSymbolWithQuotes()),
-          arguments("A".toSymbolWithQuotes(), "|A|".toSymbolWithQuotes()))
+          arguments("A".toSymbolWithQuotes(), "|A|".toSymbolWithQuotes()),
+      )
 
   @ParameterizedTest
   @MethodSource("getUnequalSymbols")

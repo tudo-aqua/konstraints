@@ -18,7 +18,6 @@
 
 package tools.aqua.konstraints.smt
 
-import java.util.*
 import tools.aqua.konstraints.util.zipWithSameLength
 
 /**
@@ -49,11 +48,15 @@ abstract class SMTFunction<out T : Sort> {
     if (this !is VarBinding && other is VarBinding<*>) return false
     if (this is SortedVar && other !is SortedVar<*>) return false
     if (this !is SortedVar && other is SortedVar<*>) return false
-    else if (symbol == other.symbol && // symbol equality
-        sort == other.sort && // same sort
-        parameters.size == other.parameters.size && // same number of parameters
-        (parameters zip other.parameters).all { (s1, s2) -> s1 == s2 } // pairwise equal parameters
-    ) return true
+    else if (
+        symbol == other.symbol && // symbol equality
+            sort == other.sort && // same sort
+            parameters.size == other.parameters.size && // same number of parameters
+            (parameters zip other.parameters).all { (s1, s2) ->
+              s1 == s2
+            } // pairwise equal parameters
+    )
+        return true
     return false
 
     // does not consider definition for equality because two functions
@@ -128,7 +131,12 @@ abstract class DefinedSMTFunction<T : Sort> : SMTFunction<T>() {
     }
 
     return UserDefinedExpression(
-        symbol, sort, emptyList(), FunctionDef(symbol, sortedVars, sort, term), this)
+        symbol,
+        sort,
+        args,
+        FunctionDef(symbol, sortedVars, sort, term),
+        this,
+    )
   }
 }
 
@@ -138,7 +146,7 @@ class FunctionCastException(from: Sort, to: String) :
 
 /** Variable bound inside a let. */
 class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>) :
-    SMTFunction<T>() {
+    SMTFunction<T>(), SMTSerializable {
 
   operator fun invoke(args: List<Expression<*>>) = instance
 
@@ -149,17 +157,42 @@ class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>)
   override val parameters = emptyList<Sort>()
 
   val instance = LocalExpression(symbol, sort, term, this)
+
+  override fun toString() =
+      "(${symbol.toSMTString(QuotingRule.SAME_AS_INPUT)} ${term.toSMTString(QuotingRule.SAME_AS_INPUT)})"
+
+  override fun toSMTString(quotingRule: QuotingRule) =
+      "(${symbol.toSMTString(quotingRule)} ${term.toSMTString(quotingRule)})"
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+    builder.append("(")
+    builder.append(symbol.toSMTString(quotingRule))
+    builder.append(" ")
+    builder.append(term.toSMTString(quotingRule))
+    return builder.append(")")
+  }
 }
 
 /** Variable bound by exists or forall quantifier. */
 class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T) :
-    SMTFunction<T>() {
+    SMTFunction<T>(), SMTSerializable {
   operator fun invoke(args: List<Expression<*>>) = instance
 
   override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>) = instance
 
-  override fun toString(): String = "($symbol $sort)"
+  override fun toString(): String = "(${symbol.toSMTString(QuotingRule.SAME_AS_INPUT)} $sort)"
 
   val instance = BoundVariable(symbol, sort, this)
   override val parameters: List<Sort> = emptyList()
+
+  override fun toSMTString(quotingRule: QuotingRule) =
+      "(${symbol.toSMTString(quotingRule)} ${sort.toSMTString(quotingRule)})"
+
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+    builder.append("(")
+    builder.append(symbol.toSMTString(quotingRule))
+    builder.append(" ")
+    builder.append(sort.toSMTString(quotingRule))
+    return builder.append(")")
+  }
 }

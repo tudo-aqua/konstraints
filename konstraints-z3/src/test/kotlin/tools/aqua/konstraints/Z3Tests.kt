@@ -39,6 +39,7 @@ import tools.aqua.konstraints.solvers.z3.Z3Solver
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Z3Tests {
+
   private fun loadResource(path: String) =
       File(javaClass.getResource(path)!!.file)
           .walk()
@@ -49,26 +50,22 @@ class Z3Tests {
   private fun solve(file: File) {
     assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
 
-    // TODO this creates a massiv memory leak (solver is not closed properly)
-    val solver = Z3Solver()
     val result =
         Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
 
     assumeTrue(
-        (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-            .symbol
-            .toString() != "unknown",
-        "Skipped due to unknown sat status.")
+        (result.info("status") as SymbolAttributeValue).symbol.toString() != "unknown",
+        "Skipped due to unknown sat status.",
+    )
 
-    solver.use {
+    Z3Solver().use { solver ->
       solver.solve(result)
 
       // verify we get the correct status for the test
       assertEquals(
-          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-              .symbol
-              .toString(),
-          solver.status.toString())
+          (result.info("status") as SymbolAttributeValue).symbol.toString(),
+          solver.status.toString(),
+      )
     }
   }
 
@@ -119,17 +116,49 @@ class Z3Tests {
 
   fun getQFUFFile(): Stream<Arguments> = loadResource("/QF_UF/")
 
-  @Disabled
   @ParameterizedTest
   @MethodSource("getQFFPFile")
   @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun QF_FP(file: File) = solve(file)
 
-  fun getQFFPFile(): Stream<Arguments> = loadResource("/QF_FP/")
+  @ParameterizedTest
+  @MethodSource("getQFFPFile")
+  @Timeout(value = 10, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  fun QF_FP_Model(file: File) {
+    assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
+
+    val solver = Z3Solver()
+    val result =
+        Parser()
+            .parse(
+                file.bufferedReader().use(BufferedReader::readLines).joinToString("\n") +
+                    "\n(get-model)"
+            )
+
+    assumeTrue(
+        (result.info("status") as SymbolAttributeValue).symbol.toString() == "sat",
+        "Skipped due to unknown or unsat status.",
+    )
+
+    solver.use {
+      solver.solve(result)
+      print(solver.model.definitions)
+    }
+  }
+
+  fun getQFFPFile(): Stream<Arguments> = loadResource("/QF_FP/aqua/")
+
+  @Disabled
+  @ParameterizedTest
+  @MethodSource("getQFALIAFile")
+  @Timeout(value = 60, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  fun QF_ALIA(file: File) = solve(file)
+
+  @Disabled fun getQFALIAFile(): Stream<Arguments> = loadResource("/QF_ALIA/")
 
   @ParameterizedTest
   @MethodSource("getUFFile")
-  @Timeout(value = 600, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
+  @Timeout(value = 2, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun UF(file: File) = solve(file)
 
   fun getUFFile(): Stream<Arguments> = loadResource("/UF/")
@@ -173,7 +202,9 @@ class Z3Tests {
   @ValueSource(
       strings =
           [
-              "(set-logic QF_BV)(declare-fun A () (_ BitVec 32))(declare-fun B () (_ BitVec 16))(assert (bvult ((_ extract 15 0) A) B))(check-sat)"])
+              "(set-logic QF_BV)(declare-fun A () (_ BitVec 32))(declare-fun B () (_ BitVec 16))(assert (bvult ((_ extract 15 0) A) B))(check-sat)"
+          ]
+  )
   fun testExtract(program: String) {
     val solver = Z3Solver()
 
@@ -204,7 +235,9 @@ class Z3Tests {
         (assert (not (and (= x_2 y_0) (= y_1 x_0))))
         (check-sat)
         (exit)        
-    """])
+    """
+          ]
+  )
   fun testEquals(program: String) {
     val solver = Z3Solver()
 
@@ -221,7 +254,9 @@ class Z3Tests {
   @ValueSource(
       strings =
           [
-              "(set-logic QF_UF)(declare-fun A () Bool)(declare-fun B () Bool)(assert (let ((C (and A B))) (and C (not C))))(check-sat)"])
+              "(set-logic QF_UF)(declare-fun A () Bool)(declare-fun B () Bool)(assert (let ((C (and A B))) (and C (not C))))(check-sat)"
+          ]
+  )
   fun testLet(program: String) {
     val solver = Z3Solver()
 
@@ -238,7 +273,9 @@ class Z3Tests {
   @ValueSource(
       strings =
           [
-              "(set-logic QF_UF)(declare-fun A (Bool) Bool)(declare-fun B () Bool)(assert (and (A B) B))(check-sat)(exit)"])
+              "(set-logic QF_UF)(declare-fun A (Bool) Bool)(declare-fun B () Bool)(assert (and (A B) B))(check-sat)(exit)"
+          ]
+  )
   fun testFreeFunctions(program: String) {
     val solver = Z3Solver()
 
@@ -257,7 +294,9 @@ class Z3Tests {
           [
               "(set-logic QF_BV)(set-info :status sat)(assert (exists ((A (_ BitVec 8)) (B (_ BitVec 8))) (= (bvadd A B) (bvmul A B))))(check-sat)",
               "(set-logic QF_IDL)(set-info :status unsat)(assert (forall ((A Int) (B Int)) (>= (* A B) (+ A B))))(check-sat)",
-              "(set-logic QF_BV)(set-info :status unsat)(assert (forall ((A (_ BitVec 8))) (exists ((B (_ BitVec 8))) (bvult A B))))(check-sat)"])
+              "(set-logic QF_BV)(set-info :status unsat)(assert (forall ((A (_ BitVec 8))) (exists ((B (_ BitVec 8))) (bvult A B))))(check-sat)",
+          ]
+  )
   fun testQuantifier(program: String) {
     val solver = Z3Solver()
 
@@ -268,10 +307,9 @@ class Z3Tests {
 
       // verify we get the correct status for the test
       assertEquals(
-          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-              .symbol
-              .toString(),
-          solver.status.toString())
+          (result.info("status") as SymbolAttributeValue).symbol.toString(),
+          solver.status.toString(),
+      )
     }
   }
 
@@ -279,7 +317,9 @@ class Z3Tests {
   @ValueSource(
       strings =
           [
-              "(set-logic QF_UF)(set-info :status sat)(declare-fun A () Bool)(push 1)(declare-fun B () Bool)(assert (= A B))(pop 1)(check-sat)"])
+              "(set-logic QF_UF)(set-info :status sat)(declare-fun A () Bool)(push 1)(declare-fun B () Bool)(assert (= A B))(pop 1)(check-sat)"
+          ]
+  )
   fun testPushPop(program: String) {
     val solver = Z3Solver()
 
@@ -290,10 +330,9 @@ class Z3Tests {
 
       // verify we get the correct status for the test
       assertEquals(
-          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-              .symbol
-              .toString(),
-          solver.status.toString())
+          (result.info("status") as SymbolAttributeValue).symbol.toString(),
+          solver.status.toString(),
+      )
     }
   }
 
@@ -302,7 +341,9 @@ class Z3Tests {
       strings =
           [
               "(set-logic QF_BV)(set-info :status sat)(declare-fun A () (_ BitVec 8))(define-fun B () (_ BitVec 8) (bvneg A))(assert (= A (bvneg B)))(check-sat)",
-              "(set-logic QF_BV)(set-info :status sat)(define-fun bvugt8 ((lhs (_ BitVec 8)) (rhs (_ BitVec 8))) Bool (and (not (= lhs rhs)) (not (bvult lhs rhs))))(declare-fun A () (_ BitVec 8))(declare-fun B () (_ BitVec 8))(assert (bvugt8 A B))(check-sat)"])
+              "(set-logic QF_BV)(set-info :status sat)(define-fun bvugt8 ((lhs (_ BitVec 8)) (rhs (_ BitVec 8))) Bool (and (not (= lhs rhs)) (not (bvult lhs rhs))))(declare-fun A () (_ BitVec 8))(declare-fun B () (_ BitVec 8))(assert (bvugt8 A B))(check-sat)",
+          ]
+  )
   fun testDefineFun(program: String) {
     val solver = Z3Solver()
 
@@ -313,10 +354,9 @@ class Z3Tests {
 
       // verify we get the correct status for the test
       assertEquals(
-          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-              .symbol
-              .toString(),
-          solver.status.toString())
+          (result.info("status") as SymbolAttributeValue).symbol.toString(),
+          solver.status.toString(),
+      )
     }
   }
 
@@ -337,18 +377,24 @@ class Z3Tests {
     val rhs = program.declareConst("rhs".toSymbolWithQuotes(), sort)()
     val msb_s =
         VarBinding(
-            "?msb_s".toSymbolWithQuotes(), BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs))
+            "?msb_s".toSymbolWithQuotes(),
+            BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs),
+        )
     val msb_t =
         VarBinding(
-            "?msb_t".toSymbolWithQuotes(), BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, rhs))
+            "?msb_t".toSymbolWithQuotes(),
+            BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, rhs),
+        )
     val abs_s =
         VarBinding(
             "?abs_s".toSymbolWithQuotes(),
-            Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)))
+            Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)),
+        )
     val abs_t =
         VarBinding(
             "?abs_t".toSymbolWithQuotes(),
-            Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)))
+            Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)),
+        )
     val u = VarBinding("u".toSymbolWithQuotes(), BVURem(abs_s.instance, abs_t.instance))
 
     val A = program.declareConst("A".toSymbolWithQuotes(), SMTInt)()
@@ -371,20 +417,33 @@ class Z3Tests {
                                     Ite(
                                         And(
                                             Equals(msb_s.instance, BVLiteral("#b0")),
-                                            Equals(msb_t.instance, BVLiteral("#b0"))),
+                                            Equals(msb_t.instance, BVLiteral("#b0")),
+                                        ),
                                         u.instance,
                                         Ite(
                                             And(
                                                 Equals(msb_s.instance, BVLiteral("#b1")),
-                                                Equals(msb_t.instance, BVLiteral("#b0"))),
+                                                Equals(msb_t.instance, BVLiteral("#b0")),
+                                            ),
                                             BVAdd(BVNeg(u.instance), rhs),
                                             Ite(
                                                 And(
                                                     Equals(msb_s.instance, BVLiteral("#b0")),
-                                                    Equals(msb_t.instance, BVLiteral("#b1"))),
+                                                    Equals(msb_t.instance, BVLiteral("#b1")),
+                                                ),
                                                 BVAdd(u.instance, rhs),
-                                                BVNeg(u.instance)))))))),
-                    BVSMod(lhs, rhs)))),
+                                                BVNeg(u.instance),
+                                            ),
+                                        ),
+                                    ),
+                                ),
+                            ),
+                        ),
+                    ),
+                    BVSMod(lhs, rhs),
+                )
+            )
+        ),
     /*Arguments.arguments(
             listOf(
                 Equals(

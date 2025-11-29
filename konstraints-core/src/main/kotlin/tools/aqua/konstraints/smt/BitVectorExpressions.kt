@@ -34,7 +34,9 @@ import tools.aqua.konstraints.parser.*
  */
 class BVConcat(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>(
-        "concat".toSymbolWithQuotes(), BVSort(lhs.sort.bits + rhs.sort.bits)) {
+        "concat".toSymbolWithQuotes(),
+        BVSort(lhs.sort.bits + rhs.sort.bits),
+    ) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   override val name: Symbol = "concat".toSymbolWithQuotes()
@@ -62,6 +64,7 @@ class BVConcat(override val lhs: Expression<BVSort>, override val rhs: Expressio
 class BVExtract(val i: Int, val j: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("extract".toSymbolWithQuotes(), BVSort(i - j + 1)) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val indices = listOf(i, j)
 
   init {
     require(j >= 0) { "j needs to be greater or equal to 0, but was $j" }
@@ -464,11 +467,10 @@ class BVXOr(val disjuncts: List<Expression<BVSort>>) :
   /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() =
       disjuncts.slice(2..<disjuncts.size).fold(
-          BVOr(
-              BVAnd(disjuncts[0], BVNot(disjuncts[1])),
-              BVAnd(BVNot(disjuncts[0]), disjuncts[1]))) { xnor, expr ->
-            BVOr(BVAnd(xnor, BVNot(expr)), BVAnd(BVNot(xnor), expr))
-          }
+          BVOr(BVAnd(disjuncts[0], BVNot(disjuncts[1])), BVAnd(BVNot(disjuncts[0]), disjuncts[1]))
+      ) { xnor, expr ->
+        BVOr(BVAnd(xnor, BVNot(expr)), BVAnd(BVNot(xnor), expr))
+      }
 }
 
 /**
@@ -519,9 +521,11 @@ class BVComp(override val lhs: Expression<BVSort>, override val rhs: Expression<
         BVAnd(
             BVXNOr(
                 BVExtract(this.sort.bits - 1, this.sort.bits - 1, lhs),
-                BVExtract(this.sort.bits - 1, this.sort.bits - 1, rhs)),
+                BVExtract(this.sort.bits - 1, this.sort.bits - 1, rhs),
+            ),
             BVComp(BVExtract(this.sort.bits - 2, 0, lhs), BVExtract(this.sort.bits - 2, 0, rhs))
-                .expand())
+                .expand(),
+        )
       }
 }
 
@@ -556,7 +560,7 @@ class BVSub(override val lhs: Expression<BVSort>, override val rhs: Expression<B
  *   of bits
  */
 class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("bvsub".toSymbolWithQuotes(), numerator.sort) {
+    BinaryExpression<BVSort, BVSort, BVSort>("bvsdiv".toSymbolWithQuotes(), numerator.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -573,10 +577,14 @@ class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
   fun expand(): Expression<BVSort> {
     val msb_s =
         VarBinding(
-            "?msb_s".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, numerator))
+            "?msb_s".toSymbolWithQuotes(),
+            BVExtract(sort.bits - 1, sort.bits - 1, numerator),
+        )
     val msb_t =
         VarBinding(
-            "?msb_t".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, denominator))
+            "?msb_t".toSymbolWithQuotes(),
+            BVExtract(sort.bits - 1, sort.bits - 1, denominator),
+        )
     return LetExpression(
         listOf(msb_s, msb_t),
         Ite(
@@ -585,15 +593,20 @@ class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
             Ite(
                 And(
                     Equals(msb_s.instance, BVLiteral("#b1")),
-                    Equals(msb_t.instance, BVLiteral("#b0"))),
+                    Equals(msb_t.instance, BVLiteral("#b0")),
+                ),
                 BVNeg(BVUDiv(BVNeg(numerator), denominator)),
                 Ite(
                     And(
                         Equals(msb_s.instance, BVLiteral("#b0")),
-                        Equals(msb_t.instance, BVLiteral("#b1"))),
+                        Equals(msb_t.instance, BVLiteral("#b1")),
+                    ),
                     BVNeg(BVUDiv(numerator, BVNeg(denominator))),
                     BVUDiv(BVNeg(numerator), BVNeg(denominator)),
-                ))))
+                ),
+            ),
+        ),
+    )
   }
 }
 
@@ -607,7 +620,7 @@ class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
  *   of bits
  */
 class BVSRem(val numerator: Expression<BVSort>, val denominator: Expression<BVSort>) :
-    BinaryExpression<BVSort, BVSort, BVSort>("bvsub".toSymbolWithQuotes(), numerator.sort) {
+    BinaryExpression<BVSort, BVSort, BVSort>("bvsrem".toSymbolWithQuotes(), numerator.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   init {
@@ -624,10 +637,14 @@ class BVSRem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
   fun expand(): Expression<BVSort> {
     val msb_s =
         VarBinding(
-            "?msb_s".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, numerator))
+            "?msb_s".toSymbolWithQuotes(),
+            BVExtract(sort.bits - 1, sort.bits - 1, numerator),
+        )
     val msb_t =
         VarBinding(
-            "?msb_t".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, denominator))
+            "?msb_t".toSymbolWithQuotes(),
+            BVExtract(sort.bits - 1, sort.bits - 1, denominator),
+        )
     return LetExpression(
         listOf(msb_s, msb_t),
         Ite(
@@ -636,15 +653,20 @@ class BVSRem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
             Ite(
                 And(
                     Equals(msb_s.instance, BVLiteral("#b1")),
-                    Equals(msb_t.instance, BVLiteral("#b0"))),
+                    Equals(msb_t.instance, BVLiteral("#b0")),
+                ),
                 BVNeg(BVURem(BVNeg(numerator), denominator)),
                 Ite(
                     And(
                         Equals(msb_s.instance, BVLiteral("#b0")),
-                        Equals(msb_t.instance, BVLiteral("#b1"))),
+                        Equals(msb_t.instance, BVLiteral("#b1")),
+                    ),
                     BVURem(numerator, BVNeg(denominator)),
                     BVNeg(BVURem(BVNeg(numerator), BVNeg(denominator))),
-                ))))
+                ),
+            ),
+        ),
+    )
   }
 }
 
@@ -676,11 +698,13 @@ class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<
     val abs_s =
         VarBinding(
             "?abs_s".toSymbolWithQuotes(),
-            Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)))
+            Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)),
+        )
     val abs_t =
         VarBinding(
             "?abs_t".toSymbolWithQuotes(),
-            Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)))
+            Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)),
+        )
     val u = VarBinding("u".toSymbolWithQuotes(), BVURem(abs_s.instance, abs_t.instance))
 
     return LetExpression(
@@ -695,19 +719,29 @@ class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<
                     Ite(
                         And(
                             Equals(msb_s.instance, BVLiteral("#b0")),
-                            Equals(msb_t.instance, BVLiteral("#b0"))),
+                            Equals(msb_t.instance, BVLiteral("#b0")),
+                        ),
                         u.instance,
                         Ite(
                             And(
                                 Equals(msb_s.instance, BVLiteral("#b1")),
-                                Equals(msb_t.instance, BVLiteral("#b0"))),
+                                Equals(msb_t.instance, BVLiteral("#b0")),
+                            ),
                             BVAdd(BVNeg(u.instance), rhs),
                             Ite(
                                 And(
                                     Equals(msb_s.instance, BVLiteral("#b0")),
-                                    Equals(msb_t.instance, BVLiteral("#b1"))),
+                                    Equals(msb_t.instance, BVLiteral("#b1")),
+                                ),
                                 BVAdd(u.instance, rhs),
-                                BVNeg(u.instance))))))))
+                                BVNeg(u.instance),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
   }
 }
 
@@ -739,7 +773,8 @@ class BVAShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
       Ite(
           Equals(BVExtract(sort.bits - 1, sort.bits - 1, value), BVLiteral("#b0")),
           BVLShr(value, distance),
-          BVNot(BVLShr(BVNot(value), distance)))
+          BVNot(BVLShr(BVNot(value), distance)),
+      )
 }
 
 /**
@@ -752,6 +787,7 @@ class BVAShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
 class Repeat(val i: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("repeat".toSymbolWithQuotes(), BVSort(inner.sort.bits * i)) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val indices = listOf(i)
 
   init {
     require(i > 0)
@@ -770,6 +806,8 @@ class Repeat(val i: Int, override val inner: Expression<BVSort>) :
 
   override fun copy(children: List<Expression<*>>): Expression<BVSort> =
       RepeatDecl.constructDynamic(children, listOf(i.idx()))
+
+  override fun toString() = "((_ repeat $i) $inner)"
 }
 
 /**
@@ -781,8 +819,11 @@ class Repeat(val i: Int, override val inner: Expression<BVSort>) :
  */
 class ZeroExtend(val i: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>(
-        "zero_extend".toSymbolWithQuotes(), BVSort(inner.sort.bits + i)) {
+        "zero_extend".toSymbolWithQuotes(),
+        BVSort(inner.sort.bits + i),
+    ) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val indices = listOf(i)
 
   init {
     require(i >= 0)
@@ -798,6 +839,8 @@ class ZeroExtend(val i: Int, override val inner: Expression<BVSort>) :
 
   override fun copy(children: List<Expression<*>>) =
       ZeroExtendDecl.constructDynamic(children, emptyList())
+
+  override fun toString() = "((_ zero_extend $i) $inner)"
 }
 
 /**
@@ -809,8 +852,11 @@ class ZeroExtend(val i: Int, override val inner: Expression<BVSort>) :
  */
 class SignExtend(val i: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>(
-        "sign_extend".toSymbolWithQuotes(), BVSort(inner.sort.bits + i)) {
+        "sign_extend".toSymbolWithQuotes(),
+        BVSort(inner.sort.bits + i),
+    ) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val indices = listOf(i)
 
   init {
     require(i >= 0)
@@ -826,6 +872,8 @@ class SignExtend(val i: Int, override val inner: Expression<BVSort>) :
 
   override fun copy(children: List<Expression<*>>) =
       SignExtendDecl.constructDynamic(children, emptyList())
+
+  override fun toString() = "((_ sign_extend $i) $inner)"
 }
 
 /**
@@ -838,6 +886,7 @@ class SignExtend(val i: Int, override val inner: Expression<BVSort>) :
 class RotateLeft(val i: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("rotate_left".toSymbolWithQuotes(), inner.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val indices = listOf(i)
 
   init {
     require(i >= 0)
@@ -855,8 +904,11 @@ class RotateLeft(val i: Int, override val inner: Expression<BVSort>) :
 
         BVConcat(
             BVExtract(sort.bits - distance - 1, 0, inner),
-            BVExtract(sort.bits - 1, sort.bits - distance, inner))
+            BVExtract(sort.bits - 1, sort.bits - distance, inner),
+        )
       }
+
+  override fun toString() = "((_ rotate_left $i) $inner)"
 }
 
 /**
@@ -868,6 +920,7 @@ class RotateLeft(val i: Int, override val inner: Expression<BVSort>) :
 class RotateRight(val i: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>("rotate_right".toSymbolWithQuotes(), inner.sort) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+  override val indices = listOf(i)
 
   init {
     require(i >= 0)
@@ -878,6 +931,8 @@ class RotateRight(val i: Int, override val inner: Expression<BVSort>) :
 
   /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand(): Expression<BVSort> = TODO()
+
+  override fun toString() = "((_ rotate_right $i) $inner)"
 }
 
 /**
@@ -974,12 +1029,16 @@ class BVSLt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
       Or(
           And(
               Equals(BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs), BVLiteral("#b1")),
-              Equals(BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs), BVLiteral("#b0"))),
+              Equals(BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs), BVLiteral("#b0")),
+          ),
           And(
               Equals(
                   BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs),
-                  BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs)),
-              BVUlt(lhs, rhs)))
+                  BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs),
+              ),
+              BVUlt(lhs, rhs),
+          ),
+      )
 }
 
 /**
@@ -1005,12 +1064,16 @@ class BVSLe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
       Or(
           And(
               Equals(BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs), BVLiteral("#b1")),
-              Equals(BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs), BVLiteral("#b0"))),
+              Equals(BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs), BVLiteral("#b0")),
+          ),
           And(
               Equals(
                   BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs),
-                  BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs)),
-              BVULe(lhs, rhs).expand()))
+                  BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs),
+              ),
+              BVULe(lhs, rhs).expand(),
+          ),
+      )
 }
 
 /**
@@ -1085,3 +1148,107 @@ fun String.isSMTBitvecShorthand(): Boolean {
 
 /** Returns true iff [this] is either #bX or #xX. */
 fun String.isBitvecLiteral() = this.isSMTBinary() || this.isSMTHex()
+
+class BVNegO(override val inner: Expression<BVSort>) :
+    UnaryExpression<BoolSort, BVSort>("bvnego".toSymbolWithQuotes(), Bool) {
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      BVNegODecl.constructDynamic(children, emptyList())
+
+  fun expand(): Expression<BoolSort> = TODO()
+}
+
+class BVUAddO(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
+    BinaryExpression<BoolSort, BVSort, BVSort>("bvuaddo".toSymbolWithQuotes(), Bool) {
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      BVUAddODecl.constructDynamic(children, emptyList())
+
+  fun expand(): Expression<BoolSort> = TODO()
+}
+
+class BVSAddO(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
+    BinaryExpression<BoolSort, BVSort, BVSort>("bvsaddo".toSymbolWithQuotes(), Bool) {
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      BVSAddODecl.constructDynamic(children, emptyList())
+
+  fun expand(): Expression<BoolSort> = TODO()
+}
+
+class BVUSubO(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
+    BinaryExpression<BoolSort, BVSort, BVSort>("bvusubo".toSymbolWithQuotes(), Bool) {
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      BVUSubODecl.constructDynamic(children, emptyList())
+
+  fun expand(): Expression<BoolSort> = TODO()
+}
+
+class BVSSubO(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
+    BinaryExpression<BoolSort, BVSort, BVSort>("bvssubo".toSymbolWithQuotes(), Bool) {
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      BVSSubODecl.constructDynamic(children, emptyList())
+
+  fun expand(): Expression<BoolSort> = TODO()
+}
+
+class BVUMulO(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
+    BinaryExpression<BoolSort, BVSort, BVSort>("bvumulo".toSymbolWithQuotes(), Bool) {
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      BVUMulODecl.constructDynamic(children, emptyList())
+
+  fun expand(): Expression<BoolSort> = TODO()
+}
+
+class BVSMulO(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
+    BinaryExpression<BoolSort, BVSort, BVSort>("bvsmulo".toSymbolWithQuotes(), Bool) {
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      BVSMulODecl.constructDynamic(children, emptyList())
+
+  fun expand(): Expression<BoolSort> = TODO()
+}
+
+class BVSDivO(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
+    BinaryExpression<BoolSort, BVSort, BVSort>("bvsdivo".toSymbolWithQuotes(), Bool) {
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
+      BVSDivODecl.constructDynamic(children, emptyList())
+
+  fun expand(): Expression<BoolSort> = TODO()
+}
+
+class UBVToInt(override val inner: Expression<BVSort>) :
+    UnaryExpression<IntSort, BVSort>("ubv_to_int".toSymbolWithQuotes(), SMTInt) {
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+
+  override fun copy(children: List<Expression<*>>): Expression<IntSort> =
+      UBVToIntDecl.constructDynamic(children, emptyList())
+}
+
+class SBVToInt(override val inner: Expression<BVSort>) :
+    UnaryExpression<IntSort, BVSort>("sbv_to_int".toSymbolWithQuotes(), SMTInt) {
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+
+  override fun copy(children: List<Expression<*>>): Expression<IntSort> =
+      SBVToIntDecl.constructDynamic(children, emptyList())
+}
+
+class IntToBV(val m: Int, override val inner: Expression<IntSort>) :
+    UnaryExpression<BVSort, IntSort>("int_to_bv".toSymbolWithQuotes(), BVSort(m)) {
+  override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
+
+  override fun copy(children: List<Expression<*>>): Expression<BVSort> =
+      IntToBVDecl.constructDynamic(children, emptyList())
+}

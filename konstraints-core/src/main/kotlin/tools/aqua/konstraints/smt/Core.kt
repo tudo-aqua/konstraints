@@ -159,13 +159,13 @@ class Distinct<T : Sort>(val statements: List<Expression<T>>) :
 /**
  * If-then-else.
  * - `(par (A) (ite Bool A A A))`
- * - `(ite [statement] [then] [otherwise])`
+ * - `(ite [condition] [then] [otherwise])`
  */
 class Ite<out T : Sort>(
-    val statement: Expression<BoolSort>,
+    val condition: Expression<BoolSort>,
     val then: Expression<T>,
-    val otherwise: Expression<T>
-) : Expression<T> {
+    val otherwise: Expression<T>,
+) : Expression<T>() {
   init {
     require(then.sort == otherwise.sort)
   }
@@ -179,7 +179,7 @@ class Ite<out T : Sort>(
 
   override val name: Symbol = "ite".toSymbolWithQuotes()
 
-  override val children: List<Expression<*>> = listOf(statement, then, otherwise)
+  override val children: List<Expression<*>> = listOf(condition, then, otherwise)
 
-  override fun toString(): String = "(ite $statement $then $otherwise)"
+  override fun toString(): String = "(ite $condition $then $otherwise)"
 }

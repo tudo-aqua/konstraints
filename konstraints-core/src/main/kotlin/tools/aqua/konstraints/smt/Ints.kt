@@ -113,7 +113,7 @@ class IntMul(val factors: List<Expression<IntSort>>) :
  * (div Int Int Int :left-assoc)
  */
 class IntDiv(val terms: List<Expression<IntSort>>) :
-    HomogenousExpression<IntSort, IntSort>("/".toSymbolWithQuotes(), SMTInt) {
+    HomogenousExpression<IntSort, IntSort>("div".toSymbolWithQuotes(), SMTInt) {
   override val theories = INTS_REALS_INTS_MARKER_SET
 
   init {
@@ -262,6 +262,7 @@ class IntGreater(val terms: List<Expression<IntSort>>) :
 class Divisible(val n: Int, override val inner: Expression<IntSort>) :
     UnaryExpression<BoolSort, IntSort>("divisible".toSymbolWithQuotes(), Bool) {
   override val theories = INTS_REALS_INTS_MARKER_SET
+  override val indices = listOf(n)
 
   init {
     require(n > 0)
@@ -269,4 +270,6 @@ class Divisible(val n: Int, override val inner: Expression<IntSort>) :
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =
       DivisibleDecl.constructDynamic(children, emptyList())
+
+  override fun toString() = "((_ divisible $n) $inner)"
 }

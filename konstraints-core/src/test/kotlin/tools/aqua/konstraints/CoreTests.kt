@@ -43,7 +43,7 @@ class CoreTests {
   @MethodSource("getCoreTheoryExpressionsAndTheirSerialization")
   fun `test that serialization of boolean expressions is correct`(
       expected: String,
-      expression: Expression<BoolSort>
+      expression: Expression<BoolSort>,
   ) {
     Assertions.assertEquals(expected, expression.toString())
   }
@@ -67,6 +67,7 @@ class CoreTests {
         arguments("(distinct A B C)", Distinct(A, B, C)),
         arguments("(ite A B C)", Ite(A, B, C)),
         arguments("(and A (or B C))", And(A, Or(B, C))),
-        arguments("(and (or A B) C)", And(Or(A, B), C)))
+        arguments("(and (or A B) C)", And(Or(A, B), C)),
+    )
   }
 }

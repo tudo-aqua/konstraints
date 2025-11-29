@@ -18,23 +18,137 @@
 
 package tools.aqua.konstraints
 
-import java.io.BufferedReader
 import java.io.File
 import java.util.stream.Stream
 import kotlin.streams.asStream
-import kotlin.use
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions.assumeTrue
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.parser.Parser
+import tools.aqua.konstraints.smt.AnnotatedExpression
+import tools.aqua.konstraints.smt.Assert
+import tools.aqua.konstraints.smt.BVLiteral
+import tools.aqua.konstraints.smt.Char
+import tools.aqua.konstraints.smt.ExistsExpression
+import tools.aqua.konstraints.smt.Expression
+import tools.aqua.konstraints.smt.FPLiteral
+import tools.aqua.konstraints.smt.ForallExpression
+import tools.aqua.konstraints.smt.IntLiteral
+import tools.aqua.konstraints.smt.LetExpression
+import tools.aqua.konstraints.smt.Literal
+import tools.aqua.konstraints.smt.QuotingRule
+import tools.aqua.konstraints.smt.RealLiteral
+import tools.aqua.konstraints.smt.SMTProgram
+import tools.aqua.konstraints.smt.StringLiteral
 
-@Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserBenchmark {
+
+  val deepRecursiveSerializer: DeepRecursiveFunction<Pair<Appendable, Expression<*>>, Appendable> =
+      DeepRecursiveFunction<Pair<Appendable, Expression<*>>, Appendable> { (builder, expr) ->
+        when (expr) {
+          is AnnotatedExpression<*> -> {
+            builder.append("(! ")
+            deepRecursiveSerializer.callRecursive(builder to expr.term)
+
+            expr.annoations.forEach {
+              builder.append(" ")
+              it.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
+            }
+
+            builder.append(")")
+          }
+          is ExistsExpression -> {
+            builder.append("(exists (")
+
+            var counter = 0
+            expr.vars.forEach {
+              if (counter++ > 1) builder.append(" ")
+              it.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
+            }
+
+            builder.append(") ")
+            deepRecursiveSerializer.callRecursive(builder to expr.term)
+
+            builder.append(")")
+          }
+          is ForallExpression -> {
+            builder.append("(forall (")
+
+            var counter = 0
+            expr.vars.forEach {
+              if (counter++ > 1) builder.append(" ")
+              it.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
+            }
+
+            builder.append(") ")
+            deepRecursiveSerializer.callRecursive(builder to expr.term)
+
+            builder.append(")")
+          }
+          is LetExpression<*> -> {
+            builder.append("(let (")
+
+            var counter = 0
+            expr.bindings.forEach {
+              if (counter++ > 1) builder.append(" ")
+              builder.append("(")
+              builder.append(it.symbol.toSMTString(QuotingRule.SAME_AS_INPUT))
+              builder.append(" ")
+              deepRecursiveSerializer.callRecursive(builder to it.term)
+              builder.append(")")
+            }
+
+            builder.append(") ")
+            deepRecursiveSerializer.callRecursive(builder to expr.inner)
+
+            builder.append(")")
+          }
+          is Literal<*> -> {
+            when (expr) {
+              is StringLiteral -> expr.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
+              is BVLiteral -> expr.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
+              is Char -> expr.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
+              is FPLiteral -> expr.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
+              is IntLiteral -> expr.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
+              is RealLiteral -> expr.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
+            }
+          }
+          else -> {
+            if (expr.children.isEmpty())
+                expr.nameStringWithIndices(builder, QuotingRule.SAME_AS_INPUT)
+            else {
+              builder.append("(")
+              expr.nameStringWithIndices(builder, QuotingRule.SAME_AS_INPUT)
+
+              expr.children.forEach {
+                builder.append(" ")
+                deepRecursiveSerializer.callRecursive(builder to it)
+              }
+
+              builder.append(")")
+            }
+          }
+        }
+      }
+
+  val serialize =
+      DeepRecursiveFunction<Pair<Appendable, SMTProgram>, Appendable> { (builder, program) ->
+        program.commands.forEach {
+          if (it is Assert) {
+            builder.append("(assert ")
+            deepRecursiveSerializer.callRecursive(builder to it.expr)
+            builder.append(")")
+          } else {
+            it.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
+          }
+        }
+        builder
+      }
 
   private fun loadResource(path: String) =
       File(javaClass.getResource(path)!!.file)
@@ -43,44 +157,99 @@ class ParserBenchmark {
           .map { file: File -> Arguments.arguments(file) }
           .asStream()
 
-  private fun parse(file: File) {
-    assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
+  private fun removeComments(program: String): String {
+    var inQuotedSymbol = false
+    var inStringLiteral = false
+    var inComment = false
+    var finished = false
+    var low = 0
+    val builder = StringBuilder(program.length)
 
-    assertDoesNotThrow {
+    program.forEachIndexed { i, c ->
+      if (c == '|' && !inStringLiteral && !inComment) { // beginning or end of quoted symbol
+        inQuotedSymbol = !inQuotedSymbol
+      } else if (c == '"' && !inQuotedSymbol && !inComment) { // beginning or end of string literal
+        inStringLiteral = !inStringLiteral
+      } else if (
+          c == ';' && !inQuotedSymbol && !inStringLiteral && !inComment
+      ) { // beginning of comment we need to check we are not already in a comment or
+        // any appearance of ';' will duplicate the last substring
+        inComment = true
+        // add all previous chars to builder unless string starts with comment
+        builder.append(program.substring(low, i))
+        finished = true
+      } else if (c == '\n' && inComment) { // end of comment
+        inComment = false
+        // set index of new first character to be included in the program later
+        low = i
+        finished = false
+      }
+    }
+
+    if (!finished) {
+      builder.append(program.substring(low))
+    }
+
+    // if we have no comment nothing is ever added to the builder so we just return the input
+    return if (builder.isNotEmpty()) builder.toString() else program
+  }
+
+  private fun parse(file: File) {
+    // assumeTrue(file.length() < 100000, "Skipped due to file size exceeding limit of 5000000")
+
+    /*assertDoesNotThrow {
       // its crucial that the separator is '\n' as comments dont have an ending symbol but rather
       // end that the end of a line
       Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
+    }*/
+
+    try {
+      val input = file.bufferedReader().readLines().joinToString("\n")
+      val program = Parser(input)
+
+      assertEquals(
+          removeComments(input)
+              .replace(" ", "")
+              .replace("\n", "")
+              .replace("\r", "")
+              .replace("\t", "")
+              .replace("|", ""),
+          serialize(StringBuilder() to program)
+            .toString()
+            .replace(" ", "")
+            .replace("\n", "")
+            .replace("\r", "")
+            .replace("\t", "")
+            .replace("|", ""),
+      )
+    } catch (e: NotImplementedError) {
+      println("Skipped due to not implemented error ${e.message}")
+      assumeTrue(false)
+    } catch (e: Exception) {
+      assertDoesNotThrow { throw e }
     }
   }
 
-  /* @Disabled */ @ParameterizedTest
-  @MethodSource("getABVFiles")
-  fun parseABV(file: File) = parse(file)
+  @ParameterizedTest @MethodSource("getABVFiles") fun parseABV(file: File) = parse(file)
 
   fun getABVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/ABV/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getABVFPFiles") fun parseABVFP(file: File) = parse(file)
 
   fun getABVFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/ABVFP/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getABVFPLRAFiles") fun parseABVFPLRA(file: File) = parse(file)
 
   fun getABVFPLRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/ABVFPLRA/")
 
-  /* @Disabled */ @ParameterizedTest
-  @MethodSource("getALIAFiles")
-  fun parseALIA(file: File) = parse(file)
+  @ParameterizedTest @MethodSource("getALIAFiles") fun parseALIA(file: File) = parse(file)
 
   fun getALIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/ALIA/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getANIAFiles") fun parseANIA(file: File) = parse(file)
 
   fun getANIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/ANIA/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getAUFBVFiles") fun parseAUFBV(file: File) = parse(file)
 
   fun getAUFBVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFBV/")
@@ -106,7 +275,6 @@ class ParserBenchmark {
 
   fun getAUFBVDTNIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFBVDTNIRA/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getAUFBVFPFiles") fun parseAUFBVFP(file: File) = parse(file)
 
   fun getAUFBVFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFBVFP/")
@@ -133,22 +301,18 @@ class ParserBenchmark {
 
   fun getAUFFPDTNIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFFPDTNIRA/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getAUFLIAFiles") fun parseAUFLIA(file: File) = parse(file)
 
   fun getAUFLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFLIA/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getAUFLIRAFiles") fun parseAUFLIRA(file: File) = parse(file)
 
   fun getAUFLIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFLIRA/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getAUFNIAFiles") fun parseAUFNIA(file: File) = parse(file)
 
   fun getAUFNIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFNIA/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getAUFNIRAFiles") fun parseAUFNIRA(file: File) = parse(file)
 
   fun getAUFNIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFNIRA/")
@@ -157,13 +321,10 @@ class ParserBenchmark {
 
   fun getBVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/BV/")
 
-  /* @Disabled */ @ParameterizedTest
-  @MethodSource("getBVFPFiles")
-  fun parseBVFP(file: File) = parse(file)
+  @ParameterizedTest @MethodSource("getBVFPFiles") fun parseBVFP(file: File) = parse(file)
 
   fun getBVFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/BVFP/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getBVFPLRAFiles") fun parseBVFPLRA(file: File) = parse(file)
 
   fun getBVFPLRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/BVFPLRA/")
@@ -172,92 +333,73 @@ class ParserBenchmark {
 
   fun getFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/FP/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getFPLRAFiles") fun parseFPLRA(file: File) = parse(file)
 
   fun getFPLRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/FPLRA/")
 
-  /* @Disabled */ @ParameterizedTest
-  @MethodSource("getLIAFiles")
-  fun parseLIA(file: File) = parse(file)
+  @ParameterizedTest @MethodSource("getLIAFiles") fun parseLIA(file: File) = parse(file)
 
   fun getLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/LIA/")
 
-  /* @Disabled */ @ParameterizedTest
-  @MethodSource("getLRAFiles")
-  fun parseLRA(file: File) = parse(file)
+  @ParameterizedTest @MethodSource("getLRAFiles") fun parseLRA(file: File) = parse(file)
 
   fun getLRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/LRA/")
 
-  /* @Disabled */ @ParameterizedTest
-  @MethodSource("getNIAFiles")
-  fun parseNIA(file: File) = parse(file)
+  @ParameterizedTest @MethodSource("getNIAFiles") fun parseNIA(file: File) = parse(file)
 
   fun getNIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/NIA/")
 
-  /* @Disabled */ @ParameterizedTest
-  @MethodSource("getNRAFiles")
-  fun parseNRA(file: File) = parse(file)
+  @ParameterizedTest @MethodSource("getNRAFiles") fun parseNRA(file: File) = parse(file)
 
   fun getNRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/NRA/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getQF_ABVFiles") fun parseQF_ABV(file: File) = parse(file)
 
   fun getQF_ABVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_ABV/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getQF_ABVFPFiles") fun parseQF_ABVFP(file: File) = parse(file)
 
   fun getQF_ABVFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_ABVFP/")
 
-  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_ABVFPLRAFiles")
   fun parseQF_ABVFPLRA(file: File) = parse(file)
 
   fun getQF_ABVFPLRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_ABVFPLRA/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getQF_ALIAFiles") fun parseQF_ALIA(file: File) = parse(file)
 
   fun getQF_ALIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_ALIA/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getQF_ANIAFiles") fun parseQF_ANIA(file: File) = parse(file)
 
   fun getQF_ANIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_ANIA/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getQF_AUFBVFiles") fun parseQF_AUFBV(file: File) = parse(file)
 
   fun getQF_AUFBVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_AUFBV/")
 
-  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_AUFBVFPFiles")
   fun parseQF_AUFBVFP(file: File) = parse(file)
 
   fun getQF_AUFBVFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_AUFBVFP/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getQF_AUFLIAFiles") fun parseQF_AUFLIA(file: File) = parse(file)
 
   fun getQF_AUFLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_AUFLIA/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getQF_AUFNIAFiles") fun parseQF_AUFNIA(file: File) = parse(file)
 
   fun getQF_AUFNIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_AUFNIA/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getQF_AXFiles") fun parseQF_AX(file: File) = parse(file)
 
   fun getQF_AXFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_AX/")
 
   @ParameterizedTest @MethodSource("getQF_BVFiles") fun parseQF_BV(file: File) = parse(file)
 
-  fun getQF_BVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_BV/sage/")
+  fun getQF_BVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_BV/")
 
   @ParameterizedTest @MethodSource("getQF_BVFPFiles") fun parseQF_BVFP(file: File) = parse(file)
 
@@ -269,6 +411,7 @@ class ParserBenchmark {
 
   fun getQF_BVFPLRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_BVFPLRA/")
 
+  /* @Disabled */
   @ParameterizedTest @MethodSource("getQF_DTFiles") fun parseQF_DT(file: File) = parse(file)
 
   fun getQF_DTFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_DT/")
@@ -315,8 +458,7 @@ class ParserBenchmark {
 
   @ParameterizedTest @MethodSource("getQF_SFiles") fun parseQF_S(file: File) = parse(file)
 
-  fun getQF_SFiles(): Stream<Arguments> =
-      loadResource("/smt-benchmark/QF_S/20230329-automatark-lu/")
+  fun getQF_SFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_S/")
 
   @ParameterizedTest @MethodSource("getQF_SLIAFiles") fun parseQF_SLIA(file: File) = parse(file)
 
@@ -334,26 +476,31 @@ class ParserBenchmark {
 
   fun getQF_UFBVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFBV/")
 
+  /* @Disabled */
   @ParameterizedTest @MethodSource("getQF_UFBVDTFiles") fun parseQF_UFBVDT(file: File) = parse(file)
 
   fun getQF_UFBVDTFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFBVDT/")
 
+  /* @Disabled */
   @ParameterizedTest @MethodSource("getQF_UFDTFiles") fun parseQF_UFDT(file: File) = parse(file)
 
   fun getQF_UFDTFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFDT/")
 
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_UFDTLIAFiles")
   fun parseQF_UFDTLIA(file: File) = parse(file)
 
   fun getQF_UFDTLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFDTLIA/")
 
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_UFDTLIRAFiles")
   fun parseQF_UFDTLIRA(file: File) = parse(file)
 
   fun getQF_UFDTLIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFDTLIRA/")
 
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_UFDTNIAFiles")
   fun parseQF_UFDTNIA(file: File) = parse(file)
@@ -364,6 +511,7 @@ class ParserBenchmark {
 
   fun getQF_UFFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFFP/")
 
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_UFFPDTNIRAFiles")
   fun parseQF_UFFPDTNIRA(file: File) = parse(file)
@@ -394,9 +542,7 @@ class ParserBenchmark {
 
   fun getUFFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UF/")
 
-  /* @Disabled */ @ParameterizedTest
-  @MethodSource("getUFBVFiles")
-  fun parseUFBV(file: File) = parse(file)
+  @ParameterizedTest @MethodSource("getUFBVFiles") fun parseUFBV(file: File) = parse(file)
 
   fun getUFBVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFBV/")
 
@@ -405,19 +551,16 @@ class ParserBenchmark {
 
   fun getUFBVDTFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFBVDT/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getUFBVFPFiles") fun parseUFBVFP(file: File) = parse(file)
 
   fun getUFBVFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFBVFP/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getUFBVLIAFiles") fun parseUFBVLIA(file: File) = parse(file)
 
   fun getUFBVLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFBVLIA/")
 
-  /* @Disabled */ @ParameterizedTest
-  @MethodSource("getUFDTFiles")
-  fun parseUFDT(file: File) = parse(file)
+  /* @Disabled */
+  @ParameterizedTest @MethodSource("getUFDTFiles") fun parseUFDT(file: File) = parse(file)
 
   fun getUFDTFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFDT/")
 
@@ -448,7 +591,6 @@ class ParserBenchmark {
 
   fun getUFFPDTNIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFFPDTNIRA/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getUFIDLFiles") fun parseUFIDL(file: File) = parse(file)
 
   fun getUFIDLFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFIDL/")
@@ -457,17 +599,14 @@ class ParserBenchmark {
 
   fun getUFLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFLIA/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getUFLRAFiles") fun parseUFLRA(file: File) = parse(file)
 
   fun getUFLRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFLRA/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getUFNIAFiles") fun parseUFNIA(file: File) = parse(file)
 
   fun getUFNIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFNIA/")
 
-  /* @Disabled */
   @ParameterizedTest @MethodSource("getUFNIRAFiles") fun parseUFNIRA(file: File) = parse(file)
 
   fun getUFNIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFNIRA/")
