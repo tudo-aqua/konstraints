@@ -135,7 +135,7 @@ sealed class Expression<out T : Sort> : SMTSerializable {
         "(_ ${name.toSMTString(quotingRule)} ${indices.joinToString(" ")})"
       }
 
-  fun nameStringWithIndices(builder: Appendable, quotingRule: QuotingRule) =
+  fun nameStringWithIndices(builder: Appendable, quotingRule: QuotingRule): Appendable =
       if (indices.isEmpty()) {
         name.toSMTString(builder, quotingRule)
       } else {

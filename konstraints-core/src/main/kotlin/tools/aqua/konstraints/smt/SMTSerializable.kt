@@ -18,6 +18,9 @@
 
 package tools.aqua.konstraints.smt
 
+import tools.aqua.konstraints.util.StackOperation
+import tools.aqua.konstraints.util.StackOperationType
+
 /**
  * Quoting rules for SMT String, used when serializing program.
  *
@@ -47,4 +50,80 @@ interface SMTSerializable {
   fun toSMTString(quotingRule: QuotingRule): String
 
   fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable
+}
+
+class SMTSerializer {
+  fun serialize(expression: Expression<*>, quotingRule: QuotingRule): String {
+    val builder = StringBuilder()
+
+    // pair of string, expression to be able to add varbindings to the stack
+    val stack = ArrayDeque<StackOperation<Pair<String, Expression<*>>>>(listOf(StackOperation(StackOperationType.BIND, "" to expression)))
+
+    while(stack.isNotEmpty()) {
+      val op = stack.removeLast()
+
+      op.let { (operation, temp) ->
+        temp.let { (name, expr) ->
+          when (operation) {
+            StackOperationType.BIND -> {
+              if (expr.children.isNotEmpty()) {
+                builder.append('(')
+                stack.addLast(op.unbind())
+              }
+
+              when (expr) {
+                is ForallExpression -> {
+                  serializeQuantifier("forall", quotingRule, builder, expr.vars)
+                }
+
+                is ExistsExpression -> {
+                  serializeQuantifier("exists", quotingRule, builder, expr.vars)
+                }
+
+                is LetExpression -> {
+                  builder.append("let (")
+
+                  stack.addAll(expr.bindings.map { binding ->
+                    StackOperation(StackOperationType.BIND, binding.symbol.toSMTString(quotingRule) to binding.term)
+                  })
+
+                  builder.append(") ")
+                }
+
+                is LocalExpression -> {
+                  require(name.isNotEmpty())
+                  builder.append("( $name ")
+                  expr.nameStringWithIndices(builder, quotingRule)
+                  stack.addLast(op.unbind())
+                }
+
+                else -> expr.nameStringWithIndices(builder, quotingRule)
+              }
+
+              stack.addAll(expr.children.map { expr ->
+                StackOperation(StackOperationType.BIND, "" to expr)
+              })
+            }
+
+            StackOperationType.UNBIND -> builder.append(')')
+            StackOperationType.NONE -> throw RuntimeException("Unexpected operation")
+          }
+        }
+      }
+    }
+
+    return builder.toString()
+  }
+
+  private fun serializeQuantifier(expr: String, quotingRule: QuotingRule, builder: StringBuilder, vars: List<SortedVar<*>>): StringBuilder {
+    builder.append("$expr (")
+
+    var counter = 0
+    vars.forEach {
+      if (counter++ > 1) builder.append(" ")
+      it.toSMTString(builder, quotingRule)
+    }
+
+    return builder.append(") ")
+  }
 }

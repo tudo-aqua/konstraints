@@ -24,6 +24,9 @@ import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.dsl.UserDeclaredSMTFunctionN
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunction0
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunctionN
+import tools.aqua.konstraints.util.StackOperation
+import tools.aqua.konstraints.util.StackOperationType
+import kotlin.let
 
 /** Sat status of an smt program. */
 enum class SatStatus {
@@ -145,6 +148,7 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     check(logic != null) { "Logic must be set before adding assertions!" }
 
     // check expr is in logic
+    /*
     assertion.expr.all {
       if (!(it.theories.isEmpty() || it.theories.any { it in logic!!.theories })) {
         throw AssertionOutOfLogicBounds(
@@ -157,48 +161,71 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
       }
       true
     }
+    */
 
     // check all symbols are known
-    require(checkContext(assertion.expr))
+    checkContext(assertion.expr)
 
     _commands.add(assertion)
   }
 
-  private val checkContext: DeepRecursiveFunction<Expression<*>, Boolean> =
-      DeepRecursiveFunction<Expression<*>, Boolean> { expr ->
-        return@DeepRecursiveFunction if (expr is ExistsExpression) {
-          context.bindVariables(expr.vars)
-          val result = checkContext.callRecursive(expr.term)
-          context.unbindVariables()
+  private fun checkContext(root: Expression<*>) {
+    val stack = ArrayDeque<StackOperation<Expression<*>>>()
 
-          result
-        } else if (expr is ForallExpression) {
-          context.bindVariables(expr.vars)
-          val result = checkContext.callRecursive(expr.term)
-          context.unbindVariables()
+    if(root is ExistsExpression || root is ForallExpression || root is LetExpression) {
+      stack.add(StackOperation(StackOperationType.BIND, root))
+    } else {
+      stack.add(StackOperation(StackOperationType.NONE, root))
+    }
 
-          result
-        } else if (expr is LetExpression) {
-          context.bindVariables(expr.bindings)
-          val result = checkContext.callRecursive(expr.inner)
-          context.unbindVariables()
 
-          result
-        } else if (expr is AnnotatedExpression) {
-          checkContext.callRecursive(expr.term)
-        } else {
-          val result =
-              (expr.theories.isNotEmpty() || expr in context) &&
-                  expr.children.all { checkContext.callRecursive(it) }
+    while (stack.isNotEmpty()) {
+      val op = stack.removeLast()
 
-          if (!result)
-              println(
-                  "Not in theories ${logic?.theories}: ($expr ${expr.children.joinToString(" ")}) is in ${expr.theories}"
-              )
+      // let here makes code later more readable and allows for auto-casting of expr
+      op.let { (operation, expr) ->
+        when(operation) {
+          // bind vars when taking binder from the stack
+          // also add operation to unbind later
+          StackOperationType.BIND -> {
+            if (expr is ExistsExpression) {
+              context.bindVariables(expr.vars)
+              stack.addLast(op.unbind())
+            } else if (expr is ForallExpression) {
+              context.bindVariables(expr.vars)
+              stack.addLast(op.unbind())
+            } else if (expr is LetExpression) {
+              context.bindVariables(expr.bindings)
+              stack.addLast(op.unbind())
+            }
 
-          result
+            stack.addAll(expr.children.map { expression ->
+              if(expression is ExistsExpression || expression is ForallExpression || expression is LetExpression) {
+                StackOperation(StackOperationType.BIND, expression)
+              } else {
+                StackOperation(StackOperationType.NONE, expression)
+              }
+            })
+          }
+          StackOperationType.UNBIND -> { context.unbindVariables() }
+          StackOperationType.NONE -> {
+            stack.addAll(expr.children.map { expression ->
+              if(expression is ExistsExpression || expression is ForallExpression || expression is LetExpression) {
+                StackOperation(StackOperationType.BIND, expression)
+              } else {
+                StackOperation(StackOperationType.NONE, expression)
+              }
+            })
+
+            // actual context check
+            if(expr !in context) {
+              throw IllegalArgumentException()
+            }
+          }
         }
       }
+    }
+  }
 
   fun <T : Sort> declareConst(name: Symbol, sort: T): UserDeclaredSMTFunction0<T> {
     val func = UserDeclaredSMTFunction0(name, sort)
