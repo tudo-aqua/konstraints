@@ -218,10 +218,12 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
             })
 
             // actual context check
-            if(expr !in context) {
+            // TODO maybe add smt function to expr.func
+            if(expr.theories.all { it !in logic!!.theories } && (expr !in context) && expr !is AnnotatedExpression) {
               throw IllegalArgumentException()
             }
           }
+          else -> throw IllegalArgumentException()
         }
       }
     }

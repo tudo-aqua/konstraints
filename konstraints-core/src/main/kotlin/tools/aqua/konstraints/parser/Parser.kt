@@ -66,6 +66,7 @@ import tools.aqua.konstraints.parser.lexer.OpeningBracket
 import tools.aqua.konstraints.parser.lexer.PopWord
 import tools.aqua.konstraints.parser.lexer.PushWord
 import tools.aqua.konstraints.parser.lexer.QuotedSymbolToken
+import tools.aqua.konstraints.parser.lexer.ReservedWord
 import tools.aqua.konstraints.parser.lexer.ResetAssertionsWord
 import tools.aqua.konstraints.parser.lexer.ResetWord
 import tools.aqua.konstraints.parser.lexer.SMTString
@@ -103,11 +104,18 @@ import tools.aqua.konstraints.smt.MutableSMTProgram
 import tools.aqua.konstraints.smt.NumeralConstant
 import tools.aqua.konstraints.smt.NumeralIndex
 import tools.aqua.konstraints.smt.RealLiteral
+import tools.aqua.konstraints.smt.SExpression
+import tools.aqua.konstraints.smt.SExpressionAttributeValue
+import tools.aqua.konstraints.smt.SExpressionConstant
+import tools.aqua.konstraints.smt.SExpressionKeyword
+import tools.aqua.konstraints.smt.SExpressionReserved
+import tools.aqua.konstraints.smt.SExpressionSymbol
 import tools.aqua.konstraints.smt.Sort
 import tools.aqua.konstraints.smt.SortedVar
 import tools.aqua.konstraints.smt.SpecConstant
 import tools.aqua.konstraints.smt.StringConstant
 import tools.aqua.konstraints.smt.StringLiteral
+import tools.aqua.konstraints.smt.SubSExpression
 import tools.aqua.konstraints.smt.Symbol
 import tools.aqua.konstraints.smt.SymbolAttributeValue
 import tools.aqua.konstraints.smt.SymbolIdentifier
@@ -125,6 +133,7 @@ import tools.aqua.konstraints.util.PeekableIterator
 import tools.aqua.konstraints.util.peekIs
 import tools.aqua.konstraints.util.peekIsNot
 import tools.aqua.konstraints.util.peekable
+import kotlin.invoke
 
 class Parser private constructor(val lexer: PeekableIterator<Token>) {
   companion object {
@@ -328,13 +337,40 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
       when (lexer.peek()) {
         is SpecConstantToken -> ConstantAttributeValue(parseSpecConstant())
         is SymbolToken -> SymbolAttributeValue(parseSymbol())
-        is OpeningBracket -> TODO("SExpr attribute value not implemented yet")
+        is OpeningBracket -> {
+          val sExpression = mutableListOf<SExpression>()
+          lexer.next()
+          while(lexer.peekIsNot { token -> token is ClosingBracket }) {
+            sExpression.add(parseSExpr(Unit))
+          }
+          lexer.next()
+          SExpressionAttributeValue(sExpression)
+        }
         else ->
             throw UnexpectedTokenException(
                 lexer.peek(),
                 "any of SpecConstantToken, SymbolToken or OpeningBracket",
             )
       }
+
+  private val parseSExpr = DeepRecursiveFunction<Unit, SExpression> {
+    when(lexer.peek()) {
+      is SpecConstantToken -> SExpressionConstant(parseSpecConstant())
+      is SymbolToken -> SExpressionSymbol(parseSymbol())
+      is ReservedWord -> SExpressionReserved((lexer.next() as ReservedWord).word)
+      is KeywordToken -> SExpressionKeyword((lexer.next() as KeywordToken).contents)
+      is OpeningBracket -> {
+        val sExpression = mutableListOf<SExpression>()
+        lexer.next()
+        while(lexer.peekIsNot { token -> token is ClosingBracket }) {
+          sExpression.add(callRecursive(Unit))
+        }
+        lexer.next()
+        SubSExpression(sExpression)
+      }
+      else -> throw UnexpectedTokenException(lexer.peek(), "any of SpecConstantToken, SymbolToken, ReservedWord, KeywordToken or OpeningBracket",)
+    }
+  }
 
   // all these function will not discard the stop token so the user does not unexpectedly lose a
   // token

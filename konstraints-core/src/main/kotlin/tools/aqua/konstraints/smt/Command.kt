@@ -181,13 +181,9 @@ data class SymbolAttributeValue(val symbol: Symbol) : AttributeValue {
 data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : AttributeValue {
   override fun toString() = sExpressions.joinToString(separator = " ", prefix = "(", postfix = ")")
 
-  override fun toSMTString(quotingRule: QuotingRule): String {
-    TODO("Not yet implemented")
-  }
+  override fun toSMTString(quotingRule: QuotingRule) = sExpressions.joinToString(separator = " ", prefix = "(", postfix = ")")
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
-    TODO("Not yet implemented")
-  }
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) = sExpressions.joinTo(builder, separator = " ", prefix = "(", postfix = ")")
 }
 
 /** SMT (declare-sort [name] [arity]) command. */

@@ -384,6 +384,8 @@ class LocalExpression<T : Sort>(
     return LocalExpression(name, sort, children.single() as Expression<T>, func) as Expression<T>
   }
 
+    // children are empty here since a local expression is always of arity 0
+    // and an alias for term
   override val children: List<Expression<*>> = emptyList()
 
   override fun toString() = name.toString()

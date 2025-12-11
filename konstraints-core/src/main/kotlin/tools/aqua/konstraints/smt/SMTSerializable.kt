@@ -53,77 +53,104 @@ interface SMTSerializable {
 }
 
 class SMTSerializer {
-  fun serialize(expression: Expression<*>, quotingRule: QuotingRule): String {
-    val builder = StringBuilder()
+  companion object {
+    fun serialize(expression: Expression<*>, quotingRule: QuotingRule, builder: StringBuilder): StringBuilder {
+      // pair of string, expression to be able to add varbindings to the stack
+      val stack = ArrayDeque<StackOperation<Expression<*>>>(
+        listOf(
+          StackOperation(
+            StackOperationType.BIND,
+            expression
+          )
+        )
+      )
 
-    // pair of string, expression to be able to add varbindings to the stack
-    val stack = ArrayDeque<StackOperation<Pair<String, Expression<*>>>>(listOf(StackOperation(StackOperationType.BIND, "" to expression)))
+      while (stack.isNotEmpty()) {
+        val op = stack.removeLast()
 
-    while(stack.isNotEmpty()) {
-      val op = stack.removeLast()
-
-      op.let { (operation, temp) ->
-        temp.let { (name, expr) ->
-          when (operation) {
-            StackOperationType.BIND -> {
-              if (expr.children.isNotEmpty()) {
+        op.let { (operation, expr) ->
+            when (operation) {
+              StackOperationType.OPEN_BINDING -> {
                 builder.append('(')
-                stack.addLast(op.unbind())
               }
-
-              when (expr) {
-                is ForallExpression -> {
-                  serializeQuantifier("forall", quotingRule, builder, expr.vars)
-                }
-
-                is ExistsExpression -> {
-                  serializeQuantifier("exists", quotingRule, builder, expr.vars)
-                }
-
-                is LetExpression -> {
-                  builder.append("let (")
-
-                  stack.addAll(expr.bindings.map { binding ->
-                    StackOperation(StackOperationType.BIND, binding.symbol.toSMTString(quotingRule) to binding.term)
-                  })
-
-                  builder.append(") ")
-                }
-
-                is LocalExpression -> {
-                  require(name.isNotEmpty())
-                  builder.append("( $name ")
-                  expr.nameStringWithIndices(builder, quotingRule)
+              StackOperationType.BIND -> {
+                if (expr.children.isNotEmpty()) {
+                  builder.append('(')
                   stack.addLast(op.unbind())
                 }
 
-                else -> expr.nameStringWithIndices(builder, quotingRule)
+                when (expr) {
+                  is ForallExpression -> {
+                    serializeQuantifier("forall", quotingRule, builder, expr.vars)
+                  }
+
+                  is ExistsExpression -> {
+                    serializeQuantifier("exists", quotingRule, builder, expr.vars)
+                  }
+
+                  is LetExpression -> {
+                    builder.append("let (")
+                  }
+
+                  is AnnotatedExpression -> {
+                    builder.append("!")
+                  }
+
+                  else -> expr.nameStringWithIndices(builder, quotingRule)
+                }
+
+                // add elements in reverse order to keep same ordering in output
+                stack.addAll(expr.children.map { expr ->
+                  StackOperation(StackOperationType.BIND, expr)
+                }.reversed())
+
+                // the bindings must be added onto the stack after the let children so they are processed first
+                if(expr is LetExpression) {
+                  // unbind for the opening bracket of the var binding list
+                  stack.add(op.unbind())
+
+                  // cast here should never fail, i am not sure why we even need it in the first place
+                  stack.addAll(expr.bindings.flatMap { binding ->
+                      listOf(
+                        StackOperation(StackOperationType.OPEN_BINDING, binding.instance),
+                        StackOperation(StackOperationType.BIND, binding.instance),
+                        StackOperation(StackOperationType.BIND, binding.term),
+                        StackOperation(StackOperationType.CLOSE_BINDING, binding.instance)
+                      )
+                  }.reversed() as List<StackOperation<Expression<*>>>)
+                }
               }
 
-              stack.addAll(expr.children.map { expr ->
-                StackOperation(StackOperationType.BIND, "" to expr)
-              })
-            }
+              StackOperationType.UNBIND -> {
+                // this is technically unsafe as the annotations may have an unlimited recursion depth
+                // but thats the users fault for putting an annotation with depth>1000
+                if (expr is AnnotatedExpression) {
+                  expr.annoations.joinTo(builder, " ") { it.toSMTString(quotingRule) }
+                }
 
-            StackOperationType.UNBIND -> builder.append(')')
-            StackOperationType.NONE -> throw RuntimeException("Unexpected operation")
+                builder.append(')')
+              }
+              StackOperationType.CLOSE_BINDING -> builder.append(')')
+              StackOperationType.NONE -> throw RuntimeException("Unexpected operation")
+            }
           }
         }
+
+      return builder
+    }
+
+    fun serialize(expression: Expression<*>, quotingRule: QuotingRule) = serialize(expression, quotingRule, StringBuilder()).toString()
+
+    private fun serializeQuantifier(expr: String, quotingRule: QuotingRule, builder: StringBuilder, vars: List<SortedVar<*>>): StringBuilder {
+      builder.append("$expr (")
+
+      var counter = 0
+      vars.forEach {
+        if (counter++ > 1) builder.append(" ")
+        it.toSMTString(builder, quotingRule)
       }
+
+      return builder.append(") ")
     }
-
-    return builder.toString()
-  }
-
-  private fun serializeQuantifier(expr: String, quotingRule: QuotingRule, builder: StringBuilder, vars: List<SortedVar<*>>): StringBuilder {
-    builder.append("$expr (")
-
-    var counter = 0
-    vars.forEach {
-      if (counter++ > 1) builder.append(" ")
-      it.toSMTString(builder, quotingRule)
-    }
-
-    return builder.append(") ")
   }
 }
