@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.lexer
+package tools.aqua.konstraints.parser.lexer
 
 val ASCII_PRINTABLES = ' '..'~'
 val CAPITAL_HEX_DIGITS = 'A'..'F'

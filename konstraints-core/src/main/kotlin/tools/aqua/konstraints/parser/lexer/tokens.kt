@@ -20,14 +20,8 @@ package tools.aqua.konstraints.parser.lexer
 
 import java.math.BigDecimal
 import java.math.BigInteger
-import tools.aqua.konstraints.lexer.isNotDigit
-import tools.aqua.konstraints.lexer.isNotSMTLineBreak
-import tools.aqua.konstraints.lexer.isQuotedSymbolLetter
-import tools.aqua.konstraints.lexer.isSMTWhiteSpace
-import tools.aqua.konstraints.lexer.isSimpleSymbolLetter
-import tools.aqua.konstraints.lexer.isStringLetter
-import tools.aqua.konstraints.location.AbstractLocalizable
-import tools.aqua.konstraints.location.SourceSpan
+import tools.aqua.konstraints.parser.location.AbstractLocalizable
+import tools.aqua.konstraints.parser.location.SourceSpan
 
 sealed class Token(source: SourceSpan) : AbstractLocalizable(source)
 

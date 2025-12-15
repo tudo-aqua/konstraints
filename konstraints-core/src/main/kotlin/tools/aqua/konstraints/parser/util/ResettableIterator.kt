@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.util
+package tools.aqua.konstraints.parser.util
 
 class ResettableIterator<T>(private val delegate: Iterator<T>) : Iterator<T> {
   private val cache = mutableListOf<T>()

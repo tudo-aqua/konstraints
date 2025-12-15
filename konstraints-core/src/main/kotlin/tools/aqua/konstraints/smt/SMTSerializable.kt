@@ -109,7 +109,7 @@ class SMTSerializer {
                   // unbind for the opening bracket of the var binding list
                   stack.add(op.unbind())
 
-                  // cast here should never fail, i am not sure why we even need it in the first place
+                  // cast here should never fail, I am not sure why we even need it in the first place
                   stack.addAll(expr.bindings.flatMap { binding ->
                       listOf(
                         StackOperation(StackOperationType.OPEN_BINDING, binding.instance),

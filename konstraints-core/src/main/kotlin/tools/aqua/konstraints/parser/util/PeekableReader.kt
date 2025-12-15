@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.util
+package tools.aqua.konstraints.parser.util
 
 import java.io.FilterReader
 import java.io.IOException

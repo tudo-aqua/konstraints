@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.util
+package tools.aqua.konstraints.parser.util
 
 open class MemoryIterator<T>(delegate: Iterator<T>) : PeekableIterator<T>(delegate) {
 

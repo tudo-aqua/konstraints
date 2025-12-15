@@ -22,24 +22,11 @@ import java.io.Reader
 import java.io.StringReader
 import java.math.BigDecimal
 import java.math.BigInteger
-import tools.aqua.konstraints.lexer.CAPITAL_LETTERS
-import tools.aqua.konstraints.lexer.DIGITS
-import tools.aqua.konstraints.lexer.LOWERCASE_LETTERS
-import tools.aqua.konstraints.lexer.UnexpectedCharacterException
-import tools.aqua.konstraints.lexer.UnexpectedEOFException
-import tools.aqua.konstraints.lexer.isBinaryDigit
-import tools.aqua.konstraints.lexer.isDigit
-import tools.aqua.konstraints.lexer.isHexadecimalDigit
-import tools.aqua.konstraints.lexer.isNotSMTLineBreak
-import tools.aqua.konstraints.lexer.isQuotedSymbolLetter
-import tools.aqua.konstraints.lexer.isSMTWhiteSpace
-import tools.aqua.konstraints.lexer.isSimpleSymbolLetter
-import tools.aqua.konstraints.lexer.isStringLetter
-import tools.aqua.konstraints.location.SourceLocation
+import tools.aqua.konstraints.parser.location.SourceLocation
 import tools.aqua.konstraints.util.lineColumnTracking
-import tools.aqua.konstraints.util.peekIsNot
-import tools.aqua.konstraints.util.peekable
-import tools.aqua.konstraints.util.readWhile
+import tools.aqua.konstraints.parser.util.peekIsNot
+import tools.aqua.konstraints.parser.util.peekable
+import tools.aqua.konstraints.parser.util.readWhile
 
 class SMTTokenizer(sourceReader: Reader, private val source: String? = null) : Iterator<Token> {
   private val reader = sourceReader.buffered().peekable().lineColumnTracking()
@@ -54,9 +41,10 @@ class SMTTokenizer(sourceReader: Reader, private val source: String? = null) : I
 
   override fun hasNext(): Boolean = reader.peek() >= 0
 
+  /**
+   * Returns the next non [Whitespace] or [Comment] token or [EOFToken] if no more valid tokens are found
+   */
   override fun next(): Token {
-    // TODO maybe return EOF token here instead of throwing although this violates the iterator
-    // interface
     if (!hasNext()) return EOFToken(tokenStartLocation.asSingletonSpan())
 
     tokenStartLocation = readerNextLocation

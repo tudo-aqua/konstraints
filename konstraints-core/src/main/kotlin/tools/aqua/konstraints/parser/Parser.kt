@@ -18,7 +18,6 @@
 
 package tools.aqua.konstraints.parser
 
-import java.io.File
 import java.io.Reader
 import java.math.BigDecimal
 import kotlin.contracts.ExperimentalContracts
@@ -129,10 +128,10 @@ import tools.aqua.konstraints.smt.defineFun
 import tools.aqua.konstraints.smt.setInfo
 import tools.aqua.konstraints.smt.toSymbolAsIs
 import tools.aqua.konstraints.smt.toSymbolWithQuotes
-import tools.aqua.konstraints.util.PeekableIterator
-import tools.aqua.konstraints.util.peekIs
-import tools.aqua.konstraints.util.peekIsNot
-import tools.aqua.konstraints.util.peekable
+import tools.aqua.konstraints.parser.util.PeekableIterator
+import tools.aqua.konstraints.parser.util.peekIs
+import tools.aqua.konstraints.parser.util.peekIsNot
+import tools.aqua.konstraints.parser.util.peekable
 import kotlin.invoke
 
 class Parser private constructor(val lexer: PeekableIterator<Token>) {
@@ -862,18 +861,6 @@ inline fun <reified T : Token> requireIsInstance(actual: Token): Boolean {
   }
 
   return true
-}
-
-class Program {
-  fun run() {
-    val file = File("E:/Projects/aqua/smt-benchmark/AUFBV/20210301-Alive2/gcc/032_gcc.smt2")
-    Parser(file.bufferedReader())
-  }
-}
-
-fun main() {
-  val prg = Program()
-  prg.run()
 }
 
 class UnexpectedTokenException(actual: Token, expected: String) :

@@ -18,12 +18,15 @@
 
 package tools.aqua.konstraints.util
 
+import tools.aqua.konstraints.parser.util.PeekableReader
+import tools.aqua.konstraints.parser.util.peekIsNot
+import tools.aqua.konstraints.parser.util.peekable
 import java.io.IOException
 import java.io.Reader
 
 private const val SKIP_BLOCK_SIZE = 0xFFFF
 
-public open class LineColumnReader(`in`: PeekableReader) : PeekableReader(`in`) {
+open class LineColumnReader(`in`: PeekableReader) : PeekableReader(`in`) {
   private var _lastLine: Int = 1
   val lastLine: Int
     get() = _lastLine

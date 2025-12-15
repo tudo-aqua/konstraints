@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints
 
+import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.util.stream.Stream
 import kotlin.streams.asStream
@@ -28,6 +29,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
+import org.junit.jupiter.params.provider.ValueSource
 import tools.aqua.konstraints.parser.Parser
 import tools.aqua.konstraints.smt.AnnotatedExpression
 import tools.aqua.konstraints.smt.Assert
@@ -42,113 +44,14 @@ import tools.aqua.konstraints.smt.LetExpression
 import tools.aqua.konstraints.smt.Literal
 import tools.aqua.konstraints.smt.QuotingRule
 import tools.aqua.konstraints.smt.RealLiteral
+import tools.aqua.konstraints.smt.RegLan
 import tools.aqua.konstraints.smt.SMTProgram
+import tools.aqua.konstraints.smt.SMTSerializer
 import tools.aqua.konstraints.smt.StringLiteral
+import tools.aqua.konstraints.smt.Theories
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserBenchmark {
-
-  val deepRecursiveSerializer: DeepRecursiveFunction<Pair<Appendable, Expression<*>>, Appendable> =
-      DeepRecursiveFunction<Pair<Appendable, Expression<*>>, Appendable> { (builder, expr) ->
-        when (expr) {
-          is AnnotatedExpression<*> -> {
-            builder.append("(! ")
-            deepRecursiveSerializer.callRecursive(builder to expr.term)
-
-            expr.annoations.forEach {
-              builder.append(" ")
-              it.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
-            }
-
-            builder.append(")")
-          }
-          is ExistsExpression -> {
-            builder.append("(exists (")
-
-            var counter = 0
-            expr.vars.forEach {
-              if (counter++ > 1) builder.append(" ")
-              it.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
-            }
-
-            builder.append(") ")
-            deepRecursiveSerializer.callRecursive(builder to expr.term)
-
-            builder.append(")")
-          }
-          is ForallExpression -> {
-            builder.append("(forall (")
-
-            var counter = 0
-            expr.vars.forEach {
-              if (counter++ > 1) builder.append(" ")
-              it.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
-            }
-
-            builder.append(") ")
-            deepRecursiveSerializer.callRecursive(builder to expr.term)
-
-            builder.append(")")
-          }
-          is LetExpression<*> -> {
-            builder.append("(let (")
-
-            var counter = 0
-            expr.bindings.forEach {
-              if (counter++ > 1) builder.append(" ")
-              builder.append("(")
-              builder.append(it.symbol.toSMTString(QuotingRule.SAME_AS_INPUT))
-              builder.append(" ")
-              deepRecursiveSerializer.callRecursive(builder to it.term)
-              builder.append(")")
-            }
-
-            builder.append(") ")
-            deepRecursiveSerializer.callRecursive(builder to expr.inner)
-
-            builder.append(")")
-          }
-          is Literal<*> -> {
-            when (expr) {
-              is StringLiteral -> expr.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
-              is BVLiteral -> expr.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
-              is Char -> expr.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
-              is FPLiteral -> expr.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
-              is IntLiteral -> expr.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
-              is RealLiteral -> expr.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
-            }
-          }
-          else -> {
-            if (expr.children.isEmpty())
-                expr.nameStringWithIndices(builder, QuotingRule.SAME_AS_INPUT)
-            else {
-              builder.append("(")
-              expr.nameStringWithIndices(builder, QuotingRule.SAME_AS_INPUT)
-
-              expr.children.forEach {
-                builder.append(" ")
-                deepRecursiveSerializer.callRecursive(builder to it)
-              }
-
-              builder.append(")")
-            }
-          }
-        }
-      }
-
-  val serialize =
-      DeepRecursiveFunction<Pair<Appendable, SMTProgram>, Appendable> { (builder, program) ->
-        program.commands.forEach {
-          if (it is Assert) {
-            builder.append("(assert ")
-            deepRecursiveSerializer.callRecursive(builder to it.expr)
-            builder.append(")")
-          } else {
-            it.toSMTString(builder, QuotingRule.SAME_AS_INPUT)
-          }
-        }
-        builder
-      }
 
   private fun loadResource(path: String) =
       File(javaClass.getResource(path)!!.file)
@@ -195,7 +98,7 @@ class ParserBenchmark {
   }
 
   private fun parse(file: File) {
-    // assumeTrue(file.length() < 100000, "Skipped due to file size exceeding limit of 5000000")
+    assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
 
     /*assertDoesNotThrow {
       // its crucial that the separator is '\n' as comments dont have an ending symbol but rather
@@ -214,7 +117,8 @@ class ParserBenchmark {
               .replace("\r", "")
               .replace("\t", "")
               .replace("|", ""),
-          serialize(StringBuilder() to program)
+          program
+            .toSMTString(StringBuilder(), QuotingRule.SAME_AS_INPUT)
             .toString()
             .replace(" ", "")
             .replace("\n", "")
@@ -610,4 +514,22 @@ class ParserBenchmark {
   @ParameterizedTest @MethodSource("getUFNIRAFiles") fun parseUFNIRA(file: File) = parse(file)
 
   fun getUFNIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFNIRA/")
+}
+
+val Expression<*>.traverse: DeepRecursiveFunction<(Expression<*>) -> Unit, Unit>
+    get() = DeepRecursiveFunction<(Expression<*>) -> Unit, Unit> { action ->
+      action(this@traverse)
+      this@traverse.children.onEach { it.traverse.callRecursive(action) }
+    }
+
+fun getKey(expr: Expression<*>): String {
+  if (expr.theories.contains(Theories.CORE)) {
+    return "Core"
+  } else if (expr.theories.contains(Theories.INTS)) {
+    return "Int"
+  } else if (expr.sort is RegLan) {
+    return "RegLan"
+  } else {
+    return "String"
+  }
 }

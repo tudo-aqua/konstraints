@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.lexer
+package tools.aqua.konstraints.parser.lexer
 
-import tools.aqua.konstraints.location.SourceLocation
+import tools.aqua.konstraints.parser.location.SourceLocation
 
 open class LexerException(s: String) : IllegalStateException(s)
 

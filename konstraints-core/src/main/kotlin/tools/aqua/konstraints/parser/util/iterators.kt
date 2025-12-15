@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.util
+package tools.aqua.konstraints.parser.util
 
 inline fun <T> PeekableIterator<T>.peekIs(depth: Int = 0, predicate: (T) -> Boolean): Boolean =
     hasNext(depth) && predicate(peek(depth))

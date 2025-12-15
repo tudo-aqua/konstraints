@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.location
+package tools.aqua.konstraints.parser.location
 
 data class SourceLocation(
     val line: Int,
