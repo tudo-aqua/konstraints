@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,10 +23,10 @@ import java.io.StringReader
 import java.math.BigDecimal
 import java.math.BigInteger
 import tools.aqua.konstraints.parser.location.SourceLocation
-import tools.aqua.konstraints.util.lineColumnTracking
 import tools.aqua.konstraints.parser.util.peekIsNot
 import tools.aqua.konstraints.parser.util.peekable
 import tools.aqua.konstraints.parser.util.readWhile
+import tools.aqua.konstraints.util.lineColumnTracking
 
 class SMTTokenizer(sourceReader: Reader, private val source: String? = null) : Iterator<Token> {
   private val reader = sourceReader.buffered().peekable().lineColumnTracking()
@@ -42,7 +42,8 @@ class SMTTokenizer(sourceReader: Reader, private val source: String? = null) : I
   override fun hasNext(): Boolean = reader.peek() >= 0
 
   /**
-   * Returns the next non [Whitespace] or [Comment] token or [EOFToken] if no more valid tokens are found
+   * Returns the next non [Whitespace] or [Comment] token or [EOFToken] if no more valid tokens are
+   * found
    */
   override fun next(): Token {
     if (!hasNext()) return EOFToken(tokenStartLocation.asSingletonSpan())

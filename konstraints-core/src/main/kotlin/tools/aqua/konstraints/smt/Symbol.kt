@@ -151,10 +151,10 @@ internal constructor(
       }
 
   /** Returns the internal representation of the symbol without any quotes. */
-  override fun toString() = toSMTString(QuotingRule.SAME_AS_INPUT)
+  override fun toString() = toSMTString(QuotingRule.SAME_AS_INPUT, false)
 
   /** Returns a valid SMT String with reconstructed quoting. */
-  override fun toSMTString(rule: QuotingRule) =
+  override fun toSMTString(rule: QuotingRule, useIterative: Boolean) =
       when (rule) {
         QuotingRule.NEVER -> if (!isSimple) throw IllegalSymbolException(value) else value
         QuotingRule.SAME_AS_INPUT -> if (isQuoted) "|$value|" else value
@@ -162,8 +162,11 @@ internal constructor(
         QuotingRule.ALWAYS -> "|$value|"
       }
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      builder.append(toSMTString(quotingRule))
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable = builder.append(toSMTString(quotingRule, useIterative))
 }
 
 class IllegalSymbolException(val symbol: String) :

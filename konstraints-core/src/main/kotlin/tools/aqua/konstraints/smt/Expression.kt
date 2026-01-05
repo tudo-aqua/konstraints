@@ -128,49 +128,63 @@ sealed class Expression<out T : Sort> : SMTSerializable {
   override fun toString() =
       if (children.isEmpty()) name.toString() else "$($name ${children.joinToString(" ")})"
 
-  fun nameStringWithIndices(quotingRule: QuotingRule) =
+  fun nameStringWithIndices(quotingRule: QuotingRule, useIterative: Boolean) =
       if (indices.isEmpty()) {
-        name.toSMTString(quotingRule)
+        name.toSMTString(quotingRule, useIterative)
       } else {
-        "(_ ${name.toSMTString(quotingRule)} ${indices.joinToString(" ")})"
+        "(_ ${name.toSMTString(quotingRule, useIterative)} ${indices.joinToString(" ")})"
       }
 
-  fun nameStringWithIndices(builder: Appendable, quotingRule: QuotingRule): Appendable =
+  fun nameStringWithIndices(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable =
       if (indices.isEmpty()) {
-        name.toSMTString(builder, quotingRule)
+        name.toSMTString(builder, quotingRule, useIterative)
       } else {
         builder.append("(_ ")
-        name.toSMTString(builder, quotingRule)
+        name.toSMTString(builder, quotingRule, useIterative)
 
         indices.forEach { builder.append(" $it") }
 
         builder.append(")")
       }
 
-  override fun toSMTString(quotingRule: QuotingRule): String =
-      if (children.isEmpty()) {
-        nameStringWithIndices(quotingRule)
-      } else
-          "(${nameStringWithIndices(quotingRule)} ${
-            children.joinToString(" ") { expr: Expression<*> ->
-                expr.toSMTString(
-                    quotingRule
-                )
-            }
-        })"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean): String =
+      if (useIterative) {
+        SMTSerializer.serialize(this, quotingRule)
+      } else {
+        if (children.isEmpty()) {
+          nameStringWithIndices(quotingRule, useIterative)
+        } else
+            "(${nameStringWithIndices(quotingRule, useIterative)} ${
+                  children.joinToString(" ") { expr: Expression<*> ->
+                      expr.toSMTString(quotingRule, useIterative)
+                  }
+              })"
+      }
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      if (children.isEmpty()) nameStringWithIndices(builder, quotingRule)
-      else {
-        builder.append("(")
-        nameStringWithIndices(builder, quotingRule)
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable =
+      if (useIterative) {
+        SMTSerializer.serialize(this, quotingRule, builder)
+      } else {
+        if (children.isEmpty()) nameStringWithIndices(builder, quotingRule, useIterative)
+        else {
+          builder.append("(")
+          nameStringWithIndices(builder, quotingRule, useIterative)
 
-        children.forEach {
-          builder.append(" ")
-          it.toSMTString(builder, quotingRule)
+          children.forEach {
+            builder.append(" ")
+            it.toSMTString(builder, quotingRule, useIterative)
+          }
+
+          builder.append(")")
         }
-
-        builder.append(")")
       }
 }
 
@@ -190,7 +204,7 @@ abstract class ConstantExpression<out T : Sort>(override val name: Symbol, overr
 
   override val children: List<Expression<*>> = emptyList()
 
-  override fun toString() = name.toSMTString(QuotingRule.SAME_AS_INPUT)
+  override fun toString() = name.toSMTString(QuotingRule.SAME_AS_INPUT, false)
 }
 
 /** Base class of all expressions with exactly one child */
@@ -257,7 +271,7 @@ abstract class HomogenousExpression<out T : Sort, out S : Sort>(
 
   override fun toString() =
       if (children.isNotEmpty()) "($name ${children.joinToString(" ")})"
-      else name.toSMTString(QuotingRule.SAME_AS_INPUT)
+      else name.toSMTString(QuotingRule.SAME_AS_INPUT, false)
 }
 
 /** Base class of all expressions with any number of children */
@@ -266,7 +280,7 @@ abstract class NAryExpression<out T : Sort>(override val name: Symbol, override 
 
   override fun toString() =
       if (children.isNotEmpty()) "($name ${children.joinToString(" ")})"
-      else name.toSMTString(QuotingRule.SAME_AS_INPUT)
+      else name.toSMTString(QuotingRule.SAME_AS_INPUT, false)
 }
 
 /** Let expression */
@@ -310,20 +324,28 @@ class LetExpression<out T : Sort>(val bindings: List<VarBinding<*>>, val inner: 
 
   override fun toString() = "(let (${bindings.joinToString(" ")}) $inner)"
 
-  override fun toSMTString(quotingRule: QuotingRule) =
-      "(let (${bindings.joinToString(" "){it.toSMTString(quotingRule)}}) ${inner.toSMTString(quotingRule)})"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(let (${bindings.joinToString(" "){it.toSMTString(quotingRule, useIterative)}}) ${if(useIterative) SMTSerializer.serialize(inner, quotingRule) else inner.toSMTString(quotingRule, useIterative)})"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     builder.append("(let (")
 
     var counter = 0
     bindings.forEach {
       if (counter++ > 1) builder.append(" ")
-      it.toSMTString(builder, quotingRule)
+      it.toSMTString(builder, quotingRule, useIterative)
     }
 
     builder.append(") ")
-    inner.toSMTString(builder, quotingRule)
+    if (useIterative) {
+      SMTSerializer.serialize(inner, quotingRule, builder)
+    } else {
+      inner.toSMTString(builder, quotingRule, useIterative)
+    }
 
     return builder.append(")")
   }
@@ -384,8 +406,8 @@ class LocalExpression<T : Sort>(
     return LocalExpression(name, sort, children.single() as Expression<T>, func) as Expression<T>
   }
 
-    // children are empty here since a local expression is always of arity 0
-    // and an alias for term
+  // children are empty here since a local expression is always of arity 0
+  // and an alias for term
   override val children: List<Expression<*>> = emptyList()
 
   override fun toString() = name.toString()
@@ -410,20 +432,24 @@ class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
 
   override fun toString() = "(exists (${vars.joinToString(" ")}) $term)"
 
-  override fun toSMTString(quotingRule: QuotingRule) =
-      "(exists (${vars.joinToString(" "){it.toSMTString(quotingRule)}}) ${term.toSMTString(quotingRule)})"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(exists (${vars.joinToString(" "){it.toSMTString(quotingRule, useIterative)}}) ${term.toSMTString(quotingRule, useIterative)})"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     builder.append("(exists (")
 
     var counter = 0
     vars.forEach {
       if (counter++ > 1) builder.append(" ")
-      it.toSMTString(builder, quotingRule)
+      it.toSMTString(builder, quotingRule, useIterative)
     }
 
     builder.append(") ")
-    term.toSMTString(builder, quotingRule)
+    term.toSMTString(builder, quotingRule, useIterative)
 
     return builder.append(")")
   }
@@ -446,20 +472,24 @@ class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
 
   override fun toString() = "(forall (${vars.joinToString(" ")}) $term)"
 
-  override fun toSMTString(quotingRule: QuotingRule) =
-      "(forall (${vars.joinToString(" "){it.toSMTString(quotingRule)}}) ${term.toSMTString(quotingRule)})"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(forall (${vars.joinToString(" "){it.toSMTString(quotingRule, useIterative)}}) ${term.toSMTString(quotingRule, useIterative)})"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     builder.append("(forall (")
 
     var counter = 0
     vars.forEach {
       if (counter++ > 1) builder.append(" ")
-      it.toSMTString(builder, quotingRule)
+      it.toSMTString(builder, quotingRule, useIterative)
     }
 
     builder.append(") ")
-    term.toSMTString(builder, quotingRule)
+    term.toSMTString(builder, quotingRule, useIterative)
 
     return builder.append(")")
   }
@@ -498,16 +528,20 @@ class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: Lis
 
   override fun toString() = "(! $term ${annoations.joinToString(" ")})"
 
-  override fun toSMTString(quotingRule: QuotingRule): String =
-      "(! ${term.toSMTString(quotingRule)} ${annoations.joinToString(" ") { it.toSMTString(quotingRule) }})"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean): String =
+      "(! ${term.toSMTString(quotingRule, useIterative)} ${annoations.joinToString(" ") { it.toSMTString(quotingRule, useIterative) }})"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     builder.append("(! ")
-    term.toSMTString(builder, quotingRule)
+    term.toSMTString(builder, quotingRule, useIterative)
 
     annoations.forEach {
       builder.append(" ")
-      it.toSMTString(builder, quotingRule)
+      it.toSMTString(builder, quotingRule, useIterative)
     }
 
     return builder.append(")")

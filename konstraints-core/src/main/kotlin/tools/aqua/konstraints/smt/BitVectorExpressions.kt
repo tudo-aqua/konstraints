@@ -1247,7 +1247,7 @@ class SBVToInt(override val inner: Expression<BVSort>) :
 
 class IntToBV(val m: Int, override val inner: Expression<IntSort>) :
     UnaryExpression<BVSort, IntSort>("int_to_bv".toSymbolWithQuotes(), BVSort(m)) {
-    override val indices = listOf(m)
+  override val indices = listOf(m)
 
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 

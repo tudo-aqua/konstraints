@@ -63,10 +63,11 @@ class UserDefinedBoolSort(override val definedSymbol: Symbol, override val param
     BoolSort() {
   override fun toString() = definedSymbol.toString()
 
-  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(quotingRule, useIterative)
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
-      definedSymbol.toSMTString(builder, quotingRule)
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(builder, quotingRule, useIterative)
 }
 
 class UserDefinedRealFactory(symbol: Symbol, val parameters: List<Symbol>) :
@@ -89,10 +90,11 @@ class UserDefinedRealSort(override val definedSymbol: Symbol, override val param
     RealSort() {
   override fun toString() = definedSymbol.toString()
 
-  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(quotingRule, useIterative)
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
-      definedSymbol.toSMTString(builder, quotingRule)
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(builder, quotingRule, useIterative)
 }
 
 class UserDefinedIntFactory(symbol: Symbol, val parameters: List<Symbol>) :
@@ -114,10 +116,11 @@ class UserDefinedIntSort(override val definedSymbol: Symbol, override val parame
     IntSort() {
   override fun toString() = definedSymbol.toString()
 
-  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(quotingRule, useIterative)
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
-      definedSymbol.toSMTString(builder, quotingRule)
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(builder, quotingRule, useIterative)
 }
 
 class UserDefinedStringFactory(symbol: Symbol, val parameters: List<Symbol>) :
@@ -142,10 +145,11 @@ class UserDefinedStringSort(
 ) : StringSort() {
   override fun toString() = definedSymbol.toString()
 
-  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(quotingRule, useIterative)
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
-      definedSymbol.toSMTString(builder, quotingRule)
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(builder, quotingRule, useIterative)
 }
 
 class UserDefinedRegLanFactory(symbol: Symbol, val parameters: List<Symbol>) :
@@ -170,10 +174,11 @@ class UserDefinedRegLanSort(
 ) : RegLanSort() {
   override fun toString() = definedSymbol.toString()
 
-  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(quotingRule, useIterative)
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
-      definedSymbol.toSMTString(builder, quotingRule)
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(builder, quotingRule, useIterative)
 }
 
 class UserDefinedRoundingModeFactory(symbol: Symbol, val parameters: List<Symbol>) :
@@ -198,10 +203,11 @@ class UserDefinedRoundingModeSort(
 ) : RoundingModeSort() {
   override fun toString() = definedSymbol.toString()
 
-  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(quotingRule, useIterative)
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
-      definedSymbol.toSMTString(builder, quotingRule)
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(builder, quotingRule, useIterative)
 }
 
 object IntFactory : SortFactory {
@@ -521,35 +527,39 @@ sealed class Sort(open val symbol: Symbol) : SMTSerializable {
         symbol.toString()
       }
 
-  fun toSMTString() = symbol.toSMTString(QuotingRule.SAME_AS_INPUT)
+  fun toSMTString() = symbol.toSMTString(QuotingRule.SAME_AS_INPUT, false)
 
-  override fun toSMTString(quotingRule: QuotingRule): String =
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean): String =
       if (this.isIndexed()) {
-        "(_ ${symbol.toSMTString(quotingRule)} ${indices.joinToString(" ")})"
+        "(_ ${symbol.toSMTString(quotingRule, useIterative)} ${indices.joinToString(" ")})"
       } else if (parameters.isNotEmpty()) {
-        "($symbol ${parameters.joinToString(" ") { it.toSMTString(quotingRule) }})"
+        "($symbol ${parameters.joinToString(" ") { it.toSMTString(quotingRule, useIterative) }})"
       } else {
-        symbol.toSMTString(quotingRule)
+        symbol.toSMTString(quotingRule, useIterative)
       }
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable =
       if (this.isIndexed()) {
         builder.append("(_ ")
-        symbol.toSMTString(builder, quotingRule)
+        symbol.toSMTString(builder, quotingRule, useIterative)
         builder.append(" ${indices.joinToString(" ")})")
       } else if (parameters.isNotEmpty()) {
         builder.append("(")
-        symbol.toSMTString(builder, quotingRule)
+        symbol.toSMTString(builder, quotingRule, useIterative)
 
         parameters.forEach {
           builder.append(" ")
-          it.toSMTString(builder, quotingRule)
+          it.toSMTString(builder, quotingRule, useIterative)
         }
         builder.append(")")
 
         builder
       } else {
-        symbol.toSMTString(builder, quotingRule)
+        symbol.toSMTString(builder, quotingRule, useIterative)
       }
 }
 
@@ -607,10 +617,11 @@ class UserDefinedUserDeclaredSort(
 ) : UserDeclaredSort(name, parameters) {
   override fun toString() = definedSymbol.toString()
 
-  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(quotingRule, useIterative)
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
-      definedSymbol.toSMTString(builder, quotingRule)
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(builder, quotingRule, useIterative)
 }
 
 abstract class UserDefinedSortFactory(val symbol: Symbol) : SortFactory {
@@ -649,10 +660,11 @@ class UserDefinedBitVectorFactory(symbol: Symbol, val bits: Int, val parameters:
 class UserDefinedBitVectorSort(override val definedSymbol: Symbol, bits: Int) : BVSort(bits.idx()) {
   override fun toString() = definedSymbol.toString()
 
-  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(quotingRule, useIterative)
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
-      definedSymbol.toSMTString(builder, quotingRule)
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(builder, quotingRule, useIterative)
 }
 
 class UserDefinedFloatingPointFactory(
@@ -678,10 +690,11 @@ class UserDefinedFloatingPointSort(override val definedSymbol: Symbol, eb: Int, 
     FPSort(eb.idx(), sb.idx()) {
   override fun toString() = definedSymbol.toString()
 
-  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(quotingRule, useIterative)
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
-      definedSymbol.toSMTString(builder, quotingRule)
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(builder, quotingRule, useIterative)
 }
 
 class UserDefinedArrayFactory(
@@ -885,10 +898,11 @@ object FP16 : FPSort(5.idx(), 11.idx()) {
 
   override fun toString() = definedSymbol.toString()
 
-  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(quotingRule, useIterative)
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
-      definedSymbol.toSMTString(builder, quotingRule)
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(builder, quotingRule, useIterative)
 }
 
 /** Standard 32-bit FloatingPoint sort. */
@@ -897,10 +911,11 @@ object FP32 : FPSort(8.idx(), 24.idx()) {
 
   override fun toString() = definedSymbol.toString()
 
-  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(quotingRule, useIterative)
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
-      definedSymbol.toSMTString(builder, quotingRule)
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(builder, quotingRule, useIterative)
 }
 
 /** Standard 64-bit FloatingPoint sort. */
@@ -909,10 +924,11 @@ object FP64 : FPSort(11.idx(), 53.idx()) {
 
   override fun toString() = definedSymbol.toString()
 
-  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(quotingRule, useIterative)
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
-      definedSymbol.toSMTString(builder, quotingRule)
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(builder, quotingRule, useIterative)
 }
 
 /** Standard 128-bit FloatingPoint sort. */
@@ -921,10 +937,11 @@ object FP128 : FPSort(15.idx(), 113.idx()) {
 
   override fun toString() = definedSymbol.toString()
 
-  override fun toSMTString(quotingRule: QuotingRule) = definedSymbol.toSMTString(quotingRule)
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(quotingRule, useIterative)
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
-      definedSymbol.toSMTString(builder, quotingRule)
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
+      definedSymbol.toSMTString(builder, quotingRule, useIterative)
 }
 
 /** Default floating point sort implementation. */

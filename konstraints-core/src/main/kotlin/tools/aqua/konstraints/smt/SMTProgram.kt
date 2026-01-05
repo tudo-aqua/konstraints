@@ -20,13 +20,13 @@ package tools.aqua.konstraints.smt
 
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.let
 import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.dsl.UserDeclaredSMTFunctionN
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunction0
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunctionN
 import tools.aqua.konstraints.util.StackOperation
 import tools.aqua.konstraints.util.StackOperationType
-import kotlin.let
 
 /** Sat status of an smt program. */
 enum class SatStatus {
@@ -95,14 +95,18 @@ abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
 
   final override fun toString() = _commands.joinToString(separator = "\n")
 
-  override fun toSMTString(quotingRule: QuotingRule) =
-      _commands.joinToString(separator = "\n") { it.toSMTString(quotingRule) }
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      _commands.joinToString(separator = "\n") { it.toSMTString(quotingRule, useIterative) }
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     var counter = 0
     _commands.forEach {
       if (++counter > 1) builder.append("\n")
-      it.toSMTString(builder, quotingRule)
+      it.toSMTString(builder, quotingRule, useIterative)
     }
 
     return builder
@@ -172,19 +176,18 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
   private fun checkContext(root: Expression<*>) {
     val stack = ArrayDeque<StackOperation<Expression<*>>>()
 
-    if(root is ExistsExpression || root is ForallExpression || root is LetExpression) {
+    if (root is ExistsExpression || root is ForallExpression || root is LetExpression) {
       stack.add(StackOperation(StackOperationType.BIND, root))
     } else {
       stack.add(StackOperation(StackOperationType.NONE, root))
     }
-
 
     while (stack.isNotEmpty()) {
       val op = stack.removeLast()
 
       // let here makes code later more readable and allows for auto-casting of expr
       op.let { (operation, expr) ->
-        when(operation) {
+        when (operation) {
           // bind vars when taking binder from the stack
           // also add operation to unbind later
           StackOperationType.BIND -> {
@@ -199,27 +202,45 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
               stack.addLast(op.unbind())
             }
 
-            stack.addAll(expr.children.map { expression ->
-              if(expression is ExistsExpression || expression is ForallExpression || expression is LetExpression) {
-                StackOperation(StackOperationType.BIND, expression)
-              } else {
-                StackOperation(StackOperationType.NONE, expression)
-              }
-            })
+            stack.addAll(
+                expr.children.map { expression ->
+                  if (
+                      expression is ExistsExpression ||
+                          expression is ForallExpression ||
+                          expression is LetExpression
+                  ) {
+                    StackOperation(StackOperationType.BIND, expression)
+                  } else {
+                    StackOperation(StackOperationType.NONE, expression)
+                  }
+                }
+            )
           }
-          StackOperationType.UNBIND -> { context.unbindVariables() }
+          StackOperationType.UNBIND -> {
+            context.unbindVariables()
+          }
           StackOperationType.NONE -> {
-            stack.addAll(expr.children.map { expression ->
-              if(expression is ExistsExpression || expression is ForallExpression || expression is LetExpression) {
-                StackOperation(StackOperationType.BIND, expression)
-              } else {
-                StackOperation(StackOperationType.NONE, expression)
-              }
-            })
+            stack.addAll(
+                expr.children.map { expression ->
+                  if (
+                      expression is ExistsExpression ||
+                          expression is ForallExpression ||
+                          expression is LetExpression
+                  ) {
+                    StackOperation(StackOperationType.BIND, expression)
+                  } else {
+                    StackOperation(StackOperationType.NONE, expression)
+                  }
+                }
+            )
 
             // actual context check
             // TODO maybe add smt function to expr.func
-            if(expr.theories.all { it !in logic!!.theories } && (expr !in context) && expr !is AnnotatedExpression) {
+            if (
+                expr.theories.all { it !in logic!!.theories } &&
+                    (expr !in context) &&
+                    expr !is AnnotatedExpression
+            ) {
               throw IllegalArgumentException()
             }
           }

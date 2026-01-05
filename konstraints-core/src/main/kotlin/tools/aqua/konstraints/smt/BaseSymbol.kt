@@ -31,18 +31,24 @@ class Keyword(val value: String) : BaseSymbol {
 
   override fun hashCode() = value.hashCode()
 
-  override fun toSMTString(quotingRule: QuotingRule) = value
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = value
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      builder.append(toSMTString(quotingRule))
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable = builder.append(toSMTString(quotingRule, useIterative))
 }
 
 /** String representation of a smt literal. */
 class LiteralString(val value: String) : BaseSymbol {
   override fun toString() = value
 
-  override fun toSMTString(quotingRule: QuotingRule) = value
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = value
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      builder.append(toSMTString(quotingRule))
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable = builder.append(toSMTString(quotingRule, useIterative))
 }

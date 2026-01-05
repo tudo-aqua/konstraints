@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,11 @@
 
 package tools.aqua.konstraints.util
 
+import java.io.IOException
+import java.io.Reader
 import tools.aqua.konstraints.parser.util.PeekableReader
 import tools.aqua.konstraints.parser.util.peekIsNot
 import tools.aqua.konstraints.parser.util.peekable
-import java.io.IOException
-import java.io.Reader
 
 private const val SKIP_BLOCK_SIZE = 0xFFFF
 

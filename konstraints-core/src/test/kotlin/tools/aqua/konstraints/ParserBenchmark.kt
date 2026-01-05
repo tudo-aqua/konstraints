@@ -18,7 +18,6 @@
 
 package tools.aqua.konstraints
 
-import kotlinx.coroutines.runBlocking
 import java.io.File
 import java.util.stream.Stream
 import kotlin.streams.asStream
@@ -29,25 +28,10 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import org.junit.jupiter.params.provider.ValueSource
 import tools.aqua.konstraints.parser.Parser
-import tools.aqua.konstraints.smt.AnnotatedExpression
-import tools.aqua.konstraints.smt.Assert
-import tools.aqua.konstraints.smt.BVLiteral
-import tools.aqua.konstraints.smt.Char
-import tools.aqua.konstraints.smt.ExistsExpression
 import tools.aqua.konstraints.smt.Expression
-import tools.aqua.konstraints.smt.FPLiteral
-import tools.aqua.konstraints.smt.ForallExpression
-import tools.aqua.konstraints.smt.IntLiteral
-import tools.aqua.konstraints.smt.LetExpression
-import tools.aqua.konstraints.smt.Literal
 import tools.aqua.konstraints.smt.QuotingRule
-import tools.aqua.konstraints.smt.RealLiteral
 import tools.aqua.konstraints.smt.RegLan
-import tools.aqua.konstraints.smt.SMTProgram
-import tools.aqua.konstraints.smt.SMTSerializer
-import tools.aqua.konstraints.smt.StringLiteral
 import tools.aqua.konstraints.smt.Theories
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -118,13 +102,13 @@ class ParserBenchmark {
               .replace("\t", "")
               .replace("|", ""),
           program
-            .toSMTString(StringBuilder(), QuotingRule.SAME_AS_INPUT)
-            .toString()
-            .replace(" ", "")
-            .replace("\n", "")
-            .replace("\r", "")
-            .replace("\t", "")
-            .replace("|", ""),
+              .toSMTString(StringBuilder(), QuotingRule.SAME_AS_INPUT, true)
+              .toString()
+              .replace(" ", "")
+              .replace("\n", "")
+              .replace("\r", "")
+              .replace("\t", "")
+              .replace("|", ""),
       )
     } catch (e: NotImplementedError) {
       println("Skipped due to not implemented error ${e.message}")
@@ -517,10 +501,11 @@ class ParserBenchmark {
 }
 
 val Expression<*>.traverse: DeepRecursiveFunction<(Expression<*>) -> Unit, Unit>
-    get() = DeepRecursiveFunction<(Expression<*>) -> Unit, Unit> { action ->
-      action(this@traverse)
-      this@traverse.children.onEach { it.traverse.callRecursive(action) }
-    }
+  get() =
+      DeepRecursiveFunction<(Expression<*>) -> Unit, Unit> { action ->
+        action(this@traverse)
+        this@traverse.children.onEach { it.traverse.callRecursive(action) }
+      }
 
 fun getKey(expr: Expression<*>): String {
   if (expr.theories.contains(Theories.CORE)) {

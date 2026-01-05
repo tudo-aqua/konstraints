@@ -22,6 +22,7 @@ import java.io.Reader
 import java.math.BigDecimal
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
+import kotlin.invoke
 import tools.aqua.konstraints.parser.lexer.AsWord
 import tools.aqua.konstraints.parser.lexer.AssertWord
 import tools.aqua.konstraints.parser.lexer.Binary
@@ -78,6 +79,10 @@ import tools.aqua.konstraints.parser.lexer.SpecConstantToken
 import tools.aqua.konstraints.parser.lexer.SymbolToken
 import tools.aqua.konstraints.parser.lexer.Token
 import tools.aqua.konstraints.parser.lexer.UnderscoreWord
+import tools.aqua.konstraints.parser.util.PeekableIterator
+import tools.aqua.konstraints.parser.util.peekIs
+import tools.aqua.konstraints.parser.util.peekIsNot
+import tools.aqua.konstraints.parser.util.peekable
 import tools.aqua.konstraints.smt.AnnotatedExpression
 import tools.aqua.konstraints.smt.Attribute
 import tools.aqua.konstraints.smt.AttributeValue
@@ -128,11 +133,6 @@ import tools.aqua.konstraints.smt.defineFun
 import tools.aqua.konstraints.smt.setInfo
 import tools.aqua.konstraints.smt.toSymbolAsIs
 import tools.aqua.konstraints.smt.toSymbolWithQuotes
-import tools.aqua.konstraints.parser.util.PeekableIterator
-import tools.aqua.konstraints.parser.util.peekIs
-import tools.aqua.konstraints.parser.util.peekIsNot
-import tools.aqua.konstraints.parser.util.peekable
-import kotlin.invoke
 
 class Parser private constructor(val lexer: PeekableIterator<Token>) {
   companion object {
@@ -339,7 +339,7 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
         is OpeningBracket -> {
           val sExpression = mutableListOf<SExpression>()
           lexer.next()
-          while(lexer.peekIsNot { token -> token is ClosingBracket }) {
+          while (lexer.peekIsNot { token -> token is ClosingBracket }) {
             sExpression.add(parseSExpr(Unit))
           }
           lexer.next()
@@ -352,24 +352,29 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
             )
       }
 
-  private val parseSExpr = DeepRecursiveFunction<Unit, SExpression> {
-    when(lexer.peek()) {
-      is SpecConstantToken -> SExpressionConstant(parseSpecConstant())
-      is SymbolToken -> SExpressionSymbol(parseSymbol())
-      is ReservedWord -> SExpressionReserved((lexer.next() as ReservedWord).word)
-      is KeywordToken -> SExpressionKeyword((lexer.next() as KeywordToken).contents)
-      is OpeningBracket -> {
-        val sExpression = mutableListOf<SExpression>()
-        lexer.next()
-        while(lexer.peekIsNot { token -> token is ClosingBracket }) {
-          sExpression.add(callRecursive(Unit))
+  private val parseSExpr =
+      DeepRecursiveFunction<Unit, SExpression> {
+        when (lexer.peek()) {
+          is SpecConstantToken -> SExpressionConstant(parseSpecConstant())
+          is SymbolToken -> SExpressionSymbol(parseSymbol())
+          is ReservedWord -> SExpressionReserved((lexer.next() as ReservedWord).word)
+          is KeywordToken -> SExpressionKeyword((lexer.next() as KeywordToken).contents)
+          is OpeningBracket -> {
+            val sExpression = mutableListOf<SExpression>()
+            lexer.next()
+            while (lexer.peekIsNot { token -> token is ClosingBracket }) {
+              sExpression.add(callRecursive(Unit))
+            }
+            lexer.next()
+            SubSExpression(sExpression)
+          }
+          else ->
+              throw UnexpectedTokenException(
+                  lexer.peek(),
+                  "any of SpecConstantToken, SymbolToken, ReservedWord, KeywordToken or OpeningBracket",
+              )
         }
-        lexer.next()
-        SubSExpression(sExpression)
       }
-      else -> throw UnexpectedTokenException(lexer.peek(), "any of SpecConstantToken, SymbolToken, ReservedWord, KeywordToken or OpeningBracket",)
-    }
-  }
 
   // all these function will not discard the stop token so the user does not unexpectedly lose a
   // token

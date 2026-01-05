@@ -68,7 +68,7 @@ class SymbolTests {
   )
   fun `test that same as input returns symbols with the same quotes as the input`(symbol: String) {
     val test = symbol.toSymbolWithQuotes()
-    assertEquals(symbol, test.toSMTString(QuotingRule.SAME_AS_INPUT))
+    assertEquals(symbol, test.toSMTString(QuotingRule.SAME_AS_INPUT, false))
   }
 
   @ParameterizedTest
@@ -146,7 +146,7 @@ class SymbolTests {
   )
   fun `test that quoting mode always quotes simple symbols`(symbol: String) {
     val test = symbol.toSymbolWithQuotes()
-    assertEquals("|$symbol|", test.toSMTString(QuotingRule.ALWAYS))
+    assertEquals("|$symbol|", test.toSMTString(QuotingRule.ALWAYS, false))
   }
 
   @ParameterizedTest
@@ -164,7 +164,7 @@ class SymbolTests {
   )
   fun `test that quoting mode always does not double quote symbols`(symbol: String) {
     val test = symbol.toSymbolWithQuotes()
-    assertEquals(symbol, test.toSMTString(QuotingRule.ALWAYS))
+    assertEquals(symbol, test.toSMTString(QuotingRule.ALWAYS, false))
   }
 
   @ParameterizedTest
