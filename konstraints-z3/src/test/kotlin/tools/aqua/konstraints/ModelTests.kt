@@ -49,7 +49,7 @@ class ModelTests {
   @ParameterizedTest
   @MethodSource("provideProgramAndModel")
   fun testModel(program: String, term: Expression<*>) {
-    val prg = Parser().parse(program)
+    val prg = Parser(program)
     val solver = Z3Solver()
 
     solver.use {

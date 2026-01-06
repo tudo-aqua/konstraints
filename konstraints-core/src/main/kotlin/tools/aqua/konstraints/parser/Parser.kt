@@ -96,6 +96,7 @@ import tools.aqua.konstraints.smt.Exit
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.ForallExpression
 import tools.aqua.konstraints.smt.FunctionDef
+import tools.aqua.konstraints.smt.GetModel
 import tools.aqua.konstraints.smt.GetValue
 import tools.aqua.konstraints.smt.HexConstant
 import tools.aqua.konstraints.smt.Identifier
@@ -181,7 +182,7 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
       is GetAssertionsWord -> TODO("GetAssertionsWord")
       is GetAssignmentWord -> TODO("GetAssignmentWord")
       is GetInfoWord -> TODO("GetInfoWord")
-      is GetModelWord -> TODO("GetModelWord")
+      is GetModelWord -> program.add(GetModel)
       is GetOptionWord -> TODO("GetOptionWord")
       is GetProofWord -> TODO("GetProofWord")
       is GetUnsatAssumptionsWord -> TODO("GetUnsatAssumptionsWord")

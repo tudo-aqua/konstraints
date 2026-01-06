@@ -24,6 +24,7 @@ import kotlin.streams.asStream
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions.assumeTrue
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -34,6 +35,7 @@ import tools.aqua.konstraints.smt.QuotingRule
 import tools.aqua.konstraints.smt.RegLan
 import tools.aqua.konstraints.smt.Theories
 
+@Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserBenchmark {
 

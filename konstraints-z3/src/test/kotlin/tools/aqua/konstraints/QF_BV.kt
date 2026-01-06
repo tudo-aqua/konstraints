@@ -52,8 +52,7 @@ class QF_BV {
     )
 
     val solver = Z3Solver()
-    val result =
-        Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString(""))
+    val result = Parser(file.bufferedReader().use(BufferedReader::readLines).joinToString(""))
 
     Assumptions.assumeTrue(
         (result.info("status") as SymbolAttributeValue).symbol.toString() != "unknown",
