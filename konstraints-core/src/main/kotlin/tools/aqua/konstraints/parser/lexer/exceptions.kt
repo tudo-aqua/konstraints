@@ -16,12 +16,14 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.parser
+package tools.aqua.konstraints.parser.lexer
 
-import tools.aqua.konstraints.smt.*
+import tools.aqua.konstraints.parser.location.SourceLocation
 
-// Terms
+open class LexerException(s: String) : IllegalStateException(s)
 
-data class Pattern(val symbols: List<Symbol>)
+class UnexpectedEOFException(val location: SourceLocation, hint: String) :
+    LexerException("unexpected EOF after $location, expected $hint")
 
-data class MatchCase(val pattern: Pattern, val term: Expression<*>)
+class UnexpectedCharacterException(val location: SourceLocation, val found: Char, hint: String) :
+    LexerException("unexpected '$found' at $location, expected $hint")

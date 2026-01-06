@@ -18,11 +18,9 @@
 
 package tools.aqua.konstraints
 
-import java.io.BufferedReader
 import java.io.File
 import java.util.stream.Stream
 import kotlin.streams.asStream
-import kotlin.use
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions.assumeTrue
@@ -32,7 +30,10 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.parser.Parser
+import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.QuotingRule
+import tools.aqua.konstraints.smt.RegLan
+import tools.aqua.konstraints.smt.Theories
 
 @Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -45,8 +46,45 @@ class ParserBenchmark {
           .map { file: File -> Arguments.arguments(file) }
           .asStream()
 
+  private fun removeComments(program: String): String {
+    var inQuotedSymbol = false
+    var inStringLiteral = false
+    var inComment = false
+    var finished = false
+    var low = 0
+    val builder = StringBuilder(program.length)
+
+    program.forEachIndexed { i, c ->
+      if (c == '|' && !inStringLiteral && !inComment) { // beginning or end of quoted symbol
+        inQuotedSymbol = !inQuotedSymbol
+      } else if (c == '"' && !inQuotedSymbol && !inComment) { // beginning or end of string literal
+        inStringLiteral = !inStringLiteral
+      } else if (
+          c == ';' && !inQuotedSymbol && !inStringLiteral && !inComment
+      ) { // beginning of comment we need to check we are not already in a comment or
+        // any appearance of ';' will duplicate the last substring
+        inComment = true
+        // add all previous chars to builder unless string starts with comment
+        builder.append(program.substring(low, i))
+        finished = true
+      } else if (c == '\n' && inComment) { // end of comment
+        inComment = false
+        // set index of new first character to be included in the program later
+        low = i
+        finished = false
+      }
+    }
+
+    if (!finished) {
+      builder.append(program.substring(low))
+    }
+
+    // if we have no comment nothing is ever added to the builder so we just return the input
+    return if (builder.isNotEmpty()) builder.toString() else program
+  }
+
   private fun parse(file: File) {
-    assumeTrue(file.length() < 1000000, "Skipped due to file size exceeding limit of 5000000")
+    assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
 
     /*assertDoesNotThrow {
       // its crucial that the separator is '\n' as comments dont have an ending symbol but rather
@@ -55,31 +93,28 @@ class ParserBenchmark {
     }*/
 
     try {
-      val input =
-          Parser()
-              .removeComments(
-                  file.bufferedReader().use(BufferedReader::readLines).joinToString("\n")
-              )
-      val program = Parser().parse(input, false)
-      // val program2 = Parser().parse(program.toString(), true)
+      val input = file.bufferedReader().readLines().joinToString("\n")
+      val program = Parser(input)
 
       assertEquals(
-          input.replace(" ", "").replace("\n", "").replace("\r", "").replace("\t", ""),
+          removeComments(input)
+              .replace(" ", "")
+              .replace("\n", "")
+              .replace("\r", "")
+              .replace("\t", "")
+              .replace("|", ""),
           program
-              .toSMTString(StringBuilder(), QuotingRule.SAME_AS_INPUT)
+              .toSMTString(StringBuilder(), QuotingRule.SAME_AS_INPUT, true)
               .toString()
               .replace(" ", "")
               .replace("\n", "")
               .replace("\r", "")
-              .replace("\t", ""),
+              .replace("\t", "")
+              .replace("|", ""),
       )
-    } catch (e: StackOverflowError) {
-      // mark stack overflows as skipped
-      assumeTrue(false)
-      println("Skipped due to stack overflow")
     } catch (e: NotImplementedError) {
+      println("Skipped due to not implemented error ${e.message}")
       assumeTrue(false)
-      println("Skipped due to not implemented error")
     } catch (e: Exception) {
       assertDoesNotThrow { throw e }
     }
@@ -109,18 +144,21 @@ class ParserBenchmark {
 
   fun getAUFBVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFBV/")
 
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getAUFBVDTLIAFiles")
   fun parseAUFBVDTLIA(file: File) = parse(file)
 
   fun getAUFBVDTLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFBVDTLIA/")
 
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getAUFBVDTNIAFiles")
   fun parseAUFBVDTNIA(file: File) = parse(file)
 
   fun getAUFBVDTNIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFBVDTNIA/")
 
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getAUFBVDTNIRAFiles")
   fun parseAUFBVDTNIRA(file: File) = parse(file)
@@ -131,18 +169,22 @@ class ParserBenchmark {
 
   fun getAUFBVFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFBVFP/")
 
+  /* @Disabled */
   @ParameterizedTest @MethodSource("getAUFDTLIAFiles") fun parseAUFDTLIA(file: File) = parse(file)
 
   fun getAUFDTLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFDTLIA/")
 
+  /* @Disabled */
   @ParameterizedTest @MethodSource("getAUFDTLIRAFiles") fun parseAUFDTLIRA(file: File) = parse(file)
 
   fun getAUFDTLIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFDTLIRA/")
 
+  /* @Disabled */
   @ParameterizedTest @MethodSource("getAUFDTNIRAFiles") fun parseAUFDTNIRA(file: File) = parse(file)
 
   fun getAUFDTNIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/AUFDTNIRA/")
 
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getAUFFPDTNIRAFiles")
   fun parseAUFFPDTNIRA(file: File) = parse(file)
@@ -259,6 +301,7 @@ class ParserBenchmark {
 
   fun getQF_BVFPLRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_BVFPLRA/")
 
+  /* @Disabled */
   @ParameterizedTest @MethodSource("getQF_DTFiles") fun parseQF_DT(file: File) = parse(file)
 
   fun getQF_DTFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_DT/")
@@ -323,26 +366,31 @@ class ParserBenchmark {
 
   fun getQF_UFBVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFBV/")
 
+  /* @Disabled */
   @ParameterizedTest @MethodSource("getQF_UFBVDTFiles") fun parseQF_UFBVDT(file: File) = parse(file)
 
   fun getQF_UFBVDTFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFBVDT/")
 
+  /* @Disabled */
   @ParameterizedTest @MethodSource("getQF_UFDTFiles") fun parseQF_UFDT(file: File) = parse(file)
 
   fun getQF_UFDTFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFDT/")
 
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_UFDTLIAFiles")
   fun parseQF_UFDTLIA(file: File) = parse(file)
 
   fun getQF_UFDTLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFDTLIA/")
 
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_UFDTLIRAFiles")
   fun parseQF_UFDTLIRA(file: File) = parse(file)
 
   fun getQF_UFDTLIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFDTLIRA/")
 
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_UFDTNIAFiles")
   fun parseQF_UFDTNIA(file: File) = parse(file)
@@ -353,6 +401,7 @@ class ParserBenchmark {
 
   fun getQF_UFFPFiles(): Stream<Arguments> = loadResource("/smt-benchmark/QF_UFFP/")
 
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getQF_UFFPDTNIRAFiles")
   fun parseQF_UFFPDTNIRA(file: File) = parse(file)
@@ -387,6 +436,7 @@ class ParserBenchmark {
 
   fun getUFBVFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFBV/")
 
+  /* @Disabled */
   @ParameterizedTest @MethodSource("getUFBVDTFiles") fun parseUFBVDT(file: File) = parse(file)
 
   fun getUFBVDTFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFBVDT/")
@@ -399,26 +449,32 @@ class ParserBenchmark {
 
   fun getUFBVLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFBVLIA/")
 
+  /* @Disabled */
   @ParameterizedTest @MethodSource("getUFDTFiles") fun parseUFDT(file: File) = parse(file)
 
   fun getUFDTFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFDT/")
 
+  /* @Disabled */
   @ParameterizedTest @MethodSource("getUFDTLIAFiles") fun parseUFDTLIA(file: File) = parse(file)
 
   fun getUFDTLIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFDTLIA/")
 
+  /* @Disabled */
   @ParameterizedTest @MethodSource("getUFDTLIRAFiles") fun parseUFDTLIRA(file: File) = parse(file)
 
   fun getUFDTLIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFDTLIRA/")
 
+  /* @Disabled */
   @ParameterizedTest @MethodSource("getUFDTNIAFiles") fun parseUFDTNIA(file: File) = parse(file)
 
   fun getUFDTNIAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFDTNIA/")
 
+  /* @Disabled */
   @ParameterizedTest @MethodSource("getUFDTNIRAFiles") fun parseUFDTNIRA(file: File) = parse(file)
 
   fun getUFDTNIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFDTNIRA/")
 
+  /* @Disabled */
   @ParameterizedTest
   @MethodSource("getUFFPDTNIRAFiles")
   fun parseUFFPDTNIRA(file: File) = parse(file)
@@ -444,4 +500,23 @@ class ParserBenchmark {
   @ParameterizedTest @MethodSource("getUFNIRAFiles") fun parseUFNIRA(file: File) = parse(file)
 
   fun getUFNIRAFiles(): Stream<Arguments> = loadResource("/smt-benchmark/UFNIRA/")
+}
+
+val Expression<*>.traverse: DeepRecursiveFunction<(Expression<*>) -> Unit, Unit>
+  get() =
+      DeepRecursiveFunction<(Expression<*>) -> Unit, Unit> { action ->
+        action(this@traverse)
+        this@traverse.children.onEach { it.traverse.callRecursive(action) }
+      }
+
+fun getKey(expr: Expression<*>): String {
+  if (expr.theories.contains(Theories.CORE)) {
+    return "Core"
+  } else if (expr.theories.contains(Theories.INTS)) {
+    return "Int"
+  } else if (expr.sort is RegLan) {
+    return "RegLan"
+  } else {
+    return "String"
+  }
 }

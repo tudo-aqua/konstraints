@@ -50,8 +50,7 @@ class Z3Tests {
   private fun solve(file: File) {
     assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
 
-    val result =
-        Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
+    val result = Parser(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
 
     assumeTrue(
         (result.info("status") as SymbolAttributeValue).symbol.toString() != "unknown",
@@ -129,11 +128,10 @@ class Z3Tests {
 
     val solver = Z3Solver()
     val result =
-        Parser()
-            .parse(
-                file.bufferedReader().use(BufferedReader::readLines).joinToString("\n") +
-                    "\n(get-model)"
-            )
+        Parser(
+            file.bufferedReader().use(BufferedReader::readLines).joinToString("\n") +
+                "\n(get-model)"
+        )
 
     assumeTrue(
         (result.info("status") as SymbolAttributeValue).symbol.toString() == "sat",
@@ -208,7 +206,7 @@ class Z3Tests {
   fun testExtract(program: String) {
     val solver = Z3Solver()
 
-    val smtProgram = Parser().parse(program)
+    val smtProgram = Parser(program)
 
     solver.use {
       smtProgram.commands.map { solver.visit(it) }
@@ -241,7 +239,7 @@ class Z3Tests {
   fun testEquals(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser().parse(program)
+    val result = Parser(program)
     solver.use {
       result.commands.map { solver.visit(it) }
 
@@ -260,7 +258,7 @@ class Z3Tests {
   fun testLet(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser().parse(program)
+    val result = Parser(program)
     solver.use {
       result.commands.map { solver.visit(it) }
 
@@ -279,7 +277,7 @@ class Z3Tests {
   fun testFreeFunctions(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser().parse(program)
+    val result = Parser(program)
     solver.use {
       result.commands.map { solver.visit(it) }
 
@@ -300,7 +298,7 @@ class Z3Tests {
   fun testQuantifier(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser().parse(program)
+    val result = Parser(program)
 
     solver.use {
       result.commands.map { solver.visit(it) }
@@ -323,7 +321,7 @@ class Z3Tests {
   fun testPushPop(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser().parse(program)
+    val result = Parser(program)
 
     solver.use {
       result.commands.map { solver.visit(it) }
@@ -347,7 +345,7 @@ class Z3Tests {
   fun testDefineFun(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser().parse(program)
+    val result = Parser(program)
 
     solver.use {
       result.commands.map { solver.visit(it) }

@@ -44,8 +44,7 @@ class SMTProgramTests {
   @MethodSource("getQFBVModelFiles")
   @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun testModelGeneration(file: File) {
-    val program =
-        Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
+    val program = Parser(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
 
     assumeTrue((program.info(":status") as SymbolAttributeValue).symbol.toString() == "sat")
 

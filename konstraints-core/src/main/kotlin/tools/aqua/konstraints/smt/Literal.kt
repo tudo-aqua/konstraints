@@ -221,15 +221,16 @@ class Char(val value: String) : Literal<StringSort>(LiteralString("char"), SMTSt
       if (this === other) true else if (other !is Char) false else character == other.character
 }
 
-class StringLiteral(val value: String) : Literal<StringSort>(LiteralString(value), SMTString) {
+class StringLiteral(val value: String) :
+    Literal<StringSort>(LiteralString("\"$value\""), SMTString) {
   override val theories = STRINGS_MARKER_SET
 
   // use symbol.toString here to get the unquoted string literal
   override fun toString(): String = "\"$value\""
 
-  override fun toSMTString(quotingRule: QuotingRule) = toString()
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = toString()
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
       builder.append(toString())
 
   override fun copy(children: List<Expression<*>>): Expression<StringSort> = this
