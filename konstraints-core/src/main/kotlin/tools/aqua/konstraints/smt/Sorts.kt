@@ -721,7 +721,7 @@ class UserDefinedArraySort<X : Sort, Y : Sort>(override val definedSymbol: Symbo
 }
 
 /** Default implementation of Array sort. */
-sealed class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) :
+sealed class ArraySort<out X : Sort, out Y : Sort>(val x: X, val y: Y) :
     Sort("Array".toSymbolWithQuotes()) {
   override val parameters = listOf(x, y)
 
