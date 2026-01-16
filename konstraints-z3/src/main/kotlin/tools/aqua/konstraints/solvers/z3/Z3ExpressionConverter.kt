@@ -341,7 +341,8 @@ fun FPExpr.aquaify(): Expression<FPSort> {
           FPLiteral(
               fpNum.signBV.aquaify().cast(),
               fpNum.getExponentBV(false).aquaify().cast(),
-              fpNum.significandBV.aquaify().cast())
+              fpNum.significandBV.aquaify().cast(),
+          )
         }
 
     Z3_decl_kind.Z3_OP_FPA_FP ->
@@ -371,7 +372,8 @@ fun FPExpr.aquaify(): Expression<FPSort> {
             args[0].aquaify().cast(),
             args[1].aquaify().cast(),
             args[2].aquaify().cast(),
-            args[3].aquaify().cast())
+            args[3].aquaify().cast(),
+        )
 
     Z3_decl_kind.Z3_OP_FPA_SQRT -> FPSqrt(args[0].aquaify().cast(), args[1].aquaify().cast())
     Z3_decl_kind.Z3_OP_FPA_REM -> FPRem(args[0].aquaify().cast(), args[1].aquaify().cast())
@@ -401,7 +403,8 @@ fun FPExpr.aquaify(): Expression<FPSort> {
 
     else ->
         throw RuntimeException(
-            "Unknown or unsupported floating point expression $this (decl kind ${this.funcDecl.declKind})")
+            "Unknown or unsupported floating point expression $this (decl kind ${this.funcDecl.declKind})"
+        )
   }
 }
 
@@ -482,16 +485,23 @@ fun SeqExpr<SeqSort<CharSort>>.aquaify(): Expression<StringSort> {
 
     Z3_decl_kind.Z3_OP_SEQ_REPLACE_RE ->
         StrReplaceRegex(
-            args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+            args[0].aquaify().cast(),
+            args[1].aquaify().cast(),
+            args[2].aquaify().cast(),
+        )
 
     Z3_decl_kind.Z3_OP_SEQ_REPLACE_RE_ALL ->
         StrReplaceAllRegex(
-            args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+            args[0].aquaify().cast(),
+            args[1].aquaify().cast(),
+            args[2].aquaify().cast(),
+        )
 
     Z3_decl_kind.Z3_OP_STR_TO_CODE -> StrFromCode(args[0].aquaify().cast())
     Z3_decl_kind.Z3_OP_STR_FROM_CODE -> StrFromInt(args[0].aquaify().cast())
     else ->
         throw IllegalStateException(
-            "Unknown or unsupported string expression $this! (decl kind ${this.funcDecl.declKind})")
+            "Unknown or unsupported string expression $this! (decl kind ${this.funcDecl.declKind})"
+        )
   }
 }

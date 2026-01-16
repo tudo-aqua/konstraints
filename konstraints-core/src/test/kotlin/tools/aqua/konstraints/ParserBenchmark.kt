@@ -58,7 +58,8 @@ class ParserBenchmark {
       val input =
           Parser()
               .removeComments(
-                  file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
+                  file.bufferedReader().use(BufferedReader::readLines).joinToString("\n")
+              )
       val program = Parser().parse(input, false)
       // val program2 = Parser().parse(program.toString(), true)
 
@@ -70,7 +71,8 @@ class ParserBenchmark {
               .replace(" ", "")
               .replace("\n", "")
               .replace("\r", "")
-              .replace("\t", ""))
+              .replace("\t", ""),
+      )
     } catch (e: StackOverflowError) {
       // mark stack overflows as skipped
       assumeTrue(false)

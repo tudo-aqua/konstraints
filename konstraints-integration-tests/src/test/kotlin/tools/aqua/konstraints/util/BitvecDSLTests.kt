@@ -16,26 +16,11 @@
  * limitations under the License.
  */
 
-plugins {
-  id("com.gradle.develocity") version "4.2.2"
-  id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
-}
+package tools.aqua.konstraints.util
 
-rootProject.name = "konstraints"
+import tools.aqua.konstraints.dsl.*
+import tools.aqua.konstraints.smt.QF_BV
 
-include("konstraints-all", "konstraints-core", "konstraints-integration-tests")
-
-include(/*"konstraints-cvc5",*/ "konstraints-z3")
-
-develocity {
-  buildScan {
-    val isCI = System.getenv("CI").isNullOrEmpty().not()
-    publishing.onlyIf { isCI }
-    if (isCI) {
-      tag("CI")
-      uploadInBackground = false
-      termsOfUseUrl = "https://gradle.com/help/legal-terms-of-use"
-      termsOfUseAgree = "yes"
-    }
-  }
+class BitvecDSLTests {
+  val bv_term_small_rw_1 = smt(QF_BV) {}
 }

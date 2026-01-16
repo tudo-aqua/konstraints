@@ -38,7 +38,7 @@ class UtilsTest {
   @MethodSource("getUnequalLengthLists")
   fun `test that zipWithSameLength throws for list with different size`(
       lhs: List<*>,
-      rhs: List<*>
+      rhs: List<*>,
   ) {
     assertThrows<IllegalArgumentException> { lhs zipWithSameLength rhs }
   }

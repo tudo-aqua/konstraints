@@ -27,7 +27,7 @@ enum class Theories {
   INTS,
   REALS,
   REALS_INTS,
-  STRINGS
+  STRINGS,
 }
 
 /** Marks all [SMTFunction]s that are part of ArraysEx theory. */

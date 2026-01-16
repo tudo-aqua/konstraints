@@ -84,11 +84,12 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
 data class FPLiteral(
     val sign: Expression<BVSort>,
     val exponent: Expression<BVSort>,
-    val significand: Expression<BVSort>
+    val significand: Expression<BVSort>,
 ) :
     Literal<FPSort>(
         LiteralString("(fp $sign $exponent $significand)"),
-        FPSort(exponent.sort.bits, significand.sort.bits + 1)) {
+        FPSort(exponent.sort.bits, significand.sort.bits + 1),
+    ) {
 
   init {
     require(sign.sort.bits == 1)
@@ -102,7 +103,8 @@ data class FPLiteral(
       return FPLiteral(
           bitvec.substring(0..0).bitvec(),
           bitvec.substring(1..11).bitvec(),
-          bitvec.substring(12).bitvec())
+          bitvec.substring(12).bitvec(),
+      )
     }
 
     operator fun invoke(value: Float): FPLiteral {
@@ -112,7 +114,8 @@ data class FPLiteral(
       return FPLiteral(
           bitvec.substring(0..0).bitvec(),
           bitvec.substring(1..8).bitvec(),
-          bitvec.substring(9).bitvec())
+          bitvec.substring(9).bitvec(),
+      )
     }
 
     private val theoriesSet = setOf(Theories.FLOATING_POINT)

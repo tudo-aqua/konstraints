@@ -47,10 +47,7 @@ class SMTProgramTests {
     val program =
         Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
 
-    assumeTrue(
-        (program.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-            .symbol
-            .toString() == "sat")
+    assumeTrue((program.info(":status") as SymbolAttributeValue).symbol.toString() == "sat")
 
     program.solve()
 

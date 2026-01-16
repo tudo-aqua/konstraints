@@ -47,27 +47,27 @@ class QF_BV {
 
   private fun solve(file: File) {
     Assumptions.assumeTrue(
-        file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
+        file.length() < 5000000,
+        "Skipped due to file size exceeding limit of 5000000",
+    )
 
     val solver = Z3Solver()
     val result =
         Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString(""))
 
     Assumptions.assumeTrue(
-        (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-            .symbol
-            .toString() != "unknown",
-        "Skipped due to unknown sat status.")
+        (result.info("status") as SymbolAttributeValue).symbol.toString() != "unknown",
+        "Skipped due to unknown sat status.",
+    )
 
     solver.use {
       result.commands.map { solver.visit(it) }
 
       // verify we get the correct status for the test
       Assertions.assertEquals(
-          (result.info.find { it.keyword == ":status" }?.value as SymbolAttributeValue)
-              .symbol
-              .toString(),
-          solver.status.toString())
+          (result.info("status") as SymbolAttributeValue).symbol.toString(),
+          solver.status.toString(),
+      )
     }
   }
 

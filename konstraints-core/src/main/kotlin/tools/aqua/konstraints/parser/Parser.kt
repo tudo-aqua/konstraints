@@ -404,7 +404,8 @@ class Parser {
                 SubSExpression(results[1] as List<SExpression>)
                 // results is guaranteed to be 3 elements where the middle one is a list of
                 // SExpression
-              } trim whitespaceCat))
+              } trim whitespaceCat)
+      )
     }
 
     // Identifiers
@@ -547,7 +548,8 @@ class Parser {
                 is SymbolIdentifier ->
                     program.context.getSort(identifier.symbol).build(sorts, emptyList())
               }
-            })
+            }
+    )
   }
 
   // Terms
@@ -557,13 +559,16 @@ class Parser {
   /* maps to an instance of SMTFunction and a list of indices */
   private val qualIdentifier =
       identifier.map { identifier: Identifier ->
-        if (identifier is
-            IndexedIdentifier && // prevents case where functions named bv register as literal
-            identifier.symbol.value.startsWith("bv") &&
-            // this prevents us from creating bitvectors when normal smt functions are named bv in
-            // logics without bitvectors
-            program.context.containsSort("BitVec".toSymbolAsIs()) &&
-            identifier.symbol.value.substring(2).all { ch -> ch.isDigit() }) {
+        if (
+            identifier is
+                IndexedIdentifier && // prevents case where functions named bv register as literal
+                identifier.symbol.value.startsWith("bv") &&
+                // this prevents us from creating bitvectors when normal smt functions are named bv
+                // in
+                // logics without bitvectors
+                program.context.containsSort("BitVec".toSymbolAsIs()) &&
+                identifier.symbol.value.substring(2).all { ch -> ch.isDigit() }
+        ) {
           listOf(
               /*
                * On the fly construction of BVLiteral factory as such an object does not exist since literals are no
@@ -577,7 +582,7 @@ class Parser {
 
                 override fun constructDynamic(
                     args: List<Expression<*>>,
-                    indices: List<Index>
+                    indices: List<Index>,
                 ): Expression<BVSort> {
                   require(args.isEmpty())
                   require(indices.size == 1)
@@ -585,7 +590,8 @@ class Parser {
                   return BVLiteral(identifier.symbol.value, sort.bits)
                 }
               },
-              identifier.indices)
+              identifier.indices,
+          )
         } else {
           when (identifier) {
             is SymbolIdentifier ->
@@ -653,7 +659,9 @@ class Parser {
                 .map { results: List<Any> ->
                   program.context.unbindVariables()
                   ForallExpression(
-                      results[3] as List<SortedVar<*>>, (results[5] as Expression<*>).cast())
+                      results[3] as List<SortedVar<*>>,
+                      (results[5] as Expression<*>).cast(),
+                  )
                   // results[3] is guaranteed to be a list of SortedVar
                 } + /* maps to ForallExpression */
             (lparen *
@@ -671,7 +679,9 @@ class Parser {
                 .map { results: List<Any> ->
                   program.context.unbindVariables()
                   ExistsExpression(
-                      results[3] as List<SortedVar<*>>, (results[5] as Expression<*>).cast())
+                      results[3] as List<SortedVar<*>>,
+                      (results[5] as Expression<*>).cast(),
+                  )
                   // results[3] is guaranteed to be a list of SortedVar
                 } + /* maps to ExistsExpression */
             (lparen * matchKW * term * lparen * matchCase.plus() * rparen * rparen).map {
@@ -689,8 +699,10 @@ class Parser {
                 is DecimalConstant -> RealLiteral(constant.decimal)
                 is HexConstant -> BVLiteral(constant.hexadecimal)
                 is NumeralConstant ->
-                    if (Theories.INTS in program.logic!!.theories ||
-                        Theories.REALS_INTS in program.logic!!.theories)
+                    if (
+                        Theories.INTS in program.logic!!.theories ||
+                            Theories.REALS_INTS in program.logic!!.theories
+                    )
                         IntLiteral(constant.numeral)
                     else if (Theories.REALS in program.logic!!.theories)
                         RealLiteral(BigDecimal(constant.numeral))
@@ -704,7 +716,9 @@ class Parser {
             qualIdentifier.map { results: List<Any> ->
               /* Results is an SMTFunction without any parameters */
               (results[0] as SMTFunction<*>).constructDynamic(
-                  emptyList(), results[1] as List<Index>)
+                  emptyList(),
+                  results[1] as List<Index>,
+              )
             } /* maps to Expression */ +
             (lparen * qualIdentifier * term.plus() * rparen).map { results: List<Any> ->
               /* Results contains list of SMTFunction and indices follow by list of its arguments as Expressions */
@@ -712,7 +726,8 @@ class Parser {
               val indices = (results[1] as List<Any>)[1] as List<Index>
 
               function.constructDynamic(results[2] as List<Expression<*>>, indices)
-            } /* maps to Expression */)
+            } /* maps to Expression */
+    )
   }
 
   private val selectorDec = lparen * symbol * sort * rparen
@@ -748,7 +763,8 @@ class Parser {
                 result[0] as Symbol,
                 result[2] as List<SortedVar<*>>,
                 result[4] as Sort,
-                result[5] as Expression<*>)
+                result[5] as Expression<*>,
+            )
           }
 
   private val assertCMD =
@@ -788,7 +804,9 @@ class Parser {
         program.setOption(
             SetOption(
                 (results[2] as List<Any>)[0] as String,
-                (results[2] as List<Any>)[1] as OptionValue))
+                (results[2] as List<Any>)[1] as OptionValue,
+            )
+        )
       }
 
   private val declareSortCMD =
@@ -875,7 +893,8 @@ class Parser {
               popCMD,
               declareDatatypeCMD,
               declareDatatypesCMD,
-              getValueCMD)
+              getValueCMD,
+          )
           .trim(whitespaceCat)
 
   internal val script = command.star().end()
@@ -967,10 +986,9 @@ class Parser {
         inQuotedSymbol = !inQuotedSymbol
       } else if (c == '"' && !inQuotedSymbol && !inComment) { // beginning or end of string literal
         inStringLiteral = !inStringLiteral
-      } else if (c == ';' &&
-          !inQuotedSymbol &&
-          !inStringLiteral &&
-          !inComment) { // beginning of comment we need to check we are not already in a comment or
+      } else if (
+          c == ';' && !inQuotedSymbol && !inStringLiteral && !inComment
+      ) { // beginning of comment we need to check we are not already in a comment or
         // any appearance of ';' will duplicate the last substring
         inComment = true
         // add all previous chars to builder unless string starts with comment
@@ -999,4 +1017,5 @@ class Parser {
  */
 class ParseException(message: String, position: Int, buffer: String) :
     RuntimeException(
-        "Parser failed with message $message at position $position: ${buffer.substring(0,position)}")
+        "Parser failed with message $message at position $position: ${buffer.substring(0,position)}"
+    )

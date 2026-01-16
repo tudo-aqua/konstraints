@@ -30,6 +30,8 @@ object True : ConstantExpression<BoolSort>("true".toSymbolWithQuotes(), Bool) {
   override val theories = CORE_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
+
+    fun toBoolean() = true
 }
 
 /** Object for SMT false. */
@@ -37,7 +39,11 @@ object False : ConstantExpression<BoolSort>("false".toSymbolWithQuotes(), Bool) 
   override val theories = CORE_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
+
+    fun toBoolean() = false
 }
+
+fun Boolean.toSMTBool() = if (this) True else False
 
 /**
  * Boolean negation.
@@ -164,7 +170,7 @@ class Distinct<T : Sort>(val statements: List<Expression<T>>) :
 class Ite<out T : Sort>(
     val condition: Expression<BoolSort>,
     val then: Expression<T>,
-    val otherwise: Expression<T>
+    val otherwise: Expression<T>,
 ) : Expression<T>() {
   init {
     require(then.sort == otherwise.sort)

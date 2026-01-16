@@ -34,7 +34,9 @@ import tools.aqua.konstraints.parser.*
  */
 class BVConcat(override val lhs: Expression<BVSort>, override val rhs: Expression<BVSort>) :
     BinaryExpression<BVSort, BVSort, BVSort>(
-        "concat".toSymbolWithQuotes(), BVSort(lhs.sort.bits + rhs.sort.bits)) {
+        "concat".toSymbolWithQuotes(),
+        BVSort(lhs.sort.bits + rhs.sort.bits),
+    ) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
   override val name: Symbol = "concat".toSymbolWithQuotes()
@@ -465,11 +467,10 @@ class BVXOr(val disjuncts: List<Expression<BVSort>>) :
   /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() =
       disjuncts.slice(2..<disjuncts.size).fold(
-          BVOr(
-              BVAnd(disjuncts[0], BVNot(disjuncts[1])),
-              BVAnd(BVNot(disjuncts[0]), disjuncts[1]))) { xnor, expr ->
-            BVOr(BVAnd(xnor, BVNot(expr)), BVAnd(BVNot(xnor), expr))
-          }
+          BVOr(BVAnd(disjuncts[0], BVNot(disjuncts[1])), BVAnd(BVNot(disjuncts[0]), disjuncts[1]))
+      ) { xnor, expr ->
+        BVOr(BVAnd(xnor, BVNot(expr)), BVAnd(BVNot(xnor), expr))
+      }
 }
 
 /**
@@ -520,9 +521,11 @@ class BVComp(override val lhs: Expression<BVSort>, override val rhs: Expression<
         BVAnd(
             BVXNOr(
                 BVExtract(this.sort.bits - 1, this.sort.bits - 1, lhs),
-                BVExtract(this.sort.bits - 1, this.sort.bits - 1, rhs)),
+                BVExtract(this.sort.bits - 1, this.sort.bits - 1, rhs),
+            ),
             BVComp(BVExtract(this.sort.bits - 2, 0, lhs), BVExtract(this.sort.bits - 2, 0, rhs))
-                .expand())
+                .expand(),
+        )
       }
 }
 
@@ -574,10 +577,14 @@ class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
   fun expand(): Expression<BVSort> {
     val msb_s =
         VarBinding(
-            "?msb_s".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, numerator))
+            "?msb_s".toSymbolWithQuotes(),
+            BVExtract(sort.bits - 1, sort.bits - 1, numerator),
+        )
     val msb_t =
         VarBinding(
-            "?msb_t".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, denominator))
+            "?msb_t".toSymbolWithQuotes(),
+            BVExtract(sort.bits - 1, sort.bits - 1, denominator),
+        )
     return LetExpression(
         listOf(msb_s, msb_t),
         Ite(
@@ -586,15 +593,20 @@ class BVSDiv(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
             Ite(
                 And(
                     Equals(msb_s.instance, BVLiteral("#b1")),
-                    Equals(msb_t.instance, BVLiteral("#b0"))),
+                    Equals(msb_t.instance, BVLiteral("#b0")),
+                ),
                 BVNeg(BVUDiv(BVNeg(numerator), denominator)),
                 Ite(
                     And(
                         Equals(msb_s.instance, BVLiteral("#b0")),
-                        Equals(msb_t.instance, BVLiteral("#b1"))),
+                        Equals(msb_t.instance, BVLiteral("#b1")),
+                    ),
                     BVNeg(BVUDiv(numerator, BVNeg(denominator))),
                     BVUDiv(BVNeg(numerator), BVNeg(denominator)),
-                ))))
+                ),
+            ),
+        ),
+    )
   }
 }
 
@@ -625,10 +637,14 @@ class BVSRem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
   fun expand(): Expression<BVSort> {
     val msb_s =
         VarBinding(
-            "?msb_s".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, numerator))
+            "?msb_s".toSymbolWithQuotes(),
+            BVExtract(sort.bits - 1, sort.bits - 1, numerator),
+        )
     val msb_t =
         VarBinding(
-            "?msb_t".toSymbolWithQuotes(), BVExtract(sort.bits - 1, sort.bits - 1, denominator))
+            "?msb_t".toSymbolWithQuotes(),
+            BVExtract(sort.bits - 1, sort.bits - 1, denominator),
+        )
     return LetExpression(
         listOf(msb_s, msb_t),
         Ite(
@@ -637,15 +653,20 @@ class BVSRem(val numerator: Expression<BVSort>, val denominator: Expression<BVSo
             Ite(
                 And(
                     Equals(msb_s.instance, BVLiteral("#b1")),
-                    Equals(msb_t.instance, BVLiteral("#b0"))),
+                    Equals(msb_t.instance, BVLiteral("#b0")),
+                ),
                 BVNeg(BVURem(BVNeg(numerator), denominator)),
                 Ite(
                     And(
                         Equals(msb_s.instance, BVLiteral("#b0")),
-                        Equals(msb_t.instance, BVLiteral("#b1"))),
+                        Equals(msb_t.instance, BVLiteral("#b1")),
+                    ),
                     BVURem(numerator, BVNeg(denominator)),
                     BVNeg(BVURem(BVNeg(numerator), BVNeg(denominator))),
-                ))))
+                ),
+            ),
+        ),
+    )
   }
 }
 
@@ -677,11 +698,13 @@ class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<
     val abs_s =
         VarBinding(
             "?abs_s".toSymbolWithQuotes(),
-            Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)))
+            Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)),
+        )
     val abs_t =
         VarBinding(
             "?abs_t".toSymbolWithQuotes(),
-            Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)))
+            Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)),
+        )
     val u = VarBinding("u".toSymbolWithQuotes(), BVURem(abs_s.instance, abs_t.instance))
 
     return LetExpression(
@@ -696,19 +719,29 @@ class BVSMod(override val lhs: Expression<BVSort>, override val rhs: Expression<
                     Ite(
                         And(
                             Equals(msb_s.instance, BVLiteral("#b0")),
-                            Equals(msb_t.instance, BVLiteral("#b0"))),
+                            Equals(msb_t.instance, BVLiteral("#b0")),
+                        ),
                         u.instance,
                         Ite(
                             And(
                                 Equals(msb_s.instance, BVLiteral("#b1")),
-                                Equals(msb_t.instance, BVLiteral("#b0"))),
+                                Equals(msb_t.instance, BVLiteral("#b0")),
+                            ),
                             BVAdd(BVNeg(u.instance), rhs),
                             Ite(
                                 And(
                                     Equals(msb_s.instance, BVLiteral("#b0")),
-                                    Equals(msb_t.instance, BVLiteral("#b1"))),
+                                    Equals(msb_t.instance, BVLiteral("#b1")),
+                                ),
                                 BVAdd(u.instance, rhs),
-                                BVNeg(u.instance))))))))
+                                BVNeg(u.instance),
+                            ),
+                        ),
+                    ),
+                ),
+            ),
+        ),
+    )
   }
 }
 
@@ -740,7 +773,8 @@ class BVAShr(val value: Expression<BVSort>, val distance: Expression<BVSort>) :
       Ite(
           Equals(BVExtract(sort.bits - 1, sort.bits - 1, value), BVLiteral("#b0")),
           BVLShr(value, distance),
-          BVNot(BVLShr(BVNot(value), distance)))
+          BVNot(BVLShr(BVNot(value), distance)),
+      )
 }
 
 /**
@@ -785,7 +819,9 @@ class Repeat(val i: Int, override val inner: Expression<BVSort>) :
  */
 class ZeroExtend(val i: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>(
-        "zero_extend".toSymbolWithQuotes(), BVSort(inner.sort.bits + i)) {
+        "zero_extend".toSymbolWithQuotes(),
+        BVSort(inner.sort.bits + i),
+    ) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
   override val indices = listOf(i)
 
@@ -816,7 +852,9 @@ class ZeroExtend(val i: Int, override val inner: Expression<BVSort>) :
  */
 class SignExtend(val i: Int, override val inner: Expression<BVSort>) :
     UnaryExpression<BVSort, BVSort>(
-        "sign_extend".toSymbolWithQuotes(), BVSort(inner.sort.bits + i)) {
+        "sign_extend".toSymbolWithQuotes(),
+        BVSort(inner.sort.bits + i),
+    ) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
   override val indices = listOf(i)
 
@@ -866,7 +904,8 @@ class RotateLeft(val i: Int, override val inner: Expression<BVSort>) :
 
         BVConcat(
             BVExtract(sort.bits - distance - 1, 0, inner),
-            BVExtract(sort.bits - 1, sort.bits - distance, inner))
+            BVExtract(sort.bits - 1, sort.bits - distance, inner),
+        )
       }
 
   override fun toString() = "((_ rotate_left $i) $inner)"
@@ -990,12 +1029,16 @@ class BVSLt(override val lhs: Expression<BVSort>, override val rhs: Expression<B
       Or(
           And(
               Equals(BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs), BVLiteral("#b1")),
-              Equals(BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs), BVLiteral("#b0"))),
+              Equals(BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs), BVLiteral("#b0")),
+          ),
           And(
               Equals(
                   BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs),
-                  BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs)),
-              BVUlt(lhs, rhs)))
+                  BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs),
+              ),
+              BVUlt(lhs, rhs),
+          ),
+      )
 }
 
 /**
@@ -1021,12 +1064,16 @@ class BVSLe(override val lhs: Expression<BVSort>, override val rhs: Expression<B
       Or(
           And(
               Equals(BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs), BVLiteral("#b1")),
-              Equals(BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs), BVLiteral("#b0"))),
+              Equals(BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs), BVLiteral("#b0")),
+          ),
           And(
               Equals(
                   BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs),
-                  BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs)),
-              BVULe(lhs, rhs).expand()))
+                  BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs),
+              ),
+              BVULe(lhs, rhs).expand(),
+          ),
+      )
 }
 
 /**

@@ -63,7 +63,8 @@ class OptionsBuilder {
    */
   @Deprecated(
       "The old name for produce-assertions. Prefer using produce-assertions.",
-      level = DeprecationLevel.WARNING)
+      level = DeprecationLevel.WARNING,
+  )
   fun interactiveMode(value: Boolean): OptionsBuilder {
     boolOptions[":interactive-model"] = value
     return this

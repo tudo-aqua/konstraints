@@ -55,7 +55,8 @@ class LeveledMap<K, V> : MutableMap<K, V> {
 
   override fun remove(key: K): V? {
     throw UnsupportedOperationException(
-        "Remove operation is not supported by LeveledMap, use push/pop to control map contents!")
+        "Remove operation is not supported by LeveledMap, use push/pop to control map contents!"
+    )
   }
 
   override fun putAll(from: Map<out K, V>) {

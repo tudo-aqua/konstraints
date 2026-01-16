@@ -21,6 +21,7 @@ package tools.aqua.konstraints.dsl
 import java.util.UUID
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.smt.BoolSort
+import tools.aqua.konstraints.solvers.Solver
 
 @DslMarker annotation class SMTDSL
 
@@ -58,6 +59,9 @@ class SMTProgramBuilder(logic: Logic) {
     }
   }
 
+  fun setInfo(init: InfoBuilder.() -> InfoBuilder) =
+      InfoBuilder().init().infos.forEach { info -> program.setInfo(info) }
+
   internal fun <T : UserDeclaredSMTFunction<S>, S : Sort> declareFun(func: T): T {
     program.declareFun(func)
 
@@ -70,6 +74,23 @@ class SMTProgramBuilder(logic: Logic) {
     return func
   }
 
+  /** Add check sat to later solve the program using any solver */
+  fun checkSat() {
+    program.add(CheckSat)
+  }
+
+  /** Solve the program using [solver] and return its sat status */
+  fun checkSat(solver: Solver): SatStatus {
+    checkSat()
+
+    return solver.solve(program)
+  }
+
+  fun <T> getModel(block: (Model) -> T) =
+      block(program.model ?: throw IllegalStateException("Model is null"))
+
+  fun <T> getModelOrNull(block: (Model?) -> T) = block(program.model)
+
   /** Registers a new constant smt function with the given [sort] and auto generated name. */
   fun <T : Sort> const(sort: T) = const("|const!${UUID.randomUUID()}|", sort)
 
@@ -78,7 +99,7 @@ class SMTProgramBuilder(logic: Logic) {
       program.declareConst(name.toSymbolWithQuotes(), sort)()
 
   /** Converts this [SMTProgramBuilder] to a finished [DefaultSMTProgram]. */
-  fun finalize() = program.apply { add(CheckSat) }
+  fun finalize() = program.apply { add(Exit) }
 }
 
 /** Builds an [SMTProgram] based on the given [logic] */

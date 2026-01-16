@@ -2577,7 +2577,7 @@ fun fpsqrt(roundingMode: Expression<RoundingModeSort> = RNE, expr: Double) =
 /** Round to integral operator for FPSort expressions. */
 fun fproundToIntegral(
     roundingMode: Expression<RoundingModeSort> = RNE,
-    block: () -> Expression<FPSort>
+    block: () -> Expression<FPSort>,
 ) = FPRoundToIntegral(roundingMode, block())
 
 /** Round to integral operator for FPSort expressions. */
@@ -3129,7 +3129,7 @@ fun toFP(
     eb: Int,
     sb: Int,
     roundingMode: Expression<RoundingModeSort> = RNE,
-    block: () -> Expression<FPSort>
+    block: () -> Expression<FPSort>,
 ) = FPToFP(roundingMode, block(), eb, sb)
 
 /** Conversion operator from another floating point sort to floating point sort. */
@@ -3138,7 +3138,7 @@ fun toFP(
     eb: Int,
     sb: Int,
     roundingMode: Expression<RoundingModeSort> = RNE,
-    expr: Expression<FPSort>
+    expr: Expression<FPSort>,
 ) = FPToFP(roundingMode, expr, eb, sb)
 
 /** Conversion operator from another floating point sort to floating point sort. */
@@ -3155,7 +3155,7 @@ fun toFP(
     eb: Int,
     sb: Int,
     roundingMode: Expression<RoundingModeSort> = RNE,
-    block: () -> Expression<RealSort>
+    block: () -> Expression<RealSort>,
 ) = RealToFP(roundingMode, block(), eb, sb)
 
 /** Conversion operator from real sort to floating point sort. */
@@ -3164,7 +3164,7 @@ fun toFP(
     eb: Int,
     sb: Int,
     roundingMode: Expression<RoundingModeSort> = RNE,
-    expr: Expression<RealSort>
+    expr: Expression<RealSort>,
 ) = RealToFP(roundingMode, expr, eb, sb)
 
 /** Conversion operator from real sort to floating point sort. */
@@ -3184,7 +3184,7 @@ fun toFPSigned(
     eb: Int,
     sb: Int,
     roundingMode: Expression<RoundingModeSort> = RNE,
-    block: () -> Expression<BVSort>
+    block: () -> Expression<BVSort>,
 ) = SBitVecToFP(roundingMode, block(), eb, sb)
 
 /**
@@ -3196,7 +3196,7 @@ fun toFPSigned(
     eb: Int,
     sb: Int,
     roundingMode: Expression<RoundingModeSort> = RNE,
-    expr: Expression<BVSort>
+    expr: Expression<BVSort>,
 ) = SBitVecToFP(roundingMode, expr, eb, sb)
 
 /**
@@ -3222,7 +3222,7 @@ fun toFPUnsigned(
     eb: Int,
     sb: Int,
     roundingMode: Expression<RoundingModeSort> = RNE,
-    block: () -> Expression<BVSort>
+    block: () -> Expression<BVSort>,
 ) = UBitVecToFP(roundingMode, block(), eb, sb)
 
 /**
@@ -3234,7 +3234,7 @@ fun toFPUnsigned(
     eb: Int,
     sb: Int,
     roundingMode: Expression<RoundingModeSort> = RNE,
-    expr: Expression<BVSort>
+    expr: Expression<BVSort>,
 ) = UBitVecToFP(roundingMode, expr, eb, sb)
 
 /**
@@ -3257,7 +3257,7 @@ fun Expression<BVSort>.toFPUnsigned(sort: FPSort, roundingMode: Expression<Round
 fun toUBV(
     bits: Int,
     roundingMode: Expression<RoundingModeSort> = RNE,
-    block: () -> Expression<FPSort>
+    block: () -> Expression<FPSort>,
 ) = FPToUBitVec(roundingMode, block(), bits)
 
 /**
@@ -3283,7 +3283,7 @@ fun Expression<FPSort>.toUBV(sort: BVSort, roundingMode: Expression<RoundingMode
 fun toSBV(
     bits: Int,
     roundingMode: Expression<RoundingModeSort> = RNE,
-    block: () -> Expression<FPSort>
+    block: () -> Expression<FPSort>,
 ) = FPToSBitVec(roundingMode, block(), bits)
 
 /**
@@ -3367,7 +3367,7 @@ class FPFMA1(val roundingMode: Expression<RoundingModeSort>, val multiplier: Exp
 class FPFMA2(
     val roundingMode: Expression<RoundingModeSort>,
     val multiplier: Expression<FPSort>,
-    val multiplicand: Expression<FPSort>
+    val multiplicand: Expression<FPSort>,
 ) {
 
   /**
