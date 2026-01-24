@@ -497,3 +497,18 @@ class GetValue(val terms: List<Expression<*>>) : Command("get-value") {
     return builder.append("))")
   }
 }
+
+class DeclareDatatype(val datatype: Datatype) : Command("declare-datatype") {
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(declare-datatype ${datatype.name} ${datatype.constructors.joinToString(" ")})"
+
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
+    builder.append("(declare-datatype ${datatype.name}")
+    datatype.constructors.joinTo(builder, " ")
+    return builder.append(")")
+  }
+}

@@ -63,6 +63,7 @@ import tools.aqua.konstraints.parser.lexer.LetWord
 import tools.aqua.konstraints.parser.lexer.MatchWord
 import tools.aqua.konstraints.parser.lexer.Numeral
 import tools.aqua.konstraints.parser.lexer.OpeningBracket
+import tools.aqua.konstraints.parser.lexer.ParWord
 import tools.aqua.konstraints.parser.lexer.PopWord
 import tools.aqua.konstraints.parser.lexer.PushWord
 import tools.aqua.konstraints.parser.lexer.QuotedSymbolToken
@@ -90,6 +91,8 @@ import tools.aqua.konstraints.smt.BVLiteral
 import tools.aqua.konstraints.smt.BinaryConstant
 import tools.aqua.konstraints.smt.CheckSat
 import tools.aqua.konstraints.smt.ConstantAttributeValue
+import tools.aqua.konstraints.smt.ConstructorDecl
+import tools.aqua.konstraints.smt.Datatype
 import tools.aqua.konstraints.smt.DecimalConstant
 import tools.aqua.konstraints.smt.ExistsExpression
 import tools.aqua.konstraints.smt.Exit
@@ -115,6 +118,7 @@ import tools.aqua.konstraints.smt.SExpressionConstant
 import tools.aqua.konstraints.smt.SExpressionKeyword
 import tools.aqua.konstraints.smt.SExpressionReserved
 import tools.aqua.konstraints.smt.SExpressionSymbol
+import tools.aqua.konstraints.smt.SelectorDecl
 import tools.aqua.konstraints.smt.Sort
 import tools.aqua.konstraints.smt.SortedVar
 import tools.aqua.konstraints.smt.SpecConstant
@@ -168,7 +172,7 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
       is CheckSatAssumingWord -> TODO("CheckSatAssumingWord")
       is CheckSatWord -> program.add(CheckSat)
       is DeclareConstWord -> parseDeclareConst(program)
-      is DeclareDatatypeWord -> TODO("DeclareDatatypeWord")
+      is DeclareDatatypeWord -> parseDatatype(program)
       is DeclareDatatypesWord -> TODO("DeclareDatatypesWord")
       is DeclareFunWord -> parseDeclareFun(program)
       is DeclareSortParameterWord -> TODO("DeclareSortParameterWord")
@@ -198,6 +202,48 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
     }
 
     requireIsInstance<ClosingBracket>(lexer.next())
+  }
+
+  private fun parseDatatype(program: MutableSMTProgram) {
+    val symbol = parseSymbol()
+    val decl = parseDatatypeDecl(program)
+
+    program.declareDatatype(Datatype(0, symbol, decl))
+  }
+
+  @OptIn(ExperimentalContracts::class)
+  private fun parseDatatypeDecl(program: MutableSMTProgram): List<ConstructorDecl> {
+    requireIsInstance<OpeningBracket>(lexer.next())
+
+    // parametric datatypes
+    if(lexer.peek() is ParWord) {
+      TODO("Parametric datatypes are not supported yet!")
+    }
+
+    val constructorDecls = plus<ClosingBracket, ConstructorDecl> { parseConstructorDecl(program) }
+    requireIsInstance<ClosingBracket>(lexer.next())
+
+    return constructorDecls
+  }
+
+  @OptIn(ExperimentalContracts::class)
+  private fun parseConstructorDecl(program: MutableSMTProgram): ConstructorDecl {
+    requireIsInstance<OpeningBracket>(lexer.next())
+    val symbol = parseSymbol()
+    val selectorDecls = star<ClosingBracket, SelectorDecl<*>> { parseSelectorDecl(program) }
+    requireIsInstance<ClosingBracket>(lexer.next())
+
+    return ConstructorDecl(symbol, selectorDecls)
+  }
+
+  @OptIn(ExperimentalContracts::class)
+  private fun parseSelectorDecl(program: MutableSMTProgram): SelectorDecl<*> {
+    requireIsInstance<OpeningBracket>(lexer.next())
+    val symbol = parseSymbol()
+    val sort = parseSort(program)
+    requireIsInstance<ClosingBracket>(lexer.next())
+
+    return SelectorDecl(symbol, sort)
   }
 
   @OptIn(ExperimentalContracts::class)

@@ -349,6 +349,19 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
 
     _commands.add(SetLogic(logic))
   }
+
+  fun declareDatatype(datatype: Datatype) {
+    context.addSort(DatatypeFactory(datatype), datatype.symbol)
+
+    datatype.constructors.forEach {
+      context.addFun(it)
+      Testers.constructors.add(it.symbol)
+    }
+
+    datatype.selectors.forEach { context.addFun(it) }
+
+    _commands.add(DeclareDatatype(datatype))
+  }
 }
 
 class DefaultSMTProgram(commands: List<Command>) : SMTProgram(commands)

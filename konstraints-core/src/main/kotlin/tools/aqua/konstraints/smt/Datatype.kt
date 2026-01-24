@@ -27,7 +27,7 @@ class Selector<T : Sort>(override val symbol: Symbol, override val sort: T, data
   override val parameters = listOf(datatype)
 
   override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<T> {
-      assert(args.size == 1)
+    assert(args.size == 1)
     return SelectorExpression(symbol, sort, this, args)
   }
 }
@@ -36,13 +36,13 @@ class SelectorExpression<T : Sort>(
     override val name: BaseSymbol,
     override val sort: T,
     override val func: SMTFunction<T>?,
-    override val children: List<Expression<*>>
+    override val children: List<Expression<*>>,
 ) : Expression<T>() {
-    override val theories: Set<Theories> = emptySet()
+  override val theories: Set<Theories> = emptySet()
 
-    override fun copy(children: List<Expression<*>>): Expression<T> {
-        TODO("Not yet implemented")
-    }
+  override fun copy(children: List<Expression<*>>): Expression<T> {
+    TODO("Not yet implemented")
+  }
 }
 
 // constructors are functions that define how a datatype may be used or more accurately constructed
@@ -57,9 +57,9 @@ data class Constructor(
       args: List<Expression<*>>,
       indices: List<Index>,
   ): Expression<Datatype> {
-      assert(args.size == selectors.size)
-      assert((args zip selectors).all { (arg, selector) -> arg.sort == selector.sort })
-      assert(indices.isEmpty())
+    assert(args.size == selectors.size)
+    assert((args zip selectors).all { (arg, selector) -> arg.sort == selector.sort })
+    assert(indices.isEmpty())
     return ConstructorExpression(symbol, sort, this, args)
   }
 }
@@ -68,19 +68,37 @@ class ConstructorExpression(
     override val name: BaseSymbol,
     override val sort: Datatype,
     override val func: SMTFunction<Datatype>?,
-    override val children: List<Expression<*>>
+    override val children: List<Expression<*>>,
 ) : Expression<Datatype>() {
-    override val theories: Set<Theories> = emptySet()
+  override val theories: Set<Theories> = emptySet()
 
-    override fun copy(children: List<Expression<*>>): Expression<Datatype> {
-        TODO("Not yet implemented")
-    }
-
+  override fun copy(children: List<Expression<*>>): Expression<Datatype> {
+    TODO("Not yet implemented")
+  }
 }
 
 data class ConstructorDecl(val symbol: Symbol, val selectors: List<SelectorDecl<*>>)
 
-class Datatype(val arity: Int, constructorDecls: List<ConstructorDecl>, symbol: Symbol) : Sort(symbol) {
+class DatatypeFactory(val instance: Datatype) : SortFactory {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
+    assert(indices.isEmpty())
+    // TODO assert parameters match DT parameters
+
+    return instance
+  }
+
+  override fun isInstanceOf(sort: Sort): Boolean {
+    assert(sort is Datatype)
+    TODO()
+  }
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+// TODO this should maybe be the factory (constructors etc. can be shared between instances)
+class Datatype(val arity: Int, symbol: Symbol, constructorDecls: List<ConstructorDecl>) :
+    Sort(symbol) {
   override val theories = emptySet<Theories>()
   val constructors =
       constructorDecls.map { constr ->
@@ -92,9 +110,48 @@ class Datatype(val arity: Int, constructorDecls: List<ConstructorDecl>, symbol: 
             this,
         )
       }
-  val selectors = constructorDecls.flatMap { decl -> decl.selectors.map { selectorDecl ->
-      Selector(selectorDecl.symbol, selectorDecl.sort, this)
-  } }
+  val selectors =
+      constructorDecls.flatMap { decl ->
+        decl.selectors.map { selectorDecl ->
+          Selector(selectorDecl.symbol, selectorDecl.sort, this)
+        }
+      }
 
-    val testers: Nothing = TODO()
+  val testers: List<SMTFunction<BoolSort>> = TODO()
+}
+
+object Testers : SMTFunction<BoolSort>() {
+  override val symbol = "is".toSymbolAsIs()
+  override val sort = Bool
+  override val parameters: List<Sort> = emptyList()
+
+  val constructors = mutableSetOf<Symbol>()
+
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>,
+  ): Expression<BoolSort> {
+    require(indices.size == 1)
+    require(args.isEmpty())
+
+    val index = indices.single()
+
+    require(index is SymbolIndex)
+    require(constructors.contains(index.symbol))
+
+    return TesterExpression(index)
+  }
+}
+
+class TesterExpression(index: SymbolIndex) : Expression<BoolSort>() {
+  override val name = "is".toSymbolAsIs()
+  override val sort = Bool
+  override val theories = emptySet<Theories>()
+  override val func = Testers
+  override val children = emptyList<Expression<*>>()
+  override val symbolicIndices = listOf(index.symbol)
+
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> {
+    return this
+  }
 }

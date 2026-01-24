@@ -488,6 +488,13 @@ class Context {
         currentContext.sorts.putAll(it.sorts)
       }
     }
+
+    // if logic supports datatypes register overloaded testers function
+    // this function is initially empty but for each datatype declared the tester overloads get
+    // registered there
+    if (logic.datatypes) {
+      currentContext.functions.put(Testers.symbol, Testers)
+    }
   }
 }
 
