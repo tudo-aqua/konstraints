@@ -52,7 +52,7 @@ data class SymbolIndex(val symbol: Symbol) : Index {
    *
    * @throws IllegalSymbolException if the string is not a valid SMT Symbol
    */
-  constructor(symbol: String) : this(symbol.toSymbolWithQuotes())
+  constructor(symbol: String) : this(symbol.toSymbol())
 
   override fun toString() = symbol.toString()
 }

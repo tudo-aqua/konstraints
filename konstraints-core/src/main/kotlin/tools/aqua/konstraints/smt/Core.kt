@@ -26,14 +26,14 @@ import tools.aqua.konstraints.parser.*
  */
 
 /** Object for SMT true. */
-object True : ConstantExpression<BoolSort>("true".toSymbolWithQuotes(), Bool) {
+object True : ConstantExpression<BoolSort>("true".toSymbol(), SMTBool) {
   override val theories = CORE_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
 }
 
 /** Object for SMT false. */
-object False : ConstantExpression<BoolSort>("false".toSymbolWithQuotes(), Bool) {
+object False : ConstantExpression<BoolSort>("false".toSymbol(), SMTBool) {
   override val theories = CORE_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
@@ -45,7 +45,7 @@ object False : ConstantExpression<BoolSort>("false".toSymbolWithQuotes(), Bool) 
  * - `(not [inner])`.
  */
 class Not(override val inner: Expression<BoolSort>) :
-    UnaryExpression<BoolSort, BoolSort>("not".toSymbolWithQuotes(), Bool) {
+    UnaryExpression<BoolSort, BoolSort>("not".toSymbol(), SMTBool) {
   override val theories = CORE_MARKER_SET
 
   override fun toString(): String = "(not $inner)"
@@ -60,7 +60,7 @@ class Not(override val inner: Expression<BoolSort>) :
  * - `(=> [statements])`.
  */
 class Implies(val statements: List<Expression<BoolSort>>) :
-    HomogenousExpression<BoolSort, BoolSort>("=>".toSymbolWithQuotes(), Bool) {
+    HomogenousExpression<BoolSort, BoolSort>("=>".toSymbol(), SMTBool) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg statements: Expression<BoolSort>) : this(statements.toList())
@@ -77,7 +77,7 @@ class Implies(val statements: List<Expression<BoolSort>>) :
  * - `(and [conjuncts])`.
  */
 class And(val conjuncts: List<Expression<BoolSort>>) :
-    HomogenousExpression<BoolSort, BoolSort>("and".toSymbolWithQuotes(), Bool) {
+    HomogenousExpression<BoolSort, BoolSort>("and".toSymbol(), SMTBool) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg conjuncts: Expression<BoolSort>) : this(conjuncts.toList())
@@ -94,7 +94,7 @@ class And(val conjuncts: List<Expression<BoolSort>>) :
  * - `(or [disjuncts])`.
  */
 class Or(val disjuncts: List<Expression<BoolSort>>) :
-    HomogenousExpression<BoolSort, BoolSort>("or".toSymbolWithQuotes(), Bool) {
+    HomogenousExpression<BoolSort, BoolSort>("or".toSymbol(), SMTBool) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
@@ -111,7 +111,7 @@ class Or(val disjuncts: List<Expression<BoolSort>>) :
  * - `(xor [disjuncts])`.
  */
 class XOr(val disjuncts: List<Expression<BoolSort>>) :
-    HomogenousExpression<BoolSort, BoolSort>("xor".toSymbolWithQuotes(), Bool) {
+    HomogenousExpression<BoolSort, BoolSort>("xor".toSymbol(), SMTBool) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
@@ -128,7 +128,7 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) :
  * - `(= [statements])`
  */
 class Equals<T : Sort>(val statements: List<Expression<T>>) :
-    HomogenousExpression<BoolSort, Sort>("=".toSymbolWithQuotes(), Bool) {
+    HomogenousExpression<BoolSort, Sort>("=".toSymbol(), SMTBool) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg statements: Expression<T>) : this(statements.toList())
@@ -145,7 +145,7 @@ class Equals<T : Sort>(val statements: List<Expression<T>>) :
  * - `(distinct [statements])`
  */
 class Distinct<T : Sort>(val statements: List<Expression<T>>) :
-    HomogenousExpression<BoolSort, T>("distinct".toSymbolWithQuotes(), Bool) {
+    HomogenousExpression<BoolSort, T>("distinct".toSymbol(), SMTBool) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg statements: Expression<T>) : this(statements.toList())
@@ -177,7 +177,7 @@ class Ite<out T : Sort>(
   override fun copy(children: List<Expression<*>>): Expression<T> =
       IteDecl.constructDynamic(children, emptyList()) as Expression<T>
 
-  override val name: Symbol = "ite".toSymbolWithQuotes()
+  override val name: Symbol = "ite".toSymbol()
 
   override val children: List<Expression<*>> = listOf(condition, then, otherwise)
 

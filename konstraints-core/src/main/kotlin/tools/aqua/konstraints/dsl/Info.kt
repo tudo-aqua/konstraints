@@ -30,7 +30,7 @@ import tools.aqua.konstraints.smt.SetInfo
 import tools.aqua.konstraints.smt.StringConstant
 import tools.aqua.konstraints.smt.Symbol
 import tools.aqua.konstraints.smt.SymbolAttributeValue
-import tools.aqua.konstraints.smt.toSymbolWithQuotes
+import tools.aqua.konstraints.smt.toSymbol
 
 enum class BenchmarkCategory {
   /** hand-crafted benchmark */
@@ -101,7 +101,7 @@ class InfoBuilder {
         infos.add(
             SetInfo(
                 ":smt-lib-source",
-                SymbolAttributeValue("|${source.removeSurrounding("|")}|".toSymbolWithQuotes()),
+                SymbolAttributeValue("|${source.removeSurrounding("|")}|".toSymbol()),
             )
         )
       }

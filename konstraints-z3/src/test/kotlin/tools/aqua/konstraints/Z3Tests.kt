@@ -370,33 +370,33 @@ class Z3Tests {
 
   fun getTerms(): Stream<Arguments> {
     val program = MutableSMTProgram()
-    val sort = BVSort(16)
-    val lhs = program.declareConst("lhs".toSymbolWithQuotes(), sort)()
-    val rhs = program.declareConst("rhs".toSymbolWithQuotes(), sort)()
+    val sort = BitVecSort(16)
+    val lhs = program.declareConst("lhs".toSymbol(), sort)()
+    val rhs = program.declareConst("rhs".toSymbol(), sort)()
     val msb_s =
         VarBinding(
-            "?msb_s".toSymbolWithQuotes(),
+            "?msb_s".toSymbol(),
             BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs),
         )
     val msb_t =
         VarBinding(
-            "?msb_t".toSymbolWithQuotes(),
+            "?msb_t".toSymbol(),
             BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, rhs),
         )
     val abs_s =
         VarBinding(
-            "?abs_s".toSymbolWithQuotes(),
+            "?abs_s".toSymbol(),
             Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)),
         )
     val abs_t =
         VarBinding(
-            "?abs_t".toSymbolWithQuotes(),
+            "?abs_t".toSymbol(),
             Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)),
         )
-    val u = VarBinding("u".toSymbolWithQuotes(), BVURem(abs_s.instance, abs_t.instance))
+    val u = VarBinding("u".toSymbol(), BVURem(abs_s.instance, abs_t.instance))
 
-    val A = program.declareConst("A".toSymbolWithQuotes(), SMTInt)()
-    val B = program.declareConst("B".toSymbolWithQuotes(), SMTInt)()
+    val A = program.declareConst("A".toSymbol(), SMTInt)()
+    val B = program.declareConst("B".toSymbol(), SMTInt)()
 
     return Stream.of(
         Arguments.arguments(listOf(And(IntGreaterEq(A, B), IntLessEq(A, B)))),

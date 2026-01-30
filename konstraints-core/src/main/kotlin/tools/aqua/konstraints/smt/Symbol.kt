@@ -172,6 +172,18 @@ internal constructor(
 class IllegalSymbolException(val symbol: String) :
     RuntimeException("$symbol is not a legal SMT symbol")
 
-fun String.toSymbolWithQuotes() = Symbol(this, this.startsWith("|") && this.endsWith("|"))
+/**
+ * Build a smt symbol from [this]. If [this] starts and ends with the pipe character '|', the string
+ * will be interpreted as a quoted symbol.
+ *
+ * @throws [IllegalSymbolException] if [this] is not a valid smt symbol
+ */
+fun String.toSymbol() = Symbol(this, this.startsWith("|") && this.endsWith("|"))
 
-fun String.toSymbolAsIs(wasQuoted: Boolean = false) = Symbol(this, wasQuoted)
+/**
+ * Build a quoted smt symbol from [this]. Note that [this] must not start or end with the pipe
+ * character as the string will be interpreted as the quoted symbols content.
+ *
+ * @throws [IllegalSymbolException] if [this] is not a valid smt symbol
+ */
+fun String.toQuotedSymbol() = Symbol(this, true)

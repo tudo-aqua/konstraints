@@ -41,12 +41,12 @@ import tools.aqua.konstraints.smt.BVNeg
 import tools.aqua.konstraints.smt.BVNot
 import tools.aqua.konstraints.smt.BVOr
 import tools.aqua.konstraints.smt.BVShl
-import tools.aqua.konstraints.smt.BVSort
 import tools.aqua.konstraints.smt.BVUDiv
 import tools.aqua.konstraints.smt.BVURem
 import tools.aqua.konstraints.smt.BVUlt
+import tools.aqua.konstraints.smt.BitVecSort
 import tools.aqua.konstraints.smt.Expression
-import tools.aqua.konstraints.smt.toSymbolWithQuotes
+import tools.aqua.konstraints.smt.toSymbol
 
 /*
  * Lifecycle.PER_CLASS is needed for MethodSource to avoid moving sources to a companion object
@@ -54,20 +54,18 @@ import tools.aqua.konstraints.smt.toSymbolWithQuotes
  */
 @TestInstance(Lifecycle.PER_CLASS)
 class BitvectorTests {
-  private val A = UserDeclaredSMTFunction0("A".toSymbolWithQuotes(), BVSort(8))()
-  private val B = UserDeclaredSMTFunction0("B".toSymbolWithQuotes(), BVSort(8))()
-  private val C = UserDeclaredSMTFunction0("C".toSymbolWithQuotes(), BVSort(8))()
-  private val D = UserDeclaredSMTFunction0("D".toSymbolWithQuotes(), BVSort(16))()
-  private val symbolicE =
-      UserDeclaredSMTFunction0("E".toSymbolWithQuotes(), BVSort.fromSymbol("a"))()
-  private val symbolicF =
-      UserDeclaredSMTFunction0("F".toSymbolWithQuotes(), BVSort.fromSymbol("b"))()
+  private val A = UserDeclaredSMTFunction0("A".toSymbol(), BitVecSort(8))()
+  private val B = UserDeclaredSMTFunction0("B".toSymbol(), BitVecSort(8))()
+  private val C = UserDeclaredSMTFunction0("C".toSymbol(), BitVecSort(8))()
+  private val D = UserDeclaredSMTFunction0("D".toSymbol(), BitVecSort(16))()
+  private val symbolicE = UserDeclaredSMTFunction0("E".toSymbol(), BitVecSort.fromSymbol("a"))()
+  private val symbolicF = UserDeclaredSMTFunction0("F".toSymbol(), BitVecSort.fromSymbol("b"))()
 
   @ParameterizedTest
   @MethodSource("getBVExpressionsAndSerialization")
   fun `test that serialization of BV expressions is correct`(
       expected: String,
-      expression: Expression<BVSort>,
+      expression: Expression<BitVecSort>,
   ) {
     assertEquals(expected, expression.toString())
   }
@@ -116,17 +114,17 @@ class BitvectorTests {
   @ParameterizedTest
   @MethodSource("getListConstructorsAndErrorArgs")
   fun `test that an exception is thrown for different BV lengths`(
-      constructor: (List<Expression<BVSort>>) -> Expression<BVSort>,
-      args: List<Expression<BVSort>>,
+      constructor: (List<Expression<BitVecSort>>) -> Expression<BitVecSort>,
+      args: List<Expression<BitVecSort>>,
   ) {
     assertThrows<IllegalArgumentException> { constructor(args) }
   }
 
   private fun getListConstructorsAndErrorArgs(): Stream<Arguments> {
-    val bvand: (List<Expression<BVSort>>) -> Expression<BVSort> = ::BVAnd
-    val bvor: (List<Expression<BVSort>>) -> Expression<BVSort> = ::BVOr
-    val bvadd: (List<Expression<BVSort>>) -> Expression<BVSort> = ::BVAdd
-    val bvmul: (List<Expression<BVSort>>) -> Expression<BVSort> = ::BVMul
+    val bvand: (List<Expression<BitVecSort>>) -> Expression<BitVecSort> = ::BVAnd
+    val bvor: (List<Expression<BitVecSort>>) -> Expression<BitVecSort> = ::BVOr
+    val bvadd: (List<Expression<BitVecSort>>) -> Expression<BitVecSort> = ::BVAdd
+    val bvmul: (List<Expression<BitVecSort>>) -> Expression<BitVecSort> = ::BVMul
     return Stream.of(
         arguments(bvand, listOf(A, D)),
         arguments(bvor, listOf(A, D)),
@@ -138,9 +136,9 @@ class BitvectorTests {
   @ParameterizedTest
   @MethodSource("getRegularConstructorsAndErrorArgs")
   fun `test that an exception is thrown when lhs and rhs BV length does not match`(
-      constructor: (Expression<BVSort>, Expression<BVSort>) -> Expression<BVSort>,
-      lhs: Expression<BVSort>,
-      rhs: Expression<BVSort>,
+      constructor: (Expression<BitVecSort>, Expression<BitVecSort>) -> Expression<BitVecSort>,
+      lhs: Expression<BitVecSort>,
+      rhs: Expression<BitVecSort>,
   ) {
     assertThrows<IllegalArgumentException> { constructor(lhs, rhs) }
   }
@@ -157,9 +155,9 @@ class BitvectorTests {
   @ParameterizedTest
   @MethodSource("getRegularConstructors")
   fun `test that constructor does not throw when BV length matches`(
-      constructor: (Expression<BVSort>, Expression<BVSort>) -> Expression<BVSort>,
-      lhs: Expression<BVSort>,
-      rhs: Expression<BVSort>,
+      constructor: (Expression<BitVecSort>, Expression<BitVecSort>) -> Expression<BitVecSort>,
+      lhs: Expression<BitVecSort>,
+      rhs: Expression<BitVecSort>,
   ) {
     assertDoesNotThrow { constructor(lhs, rhs) }
   }
@@ -176,17 +174,17 @@ class BitvectorTests {
   @ParameterizedTest
   @MethodSource("getListConstructors")
   fun `test that list constructor does not throw when BV length matches`(
-      constructor: (List<Expression<BVSort>>) -> Expression<BVSort>,
-      args: List<Expression<BVSort>>,
+      constructor: (List<Expression<BitVecSort>>) -> Expression<BitVecSort>,
+      args: List<Expression<BitVecSort>>,
   ) {
     assertDoesNotThrow { constructor(args) }
   }
 
   private fun getListConstructors(): Stream<Arguments> {
-    val bvand: (List<Expression<BVSort>>) -> Expression<BVSort> = ::BVAnd
-    val bvor: (List<Expression<BVSort>>) -> Expression<BVSort> = ::BVOr
-    val bvadd: (List<Expression<BVSort>>) -> Expression<BVSort> = ::BVAdd
-    val bvmul: (List<Expression<BVSort>>) -> Expression<BVSort> = ::BVMul
+    val bvand: (List<Expression<BitVecSort>>) -> Expression<BitVecSort> = ::BVAnd
+    val bvor: (List<Expression<BitVecSort>>) -> Expression<BitVecSort> = ::BVOr
+    val bvadd: (List<Expression<BitVecSort>>) -> Expression<BitVecSort> = ::BVAdd
+    val bvmul: (List<Expression<BitVecSort>>) -> Expression<BitVecSort> = ::BVMul
     return Stream.of(
         arguments(bvand, listOf(A, B)),
         arguments(bvor, listOf(A, B)),
