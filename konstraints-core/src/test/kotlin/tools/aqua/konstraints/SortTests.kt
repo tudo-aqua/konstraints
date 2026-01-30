@@ -28,9 +28,9 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
-import tools.aqua.konstraints.smt.BVSort
 import tools.aqua.konstraints.smt.BitVecFactory
-import tools.aqua.konstraints.smt.Bool
+import tools.aqua.konstraints.smt.BitVecSort
+import tools.aqua.konstraints.smt.SMTBool
 import tools.aqua.konstraints.smt.Sort
 
 /*
@@ -46,18 +46,18 @@ class SortTests {
   }
 
   private fun getSortsAndTheirSerialization(): Stream<Arguments> {
-    return Stream.of(arguments("Bool", Bool), arguments("(_ BitVec 32)", BVSort(32)))
+    return Stream.of(arguments("Bool", SMTBool), arguments("(_ BitVec 32)", BitVecSort(32)))
   }
 
   @ParameterizedTest
   @ValueSource(ints = [-1, 0])
   fun `test that bitvectors can only be constructed with more than 0 bits`(bits: Int) {
-    assertThrows<IllegalArgumentException> { BVSort(bits) }
+    assertThrows<IllegalArgumentException> { BitVecSort(bits) }
   }
 
   @ParameterizedTest
   @MethodSource("getEqualBVSortObjects")
-  fun `test that BVSort equals works for equal bitvectors`(lhs: BVSort, rhs: BVSort) {
+  fun `test that BVSort equals works for equal bitvectors`(lhs: BitVecSort, rhs: BitVecSort) {
     assertEquals(lhs, rhs)
   }
 
@@ -75,50 +75,50 @@ class SortTests {
 
   private fun getEqualBVSortObjects(): Stream<Arguments> {
     return Stream.of(
-        arguments(BVSort(8), BVSort(8)),
-        arguments(BVSort(16), BVSort(16)),
-        arguments(BVSort(32), BVSort(32)),
+        arguments(BitVecSort(8), BitVecSort(8)),
+        arguments(BitVecSort(16), BitVecSort(16)),
+        arguments(BitVecSort(32), BitVecSort(32)),
     )
   }
 
   @ParameterizedTest
   @MethodSource("getUnequalBVSortObjects")
-  fun `test that BVSort equals works for unequal bitvectors`(lhs: BVSort, rhs: BVSort) {
+  fun `test that BVSort equals works for unequal bitvectors`(lhs: BitVecSort, rhs: BitVecSort) {
     assertNotEquals(lhs, rhs)
   }
 
   @ParameterizedTest
   @MethodSource("getUnequalBVSortObjects")
   fun `test that BVSort objects with different bit length are different objects`(
-      lhs: BVSort,
-      rhs: BVSort,
+      lhs: BitVecSort,
+      rhs: BitVecSort,
   ) {
     assertNotSame(lhs, rhs)
   }
 
   private fun getUnequalBVSortObjects(): Stream<Arguments> {
     return Stream.of(
-        arguments(BVSort(8), BVSort(16)),
-        arguments(BVSort(32), BVSort(16)),
-        arguments(BVSort(16), BVSort(32)),
+        arguments(BitVecSort(8), BitVecSort(16)),
+        arguments(BitVecSort(32), BitVecSort(16)),
+        arguments(BitVecSort(16), BitVecSort(32)),
     )
   }
 
   @ParameterizedTest
   @MethodSource("getBVSortObjects")
   fun `test that BVSort hash code returns the same value on multiple invocations`(
-      bitvector: BVSort
+      bitvector: BitVecSort
   ) {
     assertEquals(bitvector.hashCode(), bitvector.hashCode())
   }
 
   private fun getBVSortObjects(): Stream<Arguments> {
-    return Stream.of(arguments(BVSort(32)), arguments(BVSort(16)), arguments(BVSort(8)))
+    return Stream.of(arguments(BitVecSort(32)), arguments(BitVecSort(16)), arguments(BitVecSort(8)))
   }
 
   @ParameterizedTest
   @MethodSource("getEqualBVSortObjects")
-  fun `test that equal BVSorts return the same hash code`(lhs: BVSort, rhs: BVSort) {
+  fun `test that equal BVSorts return the same hash code`(lhs: BitVecSort, rhs: BitVecSort) {
     assertEquals(lhs.hashCode(), rhs.hashCode())
   }
 

@@ -18,7 +18,7 @@
 
 package tools.aqua.konstraints.dsl
 
-import tools.aqua.konstraints.smt.BVSort
+import tools.aqua.konstraints.smt.BitVecSort
 import tools.aqua.konstraints.smt.BitVecToFP
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.FPAdd
@@ -3103,25 +3103,26 @@ infix fun Double.fpeq(rhs: () -> Expression<FPSort>) = FPEq(FPLiteral(this), rhs
  * floating point.
  */
 @JvmName("BVToFP")
-fun toFP(eb: Int, sb: Int, block: () -> Expression<BVSort>) = BitVecToFP(block(), eb, sb)
+fun toFP(eb: Int, sb: Int, block: () -> Expression<BitVecSort>) = BitVecToFP(block(), eb, sb)
 
 /**
  * Conversion operator from single bitstring representation in IEEE 754-2008 interchange format to
  * floating point.
  */
-@JvmName("BVToFP") fun toFP(eb: Int, sb: Int, expr: Expression<BVSort>) = BitVecToFP(expr, eb, sb)
+@JvmName("BVToFP")
+fun toFP(eb: Int, sb: Int, expr: Expression<BitVecSort>) = BitVecToFP(expr, eb, sb)
 
 /**
  * Conversion operator from single bitstring representation in IEEE 754-2008 interchange format to
  * floating point.
  */
-fun Expression<BVSort>.toFP(eb: Int, sb: Int) = BitVecToFP(this, eb, sb)
+fun Expression<BitVecSort>.toFP(eb: Int, sb: Int) = BitVecToFP(this, eb, sb)
 
 /**
  * Conversion operator from single bitstring representation in IEEE 754-2008 interchange format to
  * floating point.
  */
-fun Expression<BVSort>.toFP(sort: FPSort) = BitVecToFP(this, sort)
+fun Expression<BitVecSort>.toFP(sort: FPSort) = BitVecToFP(this, sort)
 
 /** Conversion operator from another floating point sort to floating point sort. */
 @JvmName("FPToFP")
@@ -3184,7 +3185,7 @@ fun toFPSigned(
     eb: Int,
     sb: Int,
     roundingMode: Expression<RoundingModeSort> = RNE,
-    block: () -> Expression<BVSort>,
+    block: () -> Expression<BitVecSort>,
 ) = SBitVecToFP(roundingMode, block(), eb, sb)
 
 /**
@@ -3196,21 +3197,24 @@ fun toFPSigned(
     eb: Int,
     sb: Int,
     roundingMode: Expression<RoundingModeSort> = RNE,
-    expr: Expression<BVSort>,
+    expr: Expression<BitVecSort>,
 ) = SBitVecToFP(roundingMode, expr, eb, sb)
 
 /**
  * Conversion operator from signed machine integer, represented as a 2's complement bit vector to
  * floating point.
  */
-fun Expression<BVSort>.toFPSigned(eb: Int, sb: Int, roundingMode: Expression<RoundingModeSort>) =
-    SBitVecToFP(roundingMode, this, eb, sb)
+fun Expression<BitVecSort>.toFPSigned(
+    eb: Int,
+    sb: Int,
+    roundingMode: Expression<RoundingModeSort>,
+) = SBitVecToFP(roundingMode, this, eb, sb)
 
 /**
  * Conversion operator from signed machine integer, represented as a 2's complement bit vector to
  * floating point.
  */
-fun Expression<BVSort>.toFPSigned(sort: FPSort, roundingMode: Expression<RoundingModeSort>) =
+fun Expression<BitVecSort>.toFPSigned(sort: FPSort, roundingMode: Expression<RoundingModeSort>) =
     SBitVecToFP(roundingMode, this, sort)
 
 /**
@@ -3222,7 +3226,7 @@ fun toFPUnsigned(
     eb: Int,
     sb: Int,
     roundingMode: Expression<RoundingModeSort> = RNE,
-    block: () -> Expression<BVSort>,
+    block: () -> Expression<BitVecSort>,
 ) = UBitVecToFP(roundingMode, block(), eb, sb)
 
 /**
@@ -3234,21 +3238,24 @@ fun toFPUnsigned(
     eb: Int,
     sb: Int,
     roundingMode: Expression<RoundingModeSort> = RNE,
-    expr: Expression<BVSort>,
+    expr: Expression<BitVecSort>,
 ) = UBitVecToFP(roundingMode, expr, eb, sb)
 
 /**
  * Conversion operator from unsigned machine integer, represented as a 2's complement bit vector to
  * floating point.
  */
-fun Expression<BVSort>.toFPUnsigned(eb: Int, sb: Int, roundingMode: Expression<RoundingModeSort>) =
-    UBitVecToFP(roundingMode, this, eb, sb)
+fun Expression<BitVecSort>.toFPUnsigned(
+    eb: Int,
+    sb: Int,
+    roundingMode: Expression<RoundingModeSort>,
+) = UBitVecToFP(roundingMode, this, eb, sb)
 
 /**
  * Conversion operator from unsigned machine integer, represented as a 2's complement bit vector to
  * floating point.
  */
-fun Expression<BVSort>.toFPUnsigned(sort: FPSort, roundingMode: Expression<RoundingModeSort>) =
+fun Expression<BitVecSort>.toFPUnsigned(sort: FPSort, roundingMode: Expression<RoundingModeSort>) =
     UBitVecToFP(roundingMode, this, sort)
 
 /**
@@ -3273,7 +3280,7 @@ fun Expression<FPSort>.toUBV(bits: Int, roundingMode: Expression<RoundingModeSor
     FPToUBitVec(roundingMode, this, bits)
 
 /** Conversion operator to unsigned machine integer, represented as a bit vector [sort]. */
-fun Expression<FPSort>.toUBV(sort: BVSort, roundingMode: Expression<RoundingModeSort> = RNE) =
+fun Expression<FPSort>.toUBV(sort: BitVecSort, roundingMode: Expression<RoundingModeSort> = RNE) =
     FPToUBitVec(roundingMode, this, sort.bits)
 
 /**
@@ -3304,7 +3311,7 @@ fun Expression<FPSort>.toSBV(bits: Int, roundingMode: Expression<RoundingModeSor
  * Conversion operator to signed machine integer, represented as a 2's complement bit vector (_
  * BitVec [sort.bits]).
  */
-fun Expression<FPSort>.toSBV(sort: BVSort, roundingMode: Expression<RoundingModeSort> = RNE) =
+fun Expression<FPSort>.toSBV(sort: BitVecSort, roundingMode: Expression<RoundingModeSort> = RNE) =
     FPToSBitVec(roundingMode, this, sort.bits)
 
 /** Conversion operator to real sort. */

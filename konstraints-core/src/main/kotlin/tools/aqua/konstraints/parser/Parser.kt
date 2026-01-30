@@ -132,8 +132,7 @@ import tools.aqua.konstraints.smt.cast
 import tools.aqua.konstraints.smt.declareFun
 import tools.aqua.konstraints.smt.defineFun
 import tools.aqua.konstraints.smt.setInfo
-import tools.aqua.konstraints.smt.toSymbolAsIs
-import tools.aqua.konstraints.smt.toSymbolWithQuotes
+import tools.aqua.konstraints.smt.toSymbol
 
 class Parser private constructor(val lexer: PeekableIterator<Token>) {
   companion object {
@@ -579,11 +578,11 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
             when (symbolToken) {
               is QuotedSymbolToken ->
                   program.context
-                      .getFunc(symbolToken.toString().toSymbolWithQuotes())
+                      .getFunc(symbolToken.toString().toSymbol())
                       .constructDynamic(emptyList(), emptyList())
               is SimpleSymbolToken ->
                   program.context
-                      .getFunc(symbolToken.toString().toSymbolWithQuotes())
+                      .getFunc(symbolToken.toString().toSymbol())
                       .constructDynamic(emptyList(), emptyList())
             }
           }
@@ -604,7 +603,7 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
                     if (
                         identifier.symbol.value.startsWith("bv") &&
                             !identifier.symbol.isQuoted &&
-                            program.context.containsSort("BitVec".toSymbolAsIs()) &&
+                            program.context.containsSort("BitVec".toSymbol()) &&
                             identifier.symbol.value.substring(2).all { ch -> ch.isDigit() }
                     ) {
                       BVLiteral(

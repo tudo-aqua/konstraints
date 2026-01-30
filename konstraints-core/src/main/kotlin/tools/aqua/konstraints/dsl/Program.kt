@@ -95,8 +95,7 @@ class SMTProgramBuilder(logic: Logic) {
   fun <T : Sort> const(sort: T) = const("|const!${UUID.randomUUID()}|", sort)
 
   /** Registers a new constant smt function with the given [name] and [sort]. */
-  fun <T : Sort> const(name: String, sort: T) =
-      program.declareConst(name.toSymbolWithQuotes(), sort)()
+  fun <T : Sort> const(name: String, sort: T) = program.declareConst(name.toSymbol(), sort)()
 
   /** Converts this [SMTProgramBuilder] to a finished [DefaultSMTProgram]. */
   fun finalize() = program.apply { add(Exit) }

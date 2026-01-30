@@ -23,7 +23,7 @@ import tools.aqua.konstraints.smt.*
 
 /** Exists quantifier with one bound variable of [sort]. */
 fun <S : Sort> exists(sort: S, block: (Expression<S>) -> Expression<BoolSort>): ExistsExpression {
-  val boundVar = SortedVar("|$sort!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort)
+  val boundVar = SortedVar("|$sort!${UUID.randomUUID()}|".toSymbol(), sort)
 
   return ExistsExpression(listOf(boundVar), block(boundVar.instance))
 }
@@ -34,8 +34,8 @@ fun <S1 : Sort, S2 : Sort> exists(
     sort2: S2,
     block: (Expression<S1>, Expression<S2>) -> Expression<BoolSort>,
 ): ExistsExpression {
-  val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort1)
-  val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort2)
+  val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbol(), sort1)
+  val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbol(), sort2)
 
   return ExistsExpression(
       listOf(boundVar1, boundVar2),
@@ -50,9 +50,9 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort> exists(
     sort3: S3,
     block: (Expression<S1>, Expression<S2>, Expression<S3>) -> Expression<BoolSort>,
 ): ExistsExpression {
-  val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort1)
-  val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort2)
-  val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort3)
+  val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbol(), sort1)
+  val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbol(), sort2)
+  val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".toSymbol(), sort3)
 
   return ExistsExpression(
       listOf(boundVar1, boundVar2, boundVar3),
@@ -68,10 +68,10 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> exists(
     sort4: S4,
     block: (Expression<S1>, Expression<S2>, Expression<S3>, Expression<S4>) -> Expression<BoolSort>,
 ): ExistsExpression {
-  val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort1)
-  val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort2)
-  val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort3)
-  val boundVar4 = SortedVar("|$sort4!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort4)
+  val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbol(), sort1)
+  val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbol(), sort2)
+  val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".toSymbol(), sort3)
+  val boundVar4 = SortedVar("|$sort4!${UUID.randomUUID()}|".toSymbol(), sort4)
 
   return ExistsExpression(
       listOf(boundVar1, boundVar2, boundVar3, boundVar4),
@@ -95,11 +95,11 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> exists(
             Expression<S5>,
         ) -> Expression<BoolSort>,
 ): ExistsExpression {
-  val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort1)
-  val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort2)
-  val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort3)
-  val boundVar4 = SortedVar("|$sort4!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort4)
-  val boundVar5 = SortedVar("|$sort5!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort5)
+  val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbol(), sort1)
+  val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbol(), sort2)
+  val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".toSymbol(), sort3)
+  val boundVar4 = SortedVar("|$sort4!${UUID.randomUUID()}|".toSymbol(), sort4)
+  val boundVar5 = SortedVar("|$sort5!${UUID.randomUUID()}|".toSymbol(), sort5)
 
   return ExistsExpression(
       listOf(boundVar1, boundVar2, boundVar3, boundVar4, boundVar5),
@@ -125,12 +125,12 @@ fun exists(
 ): ExistsExpression {
   val boundVars =
       listOf(
-          SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort1),
-          SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort2),
-          SortedVar("|$sort3!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort3),
-          SortedVar("|$sort4!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort4),
-          SortedVar("|$sort5!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort5),
-      ) + sorts.map { sort -> SortedVar("|$sort!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort) }
+          SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbol(), sort1),
+          SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbol(), sort2),
+          SortedVar("|$sort3!${UUID.randomUUID()}|".toSymbol(), sort3),
+          SortedVar("|$sort4!${UUID.randomUUID()}|".toSymbol(), sort4),
+          SortedVar("|$sort5!${UUID.randomUUID()}|".toSymbol(), sort5),
+      ) + sorts.map { sort -> SortedVar("|$sort!${UUID.randomUUID()}|".toSymbol(), sort) }
 
   return ExistsExpression(boundVars, block(boundVars.map { it.instance }))
 }
@@ -140,15 +140,14 @@ fun exists(
     sorts: List<Sort>,
     block: (List<Expression<*>>) -> Expression<BoolSort>,
 ): ExistsExpression {
-  val boundVars =
-      sorts.map { sort -> SortedVar("|$sort!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort) }
+  val boundVars = sorts.map { sort -> SortedVar("|$sort!${UUID.randomUUID()}|".toSymbol(), sort) }
 
   return ExistsExpression(boundVars, block(boundVars.map { it.instance }))
 }
 
 /** Universal quantifier with one bound variable of [sort]. */
 fun <S : Sort> forall(sort: S, block: (Expression<S>) -> Expression<BoolSort>): ForallExpression {
-  val boundVar = SortedVar("|$sort!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort)
+  val boundVar = SortedVar("|$sort!${UUID.randomUUID()}|".toSymbol(), sort)
 
   return ForallExpression(listOf(boundVar), block(boundVar.instance))
 }
@@ -159,8 +158,8 @@ fun <S1 : Sort, S2 : Sort> forall(
     sort2: S2,
     block: (Expression<S1>, Expression<S2>) -> Expression<BoolSort>,
 ): ForallExpression {
-  val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort1)
-  val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort2)
+  val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbol(), sort1)
+  val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbol(), sort2)
 
   return ForallExpression(
       listOf(boundVar1, boundVar2),
@@ -175,9 +174,9 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort> forall(
     sort3: S3,
     block: (Expression<S1>, Expression<S2>, Expression<S3>) -> Expression<BoolSort>,
 ): ForallExpression {
-  val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort1)
-  val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort2)
-  val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort3)
+  val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbol(), sort1)
+  val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbol(), sort2)
+  val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".toSymbol(), sort3)
 
   return ForallExpression(
       listOf(boundVar1, boundVar2, boundVar3),
@@ -193,10 +192,10 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> forall(
     sort4: S4,
     block: (Expression<S1>, Expression<S2>, Expression<S3>, Expression<S4>) -> Expression<BoolSort>,
 ): ForallExpression {
-  val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort1)
-  val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort2)
-  val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort3)
-  val boundVar4 = SortedVar("|$sort4!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort4)
+  val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbol(), sort1)
+  val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbol(), sort2)
+  val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".toSymbol(), sort3)
+  val boundVar4 = SortedVar("|$sort4!${UUID.randomUUID()}|".toSymbol(), sort4)
 
   return ForallExpression(
       listOf(boundVar1, boundVar2, boundVar3, boundVar4),
@@ -220,11 +219,11 @@ fun <S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> forall(
             Expression<S5>,
         ) -> Expression<BoolSort>,
 ): ForallExpression {
-  val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort1)
-  val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort2)
-  val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort3)
-  val boundVar4 = SortedVar("|$sort4!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort4)
-  val boundVar5 = SortedVar("|$sort5!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort5)
+  val boundVar1 = SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbol(), sort1)
+  val boundVar2 = SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbol(), sort2)
+  val boundVar3 = SortedVar("|$sort3!${UUID.randomUUID()}|".toSymbol(), sort3)
+  val boundVar4 = SortedVar("|$sort4!${UUID.randomUUID()}|".toSymbol(), sort4)
+  val boundVar5 = SortedVar("|$sort5!${UUID.randomUUID()}|".toSymbol(), sort5)
 
   return ForallExpression(
       listOf(boundVar1, boundVar2, boundVar3, boundVar4, boundVar5),
@@ -250,12 +249,12 @@ fun forall(
 ): ForallExpression {
   val boundVars =
       listOf(
-          SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort1),
-          SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort2),
-          SortedVar("|$sort3!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort3),
-          SortedVar("|$sort4!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort4),
-          SortedVar("|$sort5!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort5),
-      ) + sorts.map { sort -> SortedVar("|$sort!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort) }
+          SortedVar("|$sort1!${UUID.randomUUID()}|".toSymbol(), sort1),
+          SortedVar("|$sort2!${UUID.randomUUID()}|".toSymbol(), sort2),
+          SortedVar("|$sort3!${UUID.randomUUID()}|".toSymbol(), sort3),
+          SortedVar("|$sort4!${UUID.randomUUID()}|".toSymbol(), sort4),
+          SortedVar("|$sort5!${UUID.randomUUID()}|".toSymbol(), sort5),
+      ) + sorts.map { sort -> SortedVar("|$sort!${UUID.randomUUID()}|".toSymbol(), sort) }
 
   return ForallExpression(boundVars, block(boundVars.map { it.instance }))
 }
@@ -265,8 +264,7 @@ fun forall(
     sorts: List<Sort>,
     block: (List<Expression<*>>) -> Expression<BoolSort>,
 ): ForallExpression {
-  val boundVars =
-      sorts.map { sort -> SortedVar("|$sort!${UUID.randomUUID()}|".toSymbolWithQuotes(), sort) }
+  val boundVars = sorts.map { sort -> SortedVar("|$sort!${UUID.randomUUID()}|".toSymbol(), sort) }
 
   return ForallExpression(boundVars, block(boundVars.map { it.instance }))
 }

@@ -117,15 +117,15 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
       context.sorts.computeIfAbsentAndMerge(sort) { _ ->
         when (sort) {
           is BoolSort -> context.context.mkBoolSort()
-          is BVSort -> context.context.mkBitVecSort(sort.bits)
+          is BitVecSort -> context.context.mkBitVecSort(sort.bits)
           is IntSort -> context.context.mkIntSort()
           is RealSort -> context.context.mkRealSort()
           is RoundingModeSort -> context.context.mkFPRoundingModeSort()
           /* specialized floating point sorts need to be checked first as they are all FPSorts */
-          is FP16 -> context.context.mkFPSort16()
-          is FP32 -> context.context.mkFPSort32()
-          is FP64 -> context.context.mkFPSort64()
-          is FP128 -> context.context.mkFPSort128()
+          is SMTFP16 -> context.context.mkFPSort16()
+          is SMTFP32 -> context.context.mkFPSort32()
+          is SMTFP64 -> context.context.mkFPSort64()
+          is SMTFP128 -> context.context.mkFPSort128()
           is FPSort -> context.context.mkFPSort(sort.exponentBits, sort.significantBits)
           is ArraySort<*, *> ->
               context.context.mkArraySort(getOrCreateSort(sort.x), getOrCreateSort(sort.y))
@@ -213,9 +213,7 @@ operator fun Model.Companion.invoke(model: Z3Model, context: Z3Context) =
                 model.getFuncInterp(z3).let { interp ->
                   // construct sorted vars that are needed for the function definition
                   val arguments =
-                      aqua.parameters.mapIndexed { i, sort ->
-                        SortedVar("|x!$i|".toSymbolWithQuotes(), sort)
-                      }
+                      aqua.parameters.mapIndexed { i, sort -> SortedVar("|x!$i|".toSymbol(), sort) }
 
                   // finally construct the function definition
                   FunctionDef(aqua.symbol, arguments, aqua.sort, interp.aquaify(arguments))
