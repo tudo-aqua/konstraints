@@ -500,15 +500,19 @@ class GetValue(val terms: List<Expression<*>>) : Command("get-value") {
 
 class DeclareDatatype(val datatype: Datatype) : Command("declare-datatype") {
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      "(declare-datatype ${datatype.name} ${datatype.constructors.joinToString(" ")})"
+      "(declare-datatype ${datatype.symbol.toSMTString(quotingRule, useIterative)} (${datatype.constructors.joinToString(separator = " ") { it.toSMTString(quotingRule, useIterative) }}))"
 
   override fun toSMTString(
       builder: Appendable,
       quotingRule: QuotingRule,
       useIterative: Boolean,
   ): Appendable {
-    builder.append("(declare-datatype ${datatype.name}")
-    datatype.constructors.joinTo(builder, " ")
+    builder.append("(declare-datatype ")
+    builder.append("(")
+    datatype.symbol.toSMTString(builder, quotingRule, useIterative)
+    datatype.constructors.joinTo(builder, separator = " ") {
+      it.toSMTString(quotingRule, useIterative)
+    }
     return builder.append(")")
   }
 }

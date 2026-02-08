@@ -230,7 +230,7 @@ abstract class BinaryExpression<out T : Sort, out S1 : Sort, out S2 : Sort>(
     override val name: Symbol,
     override val sort: T,
 ) : Expression<T>() {
-  override val func = null
+  override val func: SMTFunction<T>? = null
 
   abstract val lhs: Expression<S1>
 

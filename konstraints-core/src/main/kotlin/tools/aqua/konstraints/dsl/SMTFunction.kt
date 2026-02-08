@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.dsl
 
+import tools.aqua.konstraints.dsl.UserDefinedSMTFunction2
 import java.util.*
 import kotlin.reflect.KProperty
 import tools.aqua.konstraints.smt.*
@@ -891,7 +892,7 @@ data class UserDefinedSMTFunction0<T : Sort>(
  *
  * Use [invoke] to generate an expression with the given parameters applied.
  */
-data class UserDefinedSMTFunction1<T : Sort, S : Sort>(
+open class UserDefinedSMTFunction1<T : Sort, S : Sort>(
     override val symbol: Symbol,
     override val sort: T,
     val parameter: SortedVar<S>,
@@ -903,6 +904,13 @@ data class UserDefinedSMTFunction1<T : Sort, S : Sort>(
       parameter: S,
       term: Expression<T>,
   ) : this(symbol, sort, SortedVar("|local!$parameter!1|".toSymbol(), parameter), term)
+
+    constructor(
+        symbol: Symbol,
+        sort: T,
+        parameter1: SortedVar<S>,
+        term: ((Expression<S>) -> Expression<T>),
+    ) : this(symbol, sort, parameter1, term(parameter1.instance))
 
   override val parameters = listOf(parameter.sort)
   override val sortedVars = listOf(parameter)
@@ -923,7 +931,7 @@ data class UserDefinedSMTFunction1<T : Sort, S : Sort>(
  *
  * Use [invoke] to generate an expression with the given parameters applied.
  */
-data class UserDefinedSMTFunction2<T : Sort, S1 : Sort, S2 : Sort>(
+open class UserDefinedSMTFunction2<T : Sort, S1 : Sort, S2 : Sort>(
     override val symbol: Symbol,
     override val sort: T,
     val parameter1: SortedVar<S1>,
@@ -943,6 +951,14 @@ data class UserDefinedSMTFunction2<T : Sort, S1 : Sort, S2 : Sort>(
       SortedVar("|$parameter2!2|".toSymbol(), parameter2),
       term,
   )
+
+  constructor(
+      symbol: Symbol,
+      sort: T,
+      parameter1: SortedVar<S1>,
+      parameter2: SortedVar<S2>,
+      term: ((Expression<S1>, Expression<S2>) -> Expression<T>),
+  ) : this(symbol, sort, parameter1, parameter2, term(parameter1.instance, parameter2.instance))
 
   override val parameters = listOf(parameter1.sort, parameter2.sort)
   override val sortedVars = listOf(parameter1, parameter2)

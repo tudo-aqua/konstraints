@@ -26,6 +26,9 @@ class Selector<T : Sort>(override val symbol: Symbol, override val sort: T, data
     SMTFunction<T>() {
   override val parameters = listOf(datatype)
 
+  fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(${symbol.toSMTString(quotingRule, useIterative)} ${sort.toSMTString(quotingRule, useIterative)})"
+
   override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<T> {
     assert(args.size == 1)
     return SelectorExpression(symbol, sort, this, args)
@@ -51,6 +54,20 @@ data class Constructor(
     val selectors: List<Selector<*>>,
     override val sort: Datatype,
 ) : SMTFunction<Datatype>() {
+  fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
+    builder.append("(")
+    symbol.toSMTString(builder, quotingRule, useIterative)
+    selectors.joinTo(builder, " ") { it.toSMTString(quotingRule, useIterative) }
+    return builder.append(")")
+  }
+
+  fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(${symbol.toSMTString(quotingRule, useIterative)} ${selectors.joinToString(" ") { it.toSMTString(quotingRule, useIterative) }})"
+
   override val parameters: List<Sort> = selectors.map { selector -> selector.sort }
 
   override fun constructDynamic(
@@ -97,7 +114,7 @@ class DatatypeFactory(val instance: Datatype) : SortFactory {
 }
 
 // TODO this should maybe be the factory (constructors etc. can be shared between instances)
-class Datatype(val arity: Int, symbol: Symbol, constructorDecls: List<ConstructorDecl>) :
+open class Datatype(val arity: Int, symbol: Symbol, constructorDecls: List<ConstructorDecl>) :
     Sort(symbol) {
   override val theories = emptySet<Theories>()
   val constructors =
@@ -116,13 +133,11 @@ class Datatype(val arity: Int, symbol: Symbol, constructorDecls: List<Constructo
           Selector(selectorDecl.symbol, selectorDecl.sort, this)
         }
       }
-
-  val testers: List<SMTFunction<BoolSort>> = TODO()
 }
 
 object Testers : SMTFunction<BoolSort>() {
-  override val symbol = "is".toSymbolAsIs()
-  override val sort = Bool
+  override val symbol = "is".toSymbol()
+  override val sort = SMTBool
   override val parameters: List<Sort> = emptyList()
 
   val constructors = mutableSetOf<Symbol>()
@@ -144,8 +159,8 @@ object Testers : SMTFunction<BoolSort>() {
 }
 
 class TesterExpression(index: SymbolIndex) : Expression<BoolSort>() {
-  override val name = "is".toSymbolAsIs()
-  override val sort = Bool
+  override val name = "is".toSymbol()
+  override val sort = SMTBool
   override val theories = emptySet<Theories>()
   override val func = Testers
   override val children = emptyList<Expression<*>>()

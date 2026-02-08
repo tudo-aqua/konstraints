@@ -215,7 +215,7 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
     requireIsInstance<OpeningBracket>(lexer.next())
 
     // parametric datatypes
-    if(lexer.peek() is ParWord) {
+    if (lexer.peek() is ParWord) {
       TODO("Parametric datatypes are not supported yet!")
     }
 
