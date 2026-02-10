@@ -126,13 +126,19 @@ open class Datatype(val arity: Int, symbol: Symbol, constructorDecls: List<Const
             },
             this,
         )
-      }
+      }.toMutableList()
   val selectors =
       constructorDecls.flatMap { decl ->
         decl.selectors.map { selectorDecl ->
           Selector(selectorDecl.symbol, selectorDecl.sort, this)
         }
-      }
+      }.toMutableList()
+
+    fun add(constructor: ConstructorDecl) {
+        constructors.add(Constructor(constructor.symbol, constructor.selectors.map { selectorDecl ->
+            Selector(selectorDecl.symbol, selectorDecl.sort, this)
+        }, this))
+    }
 }
 
 object Testers : SMTFunction<BoolSort>() {

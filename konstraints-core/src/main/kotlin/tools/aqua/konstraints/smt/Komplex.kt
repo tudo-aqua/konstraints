@@ -20,6 +20,10 @@ package tools.aqua.konstraints.smt
 
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunction1
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunction2
+import tools.aqua.konstraints.dsl.cpxadd
+import tools.aqua.konstraints.dsl.cpxmul
+import tools.aqua.konstraints.dsl.eq
+import kotlin.math.sqrt
 
 object ComplexSort :
     Datatype(
@@ -89,7 +93,7 @@ class ComplexAdd(
 
 object ComplexSubDecl :
     UserDefinedSMTFunction2<ComplexSort, ComplexSort, ComplexSort>(
-        "cpx.add".toSymbol(),
+        "cpx.sub".toSymbol(),
         ComplexSort,
         SortedVar("x".toSymbol(), ComplexSort),
         SortedVar("y".toSymbol(), ComplexSort),
@@ -108,7 +112,7 @@ object ComplexSubDecl :
 class ComplexSub(
     override val lhs: Expression<ComplexSort>,
     override val rhs: Expression<ComplexSort>,
-) : BinaryExpression<ComplexSort, ComplexSort, ComplexSort>("cpx.add".toSymbol(), ComplexSort) {
+) : BinaryExpression<ComplexSort, ComplexSort, ComplexSort>("cpx.sub".toSymbol(), ComplexSort) {
     override val theories: Set<Theories> = emptySet()
     override val func =
         ComplexSubDecl // this is important so the context finds the related function
@@ -120,7 +124,7 @@ class ComplexSub(
 
 object ComplexMulDecl :
     UserDefinedSMTFunction2<ComplexSort, ComplexSort, ComplexSort>(
-        "cpx.add".toSymbol(),
+        "cpx.mul".toSymbol(),
         ComplexSort,
         SortedVar("x".toSymbol(), ComplexSort),
         SortedVar("y".toSymbol(), ComplexSort),
@@ -139,7 +143,7 @@ object ComplexMulDecl :
 class ComplexMul(
     override val lhs: Expression<ComplexSort>,
     override val rhs: Expression<ComplexSort>,
-) : BinaryExpression<ComplexSort, ComplexSort, ComplexSort>("cpx.add".toSymbol(), ComplexSort) {
+) : BinaryExpression<ComplexSort, ComplexSort, ComplexSort>("cpx.mul".toSymbol(), ComplexSort) {
     override val theories: Set<Theories> = emptySet()
     override val func =
         ComplexMulDecl // this is important so the context finds the related function
@@ -151,7 +155,7 @@ class ComplexMul(
 
 object ComplexDivDecl :
     UserDefinedSMTFunction2<ComplexSort, ComplexSort, ComplexSort>(
-        "cpx.add".toSymbol(),
+        "cpx.div".toSymbol(),
         ComplexSort,
         SortedVar("x".toSymbol(), ComplexSort),
         SortedVar("y".toSymbol(), ComplexSort),
@@ -170,7 +174,7 @@ object ComplexDivDecl :
 class ComplexDiv(
     override val lhs: Expression<ComplexSort>,
     override val rhs: Expression<ComplexSort>,
-) : BinaryExpression<ComplexSort, ComplexSort, ComplexSort>("cpx.add".toSymbol(), ComplexSort) {
+) : BinaryExpression<ComplexSort, ComplexSort, ComplexSort>("cpx.div".toSymbol(), ComplexSort) {
     override val theories: Set<Theories> = emptySet()
     override val func =
         ComplexDivDecl // this is important so the context finds the related function
@@ -182,7 +186,7 @@ class ComplexDiv(
 
 object ComplexInvDecl :
     UserDefinedSMTFunction1<ComplexSort, ComplexSort>(
-        "cpx.add".toSymbol(),
+        "cpx.inv".toSymbol(),
         ComplexSort,
         SortedVar("x".toSymbol(), ComplexSort),
         { x: Expression<ComplexSort> ->
@@ -196,14 +200,13 @@ object ComplexInvDecl :
         args: List<Expression<*>>,
         indices: List<Index>,
     ): Expression<ComplexSort> {
-        return ComplexInv(args[0] as Expression<ComplexSort>, args[1] as Expression<ComplexSort>)
+        return ComplexInv(args[0] as Expression<ComplexSort>)
     }
 }
 
 class ComplexInv(
-    override val lhs: Expression<ComplexSort>,
-    override val rhs: Expression<ComplexSort>,
-) : BinaryExpression<ComplexSort, ComplexSort, ComplexSort>("cpx.add".toSymbol(), ComplexSort) {
+    override val inner: Expression<ComplexSort>,
+) : UnaryExpression<ComplexSort, ComplexSort>("cpx.inv".toSymbol(), ComplexSort) {
     override val theories: Set<Theories> = emptySet()
     override val func =
         ComplexInvDecl // this is important so the context finds the related function
@@ -213,15 +216,62 @@ class ComplexInv(
     }
 }
 
+data class Complex(val re: Double, val im: Double) {
+    /** Addition: (a + bi) + (c + di) = (a+c) + (b+d)i */
+    operator fun plus(other: Complex): Complex = Complex(re + other.re, im + other.im)
+
+    /** Subtraction: (a + bi) - (c + di) = (a-c) + (b-d)i */
+    operator fun minus(other: Complex): Complex = Complex(re - other.re, im - other.im)
+
+    /** Multiplication: (a + bi)(c + di) = (ac - bd) + (ad + bc)i */
+    operator fun times(other: Complex): Complex =
+        Complex(re * other.re - im * other.im, re * other.im + im * other.re)
+
+    /** Conjugate: ([re] - [im]i) */
+    fun conjugate(): Complex = Complex(re, -im)
+
+    /** Magnitude squared: |z|² = [re]² + [im]² */
+    fun magnitudeSquared(): Double = re * re + im * im
+
+    fun magnitude(): Double = sqrt(magnitudeSquared())
+
+    /** Complex inverse: 1 / ([re] + [im]i) = ([re] - [im]i) / ([re]² + [im]²) */
+    fun inverse(): Complex {
+        val denom = magnitudeSquared()
+        require(denom != 0.0) { "Can not invert zero complex number" }
+        return Complex(re / denom, -im / denom)
+    }
+
+    /**
+     * Division using multiplication and inverse: [this][tools.aqua.komplex.Complex] / [other] =
+     * [this][tools.aqua.komplex.Complex] * [other].[inverse]
+     */
+    operator fun div(other: Complex): Complex = this * other.inverse()
+}
+
+val Number.re: Complex
+    get() = Complex(this.toDouble(), 0.0)
+
+val Number.i: Complex
+    get() = Complex(0.0, this.toDouble())
+
+infix operator fun Number.plus(other: Complex): Complex = Complex(this.toDouble(), 0.0) + other
+
+infix operator fun Complex.plus(other: Number): Complex = this + Complex(other.toDouble(), 0.0)
+
+fun Complex.toExpression(): Expression<ComplexSort> = ComplexSort.construct(RealLiteral(re), RealLiteral(im))
+
 fun main() {
   val program = MutableSMTProgram()
   program.setLogic(QF_RDL)
   program.declareDatatype(ComplexSort)
   program.defineFun(ComplexAddDecl)
+  program.defineFun(ComplexMulDecl)
   val c0 = program.declareConst("C0".toSymbol(), ComplexSort).instance
   val c1 = program.declareConst("C1".toSymbol(), ComplexSort).instance
   val c2 = program.declareConst("C2".toSymbol(), ComplexSort).instance
-  program.assert(Equals(ComplexMul(c0, c1), c2))
+  program.assert((c0 cpxmul c1) eq c2)
+  program.assert((c0 cpxadd c1) eq c2)
   program.add(CheckSat)
 
   println(program.toSMTString(QuotingRule.SAME_AS_INPUT, false))

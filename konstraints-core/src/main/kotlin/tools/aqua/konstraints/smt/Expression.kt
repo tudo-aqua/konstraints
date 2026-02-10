@@ -215,7 +215,7 @@ abstract class UnaryExpression<out T : Sort, out S : Sort>(
     override val name: Symbol,
     override val sort: T,
 ) : Expression<T>() {
-  override val func = null
+  override val func: SMTFunction<T>? = null
 
   abstract val inner: Expression<S>
 
