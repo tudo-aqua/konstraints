@@ -31,7 +31,7 @@ object True : ConstantExpression<BoolSort>("true".toSymbol(), SMTBool) {
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
 
-    fun toBoolean() = true
+  fun toBoolean() = true
 }
 
 /** Object for SMT false. */
@@ -40,7 +40,7 @@ object False : ConstantExpression<BoolSort>("false".toSymbol(), SMTBool) {
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
 
-    fun toBoolean() = false
+  fun toBoolean() = false
 }
 
 fun Boolean.toSMTBool() = if (this) True else False

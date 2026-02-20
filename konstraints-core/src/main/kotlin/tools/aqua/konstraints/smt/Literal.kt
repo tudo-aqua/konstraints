@@ -59,6 +59,51 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
           throw IllegalArgumentException("$vector is not a valid bitvector literal.")
         }
 
+    /** Convert the base10 [value] to a bitvector representation of the same numeral */
+    operator fun invoke(value: Byte) = invoke("#x${value.toString(16)}")
+
+    /**
+     * Convert the base10 [value] to a bitvector representation of the same numeral with [bits]
+     * width
+     */
+    operator fun invoke(value: Byte, bits: Int) = invoke("#x${value.toString(16)}", bits)
+
+    /** Convert the base10 [value] to a bitvector representation of the same numeral */
+    operator fun invoke(value: Short) = invoke("#x${value.toString(16)}")
+
+    /**
+     * Convert the base10 [value] to a bitvector representation of the same numeral with [bits]
+     * width
+     */
+    operator fun invoke(value: Short, bits: Int) = invoke("#x${value.toString(16)}", bits)
+
+    /** Convert the base10 [value] to a bitvector representation of the same numeral */
+    operator fun invoke(value: Int) = invoke("#x${value.toString(16)}")
+
+    /**
+     * Convert the base10 [value] to a bitvector representation of the same numeral with [bits]
+     * width
+     */
+    operator fun invoke(value: Int, bits: Int) = invoke("#x${value.toString(16)}", bits)
+
+    /** Convert the base10 [value] to a bitvector representation of the same numeral */
+    operator fun invoke(value: Long) = invoke("#x${value.toString(16)}")
+
+    /**
+     * Convert the base10 [value] to a bitvector representation of the same numeral with [bits]
+     * width
+     */
+    operator fun invoke(value: Long, bits: Int) = invoke("#x${value.toString(16)}", bits)
+
+    /** Convert the base10 [value] to a bitvector representation of the same numeral */
+    operator fun invoke(value: BigInteger) = invoke("#x${value.toString(16)}")
+
+    /**
+     * Convert the base10 [value] to a bitvector representation of the same numeral with [bits]
+     * width
+     */
+    operator fun invoke(value: BigInteger, bits: Int) = invoke("#x${value.toString(16)}", bits)
+
     private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS, Theories.FLOATING_POINT)
   }
 
