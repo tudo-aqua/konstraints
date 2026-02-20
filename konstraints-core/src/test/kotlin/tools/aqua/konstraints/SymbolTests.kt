@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import tools.aqua.konstraints.smt.IllegalSymbolException
 import tools.aqua.konstraints.smt.QuotingRule
 import tools.aqua.konstraints.smt.Symbol
-import tools.aqua.konstraints.smt.toSymbolWithQuotes
+import tools.aqua.konstraints.smt.toSymbol
 
 /*
  * Lifecycle.PER_CLASS is needed for MethodSource to avoid moving sources to a companion object
@@ -67,8 +67,8 @@ class SymbolTests {
           ]
   )
   fun `test that same as input returns symbols with the same quotes as the input`(symbol: String) {
-    val test = symbol.toSymbolWithQuotes()
-    assertEquals(symbol, test.toSMTString(QuotingRule.SAME_AS_INPUT))
+    val test = symbol.toSymbol()
+    assertEquals(symbol, test.toSMTString(QuotingRule.SAME_AS_INPUT, false))
   }
 
   @ParameterizedTest
@@ -99,14 +99,14 @@ class SymbolTests {
           ]
   )
   fun `test that symbols internal representation is without quotes`(symbol: String) {
-    val test = symbol.toSymbolWithQuotes()
+    val test = symbol.toSymbol()
     assertEquals(symbol.trim('|'), test.value)
   }
 
   @ParameterizedTest
   @ValueSource(strings = ["|32|", "|3bitvec|", "|assert|", "|(check-sat)|"])
   fun `test that symbol sets is simple to false for symbols that must be quoted`(symbol: String) {
-    val test = symbol.toSymbolWithQuotes()
+    val test = symbol.toSymbol()
     assertTrue(!test.isSimple)
   }
 
@@ -121,7 +121,7 @@ class SymbolTests {
           ]
   )
   fun `test that symbol throws for illegal symbols`(symbol: String) {
-    assertThrows<IllegalSymbolException> { symbol.toSymbolWithQuotes() }
+    assertThrows<IllegalSymbolException> { symbol.toSymbol() }
   }
 
   @ParameterizedTest
@@ -145,8 +145,8 @@ class SymbolTests {
           ]
   )
   fun `test that quoting mode always quotes simple symbols`(symbol: String) {
-    val test = symbol.toSymbolWithQuotes()
-    assertEquals("|$symbol|", test.toSMTString(QuotingRule.ALWAYS))
+    val test = symbol.toSymbol()
+    assertEquals("|$symbol|", test.toSMTString(QuotingRule.ALWAYS, false))
   }
 
   @ParameterizedTest
@@ -163,8 +163,8 @@ class SymbolTests {
           ]
   )
   fun `test that quoting mode always does not double quote symbols`(symbol: String) {
-    val test = symbol.toSymbolWithQuotes()
-    assertEquals(symbol, test.toSMTString(QuotingRule.ALWAYS))
+    val test = symbol.toSymbol()
+    assertEquals(symbol, test.toSMTString(QuotingRule.ALWAYS, false))
   }
 
   @ParameterizedTest
@@ -175,8 +175,8 @@ class SymbolTests {
 
   private fun getEqualSymbols(): Stream<Arguments> =
       Stream.of(
-          arguments("A".toSymbolWithQuotes(), "A".toSymbolWithQuotes()),
-          arguments("A".toSymbolWithQuotes(), "|A|".toSymbolWithQuotes()),
+          arguments("A".toSymbol(), "A".toSymbol()),
+          arguments("A".toSymbol(), "|A|".toSymbol()),
       )
 
   @ParameterizedTest
@@ -186,5 +186,5 @@ class SymbolTests {
   }
 
   private fun getUnequalSymbols(): Stream<Arguments> =
-      Stream.of(arguments("A".toSymbolWithQuotes(), "B".toSymbolWithQuotes()))
+      Stream.of(arguments("A".toSymbol(), "B".toSymbol()))
 }

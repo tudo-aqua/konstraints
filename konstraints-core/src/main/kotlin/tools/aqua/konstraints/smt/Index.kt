@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,8 +18,16 @@
 
 package tools.aqua.konstraints.smt
 
-/** Extension method to conveniently create a [NumeralIndex] from an Integer. */
+/** Extension method to conveniently create a [NumeralIndex] from [Int]. */
 fun Int.idx(): NumeralIndex = NumeralIndex(this)
+
+/*
+/** Extension method to conveniently create a [NumeralIndex] from [Long]. */
+fun Long.idx(): NumeralIndex = NumeralIndex(this.toBigInteger())
+
+/** Extension method to conveniently create a [NumeralIndex] from [BigInteger]. */
+fun BigInteger.idx(): NumeralIndex = NumeralIndex(this)
+*/
 
 /**
  * Extension method to conveniently create a [SymbolIndex] from a String.
@@ -44,7 +52,7 @@ data class SymbolIndex(val symbol: Symbol) : Index {
    *
    * @throws IllegalSymbolException if the string is not a valid SMT Symbol
    */
-  constructor(symbol: String) : this(symbol.toSymbolWithQuotes())
+  constructor(symbol: String) : this(symbol.toSymbol())
 
   override fun toString() = symbol.toString()
 }

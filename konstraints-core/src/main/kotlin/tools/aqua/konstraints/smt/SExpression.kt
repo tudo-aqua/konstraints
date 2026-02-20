@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ data class SExpressionConstant(val constant: SpecConstant) : SExpression {
 
 /** SExpressionSymbol. */
 data class SExpressionSymbol(val symbol: Symbol) : SExpression {
-  override fun toString() = TODO()
+  override fun toString() = symbol.toString()
 }
 
 /** SExpressionReserved. */

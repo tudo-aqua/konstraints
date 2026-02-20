@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -50,14 +50,14 @@ import tools.aqua.konstraints.smt.*
 
 fun Z3Sort.aquaify(): Sort =
     when (this) {
-      is Z3BoolSort -> Bool
+      is Z3BoolSort -> SMTBool
       is Z3IntSort -> SMTInt
-      is Z3RealSort -> Real
-      is BitVecSort -> BVSort(size)
-      is Z3FPSort -> FloatingPoint(eBits, sBits)
-      is Z3RMSort -> RoundingMode
+      is Z3RealSort -> SMTReal
+      is BitVecSort -> BitVecSort(size)
+      is Z3FPSort -> SMTFloatingPoint(eBits, sBits)
+      is Z3RMSort -> SMTRoundingMode
       is Z3ArraySort<*, *> -> SMTArray(domain.aquaify(), range.aquaify())
-      is Z3ReSort<*> -> RegLan
+      is Z3ReSort<*> -> SMTRegLan
       is SeqSort<*> ->
           if (toString() == "String") {
             SMTString
@@ -260,7 +260,7 @@ fun RealExpr.aquaify(): Expression<RealSort> =
     }
 
 @JvmName("aquaifyBitVec")
-fun BitVecExpr.aquaify(): Expression<BVSort> =
+fun BitVecExpr.aquaify(): Expression<tools.aqua.konstraints.smt.BitVecSort> =
     if (isBVNOT) {
       BVNot(args[0].aquaify().cast())
     } else if (isBVAND) {
@@ -391,7 +391,7 @@ fun FPExpr.aquaify(): Expression<FPSort> {
         FPToFP(args[0].aquaify().cast(), inner.cast(), sort.aquaify() as FPSort)
       } else if (inner.sort is RealSort) {
         RealToFP(args[0].aquaify().cast(), inner.cast(), sort.aquaify() as FPSort)
-      } else if (inner.sort is BVSort) {
+      } else if (inner.sort is tools.aqua.konstraints.smt.BitVecSort) {
         SBitVecToFP(args[0].aquaify().cast(), inner.cast(), sort.aquaify() as FPSort)
       } else {
         throw IllegalStateException()

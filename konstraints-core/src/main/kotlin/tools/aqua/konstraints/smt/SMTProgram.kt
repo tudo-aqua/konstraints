@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,10 +20,13 @@ package tools.aqua.konstraints.smt
 
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.let
 import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.dsl.UserDeclaredSMTFunctionN
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunction0
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunctionN
+import tools.aqua.konstraints.util.StackOperation
+import tools.aqua.konstraints.util.StackOperationType
 
 /** Sat status of an smt program. */
 enum class SatStatus {
@@ -92,14 +95,18 @@ abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
 
   final override fun toString() = _commands.joinToString(separator = "\n")
 
-  override fun toSMTString(quotingRule: QuotingRule) =
-      _commands.joinToString(separator = "\n") { it.toSMTString(quotingRule) }
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      _commands.joinToString(separator = "\n") { it.toSMTString(quotingRule, useIterative) }
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     var counter = 0
     _commands.forEach {
       if (++counter > 1) builder.append("\n")
-      it.toSMTString(builder, quotingRule)
+      it.toSMTString(builder, quotingRule, useIterative)
     }
 
     return builder
@@ -145,6 +152,7 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     check(logic != null) { "Logic must be set before adding assertions!" }
 
     // check expr is in logic
+    /*
     assertion.expr.all {
       if (!(it.theories.isEmpty() || it.theories.any { it in logic!!.theories })) {
         throw AssertionOutOfLogicBounds(
@@ -157,32 +165,88 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
       }
       true
     }
+    */
 
     // check all symbols are known
-    require(checkContext(assertion.expr))
+    checkContext(assertion.expr)
 
     _commands.add(assertion)
   }
 
-  private fun checkContext(expr: Expression<*>): Boolean {
-    return if (expr is ExistsExpression) {
-      context.exists(expr.vars) { checkContext(expr.term) }
-    } else if (expr is ForallExpression) {
-      context.forall(expr.vars) { checkContext(expr.term) }
-    } else if (expr is LetExpression) {
-      context.let(expr.bindings) { checkContext(expr.inner) }
-    } else if (expr is AnnotatedExpression) {
-      checkContext(expr.term)
+  private fun checkContext(root: Expression<*>) {
+    val stack = ArrayDeque<StackOperation<Expression<*>>>()
+
+    if (root is ExistsExpression || root is ForallExpression || root is LetExpression) {
+      stack.add(StackOperation(StackOperationType.BIND, root))
     } else {
-      val result =
-          (expr.theories.isNotEmpty() || expr in context) && expr.children.all { checkContext(it) }
+      stack.add(StackOperation(StackOperationType.NONE, root))
+    }
 
-      if (!result)
-          println(
-              "Not in theories ${logic?.theories}: ($expr ${expr.children.joinToString(" ")}) is in ${expr.theories}"
-          )
+    while (stack.isNotEmpty()) {
+      val op = stack.removeLast()
 
-      result
+      // let here makes code later more readable and allows for auto-casting of expr
+      op.let { (operation, expr) ->
+        when (operation) {
+          // bind vars when taking binder from the stack
+          // also add operation to unbind later
+          StackOperationType.BIND -> {
+            if (expr is ExistsExpression) {
+              context.bindVariables(expr.vars)
+              stack.addLast(op.unbind())
+            } else if (expr is ForallExpression) {
+              context.bindVariables(expr.vars)
+              stack.addLast(op.unbind())
+            } else if (expr is LetExpression) {
+              context.bindVariables(expr.bindings)
+              stack.addLast(op.unbind())
+            }
+
+            stack.addAll(
+                expr.children.map { expression ->
+                  if (
+                      expression is ExistsExpression ||
+                          expression is ForallExpression ||
+                          expression is LetExpression
+                  ) {
+                    StackOperation(StackOperationType.BIND, expression)
+                  } else {
+                    StackOperation(StackOperationType.NONE, expression)
+                  }
+                }
+            )
+          }
+          StackOperationType.UNBIND -> {
+            context.unbindVariables()
+          }
+          StackOperationType.NONE -> {
+            stack.addAll(
+                expr.children.map { expression ->
+                  if (
+                      expression is ExistsExpression ||
+                          expression is ForallExpression ||
+                          expression is LetExpression
+                  ) {
+                    StackOperation(StackOperationType.BIND, expression)
+                  } else {
+                    StackOperation(StackOperationType.NONE, expression)
+                  }
+                }
+            )
+
+            // actual context check
+            // TODO maybe add smt function to expr.func
+            if (
+                expr.theories.all { it !in logic!!.theories } &&
+                    (expr !in context) &&
+                    expr !is AnnotatedExpression
+            ) {
+              throw IllegalArgumentException()
+            }
+          }
+          else -> throw IllegalArgumentException()
+        }
+      }
     }
   }
 
@@ -325,6 +389,8 @@ fun MutableSMTProgram.setOption(name: String, value: BigInteger) =
 
 fun MutableSMTProgram.setOption(name: String, value: OptionValue) =
     setOption(SetOption(name, value))
+
+fun MutableSMTProgram.setInfo(attribute: Attribute) = setInfo(SetInfo(attribute))
 
 fun MutableSMTProgram.setInfo(name: String, value: String) =
     setInfo(SetInfo(Attribute(name, ConstantAttributeValue(StringConstant(value)))))

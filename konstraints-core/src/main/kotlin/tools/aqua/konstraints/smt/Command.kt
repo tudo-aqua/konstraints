@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,37 +27,51 @@ sealed class Command(val command: String) : SMTSerializable {
 
 /** SMT (check-sat) command. */
 object CheckSat : Command("check-sat") {
-  override fun toSMTString(quotingRule: QuotingRule) = "($command)"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = "($command)"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      builder.append("($command)")
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable = builder.append("($command)")
 }
 
 /** SMT (exit) command. */
 object Exit : Command("exit") {
-  override fun toSMTString(quotingRule: QuotingRule) = "($command)"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = "($command)"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      builder.append("($command)")
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable = builder.append("($command)")
 }
 
 /** SMT (get-model) command. */
 object GetModel : Command("get-model") {
-  override fun toSMTString(quotingRule: QuotingRule) = "($command)"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = "($command)"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      builder.append("($command)")
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable = builder.append("($command)")
 }
 
 /** SMT (assert) command. */
 data class Assert(val expr: Expression<BoolSort>) : Command("assert") {
   override fun toString() = "(assert $expr)"
 
-  override fun toSMTString(quotingRule: QuotingRule) = "(assert ${expr.toSMTString(quotingRule)})"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(assert ${expr.toSMTString(quotingRule, useIterative)})"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     builder.append("(assert ")
-    expr.toSMTString(builder, quotingRule)
+    expr.toSMTString(builder, quotingRule, useIterative)
     return builder.append(")")
   }
 }
@@ -75,14 +89,18 @@ data class DeclareConst<T : Sort>(val instance: UserDeclaredExpression<T>) :
 
   override fun toString() = "(declare-const ${instance.name} ${instance.sort})"
 
-  override fun toSMTString(quotingRule: QuotingRule) =
-      "(declare-const ${instance.name.toSMTString(quotingRule)} ${instance.sort.toSMTString(quotingRule)})"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(declare-const ${instance.name.toSMTString(quotingRule, useIterative)} ${instance.sort.toSMTString(quotingRule, useIterative)})"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     builder.append("(declare-const ")
-    name.toSMTString(builder, quotingRule)
+    name.toSMTString(builder, quotingRule, useIterative)
     builder.append(" ")
-    sort.toSMTString(builder, quotingRule)
+    sort.toSMTString(builder, quotingRule, useIterative)
     return builder.append(")")
   }
 }
@@ -98,24 +116,30 @@ data class DeclareFun<T : Sort>(val func: SMTFunction<T>) : Command("declare-fun
   val sort = func.sort
 
   override fun toString() =
-      "declare-fun ${func.symbol} (${func.parameters.joinToString(" ")}) ${func.sort}"
+      "(declare-fun ${func.symbol} (${func.parameters.joinToString(" ")}) ${func.sort})"
 
-  override fun toSMTString(quotingRule: QuotingRule) =
-      "(declare-fun ${func.symbol.toSMTString(quotingRule)} (${func.parameters.joinToString(" ") {it.toSMTString(quotingRule)}}) ${func.sort.toSMTString(quotingRule)})"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(declare-fun ${func.symbol.toSMTString(quotingRule, useIterative)} (${func.parameters.joinToString(" ") {it.toSMTString(
+        quotingRule, useIterative,
+      )}}) ${func.sort.toSMTString(quotingRule, useIterative)})"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     builder.append("(declare-fun ")
-    func.symbol.toSMTString(builder, quotingRule)
+    func.symbol.toSMTString(builder, quotingRule, useIterative)
     builder.append(" (")
 
     var counter = 0
     func.parameters.forEach {
       if (++counter > 1) builder.append(" ")
-      it.toSMTString(builder, quotingRule)
+      it.toSMTString(builder, quotingRule, useIterative)
     }
     builder.append(") ")
 
-    sort.toSMTString(builder, quotingRule)
+    sort.toSMTString(builder, quotingRule, useIterative)
     return builder.append(")")
   }
 }
@@ -127,12 +151,16 @@ data class SetInfo(val attribute: Attribute) : Command("set-info") {
 
   override fun toString() = "set-info $attribute"
 
-  override fun toSMTString(quotingRule: QuotingRule) =
-      "(set-info ${attribute.toSMTString(quotingRule)})"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(set-info ${attribute.toSMTString(quotingRule, useIterative)})"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     builder.append("(set-info ")
-    attribute.toSMTString(builder, quotingRule)
+    attribute.toSMTString(builder, quotingRule, useIterative)
     return builder.append(")")
   }
 }
@@ -141,14 +169,18 @@ data class SetInfo(val attribute: Attribute) : Command("set-info") {
 data class Attribute(val keyword: String, val value: AttributeValue?) : SMTSerializable {
   override fun toString() = "$keyword $value"
 
-  override fun toSMTString(quotingRule: QuotingRule) =
-      "$keyword ${value?.toSMTString(quotingRule) ?: ""}"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "$keyword ${value?.toSMTString(quotingRule, useIterative) ?: ""}"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     builder.append(keyword)
     value?.let {
       builder.append(" ")
-      it.toSMTString(builder, quotingRule)
+      it.toSMTString(builder, quotingRule, useIterative)
     }
     return builder
   }
@@ -161,45 +193,54 @@ sealed interface AttributeValue : SMTSerializable
 data class ConstantAttributeValue(val constant: SpecConstant) : AttributeValue {
   override fun toString(): String = "$constant"
 
-  override fun toSMTString(quotingRule: QuotingRule) = constant.toString()
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = constant.toString()
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      builder.append(constant.toString())
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable = builder.append(constant.toString())
 }
 
 /** Symbolic attribute value. */
 data class SymbolAttributeValue(val symbol: Symbol) : AttributeValue {
-  override fun toString(): String = symbol.toSMTString(QuotingRule.SAME_AS_INPUT)
+  override fun toString(): String = symbol.toSMTString(QuotingRule.SAME_AS_INPUT, false)
 
-  override fun toSMTString(quotingRule: QuotingRule) = symbol.toSMTString(quotingRule)
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      symbol.toSMTString(quotingRule, useIterative)
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      symbol.toSMTString(builder, quotingRule)
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable = symbol.toSMTString(builder, quotingRule, useIterative)
 }
 
 /** SExpression attribute value. */
 data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : AttributeValue {
   override fun toString() = sExpressions.joinToString(separator = " ", prefix = "(", postfix = ")")
 
-  override fun toSMTString(quotingRule: QuotingRule): String {
-    TODO("Not yet implemented")
-  }
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      sExpressions.joinToString(separator = " ", prefix = "(", postfix = ")")
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
-    TODO("Not yet implemented")
-  }
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
+      sExpressions.joinTo(builder, separator = " ", prefix = "(", postfix = ")")
 }
 
 /** SMT (declare-sort [name] [arity]) command. */
 data class DeclareSort(val name: Symbol, val arity: Int) : Command("declare-sort") {
   override fun toString() = "declare-sort $name $arity"
 
-  override fun toSMTString(quotingRule: QuotingRule) =
-      "(declare-sort ${name.toSMTString(quotingRule)} $arity)"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(declare-sort ${name.toSMTString(quotingRule, useIterative)} $arity)"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     builder.append("(declare-sort ")
-    name.toSMTString(builder, quotingRule)
+    name.toSMTString(builder, quotingRule, useIterative)
     return builder.append(" $arity)")
   }
 }
@@ -209,22 +250,28 @@ data class DefineSort(val name: Symbol, var sortParameters: List<Symbol>, val so
     Command("define-sort") {
   override fun toString() = "define-sort $name (${sortParameters.joinToString(" ")}) $sort"
 
-  override fun toSMTString(quotingRule: QuotingRule) =
-      "(define-sort ${name.toSMTString(quotingRule)} (${sortParameters.joinToString(" "){ it.toSMTString(quotingRule) }}) ${sort.toSMTString(quotingRule)})"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(define-sort ${name.toSMTString(quotingRule, useIterative)} (${sortParameters.joinToString(" "){ it.toSMTString(quotingRule, useIterative) }}) ${sort.toSMTString(
+        quotingRule, useIterative,
+      )})"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     builder.append(" (define-sort ")
-    name.toSMTString(builder, quotingRule)
+    name.toSMTString(builder, quotingRule, useIterative)
     builder.append(" (")
 
     var counter = 0
     sortParameters.forEach {
       if (++counter > 1) builder.append(" ")
-      it.toSMTString(builder, quotingRule)
+      it.toSMTString(builder, quotingRule, useIterative)
     }
     builder.append(") ")
 
-    sort.toSMTString(builder, quotingRule)
+    sort.toSMTString(builder, quotingRule, useIterative)
     return builder.append(")")
   }
 }
@@ -234,12 +281,16 @@ data class DefineSort(val name: Symbol, var sortParameters: List<Symbol>, val so
 data class SetOption(val name: String, val value: OptionValue) : Command("set-option") {
   override fun toString() = "(set-option $name $value)"
 
-  override fun toSMTString(quotingRule: QuotingRule) =
-      "(set-option $name ${value.toSMTString(quotingRule)})"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(set-option $name ${value.toSMTString(quotingRule, useIterative)})"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     builder.append("(set-option $name ")
-    value.toSMTString(builder, quotingRule)
+    value.toSMTString(builder, quotingRule, useIterative)
     return builder.append(")")
   }
 }
@@ -249,44 +300,57 @@ sealed interface OptionValue : SMTSerializable
 
 /** Boolean option value. */
 data class BooleanOptionValue(val bool: Boolean) : OptionValue {
-  override fun toSMTString(quotingRule: QuotingRule) = bool.toString()
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = bool.toString()
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
       builder.append(bool.toString())
 }
 
 /** String option value. */
 data class StringOptionValue(val string: String) : OptionValue {
-  override fun toSMTString(quotingRule: QuotingRule) = string
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = string
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      builder.append(string)
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable = builder.append(string)
 }
 
 /** Numeral option value. */
 data class NumeralOptionValue(val numeral: BigInteger) : OptionValue {
-  override fun toSMTString(quotingRule: QuotingRule) = numeral.toString()
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = numeral.toString()
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      builder.append(numeral.toString())
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable = builder.append(numeral.toString())
 }
 
 /** Attribute option value. */
 data class AttributeOptionValue(val attribute: Attribute) : OptionValue {
-  override fun toSMTString(quotingRule: QuotingRule) = attribute.toSMTString(quotingRule)
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      attribute.toSMTString(quotingRule, useIterative)
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      attribute.toSMTString(builder, quotingRule)
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable = attribute.toSMTString(builder, quotingRule, useIterative)
 }
 
 /** SMT (set-logic [logic]) command. */
 data class SetLogic(val logic: Logic) : Command("set-logic") {
   override fun toString() = "(set-logic $logic)"
 
-  override fun toSMTString(quotingRule: QuotingRule) = toString()
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = toString()
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      builder.append(toString())
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable = builder.append(toString())
 }
 
 /** SMT (define-const [name] [sort] [term]) command. */
@@ -294,17 +358,21 @@ data class DefineConst(val name: Symbol, val sort: Sort, val term: Expression<So
     Command("define-const") {
   override fun toString() = "(define-const $name $sort $term)"
 
-  override fun toSMTString(quotingRule: QuotingRule) =
-      "(define-const ${name.toSMTString(quotingRule)} ${sort.toSMTString(quotingRule)} ${term.toSMTString(quotingRule)})"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(define-const ${name.toSMTString(quotingRule, useIterative)} ${sort.toSMTString(quotingRule, useIterative)} ${term.toSMTString(quotingRule, useIterative)})"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     builder.append("(define-const ")
 
-    name.toSMTString(builder, quotingRule)
+    name.toSMTString(builder, quotingRule, useIterative)
     builder.append(" ")
-    sort.toSMTString(builder, quotingRule)
+    sort.toSMTString(builder, quotingRule, useIterative)
     builder.append(" ")
-    term.toSMTString(builder, quotingRule)
+    term.toSMTString(builder, quotingRule, useIterative)
 
     return builder.append(")")
   }
@@ -326,24 +394,30 @@ data class DefineFun(val functionDef: FunctionDef<*>) : Command("define-fun $fun
 
   override fun toString() = "(define-fun $functionDef)"
 
-  override fun toSMTString(quotingRule: QuotingRule) =
-      "(define-fun ${functionDef.name.toSMTString(quotingRule)} (${functionDef.parameters.joinToString(" "){it.toSMTString(quotingRule)}}) ${functionDef.sort.toSMTString(quotingRule)} ${functionDef.term.toSMTString(quotingRule)})"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(define-fun ${functionDef.name.toSMTString(quotingRule, useIterative)} (${functionDef.parameters.joinToString(" "){it.toSMTString(
+        quotingRule, useIterative,
+      )}}) ${functionDef.sort.toSMTString(quotingRule, useIterative)} ${functionDef.term.toSMTString(quotingRule, useIterative)})"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     builder.append("(define-fun ")
-    functionDef.name.toSMTString(builder, quotingRule)
+    functionDef.name.toSMTString(builder, quotingRule, useIterative)
     builder.append(" (")
 
     var counter = 0
     functionDef.parameters.forEach {
       if (++counter > 1) builder.append(" ")
-      it.toSMTString(builder, quotingRule)
+      it.toSMTString(builder, quotingRule, useIterative)
     }
     builder.append(") ")
 
-    functionDef.sort.toSMTString(builder, quotingRule)
+    functionDef.sort.toSMTString(builder, quotingRule, useIterative)
     builder.append(" ")
-    functionDef.term.toSMTString(builder, quotingRule)
+    functionDef.term.toSMTString(builder, quotingRule, useIterative)
     return builder.append(")")
   }
 }
@@ -383,18 +457,43 @@ data class FunctionDef<out S : Sort>(
 data class Push(val n: Int) : Command("push") {
   override fun toString() = "(push $n)"
 
-  override fun toSMTString(quotingRule: QuotingRule) = toString()
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = toString()
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      builder.append(toString())
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable = builder.append(toString())
 }
 
 /** SMT (pop [n]) command. */
 data class Pop(val n: Int) : Command("pop") {
   override fun toString() = "(pop $n)"
 
-  override fun toSMTString(quotingRule: QuotingRule) = toString()
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = toString()
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      builder.append(toString())
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable = builder.append(toString())
+}
+
+class GetValue(val terms: List<Expression<*>>) : Command("get-value") {
+  override fun toString() = "(get-value (${terms.joinToString(" ")}))"
+
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(get-value (${terms.joinToString(" "){it.toSMTString(
+    quotingRule, useIterative,
+  )}}))"
+
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
+    builder.append("(get-value (")
+    terms.forEach { it.toSMTString(builder, quotingRule, useIterative) }
+    return builder.append("))")
+  }
 }

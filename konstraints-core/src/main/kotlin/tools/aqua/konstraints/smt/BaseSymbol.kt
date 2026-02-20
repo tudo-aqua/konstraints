@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,14 +18,12 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.parser.Parser
-
 interface BaseSymbol : SMTSerializable
 
 /** String representation of a smt keyword. */
 class Keyword(val value: String) : BaseSymbol {
   init {
-    Parser.reserved.parse(value)
+    // TODO check that value is a reserved word
   }
 
   override fun equals(other: Any?): Boolean =
@@ -33,18 +31,24 @@ class Keyword(val value: String) : BaseSymbol {
 
   override fun hashCode() = value.hashCode()
 
-  override fun toSMTString(quotingRule: QuotingRule) = value
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = value
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      builder.append(toSMTString(quotingRule))
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable = builder.append(toSMTString(quotingRule, useIterative))
 }
 
 /** String representation of a smt literal. */
 class LiteralString(val value: String) : BaseSymbol {
   override fun toString() = value
 
-  override fun toSMTString(quotingRule: QuotingRule) = value
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = value
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      builder.append(toSMTString(quotingRule))
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable = builder.append(toSMTString(quotingRule, useIterative))
 }

@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,7 +26,7 @@ sealed interface SpecConstant
 
 /** SMT String constant. */
 data class StringConstant(val string: String) : SpecConstant {
-  override fun toString(): String = "\"$string\""
+  override fun toString(): String = "\"${string.trim('"')}\""
 }
 
 /** SMT Numeral constant. */
@@ -36,6 +36,10 @@ data class NumeralConstant(val numeral: BigInteger) : SpecConstant {
 
 /** BinaryConstant of the form #b followed by a non-empty sequence of 0 and 1 characters. */
 data class BinaryConstant(val binary: String) : SpecConstant {
+  init {
+    require(binary.isSMTBinary())
+  }
+
   /* Number of bits for this binary */
   val bits = binary.length - 2
 
@@ -47,6 +51,10 @@ data class BinaryConstant(val binary: String) : SpecConstant {
  * to F , capitalized or not.
  */
 data class HexConstant(val hexadecimal: String) : SpecConstant {
+  init {
+    require(hexadecimal.isSMTHex())
+  }
+
   /* Number of bits for this hexadecimal */
   val bits = (hexadecimal.length - 2) * 4
 

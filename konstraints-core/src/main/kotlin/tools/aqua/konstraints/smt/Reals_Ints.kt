@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import tools.aqua.konstraints.parser.*
  * - `(to_real [inner])`
  */
 class ToReal(override val inner: Expression<IntSort>) :
-    UnaryExpression<RealSort, IntSort>("to_real".toSymbolWithQuotes(), Real) {
+    UnaryExpression<RealSort, IntSort>("to_real".toSymbol(), SMTReal) {
   override val theories = REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<RealSort> =
@@ -44,7 +44,7 @@ class ToReal(override val inner: Expression<IntSort>) :
  * - `(to_int [inner])`
  */
 class ToInt(override val inner: Expression<RealSort>) :
-    UnaryExpression<IntSort, RealSort>("to_int".toSymbolWithQuotes(), SMTInt) {
+    UnaryExpression<IntSort, RealSort>("to_int".toSymbol(), SMTInt) {
   override val theories = REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
@@ -53,7 +53,7 @@ class ToInt(override val inner: Expression<RealSort>) :
 
 /** `(is_int Real Bool)`. */
 class IsInt(override val inner: Expression<RealSort>) :
-    UnaryExpression<BoolSort, RealSort>("is_int".toSymbolWithQuotes(), Bool) {
+    UnaryExpression<BoolSort, RealSort>("is_int".toSymbol(), SMTBool) {
   override val theories = REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> =

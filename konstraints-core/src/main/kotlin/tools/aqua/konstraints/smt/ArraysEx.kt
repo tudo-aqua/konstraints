@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,7 +33,7 @@ import tools.aqua.konstraints.parser.*
 class ArraySelect<X : Sort, Y : Sort>(
     val array: Expression<ArraySort<X, Y>>,
     val index: Expression<X>,
-) : BinaryExpression<Y, ArraySort<X, Y>, X>("select".toSymbolWithQuotes(), array.sort.y) {
+) : BinaryExpression<Y, ArraySort<X, Y>, X>("select".toSymbol(), array.sort.y) {
   override val theories = ARRAYS_EX_MARKER_SET
 
   init {
@@ -60,7 +60,7 @@ class ArrayStore<out X : Sort, out Y : Sort>(
     val value: Expression<Y>,
 ) :
     TernaryExpression<ArraySort<X, Y>, ArraySort<X, Y>, X, Y>(
-        "store".toSymbolWithQuotes(),
+        "store".toSymbol(),
         array.sort,
     ) {
   override val theories = ARRAYS_EX_MARKER_SET

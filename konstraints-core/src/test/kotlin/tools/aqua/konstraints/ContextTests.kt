@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,11 +30,12 @@ import tools.aqua.konstraints.smt.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ContextTests {
-  val boolFunc1 = UserDeclaredSMTFunction0("A".toSymbolWithQuotes(), Bool)
-  val boolFunc2 = UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), Bool, BVSort(8), BVSort(8))
-  val boolFunc2Copy = UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), Bool, BVSort(8), BVSort(8))
+  val boolFunc1 = UserDeclaredSMTFunction0("A".toSymbol(), SMTBool)
+  val boolFunc2 = UserDeclaredSMTFunction2("B".toSymbol(), SMTBool, BitVecSort(8), BitVecSort(8))
+  val boolFunc2Copy =
+      UserDeclaredSMTFunction2("B".toSymbol(), SMTBool, BitVecSort(8), BitVecSort(8))
   val boolFunc2Overloaded =
-      UserDeclaredSMTFunction2("B".toSymbolWithQuotes(), Bool, BVSort(16), BVSort(16))
+      UserDeclaredSMTFunction2("B".toSymbol(), SMTBool, BitVecSort(16), BitVecSort(16))
 
   @ParameterizedTest
   @MethodSource("getContextAndNames")
@@ -75,16 +76,16 @@ class ContextTests {
 
   private fun getContextAndIllegalNameFunctions(): Stream<Arguments> =
       Stream.of(
-          arguments(createContext(), UserDeclaredSMTFunction0("and".toSymbolWithQuotes(), Bool)),
-          arguments(createContext(), UserDeclaredSMTFunction0("true".toSymbolWithQuotes(), Bool)),
+          arguments(createContext(), UserDeclaredSMTFunction0("and".toSymbol(), SMTBool)),
+          arguments(createContext(), UserDeclaredSMTFunction0("true".toSymbol(), SMTBool)),
           arguments(
               createContext(),
-              UserDeclaredSMTFunction0("distinct".toSymbolWithQuotes(), Bool),
+              UserDeclaredSMTFunction0("distinct".toSymbol(), SMTBool),
           ),
-          arguments(createContext(), UserDeclaredSMTFunction0("bvadd".toSymbolWithQuotes(), Bool)),
+          arguments(createContext(), UserDeclaredSMTFunction0("bvadd".toSymbol(), SMTBool)),
           arguments(
               createContext(),
-              UserDeclaredSMTFunction0("extract".toSymbolWithQuotes(), Bool),
+              UserDeclaredSMTFunction0("extract".toSymbol(), SMTBool),
           ),
       )
 
@@ -109,7 +110,7 @@ class ContextTests {
 
   private fun getContextAndNewFunction() =
       Stream.of(
-          arguments(createContext(), UserDeclaredSMTFunction0("C".toSymbolWithQuotes(), Bool)),
+          arguments(createContext(), UserDeclaredSMTFunction0("C".toSymbol(), SMTBool)),
       )
 
   @ParameterizedTest
@@ -122,7 +123,7 @@ class ContextTests {
 
   private fun getContextAndBindings() =
       Stream.of(
-          arguments(createContext(), listOf(VarBinding("binding".toSymbolWithQuotes(), True))),
+          arguments(createContext(), listOf(VarBinding("binding".toSymbol(), True))),
       )
 
   @ParameterizedTest
@@ -151,7 +152,7 @@ class ContextTests {
 
   private fun getContextAndShadowingBindings() =
       Stream.of(
-          arguments(createContext(), listOf(VarBinding("A".toSymbolWithQuotes(), True))),
+          arguments(createContext(), listOf(VarBinding("A".toSymbol(), True))),
       )
 
   @ParameterizedTest
@@ -166,17 +167,17 @@ class ContextTests {
       Stream.of(
           arguments(
               createContext(),
-              UserDeclaredSMTFunction0("|Quoted|".toSymbolWithQuotes(), Bool),
+              UserDeclaredSMTFunction0("|Quoted|".toSymbol(), SMTBool),
               "Quoted",
           ),
           arguments(
               createContext(),
-              UserDeclaredSMTFunction0("|Quoted|".toSymbolWithQuotes(), Bool),
+              UserDeclaredSMTFunction0("|Quoted|".toSymbol(), SMTBool),
               "|Quoted|",
           ),
           arguments(
               createContext(),
-              UserDeclaredSMTFunction0("Unquoted".toSymbolWithQuotes(), Bool),
+              UserDeclaredSMTFunction0("Unquoted".toSymbol(), SMTBool),
               "|Unquoted|",
           ),
       )

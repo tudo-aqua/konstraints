@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,7 @@ import java.math.BigInteger
  */
 class BVLiteral
 private constructor(vector: String, val bits: Int, val isBinary: Boolean, val value: BigInteger) :
-    Literal<BVSort>(LiteralString(vector), BVSort(bits)) {
+    Literal<BitVecSort>(LiteralString(vector), BitVecSort(bits)) {
   companion object {
     operator fun invoke(vector: String): BVLiteral =
         if (vector.isSMTBinary()) {
@@ -65,11 +65,11 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
   override val theories: Set<Theories>
     get() = theoriesSet
 
-  override val sort = BVSort(bits)
+  override val sort = BitVecSort(bits)
 
   override fun toString() = name.toString()
 
-  override fun copy(children: List<Expression<*>>): Expression<BVSort> = this
+  override fun copy(children: List<Expression<*>>): Expression<BitVecSort> = this
 
   override fun equals(other: Any?) =
       if (this === other) true
@@ -82,9 +82,9 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
  * (fp [sign] [exponent] [significand])
  */
 data class FPLiteral(
-    val sign: Expression<BVSort>,
-    val exponent: Expression<BVSort>,
-    val significand: Expression<BVSort>,
+    val sign: Expression<BitVecSort>,
+    val exponent: Expression<BitVecSort>,
+    val significand: Expression<BitVecSort>,
 ) :
     Literal<FPSort>(
         LiteralString("(fp $sign $exponent $significand)"),
@@ -170,7 +170,7 @@ class IntLiteral(val value: BigInteger) :
  * (NUMERAL Real) (DECIMAL Real)
  */
 class RealLiteral(val value: BigDecimal) :
-    Literal<RealSort>(LiteralString(value.toPlainString()), Real) {
+    Literal<RealSort>(LiteralString(value.toPlainString()), SMTReal) {
   override val theories = REALS_REALS_INTS_MARKER_SET.plus(FLOATING_POINT_MARKER_SET)
 
   constructor(value: Byte) : this(value.toInt().toBigDecimal())
@@ -187,7 +187,7 @@ class RealLiteral(val value: BigDecimal) :
 
   constructor(value: Double) : this(value.toBigDecimal())
 
-  override val sort: RealSort = Real
+  override val sort: RealSort = SMTReal
 
   override fun toString(): String = value.toPlainString()
 
@@ -221,15 +221,16 @@ class Char(val value: String) : Literal<StringSort>(LiteralString("char"), SMTSt
       if (this === other) true else if (other !is Char) false else character == other.character
 }
 
-class StringLiteral(val value: String) : Literal<StringSort>(LiteralString(value), SMTString) {
+class StringLiteral(val value: String) :
+    Literal<StringSort>(LiteralString("\"$value\""), SMTString) {
   override val theories = STRINGS_MARKER_SET
 
   // use symbol.toString here to get the unquoted string literal
   override fun toString(): String = "\"$value\""
 
-  override fun toSMTString(quotingRule: QuotingRule) = toString()
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = toString()
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule) =
+  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
       builder.append(toString())
 
   override fun copy(children: List<Expression<*>>): Expression<StringSort> = this

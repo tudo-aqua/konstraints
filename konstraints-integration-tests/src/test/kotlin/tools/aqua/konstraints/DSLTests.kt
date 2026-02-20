@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,12 +38,12 @@ class DSLTests {
 
     val program =
         smt(QF_FPLRA) {
-          val A = const("A", Bool)
-          val B = const("B", Bool)
-          val C = const("C", Bool)
+          val A = const("A", SMTBool)
+          val B = const("B", SMTBool)
+          val C = const("C", SMTBool)
 
-          val D = const("D", Real)
-          val E = const("E", Real)
+          val D = const("D", SMTReal)
+          val E = const("E", SMTReal)
 
           val F = const("F", FPSort(5, 11))
 
@@ -111,8 +111,8 @@ class DSLTests {
       Stream.of(
           arguments(
               smt(QF_BV) {
-                val s = const(BVSort(32))
-                val t = const(BVSort(32))
+                val s = const(BitVecSort(32))
+                val t = const(BitVecSort(32))
 
                 assert {
                   not {
@@ -128,8 +128,8 @@ class DSLTests {
           ),
           arguments(
               smt(QF_BV) {
-                val s = const(BVSort(32))
-                val t = const(BVSort(32))
+                val s = const(BitVecSort(32))
+                val t = const(BitVecSort(32))
 
                 assert { not { (s bvand s) eq s } }
                 checkSat()
@@ -138,8 +138,8 @@ class DSLTests {
           ),
           arguments(
               smt(QF_BV) {
-                val s = const(BVSort(32))
-                val t = const(BVSort(32))
+                val s = const(BitVecSort(32))
+                val t = const(BitVecSort(32))
 
                 assert { not { (s bvlshr s) eq "#b0".bitvec(32) } }
                 checkSat()
@@ -148,8 +148,8 @@ class DSLTests {
           ),
           arguments(
               smt(QF_BV) {
-                val s = const(BVSort(32))
-                val t = const(BVSort(32))
+                val s = const(BitVecSort(32))
+                val t = const(BitVecSort(32))
 
                 assert { not { s bvor s eq s } }
                 checkSat()
@@ -158,8 +158,8 @@ class DSLTests {
           ),
           arguments(
               smt(QF_BV) {
-                val s = const(BVSort(32))
-                val t = const(BVSort(32))
+                val s = const(BitVecSort(32))
+                val t = const(BitVecSort(32))
 
                 assert { not { s bvadd "#b0".bitvec(32) eq s } }
                 checkSat()
@@ -168,8 +168,8 @@ class DSLTests {
           ),
           arguments(
               smt(QF_BV) {
-                val s = const(BVSort(32))
-                val t = const(BVSort(32))
+                val s = const(BitVecSort(32))
+                val t = const(BitVecSort(32))
 
                 assert { not { s bvmul "#b0".bitvec(32) eq "#b0".bitvec(32) } }
                 checkSat()
@@ -220,7 +220,7 @@ class DSLTests {
           ),
           arguments(
               smt(QF_BV) {
-                assert { exists(BVSort(8), BVSort(8)) { x, y -> (x bvadd y) bvult x } }
+                assert { exists(BitVecSort(8), BitVecSort(8)) { x, y -> (x bvadd y) bvult x } }
                 checkSat()
               },
               SatStatus.SAT,
@@ -229,25 +229,25 @@ class DSLTests {
               smt(QF_BV) {
                 assert {
                   exists(
-                      BVSort(3),
-                      BVSort(3),
-                      BVSort(3),
-                      BVSort(3),
-                      BVSort(3),
-                      BVSort(3),
-                      BVSort(3),
-                      BVSort(3),
-                      BVSort(3),
+                      BitVecSort(3),
+                      BitVecSort(3),
+                      BitVecSort(3),
+                      BitVecSort(3),
+                      BitVecSort(3),
+                      BitVecSort(3),
+                      BitVecSort(3),
+                      BitVecSort(3),
+                      BitVecSort(3),
                   ) { exprs ->
-                    val x1 = exprs[0] as Expression<BVSort>
-                    val x2 = exprs[0] as Expression<BVSort>
-                    val x3 = exprs[0] as Expression<BVSort>
-                    val x4 = exprs[0] as Expression<BVSort>
-                    val x5 = exprs[0] as Expression<BVSort>
-                    val x6 = exprs[0] as Expression<BVSort>
-                    val x7 = exprs[0] as Expression<BVSort>
-                    val x8 = exprs[0] as Expression<BVSort>
-                    val x9 = exprs[0] as Expression<BVSort>
+                    val x1 = exprs[0] as Expression<BitVecSort>
+                    val x2 = exprs[0] as Expression<BitVecSort>
+                    val x3 = exprs[0] as Expression<BitVecSort>
+                    val x4 = exprs[0] as Expression<BitVecSort>
+                    val x5 = exprs[0] as Expression<BitVecSort>
+                    val x6 = exprs[0] as Expression<BitVecSort>
+                    val x7 = exprs[0] as Expression<BitVecSort>
+                    val x8 = exprs[0] as Expression<BitVecSort>
+                    val x9 = exprs[0] as Expression<BitVecSort>
                     (x1 distinct
                         x2 distinct
                         x3 distinct
@@ -267,25 +267,25 @@ class DSLTests {
               smt(QF_BV) {
                 assert {
                   exists(
-                      BVSort(3),
-                      BVSort(3),
-                      BVSort(3),
-                      BVSort(3),
-                      BVSort(3),
-                      BVSort(3),
-                      BVSort(3),
-                      BVSort(3),
-                      BVSort(3),
+                      BitVecSort(3),
+                      BitVecSort(3),
+                      BitVecSort(3),
+                      BitVecSort(3),
+                      BitVecSort(3),
+                      BitVecSort(3),
+                      BitVecSort(3),
+                      BitVecSort(3),
+                      BitVecSort(3),
                   ) { exprs ->
-                    val x1 = exprs[0] as Expression<BVSort>
-                    val x2 = exprs[1] as Expression<BVSort>
-                    val x3 = exprs[2] as Expression<BVSort>
-                    val x4 = exprs[3] as Expression<BVSort>
-                    val x5 = exprs[4] as Expression<BVSort>
-                    val x6 = exprs[5] as Expression<BVSort>
-                    val x7 = exprs[6] as Expression<BVSort>
-                    val x8 = exprs[7] as Expression<BVSort>
-                    val x9 = exprs[8] as Expression<BVSort>
+                    val x1 = exprs[0] as Expression<BitVecSort>
+                    val x2 = exprs[1] as Expression<BitVecSort>
+                    val x3 = exprs[2] as Expression<BitVecSort>
+                    val x4 = exprs[3] as Expression<BitVecSort>
+                    val x5 = exprs[4] as Expression<BitVecSort>
+                    val x6 = exprs[5] as Expression<BitVecSort>
+                    val x7 = exprs[6] as Expression<BitVecSort>
+                    val x8 = exprs[7] as Expression<BitVecSort>
+                    val x9 = exprs[8] as Expression<BitVecSort>
                     (x1 eq { x2 } eq x3 eq x4 eq x5 eq x6 eq x7 eq x8 eq x9)
                   }
                 }
@@ -295,8 +295,8 @@ class DSLTests {
           ),
           arguments(
               smt(QF_BV) {
-                val X by declaringConst(BVSort(8))
-                val Y by declaringConst(BVSort(8))
+                val X by declaringConst(BitVecSort(8))
+                val Y by declaringConst(BitVecSort(8))
 
                 assert { X bvult Y }
                 checkSat()
@@ -306,7 +306,7 @@ class DSLTests {
           arguments(
               smt(QF_BV) {
                 assert {
-                  forall(BVSort(8), BVSort(8)) { s, t ->
+                  forall(BitVecSort(8), BitVecSort(8)) { s, t ->
                     val msb_s = extract(s.sort.bits - 1, s.sort.bits - 1) { s }
                     val msb_t = extract(t.sort.bits - 1, t.sort.bits - 1) { t }
                     val expanded =
@@ -342,7 +342,7 @@ class DSLTests {
           arguments(
               smt(QF_BV) {
                 val bvugt2 by
-                    defining(Bool, BVSort(8), BVSort(8)) { s, t ->
+                    defining(SMTBool, BitVecSort(8), BitVecSort(8)) { s, t ->
                       not { s eq t } and not { s bvult t }
                     }
                 assert { bvugt2("#b11111111".bitvec(), "#b01111111".bitvec()) }
@@ -352,8 +352,8 @@ class DSLTests {
           ),
           arguments(
               smt(QF_UF) {
-                val A by declaringConst(Bool)
-                val B by declaringConst(Bool)
+                val A by declaringConst(SMTBool)
+                val B by declaringConst(SMTBool)
                 assert { A implies { B } implies A }
                 checkSat()
               },
@@ -361,8 +361,8 @@ class DSLTests {
           ),
           arguments(
               smt(QF_UF) {
-                val A = const(Bool)
-                val B = const(Bool)
+                val A = const(SMTBool)
+                val B = const(SMTBool)
                 assert { A implies { B } implies A }
                 checkSat()
               },
@@ -383,8 +383,8 @@ class DSLTests {
           ),
           arguments(
               smt(QF_ABV) {
-                val x by declaringConst(SMTArray(BVSort(32), BVSort(8)))
-                val y by declaringConst(SMTArray(BVSort(32), BVSort(8)))
+                val x by declaringConst(SMTArray(BitVecSort(32), BitVecSort(8)))
+                val y by declaringConst(SMTArray(BitVecSort(32), BitVecSort(8)))
 
                 assert {
                   ("#b0".bitvec(30) concat extract(2, 1) { select(x, "#b0".bitvec(32)) }) eq

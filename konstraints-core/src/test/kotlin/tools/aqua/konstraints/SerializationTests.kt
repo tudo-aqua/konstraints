@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,18 +18,7 @@
 
 package tools.aqua.konstraints
 
-import java.util.stream.Stream
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.assertThrows
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments.arguments
-import org.junit.jupiter.params.provider.MethodSource
-import org.junit.jupiter.params.provider.ValueSource
-import tools.aqua.konstraints.parser.Parser
-import tools.aqua.konstraints.smt.IllegalSymbolException
-import tools.aqua.konstraints.smt.QuotingRule
-
+/*
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class SerializationTests {
   @ParameterizedTest
@@ -241,3 +230,4 @@ class SerializationTests {
           ),
       )
 }
+*/

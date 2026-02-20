@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,7 +31,7 @@ import tools.aqua.konstraints.parser.*
  * (- Int Int)
  */
 class IntNeg(override val inner: Expression<IntSort>) :
-    UnaryExpression<IntSort, IntSort>("-".toSymbolWithQuotes(), SMTInt) {
+    UnaryExpression<IntSort, IntSort>("-".toSymbol(), SMTInt) {
   override val theories = INTS_REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
@@ -44,7 +44,7 @@ class IntNeg(override val inner: Expression<IntSort>) :
  * (- Int Int Int :left-assoc)
  */
 class IntSub(val terms: List<Expression<IntSort>>) :
-    HomogenousExpression<IntSort, IntSort>("-".toSymbolWithQuotes(), SMTInt) {
+    HomogenousExpression<IntSort, IntSort>("-".toSymbol(), SMTInt) {
   override val theories = INTS_REALS_INTS_MARKER_SET
 
   init {
@@ -67,7 +67,7 @@ class IntSub(val terms: List<Expression<IntSort>>) :
  * (+ Int Int Int :left-assoc)
  */
 class IntAdd(val terms: List<Expression<IntSort>>) :
-    HomogenousExpression<IntSort, IntSort>("+".toSymbolWithQuotes(), SMTInt) {
+    HomogenousExpression<IntSort, IntSort>("+".toSymbol(), SMTInt) {
   override val theories = INTS_REALS_INTS_MARKER_SET
 
   init {
@@ -90,7 +90,7 @@ class IntAdd(val terms: List<Expression<IntSort>>) :
  * (* Int Int Int :left-assoc)
  */
 class IntMul(val factors: List<Expression<IntSort>>) :
-    HomogenousExpression<IntSort, IntSort>("*".toSymbolWithQuotes(), SMTInt) {
+    HomogenousExpression<IntSort, IntSort>("*".toSymbol(), SMTInt) {
   override val theories = INTS_REALS_INTS_MARKER_SET
 
   init {
@@ -113,7 +113,7 @@ class IntMul(val factors: List<Expression<IntSort>>) :
  * (div Int Int Int :left-assoc)
  */
 class IntDiv(val terms: List<Expression<IntSort>>) :
-    HomogenousExpression<IntSort, IntSort>("div".toSymbolWithQuotes(), SMTInt) {
+    HomogenousExpression<IntSort, IntSort>("div".toSymbol(), SMTInt) {
   override val theories = INTS_REALS_INTS_MARKER_SET
 
   init {
@@ -136,7 +136,7 @@ class IntDiv(val terms: List<Expression<IntSort>>) :
  * (mod Int Int Int)
  */
 class Mod(val dividend: Expression<IntSort>, val divisor: Expression<IntSort>) :
-    BinaryExpression<IntSort, IntSort, IntSort>("mod".toSymbolWithQuotes(), SMTInt) {
+    BinaryExpression<IntSort, IntSort, IntSort>("mod".toSymbol(), SMTInt) {
   override val theories = INTS_REALS_INTS_MARKER_SET
 
   override val lhs: Expression<IntSort> = dividend
@@ -153,7 +153,7 @@ class Mod(val dividend: Expression<IntSort>, val divisor: Expression<IntSort>) :
  * (abs Int Int)
  */
 class Abs(override val inner: Expression<IntSort>) :
-    UnaryExpression<IntSort, IntSort>("abs".toSymbolWithQuotes(), SMTInt) {
+    UnaryExpression<IntSort, IntSort>("abs".toSymbol(), SMTInt) {
   override val theories = INTS_REALS_INTS_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<IntSort> =
@@ -166,7 +166,7 @@ class Abs(override val inner: Expression<IntSort>) :
  * (<= Int Int Bool :chainable)
  */
 class IntLessEq(val terms: List<Expression<IntSort>>) :
-    HomogenousExpression<BoolSort, IntSort>("<=".toSymbolWithQuotes(), Bool) {
+    HomogenousExpression<BoolSort, IntSort>("<=".toSymbol(), SMTBool) {
   override val theories = INTS_REALS_INTS_MARKER_SET
 
   constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
@@ -189,7 +189,7 @@ class IntLessEq(val terms: List<Expression<IntSort>>) :
  * (< Int Int Bool :chainable)
  */
 class IntLess(val terms: List<Expression<IntSort>>) :
-    HomogenousExpression<BoolSort, IntSort>("<".toSymbolWithQuotes(), Bool) {
+    HomogenousExpression<BoolSort, IntSort>("<".toSymbol(), SMTBool) {
   override val theories = INTS_REALS_INTS_MARKER_SET
 
   constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
@@ -212,7 +212,7 @@ class IntLess(val terms: List<Expression<IntSort>>) :
  * (>= Int Int Bool :chainable)
  */
 class IntGreaterEq(val terms: List<Expression<IntSort>>) :
-    HomogenousExpression<BoolSort, IntSort>(">=".toSymbolWithQuotes(), Bool) {
+    HomogenousExpression<BoolSort, IntSort>(">=".toSymbol(), SMTBool) {
   override val theories = INTS_REALS_INTS_MARKER_SET
 
   constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
@@ -235,7 +235,7 @@ class IntGreaterEq(val terms: List<Expression<IntSort>>) :
  * (> Int Int Bool :chainable)
  */
 class IntGreater(val terms: List<Expression<IntSort>>) :
-    HomogenousExpression<BoolSort, IntSort>(">".toSymbolWithQuotes(), Bool) {
+    HomogenousExpression<BoolSort, IntSort>(">".toSymbol(), SMTBool) {
   override val theories = INTS_REALS_INTS_MARKER_SET
 
   constructor(vararg terms: Expression<IntSort>) : this(terms.toList())
@@ -260,7 +260,7 @@ class IntGreater(val terms: List<Expression<IntSort>>) :
  * ((_ divisible n) Int Bool)
  */
 class Divisible(val n: Int, override val inner: Expression<IntSort>) :
-    UnaryExpression<BoolSort, IntSort>("divisible".toSymbolWithQuotes(), Bool) {
+    UnaryExpression<BoolSort, IntSort>("divisible".toSymbol(), SMTBool) {
   override val theories = INTS_REALS_INTS_MARKER_SET
   override val indices = listOf(n)
 

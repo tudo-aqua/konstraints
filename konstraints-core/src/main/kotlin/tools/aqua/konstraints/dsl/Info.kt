@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import tools.aqua.konstraints.smt.SetInfo
 import tools.aqua.konstraints.smt.StringConstant
 import tools.aqua.konstraints.smt.Symbol
 import tools.aqua.konstraints.smt.SymbolAttributeValue
-import tools.aqua.konstraints.smt.toSymbolWithQuotes
+import tools.aqua.konstraints.smt.toSymbol
 
 enum class BenchmarkCategory {
   /** hand-crafted benchmark */
@@ -101,7 +101,7 @@ class InfoBuilder {
         infos.add(
             SetInfo(
                 ":smt-lib-source",
-                SymbolAttributeValue("|${source.removeSurrounding("|")}|".toSymbolWithQuotes()),
+                SymbolAttributeValue("|${source.removeSurrounding("|")}|".toSymbol()),
             )
         )
       }

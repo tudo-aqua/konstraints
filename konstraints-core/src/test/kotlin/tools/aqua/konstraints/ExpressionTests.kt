@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,21 +18,7 @@
 
 package tools.aqua.konstraints
 
-import java.io.BufferedReader
-import java.io.File
-import java.util.stream.Stream
-import kotlin.streams.asStream
-import kotlin.use
-import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Assumptions.assumeTrue
-import org.junit.jupiter.api.Disabled
-import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.MethodSource
-import tools.aqua.konstraints.parser.Parser
-import tools.aqua.konstraints.smt.Assert
-
+/*
 @Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ExpressionTests {
@@ -123,3 +109,4 @@ class ExpressionTests {
               loadResourceZipped("/QF_FP/wintersteiger/"))
           .asStream()
 }
+*/

@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,12 +16,14 @@
  * limitations under the License.
  */
 
-package tools.aqua.konstraints.parser
+package tools.aqua.konstraints.parser.lexer
 
-import tools.aqua.konstraints.smt.*
+import tools.aqua.konstraints.parser.location.SourceLocation
 
-// Terms
+open class LexerException(s: String) : IllegalStateException(s)
 
-data class Pattern(val symbols: List<Symbol>)
+class UnexpectedEOFException(val location: SourceLocation, hint: String) :
+    LexerException("unexpected EOF after $location, expected $hint")
 
-data class MatchCase(val pattern: Pattern, val term: Expression<*>)
+class UnexpectedCharacterException(val location: SourceLocation, val found: Char, hint: String) :
+    LexerException("unexpected '$found' at $location, expected $hint")

@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -78,7 +78,8 @@ internal constructor(
             "exists",
             "HEXADECIMAL",
             "forall",
-            "lambda",
+            /* "lambda", */
+            // we do not implement smt 2.7 yet (this breaks some smt 2.6 benchmarks)
             "let",
             "match",
             "NUMERAL",
@@ -150,10 +151,10 @@ internal constructor(
       }
 
   /** Returns the internal representation of the symbol without any quotes. */
-  override fun toString() = toSMTString(QuotingRule.SAME_AS_INPUT)
+  override fun toString() = toSMTString(QuotingRule.SAME_AS_INPUT, false)
 
   /** Returns a valid SMT String with reconstructed quoting. */
-  override fun toSMTString(rule: QuotingRule) =
+  override fun toSMTString(rule: QuotingRule, useIterative: Boolean) =
       when (rule) {
         QuotingRule.NEVER -> if (!isSimple) throw IllegalSymbolException(value) else value
         QuotingRule.SAME_AS_INPUT -> if (isQuoted) "|$value|" else value
@@ -161,13 +162,28 @@ internal constructor(
         QuotingRule.ALWAYS -> "|$value|"
       }
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable =
-      builder.append(toSMTString(quotingRule))
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable = builder.append(toSMTString(quotingRule, useIterative))
 }
 
 class IllegalSymbolException(val symbol: String) :
     RuntimeException("$symbol is not a legal SMT symbol")
 
-fun String.toSymbolWithQuotes() = Symbol(this, this.startsWith("|") && this.endsWith("|"))
+/**
+ * Build a smt symbol from [this]. If [this] starts and ends with the pipe character '|', the string
+ * will be interpreted as a quoted symbol.
+ *
+ * @throws [IllegalSymbolException] if [this] is not a valid smt symbol
+ */
+fun String.toSymbol() = Symbol(this, this.startsWith("|") && this.endsWith("|"))
 
-fun String.toSymbolAsIs(wasQuoted: Boolean = false) = Symbol(this, wasQuoted)
+/**
+ * Build a quoted smt symbol from [this]. Note that [this] must not start or end with the pipe
+ * character as the string will be interpreted as the quoted symbols content.
+ *
+ * @throws [IllegalSymbolException] if [this] is not a valid smt symbol
+ */
+fun String.toQuotedSymbol() = Symbol(this, true)

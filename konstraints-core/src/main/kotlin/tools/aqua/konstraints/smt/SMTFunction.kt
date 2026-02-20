@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2025 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -159,16 +159,20 @@ class VarBinding<T : Sort>(override val symbol: Symbol, val term: Expression<T>)
   val instance = LocalExpression(symbol, sort, term, this)
 
   override fun toString() =
-      "(${symbol.toSMTString(QuotingRule.SAME_AS_INPUT)} ${term.toSMTString(QuotingRule.SAME_AS_INPUT)})"
+      "(${symbol.toSMTString(QuotingRule.SAME_AS_INPUT, false)} ${term.toSMTString(QuotingRule.SAME_AS_INPUT, false)})"
 
-  override fun toSMTString(quotingRule: QuotingRule) =
-      "(${symbol.toSMTString(quotingRule)} ${term.toSMTString(quotingRule)})"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(${symbol.toSMTString(quotingRule, useIterative)} ${term.toSMTString(quotingRule, useIterative)})"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     builder.append("(")
-    builder.append(symbol.toSMTString(quotingRule))
+    builder.append(symbol.toSMTString(quotingRule, useIterative))
     builder.append(" ")
-    builder.append(term.toSMTString(quotingRule))
+    builder.append(term.toSMTString(quotingRule, useIterative))
     return builder.append(")")
   }
 }
@@ -180,19 +184,24 @@ class SortedVar<out T : Sort>(override val symbol: Symbol, override val sort: T)
 
   override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>) = instance
 
-  override fun toString(): String = "(${symbol.toSMTString(QuotingRule.SAME_AS_INPUT)} $sort)"
+  override fun toString(): String =
+      "(${symbol.toSMTString(QuotingRule.SAME_AS_INPUT, false)} $sort)"
 
   val instance = BoundVariable(symbol, sort, this)
   override val parameters: List<Sort> = emptyList()
 
-  override fun toSMTString(quotingRule: QuotingRule) =
-      "(${symbol.toSMTString(quotingRule)} ${sort.toSMTString(quotingRule)})"
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(${symbol.toSMTString(quotingRule, useIterative)} ${sort.toSMTString(quotingRule, useIterative)})"
 
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule): Appendable {
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
     builder.append("(")
-    builder.append(symbol.toSMTString(quotingRule))
+    builder.append(symbol.toSMTString(quotingRule, useIterative))
     builder.append(" ")
-    builder.append(sort.toSMTString(quotingRule))
+    builder.append(sort.toSMTString(quotingRule, useIterative))
     return builder.append(")")
   }
 }
