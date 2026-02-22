@@ -18,12 +18,12 @@
 
 package tools.aqua.konstraints.smt
 
+import kotlin.math.sqrt
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunction1
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunction2
 import tools.aqua.konstraints.dsl.cpxadd
 import tools.aqua.konstraints.dsl.cpxmul
 import tools.aqua.konstraints.dsl.eq
-import kotlin.math.sqrt
 
 object ComplexSort :
     Datatype(
@@ -83,8 +83,7 @@ class ComplexAdd(
     override val rhs: Expression<ComplexSort>,
 ) : BinaryExpression<ComplexSort, ComplexSort, ComplexSort>("cpx.add".toSymbol(), ComplexSort) {
   override val theories: Set<Theories> = emptySet()
-  override val func =
-      ComplexAddDecl // this is important so the context finds the related function
+  override val func = ComplexAddDecl // this is important so the context finds the related function
 
   override fun copy(children: List<Expression<*>>): Expression<ComplexSort> {
     TODO("Not yet implemented")
@@ -98,28 +97,27 @@ object ComplexSubDecl :
         SortedVar("x".toSymbol(), ComplexSort),
         SortedVar("y".toSymbol(), ComplexSort),
         { x: Expression<ComplexSort>, y: Expression<ComplexSort> ->
-            ComplexSort.construct(RealSub(x.re(), y.re()), RealSub(x.im(), y.im()))
+          ComplexSort.construct(RealSub(x.re(), y.re()), RealSub(x.im(), y.im()))
         },
     ) {
-    override fun constructDynamic(
-        args: List<Expression<*>>,
-        indices: List<Index>,
-    ): Expression<ComplexSort> {
-        return ComplexSub(args[0] as Expression<ComplexSort>, args[1] as Expression<ComplexSort>)
-    }
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>,
+  ): Expression<ComplexSort> {
+    return ComplexSub(args[0] as Expression<ComplexSort>, args[1] as Expression<ComplexSort>)
+  }
 }
 
 class ComplexSub(
     override val lhs: Expression<ComplexSort>,
     override val rhs: Expression<ComplexSort>,
 ) : BinaryExpression<ComplexSort, ComplexSort, ComplexSort>("cpx.sub".toSymbol(), ComplexSort) {
-    override val theories: Set<Theories> = emptySet()
-    override val func =
-        ComplexSubDecl // this is important so the context finds the related function
+  override val theories: Set<Theories> = emptySet()
+  override val func = ComplexSubDecl // this is important so the context finds the related function
 
-    override fun copy(children: List<Expression<*>>): Expression<ComplexSort> {
-        TODO("Not yet implemented")
-    }
+  override fun copy(children: List<Expression<*>>): Expression<ComplexSort> {
+    TODO("Not yet implemented")
+  }
 }
 
 object ComplexMulDecl :
@@ -129,28 +127,30 @@ object ComplexMulDecl :
         SortedVar("x".toSymbol(), ComplexSort),
         SortedVar("y".toSymbol(), ComplexSort),
         { x: Expression<ComplexSort>, y: Expression<ComplexSort> ->
-            ComplexSort.construct(RealSub(RealMul(x.re(), y.re()), RealMul(x.im(), y.im())), RealAdd(RealMul(x.re(), y.im()), RealMul(x.im(), y.re())))
+          ComplexSort.construct(
+              RealSub(RealMul(x.re(), y.re()), RealMul(x.im(), y.im())),
+              RealAdd(RealMul(x.re(), y.im()), RealMul(x.im(), y.re())),
+          )
         },
     ) {
-    override fun constructDynamic(
-        args: List<Expression<*>>,
-        indices: List<Index>,
-    ): Expression<ComplexSort> {
-        return ComplexMul(args[0] as Expression<ComplexSort>, args[1] as Expression<ComplexSort>)
-    }
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>,
+  ): Expression<ComplexSort> {
+    return ComplexMul(args[0] as Expression<ComplexSort>, args[1] as Expression<ComplexSort>)
+  }
 }
 
 class ComplexMul(
     override val lhs: Expression<ComplexSort>,
     override val rhs: Expression<ComplexSort>,
 ) : BinaryExpression<ComplexSort, ComplexSort, ComplexSort>("cpx.mul".toSymbol(), ComplexSort) {
-    override val theories: Set<Theories> = emptySet()
-    override val func =
-        ComplexMulDecl // this is important so the context finds the related function
+  override val theories: Set<Theories> = emptySet()
+  override val func = ComplexMulDecl // this is important so the context finds the related function
 
-    override fun copy(children: List<Expression<*>>): Expression<ComplexSort> {
-        TODO("Not yet implemented")
-    }
+  override fun copy(children: List<Expression<*>>): Expression<ComplexSort> {
+    TODO("Not yet implemented")
+  }
 }
 
 object ComplexDivDecl :
@@ -159,29 +159,26 @@ object ComplexDivDecl :
         ComplexSort,
         SortedVar("x".toSymbol(), ComplexSort),
         SortedVar("y".toSymbol(), ComplexSort),
-        { x: Expression<ComplexSort>, y: Expression<ComplexSort> ->
-            ComplexMul(x, ComplexInv(y))
-        },
+        { x: Expression<ComplexSort>, y: Expression<ComplexSort> -> ComplexMul(x, ComplexInv(y)) },
     ) {
-    override fun constructDynamic(
-        args: List<Expression<*>>,
-        indices: List<Index>,
-    ): Expression<ComplexSort> {
-        return ComplexDiv(args[0] as Expression<ComplexSort>, args[1] as Expression<ComplexSort>)
-    }
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>,
+  ): Expression<ComplexSort> {
+    return ComplexDiv(args[0] as Expression<ComplexSort>, args[1] as Expression<ComplexSort>)
+  }
 }
 
 class ComplexDiv(
     override val lhs: Expression<ComplexSort>,
     override val rhs: Expression<ComplexSort>,
 ) : BinaryExpression<ComplexSort, ComplexSort, ComplexSort>("cpx.div".toSymbol(), ComplexSort) {
-    override val theories: Set<Theories> = emptySet()
-    override val func =
-        ComplexDivDecl // this is important so the context finds the related function
+  override val theories: Set<Theories> = emptySet()
+  override val func = ComplexDivDecl // this is important so the context finds the related function
 
-    override fun copy(children: List<Expression<*>>): Expression<ComplexSort> {
-        TODO("Not yet implemented")
-    }
+  override fun copy(children: List<Expression<*>>): Expression<ComplexSort> {
+    TODO("Not yet implemented")
+  }
 }
 
 object ComplexInvDecl :
@@ -190,76 +187,76 @@ object ComplexInvDecl :
         ComplexSort,
         SortedVar("x".toSymbol(), ComplexSort),
         { x: Expression<ComplexSort> ->
-            ComplexSort.construct(
-                RealDiv(x.re(), RealAdd(RealMul(x.re(), x.re()), RealMul(x.im(), x.im()))),
-                RealNeg(RealDiv(x.im(), RealAdd(RealMul(x.re(), x.re()), RealMul(x.im(), x.im()))))
-            )
+          ComplexSort.construct(
+              RealDiv(x.re(), RealAdd(RealMul(x.re(), x.re()), RealMul(x.im(), x.im()))),
+              RealNeg(RealDiv(x.im(), RealAdd(RealMul(x.re(), x.re()), RealMul(x.im(), x.im())))),
+          )
         },
     ) {
-    override fun constructDynamic(
-        args: List<Expression<*>>,
-        indices: List<Index>,
-    ): Expression<ComplexSort> {
-        return ComplexInv(args[0] as Expression<ComplexSort>)
-    }
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>,
+  ): Expression<ComplexSort> {
+    return ComplexInv(args[0] as Expression<ComplexSort>)
+  }
 }
 
 class ComplexInv(
     override val inner: Expression<ComplexSort>,
 ) : UnaryExpression<ComplexSort, ComplexSort>("cpx.inv".toSymbol(), ComplexSort) {
-    override val theories: Set<Theories> = emptySet()
-    override val func =
-        ComplexInvDecl // this is important so the context finds the related function
+  override val theories: Set<Theories> = emptySet()
+  override val func = ComplexInvDecl // this is important so the context finds the related function
 
-    override fun copy(children: List<Expression<*>>): Expression<ComplexSort> {
-        TODO("Not yet implemented")
-    }
+  override fun copy(children: List<Expression<*>>): Expression<ComplexSort> {
+    TODO("Not yet implemented")
+  }
 }
 
 data class Complex(val re: Double, val im: Double) {
-    /** Addition: (a + bi) + (c + di) = (a+c) + (b+d)i */
-    operator fun plus(other: Complex): Complex = Complex(re + other.re, im + other.im)
+  /** Addition: (a + bi) + (c + di) = (a+c) + (b+d)i */
+  operator fun plus(other: Complex): Complex = Complex(re + other.re, im + other.im)
 
-    /** Subtraction: (a + bi) - (c + di) = (a-c) + (b-d)i */
-    operator fun minus(other: Complex): Complex = Complex(re - other.re, im - other.im)
+  /** Subtraction: (a + bi) - (c + di) = (a-c) + (b-d)i */
+  operator fun minus(other: Complex): Complex = Complex(re - other.re, im - other.im)
 
-    /** Multiplication: (a + bi)(c + di) = (ac - bd) + (ad + bc)i */
-    operator fun times(other: Complex): Complex =
-        Complex(re * other.re - im * other.im, re * other.im + im * other.re)
+  /** Multiplication: (a + bi)(c + di) = (ac - bd) + (ad + bc)i */
+  operator fun times(other: Complex): Complex =
+      Complex(re * other.re - im * other.im, re * other.im + im * other.re)
 
-    /** Conjugate: ([re] - [im]i) */
-    fun conjugate(): Complex = Complex(re, -im)
+  /** Conjugate: ([re] - [im]i) */
+  fun conjugate(): Complex = Complex(re, -im)
 
-    /** Magnitude squared: |z|² = [re]² + [im]² */
-    fun magnitudeSquared(): Double = re * re + im * im
+  /** Magnitude squared: |z|² = [re]² + [im]² */
+  fun magnitudeSquared(): Double = re * re + im * im
 
-    fun magnitude(): Double = sqrt(magnitudeSquared())
+  fun magnitude(): Double = sqrt(magnitudeSquared())
 
-    /** Complex inverse: 1 / ([re] + [im]i) = ([re] - [im]i) / ([re]² + [im]²) */
-    fun inverse(): Complex {
-        val denom = magnitudeSquared()
-        require(denom != 0.0) { "Can not invert zero complex number" }
-        return Complex(re / denom, -im / denom)
-    }
+  /** Complex inverse: 1 / ([re] + [im]i) = ([re] - [im]i) / ([re]² + [im]²) */
+  fun inverse(): Complex {
+    val denom = magnitudeSquared()
+    require(denom != 0.0) { "Can not invert zero complex number" }
+    return Complex(re / denom, -im / denom)
+  }
 
-    /**
-     * Division using multiplication and inverse: [this][tools.aqua.komplex.Complex] / [other] =
-     * [this][tools.aqua.komplex.Complex] * [other].[inverse]
-     */
-    operator fun div(other: Complex): Complex = this * other.inverse()
+  /**
+   * Division using multiplication and inverse: [this][tools.aqua.komplex.Complex] / [other] =
+   * [this][tools.aqua.komplex.Complex] * [other].[inverse]
+   */
+  operator fun div(other: Complex): Complex = this * other.inverse()
 }
 
 val Number.re: Complex
-    get() = Complex(this.toDouble(), 0.0)
+  get() = Complex(this.toDouble(), 0.0)
 
 val Number.i: Complex
-    get() = Complex(0.0, this.toDouble())
+  get() = Complex(0.0, this.toDouble())
 
 infix operator fun Number.plus(other: Complex): Complex = Complex(this.toDouble(), 0.0) + other
 
 infix operator fun Complex.plus(other: Number): Complex = this + Complex(other.toDouble(), 0.0)
 
-fun Complex.toExpression(): Expression<ComplexSort> = ComplexSort.construct(RealLiteral(re), RealLiteral(im))
+fun Complex.toExpression(): Expression<ComplexSort> =
+    ComplexSort.construct(RealLiteral(re), RealLiteral(im))
 
 fun main() {
   val program = MutableSMTProgram()

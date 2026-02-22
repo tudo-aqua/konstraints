@@ -499,6 +499,8 @@ class GetValue(val terms: List<Expression<*>>) : Command("get-value") {
 }
 
 class DeclareDatatype(val datatype: Datatype) : Command("declare-datatype") {
+  override fun toString() = toSMTString(QuotingRule.SAME_AS_INPUT, false)
+
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
       "(declare-datatype ${datatype.symbol.toSMTString(quotingRule, useIterative)} (${datatype.constructors.joinToString(separator = " ") { it.toSMTString(quotingRule, useIterative) }}))"
 

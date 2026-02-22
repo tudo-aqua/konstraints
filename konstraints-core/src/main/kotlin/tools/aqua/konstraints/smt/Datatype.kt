@@ -18,6 +18,8 @@
 
 package tools.aqua.konstraints.smt
 
+import kotlin.collections.sort
+
 data class SelectorDecl<T : Sort>(val symbol: Symbol, val sort: T)
 
 // selectors are functions that take a datatype and map to any sort type (e.g. for complex re maps
@@ -113,32 +115,61 @@ class DatatypeFactory(val instance: Datatype) : SortFactory {
   override val numIndicies = 0
 }
 
+/*
+ * datatype dsl
+ * buildDatatype(listOf(symbol, arity)) { Datatypes ->
+ * compileDT()
+ * }
+ */
+
 // TODO this should maybe be the factory (constructors etc. can be shared between instances)
-open class Datatype(val arity: Int, symbol: Symbol, constructorDecls: List<ConstructorDecl>) :
-    Sort(symbol) {
+open class Datatype(val arity: Int, symbol: Symbol) : Sort(symbol) {
+  constructor(
+      arity: Int,
+      symbol: Symbol,
+      constructorDecls: List<ConstructorDecl>,
+  ) : this(arity, symbol) {
+    _constructors.addAll(
+        constructorDecls.map { constr ->
+          Constructor(
+              constr.symbol,
+              constr.selectors.map { selectorDecl ->
+                Selector(selectorDecl.symbol, selectorDecl.sort, this)
+              },
+              this,
+          )
+        }
+    )
+    _selectors.addAll(
+        constructorDecls.flatMap { decl ->
+          decl.selectors.map { selectorDecl ->
+            Selector(selectorDecl.symbol, selectorDecl.sort, this)
+          }
+        }
+    )
+  }
+
   override val theories = emptySet<Theories>()
-  val constructors =
-      constructorDecls.map { constr ->
+  private val _constructors = mutableListOf<Constructor>()
+  private val _selectors = mutableListOf<Selector<*>>()
+
+  val constructors: List<Constructor>
+    get() = _constructors.toList()
+
+  val selectors: List<Selector<*>>
+    get() = _selectors.toList()
+
+  internal fun add(constructor: ConstructorDecl) {
+    _constructors.add(
         Constructor(
-            constr.symbol,
-            constr.selectors.map { selectorDecl ->
+            constructor.symbol,
+            constructor.selectors.map { selectorDecl ->
               Selector(selectorDecl.symbol, selectorDecl.sort, this)
             },
             this,
         )
-      }.toMutableList()
-  val selectors =
-      constructorDecls.flatMap { decl ->
-        decl.selectors.map { selectorDecl ->
-          Selector(selectorDecl.symbol, selectorDecl.sort, this)
-        }
-      }.toMutableList()
-
-    fun add(constructor: ConstructorDecl) {
-        constructors.add(Constructor(constructor.symbol, constructor.selectors.map { selectorDecl ->
-            Selector(selectorDecl.symbol, selectorDecl.sort, this)
-        }, this))
-    }
+    )
+  }
 }
 
 object Testers : SMTFunction<BoolSort>() {

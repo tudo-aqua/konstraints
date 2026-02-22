@@ -205,9 +205,11 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
 
   private fun parseDatatype(program: MutableSMTProgram) {
     val symbol = parseSymbol()
-    val decl = parseDatatypeDecl(program)
+    val datatype = Datatype(0, symbol)
+    program.declareDatatype(datatype)
 
-    program.declareDatatype(Datatype(0, symbol, decl))
+    val decl = parseDatatypeDecl(program)
+    decl.forEach { t -> datatype.add(t) }
   }
 
   @OptIn(ExperimentalContracts::class)

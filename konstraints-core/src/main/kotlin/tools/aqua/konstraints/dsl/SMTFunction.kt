@@ -18,7 +18,6 @@
 
 package tools.aqua.konstraints.dsl
 
-import tools.aqua.konstraints.dsl.UserDefinedSMTFunction2
 import java.util.*
 import kotlin.reflect.KProperty
 import tools.aqua.konstraints.smt.*
@@ -905,12 +904,12 @@ open class UserDefinedSMTFunction1<T : Sort, S : Sort>(
       term: Expression<T>,
   ) : this(symbol, sort, SortedVar("|local!$parameter!1|".toSymbol(), parameter), term)
 
-    constructor(
-        symbol: Symbol,
-        sort: T,
-        parameter1: SortedVar<S>,
-        term: ((Expression<S>) -> Expression<T>),
-    ) : this(symbol, sort, parameter1, term(parameter1.instance))
+  constructor(
+      symbol: Symbol,
+      sort: T,
+      parameter1: SortedVar<S>,
+      term: ((Expression<S>) -> Expression<T>),
+  ) : this(symbol, sort, parameter1, term(parameter1.instance))
 
   override val parameters = listOf(parameter.sort)
   override val sortedVars = listOf(parameter)
