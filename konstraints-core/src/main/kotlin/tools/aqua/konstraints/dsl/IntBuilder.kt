@@ -1727,7 +1727,17 @@ fun intmul(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntMul)
 fun intdiv(init: Builder<IntSort>.() -> Unit) = makeIntOperator(init, ::IntDiv)
 
 /** Casting operator from RealSort to IntSort. */
+@JvmName("toIntLambdaPrefix")
 fun toInt(block: () -> Expression<RealSort>) = ToInt(block())
 
 /** Casting operator from RealSort to IntSort. */
+@JvmName("toIntPrefix")
 fun toInt(expr: Expression<RealSort>) = ToInt(expr)
+
+/** Casting operator from RealSort to IntSort. */
+@JvmName("toIntLambdaPostfix")
+fun (() -> Expression<RealSort>).toInt() = ToInt(this())
+
+/** Casting operator from RealSort to IntSort. */
+@JvmName("toIntPostfix")
+fun Expression<RealSort>.toInt() = ToInt(this)

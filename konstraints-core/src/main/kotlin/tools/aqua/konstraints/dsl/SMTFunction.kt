@@ -30,8 +30,7 @@ import tools.aqua.konstraints.util.SimpleDelegate
  *
  * @return [SMTFunction0]
  */
-fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T) =
-    Const(sort, this, "|const!$sort!${UUID.randomUUID()}|")
+fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T) = Const(sort, this)
 
 /**
  * Declares an SMT constant: (declare-const [name] [sort]).

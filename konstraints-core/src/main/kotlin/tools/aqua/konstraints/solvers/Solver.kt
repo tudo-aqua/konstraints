@@ -31,8 +31,10 @@ interface Solver : AutoCloseable {
 
   /** The model if one was generated. */
   val model: Model
-    get() = checkNotNull(modelOrNull) { "model is null" }
+    get() = if (isModelAvailable) modelOrNull!! else produceModel()
 
   /** True if a model is available. */
   val isModelAvailable: Boolean
+
+  fun produceModel(): Model
 }

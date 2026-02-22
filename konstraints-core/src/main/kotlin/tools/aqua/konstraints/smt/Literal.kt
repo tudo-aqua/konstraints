@@ -232,6 +232,8 @@ class RealLiteral(val value: BigDecimal) :
 
   constructor(value: Double) : this(value.toBigDecimal())
 
+  constructor(value: String) : this(value.toBigDecimal())
+
   override val sort: RealSort = SMTReal
 
   override fun toString(): String = value.toPlainString()
