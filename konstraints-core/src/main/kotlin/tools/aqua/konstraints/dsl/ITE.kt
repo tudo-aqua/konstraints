@@ -34,6 +34,7 @@ import tools.aqua.konstraints.smt.Sort
 import tools.aqua.konstraints.smt.StrToRe
 import tools.aqua.konstraints.smt.StringLiteral
 import tools.aqua.konstraints.smt.StringSort
+import tools.aqua.konstraints.smt.toSMTBool
 
 @SMTDSL
 class ITE1(val condition: Expression<BoolSort>) {
@@ -56,6 +57,12 @@ class ITE1(val condition: Expression<BoolSort>) {
   infix fun <T : Sort> then(block: () -> Expression<T>): ITE2<T> = ITE2(condition, block())
 
   infix fun then(numeral: Int) = IntITE2(condition, numeral)
+  infix fun then(numeral: Float) = FloatITE2(condition, numeral)
+  infix fun then(numeral: Double) = DoubleITE2(condition, numeral)
+  infix fun then(numeral: Short) = ShortITE2(condition, numeral)
+  infix fun then(numeral: Byte) = ByteITE2(condition, numeral)
+  infix fun then(numeral: Long) = LongITE2(condition, numeral)
+  infix fun then(string: String) = StringITE2(condition, string)
 }
 
 class ITE2<T : Sort>(val condition: Expression<BoolSort>, val then: Expression<T>) {
@@ -378,6 +385,22 @@ fun ite(condition: () -> Expression<BoolSort>): ITE1 = ITE1(condition())
  * @param condition: Expression<BoolSort> used as condition for the if-statement.
  */
 fun ite(condition: Expression<BoolSort>): ITE1 = ITE1(condition)
+
+/**
+ * This extension allows the usage of conditions on the kotlin side to control the flow of an SMT ite,
+ * however note that this will only substitute [tools.aqua.konstraints.smt.True] or [tools.aqua.konstraints.smt.False]
+ * for the condition and not retain any information of how this result was obtained in the final smt program.
+ */
+fun ite(condition: Boolean) = ITE1(condition.toSMTBool())
+
+/**
+ * This extension allows the usage of conditions on the kotlin side to control the flow of an SMT ite,
+ * however note that this will only substitute [tools.aqua.konstraints.smt.True] or [tools.aqua.konstraints.smt.False]
+ * for the condition and not retain any information of how this result was obtained in the final smt program.
+ */
+fun ite(condition: (() -> Boolean)) = ITE1(condition().toSMTBool())
+
+
 
 // IntSort extensions
 @JvmName("IntSortOtherwiseByte")
