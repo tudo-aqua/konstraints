@@ -2858,33 +2858,25 @@ fun realmul(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealM
 fun realdiv(init: Builder<RealSort>.() -> Unit) = makeRealOperator(init, ::RealDiv)
 
 /** Casting operator from IntSort to RealSort. */
-@JvmName("toRealLambdaPrefix")
-fun toReal(block: () -> Expression<IntSort>) = ToReal(block())
+@JvmName("toRealLambdaPrefix") fun toReal(block: () -> Expression<IntSort>) = ToReal(block())
 
 /** Casting operator from IntSort to RealSort. */
-@JvmName("toRealPrefix")
-fun toReal(expr: Expression<IntSort>) = ToReal(expr)
+@JvmName("toRealPrefix") fun toReal(expr: Expression<IntSort>) = ToReal(expr)
 
 /** Casting operator from IntSort to RealSort. */
-@JvmName("toRealLambdaPostfix")
-fun (() -> Expression<IntSort>).toReal() = ToReal(this())
+@JvmName("toRealLambdaPostfix") fun (() -> Expression<IntSort>).toReal() = ToReal(this())
 
 /** Casting operator from IntSort to RealSort. */
-@JvmName("toRealPostfix")
-fun Expression<IntSort>.toReal() = ToReal(this)
+@JvmName("toRealPostfix") fun Expression<IntSort>.toReal() = ToReal(this)
 
 /** Implements smt is_int operation. */
-@JvmName("isIntPrefix")
-fun isInt(expr: Expression<RealSort>) = IsInt(expr)
+@JvmName("isIntPrefix") fun isInt(expr: Expression<RealSort>) = IsInt(expr)
 
 /** Implements smt is_int operation. */
-@JvmName("isIntLambdaPrefix")
-fun isInt(block: () -> Expression<RealSort>) = IsInt(block())
+@JvmName("isIntLambdaPrefix") fun isInt(block: () -> Expression<RealSort>) = IsInt(block())
 
 /** Implements smt is_int operation. */
-@JvmName("isIntPostfix")
-fun Expression<RealSort>.isInt() = IsInt(this)
+@JvmName("isIntPostfix") fun Expression<RealSort>.isInt() = IsInt(this)
 
 /** Implements smt is_int operation. */
-@JvmName("isIntLambdaPostfix")
-fun (() -> Expression<RealSort>).isInt() = IsInt(this())
+@JvmName("isIntLambdaPostfix") fun (() -> Expression<RealSort>).isInt() = IsInt(this())

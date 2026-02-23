@@ -18,8 +18,6 @@
 
 package tools.aqua.konstraints.dsl
 
-import java.math.BigDecimal
-import java.math.BigInteger
 import tools.aqua.konstraints.smt.*
 
 /** Select value stored in [array] at location [index]. */
@@ -1592,7 +1590,9 @@ infix fun ArrayStore<BitVecSort, BitVecSort>.then(
     entry: Pair<Expression<BitVecSort>, Expression<BitVecSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
-@Deprecated("The array access operator does not behave like a user would expect, thus this is deprecated and will not be implemented", level = DeprecationLevel.ERROR)
+@Deprecated(
+    "The array access operator does not behave like a user would expect, thus this is deprecated and will not be implemented",
+    level = DeprecationLevel.ERROR,
+)
 operator fun <X : Sort, Y : Sort> Expression<ArraySort<X, Y>>.get(index: Expression<X>) =
     ArraySelect(this, index)
-
