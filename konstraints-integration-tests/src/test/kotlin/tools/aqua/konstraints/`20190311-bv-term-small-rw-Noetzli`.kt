@@ -19,8 +19,8 @@
 package tools.aqua.konstraints
 
 import tools.aqua.konstraints.dsl.*
-import tools.aqua.konstraints.smt.SMTBitVec
 import tools.aqua.konstraints.smt.QF_BV
+import tools.aqua.konstraints.smt.SMTBitVec
 import tools.aqua.konstraints.smt.bitvec
 
 class `20190311-bv-term-small-rw-Noetzli` {
