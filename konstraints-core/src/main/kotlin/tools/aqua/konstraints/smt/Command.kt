@@ -149,7 +149,7 @@ data class SetInfo(val attribute: Attribute) : Command("set-info") {
   /** SMT (set-info [keyword] [value]) command */
   constructor(keyword: String, value: AttributeValue?) : this(Attribute(keyword, value))
 
-  override fun toString() = "set-info $attribute"
+  override fun toString() = "(set-info $attribute)"
 
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
       "(set-info ${attribute.toSMTString(quotingRule, useIterative)})"
@@ -300,6 +300,8 @@ sealed interface OptionValue : SMTSerializable
 
 /** Boolean option value. */
 data class BooleanOptionValue(val bool: Boolean) : OptionValue {
+  override fun toString(): String = toSMTString(QuotingRule.SAME_AS_INPUT, false)
+
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = bool.toString()
 
   override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
@@ -308,6 +310,8 @@ data class BooleanOptionValue(val bool: Boolean) : OptionValue {
 
 /** String option value. */
 data class StringOptionValue(val string: String) : OptionValue {
+  override fun toString(): String = toSMTString(QuotingRule.SAME_AS_INPUT, false)
+
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = string
 
   override fun toSMTString(
@@ -319,6 +323,8 @@ data class StringOptionValue(val string: String) : OptionValue {
 
 /** Numeral option value. */
 data class NumeralOptionValue(val numeral: BigInteger) : OptionValue {
+  override fun toString(): String = toSMTString(QuotingRule.SAME_AS_INPUT, false)
+
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = numeral.toString()
 
   override fun toSMTString(
@@ -330,6 +336,8 @@ data class NumeralOptionValue(val numeral: BigInteger) : OptionValue {
 
 /** Attribute option value. */
 data class AttributeOptionValue(val attribute: Attribute) : OptionValue {
+  override fun toString(): String = toSMTString(QuotingRule.SAME_AS_INPUT, false)
+
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
       attribute.toSMTString(quotingRule, useIterative)
 

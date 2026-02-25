@@ -35,6 +35,7 @@ import tools.aqua.konstraints.smt.StrToRe
 import tools.aqua.konstraints.smt.StringLiteral
 import tools.aqua.konstraints.smt.StringSort
 import tools.aqua.konstraints.smt.toSMTBool
+import kotlin.experimental.ExperimentalTypeInference
 
 @SMTDSL
 class ITE1(val condition: Expression<BoolSort>) {
@@ -57,12 +58,46 @@ class ITE1(val condition: Expression<BoolSort>) {
   infix fun <T : Sort> then(block: () -> Expression<T>): ITE2<T> = ITE2(condition, block())
 
   infix fun then(numeral: Int) = IntITE2(condition, numeral)
+
   infix fun then(numeral: Float) = FloatITE2(condition, numeral)
+
   infix fun then(numeral: Double) = DoubleITE2(condition, numeral)
+
   infix fun then(numeral: Short) = ShortITE2(condition, numeral)
+
   infix fun then(numeral: Byte) = ByteITE2(condition, numeral)
+
   infix fun then(numeral: Long) = LongITE2(condition, numeral)
+
   infix fun then(string: String) = StringITE2(condition, string)
+
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  infix fun then(numeral: (() -> Int)) = IntITE2(condition, numeral())
+
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  infix fun then(numeral: (() -> Float)) = FloatITE2(condition, numeral())
+
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  infix fun then(numeral: (() -> Double)) = DoubleITE2(condition, numeral())
+
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  infix fun then(numeral: (() -> Short)) = ShortITE2(condition, numeral())
+
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  infix fun then(numeral: (() -> Byte)) = ByteITE2(condition, numeral())
+
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  infix fun then(numeral: (() -> Long)) = LongITE2(condition, numeral())
+
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  infix fun then(string: (() -> String)) = StringITE2(condition, string())
 }
 
 class ITE2<T : Sort>(val condition: Expression<BoolSort>, val then: Expression<T>) {
@@ -99,6 +134,8 @@ class ByteITE2(val condition: Expression<BoolSort>, val numeral: Byte) {
    * - [numeral] is converted to [IntLiteral]
    */
   @JvmName("ByteOtherwiseIntSortLambda")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
   infix fun otherwise(expr: (() -> Expression<IntSort>)) =
       Ite(condition, IntLiteral(numeral), expr())
 
@@ -114,6 +151,8 @@ class ByteITE2(val condition: Expression<BoolSort>, val numeral: Byte) {
    * - [numeral] is converted to [RealLiteral]
    */
   @JvmName("ByteOtherwiseRealSortLambda")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
   infix fun otherwise(expr: (() -> Expression<RealSort>)) =
       Ite(condition, RealLiteral(numeral), expr())
 }
@@ -135,6 +174,8 @@ class ShortITE2(val condition: Expression<BoolSort>, val numeral: Short) {
    * - [numeral] is converted to [IntLiteral]
    */
   @JvmName("ShortOtherwiseIntSortLambda")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
   infix fun otherwise(expr: (() -> Expression<IntSort>)) =
       Ite(condition, IntLiteral(numeral), expr())
 
@@ -150,6 +191,8 @@ class ShortITE2(val condition: Expression<BoolSort>, val numeral: Short) {
    * - [numeral] is converted to [RealLiteral]
    */
   @JvmName("ShortOtherwiseRealSortLambda")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
   infix fun otherwise(expr: (() -> Expression<RealSort>)) =
       Ite(condition, RealLiteral(numeral), expr())
 }
@@ -171,6 +214,8 @@ class IntITE2(val condition: Expression<BoolSort>, val numeral: Int) {
    * - [numeral] is converted to [IntLiteral]
    */
   @JvmName("IntOtherwiseIntSortLambda")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
   infix fun otherwise(expr: (() -> Expression<IntSort>)) =
       Ite(condition, IntLiteral(numeral), expr())
 
@@ -186,6 +231,8 @@ class IntITE2(val condition: Expression<BoolSort>, val numeral: Int) {
    * - [numeral] is converted to [RealLiteral]
    */
   @JvmName("IntOtherwiseRealSortLambda")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
   infix fun otherwise(expr: (() -> Expression<RealSort>)) =
       Ite(condition, RealLiteral(numeral), expr())
 }
@@ -207,6 +254,8 @@ class LongITE2(val condition: Expression<BoolSort>, val numeral: Long) {
    * - [numeral] is converted to [IntLiteral]
    */
   @JvmName("LongOtherwiseIntSortLambda")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
   infix fun otherwise(expr: (() -> Expression<IntSort>)) =
       Ite(condition, IntLiteral(numeral), expr())
 
@@ -222,6 +271,8 @@ class LongITE2(val condition: Expression<BoolSort>, val numeral: Long) {
    * - [numeral] is converted to [RealLiteral]
    */
   @JvmName("LongOtherwiseRealSortLambda")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
   infix fun otherwise(expr: (() -> Expression<RealSort>)) =
       Ite(condition, RealLiteral(numeral), expr())
 }
@@ -243,6 +294,8 @@ class BigIntegerITE2(val condition: Expression<BoolSort>, val numeral: BigIntege
    * - [numeral] is converted to [IntLiteral]
    */
   @JvmName("BigIntegerOtherwiseIntSortLambda")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
   infix fun otherwise(expr: (() -> Expression<IntSort>)) =
       Ite(condition, IntLiteral(numeral), expr())
 
@@ -258,6 +311,8 @@ class BigIntegerITE2(val condition: Expression<BoolSort>, val numeral: BigIntege
    * - [numeral] is converted to [RealLiteral]
    */
   @JvmName("BigIntegerOtherwiseRealSortLambda")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
   infix fun otherwise(expr: (() -> Expression<RealSort>)) =
       Ite(condition, RealLiteral(numeral), expr())
 }
@@ -279,8 +334,27 @@ class FloatITE2(val condition: Expression<BoolSort>, val numeral: Float) {
    * - [numeral] is converted to [RealLiteral]
    */
   @JvmName("FloatOtherwiseRealSortLambda")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
   infix fun otherwise(expr: (() -> Expression<RealSort>)) =
       Ite(condition, RealLiteral(numeral), expr())
+
+  /**
+   * Evaluate if-statement to [expr], when [condition] is false.
+   * - [numeral] is converted to [RealLiteral]
+   */
+  @JvmName("FloatOtherwiseFPSort")
+  infix fun otherwise(expr: Expression<FPSort>) = Ite(condition, FPLiteral(numeral), expr)
+
+  /**
+   * Evaluate if-statement to [expr], when [condition] is false.
+   * - [numeral] is converted to [RealLiteral]
+   */
+  @JvmName("FloatOtherwiseFPSortLambda")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  infix fun otherwise(expr: (() -> Expression<FPSort>)) =
+    Ite(condition, FPLiteral(numeral), expr())
 }
 
 /**
@@ -300,8 +374,27 @@ class DoubleITE2(val condition: Expression<BoolSort>, val numeral: Double) {
    * - [numeral] is converted to [RealLiteral]
    */
   @JvmName("DoubleOtherwiseRealSortLambda")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
   infix fun otherwise(expr: (() -> Expression<RealSort>)) =
       Ite(condition, RealLiteral(numeral), expr())
+
+  /**
+   * Evaluate if-statement to [expr], when [condition] is false.
+   * - [numeral] is converted to [RealLiteral]
+   */
+  @JvmName("FloatOtherwiseFPSort")
+  infix fun otherwise(expr: Expression<FPSort>) = Ite(condition, FPLiteral(numeral), expr)
+
+  /**
+   * Evaluate if-statement to [expr], when [condition] is false.
+   * - [numeral] is converted to [RealLiteral]
+   */
+  @JvmName("FloatOtherwiseFPSortLambda")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  infix fun otherwise(expr: (() -> Expression<FPSort>)) =
+    Ite(condition, FPLiteral(numeral), expr())
 }
 
 /**
@@ -375,7 +468,10 @@ class RegLanITE2(val condition: Expression<BoolSort>, val reglan: String) {
  *
  * @param condition: lambda yielding an Expression<BoolSort> used as condition for the if-statement.
  */
-fun ite(condition: () -> Expression<BoolSort>): ITE1 = ITE1(condition())
+@JvmName("ite1boolsortexpr")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+fun ite(condition: (() -> Expression<BoolSort>)): ITE1 = ITE1(condition())
 
 /**
  * If-then-else operator.
@@ -387,20 +483,22 @@ fun ite(condition: () -> Expression<BoolSort>): ITE1 = ITE1(condition())
 fun ite(condition: Expression<BoolSort>): ITE1 = ITE1(condition)
 
 /**
- * This extension allows the usage of conditions on the kotlin side to control the flow of an SMT ite,
- * however note that this will only substitute [tools.aqua.konstraints.smt.True] or [tools.aqua.konstraints.smt.False]
- * for the condition and not retain any information of how this result was obtained in the final smt program.
+ * This extension allows the usage of conditions on the kotlin side to control the flow of an SMT
+ * ite, however note that this will only substitute [tools.aqua.konstraints.smt.True] or
+ * [tools.aqua.konstraints.smt.False] for the condition and not retain any information of how this
+ * result was obtained in the final smt program.
  */
 fun ite(condition: Boolean) = ITE1(condition.toSMTBool())
 
 /**
- * This extension allows the usage of conditions on the kotlin side to control the flow of an SMT ite,
- * however note that this will only substitute [tools.aqua.konstraints.smt.True] or [tools.aqua.konstraints.smt.False]
- * for the condition and not retain any information of how this result was obtained in the final smt program.
+ * This extension allows the usage of conditions on the kotlin side to control the flow of an SMT
+ * ite, however note that this will only substitute [tools.aqua.konstraints.smt.True] or
+ * [tools.aqua.konstraints.smt.False] for the condition and not retain any information of how this
+ * result was obtained in the final smt program.
  */
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 fun ite(condition: (() -> Boolean)) = ITE1(condition().toSMTBool())
-
-
 
 // IntSort extensions
 @JvmName("IntSortOtherwiseByte")
@@ -419,18 +517,28 @@ infix fun ITE2<IntSort>.otherwise(numeral: Long) = otherwise(IntLiteral(numeral)
 infix fun ITE2<IntSort>.otherwise(numeral: BigInteger) = otherwise(IntLiteral(numeral))
 
 @JvmName("IntSortOtherwiseByteLambda")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 infix fun ITE2<IntSort>.otherwise(numeral: (() -> Byte)) = otherwise(IntLiteral(numeral()))
 
 @JvmName("IntSortOtherwiseShortLambda")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 infix fun ITE2<IntSort>.otherwise(numeral: (() -> Short)) = otherwise(IntLiteral(numeral()))
 
 @JvmName("IntSortOtherwiseIntLambda")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 infix fun ITE2<IntSort>.otherwise(numeral: (() -> Int)) = otherwise(IntLiteral(numeral()))
 
 @JvmName("IntSortOtherwiseLongLambda")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 infix fun ITE2<IntSort>.otherwise(numeral: (() -> Long)) = otherwise(IntLiteral(numeral()))
 
 @JvmName("IntSortOtherwiseBigIntegerLambda")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 infix fun ITE2<IntSort>.otherwise(numeral: (() -> BigInteger)) = otherwise(IntLiteral(numeral()))
 
 // RealSort extensions
@@ -456,24 +564,38 @@ infix fun ITE2<RealSort>.otherwise(numeral: Float) = otherwise(RealLiteral(numer
 infix fun ITE2<RealSort>.otherwise(numeral: BigDecimal) = otherwise(RealLiteral(numeral))
 
 @JvmName("RealSortOtherwiseByteLambda")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 infix fun ITE2<RealSort>.otherwise(numeral: (() -> Byte)) = otherwise(RealLiteral(numeral()))
 
 @JvmName("RealSortOtherwiseShortLambda")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 infix fun ITE2<RealSort>.otherwise(numeral: (() -> Short)) = otherwise(RealLiteral(numeral()))
 
 @JvmName("RealSortOtherwiseIntLambda")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 infix fun ITE2<RealSort>.otherwise(numeral: (() -> Int)) = otherwise(RealLiteral(numeral()))
 
 @JvmName("RealSortOtherwiseLongLambda")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 infix fun ITE2<RealSort>.otherwise(numeral: (() -> Long)) = otherwise(RealLiteral(numeral()))
 
 @JvmName("RealSortOtherwiseBigIntegerLambda")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 infix fun ITE2<RealSort>.otherwise(numeral: (() -> BigInteger)) = otherwise(RealLiteral(numeral()))
 
 @JvmName("RealSortOtherwiseFloatLambda")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 infix fun ITE2<RealSort>.otherwise(numeral: (() -> Float)) = otherwise(RealLiteral(numeral()))
 
 @JvmName("RealSortOtherwiseBigDecimalLambda")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 infix fun ITE2<RealSort>.otherwise(numeral: (() -> BigDecimal)) = otherwise(RealLiteral(numeral()))
 
 // Float extensions
@@ -484,9 +606,13 @@ infix fun ITE2<FPSort>.otherwise(numeral: Float) = otherwise(FPLiteral(numeral))
 infix fun ITE2<FPSort>.otherwise(numeral: Double) = otherwise(FPLiteral(numeral))
 
 @JvmName("FloatingPointSortOtherwiseFloatLambda")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 infix fun ITE2<FPSort>.otherwise(numeral: (() -> Float)) = otherwise(FPLiteral(numeral()))
 
 @JvmName("FloatingPointSortOtherwiseDoubleLambda")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 infix fun ITE2<FPSort>.otherwise(numeral: (() -> Double)) = otherwise(FPLiteral(numeral()))
 
 // String extensions
@@ -494,6 +620,8 @@ infix fun ITE2<FPSort>.otherwise(numeral: (() -> Double)) = otherwise(FPLiteral(
 infix fun ITE2<StringSort>.otherwise(string: String) = otherwise(StringLiteral(string))
 
 @JvmName("StringSortOtherwiseStringLambda")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 infix fun ITE2<StringSort>.otherwise(string: (() -> String)) = otherwise(StringLiteral(string()))
 
 // RegLan extensions
@@ -501,5 +629,7 @@ infix fun ITE2<StringSort>.otherwise(string: (() -> String)) = otherwise(StringL
 infix fun ITE2<RegLanSort>.otherwise(reglan: String) = otherwise(StrToRe(StringLiteral(reglan)))
 
 @JvmName("RegLanSortOtherwiseStringLambda")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 infix fun ITE2<RegLanSort>.otherwise(reglan: (() -> String)) =
     otherwise(StrToRe(StringLiteral(reglan())))

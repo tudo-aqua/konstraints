@@ -143,23 +143,31 @@ data class FPLiteral(
   companion object {
     operator fun invoke(value: Double): FPLiteral {
       // TODO special cases (NaN, Inf etc.)
-      val bitvec = value.toRawBits().toString()
+      val bitvec = value
+          .toRawBits() // get the bit representation as integer value
+          .toUInt() // convert to uint so that toString does not produce a '-' sign
+          .toString(2) // convert to binary representation
+          .padStart(64, '0') // pad start since toString drops leading zeros
 
       return FPLiteral(
-          bitvec.substring(0..0).bitvec(),
-          bitvec.substring(1..11).bitvec(),
-          bitvec.substring(12).bitvec(),
+          "#b${bitvec.substring(0..0)}".bitvec(),
+          "#b${bitvec.substring(1..11)}".bitvec(),
+              "#b${bitvec.substring(12)}".bitvec(),
       )
     }
 
     operator fun invoke(value: Float): FPLiteral {
       // TODO special cases (NaN, Inf etc.)
-      val bitvec = value.toRawBits().toString()
+      val bitvec = value
+          .toRawBits() // get the bit representation as integer value
+          .toUInt() // convert to uint so that toString does not produce a '-' sign
+          .toString(2) // convert to binary representation
+          .padStart(32, '0') // pad start since toString drops leading zeros
 
       return FPLiteral(
-          bitvec.substring(0..0).bitvec(),
-          bitvec.substring(1..8).bitvec(),
-          bitvec.substring(9).bitvec(),
+          "#b${bitvec.substring(0..0)}".bitvec(),
+          "#b${bitvec.substring(1..8)}".bitvec(),
+          "#b${bitvec.substring(9)}".bitvec(),
       )
     }
 

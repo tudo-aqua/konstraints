@@ -107,6 +107,7 @@ sealed interface Logic {
             "UFLRA" to UFLRA,
             "UFNIA" to UFNIA,
             "UFNIRA" to UFNIRA,
+            "QF_ASLIA" to QF_ASLIA,
         )
   }
 
@@ -1728,6 +1729,16 @@ data object QF_FPLRA : Logic {
  */
 data object QF_LIRA : Logic {
   override val theories = setOf(Theories.CORE, Theories.REALS_INTS)
+  override val datatypes = false
+  override val quantifierFree = true
+  override val linearArithmetic = true
+  override val nonlinearArithmetic = false
+  override val differentialArithmetic = true
+  override val freeSortFunctionSymbols = false
+}
+
+data object QF_ASLIA : Logic {
+  override val theories = setOf(Theories.CORE, Theories.ARRAYS_EX, Theories.STRINGS, Theories.INTS)
   override val datatypes = false
   override val quantifierFree = true
   override val linearArithmetic = true
