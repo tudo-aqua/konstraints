@@ -25,6 +25,7 @@ class OptionsBuilder {
   val stringOptions = mutableMapOf<String, String>()
   val boolOptions = mutableMapOf<String, Boolean>()
   val numeralOptions = mutableMapOf<String, BigInteger>()
+  var produceModel = false
 
   /**
    * Set diagnostic-output-channel to [value].
@@ -117,6 +118,7 @@ class OptionsBuilder {
    */
   fun produceModels(value: Boolean): OptionsBuilder {
     boolOptions[":produce-models"] = value
+    produceModel = true
     return this
   }
 
@@ -284,7 +286,7 @@ class OptionsBuilder {
    *
    * If [this] does not have the prefix ':'. its automatically added.
    */
-  infix fun String.setTo(value: String): OptionsBuilder {
+  infix fun String.set_to(value: String): OptionsBuilder {
     // add ":" prefix to option name if not already present
     val option =
         this.apply {
@@ -302,7 +304,7 @@ class OptionsBuilder {
    *
    * If [this] does not have the prefix ':'. its automatically added.
    */
-  infix fun String.setTo(value: Boolean): OptionsBuilder {
+  infix fun String.set_to(value: Boolean): OptionsBuilder {
     // add ":" prefix to option name if not already present
     val option =
         this.apply {
@@ -320,7 +322,7 @@ class OptionsBuilder {
    *
    * If [this] does not have the prefix ':'. its automatically added.
    */
-  infix fun String.setTo(value: BigInteger): OptionsBuilder {
+  infix fun String.set_to(value: BigInteger): OptionsBuilder {
     // add ":" prefix to option name if not already present
     val option =
         this.apply {
@@ -338,7 +340,7 @@ class OptionsBuilder {
    *
    * If [this] does not have the prefix ':'. its automatically added.
    */
-  infix fun String.setTo(value: Int): OptionsBuilder {
+  infix fun String.set_to(value: Int): OptionsBuilder {
     // add ":" prefix to option name if not already present
     val option =
         this.apply {

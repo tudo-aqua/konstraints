@@ -59,6 +59,51 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
           throw IllegalArgumentException("$vector is not a valid bitvector literal.")
         }
 
+    /** Convert the base10 [value] to a bitvector representation of the same numeral */
+    operator fun invoke(value: Byte) = invoke("#x${value.toString(16)}")
+
+    /**
+     * Convert the base10 [value] to a bitvector representation of the same numeral with [bits]
+     * width
+     */
+    operator fun invoke(value: Byte, bits: Int) = invoke("#x${value.toString(16)}", bits)
+
+    /** Convert the base10 [value] to a bitvector representation of the same numeral */
+    operator fun invoke(value: Short) = invoke("#x${value.toString(16)}")
+
+    /**
+     * Convert the base10 [value] to a bitvector representation of the same numeral with [bits]
+     * width
+     */
+    operator fun invoke(value: Short, bits: Int) = invoke("#x${value.toString(16)}", bits)
+
+    /** Convert the base10 [value] to a bitvector representation of the same numeral */
+    operator fun invoke(value: Int) = invoke("#x${value.toString(16)}")
+
+    /**
+     * Convert the base10 [value] to a bitvector representation of the same numeral with [bits]
+     * width
+     */
+    operator fun invoke(value: Int, bits: Int) = invoke("#x${value.toString(16)}", bits)
+
+    /** Convert the base10 [value] to a bitvector representation of the same numeral */
+    operator fun invoke(value: Long) = invoke("#x${value.toString(16)}")
+
+    /**
+     * Convert the base10 [value] to a bitvector representation of the same numeral with [bits]
+     * width
+     */
+    operator fun invoke(value: Long, bits: Int) = invoke("#x${value.toString(16)}", bits)
+
+    /** Convert the base10 [value] to a bitvector representation of the same numeral */
+    operator fun invoke(value: BigInteger) = invoke("#x${value.toString(16)}")
+
+    /**
+     * Convert the base10 [value] to a bitvector representation of the same numeral with [bits]
+     * width
+     */
+    operator fun invoke(value: BigInteger, bits: Int) = invoke("#x${value.toString(16)}", bits)
+
     private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS, Theories.FLOATING_POINT)
   }
 
@@ -98,23 +143,33 @@ data class FPLiteral(
   companion object {
     operator fun invoke(value: Double): FPLiteral {
       // TODO special cases (NaN, Inf etc.)
-      val bitvec = value.toRawBits().toString()
+      val bitvec =
+          value
+              .toRawBits() // get the bit representation as integer value
+              .toUInt() // convert to uint so that toString does not produce a '-' sign
+              .toString(2) // convert to binary representation
+              .padStart(64, '0') // pad start since toString drops leading zeros
 
       return FPLiteral(
-          bitvec.substring(0..0).bitvec(),
-          bitvec.substring(1..11).bitvec(),
-          bitvec.substring(12).bitvec(),
+          "#b${bitvec.substring(0..0)}".bitvec(),
+          "#b${bitvec.substring(1..11)}".bitvec(),
+          "#b${bitvec.substring(12)}".bitvec(),
       )
     }
 
     operator fun invoke(value: Float): FPLiteral {
       // TODO special cases (NaN, Inf etc.)
-      val bitvec = value.toRawBits().toString()
+      val bitvec =
+          value
+              .toRawBits() // get the bit representation as integer value
+              .toUInt() // convert to uint so that toString does not produce a '-' sign
+              .toString(2) // convert to binary representation
+              .padStart(32, '0') // pad start since toString drops leading zeros
 
       return FPLiteral(
-          bitvec.substring(0..0).bitvec(),
-          bitvec.substring(1..8).bitvec(),
-          bitvec.substring(9).bitvec(),
+          "#b${bitvec.substring(0..0)}".bitvec(),
+          "#b${bitvec.substring(1..8)}".bitvec(),
+          "#b${bitvec.substring(9)}".bitvec(),
       )
     }
 
@@ -186,6 +241,8 @@ class RealLiteral(val value: BigDecimal) :
   constructor(value: Float) : this(value.toBigDecimal())
 
   constructor(value: Double) : this(value.toBigDecimal())
+
+  constructor(value: String) : this(value.toBigDecimal())
 
   override val sort: RealSort = SMTReal
 

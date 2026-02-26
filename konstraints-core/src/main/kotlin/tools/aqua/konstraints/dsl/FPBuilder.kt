@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.dsl
 
+import kotlin.experimental.ExperimentalTypeInference
 import tools.aqua.konstraints.smt.BitVecSort
 import tools.aqua.konstraints.smt.BitVecToFP
 import tools.aqua.konstraints.smt.Expression
@@ -3333,6 +3334,9 @@ fun toReal(block: () -> Expression<FPSort>) = FPToReal(block())
  *
  * @param roundingMode: floating point rounding mode.
  */
+@JvmName("fpfmaFPSortExpr")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 fun fpfma(roundingMode: Expression<RoundingModeSort> = RNE, multiplier: () -> Expression<FPSort>) =
     FPFMA1(roundingMode, multiplier())
 
@@ -3342,8 +3346,50 @@ fun fpfma(roundingMode: Expression<RoundingModeSort> = RNE, multiplier: () -> Ex
  *
  * @param roundingMode: floating point rounding mode.
  */
+@JvmName("fpfmaFloat")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+fun fpfma(roundingMode: Expression<RoundingModeSort> = RNE, multiplier: () -> Float) =
+    FPFMA1(roundingMode, FPLiteral(multiplier()))
+
+/**
+ * Fused multiplication addition operator ([multiplier] * multiplicand + summand) for FPSort
+ * expressions. Must be followed by [FPFMA1.mul] and [FPFMA2.add].
+ *
+ * @param roundingMode: floating point rounding mode.
+ */
+@JvmName("fpfmaDouble")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+fun fpfma(roundingMode: Expression<RoundingModeSort> = RNE, multiplier: () -> Double) =
+    FPFMA1(roundingMode, FPLiteral(multiplier()))
+
+/**
+ * Fused multiplication addition operator ([multiplier] * multiplicand + summand) for FPSort
+ * expressions. Must be followed by [FPFMA1.mul] and [FPFMA2.add].
+ *
+ * @param roundingMode: floating point rounding mode.
+ */
 fun fpfma(roundingMode: Expression<RoundingModeSort> = RNE, multiplier: Expression<FPSort>) =
     FPFMA1(roundingMode, multiplier)
+
+/**
+ * Fused multiplication addition operator ([multiplier] * multiplicand + summand) for FPSort
+ * expressions. Must be followed by [FPFMA1.mul] and [FPFMA2.add].
+ *
+ * @param roundingMode: floating point rounding mode.
+ */
+fun fpfma(roundingMode: Expression<RoundingModeSort> = RNE, multiplier: Float) =
+    FPFMA1(roundingMode, FPLiteral(multiplier))
+
+/**
+ * Fused multiplication addition operator ([multiplier] * multiplicand + summand) for FPSort
+ * expressions. Must be followed by [FPFMA1.mul] and [FPFMA2.add].
+ *
+ * @param roundingMode: floating point rounding mode.
+ */
+fun fpfma(roundingMode: Expression<RoundingModeSort> = RNE, multiplier: Double) =
+    FPFMA1(roundingMode, FPLiteral(multiplier))
 
 /**
  * Multiplication stage of fp.fma.
@@ -3366,8 +3412,51 @@ class FPFMA1(val roundingMode: Expression<RoundingModeSort>, val multiplier: Exp
    *
    * Must be followed by [FPFMA2.add].
    */
+  infix fun mul(multiplicand: Float) = FPFMA2(roundingMode, multiplier, FPLiteral(multiplicand))
+
+  /**
+   * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort
+   * expressions.
+   *
+   * Must be followed by [FPFMA2.add].
+   */
+  infix fun mul(multiplicand: Double) = FPFMA2(roundingMode, multiplier, FPLiteral(multiplicand))
+
+  /**
+   * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort
+   * expressions.
+   *
+   * Must be followed by [FPFMA2.add].
+   */
+  @JvmName("mulFPSortExpr")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
   infix fun mul(multiplicand: () -> Expression<FPSort>) =
       FPFMA2(roundingMode, multiplier, multiplicand())
+
+  /**
+   * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort
+   * expressions.
+   *
+   * Must be followed by [FPFMA2.add].
+   */
+  @JvmName("mulFloat")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  infix fun mul(multiplicand: () -> Float) =
+      FPFMA2(roundingMode, multiplier, FPLiteral(multiplicand()))
+
+  /**
+   * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort
+   * expressions.
+   *
+   * Must be followed by [FPFMA2.add].
+   */
+  @JvmName("mulDouble")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  infix fun mul(multiplicand: () -> Double) =
+      FPFMA2(roundingMode, multiplier, FPLiteral(multiplicand()))
 }
 
 /** Addition stage of fp.fma. */
@@ -3388,48 +3477,230 @@ class FPFMA2(
    * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
    * expressions.
    */
+  infix fun add(summand: Float) = FPFma(roundingMode, multiplier, multiplicand, FPLiteral(summand))
+
+  /**
+   * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
+   * expressions.
+   */
+  infix fun add(summand: Double) = FPFma(roundingMode, multiplier, multiplicand, FPLiteral(summand))
+
+  /**
+   * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
+   * expressions.
+   */
+  @JvmName("addFPExpr")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
   infix fun add(summand: () -> Expression<FPSort>) =
       FPFma(roundingMode, multiplier, multiplicand, summand())
+
+  /**
+   * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
+   * expressions.
+   */
+  @JvmName("addFloat")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  infix fun add(summand: () -> Float) =
+      FPFma(roundingMode, multiplier, multiplicand, FPLiteral(summand()))
+
+  /**
+   * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
+   * expressions.
+   */
+  @JvmName("addDouble")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  infix fun add(summand: () -> Double) =
+      FPFma(roundingMode, multiplier, multiplicand, FPLiteral(summand()))
 }
 
 /** Implements floating point isNormal operation. */
 fun isNormal(expr: Expression<FPSort>) = FPIsNormal(expr)
 
 /** Implements floating point isNormal operation. */
+fun isNormal(expr: Float) = FPIsNormal(FPLiteral(expr))
+
+/** Implements floating point isNormal operation. */
+fun isNormal(expr: Double) = FPIsNormal(FPLiteral(expr))
+
+/** Implements floating point isNormal operation. */
+@JvmName("isNormalFPExpr")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 fun isNormal(block: () -> Expression<FPSort>) = FPIsNormal(block())
+
+/** Implements floating point isNormal operation. */
+@JvmName("isNormalFloat")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+fun isNormal(expr: () -> Float) = FPIsNormal(FPLiteral(expr()))
+
+/** Implements floating point isNormal operation. */
+@JvmName("isNormalDouble")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+fun isNormal(expr: () -> Double) = FPIsNormal(FPLiteral(expr()))
 
 /** Implements floating point isSubnormal operation. */
 fun isSubnormal(expr: Expression<FPSort>) = FPIsSubnormal(expr)
 
+/** Implements floating point isNormal operation. */
+fun isSubnormal(expr: Float) = FPIsSubnormal(FPLiteral(expr))
+
+/** Implements floating point isNormal operation. */
+fun isSubnormal(expr: Double) = FPIsSubnormal(FPLiteral(expr))
+
 /** Implements floating point isSubnormal operation. */
+@JvmName("isSubnormalFPExpr")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 fun isSubnormal(block: () -> Expression<FPSort>) = FPIsSubnormal(block())
+
+/** Implements floating point isNormal operation. */
+@JvmName("isSubnormalFloat")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+fun isSubnormal(expr: () -> Float) = FPIsSubnormal(FPLiteral(expr()))
+
+/** Implements floating point isNormal operation. */
+@JvmName("isSubnormalDouble")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+fun isSubnormal(expr: () -> Double) = FPIsSubnormal(FPLiteral(expr()))
 
 /** Implements floating point isZero operation. */
 fun isZero(expr: Expression<FPSort>) = FPIsZero(expr)
 
+/** Implements floating point isNormal operation. */
+fun isZero(expr: Float) = FPIsZero(FPLiteral(expr))
+
+/** Implements floating point isNormal operation. */
+fun isZero(expr: Double) = FPIsZero(FPLiteral(expr))
+
 /** Implements floating point isZero operation. */
+@JvmName("isZeroFPExpr")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 fun isZero(block: () -> Expression<FPSort>) = FPIsZero(block())
+
+/** Implements floating point isNormal operation. */
+@JvmName("isZeroFloat")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+fun isZero(expr: () -> Float) = FPIsZero(FPLiteral(expr()))
+
+/** Implements floating point isNormal operation. */
+@JvmName("isZeroDouble")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+fun isZero(expr: () -> Double) = FPIsZero(FPLiteral(expr()))
 
 /** Implements floating point isInfinite operation. */
 fun isInfinite(expr: Expression<FPSort>) = FPIsInfinite(expr)
 
+/** Implements floating point isNormal operation. */
+fun isInfinite(expr: Float) = FPIsInfinite(FPLiteral(expr))
+
+/** Implements floating point isNormal operation. */
+fun isInfinite(expr: Double) = FPIsInfinite(FPLiteral(expr))
+
 /** Implements floating point isInfinite operation. */
+@JvmName("isInfiniteFPExpr")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 fun isInfinite(block: () -> Expression<FPSort>) = FPIsInfinite(block())
+
+/** Implements floating point isNormal operation. */
+@JvmName("isInfiniteFloat")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+fun isInfinite(expr: () -> Float) = FPIsInfinite(FPLiteral(expr()))
+
+/** Implements floating point isNormal operation. */
+@JvmName("isInfiniteDouble")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+fun isInfinite(expr: () -> Double) = FPIsInfinite(FPLiteral(expr()))
 
 /** Implements floating point isNaN operation. */
 fun isNaN(expr: Expression<FPSort>) = FPIsNaN(expr)
 
+/** Implements floating point isNormal operation. */
+fun isNaN(expr: Float) = FPIsNaN(FPLiteral(expr))
+
+/** Implements floating point isNormal operation. */
+fun isNaN(expr: Double) = FPIsNaN(FPLiteral(expr))
+
 /** Implements floating point isNaN operation. */
+@JvmName("isNaNFPExpr")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 fun isNaN(block: () -> Expression<FPSort>) = FPIsNaN(block())
+
+/** Implements floating point isNormal operation. */
+@JvmName("isNaNFloat")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+fun isNaN(expr: () -> Float) = FPIsNaN(FPLiteral(expr()))
+
+/** Implements floating point isNormal operation. */
+@JvmName("isNaNDouble")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+fun isNaN(expr: () -> Double) = FPIsNaN(FPLiteral(expr()))
 
 /** Implements floating point isNegative operation. */
 fun isNegative(expr: Expression<FPSort>) = FPIsNegative(expr)
 
+/** Implements floating point isNormal operation. */
+fun isNegative(expr: Float) = FPIsNegative(FPLiteral(expr))
+
+/** Implements floating point isNormal operation. */
+fun isNegative(expr: Double) = FPIsNegative(FPLiteral(expr))
+
 /** Implements floating point isNegative operation. */
+@JvmName("isNegativeFPExpr")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 fun isNegative(block: () -> Expression<FPSort>) = FPIsNegative(block())
+
+/** Implements floating point isNormal operation. */
+@JvmName("isNegativeFloat")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+fun isNegative(expr: () -> Float) = FPIsNegative(FPLiteral(expr()))
+
+/** Implements floating point isNormal operation. */
+@JvmName("isNegativeDouble")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+fun isNegative(expr: () -> Double) = FPIsNegative(FPLiteral(expr()))
 
 /** Implements floating point isPositive operation. */
 fun isPositive(expr: Expression<FPSort>) = FPIsPositive(expr)
 
+/** Implements floating point isNormal operation. */
+fun isPositive(expr: Float) = FPIsPositive(FPLiteral(expr))
+
+/** Implements floating point isNormal operation. */
+fun isPositive(expr: Double) = FPIsPositive(FPLiteral(expr))
+
 /** Implements floating point isPositive operation. */
+@JvmName("isPositiveFPExpr")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
 fun isPositive(block: () -> Expression<FPSort>) = FPIsPositive(block())
+
+/** Implements floating point isNormal operation. */
+@JvmName("isPositiveFloat")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+fun isPositive(expr: () -> Float) = FPIsPositive(FPLiteral(expr()))
+
+/** Implements floating point isNormal operation. */
+@JvmName("isPositiveDouble")
+@OptIn(ExperimentalTypeInference::class)
+@OverloadResolutionByLambdaReturnType
+fun isPositive(expr: () -> Double) = FPIsPositive(FPLiteral(expr()))

@@ -51,6 +51,8 @@ abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
   var logic: Logic? = null
     protected set
 
+  internal var produceModel = false
+
   val context = Context()
 
   protected val _commands: MutableList<Command> = commands.toMutableList()

@@ -68,6 +68,12 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
   override val isModelAvailable: Boolean
     get() = z3model != null
 
+  override fun produceModel(): Model {
+    z3model = solver.model
+
+    return model
+  }
+
   override fun visit(assert: Assert) {
     val assertion = assert.expr.z3ify(context)
 
@@ -154,7 +160,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
   }
 
   override fun visit(getModel: GetModel) {
-    z3model = solver.model
+    produceModel()
   }
 
   override fun visit(defineConst: DefineConst) {
@@ -233,8 +239,8 @@ operator fun Model.Companion.invoke(model: Z3Model, context: Z3Context) =
 //      2)))))
 fun FuncInterp<*>.aquaify(arguments: List<SortedVar<*>>): Expression<*> =
     if (entries.isEmpty()) {
-      TODO("This type of z3 model is not implemented yet!")
-      // `else`.aquaify()
+      // TODO("This type of z3 model is not implemented yet!")
+      `else`.aquaify()
     } else {
       entries
           .map { entry -> entry.aquaify(arguments) }

@@ -30,6 +30,8 @@ object True : ConstantExpression<BoolSort>("true".toSymbol(), SMTBool) {
   override val theories = CORE_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
+
+  fun toBoolean() = true
 }
 
 /** Object for SMT false. */
@@ -37,7 +39,11 @@ object False : ConstantExpression<BoolSort>("false".toSymbol(), SMTBool) {
   override val theories = CORE_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
+
+  fun toBoolean() = false
 }
+
+fun Boolean.toSMTBool() = if (this) True else False
 
 /**
  * Boolean negation.

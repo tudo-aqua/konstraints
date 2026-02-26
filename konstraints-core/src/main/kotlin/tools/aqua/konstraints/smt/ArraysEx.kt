@@ -54,7 +54,7 @@ class ArraySelect<X : Sort, Y : Sort>(
  * - `(par (X Y) (store (Array X Y) X Y (Array X Y)))`
  * - `(store [array] [index] [value])`
  */
-class ArrayStore<X : Sort, Y : Sort>(
+class ArrayStore<out X : Sort, out Y : Sort>(
     val array: Expression<ArraySort<X, Y>>,
     val index: Expression<X>,
     val value: Expression<Y>,

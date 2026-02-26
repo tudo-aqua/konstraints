@@ -28,33 +28,47 @@ import tools.aqua.konstraints.util.SimpleDelegate
  *
  * The name of the constant is automatically generated as '|const!sort!UUID|'
  *
- * @return [SMTFunction0]
+ * @return [UserDeclaredExpression]
  */
-fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T) =
-    Const(sort, this, "|const!$sort!${UUID.randomUUID()}|")
+fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T) = Const(sort, this)
 
 /**
  * Declares an SMT constant: (declare-const [name] [sort]).
  *
  * If the name is empty, the function automatically generates a name as '|const!sort!UUID|'
  *
- * @return [SMTFunction0]
+ * @return [UserDeclaredExpression]
  */
 fun <T : Sort> SMTProgramBuilder.declaringConst(sort: T, name: String) = Const(sort, this, name)
 
 /**
  * Declares an SMT function without any parameters: (declare-fun symbol () [sort]).
  *
+ * Symbol is automatically inferred from the kotlin field this is stored in.
+ *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * For functions of arity 0, prefer [declaringConst]. The functions name will be the same as the
  * variables name.
  *
- * @return an [SMTFunction] object with arity 0.
+ * @return [UserDeclaredSMTFunction0].
  */
 fun <T : Sort> SMTProgramBuilder.declaring(sort: T) = Declare0(sort, this)
 
 /**
+ * Declares an SMT function without any parameters: (declare-fun [name] () [sort]).
+ *
+ * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
+ * For functions of arity 0, prefer [declaringConst]. The functions name will be the same as the
+ * variables name.
+ *
+ * @return [UserDeclaredSMTFunction0].
+ */
+fun <T : Sort> SMTProgramBuilder.declaring(sort: T, name: String) = Declare0(sort, this, name)
+
+/**
  * Declares an SMT function with one parameter: (declare-fun symbol ([par]) [sort]).
+ *
+ * Symbol is automatically inferred from the kotlin field this is stored in.
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * The functions name will be the same as the variables name.
@@ -64,7 +78,20 @@ fun <T : Sort> SMTProgramBuilder.declaring(sort: T) = Declare0(sort, this)
 fun <T : Sort, S : Sort> SMTProgramBuilder.declaring(sort: T, par: S) = Declare1(sort, par, this)
 
 /**
+ * Declares an SMT function with one parameter: (declare-fun [name] ([par]) [sort]).
+ *
+ * [UserDeclaredSMTFunction1.invoke] has to called to generate an Expression with the given
+ * parameters applied. The functions name will be the same as the variables name.
+ *
+ * @return [UserDeclaredSMTFunction1].
+ */
+fun <T : Sort, S : Sort> SMTProgramBuilder.declaring(name: String, sort: T, par: S) =
+    Declare1(sort, par, this, name)
+
+/**
  * Declares an SMT function with two parameters: (declare-fun symbol ([par1] [par2]) [sort]).
+ *
+ * Symbol is automatically inferred from the kotlin field this is stored in.
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * The functions name will be the same as the variables name.
@@ -75,8 +102,25 @@ fun <T : Sort, S1 : Sort, S2 : Sort> SMTProgramBuilder.declaring(sort: T, par1: 
     Declare2(sort, par1, par2, this)
 
 /**
- * Declares an SMT function with three parameters: (declare-fun symbol ([par1] [par2] [par3]).
- * [sort])
+ * Declares an SMT function with two parameters: (declare-fun [name] ([par1] [par2]) [sort]).
+ *
+ * [UserDeclaredSMTFunction2.invoke] has to called to generate an Expression with the given
+ * parameters applied. The functions name will be the same as the variables name.
+ *
+ * @return [UserDeclaredSMTFunction2].
+ */
+fun <T : Sort, S1 : Sort, S2 : Sort> SMTProgramBuilder.declaring(
+    name: String,
+    sort: T,
+    par1: S1,
+    par2: S2,
+) = Declare2(sort, par1, par2, this, name)
+
+/**
+ * Declares an SMT function with three parameters: (declare-fun symbol ([par1] [par2] [par3])
+ * [sort]).
+ *
+ * Symbol is automatically inferred from the kotlin field this is stored in.
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * The functions name will be the same as the variables name.
@@ -91,8 +135,27 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort> SMTProgramBuilder.declaring(
 ) = Declare3(sort, par1, par2, par3, this)
 
 /**
- * Declares an SMT function with four parameters: (declare-fun symbol ([par1] [par2] [par3] [par4]).
- * [sort])
+ * Declares an SMT function with three parameters: (declare-fun symbol ([par1] [par2] [par3])
+ * [sort]).
+ *
+ * [UserDeclaredSMTFunction3.invoke] has to called to generate an Expression with the given
+ * parameters applied. The functions name will be the same as the variables name.
+ *
+ * @return [UserDeclaredSMTFunction3].
+ */
+fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort> SMTProgramBuilder.declaring(
+    name: String,
+    sort: T,
+    par1: S1,
+    par2: S2,
+    par3: S3,
+) = Declare3(sort, par1, par2, par3, this, name)
+
+/**
+ * Declares an SMT function with four parameters: (declare-fun symbol ([par1] [par2] [par3] [par4])
+ * [sort]).
+ *
+ * Symbol is automatically inferred from the kotlin field this is stored in.
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * The functions name will be the same as the variables name.
@@ -108,8 +171,28 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> SMTProgramBuilder.dec
 ) = Declare4(sort, par1, par2, par3, par4, this)
 
 /**
+ * Declares an SMT function with four parameters: (declare-fun [name] ([par1] [par2] [par3] [par4])
+ * [sort]).
+ *
+ * [UserDeclaredSMTFunction4.invoke] has to called to generate an Expression with the given
+ * parameters applied. The functions name will be the same as the variables name.
+ *
+ * @return [UserDeclaredSMTFunction4].
+ */
+fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> SMTProgramBuilder.declaring(
+    name: String,
+    sort: T,
+    par1: S1,
+    par2: S2,
+    par3: S3,
+    par4: S4,
+) = Declare4(sort, par1, par2, par3, par4, this, name)
+
+/**
  * Declares an SMT function with five parameters: (declare-fun symbol ([par1] [par2] [par3] [par4]
  * [par5]) [sort]).
+ *
+ * Symbol is automatically inferred from the kotlin field this is stored in.
  *
  * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
  * The functions name will be the same as the variables name.
@@ -126,23 +209,60 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> SMTProgram
 ) = Declare5(sort, par1, par2, par3, par4, par5, this)
 
 /**
+ * Declares an SMT function with five parameters: (declare-fun [name] ([par1] [par2] [par3] [par4]
+ * [par5]) [sort]).
+ *
+ * [UserDeclaredSMTFunction5.invoke] has to called to generate an Expression with the given
+ * parameters applied. The functions name will be the same as the variables name.
+ *
+ * @return [UserDeclaredSMTFunction5].
+ */
+fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> SMTProgramBuilder.declaring(
+    name: String,
+    sort: T,
+    par1: S1,
+    par2: S2,
+    par3: S3,
+    par4: S4,
+    par5: S5,
+) = Declare5(sort, par1, par2, par3, par4, par5, this, name)
+
+/**
  * Define an SMT function: (define-fun symbol () [sort] [block]).
  *
- * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
- * The functions name will be the same as the variables name.
+ * Symbol is automatically inferred from the kotlin field this is stored in.
  *
- * @return an [SMTFunction] object with arity 0.
+ * [UserDefinedSMTFunction0.invoke] has to called to generate an Expression with the given
+ * parameters applied. The functions name will be the same as the variables name.
+ *
+ * @return [UserDefinedSMTFunction0].
  */
 fun <T : Sort> SMTProgramBuilder.defining(sort: T, block: (List<Expression<*>>) -> Expression<T>) =
     Define(sort, block, this)
 
 /**
+ * Define an SMT function: (define-fun [name] () [sort] [block]).
+ *
+ * [UserDefinedSMTFunction0.invoke] has to called to generate an Expression with the given
+ * parameters applied. The functions name will be the same as the variables name.
+ *
+ * @return [UserDefinedSMTFunction0].
+ */
+fun <T : Sort> SMTProgramBuilder.defining(
+    name: String,
+    sort: T,
+    block: (List<Expression<*>>) -> Expression<T>,
+) = Define(sort, block, this, emptyList(), name)
+
+/**
  * Define an SMT function: (define-fun symbol ([par]) [sort] [block]).
  *
- * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
- * The functions name will be the same as the variables name.
+ * Symbol is automatically inferred from the kotlin field this is stored in.
  *
- * @return an [SMTFunction] object with arity 1.
+ * [UserDefinedSMTFunction1.invoke] has to called to generate an Expression with the given
+ * parameters applied. The functions name will be the same as the variables name.
+ *
+ * @return [UserDefinedSMTFunction1].
  */
 fun <T : Sort, S : Sort> SMTProgramBuilder.defining(
     sort: T,
@@ -151,12 +271,29 @@ fun <T : Sort, S : Sort> SMTProgramBuilder.defining(
 ) = Define1(sort, block, par, this)
 
 /**
+ * Define an SMT function: (define-fun [name] ([par]) [sort] [block]).
+ *
+ * [UserDefinedSMTFunction1.invoke] has to called to generate an Expression with the given
+ * parameters applied. The functions name will be the same as the variables name.
+ *
+ * @return [UserDefinedSMTFunction1].
+ */
+fun <T : Sort, S : Sort> SMTProgramBuilder.defining(
+    name: String,
+    sort: T,
+    par: S,
+    block: (Expression<S>) -> Expression<T>,
+) = Define1(sort, block, par, this, name)
+
+/**
  * Define an SMT function: (define-fun symbol ([par1] [par2]) [sort] [block]).
  *
- * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
- * The functions name will be the same as the variables name.
+ * Symbol is automatically inferred from the kotlin field this is stored in.
  *
- * @return an [SMTFunction] object with arity 2.
+ * [UserDefinedSMTFunction2.invoke] has to called to generate an Expression with the given
+ * parameters applied. The functions name will be the same as the variables name.
+ *
+ * @return [UserDefinedSMTFunction2].
  */
 fun <T : Sort, S1 : Sort, S2 : Sort> SMTProgramBuilder.defining(
     sort: T,
@@ -166,12 +303,30 @@ fun <T : Sort, S1 : Sort, S2 : Sort> SMTProgramBuilder.defining(
 ) = Define2(sort, block, par1, par2, this)
 
 /**
+ * Define an SMT function: (define-fun [name] ([par1] [par2]) [sort] [block]).
+ *
+ * [UserDefinedSMTFunction2.invoke] has to called to generate an Expression with the given
+ * parameters applied. The functions name will be the same as the variables name.
+ *
+ * @return [UserDefinedSMTFunction2].
+ */
+fun <T : Sort, S1 : Sort, S2 : Sort> SMTProgramBuilder.defining(
+    name: String,
+    sort: T,
+    par1: S1,
+    par2: S2,
+    block: (Expression<S1>, Expression<S2>) -> Expression<T>,
+) = Define2(sort, block, par1, par2, this, name)
+
+/**
  * Define an SMT function: (define-fun symbol ([par1] [par2] [par3]) [sort] [block]).
  *
- * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
- * The functions name will be the same as the variables name.
+ * Symbol is automatically inferred from the kotlin field this is stored in.
  *
- * @return an [SMTFunction] object with arity 3.
+ * [UserDefinedSMTFunction3.invoke] has to called to generate an Expression with the given
+ * parameters applied. The functions name will be the same as the variables name.
+ *
+ * @return [UserDefinedSMTFunction3].
  */
 fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort> SMTProgramBuilder.defining(
     sort: T,
@@ -182,12 +337,31 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort> SMTProgramBuilder.defining(
 ) = Define3(sort, block, par1, par2, par3, this)
 
 /**
+ * Define an SMT function: (define-fun [name] ([par1] [par2] [par3]) [sort] [block]).
+ *
+ * [UserDefinedSMTFunction3.invoke] has to called to generate an Expression with the given
+ * parameters applied. The functions name will be the same as the variables name.
+ *
+ * @return [UserDefinedSMTFunction3].
+ */
+fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort> SMTProgramBuilder.defining(
+    name: String,
+    sort: T,
+    par1: S1,
+    par2: S2,
+    par3: S3,
+    block: (Expression<S1>, Expression<S2>, Expression<S3>) -> Expression<T>,
+) = Define3(sort, block, par1, par2, par3, this, name)
+
+/**
  * Define an SMT function: (define-fun symbol ([par1] [par2] [par3] [par4]) [sort] [block]).
  *
- * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
- * The functions name will be the same as the variables name.
+ * Symbol is automatically inferred from the kotlin field this is stored in.
  *
- * @return an [SMTFunction] object with arity 4.
+ * [UserDefinedSMTFunction4.invoke] has to called to generate an Expression with the given
+ * parameters applied. The functions name will be the same as the variables name.
+ *
+ * @return [UserDefinedSMTFunction4].
  */
 fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> SMTProgramBuilder.defining(
     sort: T,
@@ -199,12 +373,32 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> SMTProgramBuilder.def
 ) = Define4(sort, block, par1, par2, par3, par4, this)
 
 /**
+ * Define an SMT function: (define-fun [name] ([par1] [par2] [par3] [par4]) [sort] [block]).
+ *
+ * [UserDefinedSMTFunction4.invoke] has to called to generate an Expression with the given
+ * parameters applied. The functions name will be the same as the variables name.
+ *
+ * @return [UserDefinedSMTFunction4].
+ */
+fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort> SMTProgramBuilder.defining(
+    name: String,
+    sort: T,
+    par1: S1,
+    par2: S2,
+    par3: S3,
+    par4: S4,
+    block: (Expression<S1>, Expression<S2>, Expression<S3>, Expression<S4>) -> Expression<T>,
+) = Define4(sort, block, par1, par2, par3, par4, this, name)
+
+/**
  * Define an SMT function: (define-fun symbol ([par1] [par2] [par3] [par4] [par5]) [sort] [block]).
  *
- * [SMTFunction.invoke] has to called to generate an Expression with the given parameters applied.
- * The functions name will be the same as the variables name.
+ * Symbol is automatically inferred from the kotlin field this is stored in.
  *
- * @return an [SMTFunction] object with arity 5.
+ * [UserDefinedSMTFunction5.invoke] has to called to generate an Expression with the given
+ * parameters applied. The functions name will be the same as the variables name.
+ *
+ * @return [UserDefinedSMTFunction5].
  */
 fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> SMTProgramBuilder.defining(
     sort: T,
@@ -224,13 +418,41 @@ fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> SMTProgram
 ) = Define5(sort, block, par1, par2, par3, par4, par5, this)
 
 /**
+ * Define an SMT function: (define-fun symbol ([par1] [par2] [par3] [par4] [par5]) [sort] [block]).
+ *
+ * Symbol is automatically inferred from the kotlin field this is stored in.
+ *
+ * [UserDefinedSMTFunction5.invoke] has to called to generate an Expression with the given
+ * parameters applied. The functions name will be the same as the variables name.
+ *
+ * @return [UserDefinedSMTFunction5].
+ */
+fun <T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort> SMTProgramBuilder.defining(
+    name: String,
+    sort: T,
+    par1: S1,
+    par2: S2,
+    par3: S3,
+    par4: S4,
+    par5: S5,
+    block:
+        (
+            Expression<S1>,
+            Expression<S2>,
+            Expression<S3>,
+            Expression<S4>,
+            Expression<S5>,
+        ) -> Expression<T>,
+) = Define5(sort, block, par1, par2, par3, par4, par5, this, name)
+
+/**
  * Delegate provider class for declaring SMT functions of any arity: (declare-fun [name]
  * ([parameters]) [sort]).
  *
  * Registers the function in the given [program]. If [name] is null, the name register will be
  * `|property.name|`.
  *
- * @return [SMTFunctionN]
+ * @return [UserDeclaredSMTFunctionN]
  */
 class Declare<T : Sort>(
     val sort: T,
@@ -259,7 +481,7 @@ class Declare<T : Sort>(
  * Registers the function in the given [program]. If [name] is null, the name register will be
  * `|property.name|`.
  *
- * @return [SMTFunction0]
+ * @return [UserDeclaredExpression]
  */
 class Const<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: String? = null) {
   operator fun provideDelegate(
@@ -284,7 +506,7 @@ class Const<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: Str
  * Registers the function in the given [program]. If [name] is null, the name register will be
  * `|property.name|`.
  *
- * @return [SMTFunction0]
+ * @return [UserDeclaredSMTFunction0]
  */
 class Declare0<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: String? = null) {
   operator fun provideDelegate(
@@ -304,7 +526,7 @@ class Declare0<T : Sort>(val sort: T, val program: SMTProgramBuilder, val name: 
  * Registers the function in the given [program]. If [name] is null, the name register will be
  * `|property.name|`.
  *
- * @return [SMTFunction1]
+ * @return [UserDeclaredSMTFunction1]
  */
 class Declare1<T : Sort, S : Sort>(
     val sort: T,
@@ -333,7 +555,7 @@ class Declare1<T : Sort, S : Sort>(
  * Registers the function in the given [program]. If [name] is null, the name register will be
  * `|property.name|`.
  *
- * @return [SMTFunction2]
+ * @return [UserDeclaredSMTFunction2]
  */
 class Declare2<T : Sort, S1 : Sort, S2 : Sort>(
     val sort: T,
@@ -365,7 +587,7 @@ class Declare2<T : Sort, S1 : Sort, S2 : Sort>(
  * Registers the function in the given [program]. If [name] is null, the name register will be
  * `|property.name|`.
  *
- * @return [SMTFunction3]
+ * @return [UserDeclaredSMTFunction3]
  */
 class Declare3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val sort: T,
@@ -399,7 +621,7 @@ class Declare3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
  * Registers the function in the given [program]. If [name] is null, the name register will be
  * `|property.name|`.
  *
- * @return [SMTFunction4]
+ * @return [UserDeclaredSMTFunction4]
  */
 class Declare4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
     val sort: T,
@@ -435,7 +657,7 @@ class Declare4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
  * Registers the function in the given [program]. If [name] is null, the name register will be
  * `|property.name|`.
  *
- * @return [SMTFunction5]
+ * @return [UserDeclaredSMTFunction5]
  */
 class Declare5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
     val sort: T,
@@ -473,7 +695,7 @@ class Declare5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
  * Registers the function in the given [program]. If [name] is null, the name register will be
  * `|property.name|`.
  *
- * @return [SMTFunctionN]
+ * @return [UserDefinedSMTFunctionN]
  */
 class Define<T : Sort>(
     val sort: T,
@@ -505,7 +727,7 @@ class Define<T : Sort>(
  * Registers the function in the given [program]. If [name] is null, the name register will be
  * `|property.name|`.
  *
- * @return [SMTFunction1]
+ * @return [UserDefinedSMTFunction1]
  */
 class Define1<T : Sort, S : Sort>(
     val sort: T,
@@ -535,7 +757,7 @@ class Define1<T : Sort, S : Sort>(
  * Registers the function in the given [program]. If [name] is null, the name register will be
  * `|property.name|`.
  *
- * @return [SMTFunction2]
+ * @return [UserDefinedSMTFunction2]
  */
 class Define2<T : Sort, S1 : Sort, S2 : Sort>(
     val sort: T,
@@ -567,7 +789,7 @@ class Define2<T : Sort, S1 : Sort, S2 : Sort>(
  * Registers the function in the given [program]. If [name] is null, the name register will be
  * `|property.name|`.
  *
- * @return [SMTFunction3]
+ * @return [UserDefinedSMTFunction3]
  */
 class Define3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
     val sort: T,
@@ -657,7 +879,7 @@ class Define4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort>(
  * Registers the function in the given [program]. If [name] is null, the name register will be
  * `|property.name|`.
  *
- * @return [SMTFunction5]
+ * @return [UserDefinedSMTFunction5]
  */
 class Define5<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S4 : Sort, S5 : Sort>(
     val sort: T,

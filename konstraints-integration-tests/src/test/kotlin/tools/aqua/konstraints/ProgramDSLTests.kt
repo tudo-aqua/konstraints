@@ -77,7 +77,7 @@ class ProgramDSLTests {
           randomSeed(0)
           regularOutputChannel("stdout")
           reproducibleResourceLimit(0)
-          "option" setTo "value"
+          "option" set_to "value"
         }
 
         val x = const("x", SMTBool)

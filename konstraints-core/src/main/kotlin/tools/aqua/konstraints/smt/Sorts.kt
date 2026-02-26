@@ -735,7 +735,7 @@ class UserDefinedArraySort<X : Sort, Y : Sort>(override val definedSymbol: Symbo
 }
 
 /** Default implementation of Array sort. */
-sealed class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) : Sort("Array".toSymbol()) {
+sealed class ArraySort<out X : Sort, out Y : Sort>(val x: X, val y: Y) : Sort("Array".toSymbol()) {
   override val parameters = listOf(x, y)
 
   override fun toString(): String = "(Array $x $y)"
@@ -744,7 +744,7 @@ sealed class ArraySort<X : Sort, Y : Sort>(val x: X, val y: Y) : Sort("Array".to
 }
 
 /** Base class for all ArraySorts. */
-class SMTArray<X : Sort, Y : Sort>(x: X, y: Y) : ArraySort<X, Y>(x, y)
+class SMTArray<out X : Sort, out Y : Sort>(x: X, y: Y) : ArraySort<X, Y>(x, y)
 
 /** Bitvector sort with [bits] length. */
 sealed class BitVecSort(index: Index) : Sort("BitVec") {
