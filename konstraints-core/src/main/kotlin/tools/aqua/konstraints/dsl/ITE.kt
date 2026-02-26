@@ -20,6 +20,7 @@ package tools.aqua.konstraints.dsl
 
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.experimental.ExperimentalTypeInference
 import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.FPLiteral
@@ -35,7 +36,6 @@ import tools.aqua.konstraints.smt.StrToRe
 import tools.aqua.konstraints.smt.StringLiteral
 import tools.aqua.konstraints.smt.StringSort
 import tools.aqua.konstraints.smt.toSMTBool
-import kotlin.experimental.ExperimentalTypeInference
 
 @SMTDSL
 class ITE1(val condition: Expression<BoolSort>) {
@@ -353,8 +353,7 @@ class FloatITE2(val condition: Expression<BoolSort>, val numeral: Float) {
   @JvmName("FloatOtherwiseFPSortLambda")
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
-  infix fun otherwise(expr: (() -> Expression<FPSort>)) =
-    Ite(condition, FPLiteral(numeral), expr())
+  infix fun otherwise(expr: (() -> Expression<FPSort>)) = Ite(condition, FPLiteral(numeral), expr())
 }
 
 /**
@@ -393,8 +392,7 @@ class DoubleITE2(val condition: Expression<BoolSort>, val numeral: Double) {
   @JvmName("FloatOtherwiseFPSortLambda")
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
-  infix fun otherwise(expr: (() -> Expression<FPSort>)) =
-    Ite(condition, FPLiteral(numeral), expr())
+  infix fun otherwise(expr: (() -> Expression<FPSort>)) = Ite(condition, FPLiteral(numeral), expr())
 }
 
 /**

@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints
 
+import kotlin.use
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import tools.aqua.konstraints.dsl.*
@@ -40,7 +41,6 @@ import tools.aqua.konstraints.smt.SMTString
 import tools.aqua.konstraints.smt.SatStatus
 import tools.aqua.konstraints.smt.bitvec
 import tools.aqua.konstraints.solvers.z3.Z3Solver
-import kotlin.use
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Examples {
@@ -293,14 +293,19 @@ class Examples {
           // using lambdas is provided
           val lambdaIf = ite { u gt v } then { u } otherwise { v }
 
-          // note that lambdas also work with kotlin primitives however there are 2 major restrictions
+          // note that lambdas also work with kotlin primitives however there are 2 major
+          // restrictions
           // 1. At least one of the ite values needs to be an expression with an explicit sort to
           // determine the overall sort of the ite
-          // 2. If the then value is a kotlin primitive the otherwise gets restricted to only applicable sort types
-          // i.e. using a Float as then value restricts the otherwise to also only use floating point sort while
+          // 2. If the then value is a kotlin primitive the otherwise gets restricted to only
+          // applicable sort types
+          // i.e. using a Float as then value restricts the otherwise to also only use floating
+          // point sort while
           // using an Integer would restrict to any numeral type other than float
-          // It is also allowed to use a Boolean expression that is evaluated by kotlin however any information
-          // about how the statement was evaluated is lost on the smt end as it is just converted to a constant
+          // It is also allowed to use a Boolean expression that is evaluated by kotlin however any
+          // information
+          // about how the statement was evaluated is lost on the smt end as it is just converted to
+          // a constant
           ite { javaClass.name.startsWith("tools.aqua") } then { 5L } otherwise { u }
 
           assert(simpleIf eq nestedIf eq lambdaIf)
@@ -584,57 +589,59 @@ class Examples {
   @Test
   fun floatProgram() {
     val program =
-      smt(QF_FP) {
-        setInfo {
-          smtLibVersion("2.6")
-          source("|An examples program to show the usage of the konstraints dsl.|")
-          category(BenchmarkCategory.CRAFTED)
-          status(SatStatus.UNSAT)
+        smt(QF_FP) {
+          setInfo {
+            smtLibVersion("2.6")
+            source("|An examples program to show the usage of the konstraints dsl.|")
+            category(BenchmarkCategory.CRAFTED)
+            status(SatStatus.UNSAT)
+          }
+
+          setOptions {
+            printSuccess(true)
+            produceModels(true)
+          }
+
+          // be careful with floating point sorts and kotlin literals
+          // Float will ALWAYS be converted to (_ FloatingPoint 8 24)
+          // Double will ALWAYS be converted to (_ FloatingPoint 11 53)
+          // there are no compile-time checks so its completely legal to mix
+          // floating point types with different sizes however this will lead to runtime errors
+
+          val foo by declaringConst(SMTFloatingPoint(8, 24))
+
+          // the smt shorthand for Float32 can be used
+          val bar by declaringConst(SMTFP32)
+
+          // we can also declare a free function of rounding mode sort
+          val rm by declaring(SMTRoundingMode)
+
+          // infix operator exist in 2 variants the 'default' version without a name postfix
+          // they use the default rounding mode rne (round nearest ties to even)
+          val sum = foo fpadd bar
+
+          // if a specific one must be used there is a version for each rounding mode
+          val diff = foo fpsub_rtz bar
+
+          // we can also use an expression of rounding mode sort however there are no infix
+          // operators that exists for this case
+          val prod = FPMul(rm.instance, foo, bar)
+
+          // fused multiplication and addition can be used as a chain of infix functions
+          // the intial function takes a rounding mode that is defaulted to rne and either an
+          // expression
+          // or a lambda that yields an expression
+          val fma = fpfma { foo } mul bar add 4.2f
+
+          assert(sum eq 3.14f)
+          assert(diff eq 2.71f)
+
+          val solver = Z3Solver()
+
+          solver.use { solver ->
+            val status = checkSat(solver)
+            println(status)
+          }
         }
-
-        setOptions {
-          printSuccess(true)
-          produceModels(true)
-        }
-
-        // be careful with floating point sorts and kotlin literals
-        // Float will ALWAYS be converted to (_ FloatingPoint 8 24)
-        // Double will ALWAYS be converted to (_ FloatingPoint 11 53)
-        // there are no compile-time checks so its completely legal to mix
-        // floating point types with different sizes however this will lead to runtime errors
-
-        val foo by declaringConst(SMTFloatingPoint(8, 24))
-
-        // the smt shorthand for Float32 can be used
-        val bar by declaringConst(SMTFP32)
-
-        // we can also declare a free function of rounding mode sort
-        val rm by declaring(SMTRoundingMode)
-
-        // infix operator exist in 2 variants the 'default' version without a name postfix
-        // they use the default rounding mode rne (round nearest ties to even)
-        val sum = foo fpadd bar
-
-        // if a specific one must be used there is a version for each rounding mode
-        val diff = foo fpsub_rtz bar
-
-        // we can also use an expression of rounding mode sort however there are no infix operators that exists for this case
-        val prod = FPMul(rm.instance, foo, bar)
-
-        // fused multiplication and addition can be used as a chain of infix functions
-        // the intial function takes a rounding mode that is defaulted to rne and either an expression
-        // or a lambda that yields an expression
-        val fma = fpfma { foo } mul bar add 4.2f
-
-        assert(sum eq 3.14f)
-        assert(diff eq 2.71f)
-
-        val solver = Z3Solver()
-
-        solver.use { solver ->
-          val status = checkSat(solver)
-          println(status)
-        }
-      }
   }
 }

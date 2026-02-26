@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.dsl
 
+import kotlin.experimental.ExperimentalTypeInference
 import tools.aqua.konstraints.smt.BitVecSort
 import tools.aqua.konstraints.smt.BitVecToFP
 import tools.aqua.konstraints.smt.Expression
@@ -59,8 +60,6 @@ import tools.aqua.konstraints.smt.RealToFP
 import tools.aqua.konstraints.smt.RoundingModeSort
 import tools.aqua.konstraints.smt.SBitVecToFP
 import tools.aqua.konstraints.smt.UBitVecToFP
-import java.math.BigDecimal
-import kotlin.experimental.ExperimentalTypeInference
 
 /*
  * floating-point infix operations
@@ -3407,21 +3406,21 @@ class FPFMA1(val roundingMode: Expression<RoundingModeSort>, val multiplier: Exp
    */
   infix fun mul(multiplicand: Expression<FPSort>) = FPFMA2(roundingMode, multiplier, multiplicand)
 
-    /**
-     * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort
-     * expressions.
-     *
-     * Must be followed by [FPFMA2.add].
-     */
-    infix fun mul(multiplicand: Float) = FPFMA2(roundingMode, multiplier, FPLiteral(multiplicand))
+  /**
+   * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort
+   * expressions.
+   *
+   * Must be followed by [FPFMA2.add].
+   */
+  infix fun mul(multiplicand: Float) = FPFMA2(roundingMode, multiplier, FPLiteral(multiplicand))
 
-    /**
-     * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort
-     * expressions.
-     *
-     * Must be followed by [FPFMA2.add].
-     */
-    infix fun mul(multiplicand: Double) = FPFMA2(roundingMode, multiplier, FPLiteral(multiplicand))
+  /**
+   * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort
+   * expressions.
+   *
+   * Must be followed by [FPFMA2.add].
+   */
+  infix fun mul(multiplicand: Double) = FPFMA2(roundingMode, multiplier, FPLiteral(multiplicand))
 
   /**
    * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort
@@ -3435,27 +3434,29 @@ class FPFMA1(val roundingMode: Expression<RoundingModeSort>, val multiplier: Exp
   infix fun mul(multiplicand: () -> Expression<FPSort>) =
       FPFMA2(roundingMode, multiplier, multiplicand())
 
-    /**
-     * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort
-     * expressions.
-     *
-     * Must be followed by [FPFMA2.add].
-     */
-    @JvmName("mulFloat")
-    @OptIn(ExperimentalTypeInference::class)
-    @OverloadResolutionByLambdaReturnType
-    infix fun mul(multiplicand: () -> Float) = FPFMA2(roundingMode, multiplier, FPLiteral(multiplicand()))
+  /**
+   * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort
+   * expressions.
+   *
+   * Must be followed by [FPFMA2.add].
+   */
+  @JvmName("mulFloat")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  infix fun mul(multiplicand: () -> Float) =
+      FPFMA2(roundingMode, multiplier, FPLiteral(multiplicand()))
 
-    /**
-     * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort
-     * expressions.
-     *
-     * Must be followed by [FPFMA2.add].
-     */
-    @JvmName("mulDouble")
-    @OptIn(ExperimentalTypeInference::class)
-    @OverloadResolutionByLambdaReturnType
-    infix fun mul(multiplicand: () -> Double) = FPFMA2(roundingMode, multiplier, FPLiteral(multiplicand()))
+  /**
+   * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort
+   * expressions.
+   *
+   * Must be followed by [FPFMA2.add].
+   */
+  @JvmName("mulDouble")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  infix fun mul(multiplicand: () -> Double) =
+      FPFMA2(roundingMode, multiplier, FPLiteral(multiplicand()))
 }
 
 /** Addition stage of fp.fma. */
@@ -3472,19 +3473,17 @@ class FPFMA2(
   infix fun add(summand: Expression<FPSort>) =
       FPFma(roundingMode, multiplier, multiplicand, summand)
 
-    /**
-     * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
-     * expressions.
-     */
-    infix fun add(summand: Float) =
-        FPFma(roundingMode, multiplier, multiplicand, FPLiteral(summand))
+  /**
+   * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
+   * expressions.
+   */
+  infix fun add(summand: Float) = FPFma(roundingMode, multiplier, multiplicand, FPLiteral(summand))
 
-    /**
-     * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
-     * expressions.
-     */
-    infix fun add(summand: Double) =
-        FPFma(roundingMode, multiplier, multiplicand, FPLiteral(summand))
+  /**
+   * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
+   * expressions.
+   */
+  infix fun add(summand: Double) = FPFma(roundingMode, multiplier, multiplicand, FPLiteral(summand))
 
   /**
    * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
@@ -3496,25 +3495,25 @@ class FPFMA2(
   infix fun add(summand: () -> Expression<FPSort>) =
       FPFma(roundingMode, multiplier, multiplicand, summand())
 
-    /**
-     * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
-     * expressions.
-     */
-    @JvmName("addFloat")
-    @OptIn(ExperimentalTypeInference::class)
-    @OverloadResolutionByLambdaReturnType
-    infix fun add(summand: () -> Float) =
-        FPFma(roundingMode, multiplier, multiplicand, FPLiteral(summand()))
+  /**
+   * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
+   * expressions.
+   */
+  @JvmName("addFloat")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  infix fun add(summand: () -> Float) =
+      FPFma(roundingMode, multiplier, multiplicand, FPLiteral(summand()))
 
-    /**
-     * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
-     * expressions.
-     */
-    @JvmName("addDouble")
-    @OptIn(ExperimentalTypeInference::class)
-    @OverloadResolutionByLambdaReturnType
-    infix fun add(summand: () -> Double) =
-        FPFma(roundingMode, multiplier, multiplicand, FPLiteral(summand()))
+  /**
+   * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
+   * expressions.
+   */
+  @JvmName("addDouble")
+  @OptIn(ExperimentalTypeInference::class)
+  @OverloadResolutionByLambdaReturnType
+  infix fun add(summand: () -> Double) =
+      FPFma(roundingMode, multiplier, multiplicand, FPLiteral(summand()))
 }
 
 /** Implements floating point isNormal operation. */
