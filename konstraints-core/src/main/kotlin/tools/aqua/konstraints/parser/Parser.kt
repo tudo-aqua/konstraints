@@ -92,7 +92,6 @@ import tools.aqua.konstraints.smt.BinaryConstant
 import tools.aqua.konstraints.smt.CheckSat
 import tools.aqua.konstraints.smt.ConstantAttributeValue
 import tools.aqua.konstraints.smt.ConstructorDecl
-import tools.aqua.konstraints.smt.Datatype
 import tools.aqua.konstraints.smt.DecimalConstant
 import tools.aqua.konstraints.smt.ExistsExpression
 import tools.aqua.konstraints.smt.Exit
@@ -205,11 +204,13 @@ class Parser private constructor(val lexer: PeekableIterator<Token>) {
 
   private fun parseDatatype(program: MutableSMTProgram) {
     val symbol = parseSymbol()
-    val datatype = Datatype(0, symbol)
-    program.declareDatatype(datatype)
+
+    val datatype = program.declareEmptyDatatype(0, symbol)
 
     val decl = parseDatatypeDecl(program)
     decl.forEach { t -> datatype.add(t) }
+
+    program.finishDatatype(datatype)
   }
 
   @OptIn(ExperimentalContracts::class)

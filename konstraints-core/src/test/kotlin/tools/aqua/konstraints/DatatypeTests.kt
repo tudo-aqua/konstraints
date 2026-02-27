@@ -18,12 +18,21 @@
 
 package tools.aqua.konstraints
 
+import kotlin.test.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertDoesNotThrow
 import tools.aqua.konstraints.parser.Parser
+import tools.aqua.konstraints.smt.ConstructorDecl
+import tools.aqua.konstraints.smt.Datatype
+import tools.aqua.konstraints.smt.MutableSMTProgram
+import tools.aqua.konstraints.smt.QuotingRule
+import tools.aqua.konstraints.smt.SMTInt
+import tools.aqua.konstraints.smt.SelectorDecl
+import tools.aqua.konstraints.smt.toSymbol
 
 class DatatypeTests {
   @Test
-  fun intListTest() {
+  fun testIntListConstructionFromParser() {
     val smt =
         "(set-logic QF_IDL)" +
             "(declare-datatype IntList( ( empty )( insert ( head Int ) ( tail IntList ) )))" +
@@ -31,6 +40,31 @@ class DatatypeTests {
             "(assert (= l l))" +
             "(check-sat)"
     val prg = Parser(smt)
-    println(prg.toString())
+
+    assertEquals(
+        prg.toSMTString(QuotingRule.SAME_AS_INPUT, false).replace('\n', ' ').replace(" ", ""),
+        smt.replace('\n', ' ').replace(" ", ""),
+    )
+  }
+
+  @Test
+  fun testIntListConstructionFromProgram() {
+    assertDoesNotThrow {
+      val program = MutableSMTProgram()
+      val intListDt =
+          Datatype(0, "IntList".toSymbol()) { IntList ->
+            listOf(
+                ConstructorDecl("empty".toSymbol(), emptyList()),
+                ConstructorDecl(
+                    "insert".toSymbol(),
+                    listOf(
+                        SelectorDecl("head".toSymbol(), SMTInt),
+                        SelectorDecl("tail".toSymbol(), IntList),
+                    ),
+                ),
+            )
+          }
+      program.declareDatatype(intListDt)
+    }
   }
 }

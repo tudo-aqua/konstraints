@@ -234,21 +234,3 @@ class TesterExpression(index: SymbolIndex) : Expression<BoolSort>() {
     return this
   }
 }
-
-fun main() {
-  val intListDt =
-      Datatype(0, "IntList".toSymbol()) { IntList ->
-        listOf(
-            ConstructorDecl("empty".toSymbol(), emptyList()),
-            ConstructorDecl(
-                "insert".toSymbol(),
-                listOf(
-                    SelectorDecl("head".toSymbol(), SMTInt),
-                    SelectorDecl("tail".toSymbol(), IntList),
-                ),
-            ),
-        )
-      }
-  val cmd = DeclareDatatype(intListDt)
-  println(cmd)
-}

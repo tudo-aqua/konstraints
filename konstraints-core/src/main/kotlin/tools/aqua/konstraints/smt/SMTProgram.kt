@@ -350,6 +350,28 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     _commands.add(SetLogic(logic))
   }
 
+  /**
+   * Declare a datatype without any constructors or selectors. This only notifies the program that
+   * this datatype exists, constructors still need to be added.
+   */
+  internal fun declareEmptyDatatype(arity: Int, symbol: Symbol): Datatype {
+    val datatype = Datatype(arity, symbol)
+
+    _commands.add(DeclareDatatype(datatype))
+    context.addSort(DatatypeFactory(datatype), datatype.symbol)
+
+    return datatype
+  }
+
+  internal fun finishDatatype(datatype: Datatype) {
+    datatype.constructors.forEach {
+      context.addFun(it)
+      Testers.constructors.add(it.symbol)
+    }
+
+    datatype.selectors.forEach { context.addFun(it) }
+  }
+
   fun declareDatatype(datatype: Datatype) {
     context.addSort(DatatypeFactory(datatype), datatype.symbol)
 

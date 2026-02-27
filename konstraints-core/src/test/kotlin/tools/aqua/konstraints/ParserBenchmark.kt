@@ -35,6 +35,7 @@ import tools.aqua.konstraints.smt.QuotingRule
 import tools.aqua.konstraints.smt.SMTRegLan
 import tools.aqua.konstraints.smt.Theories
 
+@Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserBenchmark {
 

@@ -510,11 +510,11 @@ class DeclareDatatype(val datatype: Datatype) : Command("declare-datatype") {
       useIterative: Boolean,
   ): Appendable {
     builder.append("(declare-datatype ")
-    builder.append("(")
     datatype.symbol.toSMTString(builder, quotingRule, useIterative)
+    builder.append("(")
     datatype.constructors.joinTo(builder, separator = " ") {
       it.toSMTString(quotingRule, useIterative)
     }
-    return builder.append(")")
+    return builder.append("))")
   }
 }
