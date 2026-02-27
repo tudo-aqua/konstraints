@@ -148,31 +148,32 @@ open class Datatype(val arity: Int, symbol: Symbol) : Sort(symbol) {
         }
     )
   }
-    constructor(
-        arity: Int,
-        symbol: Symbol,
-        constructorDecls: ((Datatype) -> List<ConstructorDecl>)
-    ) : this(arity, symbol){
-        val temp = constructorDecls(this)
-        _constructors.addAll(
-            temp.map { constr ->
-                Constructor(
-                    constr.symbol,
-                    constr.selectors.map { selectorDecl ->
-                        Selector(selectorDecl.symbol, selectorDecl.sort, this)
-                    },
-                    this,
-                )
-            }
-        )
-        _selectors.addAll(
-            temp.flatMap { decl ->
-                decl.selectors.map { selectorDecl ->
-                    Selector(selectorDecl.symbol, selectorDecl.sort, this)
-                }
-            }
-        )
-    }
+
+  constructor(
+      arity: Int,
+      symbol: Symbol,
+      constructorDecls: ((Datatype) -> List<ConstructorDecl>),
+  ) : this(arity, symbol) {
+    val temp = constructorDecls(this)
+    _constructors.addAll(
+        temp.map { constr ->
+          Constructor(
+              constr.symbol,
+              constr.selectors.map { selectorDecl ->
+                Selector(selectorDecl.symbol, selectorDecl.sort, this)
+              },
+              this,
+          )
+        }
+    )
+    _selectors.addAll(
+        temp.flatMap { decl ->
+          decl.selectors.map { selectorDecl ->
+            Selector(selectorDecl.symbol, selectorDecl.sort, this)
+          }
+        }
+    )
+  }
 
   override val theories = emptySet<Theories>()
   private val _constructors = mutableListOf<Constructor>()
@@ -185,7 +186,7 @@ open class Datatype(val arity: Int, symbol: Symbol) : Sort(symbol) {
     get() = _selectors.toList()
 
   internal fun add(constructor: ConstructorDecl) {
-      // TODO selectors are missing
+    // TODO selectors are missing
     _constructors.add(
         Constructor(
             constructor.symbol,
@@ -235,15 +236,19 @@ class TesterExpression(index: SymbolIndex) : Expression<BoolSort>() {
 }
 
 fun main() {
-    val intListDt = Datatype(0, "IntList".toSymbol()) { IntList ->
+  val intListDt =
+      Datatype(0, "IntList".toSymbol()) { IntList ->
         listOf(
             ConstructorDecl("empty".toSymbol(), emptyList()),
-            ConstructorDecl("insert".toSymbol(), listOf(
-                SelectorDecl("head".toSymbol(), SMTInt),
-                SelectorDecl("tail".toSymbol(), IntList)
-            ))
+            ConstructorDecl(
+                "insert".toSymbol(),
+                listOf(
+                    SelectorDecl("head".toSymbol(), SMTInt),
+                    SelectorDecl("tail".toSymbol(), IntList),
+                ),
+            ),
         )
-    }
-    val cmd = DeclareDatatype(intListDt)
-    println(cmd)
+      }
+  val cmd = DeclareDatatype(intListDt)
+  println(cmd)
 }
