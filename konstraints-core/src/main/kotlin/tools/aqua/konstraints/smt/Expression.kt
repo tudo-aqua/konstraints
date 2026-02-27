@@ -25,7 +25,10 @@ sealed class Expression<out T : Sort> : SMTSerializable {
   abstract val theories: Set<Theories>
   abstract val func: SMTFunction<T>?
   abstract val children: List<Expression<*>>
+
+  // TODO combine into list index, provide views as symbol/int list
   open val indices = emptyList<Int>()
+  open val symbolicIndices = emptyList<Symbol>()
 
   /**
    * Recursive all implementation fun all(predicate: (Expression<*>) -> Boolean): Boolean { return
@@ -212,7 +215,7 @@ abstract class UnaryExpression<out T : Sort, out S : Sort>(
     override val name: Symbol,
     override val sort: T,
 ) : Expression<T>() {
-  override val func = null
+  override val func: SMTFunction<T>? = null
 
   abstract val inner: Expression<S>
 
@@ -227,7 +230,7 @@ abstract class BinaryExpression<out T : Sort, out S1 : Sort, out S2 : Sort>(
     override val name: Symbol,
     override val sort: T,
 ) : Expression<T>() {
-  override val func = null
+  override val func: SMTFunction<T>? = null
 
   abstract val lhs: Expression<S1>
 

@@ -505,3 +505,24 @@ class GetValue(val terms: List<Expression<*>>) : Command("get-value") {
     return builder.append("))")
   }
 }
+
+class DeclareDatatype(val datatype: Datatype) : Command("declare-datatype") {
+  override fun toString() = toSMTString(QuotingRule.SAME_AS_INPUT, false)
+
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(declare-datatype ${datatype.symbol.toSMTString(quotingRule, useIterative)} (${datatype.constructors.joinToString(separator = " ") { it.toSMTString(quotingRule, useIterative) }}))"
+
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
+    builder.append("(declare-datatype ")
+    datatype.symbol.toSMTString(builder, quotingRule, useIterative)
+    builder.append("(")
+    datatype.constructors.joinTo(builder, separator = " ") {
+      it.toSMTString(quotingRule, useIterative)
+    }
+    return builder.append("))")
+  }
+}
