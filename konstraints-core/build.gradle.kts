@@ -31,5 +31,4 @@ metadata {
 dependencies {
   implementation(libs.kotlin.coroutines)
   api(libs.petitparser.core)
-  testImplementation(kotlin("test"))
 }
