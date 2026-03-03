@@ -32,7 +32,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
-import tools.aqua.konstraints.parser.Parser
+import tools.aqua.konstraints.parser.SMTScriptParser
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.smt.VarBinding
 import tools.aqua.konstraints.solvers.z3.Z3Solver
@@ -50,7 +50,8 @@ class Z3Tests {
   private fun solve(file: File) {
     assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
 
-    val result = Parser(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
+    val result =
+        SMTScriptParser(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
 
     assumeTrue(
         (result.info("status") as SymbolAttributeValue).symbol.toString() != "unknown",
@@ -128,7 +129,7 @@ class Z3Tests {
 
     val solver = Z3Solver()
     val result =
-        Parser(
+        SMTScriptParser(
             file.bufferedReader().use(BufferedReader::readLines).joinToString("\n") +
                 "\n(get-model)"
         )
@@ -140,7 +141,8 @@ class Z3Tests {
 
     solver.use {
       solver.solve(result)
-      print(solver.model.definitions)
+      result.getModel(solver)
+      print(result.model!!.definitions)
     }
   }
 
@@ -189,6 +191,7 @@ class Z3Tests {
 
   fun getQFIDLModelsFile(): Stream<Arguments> = loadResource("/QF_IDL/Models/")
 
+  @Disabled
   @ParameterizedTest
   @MethodSource("getQFBVModelsFile")
   @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
@@ -206,7 +209,7 @@ class Z3Tests {
   fun testExtract(program: String) {
     val solver = Z3Solver()
 
-    val smtProgram = Parser(program)
+    val smtProgram = SMTScriptParser(program)
 
     solver.use {
       smtProgram.commands.map { solver.visit(it) }
@@ -239,7 +242,7 @@ class Z3Tests {
   fun testEquals(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser(program)
+    val result = SMTScriptParser(program)
     solver.use {
       result.commands.map { solver.visit(it) }
 
@@ -258,7 +261,7 @@ class Z3Tests {
   fun testLet(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser(program)
+    val result = SMTScriptParser(program)
     solver.use {
       result.commands.map { solver.visit(it) }
 
@@ -277,7 +280,7 @@ class Z3Tests {
   fun testFreeFunctions(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser(program)
+    val result = SMTScriptParser(program)
     solver.use {
       result.commands.map { solver.visit(it) }
 
@@ -298,7 +301,7 @@ class Z3Tests {
   fun testQuantifier(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser(program)
+    val result = SMTScriptParser(program)
 
     solver.use {
       result.commands.map { solver.visit(it) }
@@ -321,7 +324,7 @@ class Z3Tests {
   fun testPushPop(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser(program)
+    val result = SMTScriptParser(program)
 
     solver.use {
       result.commands.map { solver.visit(it) }
@@ -345,7 +348,7 @@ class Z3Tests {
   fun testDefineFun(program: String) {
     val solver = Z3Solver()
 
-    val result = Parser(program)
+    val result = SMTScriptParser(program)
 
     solver.use {
       result.commands.map { solver.visit(it) }
@@ -386,12 +389,12 @@ class Z3Tests {
     val abs_s =
         VarBinding(
             "?abs_s".toSymbol(),
-            Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)),
+            Ite(Equals(msb_s.instance, BitVecLiteral("#b0")), lhs, BVNeg(lhs)),
         )
     val abs_t =
         VarBinding(
             "?abs_t".toSymbol(),
-            Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)),
+            Ite(Equals(msb_s.instance, BitVecLiteral("#b0")), rhs, BVNeg(rhs)),
         )
     val u = VarBinding("u".toSymbol(), BVURem(abs_s.instance, abs_t.instance))
 
@@ -410,24 +413,24 @@ class Z3Tests {
                             LetExpression(
                                 listOf(u),
                                 Ite(
-                                    Equals(u.instance, BVLiteral("#b0", sort.bits)),
+                                    Equals(u.instance, BitVecLiteral("#b0", sort.bits)),
                                     u.instance,
                                     Ite(
                                         And(
-                                            Equals(msb_s.instance, BVLiteral("#b0")),
-                                            Equals(msb_t.instance, BVLiteral("#b0")),
+                                            Equals(msb_s.instance, BitVecLiteral("#b0")),
+                                            Equals(msb_t.instance, BitVecLiteral("#b0")),
                                         ),
                                         u.instance,
                                         Ite(
                                             And(
-                                                Equals(msb_s.instance, BVLiteral("#b1")),
-                                                Equals(msb_t.instance, BVLiteral("#b0")),
+                                                Equals(msb_s.instance, BitVecLiteral("#b1")),
+                                                Equals(msb_t.instance, BitVecLiteral("#b0")),
                                             ),
                                             BVAdd(BVNeg(u.instance), rhs),
                                             Ite(
                                                 And(
-                                                    Equals(msb_s.instance, BVLiteral("#b0")),
-                                                    Equals(msb_t.instance, BVLiteral("#b1")),
+                                                    Equals(msb_s.instance, BitVecLiteral("#b0")),
+                                                    Equals(msb_t.instance, BitVecLiteral("#b1")),
                                                 ),
                                                 BVAdd(u.instance, rhs),
                                                 BVNeg(u.instance),

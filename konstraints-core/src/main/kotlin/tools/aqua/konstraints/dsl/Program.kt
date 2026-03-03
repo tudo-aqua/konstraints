@@ -76,18 +76,26 @@ class SMTProgramBuilder(logic: Logic) {
 
   /** Add check sat to later solve the program using any solver */
   fun checkSat() {
-    program.add(CheckSat)
+    program.checkSat()
   }
 
   /** Solve the program using [solver] and return its sat status */
   fun checkSat(solver: Solver): SatStatus {
-    checkSat()
-
-    return solver.solve(program)
+    return program.checkSat(solver)
   }
 
-  fun <T> getModel(block: (Model) -> T) =
-      block(program.model ?: throw IllegalStateException("Model is null"))
+  fun getModel() {
+    program.getModel()
+  }
+
+  fun getModel(solver: Solver) {
+    program.getModel(solver)
+  }
+
+  fun <T> getModel(solver: Solver, block: (Model) -> T) {
+    program.model = solver.getModel()
+    block(program.model ?: throw IllegalStateException("Model is null"))
+  }
 
   fun <T> getModelOrNull(block: (Model?) -> T) = block(program.model)
 

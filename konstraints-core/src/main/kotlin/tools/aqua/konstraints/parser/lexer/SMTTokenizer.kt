@@ -148,7 +148,7 @@ class SMTTokenizer(sourceReader: Reader, private val source: String? = null) : I
     }
   }
 
-  private fun readString(): SMTString {
+  private fun readString(): SMTStringToken {
     requireReadChar('"')
     val string = buildString {
       while (true) {
@@ -170,7 +170,7 @@ class SMTTokenizer(sourceReader: Reader, private val source: String? = null) : I
         }
       }
     }
-    return SMTString(string, tokenStartLocation..readerLastLocation)
+    return SMTStringToken(string, tokenStartLocation..readerLastLocation)
   }
 
   private fun readSimpleSymbolOrReservedWord(): Token {

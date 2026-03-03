@@ -320,9 +320,9 @@ fun BitVecExpr.aquaify(): Expression<tools.aqua.konstraints.smt.BitVecSort> =
     } else if (this is BitVecNum) {
       // its important that we pass the number of bits here to ensure sort compatibility with the
       // declared function
-      BVLiteral("#x${bigInteger.toString(16)}", sort.size)
+      BitVecLiteral("#x${bigInteger.toString(16)}", sort.size)
     } else if (funcDecl.declKind == Z3_decl_kind.Z3_OP_BNUM) {
-      BVLiteral(toString(), sort.size)
+      BitVecLiteral(toString(), sort.size)
     } else if (isITE) {
       Ite(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
     } else {
@@ -338,7 +338,7 @@ fun FPExpr.aquaify(): Expression<FPSort> {
   return when (funcDecl.declKind) {
     Z3_decl_kind.Z3_OP_FPA_NUM ->
         (this as FPNum).let { fpNum ->
-          FPLiteral(
+          FloatingPointLiteral(
               fpNum.signBV.aquaify().cast(),
               fpNum.getExponentBV(false).aquaify().cast(),
               fpNum.significandBV.aquaify().cast(),
@@ -346,7 +346,11 @@ fun FPExpr.aquaify(): Expression<FPSort> {
         }
 
     Z3_decl_kind.Z3_OP_FPA_FP ->
-        FPLiteral(args[0].aquaify().cast(), args[1].aquaify().cast(), args[2].aquaify().cast())
+        FloatingPointLiteral(
+            args[0].aquaify().cast(),
+            args[1].aquaify().cast(),
+            args[2].aquaify().cast(),
+        )
 
     Z3_decl_kind.Z3_OP_FPA_PLUS_INF -> FPInfinity(sort.eBits, sort.sBits)
     Z3_decl_kind.Z3_OP_FPA_MINUS_INF -> FPMinusInfinity(sort.eBits, sort.sBits)

@@ -27,8 +27,8 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.dsl.*
-import tools.aqua.konstraints.parser.Parser
-import tools.aqua.konstraints.smt.BVLiteral
+import tools.aqua.konstraints.parser.SMTScriptParser
+import tools.aqua.konstraints.smt.BitVecLiteral
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.FPMinusZero
 import tools.aqua.konstraints.smt.FPNaN
@@ -49,12 +49,13 @@ class ModelTests {
   @ParameterizedTest
   @MethodSource("provideProgramAndModel")
   fun testModel(program: String, term: Expression<*>) {
-    val prg = Parser(program)
+    val prg = SMTScriptParser(program)
     val solver = Z3Solver()
 
     solver.use {
       solver.solve(prg)
-      assertEquals(term, solver.model.definitions.single().term)
+      prg.getModel(solver)
+      assertEquals(term, prg.model!!.definitions.single().term)
     }
   }
 
@@ -104,7 +105,7 @@ class ModelTests {
           ),
           arguments(
               "(set-logic QF_BV)(declare-fun foo () (_ BitVec 8))(assert (= foo #b00000000))(check-sat)(get-model)",
-              BVLiteral("#b00000000"),
+              BitVecLiteral("#b00000000"),
           ),
           arguments(
               "(set-logic QF_FP)(declare-fun foo () Float16)(assert (= foo (_ +zero 5 11)))(check-sat)(get-model)",

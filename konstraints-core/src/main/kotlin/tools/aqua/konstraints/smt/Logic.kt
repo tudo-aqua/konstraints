@@ -1746,3 +1746,6 @@ data object QF_ASLIA : Logic {
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
 }
+
+/** interface to derive custom logics from. */
+interface OpenLogic : Logic

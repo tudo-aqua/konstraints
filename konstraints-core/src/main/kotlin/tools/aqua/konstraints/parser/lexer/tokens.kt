@@ -141,6 +141,10 @@ private const val DEFINE_FUN_REC = "define-fun-rec"
 
 class DefineFunRecWord(source: SourceSpan) : CommandName(DEFINE_FUN_REC, source)
 
+private const val DEFINE_FUNS_REC = "define-funs-rec"
+
+class DefineFunsRecWord(source: SourceSpan) : CommandName(DEFINE_FUN_REC, source)
+
 private const val DEFINE_SORT = "define-sort"
 
 class DefineSortWord(source: SourceSpan) : CommandName(DEFINE_SORT, source)
@@ -246,6 +250,7 @@ internal val reservedWords =
         DEFINE_CONST to ::DefineConstWord,
         DEFINE_FUN to ::DefineFunWord,
         DEFINE_FUN_REC to ::DefineFunRecWord,
+        DEFINE_FUNS_REC to ::DefineFunsRecWord,
         DEFINE_SORT to ::DefineSortWord,
         ECHO to ::EchoWord,
         EXIT to ::ExitWord,
@@ -328,7 +333,7 @@ class Binary(val number: String, source: SourceSpan) : SpecConstantToken(source)
   override fun toString() = "#b$number"
 }
 
-class SMTString(val contents: String, source: SourceSpan) : SpecConstantToken(source) {
+class SMTStringToken(val contents: String, source: SourceSpan) : SpecConstantToken(source) {
   init {
     require(contents.all(Char::isStringLetter)) {
       "all characters in $contents must be SMT string letters"
@@ -337,6 +342,62 @@ class SMTString(val contents: String, source: SourceSpan) : SpecConstantToken(so
 
   override fun toString(): String = "\"${contents}\""
 }
+
+/**
+ * In SMT lib some tokens have a predefined meaning but are not reserved words. Depending on the
+ * context they may just be normal simple symbol tokens or act more like a reserved word. To check
+ * if a SimpleSymbolTokens has a predefined meaning use [], to convert to a PredefinedToken use [].
+ */
+sealed class PredefinedToken(val contents: String, source: SourceSpan) : SemanticToken(source)
+
+class BoolToken(source: SourceSpan) : PredefinedToken("Bool", source)
+
+class ContinuedExecutionToken(source: SourceSpan) : PredefinedToken("continued-execution", source)
+
+class ErrorToken(source: SourceSpan) : PredefinedToken("error", source)
+
+class FalseToken(source: SourceSpan) : PredefinedToken("false", source)
+
+class ImmediateExitToken(source: SourceSpan) : PredefinedToken("immediate-exit", source)
+
+class IncompleteToken(source: SourceSpan) : PredefinedToken("incomplete", source)
+
+class LogicToken(source: SourceSpan) : PredefinedToken("logic", source)
+
+class MemoutToken(source: SourceSpan) : PredefinedToken("memout", source)
+
+class SatToken(source: SourceSpan) : PredefinedToken("sat", source)
+
+class SuccessToken(source: SourceSpan) : PredefinedToken("success", source)
+
+class TheoryToken(source: SourceSpan) : PredefinedToken("theory", source)
+
+class TrueToken(source: SourceSpan) : PredefinedToken("true", source)
+
+class UnknownToken(source: SourceSpan) : PredefinedToken("unknown", source)
+
+class UnsupportedToken(source: SourceSpan) : PredefinedToken("unsupported", source)
+
+class UnsatToken(source: SourceSpan) : PredefinedToken("unsat", source)
+
+internal val predefinedTokens =
+    mapOf(
+        "Bool" to ::BoolToken,
+        "continued-execution" to ::ContinuedExecutionToken,
+        "error" to ::ErrorToken,
+        "false" to ::FalseToken,
+        "immediate-exit" to ::ImmediateExitToken,
+        "incomplete" to ::IncompleteToken,
+        "logic" to ::LogicToken,
+        "memout" to ::MemoutToken,
+        "sat" to ::SatToken,
+        "success" to ::SuccessToken,
+        "theory" to ::TheoryToken,
+        "true" to ::TrueToken,
+        "unknown" to ::UnknownToken,
+        "unsupported" to ::UnsupportedToken,
+        "unsat" to ::UnsatToken,
+    )
 
 sealed class SymbolToken(source: SourceSpan) : SemanticToken(source)
 
@@ -348,6 +409,13 @@ class SimpleSymbolToken(val contents: String, source: SourceSpan) : SymbolToken(
     }
     require(contents !in reservedWords) { "$contents must not be reserved" }
   }
+
+  fun isPredefinedToken() = predefinedTokens.containsKey(contents)
+
+  fun toPredefinedToken() =
+      predefinedTokens[contents]?.let { it(source) } ?: throw IllegalStateException()
+
+  fun toPredefinedTokenOrNull() = predefinedTokens[contents]?.let { it(source) }
 
   override fun toString(): String = contents
 }

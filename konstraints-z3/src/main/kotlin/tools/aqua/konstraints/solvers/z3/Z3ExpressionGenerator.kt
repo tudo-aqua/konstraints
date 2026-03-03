@@ -608,7 +608,7 @@ fun Expression<tools.aqua.konstraints.smt.BitVecSort>.z3ify(
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
       is BoundVariable -> context.boundVariable(this.func, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
-      is BVLiteral -> this.z3ify(context)
+      is BitVecLiteral -> this.z3ify(context)
       is BVConcat -> this.z3ify(context)
       is BVExtract -> this.z3ify(context)
       is BVNot -> this.z3ify(context)
@@ -657,7 +657,7 @@ fun Expression<tools.aqua.konstraints.smt.BitVecSort>.z3ify(
       else -> throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
 
-fun BVLiteral.z3ify(context: Z3Context): Expr<Z3BitVecSort> =
+fun BitVecLiteral.z3ify(context: Z3Context): Expr<Z3BitVecSort> =
     context.context.mkBV(this.value.toString(), this.bits)
 
 fun BVConcat.z3ify(context: Z3Context): Expr<Z3BitVecSort> =
@@ -911,7 +911,7 @@ fun Expression<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
       is LetExpression -> context.let(this.bindings) { this.inner.z3ify(context) }
       is BoundVariable -> context.boundVariable(this.func, this.sort.z3ify(context))
       is Ite -> this.z3ify(context)
-      is FPLiteral -> this.z3ify(context)
+      is FloatingPointLiteral -> this.z3ify(context)
       is FPInfinity -> this.z3ify(context)
       is FPMinusInfinity -> this.z3ify(context)
       is FPZero -> this.z3ify(context)
@@ -953,7 +953,7 @@ fun Expression<FPSort>.z3ify(context: Z3Context): Expr<Z3FPSort> =
       else -> throw IllegalArgumentException("Z3 can not visit expression $this!")
     }
 
-fun FPLiteral.z3ify(context: Z3Context): Expr<Z3FPSort> =
+fun FloatingPointLiteral.z3ify(context: Z3Context): Expr<Z3FPSort> =
     context.context.mkFP(
         this.sign.z3ify(context),
         this.exponent.z3ify(context),

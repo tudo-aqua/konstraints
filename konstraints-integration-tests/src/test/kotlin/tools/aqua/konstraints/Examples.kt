@@ -112,16 +112,15 @@ class Examples {
             // we may save the status here however it will also be stored at the program.status
             // field for later use
             val status = checkSat(solver)
-            println(status)
 
-            // we can also inspect the model here
-            println(solver.model)
+            // use the getModel variant that takes a solver to generate the model from the solver
+            // this needs to be done while the solver is still open
+            // later the model can be accessed again via program.model
+            getModel(solver) { model ->
+              // we can also inspect the model here
+              println(model)
+            }
           }
-
-          // note that calling checkSat without a solver argument only
-          // indicates that we want to get the sat status
-          // in this location the program will not be solver yet
-          // to actually solve the program we later need to call Solver.solve (see example. ?)
         }
   }
 
@@ -254,8 +253,10 @@ class Examples {
             // field for later use
             val status = checkSat(solver)
 
-            // we can also inspect the model here
-            println(solver.model)
+            getModel(solver) { model ->
+              // we can also inspect the model here
+              println(model)
+            }
           }
         }
 
@@ -314,7 +315,8 @@ class Examples {
 
           solver.use { solver ->
             checkSat(solver)
-            println(solver.model)
+
+            getModel(solver) { model -> println(model) }
           }
         }
 
@@ -400,8 +402,10 @@ class Examples {
             // field for later use
             val status = checkSat(solver)
 
-            // we can also inspect the model here
-            println(solver.model)
+            getModel(solver) { model ->
+              // we can also inspect the model here
+              println(model)
+            }
           }
 
           // note that calling checkSat without a solver argument only
@@ -506,20 +510,9 @@ class Examples {
 
           val solver = Z3Solver()
 
-          // to automatically close solver resources once finished we solve inside this use block
-          solver.use { solver ->
-            // we may save the status here however it will also be stored at the program.status
-            // field for later use
-            val status = checkSat(solver)
-
-            // we can also inspect the model here
-            println(solver.model)
-          }
-
-          // note that calling checkSat without a solver argument only
-          // indicates that we want to get the sat status
-          // in this location the program will not be solver yet
-          // to actually solve the program we later need to call Solver.solve (see example. ?)
+          // we may save the status here however it will also be stored at the program.status
+          // field for later use
+          val status = solver.use { solver -> checkSat(solver) }
         }
 
     println(program)

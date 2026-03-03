@@ -2637,7 +2637,7 @@ internal object FPLiteralDecl :
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
     require(args.all { expr -> expr.sort is BitVecSort })
-    return FPLiteral(
+    return FloatingPointLiteral(
         args[0] as Expression<BitVecSort>,
         args[1] as Expression<BitVecSort>,
         args[2] as Expression<BitVecSort>,

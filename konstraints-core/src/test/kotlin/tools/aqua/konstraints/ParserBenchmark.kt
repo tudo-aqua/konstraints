@@ -29,7 +29,7 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import tools.aqua.konstraints.parser.Parser
+import tools.aqua.konstraints.parser.SMTScriptParser
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.QuotingRule
 import tools.aqua.konstraints.smt.SMTRegLan
@@ -94,7 +94,7 @@ class ParserBenchmark {
 
     try {
       val input = file.bufferedReader().readLines().joinToString("\n")
-      val program = Parser(input)
+      val program = SMTScriptParser(input)
 
       assertEquals(
           removeComments(input)

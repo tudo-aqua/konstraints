@@ -25,8 +25,8 @@ import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Distinct
 import tools.aqua.konstraints.smt.Equals
 import tools.aqua.konstraints.smt.Expression
-import tools.aqua.konstraints.smt.FPLiteral
 import tools.aqua.konstraints.smt.FPSort
+import tools.aqua.konstraints.smt.FloatingPointLiteral
 import tools.aqua.konstraints.smt.Implies
 import tools.aqua.konstraints.smt.IntLiteral
 import tools.aqua.konstraints.smt.IntSort
@@ -1959,9 +1959,9 @@ class IntEqBuffer(lhs: Long, rhs: Long) {
       Equals(
           buffer.map {
             if (expr.sort.exponentBits == 8 && expr.sort.significantBits == 24) {
-              FPLiteral(it.toFloat())
+              FloatingPointLiteral(it.toFloat())
             } else if (expr.sort.exponentBits == 11 && expr.sort.significantBits == 53) {
-              FPLiteral(it.toDouble())
+              FloatingPointLiteral(it.toDouble())
             } else {
               throw RuntimeException(
                   "Kotlin floating points can not be converted to sort ${expr.sort}, use (_ FloatingPoint 8 24) or (_ FloatingPoint 11 53)."
@@ -2040,9 +2040,9 @@ class RealEqBuffer(lhs: Double, rhs: Double) {
       Equals(
           buffer.map {
             if (expr.sort.exponentBits == 8 && expr.sort.significantBits == 24) {
-              FPLiteral(it.toFloat())
+              FloatingPointLiteral(it.toFloat())
             } else if (expr.sort.exponentBits == 11 && expr.sort.significantBits == 53) {
-              FPLiteral(it.toDouble())
+              FloatingPointLiteral(it.toDouble())
             } else {
               throw RuntimeException(
                   "Kotlin floating points can not be converted to sort ${expr.sort}, use (_ FloatingPoint 8 24) or (_ FloatingPoint 11 53)."
@@ -2054,220 +2054,231 @@ class RealEqBuffer(lhs: Double, rhs: Double) {
 
 /**
  * SMT equality (= [this] [expr])
- * - [this] is converted to [FPLiteral]
- */
-@JvmName("eqFloatFPSort") infix fun Float.eq(expr: Expression<FPSort>) = FPLiteral(this) eq expr
-
-/**
- * SMT equality (= [this] [expr])
- * - [this] is converted to [FPLiteral]
+ * - [this] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFloatFPSort")
-infix fun Float.eq(expr: (() -> Expression<FPSort>)) = FPLiteral(this) eq expr()
+infix fun Float.eq(expr: Expression<FPSort>) = FloatingPointLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [this] is converted to [FPLiteral]
+ * - [this] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFloatFPSort")
-infix fun (() -> Float).eq(expr: Expression<FPSort>) = FPLiteral(this()) eq expr
+infix fun Float.eq(expr: (() -> Expression<FPSort>)) = FloatingPointLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [this] is converted to [FPLiteral]
+ * - [this] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFloatFPSort")
-infix fun (() -> Float).eq(expr: (() -> Expression<FPSort>)) = FPLiteral(this()) eq expr()
+infix fun (() -> Float).eq(expr: Expression<FPSort>) = FloatingPointLiteral(this()) eq expr
 
 /**
- * SMT equality (= [this] [other])
- * - [other] is converted to [FPLiteral]
+ * SMT equality (= [this] [expr])
+ * - [this] is converted to [FloatingPointLiteral]
  */
-@JvmName("eqFPSortFloat") infix fun Expression<FPSort>.eq(other: Float) = this eq FPLiteral(other)
+@JvmName("eqFloatFPSort")
+infix fun (() -> Float).eq(expr: (() -> Expression<FPSort>)) =
+    FloatingPointLiteral(this()) eq expr()
 
 /**
  * SMT equality (= [this] [other])
- * - [other] is converted to [FPLiteral]
+ * - [other] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFPSortFloat")
-infix fun Expression<FPSort>.eq(other: (() -> Float)) = this eq FPLiteral(other())
+infix fun Expression<FPSort>.eq(other: Float) = this eq FloatingPointLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
- * - [other] is converted to [FPLiteral]
+ * - [other] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFPSortFloat")
-infix fun (() -> Expression<FPSort>).eq(other: Float) = this() eq FPLiteral(other)
+infix fun Expression<FPSort>.eq(other: (() -> Float)) = this eq FloatingPointLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
- * - [other] is converted to [FPLiteral]
+ * - [other] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFPSortFloat")
-infix fun (() -> Expression<FPSort>).eq(other: (() -> Float)) = this() eq FPLiteral(other())
+infix fun (() -> Expression<FPSort>).eq(other: Float) = this() eq FloatingPointLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
- * - [other] is converted to [FPLiteral]
+ * - [other] is converted to [FloatingPointLiteral]
  */
-@JvmName("eqFPSortFloatEquals") infix fun Equals<FPSort>.eq(other: Float) = this eq FPLiteral(other)
+@JvmName("eqFPSortFloat")
+infix fun (() -> Expression<FPSort>).eq(other: (() -> Float)) =
+    this() eq FloatingPointLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
- * - [other] is converted to [FPLiteral]
+ * - [other] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFPSortFloatEquals")
-infix fun Equals<FPSort>.eq(other: (() -> Float)) = this eq FPLiteral(other())
+infix fun Equals<FPSort>.eq(other: Float) = this eq FloatingPointLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
- * - [other] is converted to [FPLiteral]
+ * - [other] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFPSortFloatEquals")
-infix fun (() -> Equals<FPSort>).eq(other: Float) = this() eq FPLiteral(other)
+infix fun Equals<FPSort>.eq(other: (() -> Float)) = this eq FloatingPointLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
- * - [other] is converted to [FPLiteral]
+ * - [other] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFPSortFloatEquals")
-infix fun (() -> Equals<FPSort>).eq(other: (() -> Float)) = this() eq FPLiteral(other())
+infix fun (() -> Equals<FPSort>).eq(other: Float) = this() eq FloatingPointLiteral(other)
 
 /**
- * SMT equality (= [this] [expr])
- * - [this] is converted to [FPLiteral]
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [FloatingPointLiteral]
  */
-@JvmName("eqFloatFPSortEquals") infix fun Float.eq(expr: Equals<FPSort>) = FPLiteral(this) eq expr
+@JvmName("eqFPSortFloatEquals")
+infix fun (() -> Equals<FPSort>).eq(other: (() -> Float)) = this() eq FloatingPointLiteral(other())
 
 /**
  * SMT equality (= [this] [expr])
- * - [this] is converted to [FPLiteral]
+ * - [this] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFloatFPSortEquals")
-infix fun Float.eq(expr: (() -> Equals<FPSort>)) = FPLiteral(this) eq expr()
+infix fun Float.eq(expr: Equals<FPSort>) = FloatingPointLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [this] is converted to [FPLiteral]
+ * - [this] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFloatFPSortEquals")
-infix fun (() -> Float).eq(expr: Equals<FPSort>) = FPLiteral(this()) eq expr
+infix fun Float.eq(expr: (() -> Equals<FPSort>)) = FloatingPointLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [this] is converted to [FPLiteral]
+ * - [this] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFloatFPSortEquals")
-infix fun (() -> Float).eq(expr: (() -> Equals<FPSort>)) = FPLiteral(this()) eq expr()
+infix fun (() -> Float).eq(expr: Equals<FPSort>) = FloatingPointLiteral(this()) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [this] is converted to [FPLiteral]
+ * - [this] is converted to [FloatingPointLiteral]
  */
-@JvmName("eqDoubleFPSort") infix fun Double.eq(expr: Expression<FPSort>) = FPLiteral(this) eq expr
+@JvmName("eqFloatFPSortEquals")
+infix fun (() -> Float).eq(expr: (() -> Equals<FPSort>)) = FloatingPointLiteral(this()) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [this] is converted to [FPLiteral]
+ * - [this] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqDoubleFPSort")
-infix fun Double.eq(expr: (() -> Expression<FPSort>)) = FPLiteral(this) eq expr()
+infix fun Double.eq(expr: Expression<FPSort>) = FloatingPointLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [this] is converted to [FPLiteral]
+ * - [this] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqDoubleFPSort")
-infix fun (() -> Double).eq(expr: Expression<FPSort>) = FPLiteral(this()) eq expr
+infix fun Double.eq(expr: (() -> Expression<FPSort>)) = FloatingPointLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [this] is converted to [FPLiteral]
+ * - [this] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqDoubleFPSort")
-infix fun (() -> Double).eq(expr: (() -> Expression<FPSort>)) = FPLiteral(this()) eq expr()
+infix fun (() -> Double).eq(expr: Expression<FPSort>) = FloatingPointLiteral(this()) eq expr
 
 /**
- * SMT equality (= [this] [other])
- * - [other] is converted to [FPLiteral]
+ * SMT equality (= [this] [expr])
+ * - [this] is converted to [FloatingPointLiteral]
  */
-@JvmName("eqFPSortDouble") infix fun Expression<FPSort>.eq(other: Double) = this eq FPLiteral(other)
+@JvmName("eqDoubleFPSort")
+infix fun (() -> Double).eq(expr: (() -> Expression<FPSort>)) =
+    FloatingPointLiteral(this()) eq expr()
 
 /**
  * SMT equality (= [this] [other])
- * - [other] is converted to [FPLiteral]
+ * - [other] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFPSortDouble")
-infix fun Expression<FPSort>.eq(other: (() -> Double)) = this eq FPLiteral(other())
+infix fun Expression<FPSort>.eq(other: Double) = this eq FloatingPointLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
- * - [other] is converted to [FPLiteral]
+ * - [other] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFPSortDouble")
-infix fun (() -> Expression<FPSort>).eq(other: Double) = this() eq FPLiteral(other)
+infix fun Expression<FPSort>.eq(other: (() -> Double)) = this eq FloatingPointLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
- * - [other] is converted to [FPLiteral]
+ * - [other] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFPSortDouble")
-infix fun (() -> Expression<FPSort>).eq(other: (() -> Double)) = this() eq FPLiteral(other())
+infix fun (() -> Expression<FPSort>).eq(other: Double) = this() eq FloatingPointLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
- * - [other] is converted to [FPLiteral]
+ * - [other] is converted to [FloatingPointLiteral]
  */
-@JvmName("eqFPSortDoubleEquals")
-infix fun Equals<FPSort>.eq(other: Double) = this eq FPLiteral(other)
+@JvmName("eqFPSortDouble")
+infix fun (() -> Expression<FPSort>).eq(other: (() -> Double)) =
+    this() eq FloatingPointLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
- * - [other] is converted to [FPLiteral]
+ * - [other] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFPSortDoubleEquals")
-infix fun Equals<FPSort>.eq(other: (() -> Double)) = this eq FPLiteral(other())
+infix fun Equals<FPSort>.eq(other: Double) = this eq FloatingPointLiteral(other)
 
 /**
  * SMT equality (= [this] [other])
- * - [other] is converted to [FPLiteral]
+ * - [other] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFPSortDoubleEquals")
-infix fun (() -> Equals<FPSort>).eq(other: Double) = this() eq FPLiteral(other)
+infix fun Equals<FPSort>.eq(other: (() -> Double)) = this eq FloatingPointLiteral(other())
 
 /**
  * SMT equality (= [this] [other])
- * - [other] is converted to [FPLiteral]
+ * - [other] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqFPSortDoubleEquals")
-infix fun (() -> Equals<FPSort>).eq(other: (() -> Double)) = this() eq FPLiteral(other())
+infix fun (() -> Equals<FPSort>).eq(other: Double) = this() eq FloatingPointLiteral(other)
+
+/**
+ * SMT equality (= [this] [other])
+ * - [other] is converted to [FloatingPointLiteral]
+ */
+@JvmName("eqFPSortDoubleEquals")
+infix fun (() -> Equals<FPSort>).eq(other: (() -> Double)) = this() eq FloatingPointLiteral(other())
 
 /**
  * SMT equality (= [this] [expr])
- * - [this] is converted to [FPLiteral]
- */
-@JvmName("eqDoubleFPSortEquals") infix fun Double.eq(expr: Equals<FPSort>) = FPLiteral(this) eq expr
-
-/**
- * SMT equality (= [this] [expr])
- * - [this] is converted to [FPLiteral]
+ * - [this] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqDoubleFPSortEquals")
-infix fun Double.eq(expr: (() -> Equals<FPSort>)) = FPLiteral(this) eq expr()
+infix fun Double.eq(expr: Equals<FPSort>) = FloatingPointLiteral(this) eq expr
 
 /**
  * SMT equality (= [this] [expr])
- * - [this] is converted to [FPLiteral]
+ * - [this] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqDoubleFPSortEquals")
-infix fun (() -> Double).eq(expr: Equals<FPSort>) = FPLiteral(this()) eq expr
+infix fun Double.eq(expr: (() -> Equals<FPSort>)) = FloatingPointLiteral(this) eq expr()
 
 /**
  * SMT equality (= [this] [expr])
- * - [this] is converted to [FPLiteral]
+ * - [this] is converted to [FloatingPointLiteral]
  */
 @JvmName("eqDoubleFPSortEquals")
-infix fun (() -> Double).eq(expr: (() -> Equals<FPSort>)) = FPLiteral(this()) eq expr()
+infix fun (() -> Double).eq(expr: Equals<FPSort>) = FloatingPointLiteral(this()) eq expr
+
+/**
+ * SMT equality (= [this] [expr])
+ * - [this] is converted to [FloatingPointLiteral]
+ */
+@JvmName("eqDoubleFPSortEquals")
+infix fun (() -> Double).eq(expr: (() -> Equals<FPSort>)) = FloatingPointLiteral(this()) eq expr()
 
 /** Creates a distinct: [this] distinct [other]. */
 infix fun <T : Sort> Expression<T>.distinct(other: Expression<T>): Distinct<T> =

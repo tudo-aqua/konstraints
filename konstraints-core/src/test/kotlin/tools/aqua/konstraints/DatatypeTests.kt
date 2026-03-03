@@ -21,7 +21,7 @@ package tools.aqua.konstraints
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
-import tools.aqua.konstraints.parser.Parser
+import tools.aqua.konstraints.parser.SMTScriptParser
 import tools.aqua.konstraints.smt.ConstructorDecl
 import tools.aqua.konstraints.smt.Datatype
 import tools.aqua.konstraints.smt.MutableSMTProgram
@@ -39,7 +39,7 @@ class DatatypeTests {
             "(declare-const l IntList)" +
             "(assert (= l l))" +
             "(check-sat)"
-    val prg = Parser(smt)
+    val prg = SMTScriptParser(smt)
 
     assertEquals(
         prg.toSMTString(QuotingRule.SAME_AS_INPUT, false).replace('\n', ' ').replace(" ", ""),

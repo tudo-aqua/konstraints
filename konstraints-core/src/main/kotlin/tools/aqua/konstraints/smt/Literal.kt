@@ -20,24 +20,39 @@ package tools.aqua.konstraints.smt
 
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.text.toString
 
 /**
  * Any form of bitvector literals either
  * - All binaries #bX of sort (_ BitVec m) where m is the number of digits in X or
  * - All hexadecimals #xX of sort (_ BitVec m) where m is 4 times the number of digits in X.
  */
-class BVLiteral
+class BitVecLiteral
 private constructor(vector: String, val bits: Int, val isBinary: Boolean, val value: BigInteger) :
     Literal<BitVecSort>(LiteralString(vector), BitVecSort(bits)) {
   companion object {
-    operator fun invoke(vector: String): BVLiteral =
+    internal fun constructFromHex(hex: String, bits: Int): BitVecLiteral {
+      // here we pad the string to get a literal of the correct length, so that later
+      // when we serialize it there is no bit length miss match
+
+      require(bits % 4 == 0)
+      hex.padStart(bits / 4, '0')
+
+      return BitVecLiteral("#x$hex", bits, false, BigInteger(hex))
+    }
+
+    internal fun constructFromBin(bin: String, bits: Int): BitVecLiteral {
+      return BitVecLiteral("#b${bin.padStart(bits, '0')}", bits, true, BigInteger(bin))
+    }
+
+    operator fun invoke(vector: String): BitVecLiteral =
         if (vector.isSMTBinary()) {
-          BVLiteral(vector, vector.length - 2)
+          BitVecLiteral(vector, vector.length - 2)
         } else if (vector.isSMTHex()) {
-          BVLiteral(vector, (vector.length - 2) * 4)
+          BitVecLiteral(vector, (vector.length - 2) * 4)
         } else if (vector.isSMTBitvecShorthand()) {
           val tokens = vector.split(' ')
-          BVLiteral(tokens[1], tokens[2].trim(')').toInt())
+          BitVecLiteral(tokens[1], tokens[2].trim(')').toInt())
         } else {
           throw IllegalArgumentException("$vector is not a valid bitvector literal.")
         }
@@ -47,14 +62,14 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
           require(vector.length - 2 <= bits) {
             "BitVec literal $vector can not fit into request number of $bits bits"
           }
-          BVLiteral(vector, bits, true, vector.substring(2).toBigInteger(2))
+          BitVecLiteral(vector, bits, true, vector.substring(2).toBigInteger(2))
         } else if (vector.isSMTHex()) {
           require((vector.length - 2) * 4 <= bits) {
             "BitVec literal $vector can not fit into request number of $bits bits"
           }
-          BVLiteral(vector, bits, false, vector.substring(2).toBigInteger(16))
+          BitVecLiteral(vector, bits, false, vector.substring(2).toBigInteger(16))
         } else if (vector.startsWith("bv") && vector.substring(2).all { it.isDigit() }) {
-          BVLiteral("(_ $vector $bits)", bits, false, vector.substring(2).toBigInteger(10))
+          BitVecLiteral("(_ $vector $bits)", bits, false, vector.substring(2).toBigInteger(10))
         } else {
           throw IllegalArgumentException("$vector is not a valid bitvector literal.")
         }
@@ -66,7 +81,7 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
      * Convert the base10 [value] to a bitvector representation of the same numeral with [bits]
      * width
      */
-    operator fun invoke(value: Byte, bits: Int) = invoke("#x${value.toString(16)}", bits)
+    operator fun invoke(value: Byte, bits: Int) = constructFromBin(value.toString(2), bits)
 
     /** Convert the base10 [value] to a bitvector representation of the same numeral */
     operator fun invoke(value: Short) = invoke("#x${value.toString(16)}")
@@ -75,7 +90,7 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
      * Convert the base10 [value] to a bitvector representation of the same numeral with [bits]
      * width
      */
-    operator fun invoke(value: Short, bits: Int) = invoke("#x${value.toString(16)}", bits)
+    operator fun invoke(value: Short, bits: Int) = constructFromBin(value.toString(2), bits)
 
     /** Convert the base10 [value] to a bitvector representation of the same numeral */
     operator fun invoke(value: Int) = invoke("#x${value.toString(16)}")
@@ -84,7 +99,7 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
      * Convert the base10 [value] to a bitvector representation of the same numeral with [bits]
      * width
      */
-    operator fun invoke(value: Int, bits: Int) = invoke("#x${value.toString(16)}", bits)
+    operator fun invoke(value: Int, bits: Int) = constructFromBin(value.toString(2), bits)
 
     /** Convert the base10 [value] to a bitvector representation of the same numeral */
     operator fun invoke(value: Long) = invoke("#x${value.toString(16)}")
@@ -93,7 +108,7 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
      * Convert the base10 [value] to a bitvector representation of the same numeral with [bits]
      * width
      */
-    operator fun invoke(value: Long, bits: Int) = invoke("#x${value.toString(16)}", bits)
+    operator fun invoke(value: Long, bits: Int) = constructFromBin(value.toString(2), bits)
 
     /** Convert the base10 [value] to a bitvector representation of the same numeral */
     operator fun invoke(value: BigInteger) = invoke("#x${value.toString(16)}")
@@ -102,7 +117,7 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
      * Convert the base10 [value] to a bitvector representation of the same numeral with [bits]
      * width
      */
-    operator fun invoke(value: BigInteger, bits: Int) = invoke("#x${value.toString(16)}", bits)
+    operator fun invoke(value: BigInteger, bits: Int) = constructFromBin(value.toString(2), bits)
 
     private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS, Theories.FLOATING_POINT)
   }
@@ -118,7 +133,8 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
 
   override fun equals(other: Any?) =
       if (this === other) true
-      else if (other !is BVLiteral) false else sort.bits == other.sort.bits && value == other.value
+      else if (other !is BitVecLiteral) false
+      else sort.bits == other.sort.bits && value == other.value
 }
 
 /**
@@ -126,7 +142,7 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
  *
  * (fp [sign] [exponent] [significand])
  */
-data class FPLiteral(
+data class FloatingPointLiteral(
     val sign: Expression<BitVecSort>,
     val exponent: Expression<BitVecSort>,
     val significand: Expression<BitVecSort>,
@@ -141,7 +157,7 @@ data class FPLiteral(
   }
 
   companion object {
-    operator fun invoke(value: Double): FPLiteral {
+    operator fun invoke(value: Double): FloatingPointLiteral {
       // TODO special cases (NaN, Inf etc.)
       val bitvec =
           value
@@ -150,14 +166,14 @@ data class FPLiteral(
               .toString(2) // convert to binary representation
               .padStart(64, '0') // pad start since toString drops leading zeros
 
-      return FPLiteral(
+      return FloatingPointLiteral(
           "#b${bitvec.substring(0..0)}".bitvec(),
           "#b${bitvec.substring(1..11)}".bitvec(),
           "#b${bitvec.substring(12)}".bitvec(),
       )
     }
 
-    operator fun invoke(value: Float): FPLiteral {
+    operator fun invoke(value: Float): FloatingPointLiteral {
       // TODO special cases (NaN, Inf etc.)
       val bitvec =
           value
@@ -166,7 +182,7 @@ data class FPLiteral(
               .toString(2) // convert to binary representation
               .padStart(32, '0') // pad start since toString drops leading zeros
 
-      return FPLiteral(
+      return FloatingPointLiteral(
           "#b${bitvec.substring(0..0)}".bitvec(),
           "#b${bitvec.substring(1..8)}".bitvec(),
           "#b${bitvec.substring(9)}".bitvec(),
@@ -183,7 +199,7 @@ data class FPLiteral(
 
   override fun equals(other: Any?) =
       if (this === other) true
-      else if (other !is FPLiteral) false
+      else if (other !is FloatingPointLiteral) false
       else
           sort.exponentBits == other.sort.exponentBits &&
               sort.significantBits == other.sort.significantBits &&

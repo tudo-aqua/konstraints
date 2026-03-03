@@ -36,7 +36,6 @@ import tools.aqua.konstraints.smt.FPIsPositive
 import tools.aqua.konstraints.smt.FPIsSubnormal
 import tools.aqua.konstraints.smt.FPIsZero
 import tools.aqua.konstraints.smt.FPLeq
-import tools.aqua.konstraints.smt.FPLiteral
 import tools.aqua.konstraints.smt.FPLt
 import tools.aqua.konstraints.smt.FPMax
 import tools.aqua.konstraints.smt.FPMin
@@ -50,6 +49,7 @@ import tools.aqua.konstraints.smt.FPToFP
 import tools.aqua.konstraints.smt.FPToReal
 import tools.aqua.konstraints.smt.FPToSBitVec
 import tools.aqua.konstraints.smt.FPToUBitVec
+import tools.aqua.konstraints.smt.FloatingPointLiteral
 import tools.aqua.konstraints.smt.RNA
 import tools.aqua.konstraints.smt.RNE
 import tools.aqua.konstraints.smt.RTN
@@ -253,405 +253,429 @@ infix fun (() -> Expression<FPSort>).fpadd_rtz(summand: () -> Expression<FPSort>
  * Addition operator for FPSort expressions: [this] + [summand].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [summand] from [Float] to
- * [tools.aqua.konstraints.smt.FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * [tools.aqua.konstraints.smt.FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpadd(summand: Float) = this fpadd_rne FPLiteral(summand)
+infix fun Expression<FPSort>.fpadd(summand: Float) = this fpadd_rne FloatingPointLiteral(summand)
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round to nearest even'. Converts [summand] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest even'. Converts [summand] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpadd_rne(summand: Float) = FPAdd(RNE, this, FPLiteral(summand))
+infix fun Expression<FPSort>.fpadd_rne(summand: Float) =
+    FPAdd(RNE, this, FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round to nearest away'. Converts [summand] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest away'. Converts [summand] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpadd_rna(summand: Float) = FPAdd(RNA, this, FPLiteral(summand))
+infix fun Expression<FPSort>.fpadd_rna(summand: Float) =
+    FPAdd(RNA, this, FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward positive'. Converts [summand] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward positive'. Converts [summand] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpadd_rtp(summand: Float) = FPAdd(RTP, this, FPLiteral(summand))
+infix fun Expression<FPSort>.fpadd_rtp(summand: Float) =
+    FPAdd(RTP, this, FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward negative'. Converts [summand] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward negative'. Converts [summand] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpadd_rtn(summand: Float) = FPAdd(RTN, this, FPLiteral(summand))
+infix fun Expression<FPSort>.fpadd_rtn(summand: Float) =
+    FPAdd(RTN, this, FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward zero'. Converts [summand] from [Float] to [FPLiteral] with sort
- * [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward zero'. Converts [summand] from [Float] to [FloatingPointLiteral]
+ * with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpadd_rtz(summand: Float) = FPAdd(RTZ, this, FPLiteral(summand))
+infix fun Expression<FPSort>.fpadd_rtz(summand: Float) =
+    FPAdd(RTZ, this, FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [summand] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun (() -> Expression<FPSort>).fpadd(summand: Float) = this() fpadd_rne FPLiteral(summand)
+infix fun (() -> Expression<FPSort>).fpadd(summand: Float) =
+    this() fpadd_rne FloatingPointLiteral(summand)
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round to nearest even'. Converts [summand] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest even'. Converts [summand] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpadd_rne(summand: Float) =
-    FPAdd(RNE, this(), FPLiteral(summand))
+    FPAdd(RNE, this(), FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round to nearest away'. Converts [summand] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest away'. Converts [summand] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpadd_rna(summand: Float) =
-    FPAdd(RNA, this(), FPLiteral(summand))
+    FPAdd(RNA, this(), FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward positive'. Converts [summand] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward positive'. Converts [summand] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpadd_rtp(summand: Float) =
-    FPAdd(RTP, this(), FPLiteral(summand))
+    FPAdd(RTP, this(), FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward negative'. Converts [summand] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward negative'. Converts [summand] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpadd_rtn(summand: Float) =
-    FPAdd(RTN, this(), FPLiteral(summand))
+    FPAdd(RTN, this(), FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward zero'. Converts [summand] from [Float] to [FPLiteral] with sort
- * [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward zero'. Converts [summand] from [Float] to [FloatingPointLiteral]
+ * with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpadd_rtz(summand: Float) =
-    FPAdd(RTZ, this(), FPLiteral(summand))
+    FPAdd(RTZ, this(), FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [summand] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpadd(summand: Expression<FPSort>) = FPLiteral(this) fpadd_rne summand
+infix fun Float.fpadd(summand: Expression<FPSort>) = FloatingPointLiteral(this) fpadd_rne summand
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round to nearest even'. Converts [summand] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest even'. Converts [summand] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpadd_rne(summand: Expression<FPSort>) = FPAdd(RNE, FPLiteral(this), summand)
+infix fun Float.fpadd_rne(summand: Expression<FPSort>) =
+    FPAdd(RNE, FloatingPointLiteral(this), summand)
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round to nearest away'. Converts [summand] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest away'. Converts [summand] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpadd_rna(summand: Expression<FPSort>) = FPAdd(RNA, FPLiteral(this), summand)
+infix fun Float.fpadd_rna(summand: Expression<FPSort>) =
+    FPAdd(RNA, FloatingPointLiteral(this), summand)
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward positive'. Converts [summand] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward positive'. Converts [summand] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpadd_rtp(summand: Expression<FPSort>) = FPAdd(RTP, FPLiteral(this), summand)
+infix fun Float.fpadd_rtp(summand: Expression<FPSort>) =
+    FPAdd(RTP, FloatingPointLiteral(this), summand)
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward negative'. Converts [summand] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward negative'. Converts [summand] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpadd_rtn(summand: Expression<FPSort>) = FPAdd(RTN, FPLiteral(this), summand)
+infix fun Float.fpadd_rtn(summand: Expression<FPSort>) =
+    FPAdd(RTN, FloatingPointLiteral(this), summand)
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward zero'. Converts [summand] from [Float] to [FPLiteral] with sort
- * [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward zero'. Converts [summand] from [Float] to [FloatingPointLiteral]
+ * with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpadd_rtz(summand: Expression<FPSort>) = FPAdd(RTZ, FPLiteral(this), summand)
+infix fun Float.fpadd_rtz(summand: Expression<FPSort>) =
+    FPAdd(RTZ, FloatingPointLiteral(this), summand)
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [summand] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpadd(summand: () -> Expression<FPSort>) = FPLiteral(this) fpadd_rne summand()
+infix fun Float.fpadd(summand: () -> Expression<FPSort>) =
+    FloatingPointLiteral(this) fpadd_rne summand()
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round to nearest even'. Converts [summand] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest even'. Converts [summand] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpadd_rne(summand: () -> Expression<FPSort>) =
-    FPAdd(RNE, FPLiteral(this), summand())
+    FPAdd(RNE, FloatingPointLiteral(this), summand())
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round to nearest away'. Converts [summand] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest away'. Converts [summand] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpadd_rna(summand: () -> Expression<FPSort>) =
-    FPAdd(RNA, FPLiteral(this), summand())
+    FPAdd(RNA, FloatingPointLiteral(this), summand())
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward positive'. Converts [summand] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward positive'. Converts [summand] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpadd_rtp(summand: () -> Expression<FPSort>) =
-    FPAdd(RTP, FPLiteral(this), summand())
+    FPAdd(RTP, FloatingPointLiteral(this), summand())
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward negative'. Converts [summand] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward negative'. Converts [summand] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpadd_rtn(summand: () -> Expression<FPSort>) =
-    FPAdd(RTN, FPLiteral(this), summand())
+    FPAdd(RTN, FloatingPointLiteral(this), summand())
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward zero'. Converts [summand] from [Float] to [FPLiteral] with sort
- * [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward zero'. Converts [summand] from [Float] to [FloatingPointLiteral]
+ * with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpadd_rtz(summand: () -> Expression<FPSort>) =
-    FPAdd(RTZ, FPLiteral(this), summand())
+    FPAdd(RTZ, FloatingPointLiteral(this), summand())
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [summand] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpadd(summand: Double) = this fpadd_rne FPLiteral(summand)
+infix fun Expression<FPSort>.fpadd(summand: Double) = this fpadd_rne FloatingPointLiteral(summand)
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round to nearest even'. Converts [summand] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest even'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpadd_rne(summand: Double) = FPAdd(RNE, this, FPLiteral(summand))
+infix fun Expression<FPSort>.fpadd_rne(summand: Double) =
+    FPAdd(RNE, this, FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round to nearest away'. Converts [summand] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest away'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpadd_rna(summand: Double) = FPAdd(RNA, this, FPLiteral(summand))
+infix fun Expression<FPSort>.fpadd_rna(summand: Double) =
+    FPAdd(RNA, this, FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward positive'. Converts [summand] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward positive'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpadd_rtp(summand: Double) = FPAdd(RTP, this, FPLiteral(summand))
+infix fun Expression<FPSort>.fpadd_rtp(summand: Double) =
+    FPAdd(RTP, this, FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward negative'. Converts [summand] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward negative'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpadd_rtn(summand: Double) = FPAdd(RTN, this, FPLiteral(summand))
+infix fun Expression<FPSort>.fpadd_rtn(summand: Double) =
+    FPAdd(RTN, this, FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward zero'. Converts [summand] from [Double] to [FPLiteral] with sort
- * [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward zero'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpadd_rtz(summand: Double) = FPAdd(RTZ, this, FPLiteral(summand))
+infix fun Expression<FPSort>.fpadd_rtz(summand: Double) =
+    FPAdd(RTZ, this, FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [summand] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun (() -> Expression<FPSort>).fpadd(summand: Double) = this() fpadd_rne FPLiteral(summand)
+infix fun (() -> Expression<FPSort>).fpadd(summand: Double) =
+    this() fpadd_rne FloatingPointLiteral(summand)
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round to nearest even'. Converts [summand] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest even'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpadd_rne(summand: Double) =
-    FPAdd(RNE, this(), FPLiteral(summand))
+    FPAdd(RNE, this(), FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round to nearest away'. Converts [summand] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest away'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpadd_rna(summand: Double) =
-    FPAdd(RNA, this(), FPLiteral(summand))
+    FPAdd(RNA, this(), FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward positive'. Converts [summand] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward positive'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpadd_rtp(summand: Double) =
-    FPAdd(RTP, this(), FPLiteral(summand))
+    FPAdd(RTP, this(), FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward negative'. Converts [summand] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward negative'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpadd_rtn(summand: Double) =
-    FPAdd(RTN, this(), FPLiteral(summand))
+    FPAdd(RTN, this(), FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward zero'. Converts [summand] from [Double] to [FPLiteral] with sort
- * [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward zero'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpadd_rtz(summand: Double) =
-    FPAdd(RTZ, this(), FPLiteral(summand))
+    FPAdd(RTZ, this(), FloatingPointLiteral(summand))
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [summand] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpadd(summand: Expression<FPSort>) = FPLiteral(this) fpadd_rne summand
+infix fun Double.fpadd(summand: Expression<FPSort>) = FloatingPointLiteral(this) fpadd_rne summand
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round to nearest even'. Converts [summand] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest even'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpadd_rne(summand: Expression<FPSort>) = FPAdd(RNE, FPLiteral(this), summand)
+infix fun Double.fpadd_rne(summand: Expression<FPSort>) =
+    FPAdd(RNE, FloatingPointLiteral(this), summand)
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round to nearest away'. Converts [summand] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest away'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpadd_rna(summand: Expression<FPSort>) = FPAdd(RNA, FPLiteral(this), summand)
+infix fun Double.fpadd_rna(summand: Expression<FPSort>) =
+    FPAdd(RNA, FloatingPointLiteral(this), summand)
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward positive'. Converts [summand] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward positive'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpadd_rtp(summand: Expression<FPSort>) = FPAdd(RTP, FPLiteral(this), summand)
+infix fun Double.fpadd_rtp(summand: Expression<FPSort>) =
+    FPAdd(RTP, FloatingPointLiteral(this), summand)
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward negative'. Converts [summand] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward negative'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpadd_rtn(summand: Expression<FPSort>) = FPAdd(RTN, FPLiteral(this), summand)
+infix fun Double.fpadd_rtn(summand: Expression<FPSort>) =
+    FPAdd(RTN, FloatingPointLiteral(this), summand)
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward zero'. Converts [summand] from [Double] to [FPLiteral] with sort
- * [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward zero'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpadd_rtz(summand: Expression<FPSort>) = FPAdd(RTZ, FPLiteral(this), summand)
+infix fun Double.fpadd_rtz(summand: Expression<FPSort>) =
+    FPAdd(RTZ, FloatingPointLiteral(this), summand)
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [summand] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpadd(summand: () -> Expression<FPSort>) = FPLiteral(this) fpadd_rne summand()
+infix fun Double.fpadd(summand: () -> Expression<FPSort>) =
+    FloatingPointLiteral(this) fpadd_rne summand()
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round to nearest even'. Converts [summand] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest even'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpadd_rne(summand: () -> Expression<FPSort>) =
-    FPAdd(RNE, FPLiteral(this), summand())
+    FPAdd(RNE, FloatingPointLiteral(this), summand())
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round to nearest away'. Converts [summand] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest away'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpadd_rna(summand: () -> Expression<FPSort>) =
-    FPAdd(RNA, FPLiteral(this), summand())
+    FPAdd(RNA, FloatingPointLiteral(this), summand())
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward positive'. Converts [summand] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward positive'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpadd_rtp(summand: () -> Expression<FPSort>) =
-    FPAdd(RTP, FPLiteral(this), summand())
+    FPAdd(RTP, FloatingPointLiteral(this), summand())
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward negative'. Converts [summand] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward negative'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpadd_rtn(summand: () -> Expression<FPSort>) =
-    FPAdd(RTN, FPLiteral(this), summand())
+    FPAdd(RTN, FloatingPointLiteral(this), summand())
 
 /**
  * Addition operator for FPSort expressions: [this] + [summand].
  *
- * Uses rounding mode 'round toward zero'. Converts [summand] from [Double] to [FPLiteral] with sort
- * [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward zero'. Converts [summand] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpadd_rtz(summand: () -> Expression<FPSort>) =
-    FPAdd(RTZ, FPLiteral(this), summand())
+    FPAdd(RTZ, FloatingPointLiteral(this), summand())
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
@@ -848,408 +872,433 @@ infix fun (() -> Expression<FPSort>).fpsub_rtz(subtrahend: () -> Expression<FPSo
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [subtrahend] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpsub(subtrahend: Float) = this fpsub_rne FPLiteral(subtrahend)
+infix fun Expression<FPSort>.fpsub(subtrahend: Float) =
+    this fpsub_rne FloatingPointLiteral(subtrahend)
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round to nearest even'. Converts [subtrahend] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest even'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpsub_rne(subtrahend: Float) = FPSub(RNE, this, FPLiteral(subtrahend))
+infix fun Expression<FPSort>.fpsub_rne(subtrahend: Float) =
+    FPSub(RNE, this, FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round to nearest away'. Converts [subtrahend] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest away'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpsub_rna(subtrahend: Float) = FPSub(RNA, this, FPLiteral(subtrahend))
+infix fun Expression<FPSort>.fpsub_rna(subtrahend: Float) =
+    FPSub(RNA, this, FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward positive'. Converts [subtrahend] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward positive'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpsub_rtp(subtrahend: Float) = FPSub(RTP, this, FPLiteral(subtrahend))
+infix fun Expression<FPSort>.fpsub_rtp(subtrahend: Float) =
+    FPSub(RTP, this, FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward negative'. Converts [subtrahend] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward negative'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpsub_rtn(subtrahend: Float) = FPSub(RTN, this, FPLiteral(subtrahend))
+infix fun Expression<FPSort>.fpsub_rtn(subtrahend: Float) =
+    FPSub(RTN, this, FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward zero'. Converts [subtrahend] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward zero'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpsub_rtz(subtrahend: Float) = FPSub(RTZ, this, FPLiteral(subtrahend))
+infix fun Expression<FPSort>.fpsub_rtz(subtrahend: Float) =
+    FPSub(RTZ, this, FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [subtrahend] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpsub(subtrahend: Float) =
-    this() fpsub_rne FPLiteral(subtrahend)
+    this() fpsub_rne FloatingPointLiteral(subtrahend)
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round to nearest even'. Converts [subtrahend] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest even'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpsub_rne(subtrahend: Float) =
-    FPSub(RNE, this(), FPLiteral(subtrahend))
+    FPSub(RNE, this(), FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round to nearest away'. Converts [subtrahend] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest away'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpsub_rna(subtrahend: Float) =
-    FPSub(RNA, this(), FPLiteral(subtrahend))
+    FPSub(RNA, this(), FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward positive'. Converts [subtrahend] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward positive'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpsub_rtp(subtrahend: Float) =
-    FPSub(RTP, this(), FPLiteral(subtrahend))
+    FPSub(RTP, this(), FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward negative'. Converts [subtrahend] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward negative'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpsub_rtn(subtrahend: Float) =
-    FPSub(RTN, this(), FPLiteral(subtrahend))
+    FPSub(RTN, this(), FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward zero'. Converts [subtrahend] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward zero'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpsub_rtz(subtrahend: Float) =
-    FPSub(RTZ, this(), FPLiteral(subtrahend))
+    FPSub(RTZ, this(), FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [subtrahend] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpsub(subtrahend: Expression<FPSort>) = FPLiteral(this) fpsub_rne subtrahend
+infix fun Float.fpsub(subtrahend: Expression<FPSort>) =
+    FloatingPointLiteral(this) fpsub_rne subtrahend
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round to nearest even'. Converts [subtrahend] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest even'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpsub_rne(subtrahend: Expression<FPSort>) = FPSub(RNE, FPLiteral(this), subtrahend)
+infix fun Float.fpsub_rne(subtrahend: Expression<FPSort>) =
+    FPSub(RNE, FloatingPointLiteral(this), subtrahend)
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round to nearest away'. Converts [subtrahend] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest away'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpsub_rna(subtrahend: Expression<FPSort>) = FPSub(RNA, FPLiteral(this), subtrahend)
+infix fun Float.fpsub_rna(subtrahend: Expression<FPSort>) =
+    FPSub(RNA, FloatingPointLiteral(this), subtrahend)
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward positive'. Converts [subtrahend] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward positive'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpsub_rtp(subtrahend: Expression<FPSort>) = FPSub(RTP, FPLiteral(this), subtrahend)
+infix fun Float.fpsub_rtp(subtrahend: Expression<FPSort>) =
+    FPSub(RTP, FloatingPointLiteral(this), subtrahend)
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward negative'. Converts [subtrahend] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward negative'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpsub_rtn(subtrahend: Expression<FPSort>) = FPSub(RTN, FPLiteral(this), subtrahend)
+infix fun Float.fpsub_rtn(subtrahend: Expression<FPSort>) =
+    FPSub(RTN, FloatingPointLiteral(this), subtrahend)
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward zero'. Converts [subtrahend] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward zero'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpsub_rtz(subtrahend: Expression<FPSort>) = FPSub(RTZ, FPLiteral(this), subtrahend)
+infix fun Float.fpsub_rtz(subtrahend: Expression<FPSort>) =
+    FPSub(RTZ, FloatingPointLiteral(this), subtrahend)
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [subtrahend] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpsub(subtrahend: () -> Expression<FPSort>) = FPLiteral(this) fpsub_rne subtrahend()
+infix fun Float.fpsub(subtrahend: () -> Expression<FPSort>) =
+    FloatingPointLiteral(this) fpsub_rne subtrahend()
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round to nearest even'. Converts [subtrahend] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest even'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpsub_rne(subtrahend: () -> Expression<FPSort>) =
-    FPSub(RNE, FPLiteral(this), subtrahend())
+    FPSub(RNE, FloatingPointLiteral(this), subtrahend())
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round to nearest away'. Converts [subtrahend] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest away'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpsub_rna(subtrahend: () -> Expression<FPSort>) =
-    FPSub(RNA, FPLiteral(this), subtrahend())
+    FPSub(RNA, FloatingPointLiteral(this), subtrahend())
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward positive'. Converts [subtrahend] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward positive'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpsub_rtp(subtrahend: () -> Expression<FPSort>) =
-    FPSub(RTP, FPLiteral(this), subtrahend())
+    FPSub(RTP, FloatingPointLiteral(this), subtrahend())
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward negative'. Converts [subtrahend] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward negative'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpsub_rtn(subtrahend: () -> Expression<FPSort>) =
-    FPSub(RTN, FPLiteral(this), subtrahend())
+    FPSub(RTN, FloatingPointLiteral(this), subtrahend())
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward zero'. Converts [subtrahend] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward zero'. Converts [subtrahend] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpsub_rtz(subtrahend: () -> Expression<FPSort>) =
-    FPSub(RTZ, FPLiteral(this), subtrahend())
+    FPSub(RTZ, FloatingPointLiteral(this), subtrahend())
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [subtrahend] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpsub(subtrahend: Double) = this fpsub_rne FPLiteral(subtrahend)
+infix fun Expression<FPSort>.fpsub(subtrahend: Double) =
+    this fpsub_rne FloatingPointLiteral(subtrahend)
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round to nearest even'. Converts [subtrahend] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest even'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpsub_rne(subtrahend: Double) = FPSub(RNE, this, FPLiteral(subtrahend))
+infix fun Expression<FPSort>.fpsub_rne(subtrahend: Double) =
+    FPSub(RNE, this, FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round to nearest away'. Converts [subtrahend] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest away'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpsub_rna(subtrahend: Double) = FPSub(RNA, this, FPLiteral(subtrahend))
+infix fun Expression<FPSort>.fpsub_rna(subtrahend: Double) =
+    FPSub(RNA, this, FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward positive'. Converts [subtrahend] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward positive'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpsub_rtp(subtrahend: Double) = FPSub(RTP, this, FPLiteral(subtrahend))
+infix fun Expression<FPSort>.fpsub_rtp(subtrahend: Double) =
+    FPSub(RTP, this, FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward negative'. Converts [subtrahend] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward negative'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpsub_rtn(subtrahend: Double) = FPSub(RTN, this, FPLiteral(subtrahend))
+infix fun Expression<FPSort>.fpsub_rtn(subtrahend: Double) =
+    FPSub(RTN, this, FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward zero'. Converts [subtrahend] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward zero'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpsub_rtz(subtrahend: Double) = FPSub(RTZ, this, FPLiteral(subtrahend))
+infix fun Expression<FPSort>.fpsub_rtz(subtrahend: Double) =
+    FPSub(RTZ, this, FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [subtrahend] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpsub(subtrahend: Double) =
-    this() fpsub_rne FPLiteral(subtrahend)
+    this() fpsub_rne FloatingPointLiteral(subtrahend)
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round to nearest even'. Converts [subtrahend] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest even'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpsub_rne(subtrahend: Double) =
-    FPSub(RNE, this(), FPLiteral(subtrahend))
+    FPSub(RNE, this(), FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round to nearest away'. Converts [subtrahend] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest away'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpsub_rna(subtrahend: Double) =
-    FPSub(RNA, this(), FPLiteral(subtrahend))
+    FPSub(RNA, this(), FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward positive'. Converts [subtrahend] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward positive'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpsub_rtp(subtrahend: Double) =
-    FPSub(RTP, this(), FPLiteral(subtrahend))
+    FPSub(RTP, this(), FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward negative'. Converts [subtrahend] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward negative'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpsub_rtn(subtrahend: Double) =
-    FPSub(RTN, this(), FPLiteral(subtrahend))
+    FPSub(RTN, this(), FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward zero'. Converts [subtrahend] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward zero'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpsub_rtz(subtrahend: Double) =
-    FPSub(RTZ, this(), FPLiteral(subtrahend))
+    FPSub(RTZ, this(), FloatingPointLiteral(subtrahend))
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [subtrahend] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpsub(subtrahend: Expression<FPSort>) = FPLiteral(this) fpsub_rne subtrahend
+infix fun Double.fpsub(subtrahend: Expression<FPSort>) =
+    FloatingPointLiteral(this) fpsub_rne subtrahend
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round to nearest even'. Converts [subtrahend] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest even'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpsub_rne(subtrahend: Expression<FPSort>) = FPSub(RNE, FPLiteral(this), subtrahend)
+infix fun Double.fpsub_rne(subtrahend: Expression<FPSort>) =
+    FPSub(RNE, FloatingPointLiteral(this), subtrahend)
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round to nearest away'. Converts [subtrahend] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest away'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpsub_rna(subtrahend: Expression<FPSort>) = FPSub(RNA, FPLiteral(this), subtrahend)
+infix fun Double.fpsub_rna(subtrahend: Expression<FPSort>) =
+    FPSub(RNA, FloatingPointLiteral(this), subtrahend)
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward positive'. Converts [subtrahend] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward positive'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpsub_rtp(subtrahend: Expression<FPSort>) = FPSub(RTP, FPLiteral(this), subtrahend)
+infix fun Double.fpsub_rtp(subtrahend: Expression<FPSort>) =
+    FPSub(RTP, FloatingPointLiteral(this), subtrahend)
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward negative'. Converts [subtrahend] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward negative'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpsub_rtn(subtrahend: Expression<FPSort>) = FPSub(RTN, FPLiteral(this), subtrahend)
+infix fun Double.fpsub_rtn(subtrahend: Expression<FPSort>) =
+    FPSub(RTN, FloatingPointLiteral(this), subtrahend)
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward zero'. Converts [subtrahend] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward zero'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpsub_rtz(subtrahend: Expression<FPSort>) = FPSub(RTZ, FPLiteral(this), subtrahend)
+infix fun Double.fpsub_rtz(subtrahend: Expression<FPSort>) =
+    FPSub(RTZ, FloatingPointLiteral(this), subtrahend)
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [subtrahend] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpsub(subtrahend: () -> Expression<FPSort>) =
-    FPLiteral(this) fpsub_rne subtrahend()
+    FloatingPointLiteral(this) fpsub_rne subtrahend()
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round to nearest even'. Converts [subtrahend] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest even'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpsub_rne(subtrahend: () -> Expression<FPSort>) =
-    FPSub(RNE, FPLiteral(this), subtrahend())
+    FPSub(RNE, FloatingPointLiteral(this), subtrahend())
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round to nearest away'. Converts [subtrahend] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest away'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpsub_rna(subtrahend: () -> Expression<FPSort>) =
-    FPSub(RNA, FPLiteral(this), subtrahend())
+    FPSub(RNA, FloatingPointLiteral(this), subtrahend())
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward positive'. Converts [subtrahend] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward positive'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpsub_rtp(subtrahend: () -> Expression<FPSort>) =
-    FPSub(RTP, FPLiteral(this), subtrahend())
+    FPSub(RTP, FloatingPointLiteral(this), subtrahend())
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward negative'. Converts [subtrahend] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward negative'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpsub_rtn(subtrahend: () -> Expression<FPSort>) =
-    FPSub(RTN, FPLiteral(this), subtrahend())
+    FPSub(RTN, FloatingPointLiteral(this), subtrahend())
 
 /**
  * Subtraction operator for FPSort expressions: [this] - [subtrahend].
  *
- * Uses rounding mode 'round toward zero'. Converts [subtrahend] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward zero'. Converts [subtrahend] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpsub_rtz(subtrahend: () -> Expression<FPSort>) =
-    FPSub(RTZ, FPLiteral(this), subtrahend())
+    FPSub(RTZ, FloatingPointLiteral(this), subtrahend())
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
@@ -1446,429 +1495,433 @@ infix fun (() -> Expression<FPSort>).fpmul_rtz(multiplicant: () -> Expression<FP
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [multiplicant] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpmul(multiplicant: Float) = this fpmul_rne FPLiteral(multiplicant)
+infix fun Expression<FPSort>.fpmul(multiplicant: Float) =
+    this fpmul_rne FloatingPointLiteral(multiplicant)
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round to nearest even'. Converts [multiplicant] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest even'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpmul_rne(multiplicant: Float) =
-    FPMul(RNE, this, FPLiteral(multiplicant))
+    FPMul(RNE, this, FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round to nearest away'. Converts [multiplicant] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest away'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpmul_rna(multiplicant: Float) =
-    FPMul(RNA, this, FPLiteral(multiplicant))
+    FPMul(RNA, this, FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward positive'. Converts [multiplicant] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward positive'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpmul_rtp(multiplicant: Float) =
-    FPMul(RTP, this, FPLiteral(multiplicant))
+    FPMul(RTP, this, FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward negative'. Converts [multiplicant] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward negative'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpmul_rtn(multiplicant: Float) =
-    FPMul(RTN, this, FPLiteral(multiplicant))
+    FPMul(RTN, this, FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward zero'. Converts [multiplicant] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward zero'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Expression<FPSort>.fpmul_rtz(multiplicant: Float) =
-    FPMul(RTZ, this, FPLiteral(multiplicant))
+    FPMul(RTZ, this, FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [multiplicant] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpmul(multiplicant: Float) =
-    this() fpmul_rne FPLiteral(multiplicant)
+    this() fpmul_rne FloatingPointLiteral(multiplicant)
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round to nearest even'. Converts [multiplicant] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest even'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpmul_rne(multiplicant: Float) =
-    FPMul(RNE, this(), FPLiteral(multiplicant))
+    FPMul(RNE, this(), FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round to nearest away'. Converts [multiplicant] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest away'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpmul_rna(multiplicant: Float) =
-    FPMul(RNA, this(), FPLiteral(multiplicant))
+    FPMul(RNA, this(), FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward positive'. Converts [multiplicant] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward positive'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpmul_rtp(multiplicant: Float) =
-    FPMul(RTP, this(), FPLiteral(multiplicant))
+    FPMul(RTP, this(), FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward negative'. Converts [multiplicant] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward negative'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpmul_rtn(multiplicant: Float) =
-    FPMul(RTN, this(), FPLiteral(multiplicant))
+    FPMul(RTN, this(), FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward zero'. Converts [multiplicant] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward zero'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpmul_rtz(multiplicant: Float) =
-    FPMul(RTZ, this(), FPLiteral(multiplicant))
+    FPMul(RTZ, this(), FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [multiplicant] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpmul(multiplicant: Expression<FPSort>) = FPLiteral(this) fpmul_rne multiplicant
+infix fun Float.fpmul(multiplicant: Expression<FPSort>) =
+    FloatingPointLiteral(this) fpmul_rne multiplicant
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round to nearest even'. Converts [multiplicant] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest even'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpmul_rne(multiplicant: Expression<FPSort>) =
-    FPMul(RNE, FPLiteral(this), multiplicant)
+    FPMul(RNE, FloatingPointLiteral(this), multiplicant)
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round to nearest away'. Converts [multiplicant] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest away'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpmul_rna(multiplicant: Expression<FPSort>) =
-    FPMul(RNA, FPLiteral(this), multiplicant)
+    FPMul(RNA, FloatingPointLiteral(this), multiplicant)
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward positive'. Converts [multiplicant] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward positive'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpmul_rtp(multiplicant: Expression<FPSort>) =
-    FPMul(RTP, FPLiteral(this), multiplicant)
+    FPMul(RTP, FloatingPointLiteral(this), multiplicant)
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward negative'. Converts [multiplicant] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward negative'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpmul_rtn(multiplicant: Expression<FPSort>) =
-    FPMul(RTN, FPLiteral(this), multiplicant)
+    FPMul(RTN, FloatingPointLiteral(this), multiplicant)
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward zero'. Converts [multiplicant] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward zero'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpmul_rtz(multiplicant: Expression<FPSort>) =
-    FPMul(RTZ, FPLiteral(this), multiplicant)
+    FPMul(RTZ, FloatingPointLiteral(this), multiplicant)
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [multiplicant] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpmul(multiplicant: () -> Expression<FPSort>) =
-    FPLiteral(this) fpmul_rne multiplicant()
+    FloatingPointLiteral(this) fpmul_rne multiplicant()
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round to nearest even'. Converts [multiplicant] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest even'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpmul_rne(multiplicant: () -> Expression<FPSort>) =
-    FPMul(RNE, FPLiteral(this), multiplicant())
+    FPMul(RNE, FloatingPointLiteral(this), multiplicant())
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round to nearest away'. Converts [multiplicant] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest away'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpmul_rna(multiplicant: () -> Expression<FPSort>) =
-    FPMul(RNA, FPLiteral(this), multiplicant())
+    FPMul(RNA, FloatingPointLiteral(this), multiplicant())
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward positive'. Converts [multiplicant] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward positive'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpmul_rtp(multiplicant: () -> Expression<FPSort>) =
-    FPMul(RTP, FPLiteral(this), multiplicant())
+    FPMul(RTP, FloatingPointLiteral(this), multiplicant())
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward negative'. Converts [multiplicant] from [Float] to [FPLiteral]
- * with sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward negative'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpmul_rtn(multiplicant: () -> Expression<FPSort>) =
-    FPMul(RTN, FPLiteral(this), multiplicant())
+    FPMul(RTN, FloatingPointLiteral(this), multiplicant())
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward zero'. Converts [multiplicant] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward zero'. Converts [multiplicant] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpmul_rtz(multiplicant: () -> Expression<FPSort>) =
-    FPMul(RTZ, FPLiteral(this), multiplicant())
+    FPMul(RTZ, FloatingPointLiteral(this), multiplicant())
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [multiplicant] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpmul(multiplicant: Double) = this fpmul_rne FPLiteral(multiplicant)
+infix fun Expression<FPSort>.fpmul(multiplicant: Double) =
+    this fpmul_rne FloatingPointLiteral(multiplicant)
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round to nearest even'. Converts [multiplicant] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest even'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpmul_rne(multiplicant: Double) =
-    FPMul(RNE, this, FPLiteral(multiplicant))
+    FPMul(RNE, this, FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round to nearest away'. Converts [multiplicant] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest away'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpmul_rna(multiplicant: Double) =
-    FPMul(RNA, this, FPLiteral(multiplicant))
+    FPMul(RNA, this, FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward positive'. Converts [multiplicant] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward positive'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpmul_rtp(multiplicant: Double) =
-    FPMul(RTP, this, FPLiteral(multiplicant))
+    FPMul(RTP, this, FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward negative'. Converts [multiplicant] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward negative'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpmul_rtn(multiplicant: Double) =
-    FPMul(RTN, this, FPLiteral(multiplicant))
+    FPMul(RTN, this, FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward zero'. Converts [multiplicant] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward zero'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Expression<FPSort>.fpmul_rtz(multiplicant: Double) =
-    FPMul(RTZ, this, FPLiteral(multiplicant))
+    FPMul(RTZ, this, FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [multiplicant] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpmul(multiplicant: Double) =
-    this() fpmul_rne FPLiteral(multiplicant)
+    this() fpmul_rne FloatingPointLiteral(multiplicant)
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round to nearest even'. Converts [multiplicant] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest even'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpmul_rne(multiplicant: Double) =
-    FPMul(RNE, this(), FPLiteral(multiplicant))
+    FPMul(RNE, this(), FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round to nearest away'. Converts [multiplicant] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest away'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpmul_rna(multiplicant: Double) =
-    FPMul(RNA, this(), FPLiteral(multiplicant))
+    FPMul(RNA, this(), FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward positive'. Converts [multiplicant] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward positive'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpmul_rtp(multiplicant: Double) =
-    FPMul(RTP, this(), FPLiteral(multiplicant))
+    FPMul(RTP, this(), FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward negative'. Converts [multiplicant] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward negative'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpmul_rtn(multiplicant: Double) =
-    FPMul(RTN, this(), FPLiteral(multiplicant))
+    FPMul(RTN, this(), FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward zero'. Converts [multiplicant] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward zero'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpmul_rtz(multiplicant: Double) =
-    FPMul(RTZ, this(), FPLiteral(multiplicant))
+    FPMul(RTZ, this(), FloatingPointLiteral(multiplicant))
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [multiplicant] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpmul(multiplicant: Expression<FPSort>) = FPLiteral(this) fpmul_rne multiplicant
+infix fun Double.fpmul(multiplicant: Expression<FPSort>) =
+    FloatingPointLiteral(this) fpmul_rne multiplicant
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round to nearest even'. Converts [multiplicant] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest even'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpmul_rne(multiplicant: Expression<FPSort>) =
-    FPMul(RNE, FPLiteral(this), multiplicant)
+    FPMul(RNE, FloatingPointLiteral(this), multiplicant)
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round to nearest away'. Converts [multiplicant] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest away'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpmul_rna(multiplicant: Expression<FPSort>) =
-    FPMul(RNA, FPLiteral(this), multiplicant)
+    FPMul(RNA, FloatingPointLiteral(this), multiplicant)
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward positive'. Converts [multiplicant] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward positive'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpmul_rtp(multiplicant: Expression<FPSort>) =
-    FPMul(RTP, FPLiteral(this), multiplicant)
+    FPMul(RTP, FloatingPointLiteral(this), multiplicant)
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward negative'. Converts [multiplicant] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward negative'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpmul_rtn(multiplicant: Expression<FPSort>) =
-    FPMul(RTN, FPLiteral(this), multiplicant)
+    FPMul(RTN, FloatingPointLiteral(this), multiplicant)
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward zero'. Converts [multiplicant] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward zero'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpmul_rtz(multiplicant: Expression<FPSort>) =
-    FPMul(RTZ, FPLiteral(this), multiplicant)
+    FPMul(RTZ, FloatingPointLiteral(this), multiplicant)
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [multiplicant] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpmul(multiplicant: () -> Expression<FPSort>) =
-    FPLiteral(this) fpmul_rne multiplicant()
+    FloatingPointLiteral(this) fpmul_rne multiplicant()
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round to nearest even'. Converts [multiplicant] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest even'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpmul_rne(multiplicant: () -> Expression<FPSort>) =
-    FPMul(RNE, FPLiteral(this), multiplicant())
+    FPMul(RNE, FloatingPointLiteral(this), multiplicant())
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round to nearest away'. Converts [multiplicant] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest away'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpmul_rna(multiplicant: () -> Expression<FPSort>) =
-    FPMul(RNA, FPLiteral(this), multiplicant())
+    FPMul(RNA, FloatingPointLiteral(this), multiplicant())
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward positive'. Converts [multiplicant] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward positive'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpmul_rtp(multiplicant: () -> Expression<FPSort>) =
-    FPMul(RTP, FPLiteral(this), multiplicant())
+    FPMul(RTP, FloatingPointLiteral(this), multiplicant())
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward negative'. Converts [multiplicant] from [Double] to [FPLiteral]
- * with sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward negative'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpmul_rtn(multiplicant: () -> Expression<FPSort>) =
-    FPMul(RTN, FPLiteral(this), multiplicant())
+    FPMul(RTN, FloatingPointLiteral(this), multiplicant())
 
 /**
  * Multiplication operator for FPSort expressions: [this] * [multiplicant].
  *
- * Uses rounding mode 'round toward zero'. Converts [multiplicant] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward zero'. Converts [multiplicant] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpmul_rtz(multiplicant: () -> Expression<FPSort>) =
-    FPMul(RTZ, FPLiteral(this), multiplicant())
+    FPMul(RTZ, FloatingPointLiteral(this), multiplicant())
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
@@ -2058,405 +2111,429 @@ infix fun (() -> Expression<FPSort>).fpdiv_rtz(divisor: () -> Expression<FPSort>
  * Division operator for FPSort expressions: [this] / [divisor].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [divisor] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpdiv(divisor: Float) = this fpdiv_rne FPLiteral(divisor)
+infix fun Expression<FPSort>.fpdiv(divisor: Float) = this fpdiv_rne FloatingPointLiteral(divisor)
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round to nearest even'. Converts [divisor] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest even'. Converts [divisor] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpdiv_rne(divisor: Float) = FPDiv(RNE, this, FPLiteral(divisor))
+infix fun Expression<FPSort>.fpdiv_rne(divisor: Float) =
+    FPDiv(RNE, this, FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round to nearest away'. Converts [divisor] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest away'. Converts [divisor] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpdiv_rna(divisor: Float) = FPDiv(RNA, this, FPLiteral(divisor))
+infix fun Expression<FPSort>.fpdiv_rna(divisor: Float) =
+    FPDiv(RNA, this, FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward positive'. Converts [divisor] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward positive'. Converts [divisor] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpdiv_rtp(divisor: Float) = FPDiv(RTP, this, FPLiteral(divisor))
+infix fun Expression<FPSort>.fpdiv_rtp(divisor: Float) =
+    FPDiv(RTP, this, FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward negative'. Converts [divisor] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward negative'. Converts [divisor] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpdiv_rtn(divisor: Float) = FPDiv(RTN, this, FPLiteral(divisor))
+infix fun Expression<FPSort>.fpdiv_rtn(divisor: Float) =
+    FPDiv(RTN, this, FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward zero'. Converts [divisor] from [Float] to [FPLiteral] with sort
- * [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward zero'. Converts [divisor] from [Float] to [FloatingPointLiteral]
+ * with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Expression<FPSort>.fpdiv_rtz(divisor: Float) = FPDiv(RTZ, this, FPLiteral(divisor))
+infix fun Expression<FPSort>.fpdiv_rtz(divisor: Float) =
+    FPDiv(RTZ, this, FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [divisor] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun (() -> Expression<FPSort>).fpdiv(divisor: Float) = this() fpdiv_rne FPLiteral(divisor)
+infix fun (() -> Expression<FPSort>).fpdiv(divisor: Float) =
+    this() fpdiv_rne FloatingPointLiteral(divisor)
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round to nearest even'. Converts [divisor] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest even'. Converts [divisor] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rne(divisor: Float) =
-    FPDiv(RNE, this(), FPLiteral(divisor))
+    FPDiv(RNE, this(), FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round to nearest away'. Converts [divisor] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest away'. Converts [divisor] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rna(divisor: Float) =
-    FPDiv(RNA, this(), FPLiteral(divisor))
+    FPDiv(RNA, this(), FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward positive'. Converts [divisor] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward positive'. Converts [divisor] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rtp(divisor: Float) =
-    FPDiv(RTP, this(), FPLiteral(divisor))
+    FPDiv(RTP, this(), FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward negative'. Converts [divisor] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward negative'. Converts [divisor] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rtn(divisor: Float) =
-    FPDiv(RTN, this(), FPLiteral(divisor))
+    FPDiv(RTN, this(), FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward zero'. Converts [divisor] from [Float] to [FPLiteral] with sort
- * [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward zero'. Converts [divisor] from [Float] to [FloatingPointLiteral]
+ * with sort [(_ FloatingPoint 8 24)]
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rtz(divisor: Float) =
-    FPDiv(RTZ, this(), FPLiteral(divisor))
+    FPDiv(RTZ, this(), FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [divisor] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpdiv(divisor: Expression<FPSort>) = FPLiteral(this) fpdiv_rne divisor
+infix fun Float.fpdiv(divisor: Expression<FPSort>) = FloatingPointLiteral(this) fpdiv_rne divisor
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round to nearest even'. Converts [divisor] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest even'. Converts [divisor] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpdiv_rne(divisor: Expression<FPSort>) = FPDiv(RNE, FPLiteral(this), divisor)
+infix fun Float.fpdiv_rne(divisor: Expression<FPSort>) =
+    FPDiv(RNE, FloatingPointLiteral(this), divisor)
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round to nearest away'. Converts [divisor] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest away'. Converts [divisor] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpdiv_rna(divisor: Expression<FPSort>) = FPDiv(RNA, FPLiteral(this), divisor)
+infix fun Float.fpdiv_rna(divisor: Expression<FPSort>) =
+    FPDiv(RNA, FloatingPointLiteral(this), divisor)
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward positive'. Converts [divisor] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward positive'. Converts [divisor] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpdiv_rtp(divisor: Expression<FPSort>) = FPDiv(RTP, FPLiteral(this), divisor)
+infix fun Float.fpdiv_rtp(divisor: Expression<FPSort>) =
+    FPDiv(RTP, FloatingPointLiteral(this), divisor)
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward negative'. Converts [divisor] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward negative'. Converts [divisor] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpdiv_rtn(divisor: Expression<FPSort>) = FPDiv(RTN, FPLiteral(this), divisor)
+infix fun Float.fpdiv_rtn(divisor: Expression<FPSort>) =
+    FPDiv(RTN, FloatingPointLiteral(this), divisor)
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward zero'. Converts [divisor] from [Float] to [FPLiteral] with sort
- * [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward zero'. Converts [divisor] from [Float] to [FloatingPointLiteral]
+ * with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpdiv_rtz(divisor: Expression<FPSort>) = FPDiv(RTZ, FPLiteral(this), divisor)
+infix fun Float.fpdiv_rtz(divisor: Expression<FPSort>) =
+    FPDiv(RTZ, FloatingPointLiteral(this), divisor)
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [divisor] from [Float] to
- * [FPLiteral] with sort [(_ FloatingPoint 8 24)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
-infix fun Float.fpdiv(divisor: () -> Expression<FPSort>) = FPLiteral(this) fpdiv_rne divisor()
+infix fun Float.fpdiv(divisor: () -> Expression<FPSort>) =
+    FloatingPointLiteral(this) fpdiv_rne divisor()
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round to nearest even'. Converts [divisor] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest even'. Converts [divisor] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpdiv_rne(divisor: () -> Expression<FPSort>) =
-    FPDiv(RNE, FPLiteral(this), divisor())
+    FPDiv(RNE, FloatingPointLiteral(this), divisor())
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round to nearest away'. Converts [divisor] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round to nearest away'. Converts [divisor] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpdiv_rna(divisor: () -> Expression<FPSort>) =
-    FPDiv(RNA, FPLiteral(this), divisor())
+    FPDiv(RNA, FloatingPointLiteral(this), divisor())
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward positive'. Converts [divisor] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward positive'. Converts [divisor] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpdiv_rtp(divisor: () -> Expression<FPSort>) =
-    FPDiv(RTP, FPLiteral(this), divisor())
+    FPDiv(RTP, FloatingPointLiteral(this), divisor())
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward negative'. Converts [divisor] from [Float] to [FPLiteral] with
- * sort [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward negative'. Converts [divisor] from [Float] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpdiv_rtn(divisor: () -> Expression<FPSort>) =
-    FPDiv(RTN, FPLiteral(this), divisor())
+    FPDiv(RTN, FloatingPointLiteral(this), divisor())
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward zero'. Converts [divisor] from [Float] to [FPLiteral] with sort
- * [(_ FloatingPoint 8 24)]
+ * Uses rounding mode 'round toward zero'. Converts [divisor] from [Float] to [FloatingPointLiteral]
+ * with sort [(_ FloatingPoint 8 24)]
  */
 infix fun Float.fpdiv_rtz(divisor: () -> Expression<FPSort>) =
-    FPDiv(RTZ, FPLiteral(this), divisor())
+    FPDiv(RTZ, FloatingPointLiteral(this), divisor())
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [divisor] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpdiv(divisor: Double) = this fpdiv_rne FPLiteral(divisor)
+infix fun Expression<FPSort>.fpdiv(divisor: Double) = this fpdiv_rne FloatingPointLiteral(divisor)
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round to nearest even'. Converts [divisor] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest even'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpdiv_rne(divisor: Double) = FPDiv(RNE, this, FPLiteral(divisor))
+infix fun Expression<FPSort>.fpdiv_rne(divisor: Double) =
+    FPDiv(RNE, this, FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round to nearest away'. Converts [divisor] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest away'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpdiv_rna(divisor: Double) = FPDiv(RNA, this, FPLiteral(divisor))
+infix fun Expression<FPSort>.fpdiv_rna(divisor: Double) =
+    FPDiv(RNA, this, FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward positive'. Converts [divisor] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward positive'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpdiv_rtp(divisor: Double) = FPDiv(RTP, this, FPLiteral(divisor))
+infix fun Expression<FPSort>.fpdiv_rtp(divisor: Double) =
+    FPDiv(RTP, this, FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward negative'. Converts [divisor] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward negative'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpdiv_rtn(divisor: Double) = FPDiv(RTN, this, FPLiteral(divisor))
+infix fun Expression<FPSort>.fpdiv_rtn(divisor: Double) =
+    FPDiv(RTN, this, FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward zero'. Converts [divisor] from [Double] to [FPLiteral] with sort
- * [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward zero'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Expression<FPSort>.fpdiv_rtz(divisor: Double) = FPDiv(RTZ, this, FPLiteral(divisor))
+infix fun Expression<FPSort>.fpdiv_rtz(divisor: Double) =
+    FPDiv(RTZ, this, FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [divisor] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun (() -> Expression<FPSort>).fpdiv(divisor: Double) = this() fpdiv_rne FPLiteral(divisor)
+infix fun (() -> Expression<FPSort>).fpdiv(divisor: Double) =
+    this() fpdiv_rne FloatingPointLiteral(divisor)
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round to nearest even'. Converts [divisor] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest even'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rne(divisor: Double) =
-    FPDiv(RNE, this(), FPLiteral(divisor))
+    FPDiv(RNE, this(), FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round to nearest away'. Converts [divisor] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest away'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rna(divisor: Double) =
-    FPDiv(RNA, this(), FPLiteral(divisor))
+    FPDiv(RNA, this(), FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward positive'. Converts [divisor] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward positive'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rtp(divisor: Double) =
-    FPDiv(RTP, this(), FPLiteral(divisor))
+    FPDiv(RTP, this(), FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward negative'. Converts [divisor] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward negative'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rtn(divisor: Double) =
-    FPDiv(RTN, this(), FPLiteral(divisor))
+    FPDiv(RTN, this(), FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward zero'. Converts [divisor] from [Double] to [FPLiteral] with sort
- * [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward zero'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun (() -> Expression<FPSort>).fpdiv_rtz(divisor: Double) =
-    FPDiv(RTZ, this(), FPLiteral(divisor))
+    FPDiv(RTZ, this(), FloatingPointLiteral(divisor))
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [divisor] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpdiv(divisor: Expression<FPSort>) = FPLiteral(this) fpdiv_rne divisor
+infix fun Double.fpdiv(divisor: Expression<FPSort>) = FloatingPointLiteral(this) fpdiv_rne divisor
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round to nearest even'. Converts [divisor] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest even'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpdiv_rne(divisor: Expression<FPSort>) = FPDiv(RNE, FPLiteral(this), divisor)
+infix fun Double.fpdiv_rne(divisor: Expression<FPSort>) =
+    FPDiv(RNE, FloatingPointLiteral(this), divisor)
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round to nearest away'. Converts [divisor] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest away'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpdiv_rna(divisor: Expression<FPSort>) = FPDiv(RNA, FPLiteral(this), divisor)
+infix fun Double.fpdiv_rna(divisor: Expression<FPSort>) =
+    FPDiv(RNA, FloatingPointLiteral(this), divisor)
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward positive'. Converts [divisor] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward positive'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpdiv_rtp(divisor: Expression<FPSort>) = FPDiv(RTP, FPLiteral(this), divisor)
+infix fun Double.fpdiv_rtp(divisor: Expression<FPSort>) =
+    FPDiv(RTP, FloatingPointLiteral(this), divisor)
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward negative'. Converts [divisor] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward negative'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpdiv_rtn(divisor: Expression<FPSort>) = FPDiv(RTN, FPLiteral(this), divisor)
+infix fun Double.fpdiv_rtn(divisor: Expression<FPSort>) =
+    FPDiv(RTN, FloatingPointLiteral(this), divisor)
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward zero'. Converts [divisor] from [Double] to [FPLiteral] with sort
- * [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward zero'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpdiv_rtz(divisor: Expression<FPSort>) = FPDiv(RTZ, FPLiteral(this), divisor)
+infix fun Double.fpdiv_rtz(divisor: Expression<FPSort>) =
+    FPDiv(RTZ, FloatingPointLiteral(this), divisor)
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
  * Uses default rounding mode 'round to nearest even'. Converts [divisor] from [Double] to
- * [FPLiteral] with sort [(_ FloatingPoint 11 53)]
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
-infix fun Double.fpdiv(divisor: () -> Expression<FPSort>) = FPLiteral(this) fpdiv_rne divisor()
+infix fun Double.fpdiv(divisor: () -> Expression<FPSort>) =
+    FloatingPointLiteral(this) fpdiv_rne divisor()
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round to nearest even'. Converts [divisor] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest even'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpdiv_rne(divisor: () -> Expression<FPSort>) =
-    FPDiv(RNE, FPLiteral(this), divisor())
+    FPDiv(RNE, FloatingPointLiteral(this), divisor())
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round to nearest away'. Converts [divisor] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round to nearest away'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpdiv_rna(divisor: () -> Expression<FPSort>) =
-    FPDiv(RNA, FPLiteral(this), divisor())
+    FPDiv(RNA, FloatingPointLiteral(this), divisor())
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward positive'. Converts [divisor] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward positive'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpdiv_rtp(divisor: () -> Expression<FPSort>) =
-    FPDiv(RTP, FPLiteral(this), divisor())
+    FPDiv(RTP, FloatingPointLiteral(this), divisor())
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward negative'. Converts [divisor] from [Double] to [FPLiteral] with
- * sort [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward negative'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpdiv_rtn(divisor: () -> Expression<FPSort>) =
-    FPDiv(RTN, FPLiteral(this), divisor())
+    FPDiv(RTN, FloatingPointLiteral(this), divisor())
 
 /**
  * Division operator for FPSort expressions: [this] / [divisor].
  *
- * Uses rounding mode 'round toward zero'. Converts [divisor] from [Double] to [FPLiteral] with sort
- * [(_ FloatingPoint 11 53)]
+ * Uses rounding mode 'round toward zero'. Converts [divisor] from [Double] to
+ * [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)]
  */
 infix fun Double.fpdiv_rtz(divisor: () -> Expression<FPSort>) =
-    FPDiv(RTZ, FPLiteral(this), divisor())
+    FPDiv(RTZ, FloatingPointLiteral(this), divisor())
 
 /**
  * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
@@ -2487,65 +2564,69 @@ infix fun (() -> Expression<FPSort>).fprem(divisor: () -> Expression<FPSort>) =
  * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
  * [this]/[divisor].
  *
- * Converts [this] from [Float] to [FPLiteral] with sort (_ FloatingPoint 8 24).
+ * Converts [this] from [Float] to [FloatingPointLiteral] with sort (_ FloatingPoint 8 24).
  */
-infix fun Float.fprem(divisor: Expression<FPSort>) = FPRem(FPLiteral(this), divisor)
+infix fun Float.fprem(divisor: Expression<FPSort>) = FPRem(FloatingPointLiteral(this), divisor)
 
 /**
  * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
  * [this]/[divisor].
  *
- * Converts [this] from [Float] to [FPLiteral] with sort (_ FloatingPoint 8 24).
+ * Converts [this] from [Float] to [FloatingPointLiteral] with sort (_ FloatingPoint 8 24).
  */
-infix fun Float.fprem(divisor: () -> Expression<FPSort>) = FPRem(FPLiteral(this), divisor())
+infix fun Float.fprem(divisor: () -> Expression<FPSort>) =
+    FPRem(FloatingPointLiteral(this), divisor())
 
 /**
  * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
  * [this]/[divisor].
  *
- * Converts [divisor] from [Float] to [FPLiteral] with sort (_ FloatingPoint 8 24).
+ * Converts [divisor] from [Float] to [FloatingPointLiteral] with sort (_ FloatingPoint 8 24).
  */
-infix fun Expression<FPSort>.fprem(divisor: Float) = FPRem(this, FPLiteral(divisor))
+infix fun Expression<FPSort>.fprem(divisor: Float) = FPRem(this, FloatingPointLiteral(divisor))
 
 /**
  * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
  * [this]/[divisor].
  *
- * Converts [divisor] from [Float] to [FPLiteral] with sort (_ FloatingPoint 8 24).
+ * Converts [divisor] from [Float] to [FloatingPointLiteral] with sort (_ FloatingPoint 8 24).
  */
-infix fun (() -> Expression<FPSort>).fprem(divisor: Float) = FPRem(this(), FPLiteral(divisor))
+infix fun (() -> Expression<FPSort>).fprem(divisor: Float) =
+    FPRem(this(), FloatingPointLiteral(divisor))
 
 /**
  * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
  * [this]/[divisor].
  *
- * Converts [this] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ * Converts [this] from [Double] to [FloatingPointLiteral] with sort (_ FloatingPoint 11 53).
  */
-infix fun Double.fprem(divisor: Expression<FPSort>) = FPRem(FPLiteral(this), divisor)
+infix fun Double.fprem(divisor: Expression<FPSort>) = FPRem(FloatingPointLiteral(this), divisor)
 
 /**
  * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
  * [this]/[divisor].
  *
- * Converts [this] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ * Converts [this] from [Double] to [FloatingPointLiteral] with sort (_ FloatingPoint 11 53).
  */
-infix fun Double.fprem(divisor: () -> Expression<FPSort>) = FPRem(FPLiteral(this), divisor())
+infix fun Double.fprem(divisor: () -> Expression<FPSort>) =
+    FPRem(FloatingPointLiteral(this), divisor())
 
 /**
  * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
  * [this]/[divisor].
  *
- * Converts [divisor] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ * Converts [divisor] from [Double] to [FloatingPointLiteral] with sort (_ FloatingPoint 11 53).
  */
-infix fun Expression<FPSort>.fprem(divisor: Double) = FPRem(this, FPLiteral(divisor))
+infix fun Expression<FPSort>.fprem(divisor: Double) = FPRem(this, FloatingPointLiteral(divisor))
 
 /**
  * Remainder operator for FPSort expressions: [this] - [divisor] * n, where n in Z is closest to
  * [this]/[divisor].
  *
- * Converts [divisor] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ * Converts [divisor] from [Double] to [FloatingPointLiteral] with sort (_ FloatingPoint 11 53).
  */
-infix fun (() -> Expression<FPSort>).fprem(divisor: Double) = FPRem(this(), FPLiteral(divisor))
+infix fun (() -> Expression<FPSort>).fprem(divisor: Double) =
+    FPRem(this(), FloatingPointLiteral(divisor))
 
 /*
  * unary floating-point operations
@@ -2562,18 +2643,18 @@ fun fpsqrt(roundingMode: Expression<RoundingModeSort> = RNE, expr: Expression<FP
 /**
  * Square root operator for FPSort expressions.
  *
- * Converts [expr] from [Float] to [FPLiteral] with sort (_ FloatingPoint 8 24).
+ * Converts [expr] from [Float] to [FloatingPointLiteral] with sort (_ FloatingPoint 8 24).
  */
 fun fpsqrt(roundingMode: Expression<RoundingModeSort> = RNE, expr: Float) =
-    FPSqrt(roundingMode, FPLiteral(expr))
+    FPSqrt(roundingMode, FloatingPointLiteral(expr))
 
 /**
  * Square root operator for FPSort expressions.
  *
- * Converts [expr] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ * Converts [expr] from [Double] to [FloatingPointLiteral] with sort (_ FloatingPoint 11 53).
  */
 fun fpsqrt(roundingMode: Expression<RoundingModeSort> = RNE, expr: Double) =
-    FPSqrt(roundingMode, FPLiteral(expr))
+    FPSqrt(roundingMode, FloatingPointLiteral(expr))
 
 /** Round to integral operator for FPSort expressions. */
 fun fproundToIntegral(
@@ -2588,18 +2669,18 @@ fun fproundToIntegral(roundingMode: Expression<RoundingModeSort> = RNE, expr: Ex
 /**
  * Round to integral operator for FPSort expressions.
  *
- * Converts [expr] from [Float] to [FPLiteral] with sort (_ FloatingPoint 8 24).
+ * Converts [expr] from [Float] to [FloatingPointLiteral] with sort (_ FloatingPoint 8 24).
  */
 fun fproundToIntegral(roundingMode: Expression<RoundingModeSort> = RNE, expr: Float) =
-    FPRoundToIntegral(roundingMode, FPLiteral(expr))
+    FPRoundToIntegral(roundingMode, FloatingPointLiteral(expr))
 
 /**
  * Round to integral operator for FPSort expressions.
  *
- * Converts [expr] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ * Converts [expr] from [Double] to [FloatingPointLiteral] with sort (_ FloatingPoint 11 53).
  */
 fun fproundToIntegral(roundingMode: Expression<RoundingModeSort> = RNE, expr: Double) =
-    FPRoundToIntegral(roundingMode, FPLiteral(expr))
+    FPRoundToIntegral(roundingMode, FloatingPointLiteral(expr))
 
 /*
  * floating-point comparison operators
@@ -2620,30 +2701,30 @@ fun fpmin(lhs: () -> Expression<FPSort>, rhs: () -> Expression<FPSort>) = FPMin(
 /**
  * Min operator for FPSort expressions.
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort (_ FloatingPoint 4 24).
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort (_ FloatingPoint 4 24).
  */
-fun fpmin(lhs: Expression<FPSort>, rhs: Float) = FPMin(lhs, FPLiteral(rhs))
+fun fpmin(lhs: Expression<FPSort>, rhs: Float) = FPMin(lhs, FloatingPointLiteral(rhs))
 
 /**
  * Min operator for FPSort expressions.
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort (_ FloatingPoint 11 53).
  */
-fun fpmin(lhs: Expression<FPSort>, rhs: Double) = FPMin(lhs, FPLiteral(rhs))
+fun fpmin(lhs: Expression<FPSort>, rhs: Double) = FPMin(lhs, FloatingPointLiteral(rhs))
 
 /**
  * Min operator for FPSort expressions.
  *
- * Converts [lhs] from [Float] to [FPLiteral] with sort (_ FloatingPoint 4 24).
+ * Converts [lhs] from [Float] to [FloatingPointLiteral] with sort (_ FloatingPoint 4 24).
  */
-fun fpmin(lhs: Float, rhs: Expression<FPSort>) = FPMin(FPLiteral(lhs), rhs)
+fun fpmin(lhs: Float, rhs: Expression<FPSort>) = FPMin(FloatingPointLiteral(lhs), rhs)
 
 /**
  * Min operator for FPSort expressions.
  *
- * Converts [lhs] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ * Converts [lhs] from [Double] to [FloatingPointLiteral] with sort (_ FloatingPoint 11 53).
  */
-fun fpmin(lhs: Double, rhs: Expression<FPSort>) = FPMin(FPLiteral(lhs), rhs)
+fun fpmin(lhs: Double, rhs: Expression<FPSort>) = FPMin(FloatingPointLiteral(lhs), rhs)
 
 /** Max operator for FPSort expressions. */
 fun fpmax(lhs: Expression<FPSort>, rhs: Expression<FPSort>) = FPMax(lhs, rhs)
@@ -2660,30 +2741,30 @@ fun fpmax(lhs: () -> Expression<FPSort>, rhs: () -> Expression<FPSort>) = FPMax(
 /**
  * Max operator for FPSort expressions.
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort (_ FloatingPoint 4 24).
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort (_ FloatingPoint 4 24).
  */
-fun fpmax(lhs: Expression<FPSort>, rhs: Float) = FPMax(lhs, FPLiteral(rhs))
+fun fpmax(lhs: Expression<FPSort>, rhs: Float) = FPMax(lhs, FloatingPointLiteral(rhs))
 
 /**
  * Max operator for FPSort expressions.
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort (_ FloatingPoint 11 53).
  */
-fun fpmax(lhs: Expression<FPSort>, rhs: Double) = FPMax(lhs, FPLiteral(rhs))
+fun fpmax(lhs: Expression<FPSort>, rhs: Double) = FPMax(lhs, FloatingPointLiteral(rhs))
 
 /**
  * Max operator for FPSort expressions.
  *
- * Converts [lhs] from [Float] to [FPLiteral] with sort (_ FloatingPoint 4 24).
+ * Converts [lhs] from [Float] to [FloatingPointLiteral] with sort (_ FloatingPoint 4 24).
  */
-fun fpmax(lhs: Float, rhs: Expression<FPSort>) = FPMax(FPLiteral(lhs), rhs)
+fun fpmax(lhs: Float, rhs: Expression<FPSort>) = FPMax(FloatingPointLiteral(lhs), rhs)
 
 /**
  * Max operator for FPSort expressions.
  *
- * Converts [lhs] from [Double] to [FPLiteral] with sort (_ FloatingPoint 11 53).
+ * Converts [lhs] from [Double] to [FloatingPointLiteral] with sort (_ FloatingPoint 11 53).
  */
-fun fpmax(lhs: Double, rhs: Expression<FPSort>) = FPMax(FPLiteral(lhs), rhs)
+fun fpmax(lhs: Double, rhs: Expression<FPSort>) = FPMax(FloatingPointLiteral(lhs), rhs)
 
 /** Less equals operator for FPSort expressions: [this] <= [rhs]. */
 infix fun Expression<FPSort>.fpleq(rhs: Expression<FPSort>) = FPLeq(this, rhs)
@@ -2818,282 +2899,282 @@ infix fun (() -> FPEq).fpeq(rhs: () -> Expression<FPSort>) = FPEq(this().childre
 /**
  * Less equals operator for FPSort expressions: [this] <= [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun Expression<FPSort>.fpleq(rhs: Float) = FPLeq(this, FPLiteral(rhs))
+infix fun Expression<FPSort>.fpleq(rhs: Float) = FPLeq(this, FloatingPointLiteral(rhs))
 
 /**
  * Less equals operator for FPSort expressions: [this] <= [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun Expression<FPSort>.fpleq(rhs: Double) = FPLeq(this, FPLiteral(rhs))
+infix fun Expression<FPSort>.fpleq(rhs: Double) = FPLeq(this, FloatingPointLiteral(rhs))
 
 /**
  * Less than operator for FPSort expressions: [this] < [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun Expression<FPSort>.fplt(rhs: Float) = FPLt(this, FPLiteral(rhs))
+infix fun Expression<FPSort>.fplt(rhs: Float) = FPLt(this, FloatingPointLiteral(rhs))
 
 /**
  * Less than operator for FPSort expressions: [this] < [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun Expression<FPSort>.fplt(rhs: Double) = FPLt(this, FPLiteral(rhs))
+infix fun Expression<FPSort>.fplt(rhs: Double) = FPLt(this, FloatingPointLiteral(rhs))
 
 /**
  * Greater equals operator for FPSort expressions: [this] >= [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun Expression<FPSort>.fpgeq(rhs: Float) = FPGeq(this, FPLiteral(rhs))
+infix fun Expression<FPSort>.fpgeq(rhs: Float) = FPGeq(this, FloatingPointLiteral(rhs))
 
 /**
  * Greater equals operator for FPSort expressions: [this] >= [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun Expression<FPSort>.fpgeq(rhs: Double) = FPGeq(this, FPLiteral(rhs))
+infix fun Expression<FPSort>.fpgeq(rhs: Double) = FPGeq(this, FloatingPointLiteral(rhs))
 
 /**
  * Greater than operator for FPSort expressions: [this] > [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun Expression<FPSort>.fpgt(rhs: Float) = FPGt(this, FPLiteral(rhs))
+infix fun Expression<FPSort>.fpgt(rhs: Float) = FPGt(this, FloatingPointLiteral(rhs))
 
 /**
  * Greater than operator for FPSort expressions: [this] > [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun Expression<FPSort>.fpgt(rhs: Double) = FPGt(this, FPLiteral(rhs))
+infix fun Expression<FPSort>.fpgt(rhs: Double) = FPGt(this, FloatingPointLiteral(rhs))
 
 /**
  * Equals operator for FPSort expressions: [this] = [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun Expression<FPSort>.fpeq(rhs: Float) = FPEq(this, FPLiteral(rhs))
+infix fun Expression<FPSort>.fpeq(rhs: Float) = FPEq(this, FloatingPointLiteral(rhs))
 
 /**
  * Equals operator for FPSort expressions: [this] = [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun Expression<FPSort>.fpeq(rhs: Double) = FPEq(this, FPLiteral(rhs))
+infix fun Expression<FPSort>.fpeq(rhs: Double) = FPEq(this, FloatingPointLiteral(rhs))
 
 /**
  * Less equals operator for FPSort expressions: [this] <= [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun (() -> Expression<FPSort>).fpleq(rhs: Float) = FPLeq(this(), FPLiteral(rhs))
+infix fun (() -> Expression<FPSort>).fpleq(rhs: Float) = FPLeq(this(), FloatingPointLiteral(rhs))
 
 /**
  * Less equals operator for FPSort expressions: [this] <= [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun (() -> Expression<FPSort>).fpleq(rhs: Double) = FPLeq(this(), FPLiteral(rhs))
+infix fun (() -> Expression<FPSort>).fpleq(rhs: Double) = FPLeq(this(), FloatingPointLiteral(rhs))
 
 /**
  * Less than operator for FPSort expressions: [this] < [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun (() -> Expression<FPSort>).fplt(rhs: Float) = FPLt(this(), FPLiteral(rhs))
+infix fun (() -> Expression<FPSort>).fplt(rhs: Float) = FPLt(this(), FloatingPointLiteral(rhs))
 
 /**
  * Less than operator for FPSort expressions: [this] < [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun (() -> Expression<FPSort>).fplt(rhs: Double) = FPLt(this(), FPLiteral(rhs))
+infix fun (() -> Expression<FPSort>).fplt(rhs: Double) = FPLt(this(), FloatingPointLiteral(rhs))
 
 /**
  * Greater equals operator for FPSort expressions: [this] >= [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun (() -> Expression<FPSort>).fpgeq(rhs: Float) = FPGeq(this(), FPLiteral(rhs))
+infix fun (() -> Expression<FPSort>).fpgeq(rhs: Float) = FPGeq(this(), FloatingPointLiteral(rhs))
 
 /**
  * Greater equals operator for FPSort expressions: [this] >= [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun (() -> Expression<FPSort>).fpgeq(rhs: Double) = FPGeq(this(), FPLiteral(rhs))
+infix fun (() -> Expression<FPSort>).fpgeq(rhs: Double) = FPGeq(this(), FloatingPointLiteral(rhs))
 
 /**
  * Greater than operator for FPSort expressions: [this] > [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun (() -> Expression<FPSort>).fpgt(rhs: Float) = FPGt(this(), FPLiteral(rhs))
+infix fun (() -> Expression<FPSort>).fpgt(rhs: Float) = FPGt(this(), FloatingPointLiteral(rhs))
 
 /**
  * Greater than operator for FPSort expressions: [this] > [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun (() -> Expression<FPSort>).fpgt(rhs: Double) = FPGt(this(), FPLiteral(rhs))
+infix fun (() -> Expression<FPSort>).fpgt(rhs: Double) = FPGt(this(), FloatingPointLiteral(rhs))
 
 /**
  * Equals operator for FPSort expressions: [this] = [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun (() -> Expression<FPSort>).fpeq(rhs: Float) = FPEq(this(), FPLiteral(rhs))
+infix fun (() -> Expression<FPSort>).fpeq(rhs: Float) = FPEq(this(), FloatingPointLiteral(rhs))
 
 /**
  * Equals operator for FPSort expressions: [this] = [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun (() -> Expression<FPSort>).fpeq(rhs: Double) = FPEq(this(), FPLiteral(rhs))
+infix fun (() -> Expression<FPSort>).fpeq(rhs: Double) = FPEq(this(), FloatingPointLiteral(rhs))
 
 /**
  * Less equals operator for FPSort expressions: [this] <= [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun Float.fpleq(rhs: Expression<FPSort>) = FPLeq(FPLiteral(this), rhs)
+infix fun Float.fpleq(rhs: Expression<FPSort>) = FPLeq(FloatingPointLiteral(this), rhs)
 
 /**
  * Less equals operator for FPSort expressions: [this] <= [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun Double.fpleq(rhs: Expression<FPSort>) = FPLeq(FPLiteral(this), rhs)
+infix fun Double.fpleq(rhs: Expression<FPSort>) = FPLeq(FloatingPointLiteral(this), rhs)
 
 /**
  * Less than operator for FPSort expressions: [this] < [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun Float.fplt(rhs: Expression<FPSort>) = FPLt(FPLiteral(this), rhs)
+infix fun Float.fplt(rhs: Expression<FPSort>) = FPLt(FloatingPointLiteral(this), rhs)
 
 /**
  * Less than operator for FPSort expressions: [this] < [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun Double.fplt(rhs: Expression<FPSort>) = FPLt(FPLiteral(this), rhs)
+infix fun Double.fplt(rhs: Expression<FPSort>) = FPLt(FloatingPointLiteral(this), rhs)
 
 /**
  * Greater equals operator for FPSort expressions: [this] >= [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun Float.fpgeq(rhs: Expression<FPSort>) = FPGeq(FPLiteral(this), rhs)
+infix fun Float.fpgeq(rhs: Expression<FPSort>) = FPGeq(FloatingPointLiteral(this), rhs)
 
 /**
  * Greater equals operator for FPSort expressions: [this] >= [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun Double.fpgeq(rhs: Expression<FPSort>) = FPGeq(FPLiteral(this), rhs)
+infix fun Double.fpgeq(rhs: Expression<FPSort>) = FPGeq(FloatingPointLiteral(this), rhs)
 
 /**
  * Greater than operator for FPSort expressions: [this] > [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun Float.fpgt(rhs: Expression<FPSort>) = FPGt(FPLiteral(this), rhs)
+infix fun Float.fpgt(rhs: Expression<FPSort>) = FPGt(FloatingPointLiteral(this), rhs)
 
 /**
  * Greater than operator for FPSort expressions: [this] > [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun Double.fpgt(rhs: Expression<FPSort>) = FPGt(FPLiteral(this), rhs)
+infix fun Double.fpgt(rhs: Expression<FPSort>) = FPGt(FloatingPointLiteral(this), rhs)
 
 /**
  * Equals operator for FPSort expressions: [this] = [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun Float.fpeq(rhs: Expression<FPSort>) = FPEq(FPLiteral(this), rhs)
+infix fun Float.fpeq(rhs: Expression<FPSort>) = FPEq(FloatingPointLiteral(this), rhs)
 
 /**
  * Equals operator for FPSort expressions: [this] = [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun Double.fpeq(rhs: Expression<FPSort>) = FPEq(FPLiteral(this), rhs)
+infix fun Double.fpeq(rhs: Expression<FPSort>) = FPEq(FloatingPointLiteral(this), rhs)
 
 /**
  * Less equals operator for FPSort expressions: [this] <= [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun Float.fpleq(rhs: () -> Expression<FPSort>) = FPLeq(FPLiteral(this), rhs())
+infix fun Float.fpleq(rhs: () -> Expression<FPSort>) = FPLeq(FloatingPointLiteral(this), rhs())
 
 /**
  * Less equals operator for FPSort expressions: [this] <= [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun Double.fpleq(rhs: () -> Expression<FPSort>) = FPLeq(FPLiteral(this), rhs())
+infix fun Double.fpleq(rhs: () -> Expression<FPSort>) = FPLeq(FloatingPointLiteral(this), rhs())
 
 /**
  * Less than operator for FPSort expressions: [this] < [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun Float.fplt(rhs: () -> Expression<FPSort>) = FPLt(FPLiteral(this), rhs())
+infix fun Float.fplt(rhs: () -> Expression<FPSort>) = FPLt(FloatingPointLiteral(this), rhs())
 
 /**
  * Less than operator for FPSort expressions: [this] < [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun Double.fplt(rhs: () -> Expression<FPSort>) = FPLt(FPLiteral(this), rhs())
+infix fun Double.fplt(rhs: () -> Expression<FPSort>) = FPLt(FloatingPointLiteral(this), rhs())
 
 /**
  * Greater equals operator for FPSort expressions: [this] >= [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun Float.fpgeq(rhs: () -> Expression<FPSort>) = FPGeq(FPLiteral(this), rhs())
+infix fun Float.fpgeq(rhs: () -> Expression<FPSort>) = FPGeq(FloatingPointLiteral(this), rhs())
 
 /**
  * Greater equals operator for FPSort expressions: [this] >= [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun Double.fpgeq(rhs: () -> Expression<FPSort>) = FPGeq(FPLiteral(this), rhs())
+infix fun Double.fpgeq(rhs: () -> Expression<FPSort>) = FPGeq(FloatingPointLiteral(this), rhs())
 
 /**
  * Greater than operator for FPSort expressions: [this] > [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun Float.fpgt(rhs: () -> Expression<FPSort>) = FPGt(FPLiteral(this), rhs())
+infix fun Float.fpgt(rhs: () -> Expression<FPSort>) = FPGt(FloatingPointLiteral(this), rhs())
 
 /**
  * Greater than operator for FPSort expressions: [this] > [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun Double.fpgt(rhs: () -> Expression<FPSort>) = FPGt(FPLiteral(this), rhs())
+infix fun Double.fpgt(rhs: () -> Expression<FPSort>) = FPGt(FloatingPointLiteral(this), rhs())
 
 /**
  * Equals operator for FPSort expressions: [this] = [rhs].
  *
- * Converts [rhs] from [Float] to [FPLiteral] with sort [(_ FloatingPoint 8 24)].
+ * Converts [rhs] from [Float] to [FloatingPointLiteral] with sort [(_ FloatingPoint 8 24)].
  */
-infix fun Float.fpeq(rhs: () -> Expression<FPSort>) = FPEq(FPLiteral(this), rhs())
+infix fun Float.fpeq(rhs: () -> Expression<FPSort>) = FPEq(FloatingPointLiteral(this), rhs())
 
 /**
  * Equals operator for FPSort expressions: [this] = [rhs].
  *
- * Converts [rhs] from [Double] to [FPLiteral] with sort [(_ FloatingPoint 11 53)].
+ * Converts [rhs] from [Double] to [FloatingPointLiteral] with sort [(_ FloatingPoint 11 53)].
  */
-infix fun Double.fpeq(rhs: () -> Expression<FPSort>) = FPEq(FPLiteral(this), rhs())
+infix fun Double.fpeq(rhs: () -> Expression<FPSort>) = FPEq(FloatingPointLiteral(this), rhs())
 
 /*
  * floating-point conversion operations
@@ -3350,7 +3431,7 @@ fun fpfma(roundingMode: Expression<RoundingModeSort> = RNE, multiplier: () -> Ex
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 fun fpfma(roundingMode: Expression<RoundingModeSort> = RNE, multiplier: () -> Float) =
-    FPFMA1(roundingMode, FPLiteral(multiplier()))
+    FPFMA1(roundingMode, FloatingPointLiteral(multiplier()))
 
 /**
  * Fused multiplication addition operator ([multiplier] * multiplicand + summand) for FPSort
@@ -3362,7 +3443,7 @@ fun fpfma(roundingMode: Expression<RoundingModeSort> = RNE, multiplier: () -> Fl
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 fun fpfma(roundingMode: Expression<RoundingModeSort> = RNE, multiplier: () -> Double) =
-    FPFMA1(roundingMode, FPLiteral(multiplier()))
+    FPFMA1(roundingMode, FloatingPointLiteral(multiplier()))
 
 /**
  * Fused multiplication addition operator ([multiplier] * multiplicand + summand) for FPSort
@@ -3380,7 +3461,7 @@ fun fpfma(roundingMode: Expression<RoundingModeSort> = RNE, multiplier: Expressi
  * @param roundingMode: floating point rounding mode.
  */
 fun fpfma(roundingMode: Expression<RoundingModeSort> = RNE, multiplier: Float) =
-    FPFMA1(roundingMode, FPLiteral(multiplier))
+    FPFMA1(roundingMode, FloatingPointLiteral(multiplier))
 
 /**
  * Fused multiplication addition operator ([multiplier] * multiplicand + summand) for FPSort
@@ -3389,7 +3470,7 @@ fun fpfma(roundingMode: Expression<RoundingModeSort> = RNE, multiplier: Float) =
  * @param roundingMode: floating point rounding mode.
  */
 fun fpfma(roundingMode: Expression<RoundingModeSort> = RNE, multiplier: Double) =
-    FPFMA1(roundingMode, FPLiteral(multiplier))
+    FPFMA1(roundingMode, FloatingPointLiteral(multiplier))
 
 /**
  * Multiplication stage of fp.fma.
@@ -3412,7 +3493,8 @@ class FPFMA1(val roundingMode: Expression<RoundingModeSort>, val multiplier: Exp
    *
    * Must be followed by [FPFMA2.add].
    */
-  infix fun mul(multiplicand: Float) = FPFMA2(roundingMode, multiplier, FPLiteral(multiplicand))
+  infix fun mul(multiplicand: Float) =
+      FPFMA2(roundingMode, multiplier, FloatingPointLiteral(multiplicand))
 
   /**
    * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort
@@ -3420,7 +3502,8 @@ class FPFMA1(val roundingMode: Expression<RoundingModeSort>, val multiplier: Exp
    *
    * Must be followed by [FPFMA2.add].
    */
-  infix fun mul(multiplicand: Double) = FPFMA2(roundingMode, multiplier, FPLiteral(multiplicand))
+  infix fun mul(multiplicand: Double) =
+      FPFMA2(roundingMode, multiplier, FloatingPointLiteral(multiplicand))
 
   /**
    * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort
@@ -3444,7 +3527,7 @@ class FPFMA1(val roundingMode: Expression<RoundingModeSort>, val multiplier: Exp
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
   infix fun mul(multiplicand: () -> Float) =
-      FPFMA2(roundingMode, multiplier, FPLiteral(multiplicand()))
+      FPFMA2(roundingMode, multiplier, FloatingPointLiteral(multiplicand()))
 
   /**
    * Fused multiplication addition operator (multiplier * [multiplicand] + summand) for FPSort
@@ -3456,7 +3539,7 @@ class FPFMA1(val roundingMode: Expression<RoundingModeSort>, val multiplier: Exp
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
   infix fun mul(multiplicand: () -> Double) =
-      FPFMA2(roundingMode, multiplier, FPLiteral(multiplicand()))
+      FPFMA2(roundingMode, multiplier, FloatingPointLiteral(multiplicand()))
 }
 
 /** Addition stage of fp.fma. */
@@ -3477,13 +3560,15 @@ class FPFMA2(
    * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
    * expressions.
    */
-  infix fun add(summand: Float) = FPFma(roundingMode, multiplier, multiplicand, FPLiteral(summand))
+  infix fun add(summand: Float) =
+      FPFma(roundingMode, multiplier, multiplicand, FloatingPointLiteral(summand))
 
   /**
    * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
    * expressions.
    */
-  infix fun add(summand: Double) = FPFma(roundingMode, multiplier, multiplicand, FPLiteral(summand))
+  infix fun add(summand: Double) =
+      FPFma(roundingMode, multiplier, multiplicand, FloatingPointLiteral(summand))
 
   /**
    * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
@@ -3503,7 +3588,7 @@ class FPFMA2(
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
   infix fun add(summand: () -> Float) =
-      FPFma(roundingMode, multiplier, multiplicand, FPLiteral(summand()))
+      FPFma(roundingMode, multiplier, multiplicand, FloatingPointLiteral(summand()))
 
   /**
    * Fused multiplication addition operator (multiplier * multiplicand + [summand]) for FPSort
@@ -3513,17 +3598,17 @@ class FPFMA2(
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
   infix fun add(summand: () -> Double) =
-      FPFma(roundingMode, multiplier, multiplicand, FPLiteral(summand()))
+      FPFma(roundingMode, multiplier, multiplicand, FloatingPointLiteral(summand()))
 }
 
 /** Implements floating point isNormal operation. */
 fun isNormal(expr: Expression<FPSort>) = FPIsNormal(expr)
 
 /** Implements floating point isNormal operation. */
-fun isNormal(expr: Float) = FPIsNormal(FPLiteral(expr))
+fun isNormal(expr: Float) = FPIsNormal(FloatingPointLiteral(expr))
 
 /** Implements floating point isNormal operation. */
-fun isNormal(expr: Double) = FPIsNormal(FPLiteral(expr))
+fun isNormal(expr: Double) = FPIsNormal(FloatingPointLiteral(expr))
 
 /** Implements floating point isNormal operation. */
 @JvmName("isNormalFPExpr")
@@ -3535,22 +3620,22 @@ fun isNormal(block: () -> Expression<FPSort>) = FPIsNormal(block())
 @JvmName("isNormalFloat")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-fun isNormal(expr: () -> Float) = FPIsNormal(FPLiteral(expr()))
+fun isNormal(expr: () -> Float) = FPIsNormal(FloatingPointLiteral(expr()))
 
 /** Implements floating point isNormal operation. */
 @JvmName("isNormalDouble")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-fun isNormal(expr: () -> Double) = FPIsNormal(FPLiteral(expr()))
+fun isNormal(expr: () -> Double) = FPIsNormal(FloatingPointLiteral(expr()))
 
 /** Implements floating point isSubnormal operation. */
 fun isSubnormal(expr: Expression<FPSort>) = FPIsSubnormal(expr)
 
 /** Implements floating point isNormal operation. */
-fun isSubnormal(expr: Float) = FPIsSubnormal(FPLiteral(expr))
+fun isSubnormal(expr: Float) = FPIsSubnormal(FloatingPointLiteral(expr))
 
 /** Implements floating point isNormal operation. */
-fun isSubnormal(expr: Double) = FPIsSubnormal(FPLiteral(expr))
+fun isSubnormal(expr: Double) = FPIsSubnormal(FloatingPointLiteral(expr))
 
 /** Implements floating point isSubnormal operation. */
 @JvmName("isSubnormalFPExpr")
@@ -3562,22 +3647,22 @@ fun isSubnormal(block: () -> Expression<FPSort>) = FPIsSubnormal(block())
 @JvmName("isSubnormalFloat")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-fun isSubnormal(expr: () -> Float) = FPIsSubnormal(FPLiteral(expr()))
+fun isSubnormal(expr: () -> Float) = FPIsSubnormal(FloatingPointLiteral(expr()))
 
 /** Implements floating point isNormal operation. */
 @JvmName("isSubnormalDouble")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-fun isSubnormal(expr: () -> Double) = FPIsSubnormal(FPLiteral(expr()))
+fun isSubnormal(expr: () -> Double) = FPIsSubnormal(FloatingPointLiteral(expr()))
 
 /** Implements floating point isZero operation. */
 fun isZero(expr: Expression<FPSort>) = FPIsZero(expr)
 
 /** Implements floating point isNormal operation. */
-fun isZero(expr: Float) = FPIsZero(FPLiteral(expr))
+fun isZero(expr: Float) = FPIsZero(FloatingPointLiteral(expr))
 
 /** Implements floating point isNormal operation. */
-fun isZero(expr: Double) = FPIsZero(FPLiteral(expr))
+fun isZero(expr: Double) = FPIsZero(FloatingPointLiteral(expr))
 
 /** Implements floating point isZero operation. */
 @JvmName("isZeroFPExpr")
@@ -3589,22 +3674,22 @@ fun isZero(block: () -> Expression<FPSort>) = FPIsZero(block())
 @JvmName("isZeroFloat")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-fun isZero(expr: () -> Float) = FPIsZero(FPLiteral(expr()))
+fun isZero(expr: () -> Float) = FPIsZero(FloatingPointLiteral(expr()))
 
 /** Implements floating point isNormal operation. */
 @JvmName("isZeroDouble")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-fun isZero(expr: () -> Double) = FPIsZero(FPLiteral(expr()))
+fun isZero(expr: () -> Double) = FPIsZero(FloatingPointLiteral(expr()))
 
 /** Implements floating point isInfinite operation. */
 fun isInfinite(expr: Expression<FPSort>) = FPIsInfinite(expr)
 
 /** Implements floating point isNormal operation. */
-fun isInfinite(expr: Float) = FPIsInfinite(FPLiteral(expr))
+fun isInfinite(expr: Float) = FPIsInfinite(FloatingPointLiteral(expr))
 
 /** Implements floating point isNormal operation. */
-fun isInfinite(expr: Double) = FPIsInfinite(FPLiteral(expr))
+fun isInfinite(expr: Double) = FPIsInfinite(FloatingPointLiteral(expr))
 
 /** Implements floating point isInfinite operation. */
 @JvmName("isInfiniteFPExpr")
@@ -3616,22 +3701,22 @@ fun isInfinite(block: () -> Expression<FPSort>) = FPIsInfinite(block())
 @JvmName("isInfiniteFloat")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-fun isInfinite(expr: () -> Float) = FPIsInfinite(FPLiteral(expr()))
+fun isInfinite(expr: () -> Float) = FPIsInfinite(FloatingPointLiteral(expr()))
 
 /** Implements floating point isNormal operation. */
 @JvmName("isInfiniteDouble")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-fun isInfinite(expr: () -> Double) = FPIsInfinite(FPLiteral(expr()))
+fun isInfinite(expr: () -> Double) = FPIsInfinite(FloatingPointLiteral(expr()))
 
 /** Implements floating point isNaN operation. */
 fun isNaN(expr: Expression<FPSort>) = FPIsNaN(expr)
 
 /** Implements floating point isNormal operation. */
-fun isNaN(expr: Float) = FPIsNaN(FPLiteral(expr))
+fun isNaN(expr: Float) = FPIsNaN(FloatingPointLiteral(expr))
 
 /** Implements floating point isNormal operation. */
-fun isNaN(expr: Double) = FPIsNaN(FPLiteral(expr))
+fun isNaN(expr: Double) = FPIsNaN(FloatingPointLiteral(expr))
 
 /** Implements floating point isNaN operation. */
 @JvmName("isNaNFPExpr")
@@ -3643,22 +3728,22 @@ fun isNaN(block: () -> Expression<FPSort>) = FPIsNaN(block())
 @JvmName("isNaNFloat")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-fun isNaN(expr: () -> Float) = FPIsNaN(FPLiteral(expr()))
+fun isNaN(expr: () -> Float) = FPIsNaN(FloatingPointLiteral(expr()))
 
 /** Implements floating point isNormal operation. */
 @JvmName("isNaNDouble")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-fun isNaN(expr: () -> Double) = FPIsNaN(FPLiteral(expr()))
+fun isNaN(expr: () -> Double) = FPIsNaN(FloatingPointLiteral(expr()))
 
 /** Implements floating point isNegative operation. */
 fun isNegative(expr: Expression<FPSort>) = FPIsNegative(expr)
 
 /** Implements floating point isNormal operation. */
-fun isNegative(expr: Float) = FPIsNegative(FPLiteral(expr))
+fun isNegative(expr: Float) = FPIsNegative(FloatingPointLiteral(expr))
 
 /** Implements floating point isNormal operation. */
-fun isNegative(expr: Double) = FPIsNegative(FPLiteral(expr))
+fun isNegative(expr: Double) = FPIsNegative(FloatingPointLiteral(expr))
 
 /** Implements floating point isNegative operation. */
 @JvmName("isNegativeFPExpr")
@@ -3670,22 +3755,22 @@ fun isNegative(block: () -> Expression<FPSort>) = FPIsNegative(block())
 @JvmName("isNegativeFloat")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-fun isNegative(expr: () -> Float) = FPIsNegative(FPLiteral(expr()))
+fun isNegative(expr: () -> Float) = FPIsNegative(FloatingPointLiteral(expr()))
 
 /** Implements floating point isNormal operation. */
 @JvmName("isNegativeDouble")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-fun isNegative(expr: () -> Double) = FPIsNegative(FPLiteral(expr()))
+fun isNegative(expr: () -> Double) = FPIsNegative(FloatingPointLiteral(expr()))
 
 /** Implements floating point isPositive operation. */
 fun isPositive(expr: Expression<FPSort>) = FPIsPositive(expr)
 
 /** Implements floating point isNormal operation. */
-fun isPositive(expr: Float) = FPIsPositive(FPLiteral(expr))
+fun isPositive(expr: Float) = FPIsPositive(FloatingPointLiteral(expr))
 
 /** Implements floating point isNormal operation. */
-fun isPositive(expr: Double) = FPIsPositive(FPLiteral(expr))
+fun isPositive(expr: Double) = FPIsPositive(FloatingPointLiteral(expr))
 
 /** Implements floating point isPositive operation. */
 @JvmName("isPositiveFPExpr")
@@ -3697,10 +3782,10 @@ fun isPositive(block: () -> Expression<FPSort>) = FPIsPositive(block())
 @JvmName("isPositiveFloat")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-fun isPositive(expr: () -> Float) = FPIsPositive(FPLiteral(expr()))
+fun isPositive(expr: () -> Float) = FPIsPositive(FloatingPointLiteral(expr()))
 
 /** Implements floating point isNormal operation. */
 @JvmName("isPositiveDouble")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-fun isPositive(expr: () -> Double) = FPIsPositive(FPLiteral(expr()))
+fun isPositive(expr: () -> Double) = FPIsPositive(FloatingPointLiteral(expr()))

@@ -588,18 +588,21 @@ class BVSDiv(val numerator: Expression<BitVecSort>, val denominator: Expression<
     return LetExpression(
         listOf(msb_s, msb_t),
         Ite(
-            And(Equals(msb_s.instance, BVLiteral("#b0")), Equals(msb_t.instance, BVLiteral("#b0"))),
+            And(
+                Equals(msb_s.instance, BitVecLiteral("#b0")),
+                Equals(msb_t.instance, BitVecLiteral("#b0")),
+            ),
             BVUDiv(numerator, denominator),
             Ite(
                 And(
-                    Equals(msb_s.instance, BVLiteral("#b1")),
-                    Equals(msb_t.instance, BVLiteral("#b0")),
+                    Equals(msb_s.instance, BitVecLiteral("#b1")),
+                    Equals(msb_t.instance, BitVecLiteral("#b0")),
                 ),
                 BVNeg(BVUDiv(BVNeg(numerator), denominator)),
                 Ite(
                     And(
-                        Equals(msb_s.instance, BVLiteral("#b0")),
-                        Equals(msb_t.instance, BVLiteral("#b1")),
+                        Equals(msb_s.instance, BitVecLiteral("#b0")),
+                        Equals(msb_t.instance, BitVecLiteral("#b1")),
                     ),
                     BVNeg(BVUDiv(numerator, BVNeg(denominator))),
                     BVUDiv(BVNeg(numerator), BVNeg(denominator)),
@@ -648,18 +651,21 @@ class BVSRem(val numerator: Expression<BitVecSort>, val denominator: Expression<
     return LetExpression(
         listOf(msb_s, msb_t),
         Ite(
-            And(Equals(msb_s.instance, BVLiteral("#b0")), Equals(msb_t.instance, BVLiteral("#b0"))),
+            And(
+                Equals(msb_s.instance, BitVecLiteral("#b0")),
+                Equals(msb_t.instance, BitVecLiteral("#b0")),
+            ),
             BVURem(numerator, denominator),
             Ite(
                 And(
-                    Equals(msb_s.instance, BVLiteral("#b1")),
-                    Equals(msb_t.instance, BVLiteral("#b0")),
+                    Equals(msb_s.instance, BitVecLiteral("#b1")),
+                    Equals(msb_t.instance, BitVecLiteral("#b0")),
                 ),
                 BVNeg(BVURem(BVNeg(numerator), denominator)),
                 Ite(
                     And(
-                        Equals(msb_s.instance, BVLiteral("#b0")),
-                        Equals(msb_t.instance, BVLiteral("#b1")),
+                        Equals(msb_s.instance, BitVecLiteral("#b0")),
+                        Equals(msb_t.instance, BitVecLiteral("#b1")),
                     ),
                     BVURem(numerator, BVNeg(denominator)),
                     BVNeg(BVURem(BVNeg(numerator), BVNeg(denominator))),
@@ -696,12 +702,12 @@ class BVSMod(override val lhs: Expression<BitVecSort>, override val rhs: Express
     val abs_s =
         VarBinding(
             "?abs_s".toSymbol(),
-            Ite(Equals(msb_s.instance, BVLiteral("#b0")), lhs, BVNeg(lhs)),
+            Ite(Equals(msb_s.instance, BitVecLiteral("#b0")), lhs, BVNeg(lhs)),
         )
     val abs_t =
         VarBinding(
             "?abs_t".toSymbol(),
-            Ite(Equals(msb_s.instance, BVLiteral("#b0")), rhs, BVNeg(rhs)),
+            Ite(Equals(msb_s.instance, BitVecLiteral("#b0")), rhs, BVNeg(rhs)),
         )
     val u = VarBinding("u".toSymbol(), BVURem(abs_s.instance, abs_t.instance))
 
@@ -712,24 +718,24 @@ class BVSMod(override val lhs: Expression<BitVecSort>, override val rhs: Express
             LetExpression(
                 listOf(u),
                 Ite(
-                    Equals(u.instance, BVLiteral("#b0", sort.bits)),
+                    Equals(u.instance, BitVecLiteral("#b0", sort.bits)),
                     u.instance,
                     Ite(
                         And(
-                            Equals(msb_s.instance, BVLiteral("#b0")),
-                            Equals(msb_t.instance, BVLiteral("#b0")),
+                            Equals(msb_s.instance, BitVecLiteral("#b0")),
+                            Equals(msb_t.instance, BitVecLiteral("#b0")),
                         ),
                         u.instance,
                         Ite(
                             And(
-                                Equals(msb_s.instance, BVLiteral("#b1")),
-                                Equals(msb_t.instance, BVLiteral("#b0")),
+                                Equals(msb_s.instance, BitVecLiteral("#b1")),
+                                Equals(msb_t.instance, BitVecLiteral("#b0")),
                             ),
                             BVAdd(BVNeg(u.instance), rhs),
                             Ite(
                                 And(
-                                    Equals(msb_s.instance, BVLiteral("#b0")),
-                                    Equals(msb_t.instance, BVLiteral("#b1")),
+                                    Equals(msb_s.instance, BitVecLiteral("#b0")),
+                                    Equals(msb_t.instance, BitVecLiteral("#b1")),
                                 ),
                                 BVAdd(u.instance, rhs),
                                 BVNeg(u.instance),
@@ -769,7 +775,7 @@ class BVAShr(val value: Expression<BitVecSort>, val distance: Expression<BitVecS
   /** Express [this] in terms of standard smt fixed size bitvector theory. */
   fun expand() =
       Ite(
-          Equals(BVExtract(sort.bits - 1, sort.bits - 1, value), BVLiteral("#b0")),
+          Equals(BVExtract(sort.bits - 1, sort.bits - 1, value), BitVecLiteral("#b0")),
           BVLShr(value, distance),
           BVNot(BVLShr(BVNot(value), distance)),
       )
@@ -832,7 +838,7 @@ class ZeroExtend(val i: Int, override val inner: Expression<BitVecSort>) :
       if (i == 0) {
         inner
       } else {
-        BVConcat(Repeat(i, BVLiteral("#b0")).expand(), inner)
+        BVConcat(Repeat(i, BitVecLiteral("#b0")).expand(), inner)
       }
 
   override fun copy(children: List<Expression<*>>) =
@@ -1026,8 +1032,8 @@ class BVSLt(override val lhs: Expression<BitVecSort>, override val rhs: Expressi
   fun expand() =
       Or(
           And(
-              Equals(BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs), BVLiteral("#b1")),
-              Equals(BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs), BVLiteral("#b0")),
+              Equals(BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs), BitVecLiteral("#b1")),
+              Equals(BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs), BitVecLiteral("#b0")),
           ),
           And(
               Equals(
@@ -1061,8 +1067,8 @@ class BVSLe(override val lhs: Expression<BitVecSort>, override val rhs: Expressi
   fun expand() =
       Or(
           And(
-              Equals(BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs), BVLiteral("#b1")),
-              Equals(BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs), BVLiteral("#b0")),
+              Equals(BVExtract(lhs.sort.bits - 1, lhs.sort.bits - 1, lhs), BitVecLiteral("#b1")),
+              Equals(BVExtract(rhs.sort.bits - 1, rhs.sort.bits - 1, rhs), BitVecLiteral("#b0")),
           ),
           And(
               Equals(
@@ -1119,10 +1125,10 @@ class BVSGe(override val lhs: Expression<BitVecSort>, override val rhs: Expressi
 }
 
 /** Convert [this] into SMT bitvector literal. */
-fun String.bitvec() = BVLiteral(this)
+fun String.bitvec() = BitVecLiteral(this)
 
 /** Convert [this] into SMT bitvector literal of sort (_ BitVec [bits]). */
-fun String.bitvec(bits: Int) = BVLiteral(this, bits)
+fun String.bitvec(bits: Int) = BitVecLiteral(this, bits)
 
 /** Returns true iff [this] is of form #bX, where X is any valid binary number. */
 fun String.isSMTBinary() = this.startsWith("#b") && this.substring(2).all { ch -> ch in "01" }

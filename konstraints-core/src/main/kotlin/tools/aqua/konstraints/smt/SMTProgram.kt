@@ -25,6 +25,7 @@ import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.dsl.UserDeclaredSMTFunctionN
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunction0
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunctionN
+import tools.aqua.konstraints.solvers.Solver
 import tools.aqua.konstraints.util.StackOperation
 import tools.aqua.konstraints.util.StackOperationType
 
@@ -243,7 +244,7 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
                     (expr !in context) &&
                     expr !is AnnotatedExpression
             ) {
-              throw IllegalArgumentException()
+              throw IllegalArgumentException("Illegal expression $expr!")
             }
           }
           else -> throw IllegalArgumentException()
@@ -321,6 +322,25 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
   fun defineSort(name: Symbol, parameters: List<Symbol>, sort: Sort) {
     context.defineSort(name, parameters, sort)
     _commands.add(DefineSort(name, parameters, sort))
+  }
+
+  fun checkSat() {
+    _commands.add(CheckSat)
+  }
+
+  fun checkSat(solver: Solver): SatStatus {
+    checkSat()
+
+    return solver.solve(this)
+  }
+
+  fun getModel() {
+    _commands.add(GetModel)
+  }
+
+  fun getModel(solver: Solver) {
+    getModel()
+    model = solver.getModel()
   }
 
   /**

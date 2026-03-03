@@ -29,7 +29,7 @@ import org.junit.jupiter.api.TestInstance.Lifecycle.PER_CLASS
 import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
-import tools.aqua.konstraints.parser.Parser
+import tools.aqua.konstraints.parser.SMTScriptParser
 import tools.aqua.konstraints.smt.SymbolAttributeValue
 import tools.aqua.konstraints.solvers.z3.Z3Solver
 import tools.aqua.konstraints.util.Benchmark
@@ -77,7 +77,7 @@ class BenchmarkTest {
 
     val solver = Z3Solver()
 
-    val result = Parser(benchmark.program)
+    val result = SMTScriptParser(benchmark.program)
 
     /* ignore the test if assumption fails, ignores all unknown tests */
     Assumptions.assumeTrue(

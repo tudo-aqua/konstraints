@@ -93,7 +93,7 @@ object SMTSerializer {
                 builder.append("!")
               }
 
-              else -> expr.nameStringWithIndices(builder, quotingRule, true)
+              else -> expr.nameStringWithIndices(builder, quotingRule, true).append(' ')
             }
 
             // add elements in reverse order to keep same ordering in output

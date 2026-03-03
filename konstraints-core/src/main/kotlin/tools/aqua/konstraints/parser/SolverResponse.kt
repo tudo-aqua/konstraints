@@ -16,16 +16,19 @@
  * limitations under the License.
  */
 
-plugins {
-  id("konstraints.developer-utilities")
-  id("konstraints.kotlin-library")
-  id("konstraints.kotlin-static-analysis")
-  id("konstraints.maven-library")
-}
+package tools.aqua.konstraints.parser
 
-metadata {
-  name = "Konstraints Core"
-  description = "A library for working with SMT expressions on the JVM"
-}
+import tools.aqua.konstraints.smt.Model
+import tools.aqua.konstraints.smt.SatStatus
 
-dependencies { implementation(libs.kotlin.coroutines) }
+sealed interface SolverResponse
+
+object SuccessResponse : SolverResponse
+
+object UnsupportedResponse : SolverResponse
+
+class ErrorResponse(val msg: String) : SolverResponse
+
+class CheckSatResponse(val status: SatStatus) : SolverResponse
+
+class GetModelResponse(val model: Model) : SolverResponse

@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
-import tools.aqua.konstraints.parser.Parser
+import tools.aqua.konstraints.parser.SMTScriptParser
 import tools.aqua.konstraints.smt.SymbolAttributeValue
 import tools.aqua.konstraints.solvers.z3.Z3Solver
 
@@ -52,7 +52,8 @@ class QF_BV {
     )
 
     val solver = Z3Solver()
-    val result = Parser(file.bufferedReader().use(BufferedReader::readLines).joinToString(""))
+    val result =
+        SMTScriptParser(file.bufferedReader().use(BufferedReader::readLines).joinToString(""))
 
     Assumptions.assumeTrue(
         (result.info("status") as SymbolAttributeValue).symbol.toString() != "unknown",

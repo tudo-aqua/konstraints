@@ -430,147 +430,147 @@ infix fun <X : RealSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(
 @JvmName("selectFPSortFloat")
 /** Select value stored at [index] in [this]. */
 infix fun <X : FPSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: Float) =
-    ArraySelect(this, FPLiteral(index))
+    ArraySelect(this, FloatingPointLiteral(index))
 
 @JvmName("selectFPSortFloatLambdaIndex")
 /** Select value stored at [index] in [this]. */
 infix fun <X : FPSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: (() -> Float)) =
-    ArraySelect(this, FPLiteral(index()))
+    ArraySelect(this, FloatingPointLiteral(index()))
 
 @JvmName("selectFPSortFloatLambdaArray")
 /** Select value stored at [index] in [this]. */
 infix fun <X : FPSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(index: Float) =
-    ArraySelect(this(), FPLiteral(index))
+    ArraySelect(this(), FloatingPointLiteral(index))
 
 @JvmName("selectFPSortFloatLambda")
 /** Select value stored at [index] in [this]. */
 infix fun <X : FPSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(index: (() -> Float)) =
-    ArraySelect(this(), FPLiteral(index()))
+    ArraySelect(this(), FloatingPointLiteral(index()))
 
 @JvmName("selectFPSortDouble")
 /** Select value stored at [index] in [this]. */
 infix fun <X : FPSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: Double) =
-    ArraySelect(this, FPLiteral(index))
+    ArraySelect(this, FloatingPointLiteral(index))
 
 @JvmName("selectFPSortDoubleLambdaIndex")
 /** Select value stored at [index] in [this]. */
 infix fun <X : FPSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: (() -> Double)) =
-    ArraySelect(this, FPLiteral(index()))
+    ArraySelect(this, FloatingPointLiteral(index()))
 
 @JvmName("selectFPSortDoubleLambdaArray")
 /** Select value stored at [index] in [this]. */
 infix fun <X : FPSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(index: Double) =
-    ArraySelect(this(), FPLiteral(index))
+    ArraySelect(this(), FloatingPointLiteral(index))
 
 @JvmName("selectFPSortDoubleLambda")
 /** Select value stored at [index] in [this]. */
 infix fun <X : FPSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(index: (() -> Double)) =
-    ArraySelect(this(), FPLiteral(index()))
+    ArraySelect(this(), FloatingPointLiteral(index()))
 
 @JvmName("selectBitVecSortByte")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: Byte) =
-    ArraySelect(this, BVLiteral(index))
+    ArraySelect(this, BitVecLiteral(index))
 
 @JvmName("selectBitVecSortByteLambdaIndex")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: (() -> Byte)) =
-    ArraySelect(this, BVLiteral(index()))
+    ArraySelect(this, BitVecLiteral(index()))
 
 @JvmName("selectBitVecSortByteLambdaArray")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(index: Byte) =
-    ArraySelect(this(), BVLiteral(index))
+    ArraySelect(this(), BitVecLiteral(index))
 
 @JvmName("selectBitVecSortByteLambda")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(
     index: (() -> Byte)
-) = ArraySelect(this(), BVLiteral(index()))
+) = ArraySelect(this(), BitVecLiteral(index()))
 
 @JvmName("selectBitVecSortShort")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: Short) =
-    ArraySelect(this, BVLiteral(index))
+    ArraySelect(this, BitVecLiteral(index))
 
 @JvmName("selectBitVecSortShortLambdaIndex")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: (() -> Short)) =
-    ArraySelect(this, BVLiteral(index()))
+    ArraySelect(this, BitVecLiteral(index()))
 
 @JvmName("selectBitVecSortShortLambdaArray")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(index: Short) =
-    ArraySelect(this(), BVLiteral(index))
+    ArraySelect(this(), BitVecLiteral(index))
 
 @JvmName("selectBitVecSortShortLambda")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(
     index: (() -> Short)
-) = ArraySelect(this(), BVLiteral(index()))
+) = ArraySelect(this(), BitVecLiteral(index()))
 
 @JvmName("selectBitVecSortInt")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: Int) =
-    ArraySelect(this, BVLiteral(index))
+    ArraySelect(this, BitVecLiteral(index))
 
 @JvmName("selectBitVecSortIntLambdaIndex")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: (() -> Int)) =
-    ArraySelect(this, BVLiteral(index()))
+    ArraySelect(this, BitVecLiteral(index()))
 
 @JvmName("selectBitVecSortIntLambdaArray")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(index: Int) =
-    ArraySelect(this(), BVLiteral(index))
+    ArraySelect(this(), BitVecLiteral(index))
 
 @JvmName("selectBitVecSortIntLambda")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(
     index: (() -> Int)
-) = ArraySelect(this(), BVLiteral(index()))
+) = ArraySelect(this(), BitVecLiteral(index()))
 
 @JvmName("selectBitVecSortLong")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: Long) =
-    ArraySelect(this, BVLiteral(index))
+    ArraySelect(this, BitVecLiteral(index))
 
 @JvmName("selectBitVecSortLongLambdaIndex")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: (() -> Long)) =
-    ArraySelect(this, BVLiteral(index()))
+    ArraySelect(this, BitVecLiteral(index()))
 
 @JvmName("selectBitVecSortLongLambdaArray")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(index: Long) =
-    ArraySelect(this(), BVLiteral(index))
+    ArraySelect(this(), BitVecLiteral(index))
 
 @JvmName("selectBitVecSortLongLambda")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(
     index: (() -> Long)
-) = ArraySelect(this(), BVLiteral(index()))
+) = ArraySelect(this(), BitVecLiteral(index()))
 
 @JvmName("selectBitVecSortBigInteger")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: BigInteger) =
-    ArraySelect(this, BVLiteral(index))
+    ArraySelect(this, BitVecLiteral(index))
 
 @JvmName("selectBitVecSortBigIntegerLambdaIndex")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: (() -> BigInteger)) =
-    ArraySelect(this, BVLiteral(index()))
+    ArraySelect(this, BitVecLiteral(index()))
 
 @JvmName("selectBitVecSortBigIntegerLambdaArray")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(index: BigInteger) =
-    ArraySelect(this(), BVLiteral(index))
+    ArraySelect(this(), BitVecLiteral(index))
 
 @JvmName("selectBitVecSortBigIntegerLambda")
 /** Select value stored at [index] in [this]. */
 infix fun <X : BitVecSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(
     index: (() -> BigInteger)
-) = ArraySelect(this(), BVLiteral(index()))
+) = ArraySelect(this(), BitVecLiteral(index()))
 
 @JvmName("atIntSortIntSort")
 /** Create a pair to store [this] at [index] in a smt array. */

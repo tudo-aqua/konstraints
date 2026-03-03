@@ -27,13 +27,5 @@ import tools.aqua.konstraints.solvers.z3.Z3Solver
 fun SMTProgram.solve() {
   val solver = Z3Solver()
 
-  solver.use {
-    status = solver.solve(this)
-
-    println(status)
-
-    if (solver.isModelAvailable) {
-      model = solver.model
-    }
-  }
+  solver.use { status = solver.solve(this) }
 }

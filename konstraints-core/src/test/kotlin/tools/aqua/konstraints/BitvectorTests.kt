@@ -35,7 +35,6 @@ import tools.aqua.konstraints.smt.BVAnd
 import tools.aqua.konstraints.smt.BVConcat
 import tools.aqua.konstraints.smt.BVExtract
 import tools.aqua.konstraints.smt.BVLShr
-import tools.aqua.konstraints.smt.BVLiteral
 import tools.aqua.konstraints.smt.BVMul
 import tools.aqua.konstraints.smt.BVNeg
 import tools.aqua.konstraints.smt.BVNot
@@ -44,6 +43,7 @@ import tools.aqua.konstraints.smt.BVShl
 import tools.aqua.konstraints.smt.BVUDiv
 import tools.aqua.konstraints.smt.BVURem
 import tools.aqua.konstraints.smt.BVUlt
+import tools.aqua.konstraints.smt.BitVecLiteral
 import tools.aqua.konstraints.smt.BitVecSort
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.toSymbol
@@ -196,7 +196,7 @@ class BitvectorTests {
   @ParameterizedTest
   @MethodSource("getLiteralsAndLength")
   fun `test that BVLiterals have the right bit length`(literal: String, expected: Int) {
-    assertEquals(expected, BVLiteral(literal).bits)
+    assertEquals(expected, BitVecLiteral(literal).bits)
   }
 
   private fun getLiteralsAndLength(): Stream<Arguments> {
@@ -215,19 +215,19 @@ class BitvectorTests {
   @ParameterizedTest
   @ValueSource(strings = ["#b0000", "#b00001111", "#b0000111100", "#b0000000"])
   fun `test that binary BVLiterals get classified correctly`(literal: String) {
-    assertTrue(BVLiteral(literal).isBinary)
+    assertTrue(BitVecLiteral(literal).isBinary)
   }
 
   @ParameterizedTest
   @ValueSource(strings = ["#x0", "#x012", "#xEEEE", "#xAEF00"])
   fun `test that hexadecimal BVLiterals get classified correctly`(literal: String) {
-    assertFalse(BVLiteral(literal).isBinary)
+    assertFalse(BitVecLiteral(literal).isBinary)
   }
 
   @ParameterizedTest
   @MethodSource("getLiteralsAndValue")
   fun `test that BVLiterals have the right decimal value`(literal: String, expected: Int) {
-    assertEquals(expected, BVLiteral(literal).value.toInt())
+    assertEquals(expected, BitVecLiteral(literal).value.toInt())
   }
 
   private fun getLiteralsAndValue(): Stream<Arguments> {

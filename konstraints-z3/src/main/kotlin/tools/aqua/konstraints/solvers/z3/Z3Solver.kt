@@ -59,20 +59,19 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     program.commands.forEach { visit(it) }
     program.status = status
 
+    try {
+      z3model = solver.model
+    } catch (t: Throwable) {}
+
     return status
   }
 
-  override val modelOrNull: Model?
-    get() = z3model?.let { Model(it, context) }
+  /** Creates and returns the model if available else throws [IllegalStateException]. */
+  override fun getModel() =
+      if (isModelAvailable) Model(z3model!!, context) else throw IllegalStateException("")
 
-  override val isModelAvailable: Boolean
+  val isModelAvailable: Boolean
     get() = z3model != null
-
-  override fun produceModel(): Model {
-    z3model = solver.model
-
-    return model
-  }
 
   override fun visit(assert: Assert) {
     val assertion = assert.expr.z3ify(context)
@@ -160,7 +159,7 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
   }
 
   override fun visit(getModel: GetModel) {
-    produceModel()
+    z3model = solver.model
   }
 
   override fun visit(defineConst: DefineConst) {

@@ -30,10 +30,8 @@ import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
-import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
-import tools.aqua.konstraints.dsl.*
-import tools.aqua.konstraints.parser.Parser
+import tools.aqua.konstraints.parser.SMTScriptParser
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.util.solve
 
@@ -44,7 +42,8 @@ class SMTProgramTests {
   @MethodSource("getQFBVModelFiles")
   @Timeout(value = 5, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun testModelGeneration(file: File) {
-    val program = Parser(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
+    val program =
+        SMTScriptParser(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
 
     assumeTrue((program.info(":status") as SymbolAttributeValue).symbol.toString() == "sat")
 

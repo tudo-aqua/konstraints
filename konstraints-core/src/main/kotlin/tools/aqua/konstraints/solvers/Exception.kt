@@ -16,16 +16,16 @@
  * limitations under the License.
  */
 
-plugins {
-  id("konstraints.developer-utilities")
-  id("konstraints.kotlin-library")
-  id("konstraints.kotlin-static-analysis")
-  id("konstraints.maven-library")
-}
+package tools.aqua.konstraints.solvers
 
-metadata {
-  name = "Konstraints Core"
-  description = "A library for working with SMT expressions on the JVM"
-}
+sealed class SolverException(message: String) : RuntimeException(message)
 
-dependencies { implementation(libs.kotlin.coroutines) }
+class SolverError(message: String) : SolverException(message)
+
+class SolverTimeoutException(duration: Long) :
+    SolverException("Solver timed out after $duration ms")
+
+class UnexpectedSolverResponseException(response: String) :
+    SolverException("Unexpected solver response: $response")
+
+class SolverUnsupportedOperationException() : SolverException("Unsupported")

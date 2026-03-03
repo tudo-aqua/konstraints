@@ -24,7 +24,6 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import tools.aqua.konstraints.parser.*
-import tools.aqua.konstraints.smt.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserTests {
@@ -39,12 +38,12 @@ class ParserTests {
 
     (0..level).forEach { program += ")" }
 
-    assertDoesNotThrow { Parser(program) }
+    assertDoesNotThrow { SMTScriptParser(program) }
   }
 
   @Test
   fun test() {
-    Parser(
+    SMTScriptParser(
         "(set-logic QF_UF)(declare-fun __ADDRESS_OF_h () Bool)(assert (= __ADDRESS_OF_h __ADDRESS_OF_h))(exit)"
     )
   }
