@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints
 
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import tools.aqua.konstraints.dsl.declaringConst
 import tools.aqua.konstraints.dsl.eq
@@ -28,6 +29,8 @@ import tools.aqua.konstraints.smt.QF_BV
 import tools.aqua.konstraints.smt.SMTBitVec
 import tools.aqua.konstraints.solvers.InteractiveZ3Solver
 
+// these tests need a z3 version installed which is currently not present on the remote
+@Disabled
 class InteractiveSolverTests {
   @Test
   fun testZ3InteractiveSolver() {
