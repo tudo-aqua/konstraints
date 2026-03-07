@@ -16,12 +16,7 @@
  * limitations under the License.
  */
 
-import org.gradle.kotlin.dsl.repositories
-
-plugins {
-  id("io.github.gradle-nexus.publish-plugin")
-  id("me.qoomon.git-versioning")
-}
+plugins { id("me.qoomon.git-versioning") }
 
 allprojects { group = "tools.aqua" }
 
@@ -52,5 +47,3 @@ gitVersioning.apply {
     version = "0.0.0-unknown-0-\${commit.short}-SNAPSHOT"
   }
 }
-
-nexusPublishing { this.repositories { sonatype() } }

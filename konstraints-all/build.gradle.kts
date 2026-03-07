@@ -16,13 +16,7 @@
  * limitations under the License.
  */
 
-import tools.aqua.commonSetup
-
 plugins {
-  `maven-publish`
-
-  alias(libs.plugins.mavenPublish)
-
   id("konstraints.developer-utilities")
   id("konstraints.maven-library")
 }
@@ -30,24 +24,10 @@ plugins {
 metadata {
   name = "Konstraints Full Bundle"
   description = "The Konstraints library and all accompanying solver plugins"
+  packaging = "pom"
 }
 
 dependencies {
   api(project(":konstraints-core"))
   api(project(":konstraints-z3"))
 }
-
-publishing.publications.withType(MavenPublication::class) {
-  pom { packaging = "pom" }
-}
-
-mavenPublishing {
-  publishToMavenCentral()
-  signAllPublications()
-
-  pom {
-    commonSetup(metadata)
-  }
-}
-
-signing { useGpgCmd() }

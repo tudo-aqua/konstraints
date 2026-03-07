@@ -32,7 +32,7 @@ dependencies {
   implementation(libs.gradle.kotlin.dokka)
   implementation(libs.gradle.kotlin.jvm)
   implementation(libs.gradle.kotlin.serialization)
-  implementation(libs.gradle.nexus.publish)
+  implementation(libs.gradle.vanniktech.maven.publish)
   implementation(libs.gradle.node)
   implementation(libs.gradle.spotless)
   implementation(libs.gradle.taskTree)

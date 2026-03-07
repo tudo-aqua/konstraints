@@ -23,8 +23,7 @@ import tools.aqua.commonSetup
 
 plugins {
   `java-library`
-  `maven-publish`
-  signing
+  id("com.vanniktech.maven.publish")
 }
 
 val libs = the<LibrariesForLibs>()
@@ -35,16 +34,11 @@ java { toolchain { languageVersion = JavaLanguageVersion.of(libs.versions.java.j
 
 val metadata = project.extensions.create<MetadataExtension>("metadata")
 
-publishing.publications.withType(MavenPublication::class).configureEach {
-  pom { commonSetup(metadata) }
-}
-
-if (plugins.hasPlugin("com.vanniktech.maven.publish").not()) {
-  publishing.publications.create("maven", MavenPublication::class) { from(components["java"]) }
-}
-
-signing {
-  setRequired { gradle.taskGraph.allTasks.any { it is PublishToMavenRepository } }
-  useGpgCmd()
-  sign(publishing.publications)
+mavenPublishing {
+  publishToMavenCentral()
+  signAllPublications()
+  pom {
+    commonSetup(metadata)
+    metadata.packaging.orNull?.let { packaging = it }
+  }
 }

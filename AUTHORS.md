@@ -19,6 +19,7 @@ Konstraints is developed by [AQUA Group](https://aqua.cs.tu-dortmund.de/) at TU 
 - Simon Dierl
 - Falk Howar
 - Laurenz Levi Spielmann
+- Richard Stewing
 
 ### Past Developers
 

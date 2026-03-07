@@ -26,4 +26,6 @@ interface MetadataExtension {
   val name: Property<String>
   /** The project's human-readable description. */
   val description: Property<String>
+  /** Optional POM packaging, e.g. `pom` for aggregator modules. */
+  val packaging: Property<String>
 }
