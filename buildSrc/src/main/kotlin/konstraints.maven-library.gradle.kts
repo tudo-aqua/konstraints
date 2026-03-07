@@ -35,15 +35,16 @@ java { toolchain { languageVersion = JavaLanguageVersion.of(libs.versions.java.j
 
 val metadata = project.extensions.create<MetadataExtension>("metadata")
 
-val maven by
-    publishing.publications.creating(MavenPublication::class) {
-      from(components["java"])
+publishing.publications.withType(MavenPublication::class).configureEach {
+  pom { commonSetup(metadata) }
+}
 
-      pom { commonSetup(metadata) }
-    }
+if (plugins.hasPlugin("com.vanniktech.maven.publish").not()) {
+  publishing.publications.create("maven", MavenPublication::class) { from(components["java"]) }
+}
 
 signing {
   setRequired { gradle.taskGraph.allTasks.any { it is PublishToMavenRepository } }
   useGpgCmd()
-  sign(maven)
+  sign(publishing.publications)
 }
