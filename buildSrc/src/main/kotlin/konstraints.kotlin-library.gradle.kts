@@ -17,7 +17,6 @@
  */
 
 import org.gradle.accessors.dm.LibrariesForLibs
-import org.gradle.api.plugins.JavaBasePlugin.DOCUMENTATION_GROUP
 import org.gradle.api.tasks.testing.logging.TestLogEvent.*
 
 plugins {
@@ -25,7 +24,6 @@ plugins {
   kotlin("jvm")
 
   id("org.jetbrains.dokka")
-  id("org.jetbrains.dokka-javadoc")
 }
 
 val libs = the<LibrariesForLibs>()
@@ -38,31 +36,7 @@ dependencies {
   testRuntimeOnly(libs.junit.launcher)
 }
 
-val kdocJar: TaskProvider<Jar> by
-    tasks.registering(Jar::class) {
-      group = DOCUMENTATION_GROUP
-      archiveClassifier = "kdoc"
-      from(tasks.dokkaGeneratePublicationHtml.flatMap { it.outputDirectory })
-    }
-
-val kdoc: Configuration by
-    configurations.creating {
-      isCanBeConsumed = true
-      isCanBeResolved = false
-    }
-
-artifacts { add(kdoc.name, kdocJar) }
-
-tasks.register("javadocJar", Jar::class) {
-  group = DOCUMENTATION_GROUP
-  archiveClassifier = "javadoc"
-  from(tasks.dokkaGeneratePublicationJavadoc.flatMap { it.outputDirectory })
-}
-
-java {
-  withJavadocJar()
-  withSourcesJar()
-}
+java { withSourcesJar() }
 
 kotlin { jvmToolchain(libs.versions.java.jdk.get().toInt()) }
 
@@ -70,3 +44,11 @@ tasks.test {
   useJUnitPlatform()
   testLogging { events(FAILED, SKIPPED, PASSED) }
 }
+
+// Avoid generating Dokka HTML publication pages during local publishing.
+// The javadoc jar produced for Maven publishing does not require these tasks.
+tasks
+    .matching {
+      it.name == "dokkaGeneratePublicationHtml" || it.name == "logLinkDokkaGeneratePublicationHtml"
+    }
+    .configureEach { enabled = false }
