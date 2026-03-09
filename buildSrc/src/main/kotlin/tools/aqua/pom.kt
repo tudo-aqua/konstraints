@@ -56,6 +56,11 @@ fun MavenPom.commonSetup(metadata: MetadataExtension) {
       email.set("laurenz-levi.spielmann@tu-dortmund.de")
       organization.set("TU Dortmund University")
     }
+    developer {
+      name.set("Richard Stewing")
+      email.set("richard.stewing@tu-dortmund.de")
+      organization.set("TU Dortmund University")
+    }
   }
 
   scm {
