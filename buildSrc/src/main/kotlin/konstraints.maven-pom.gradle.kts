@@ -16,9 +16,9 @@
  * limitations under the License.
  */
 
-import com.vanniktech.maven.publish.JavadocJar.Dokka
-import com.vanniktech.maven.publish.KotlinJvm
-import org.jetbrains.dokka.gradle.tasks.DokkaGenerateModuleTask
+import com.vanniktech.maven.publish.JavaLibrary
+import com.vanniktech.maven.publish.JavadocJar
+import com.vanniktech.maven.publish.SourcesJar
 import tools.aqua.MetadataExtension
 import tools.aqua.commonSetup
 
@@ -32,20 +32,11 @@ mavenPublishing {
   publishToMavenCentral()
   signAllPublications()
 
-  configure(
-      KotlinJvm(
-          Dokka(tasks.named("dokkaGenerateModuleJavadoc")),
-      )
-  )
+  // unfortunately, we have to add an empty JAR in this step due to Gradle / Vanniktech limitations
+  configure(JavaLibrary(JavadocJar.None(), SourcesJar.None()))
 
-  // add kdoc artifact
-  val kdocJar =
-      tasks.register<Jar>("dokkaKdocJar") {
-        archiveClassifier = "kdoc"
-        val dokkaTask = tasks.named<DokkaGenerateModuleTask>("dokkaGenerateModuleHtml")
-        from(dokkaTask.flatMap { it.outputDirectory })
-      }
-  project.publishing.publications.named<MavenPublication>("maven").configure { artifact(kdocJar) }
-
-  pom { commonSetup(metadata) }
+  pom {
+    packaging = "pom"
+    commonSetup(metadata)
+  }
 }

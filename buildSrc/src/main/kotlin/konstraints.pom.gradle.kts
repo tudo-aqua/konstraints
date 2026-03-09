@@ -1,7 +1,7 @@
 /*
  * SPDX-License-Identifier: Apache-2.0
  *
- * Copyright 2023-2024 The Konstraints Authors
+ * Copyright 2023-2026 The Konstraints Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,19 +16,13 @@
  * limitations under the License.
  */
 
-plugins {
-  `java-library`
-  id("konstraints.developer-utilities")
-  id("konstraints.maven-pom")
-  id("konstraints.pom")
-}
+import org.gradle.accessors.dm.LibrariesForLibs
+import org.gradle.api.tasks.testing.logging.TestLogEvent.*
 
-metadata {
-  name = "Konstraints Full Bundle"
-  description = "The Konstraints library and all accompanying solver plugins"
-}
+plugins { `java-library` }
 
-dependencies {
-  api(project(":konstraints-core"))
-  api(project(":konstraints-z3"))
-}
+val libs = the<LibrariesForLibs>()
+
+repositories { mavenCentral() }
+
+java { toolchain { languageVersion = JavaLanguageVersion.of(libs.versions.java.jdk.get()) } }

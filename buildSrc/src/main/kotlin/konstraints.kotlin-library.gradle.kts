@@ -32,11 +32,15 @@ val libs = the<LibrariesForLibs>()
 
 repositories { mavenCentral() }
 
+java { toolchain { languageVersion = JavaLanguageVersion.of(libs.versions.java.jdk.get()) } }
+
 dependencies {
   testImplementation(platform(libs.junit.bom))
   testImplementation(libs.junit.jupiter)
   testRuntimeOnly(libs.junit.launcher)
 }
+
+dokka { dokkaGeneratorIsolation = ProcessIsolation { maxHeapSize = "4g" } }
 
 val kdocJar: TaskProvider<Jar> by
     tasks.registering(Jar::class) {
@@ -52,17 +56,6 @@ val kdoc: Configuration by
     }
 
 artifacts { add(kdoc.name, kdocJar) }
-
-tasks.register("javadocJar", Jar::class) {
-  group = DOCUMENTATION_GROUP
-  archiveClassifier = "javadoc"
-  from(tasks.dokkaGeneratePublicationJavadoc.flatMap { it.outputDirectory })
-}
-
-java {
-  withJavadocJar()
-  withSourcesJar()
-}
 
 kotlin { jvmToolchain(libs.versions.java.jdk.get().toInt()) }
 
