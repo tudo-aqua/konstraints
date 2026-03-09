@@ -17,7 +17,6 @@
  */
 
 import org.gradle.accessors.dm.LibrariesForLibs
-import org.gradle.api.publish.tasks.GenerateModuleMetadata
 import org.gradle.kotlin.dsl.*
 import tools.aqua.MetadataExtension
 import tools.aqua.commonSetup
@@ -42,8 +41,4 @@ mavenPublishing {
     commonSetup(metadata)
     metadata.packaging.orNull?.let { packaging = it }
   }
-}
-
-tasks.withType<GenerateModuleMetadata>().configureEach {
-  dependsOn(tasks.matching { it.name == "dokkaJavadocJar" })
 }
