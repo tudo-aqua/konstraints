@@ -354,14 +354,35 @@ class LetExpression<out T : Sort>(val bindings: List<VarBinding<*>>, val inner: 
   }
 }
 
+sealed class FreeExpression<out T : Sort>(
+    override val name: Symbol,
+    override val sort: T,
+    override val children: List<Expression<*>>,
+) : Expression<T>() {
+  override val theories: Set<Theories> = emptySet()
+  override val func: SMTFunction<T>? = null
+}
+
+/**
+ * Instance of user declared smt function that is auto-declared in solving process.
+ */
+class Variable<T : Sort>(name: Symbol, sort: T, args: List<Expression<*>>) :
+    FreeExpression<T>(name, sort, args) {
+  constructor(name: Symbol, sort: T) : this(name, sort, emptyList())
+
+  constructor(name: String, sort: T, args: List<Expression<*>>) : this(name.toSymbol(), sort, args)
+
+  constructor(name: String, sort: T) : this(name.toSymbol(), sort, emptyList())
+
+  override fun copy(children: List<Expression<*>>): Expression<T> = Variable(name, sort, children)
+}
+
 class UserDeclaredExpression<out T : Sort>(
     name: Symbol,
     sort: T,
     args: List<Expression<*>>,
     override val func: SMTFunction<T>,
-) : NAryExpression<T>(name, sort) {
-  override val theories = emptySet<Theories>()
-
+) : FreeExpression<T>(name, sort, args) {
   constructor(name: Symbol, sort: T, func: SMTFunction<T>) : this(name, sort, emptyList(), func)
 
   override val children: List<Expression<*>> = args
@@ -376,9 +397,7 @@ class UserDefinedExpression<T : Sort>(
     args: List<Expression<*>>,
     val definition: FunctionDef<T>,
     override val func: DefinedSMTFunction<T>,
-) : NAryExpression<T>(name, sort) {
-  override val theories = emptySet<Theories>()
-
+) : FreeExpression<T>(name, sort, args) {
   init {
     // check that args.sort matches expected sorts from definition
     require(args.zip(definition.parameters).all { (arg, par) -> arg.sort == par.sort })

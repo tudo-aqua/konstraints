@@ -134,7 +134,7 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) :
  * - `(= [statements])`
  */
 class Equals<T : Sort>(val statements: List<Expression<T>>) :
-    HomogenousExpression<BoolSort, Sort>("=".toSymbol(), SMTBool) {
+    HomogenousExpression<BoolSort, T>("=".toSymbol(), SMTBool) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg statements: Expression<T>) : this(statements.toList())
