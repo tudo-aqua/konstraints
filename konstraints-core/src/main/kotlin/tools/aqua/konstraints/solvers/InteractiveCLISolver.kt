@@ -43,6 +43,7 @@ import tools.aqua.konstraints.smt.SatStatus
 import tools.aqua.konstraints.smt.SetOption
 
 class InteractiveZ3Solver : InteractiveCLISolver("z3", "-in")
+class InteractiveCVC5Solver : InteractiveCLISolver("cvc5", "--interactive")
 
 open class InteractiveCLISolver(val name: String, vararg solverOptions: String) : Solver {
 
