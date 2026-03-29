@@ -45,7 +45,27 @@ import tools.aqua.konstraints.smt.TesterExpression
 import tools.aqua.konstraints.smt.UnaryExpression
 
 interface VisitByStructure<T> {
-  fun visit(expr: Expression<*>, ctx: T) {
+  fun visit(expression: Expression<*>, ctx: T, useIterative: Boolean = true) =
+      if (useIterative) visitIterative(expression, ctx) else visitRecursive(expression, ctx)
+
+  fun visitIterative(expr: Expression<*>, ctx: T) {
+    val stack = ArrayDeque(listOf(expr))
+
+    while (stack.isNotEmpty()) {
+      val curr = stack.removeFirst()
+      visitInternal(curr, ctx)
+
+      // TODO check ordering
+      stack.addAll(curr.children)
+    }
+  }
+
+  fun visitRecursive(expr: Expression<*>, ctx: T) {
+    visitInternal(expr, ctx)
+    expr.children.forEach { visitInternal(it, ctx) }
+  }
+
+  fun visitInternal(expr: Expression<*>, ctx: T) {
     when (expr) {
       is ConstantExpression<*> -> visit(expr, ctx)
       is UnaryExpression<*, *> -> visit(expr, ctx)
@@ -66,7 +86,6 @@ interface VisitByStructure<T> {
       is SelectorExpression<*> -> visit(expr, ctx)
       is TesterExpression -> visit(expr, ctx)
     }
-    expr.children.forEach { visit(it, ctx) }
   }
 
   fun visit(expr: ConstantExpression<*>, ctx: T)

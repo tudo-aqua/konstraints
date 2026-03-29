@@ -363,9 +363,7 @@ sealed class FreeExpression<out T : Sort>(
   override val func: SMTFunction<T>? = null
 }
 
-/**
- * Instance of user declared smt function that is auto-declared in solving process.
- */
+/** Instance of user declared smt function that is auto-declared in solving process. */
 class Variable<T : Sort>(name: Symbol, sort: T, args: List<Expression<*>>) :
     FreeExpression<T>(name, sort, args) {
   constructor(name: Symbol, sort: T) : this(name, sort, emptyList())

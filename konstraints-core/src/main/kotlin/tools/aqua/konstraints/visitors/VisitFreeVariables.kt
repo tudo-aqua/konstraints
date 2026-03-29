@@ -44,11 +44,11 @@ import tools.aqua.konstraints.smt.TesterExpression
 import tools.aqua.konstraints.smt.UnaryExpression
 
 object FreeVariables : VisitByStructure<MutableList<FreeExpression<*>>> {
-    fun of(expr: Expression<*>): List<FreeExpression<*>> {
-        val list = mutableListOf<FreeExpression<*>>()
-        visit(expr, list)
-        return list
-    }
+  fun of(expr: Expression<*>): List<FreeExpression<*>> {
+    val list = mutableListOf<FreeExpression<*>>()
+    visit(expr, list)
+    return list
+  }
 
   override fun visit(expr: ConstantExpression<*>, ctx: MutableList<FreeExpression<*>>) {}
 

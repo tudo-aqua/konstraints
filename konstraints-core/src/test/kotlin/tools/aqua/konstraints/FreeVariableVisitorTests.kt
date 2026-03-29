@@ -18,6 +18,8 @@
 
 package tools.aqua.konstraints
 
+import java.util.stream.Stream
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments.arguments
@@ -33,13 +35,10 @@ import tools.aqua.konstraints.smt.Assert
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.QF_BV
 import tools.aqua.konstraints.smt.SMTBitVec
-import tools.aqua.konstraints.smt.SMTProgram
 import tools.aqua.konstraints.smt.Symbol
 import tools.aqua.konstraints.smt.bitvec
 import tools.aqua.konstraints.smt.toSymbol
 import tools.aqua.konstraints.visitors.FreeVariables
-import java.util.stream.Stream
-import kotlin.math.exp
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FreeVariableVisitorTests {
@@ -48,34 +47,72 @@ class FreeVariableVisitorTests {
   fun testVisitFreeVariables(expr: Expression<*>, expected: List<Symbol>) {
     val freeVariables = FreeVariables.of(expr)
 
-      assert(expected.size == freeVariables.size)
-      assert(expected.all { symbol -> freeVariables.find { expression -> expression.name == symbol } != null })
+    assertEquals(expected.size, freeVariables.toSet().size)
+    assert(
+        expected.all { symbol ->
+          freeVariables.find { expression -> expression.name == symbol } != null
+        }
+    )
   }
 
-    fun provideExpressionAndFreeVariables() = Stream.of(
-        arguments(smt(QF_BV) {
-            val s by declaringConst(SMTBitVec(32))
-            assert { not(s bvand s eq s) }
-        }.commands.filterIsInstance<Assert>().single().expr, listOf("s".toSymbol())),
-        arguments(          smt(QF_BV) {
-            val s by declaringConst(SMTBitVec(32))
-            assert { not(s bvlshr s eq "#b0".bitvec(32)) }
-        }.commands.filterIsInstance<Assert>().single().expr, listOf("s".toSymbol())),
-        arguments(smt(QF_BV) {
-            val s by declaringConst(SMTBitVec(32))
-            assert { not(s bvlshr s eq "#b0".bitvec(32)) }
-        }.commands.filterIsInstance<Assert>().single().expr, listOf("s".toSymbol())),
-        arguments(smt(QF_BV) {
-            smt(QF_BV) {
-                val s by declaringConst(SMTBitVec(32))
-                val t by declaringConst(SMTBitVec(32))
-                assert { not((s bvor (t bvor t)) eq (s bvor t)) }
-            }
-        }.commands.filterIsInstance<Assert>().single().expr, listOf("s".toSymbol(), "t".toSymbol())),
-        arguments(smt(QF_BV) {
-            val s by declaringConst(SMTBitVec(32))
-            val t by declaringConst(SMTBitVec(32))
-            assert { not((s bvor (t bvor t)) eq (s bvor t)) }
-        }.commands.filterIsInstance<Assert>().single().expr, listOf("s".toSymbol(), "t".toSymbol()))
-    )
+  fun provideExpressionAndFreeVariables() =
+      Stream.of(
+          arguments(
+              smt(QF_BV) {
+                    val s by declaringConst(SMTBitVec(32))
+                    assert { not(s bvand s eq s) }
+                  }
+                  .commands
+                  .filterIsInstance<Assert>()
+                  .single()
+                  .expr,
+              listOf("s".toSymbol()),
+          ),
+          arguments(
+              smt(QF_BV) {
+                    val s by declaringConst(SMTBitVec(32))
+                    assert { not(s bvlshr s eq "#b0".bitvec(32)) }
+                  }
+                  .commands
+                  .filterIsInstance<Assert>()
+                  .single()
+                  .expr,
+              listOf("s".toSymbol()),
+          ),
+          arguments(
+              smt(QF_BV) {
+                    val s by declaringConst(SMTBitVec(32))
+                    assert { not(s bvlshr s eq "#b0".bitvec(32)) }
+                  }
+                  .commands
+                  .filterIsInstance<Assert>()
+                  .single()
+                  .expr,
+              listOf("s".toSymbol()),
+          ),
+          arguments(
+              smt(QF_BV) {
+                    val s by declaringConst(SMTBitVec(32))
+                    val t by declaringConst(SMTBitVec(32))
+                    assert { not((s bvor (t bvor t)) eq (s bvor t)) }
+                  }
+                  .commands
+                  .filterIsInstance<Assert>()
+                  .single()
+                  .expr,
+              listOf("s".toSymbol(), "t".toSymbol()),
+          ),
+          arguments(
+              smt(QF_BV) {
+                    val s by declaringConst(SMTBitVec(32))
+                    val t by declaringConst(SMTBitVec(32))
+                    assert { not((s bvor (t bvor t)) eq (s bvor t)) }
+                  }
+                  .commands
+                  .filterIsInstance<Assert>()
+                  .single()
+                  .expr,
+              listOf("s".toSymbol(), "t".toSymbol()),
+          ),
+      )
 }

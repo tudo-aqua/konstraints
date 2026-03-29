@@ -20,6 +20,7 @@ package tools.aqua.konstraints.visitors
 
 import tools.aqua.konstraints.smt.*
 
+@Suppress("INAPPLICABLE_JVM_NAME")
 interface VisitByType<T> {
   fun visit(expr: Expression<*>): T =
       when (expr.sort) {
@@ -38,6 +39,7 @@ interface VisitByType<T> {
         NumeralSortInstance -> TODO()
       }
 
+  @JvmName("visitExprBoolSort")
   fun visit(expr: Expression<BoolSort>): T =
       when (expr) {
         is AnnotatedExpression<BoolSort> -> visit(expr)
@@ -110,19 +112,19 @@ interface VisitByType<T> {
             )
       }
 
-  fun visit(expr: AnnotatedExpression<BoolSort>): T
+  @JvmName("visitAnnotatedExpressionBoolSort") fun visit(expr: AnnotatedExpression<BoolSort>): T
 
-  fun visit(expr: LocalExpression<BoolSort>): T
+  @JvmName("visitLocalExpressionBoolSort") fun visit(expr: LocalExpression<BoolSort>): T
 
-  fun visit(expr: LetExpression<BoolSort>): T
+  @JvmName("visitLetExpressionBoolSort") fun visit(expr: LetExpression<BoolSort>): T
 
   fun visit(expr: ForallExpression): T
 
   fun visit(expr: ExistsExpression): T
 
-  fun visit(expr: BoundVariable<BoolSort>): T
+  @JvmName("visitBoundVariableBoolSort") fun visit(expr: BoundVariable<BoolSort>): T
 
-  fun visit(expr: Ite<BoolSort>): T
+  @JvmName("visitIteBoolSort") fun visit(expr: Ite<BoolSort>): T
 
   fun visit(expr: True): T
 
@@ -216,7 +218,7 @@ interface VisitByType<T> {
 
   fun visit(expr: StrInRe): T
 
-  fun visit(expr: ArraySelect<*, BoolSort>): T
+  @JvmName("visitArraySelectBoolSort") fun visit(expr: ArraySelect<*, BoolSort>): T
 
   fun visit(expr: BVNegO): T
 
@@ -234,12 +236,15 @@ interface VisitByType<T> {
 
   fun visit(expr: BVSDivO): T
 
+  @JvmName("visitUserDeclaredExpressionBoolSort")
   fun visit(expr: UserDeclaredExpression<BoolSort>): T
 
-  fun visit(expr: UserDefinedExpression<BoolSort>): T
+  @JvmName("visitUserDefinedExpressionBoolSort") fun visit(expr: UserDefinedExpression<BoolSort>): T
 
+  @JvmName("visitExprBitVecSort")
   fun visit(expr: Expression<BitVecSort>) =
       when (expr) {
+        is AnnotatedExpression<BitVecSort> -> visit(expr)
         is LocalExpression -> visit(expr)
         is LetExpression -> visit(expr)
         is BoundVariable -> visit(expr)
@@ -283,13 +288,15 @@ interface VisitByType<T> {
             )
       }
 
-  fun visit(expr: LocalExpression<BitVecSort>): T
+  @JvmName("visitAnnotatedExpressionBitVecSort") fun visit(expr: AnnotatedExpression<BitVecSort>): T
 
-  fun visit(expr: LetExpression<BitVecSort>): T
+  @JvmName("visitLocalExpressionBitVecSort") fun visit(expr: LocalExpression<BitVecSort>): T
 
-  fun visit(expr: BoundVariable<BitVecSort>): T
+  @JvmName("visitLetExpressionBitVecSort") fun visit(expr: LetExpression<BitVecSort>): T
 
-  fun visit(expr: Ite<BitVecSort>): T
+  @JvmName("visitBoundVariableBitVecSort") fun visit(expr: BoundVariable<BitVecSort>): T
+
+  @JvmName("visitIteBitVecSort") fun visit(expr: Ite<BitVecSort>): T
 
   fun visit(expr: BitVecLiteral): T
 
@@ -351,14 +358,18 @@ interface VisitByType<T> {
 
   fun visit(expr: RotateLeft): T
 
-  fun visit(expr: ArraySelect<*, BitVecSort>): T
+  @JvmName("visitArraySelectBitVecSort") fun visit(expr: ArraySelect<*, BitVecSort>): T
 
+  @JvmName("visitUserDeclaredExpressionBitVecSort")
   fun visit(expr: UserDeclaredExpression<BitVecSort>): T
 
+  @JvmName("visitUserDefinedExpressionBitVecSort")
   fun visit(expr: UserDefinedExpression<BitVecSort>): T
 
+  @JvmName("visitExprIntSort")
   fun visit(expr: Expression<IntSort>): T =
       when (expr) {
+        is AnnotatedExpression<IntSort> -> visit(expr)
         is LocalExpression -> visit(expr)
         is LetExpression -> visit(expr)
         is BoundVariable -> visit(expr)
@@ -385,11 +396,13 @@ interface VisitByType<T> {
             )
       }
 
-  fun visit(expr: LocalExpression<IntSort>): T
+  @JvmName("visitAnnotatedExpressionIntSort") fun visit(expr: AnnotatedExpression<IntSort>): T
 
-  fun visit(expr: LetExpression<IntSort>): T
+  @JvmName("visitLocalExpressionIntSort") fun visit(expr: LocalExpression<IntSort>): T
 
-  fun visit(expr: BoundVariable<IntSort>): T
+  @JvmName("visitLetExpressionIntSort") fun visit(expr: LetExpression<IntSort>): T
+
+  @JvmName("visitBoundVariableIntSort") fun visit(expr: BoundVariable<IntSort>): T
 
   fun visit(expr: Ite<IntSort>): T
 
@@ -419,14 +432,16 @@ interface VisitByType<T> {
 
   fun visit(expr: StrToInt): T
 
-  fun visit(expr: ArraySelect<*, IntSort>): T
+  @JvmName("visitArraySelectIntSort") fun visit(expr: ArraySelect<*, IntSort>): T
 
-  fun visit(expr: UserDeclaredExpression<IntSort>): T
+  @JvmName("visitUserDeclaredExpressionIntSort") fun visit(expr: UserDeclaredExpression<IntSort>): T
 
-  fun visit(expr: UserDefinedExpression<IntSort>): T
+  @JvmName("visitUserDefinedExpressionIntSort") fun visit(expr: UserDefinedExpression<IntSort>): T
 
+  @JvmName("visitExprRealSort")
   fun visit(expr: Expression<RealSort>): T =
       when (expr) {
+        is AnnotatedExpression<RealSort> -> visit(expr)
         is LocalExpression -> visit(expr)
         is LetExpression -> visit(expr)
         is BoundVariable -> visit(expr)
@@ -448,13 +463,15 @@ interface VisitByType<T> {
             )
       }
 
-  fun visit(expr: LocalExpression<RealSort>): T
+  @JvmName("visitAnnotatedExpressionRealSort") fun visit(expr: AnnotatedExpression<RealSort>): T
 
-  fun visit(expr: LetExpression<RealSort>): T
+  @JvmName("visitLocalExpressionRealSort") fun visit(expr: LocalExpression<RealSort>): T
 
-  fun visit(expr: BoundVariable<RealSort>): T
+  @JvmName("visitLetExpressionRealSort") fun visit(expr: LetExpression<RealSort>): T
 
-  fun visit(expr: Ite<RealSort>): T
+  @JvmName("visitBoundVariableRealSort") fun visit(expr: BoundVariable<RealSort>): T
+
+  @JvmName("visitIteRealSort") fun visit(expr: Ite<RealSort>): T
 
   fun visit(expr: RealLiteral): T
 
@@ -472,14 +489,17 @@ interface VisitByType<T> {
 
   fun visit(expr: FPToReal): T
 
-  fun visit(expr: ArraySelect<*, RealSort>): T
+  @JvmName("visitArraySelectRealSort") fun visit(expr: ArraySelect<*, RealSort>): T
 
+  @JvmName("visitUserDeclaredExpressionRealSort")
   fun visit(expr: UserDeclaredExpression<RealSort>): T
 
-  fun visit(expr: UserDefinedExpression<RealSort>): T
+  @JvmName("visitUserDefinedExpressionRealSort") fun visit(expr: UserDefinedExpression<RealSort>): T
 
+  @JvmName("visitExprFPSort")
   fun visit(expr: Expression<FPSort>): T =
       when (expr) {
+        is AnnotatedExpression<FPSort> -> visit(expr)
         is LocalExpression -> visit(expr)
         is LetExpression -> visit(expr)
         is BoundVariable -> visit(expr)
@@ -516,13 +536,15 @@ interface VisitByType<T> {
             )
       }
 
-  fun visit(expr: LocalExpression<FPSort>): T
+  @JvmName("visitAnnotatedExpressionFPSort") fun visit(expr: AnnotatedExpression<FPSort>): T
 
-  fun visit(expr: LetExpression<FPSort>): T
+  @JvmName("visitLocalExpressionFPSort") fun visit(expr: LocalExpression<FPSort>): T
 
-  fun visit(expr: BoundVariable<FPSort>): T
+  @JvmName("visitLetExpressionFPSort") fun visit(expr: LetExpression<FPSort>): T
 
-  fun visit(expr: Ite<FPSort>): T
+  @JvmName("visitBoundVariableFPSort") fun visit(expr: BoundVariable<FPSort>): T
+
+  @JvmName("visitIteFPSort") fun visit(expr: Ite<FPSort>): T
 
   fun visit(expr: FloatingPointLiteral): T
 
@@ -570,14 +592,16 @@ interface VisitByType<T> {
 
   fun visit(expr: UBitVecToFP): T
 
-  fun visit(expr: ArraySelect<*, FPSort>): T
+  @JvmName("visitArraySelectFPSort") fun visit(expr: ArraySelect<*, FPSort>): T
 
-  fun visit(expr: UserDeclaredExpression<FPSort>): T
+  @JvmName("visitUserDeclaredExpressionFPSort") fun visit(expr: UserDeclaredExpression<FPSort>): T
 
-  fun visit(expr: UserDefinedExpression<FPSort>): T
+  @JvmName("visitUserDefinedExpressionFPSort") fun visit(expr: UserDefinedExpression<FPSort>): T
 
+  @JvmName("visitExprRoundingModeSort")
   fun visit(expr: Expression<RoundingModeSort>): T =
       when (expr) {
+        is AnnotatedExpression<RoundingModeSort> -> visit(expr)
         is LocalExpression -> visit(expr)
         is LetExpression -> visit(expr)
         is BoundVariable -> visit(expr)
@@ -601,13 +625,17 @@ interface VisitByType<T> {
             )
       }
 
+  @JvmName("visitAnnotatedExpressionRoundingModeSort")
+  fun visit(expr: AnnotatedExpression<RoundingModeSort>): T
+
+  @JvmName("visitLocalExpressionRoundingModeSort")
   fun visit(expr: LocalExpression<RoundingModeSort>): T
 
-  fun visit(expr: LetExpression<RoundingModeSort>): T
+  @JvmName("visitLetExpressionRoundingModeSort") fun visit(expr: LetExpression<RoundingModeSort>): T
 
-  fun visit(expr: BoundVariable<RoundingModeSort>): T
+  @JvmName("visitBoundVariableRoundingModeSort") fun visit(expr: BoundVariable<RoundingModeSort>): T
 
-  fun visit(expr: Ite<RoundingModeSort>): T
+  @JvmName("visitIteRoundingModeSort") fun visit(expr: Ite<RoundingModeSort>): T
 
   fun visit(expr: RoundNearestTiesToEven): T
 
@@ -629,14 +657,18 @@ interface VisitByType<T> {
 
   fun visit(expr: RTZ): T
 
-  fun visit(expr: ArraySelect<*, RoundingModeSort>): T
+  @JvmName("visitArraySelectRoundingModeSort") fun visit(expr: ArraySelect<*, RoundingModeSort>): T
 
+  @JvmName("visitUserDeclaredExpressionRoundingModeSort")
   fun visit(expr: UserDeclaredExpression<RoundingModeSort>): T
 
+  @JvmName("visitUserDefinedExpressionRoundingModeSort")
   fun visit(expr: UserDefinedExpression<RoundingModeSort>): T
 
+  @JvmName("visitExprStringSort")
   fun visit(expr: Expression<StringSort>): T =
       when (expr) {
+        is AnnotatedExpression<StringSort> -> visit(expr)
         is LocalExpression -> visit(expr)
         is LetExpression -> visit(expr)
         is BoundVariable -> visit(expr)
@@ -660,13 +692,15 @@ interface VisitByType<T> {
             )
       }
 
-  fun visit(expr: LocalExpression<StringSort>): T
+  @JvmName("visitAnnotatedExpressionStringSort") fun visit(expr: AnnotatedExpression<StringSort>): T
 
-  fun visit(expr: LetExpression<StringSort>): T
+  @JvmName("visitLocalExpressionStringSort") fun visit(expr: LocalExpression<StringSort>): T
 
-  fun visit(expr: BoundVariable<StringSort>): T
+  @JvmName("visitLetExpressionStringSort") fun visit(expr: LetExpression<StringSort>): T
 
-  fun visit(expr: Ite<StringSort>): T
+  @JvmName("visitBoundVariableStringSort") fun visit(expr: BoundVariable<StringSort>): T
+
+  @JvmName("visitIteStringSort") fun visit(expr: Ite<StringSort>): T
 
   fun visit(expr: StringLiteral): T
 
@@ -688,17 +722,22 @@ interface VisitByType<T> {
 
   fun visit(expr: StrFromInt): T
 
-  fun visit(expr: ArraySelect<*, StringSort>): T
+  @JvmName("visitArraySelectStringSort") fun visit(expr: ArraySelect<*, StringSort>): T
 
+  @JvmName("visitUserDeclaredExpressionStringSort")
   fun visit(expr: UserDeclaredExpression<StringSort>): T
 
+  @JvmName("visitUserDefinedExpressionStringSort")
   fun visit(expr: UserDefinedExpression<StringSort>): T
 
+  @JvmName("visitExprRegLanSort")
   fun visit(expr: Expression<RegLanSort>): T =
       when (expr) {
+        is AnnotatedExpression<RegLanSort> -> visit(expr)
         is LocalExpression -> visit(expr)
         is LetExpression -> visit(expr)
         is BoundVariable -> visit(expr)
+        is Ite<RegLanSort> -> visit(expr)
         is StrToRe -> visit(expr)
         is RegexNone -> visit(expr)
         is RegexAll -> visit(expr)
@@ -723,11 +762,15 @@ interface VisitByType<T> {
             )
       }
 
-  fun visit(expr: LocalExpression<RegLanSort>): T
+  @JvmName("visitAnnotatedExpressionRegLanSort") fun visit(expr: AnnotatedExpression<RegLanSort>): T
 
-  fun visit(expr: LetExpression<RegLanSort>): T
+  @JvmName("visitLocalExpressionRegLanSort") fun visit(expr: LocalExpression<RegLanSort>): T
 
-  fun visit(expr: BoundVariable<RegLanSort>): T
+  @JvmName("visitLetExpressionRegLanSort") fun visit(expr: LetExpression<RegLanSort>): T
+
+  @JvmName("visitBoundVariableRegLanSort") fun visit(expr: BoundVariable<RegLanSort>): T
+
+  @JvmName("visitIteRegLanSort") fun visit(expr: Ite<RegLanSort>): T
 
   fun visit(expr: StrToRe): T
 
@@ -759,12 +802,15 @@ interface VisitByType<T> {
 
   fun visit(expr: RegexLoop): T
 
-  fun visit(expr: ArraySelect<*, RegLanSort>): T
+  @JvmName("visitArraySelectRegLanSort") fun visit(expr: ArraySelect<*, RegLanSort>): T
 
+  @JvmName("visitUserDeclaredExpressionRegLanSort")
   fun visit(expr: UserDeclaredExpression<RegLanSort>): T
 
+  @JvmName("visitUserDefinedExpressionRegLanSort")
   fun visit(expr: UserDefinedExpression<RegLanSort>): T
 
+  @JvmName("visitExprArraySort")
   fun visit(expr: Expression<ArraySort<*, *>>): T =
       when (expr) {
         is Ite -> visit(expr)
@@ -780,22 +826,26 @@ interface VisitByType<T> {
             )
       }
 
-  fun visit(expr: Ite<ArraySort<*, *>>): T
+  @JvmName("visitIteArraySort") fun visit(expr: Ite<ArraySort<*, *>>): T
 
-  fun visit(expr: LocalExpression<ArraySort<*, *>>): T
+  @JvmName("visitLocalExpressionArraySort") fun visit(expr: LocalExpression<ArraySort<*, *>>): T
 
-  fun visit(expr: LetExpression<ArraySort<*, *>>): T
+  @JvmName("visitLetExpressionArraySort") fun visit(expr: LetExpression<ArraySort<*, *>>): T
 
-  fun visit(expr: ArrayStore<*, *>): T
+  @JvmName("visitArrayStore") fun visit(expr: ArrayStore<*, *>): T
 
   fun visit(expr: ArraySelect<*, ArraySort<*, *>>): T
 
+  @JvmName("visitUserDeclaredExpressionArraySort")
   fun visit(expr: UserDeclaredExpression<ArraySort<*, *>>): T
 
+  @JvmName("visitUserDefinedExpressionArraySort")
   fun visit(expr: UserDefinedExpression<ArraySort<*, *>>): T
 
+  @JvmName("visitExprDatatype")
   fun visit(expr: Expression<Datatype>): T =
       when (expr) {
+        is AnnotatedExpression<Datatype> -> visit(expr)
         is Ite -> visit(expr)
         is LocalExpression -> visit(expr)
         is LetExpression -> visit(expr)
@@ -808,20 +858,25 @@ interface VisitByType<T> {
             )
       }
 
-  fun visit(expr: Ite<Datatype>): T
+  @JvmName("visitAnnotatedExpressionDatatype") fun visit(expr: AnnotatedExpression<Datatype>): T
 
-  fun visit(expr: LocalExpression<Datatype>): T
+  @JvmName("visitIteDatatype") fun visit(expr: Ite<Datatype>): T
 
-  fun visit(expr: LetExpression<Datatype>): T
+  @JvmName("visitLocalExpressionDatatype") fun visit(expr: LocalExpression<Datatype>): T
 
-  fun visit(expr: ArraySelect<*, Datatype>): T
+  @JvmName("visitLetExpressionDatatype") fun visit(expr: LetExpression<Datatype>): T
 
+  @JvmName("visitArraySelectDatatype") fun visit(expr: ArraySelect<*, Datatype>): T
+
+  @JvmName("visitUserDeclaredExpressionDatatype")
   fun visit(expr: UserDeclaredExpression<Datatype>): T
 
-  fun visit(expr: UserDefinedExpression<Datatype>): T
+  @JvmName("visitUserDefinedExpressionDatatype") fun visit(expr: UserDefinedExpression<Datatype>): T
 
+  @JvmName("visitExprUserDeclaredSort")
   fun visit(expr: Expression<UserDeclaredSort>): T =
       when (expr) {
+        is AnnotatedExpression<UserDeclaredSort> -> visit(expr)
         is Ite -> visit(expr)
         is LocalExpression -> visit(expr)
         is LetExpression -> visit(expr)
@@ -834,15 +889,21 @@ interface VisitByType<T> {
             )
       }
 
-  fun visit(expr: Ite<UserDeclaredSort>): T
+  @JvmName("visitAnnotatedExpressionUserDeclaredSort")
+  fun visit(expr: AnnotatedExpression<UserDeclaredSort>): T
 
+  @JvmName("visitIteUserDeclaredSort") fun visit(expr: Ite<UserDeclaredSort>): T
+
+  @JvmName("visitLocalExpressionUserDeclaredSort")
   fun visit(expr: LocalExpression<UserDeclaredSort>): T
 
-  fun visit(expr: LetExpression<UserDeclaredSort>): T
+  @JvmName("visitLetExpressionUserDeclaredSort") fun visit(expr: LetExpression<UserDeclaredSort>): T
 
-  fun visit(expr: ArraySelect<*, UserDeclaredSort>): T
+  @JvmName("visitArraySelectUserDeclaredSort") fun visit(expr: ArraySelect<*, UserDeclaredSort>): T
 
+  @JvmName("visitUserDeclaredExpressionUserDeclaredSort")
   fun visit(expr: UserDeclaredExpression<UserDeclaredSort>): T
 
+  @JvmName("visitUserDefinedExpressionUserDeclaredSort")
   fun visit(expr: UserDefinedExpression<UserDeclaredSort>): T
 }
