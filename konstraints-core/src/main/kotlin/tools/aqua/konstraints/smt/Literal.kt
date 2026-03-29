@@ -20,6 +20,7 @@ package tools.aqua.konstraints.smt
 
 import java.math.BigDecimal
 import java.math.BigInteger
+import kotlin.fromBits
 import kotlin.text.toString
 
 /**
@@ -28,8 +29,12 @@ import kotlin.text.toString
  * - All hexadecimals #xX of sort (_ BitVec m) where m is 4 times the number of digits in X.
  */
 class BitVecLiteral
-private constructor(vector: String, val bits: Int, val isBinary: Boolean, val value: BigInteger) :
-    Literal<BitVecSort>(LiteralString(vector), BitVecSort(bits)) {
+private constructor(
+    vector: String,
+    val numBits: Int,
+    val isBinary: Boolean,
+    val value: BigInteger,
+) : Literal<BitVecSort>(LiteralString(vector), BitVecSort(numBits)) {
   companion object {
     internal fun constructFromHex(hex: String, bits: Int): BitVecLiteral {
       // here we pad the string to get a literal of the correct length, so that later
@@ -122,10 +127,12 @@ private constructor(vector: String, val bits: Int, val isBinary: Boolean, val va
     private val theoriesSet = setOf(Theories.FIXED_SIZE_BIT_VECTORS, Theories.FLOATING_POINT)
   }
 
+  val rawBits = value.toString(2).padStart(numBits, '0')
+
   override val theories: Set<Theories>
     get() = theoriesSet
 
-  override val sort = BitVecSort(bits)
+  override val sort = BitVecSort(numBits)
 
   override fun toString() = name.toString()
 
@@ -162,7 +169,7 @@ data class FloatingPointLiteral(
       val bitvec =
           value
               .toRawBits() // get the bit representation as integer value
-              .toUInt() // convert to uint so that toString does not produce a '-' sign
+              .toULong() // convert to uint so that toString does not produce a '-' sign
               .toString(2) // convert to binary representation
               .padStart(64, '0') // pad start since toString drops leading zeros
 
@@ -208,6 +215,27 @@ data class FloatingPointLiteral(
               significand == other.significand
 
   override fun toString() = "(fp $sign $exponent $significand)"
+
+  fun asBitString(): String {
+    check(sign is BitVecLiteral)
+    check(exponent is BitVecLiteral)
+    check(significand is BitVecLiteral)
+    return "${sign.rawBits}${exponent.rawBits}${significand.rawBits}"
+  }
+
+  fun asFloat(): Float {
+    check(sort.exponentBits == 8)
+    check(sort.significantBits == 24)
+
+    return Float.fromBits(asBitString().toUInt(2).toInt())
+  }
+
+  fun asDouble(): Double {
+    check(sort.exponentBits == 11)
+    check(sort.significantBits == 53)
+
+    return Double.fromBits(asBitString().toULong(2).toLong())
+  }
 }
 
 /**

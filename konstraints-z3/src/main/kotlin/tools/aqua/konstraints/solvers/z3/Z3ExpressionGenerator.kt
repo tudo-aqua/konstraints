@@ -658,7 +658,7 @@ fun Expression<tools.aqua.konstraints.smt.BitVecSort>.z3ify(
     }
 
 fun BitVecLiteral.z3ify(context: Z3Context): Expr<Z3BitVecSort> =
-    context.context.mkBV(this.value.toString(), this.bits)
+    context.context.mkBV(this.value.toString(), this.numBits)
 
 fun BVConcat.z3ify(context: Z3Context): Expr<Z3BitVecSort> =
     context.context.mkConcat(this.lhs.z3ify(context), this.rhs.z3ify(context))
