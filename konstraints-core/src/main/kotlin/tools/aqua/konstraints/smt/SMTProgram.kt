@@ -33,7 +33,9 @@ import tools.aqua.konstraints.util.StackOperationType
 enum class SatStatus {
   SAT, // program is satisfiable
   UNSAT, // program is unsatisfiable
-  UNKNOWN, // solver timed out
+  UNKNOWN, // program satisfiability is unknown
+  TIMEOUT, // solver timed out
+  ERROR,
   PENDING; // solve has not been called yet on program
 
   override fun toString() =
@@ -41,6 +43,8 @@ enum class SatStatus {
         SAT -> "sat"
         UNSAT -> "unsat"
         UNKNOWN -> "unknown"
+        TIMEOUT -> "unknown"
+        ERROR -> "unknown"
         PENDING -> "pending"
       }
 }

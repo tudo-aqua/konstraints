@@ -43,6 +43,7 @@ import tools.aqua.konstraints.smt.SatStatus
 import tools.aqua.konstraints.smt.SetOption
 
 class InteractiveZ3Solver : InteractiveCLISolver("z3", "-in")
+
 class InteractiveCVC5Solver : InteractiveCLISolver("cvc5", "--interactive")
 
 open class InteractiveCLISolver(val name: String, vararg solverOptions: String) : Solver {
@@ -81,14 +82,6 @@ open class InteractiveCLISolver(val name: String, vararg solverOptions: String) 
 
       throw SolverTimeoutException(timeout)
     }
-
-    /*
-    var lines = ""
-    while(reader.ready()) {
-      lines += reader.readLine() + '\n'
-    }
-    lines
-    */
   }
 
   private fun processCommand(cmd: Command, program: SMTProgram, timeout: Long) {
@@ -123,6 +116,13 @@ open class InteractiveCLISolver(val name: String, vararg solverOptions: String) 
 
   override fun getModel(): Model {
     return _model!!
+  }
+
+  fun closeForcibly() {
+    // IMPORTANT kill the process first, or it waits for the writer and reader to close
+    process.destroyForcibly()
+    writer.close()
+    reader.close()
   }
 
   override fun close() {

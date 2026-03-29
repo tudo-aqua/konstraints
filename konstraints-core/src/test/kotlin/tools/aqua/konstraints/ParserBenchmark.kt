@@ -21,6 +21,7 @@ package tools.aqua.konstraints
 import java.io.File
 import java.util.stream.Stream
 import kotlin.streams.asStream
+import kotlin.time.measureTime
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions.assumeTrue
@@ -34,8 +35,11 @@ import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.QuotingRule
 import tools.aqua.konstraints.smt.SMTRegLan
 import tools.aqua.konstraints.smt.Theories
+import tools.aqua.konstraints.solvers.EarliestSolver
+import tools.aqua.konstraints.solvers.ExecutionPolicy
+import tools.aqua.konstraints.solvers.InteractiveCVC5Solver
+import tools.aqua.konstraints.solvers.InteractiveZ3Solver
 
-@Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserBenchmark {
 
@@ -119,6 +123,21 @@ class ParserBenchmark {
       assertDoesNotThrow { throw e }
     }
   }
+
+  @ParameterizedTest
+  @MethodSource("loadSingle")
+  fun test(file: File) {
+    val solver = EarliestSolver(listOf(InteractiveZ3Solver(), InteractiveCVC5Solver()), null)
+
+    val program = SMTScriptParser(file.bufferedReader())
+    val time = measureTime {
+      val status = solver.solve(program, ExecutionPolicy.PARALLEL)
+    }
+
+    println(time)
+  }
+
+  fun loadSingle() = loadResource("/QF_SLIA/")
 
   @Disabled @ParameterizedTest @MethodSource("getABVFiles") fun parseABV(file: File) = parse(file)
 

@@ -1,50 +1,60 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Copyright 2023-2026 The Konstraints Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package tools.aqua.konstraints.solvers
 
-import tools.aqua.konstraints.dsl.bvult
-import tools.aqua.konstraints.dsl.declaringConst
-import tools.aqua.konstraints.dsl.smt
-import tools.aqua.konstraints.smt.BitVecLiteral
+import kotlin.collections.eachCount
 import tools.aqua.konstraints.smt.Model
-import tools.aqua.konstraints.smt.QF_BV
-import tools.aqua.konstraints.smt.SMTBitVec
 import tools.aqua.konstraints.smt.SMTProgram
+import tools.aqua.konstraints.smt.SatStatus
 
-class MajorityVoteSolver(override val solvers: Iterable<Solver>, val policy: ExecutionPolicy) : MetaSolver {
-    override fun solve(program: SMTProgram) = solve(program, policy)
+class MajorityVoteSolver(
+    override val solvers: Iterable<Solver>,
+    val policy: ExecutionPolicy,
+    val defaultStatus: SatStatus,
+    val resultFilter: (Solver, SatStatus) -> Boolean,
+    val earlyAbort: Boolean = true,
+) : MetaSolver {
+  override fun solve(program: SMTProgram) = solve(program, policy)
 
-    override fun getModel(): Model {
-        TODO("Not yet implemented")
-    }
+  override fun getModel(): Model {
+    TODO("Not yet implemented")
+  }
 
-    override fun solve(
-        program: SMTProgram,
-        policy: ExecutionPolicy
-    ) =
-        when (policy) {
-            ExecutionPolicy.PARALLEL -> solveParallel(program)
-            ExecutionPolicy.SEQUENTIAL -> solveSequential(program)
-        }.groupingBy { it }.eachCount().maxBy { it.value }.key
+  /** Return majority verdict */
+  override fun solve(program: SMTProgram, policy: ExecutionPolicy) =
+      when (policy) {
+        ExecutionPolicy.PARALLEL ->
+            solveParallel(program, resultFilter, ::abortCondition, ::majorityAnswer)
+        ExecutionPolicy.SEQUENTIAL -> majorityAnswer(solveSequential(program))
+      }
 
-    override fun close() {
-        // empty
-    }
-}
+  private fun abortCondition(results: List<SatStatus>) =
+      if (earlyAbort) {
+        results.size > solvers.count() / 2
+      } else {
+        false
+      }
 
-fun main() {
-    val solver = MajorityVoteSolver(
-        listOf(InteractiveZ3Solver(), InteractiveCVC5Solver()), ExecutionPolicy.PARALLEL
-    )
+  private fun majorityAnswer(results: List<SatStatus>) =
+      results.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key ?: defaultStatus
 
-    val program = smt(QF_BV) {
-        val x by declaringConst(SMTBitVec(8))
-
-        assert(x bvult BitVecLiteral(0, 8))
-        checkSat()
-    }
-
-    val status = solver.use { solver ->
-        solver.solve(program)
-    }
-
-    println(status)
+  override fun close() {
+    // empty
+  }
 }
