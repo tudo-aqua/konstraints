@@ -65,3 +65,4 @@ gradle-app.setting
 # End of https://www.toptal.com/developers/gitignore/api/intellij+all,gradle
 # ignore smt-benchmark if present locally
 /konstraints-core/src/test/resources/smt-benchmark/
+GEMINI.md
