@@ -50,7 +50,6 @@ class SMTProgramTests {
     program.solve()
 
     assertNotNull(program.model)
-    print(program.model?.definitions?.joinToString("\n"))
   }
 
   fun getQFBVModelFiles(): Stream<Arguments> {

@@ -21,26 +21,8 @@ package tools.aqua.konstraints.solvers
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
-import java.lang.Thread.sleep
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.runInterruptible
-import kotlinx.coroutines.withTimeout
-import tools.aqua.konstraints.parser.CheckSatResponse
-import tools.aqua.konstraints.parser.ErrorResponse
-import tools.aqua.konstraints.parser.GetModelResponse
-import tools.aqua.konstraints.parser.ResponseParser
-import tools.aqua.konstraints.parser.SolverResponse
-import tools.aqua.konstraints.parser.SuccessResponse
-import tools.aqua.konstraints.parser.UnsupportedResponse
-import tools.aqua.konstraints.smt.BooleanOptionValue
-import tools.aqua.konstraints.smt.Command
-import tools.aqua.konstraints.smt.Model
-import tools.aqua.konstraints.smt.MutableSMTProgram
-import tools.aqua.konstraints.smt.QuotingRule
-import tools.aqua.konstraints.smt.SMTProgram
-import tools.aqua.konstraints.smt.SatStatus
-import tools.aqua.konstraints.smt.SetOption
+import tools.aqua.konstraints.parser.*
+import tools.aqua.konstraints.smt.*
 
 class InteractiveZ3Solver : InteractiveCLISolver("z3", "-in")
 
@@ -62,31 +44,14 @@ open class InteractiveCLISolver(val name: String, vararg solverOptions: String) 
     writer.flush()
   }
 
-  /**
-   * Wait for a solver response, kill the solver after [timeout] milliseconds and throw a
-   * [SolverTimeoutException]
-   */
-  private fun waitResponse(timeout: Long) = runBlocking {
-    try {
-      withTimeout(timeout) {
-        runInterruptible {
-          // wait for reader to become available
-          // sleep in the body of the loop because sleep is an interruptible function
-          while (!reader.ready()) {
-            sleep(1)
-          }
-        }
-      }
-    } catch (e: TimeoutCancellationException) {
-      process.destroyForcibly()
-
-      throw SolverTimeoutException(timeout)
-    }
-  }
-
   private fun processCommand(cmd: Command, program: SMTProgram, timeout: Long) {
     writeCommand(cmd)
-    val response = ResponseParser.parse(reader, program as MutableSMTProgram)
+    val response =
+        try {
+          ResponseParser.parse(reader, program as MutableSMTProgram)
+        } catch (e: Exception) {
+          ErrorResponse(e.message ?: "")
+        }
 
     processResponse(response, program)
   }

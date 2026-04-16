@@ -1,31 +1,53 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Copyright 2023-2026 The Konstraints Authors
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package tools.aqua.konstraints.solvers
 
+import java.io.BufferedReader
+import java.io.InputStreamReader
 import tools.aqua.konstraints.parser.ResponseParser
 import tools.aqua.konstraints.smt.Model
 import tools.aqua.konstraints.smt.SMTProgram
 import tools.aqua.konstraints.smt.SatStatus
-import java.io.BufferedReader
-import java.io.InputStreamReader
 
-class OstrichSolver(location : String, file : String): Solver {
-    val processBuilder = ProcessBuilder("java", "-jar", location, file, "+quiet")
-        .redirectErrorStream(true)
+class OstrichSolver(location: String, file: String) : Solver {
+  val processBuilder =
+      ProcessBuilder("java", "-jar", location, file, "+quiet").redirectErrorStream(true)
 
-    override fun solve(program: SMTProgram): SatStatus {
-        val process = processBuilder.start()
-        val reader = BufferedReader(InputStreamReader(process.inputStream, Charsets.UTF_8))
-        process.waitFor()
-        ResponseParser.parse(reader, program)
-        process.destroy()
+  override fun solve(program: SMTProgram): SatStatus {
+    val process = processBuilder.start()
+    val reader = BufferedReader(InputStreamReader(process.inputStream, Charsets.UTF_8))
+    process.waitFor()
 
-        return program.status
+    try {
+      ResponseParser.parse(reader, program)
+    } catch (e: Exception) {
+      return SatStatus.ERROR
     }
 
-    override fun getModel(): Model {
-        TODO("Not yet implemented")
-    }
+    process.destroy()
 
-    override fun close() {
+    return program.status
+  }
 
-    }
+  override fun getModel(): Model {
+    TODO("Not yet implemented")
+  }
+
+  override fun close() {}
 }

@@ -24,7 +24,7 @@ import tools.aqua.konstraints.smt.SMTProgram
 import tools.aqua.konstraints.smt.SatStatus
 
 class MajorityVoteSolver(
-    override val solvers: Iterable<Solver>,
+    override val solvers: List<Solver>,
     val policy: ExecutionPolicy,
     val defaultStatus: SatStatus,
     val resultFilter: (Solver, SatStatus) -> Boolean,
@@ -32,21 +32,32 @@ class MajorityVoteSolver(
 ) : MetaSolver {
   override fun solve(program: SMTProgram) = solve(program, policy)
 
-  override fun getModel(): Model {
-    TODO("Not yet implemented")
-  }
-
   /** Return majority verdict */
   override fun solve(program: SMTProgram, policy: ExecutionPolicy) =
       when (policy) {
         ExecutionPolicy.PARALLEL ->
-            solveParallel(program, resultFilter, ::abortCondition, ::majorityAnswer)
-        ExecutionPolicy.SEQUENTIAL -> majorityAnswer(solveSequential(program))
+            solveParallel(
+                program,
+                resultFilter,
+                ::abortCondition,
+                ::majorityAnswer,
+                SatStatus.PENDING,
+                300000L,
+            )
+        ExecutionPolicy.SEQUENTIAL ->
+            solveSequential(
+                program,
+                resultFilter,
+                ::abortCondition,
+                ::majorityAnswer,
+                SatStatus.PENDING,
+                300000L,
+            )
       }
 
   private fun abortCondition(results: List<SatStatus>) =
       if (earlyAbort) {
-        results.size > solvers.count() / 2
+        solvers.count() / 2 < results.groupingBy { it }.eachCount().maxBy { it.value }.value
       } else {
         false
       }
@@ -55,6 +66,10 @@ class MajorityVoteSolver(
       results.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key ?: defaultStatus
 
   override fun close() {
-    // empty
+    solvers.forEach { it.close() }
   }
+
+    override fun getModel(): Model {
+        TODO("Not yet implemented")
+    }
 }

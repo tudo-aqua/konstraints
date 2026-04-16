@@ -81,7 +81,7 @@ object ResponseParser {
         is SatToken -> return CheckSatResponse(SatStatus.SAT)
         is UnknownToken -> return CheckSatResponse(SatStatus.UNKNOWN)
         is UnsatToken -> return CheckSatResponse(SatStatus.UNSAT)
-          is ErrorToken -> return ErrorResponse("")
+        is ErrorToken -> return ErrorResponse("")
         else -> throw UnexpectedTokenException(token, "")
       }
     } else if (token is OpeningBracket) {
@@ -130,8 +130,8 @@ object ResponseParser {
                     requireIsInstance<ErrorToken>(token.toPredefinedToken())
                     parseErrorResponse(lexer)
                   } else {
-                      println(lexer.peek())
-                      TODO()
+                    println(lexer.peek())
+                    TODO()
                   }
                 }
               }
@@ -146,10 +146,10 @@ object ResponseParser {
       requireIsInstance<ClosingBracket>(lexer.next())
       return response
     } else {
-        println(lexer.peek())
+      println(lexer.peek())
       TODO()
     }
-      println(lexer.peek())
+    println(lexer.peek())
     TODO()
   }
 

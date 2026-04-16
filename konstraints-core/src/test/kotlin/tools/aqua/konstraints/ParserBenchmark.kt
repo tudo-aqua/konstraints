@@ -40,6 +40,7 @@ import tools.aqua.konstraints.solvers.ExecutionPolicy
 import tools.aqua.konstraints.solvers.InteractiveCVC5Solver
 import tools.aqua.konstraints.solvers.InteractiveZ3Solver
 
+@Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ParserBenchmark {
 

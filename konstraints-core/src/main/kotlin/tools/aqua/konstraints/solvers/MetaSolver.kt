@@ -29,32 +29,87 @@ enum class ExecutionPolicy {
 }
 
 interface MetaSolver : Solver {
-  val solvers: Iterable<Solver>
+  val solvers: List<Solver>
 
   fun solve(program: SMTProgram, policy: ExecutionPolicy): SatStatus
 
   /**
    * Execute solvers sequentially.
    *
-   * @return List of [SatStatus]
+   * @return reduceResult with a list of individual results
    */
-  fun solveSequential(program: SMTProgram) =
-      solvers.map { solver -> solver.use { solver -> solver.solve(program) } }
+  fun solveSequential(
+      program: SMTProgram,
+      validateResult: (Solver, SatStatus) -> Boolean,
+      reduceResult: (List<SatStatus>) -> SatStatus,
+      default: SatStatus,
+      timeout: Long,
+  ) = solveSequential(program, validateResult, { status -> false }, reduceResult, default, timeout)
 
   /**
    * Execute solvers sequentially, returns first result for which [condition] returns true.
    *
    * @return [SatStatus]
    */
-  fun solveSequential(program: SMTProgram, condition: (Solver, SatStatus) -> Boolean): SatStatus {
+  fun solveSequential(
+      program: SMTProgram,
+      validateResult: (Solver, SatStatus) -> Boolean,
+      abortCondition: (List<SatStatus>) -> Boolean,
+      reduceResult: (List<SatStatus>) -> SatStatus,
+      default: SatStatus,
+      timeout: Long,
+  ): SatStatus {
+    val results = mutableListOf<SatStatus>()
     solvers.map { solver ->
-      val status = solver.use { solver -> solver.solve(program) }
-      if (condition(solver, status)) {
-        return status
+      val startTime = System.currentTimeMillis()
+      val globalSolverScope = CoroutineScope(SupervisorJob())
+      val deferred =
+          globalSolverScope.async {
+            try {
+              solver.solve(program)
+            } catch (e: Exception) {
+              SatStatus.ERROR
+            }
+          } to solver
+
+      try {
+        var status = SatStatus.PENDING
+        while (System.currentTimeMillis() - startTime < timeout && deferred.first.isActive) {
+          deferred.let { (deferred, solver) ->
+            // this works since isCompleted is only true if the job completed and we did not get the
+            // result yet
+            if (deferred.isCompleted) {
+              status = @OptIn(ExperimentalCoroutinesApi::class) deferred.getCompleted()
+
+              if (validateResult(solver, status)) {
+                results.add(status)
+              }
+
+              if (abortCondition(results)) {
+                return reduceResult(results) // IMMEDIATE EXIT
+              }
+            }
+          }
+          sleep(1)
+        }
+        // if status is still pending we timed out
+        if (status == SatStatus.PENDING) SatStatus.TIMEOUT else default
+      } finally {
+        // asynchronously shut down solver
+        CoroutineScope(Dispatchers.IO).launch {
+          solvers.forEach {
+            try {
+              // forcibly close all interactive solvers hope that other solvers close cooperates
+              if (it is InteractiveCLISolver) it.closeForcibly() else it.close()
+            } catch (e: Exception) {}
+          }
+          globalSolverScope.cancel()
+        }
       }
     }
 
-    return SatStatus.UNKNOWN
+    // finally return combined result or default if no solver was able to solve the program
+    return if (results.isNotEmpty()) reduceResult(results) else default
   }
 
   /**
@@ -62,9 +117,13 @@ interface MetaSolver : Solver {
    *
    * @return List of [SatStatus]
    */
-  fun solveParallel(program: SMTProgram) = runBlocking {
-    solvers.map { solver -> async { solver.use { solver -> solver.solve(program) } } }.awaitAll()
-  }
+  fun solveParallel(
+      program: SMTProgram,
+      validateResult: (Solver, SatStatus) -> Boolean,
+      reduceResult: (List<SatStatus>) -> SatStatus,
+      default: SatStatus,
+      timeout: Long,
+  ) = solveParallel(program, validateResult, { status -> false }, reduceResult, default, timeout)
 
   /**
    * Execute solvers in parallel, returns first result for which [condition] returns true or
@@ -77,8 +136,10 @@ interface MetaSolver : Solver {
       validateResult: (Solver, SatStatus) -> Boolean,
       abortCondition: (List<SatStatus>) -> Boolean,
       reduceResult: (List<SatStatus>) -> SatStatus,
+      default: SatStatus,
+      timeout: Long,
   ): SatStatus {
-    val globalSolverScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    val globalSolverScope = CoroutineScope(SupervisorJob())
     val startTime = System.currentTimeMillis()
 
     val deferreds =
@@ -95,9 +156,12 @@ interface MetaSolver : Solver {
     val results = mutableListOf<SatStatus>()
 
     try {
-      while (System.currentTimeMillis() - startTime < 300000L && deferreds.any { it.first.isActive }) {
+      while (
+          System.currentTimeMillis() - startTime < timeout && deferreds.any { it.first.isActive }
+      ) {
         deferreds.forEach { (deferred, solver) ->
-          // this works since isCompleted is only true if the job completed and we did not get the result yet
+          // this works since isCompleted is only true if the job completed and we did not get the
+          // result yet
           if (deferred.isCompleted) {
             val status = @OptIn(ExperimentalCoroutinesApi::class) deferred.getCompleted()
 
@@ -112,12 +176,17 @@ interface MetaSolver : Solver {
         }
         sleep(1)
       }
-      return if (results.isNotEmpty())  reduceResult(results) else SatStatus.TIMEOUT
+      // return reduced result if we had at least one valid result
+      // otherwise return timeout when all solvers timed out or default if all solvers terminated
+      // without a valid result
+      return if (results.isNotEmpty()) reduceResult(results)
+      else if (System.currentTimeMillis() - startTime < 300000L) SatStatus.TIMEOUT else default
     } finally {
       CoroutineScope(Dispatchers.IO).launch {
         solvers.forEach {
           try {
-            (it as InteractiveCLISolver).closeForcibly()
+            // forcibly close all interactive solvers hope that other solvers close cooperates
+            if (it is InteractiveCLISolver) it.closeForcibly() else it.close()
           } catch (e: Exception) {}
         }
         globalSolverScope.cancel()

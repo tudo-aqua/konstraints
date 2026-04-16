@@ -43,8 +43,8 @@ enum class SatStatus {
         SAT -> "sat"
         UNSAT -> "unsat"
         UNKNOWN -> "unknown"
-        TIMEOUT -> "unknown"
-        ERROR -> "unknown"
+        TIMEOUT -> "timeout"
+        ERROR -> "error"
         PENDING -> "pending"
       }
 }
