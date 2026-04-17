@@ -25,10 +25,10 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.dsl.bvand
-import tools.aqua.konstraints.dsl.bvlshr
 import tools.aqua.konstraints.dsl.bvor
 import tools.aqua.konstraints.dsl.declaringConst
 import tools.aqua.konstraints.dsl.eq
+import tools.aqua.konstraints.dsl.forall
 import tools.aqua.konstraints.dsl.not
 import tools.aqua.konstraints.dsl.smt
 import tools.aqua.konstraints.smt.Assert
@@ -36,7 +36,6 @@ import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.QF_BV
 import tools.aqua.konstraints.smt.SMTBitVec
 import tools.aqua.konstraints.smt.Symbol
-import tools.aqua.konstraints.smt.bitvec
 import tools.aqua.konstraints.smt.toSymbol
 import tools.aqua.konstraints.visitors.FreeVariables
 
@@ -47,7 +46,7 @@ class FreeVariableVisitorTests {
   fun testVisitFreeVariables(expr: Expression<*>, expected: List<Symbol>) {
     val freeVariables = FreeVariables.of(expr)
 
-    assertEquals(expected.size, freeVariables.toSet().size)
+    assertEquals(expected.size, freeVariables.size)
     assert(
         expected.all { symbol ->
           freeVariables.find { expression -> expression.name == symbol } != null
@@ -66,29 +65,7 @@ class FreeVariableVisitorTests {
                   .filterIsInstance<Assert>()
                   .single()
                   .expr,
-              listOf("s".toSymbol()),
-          ),
-          arguments(
-              smt(QF_BV) {
-                    val s by declaringConst(SMTBitVec(32))
-                    assert { not(s bvlshr s eq "#b0".bitvec(32)) }
-                  }
-                  .commands
-                  .filterIsInstance<Assert>()
-                  .single()
-                  .expr,
-              listOf("s".toSymbol()),
-          ),
-          arguments(
-              smt(QF_BV) {
-                    val s by declaringConst(SMTBitVec(32))
-                    assert { not(s bvlshr s eq "#b0".bitvec(32)) }
-                  }
-                  .commands
-                  .filterIsInstance<Assert>()
-                  .single()
-                  .expr,
-              listOf("s".toSymbol()),
+              listOf("s".toSymbol(), "s".toSymbol(), "s".toSymbol()),
           ),
           arguments(
               smt(QF_BV) {
@@ -100,19 +77,25 @@ class FreeVariableVisitorTests {
                   .filterIsInstance<Assert>()
                   .single()
                   .expr,
-              listOf("s".toSymbol(), "t".toSymbol()),
+              listOf(
+                  "s".toSymbol(),
+                  "t".toSymbol(),
+                  "t".toSymbol(),
+                  "s".toSymbol(),
+                  "t".toSymbol(),
+              ),
           ),
           arguments(
               smt(QF_BV) {
                     val s by declaringConst(SMTBitVec(32))
                     val t by declaringConst(SMTBitVec(32))
-                    assert { not((s bvor (t bvor t)) eq (s bvor t)) }
+                    assert { forall(SMTBitVec(32)) { x -> not((s bvor (x bvor x)) eq (s bvor t)) } }
                   }
                   .commands
                   .filterIsInstance<Assert>()
                   .single()
                   .expr,
-              listOf("s".toSymbol(), "t".toSymbol()),
+              listOf("s".toSymbol(), "s".toSymbol(), "t".toSymbol()),
           ),
       )
 }

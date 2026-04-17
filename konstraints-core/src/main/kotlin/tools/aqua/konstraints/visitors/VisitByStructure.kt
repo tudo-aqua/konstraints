@@ -53,6 +53,7 @@ interface VisitByStructure<T> {
 
     while (stack.isNotEmpty()) {
       val curr = stack.removeFirst()
+
       visitInternal(curr, ctx)
 
       // TODO check ordering
