@@ -56,39 +56,6 @@ sealed class Expression<out T : Sort> : SMTSerializable {
     return deepAll(this)
   }
 
-  /*
-  fun all(predicate: (Expression<*>) -> Boolean): Boolean =
-      when (this) {
-        is ConstantExpression -> predicate(this)
-        is UnaryExpression<*, *> -> predicate(this) and inner.all(predicate)
-        is BinaryExpression<*, *, *> ->
-            predicate(this) and lhs.all(predicate) and rhs.all(predicate)
-        is HomogenousExpression<*, *> ->
-            predicate(this) and
-                children.map { it.all(predicate) }.reduceOrDefault(true) { t1, t2 -> t1 and t2 }
-        is Ite ->
-            predicate(this) and
-                predicate(condition) and
-                predicate(then) and
-                predicate(otherwise) and
-                condition.all(predicate) and
-                then.all(predicate) and
-                otherwise.all(predicate)
-        is Literal -> predicate(this)
-        is NAryExpression ->
-            predicate(this) and
-                children.map { it.all(predicate) }.reduceOrDefault(true) { t1, t2 -> t1 and t2 }
-        is TernaryExpression<*, *, *, *> ->
-            predicate(this) and lhs.all(predicate) and mid.all(predicate) and rhs.all(predicate)
-        is LetExpression -> predicate(this) and inner.all(predicate)
-        is LocalExpression -> predicate(this)
-        is BoundVariable -> predicate(this)
-        is ExistsExpression -> predicate(this) and term.all(predicate)
-        is ForallExpression -> predicate(this) and term.all(predicate)
-        is AnnotatedExpression -> predicate(this) and term.all(predicate)
-      }
-    */
-
   fun asSequence(): Sequence<Expression<*>> = sequence {
     yield(this@Expression)
     children.forEach { yieldAll(it.asSequence()) }

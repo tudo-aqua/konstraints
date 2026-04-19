@@ -940,7 +940,9 @@ data class UserDeclaredSMTFunctionN<T : Sort>(
     override val symbol: Symbol,
     override val sort: T,
     override val parameters: List<Sort>,
-) : UserDeclaredSMTFunction<T>()
+) : UserDeclaredSMTFunction<T>() {
+    override fun rename(symbol: Symbol) = UserDeclaredSMTFunctionN(symbol, sort, parameters)
+}
 
 /**
  * SMTFunction of arity 0.
@@ -957,6 +959,8 @@ data class UserDeclaredSMTFunction0<T : Sort>(
 
   /** Get instance. */
   operator fun invoke() = instance
+
+    override fun rename(symbol: Symbol) = UserDeclaredSMTFunction0(symbol, sort)
 }
 
 /**
@@ -973,6 +977,8 @@ data class UserDeclaredSMTFunction1<T : Sort, S : Sort>(
 
   /** Create instance by applying [arg] to [this]. */
   operator fun invoke(arg: Expression<S>) = UserDeclaredExpression(symbol, sort, listOf(arg), this)
+
+    override fun rename(symbol: Symbol) = UserDeclaredSMTFunction1(symbol, sort, parameter)
 }
 
 /**
@@ -991,6 +997,8 @@ data class UserDeclaredSMTFunction2<T : Sort, S1 : Sort, S2 : Sort>(
   /** Create instance by applying [arg1], [arg2] to [this]. */
   operator fun invoke(arg1: Expression<S1>, arg2: Expression<S2>) =
       UserDeclaredExpression(symbol, sort, listOf(arg1, arg2), this)
+
+    override fun rename(symbol: Symbol) = UserDeclaredSMTFunction2(symbol, sort, parameter1, parameter2)
 }
 
 /**
@@ -1010,6 +1018,8 @@ data class UserDeclaredSMTFunction3<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort>(
   /** Create instance by applying [arg1], [arg2], [arg3] to [this]. */
   operator fun invoke(arg1: Expression<S1>, arg2: Expression<S2>, arg3: Expression<S3>) =
       UserDeclaredExpression(symbol, sort, listOf(arg1, arg2, arg3), this)
+
+    override fun rename(symbol: Symbol) = UserDeclaredSMTFunction3(symbol, sort, parameter1, parameter2, parameter3)
 }
 
 /**
@@ -1034,6 +1044,8 @@ data class UserDeclaredSMTFunction4<T : Sort, S1 : Sort, S2 : Sort, S3 : Sort, S
       arg3: Expression<S3>,
       arg4: Expression<S4>,
   ) = UserDeclaredExpression(symbol, sort, listOf(arg1, arg2, arg3, arg4), this)
+
+    override fun rename(symbol: Symbol) = UserDeclaredSMTFunction4(symbol, sort, parameter1, parameter2, parameter3, parameter4)
 }
 
 /**
@@ -1067,6 +1079,8 @@ data class UserDeclaredSMTFunction5<
       arg4: Expression<S4>,
       arg5: Expression<S5>,
   ) = UserDeclaredExpression(symbol, sort, listOf(arg1, arg2, arg3, arg4, arg5), this)
+
+    override fun rename(symbol: Symbol) = UserDeclaredSMTFunction5(symbol, sort, parameter1, parameter2, parameter3, parameter4, parameter5)
 }
 
 /** User defined smt function with any number of arguments. */

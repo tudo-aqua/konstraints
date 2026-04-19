@@ -105,6 +105,8 @@ abstract class UserDeclaredSMTFunction<T : Sort> : SMTFunction<T>() {
 
     return UserDeclaredExpression(symbol, sort, args, this)
   }
+
+    abstract fun rename(symbol: Symbol) : UserDeclaredSMTFunction<T>
 }
 
 /** Base class for all functions defined by the user. */

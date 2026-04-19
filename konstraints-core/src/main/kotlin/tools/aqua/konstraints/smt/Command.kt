@@ -18,7 +18,10 @@
 
 package tools.aqua.konstraints.smt
 
+import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
+import tools.aqua.konstraints.dsl.UserDefinedSMTFunction0
 import java.math.BigInteger
+import kotlin.math.exp
 
 /** Base class for each SMT command. */
 sealed class Command(val command: String) : SMTSerializable {
@@ -81,11 +84,10 @@ data class Assert(val expr: Expression<BoolSort>) : Command("assert") {
  *
  * Declares a new a constant function of [sort] with the given [name]
  */
-data class DeclareConst<T : Sort>(val instance: UserDeclaredExpression<T>) :
+data class DeclareConst<T : Sort>(val func : UserDeclaredSMTFunction0<T>) :
     Command("declare-const") {
-  val func = instance.func
-  val name = instance.name
-  val sort = instance.sort
+    val instance = func()
+    val name = func.symbol
 
   override fun toString() = "(declare-const ${instance.name} ${instance.sort})"
 
@@ -98,11 +100,13 @@ data class DeclareConst<T : Sort>(val instance: UserDeclaredExpression<T>) :
       useIterative: Boolean,
   ): Appendable {
     builder.append("(declare-const ")
-    name.toSMTString(builder, quotingRule, useIterative)
+    func.symbol.toSMTString(builder, quotingRule, useIterative)
     builder.append(" ")
-    sort.toSMTString(builder, quotingRule, useIterative)
+    func.sort.toSMTString(builder, quotingRule, useIterative)
     return builder.append(")")
   }
+
+    fun rename(symbol : Symbol) = DeclareConst(func.rename(symbol))
 }
 
 /**
@@ -110,7 +114,7 @@ data class DeclareConst<T : Sort>(val instance: UserDeclaredExpression<T>) :
  *
  * Declares a new a function of [sort] with the given [name] and [parameters]
  */
-data class DeclareFun<T : Sort>(val func: SMTFunction<T>) : Command("declare-fun") {
+data class DeclareFun<T : Sort>(val func: UserDeclaredSMTFunction<T>) : Command("declare-fun") {
   val name = func.symbol
   val parameters = func.parameters
   val sort = func.sort
@@ -142,6 +146,8 @@ data class DeclareFun<T : Sort>(val func: SMTFunction<T>) : Command("declare-fun
     sort.toSMTString(builder, quotingRule, useIterative)
     return builder.append(")")
   }
+
+    fun rename(symbol: Symbol) = DeclareFun(func.rename(symbol))
 }
 
 /** SMT (set-info [Attribute.keyword] [Attribute.value]) command. */
@@ -362,9 +368,11 @@ data class SetLogic(val logic: Logic) : Command("set-logic") {
 }
 
 /** SMT (define-const [name] [sort] [term]) command. */
-data class DefineConst(val name: Symbol, val sort: Sort, val term: Expression<Sort>) :
+data class DefineConst<T : Sort>(val name: Symbol, val sort: T, val term: Expression<Sort>) :
     Command("define-const") {
   override fun toString() = "(define-const $name $sort $term)"
+
+    val func = UserDefinedSMTFunction0(name, sort, term)
 
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
       "(define-const ${name.toSMTString(quotingRule, useIterative)} ${sort.toSMTString(quotingRule, useIterative)} ${term.toSMTString(quotingRule, useIterative)})"
@@ -384,10 +392,19 @@ data class DefineConst(val name: Symbol, val sort: Sort, val term: Expression<So
 
     return builder.append(")")
   }
+
+    // term is not safe to reuse, while it can not reference itself, other referenced functions may have been renamed
+    fun rename(symbol : Symbol) : DefineConst<T> {
+        val temp = DefineConst(symbol, sort, term)
+
+        term.transform { expression -> if(expression.func === this.func) { expression } else expression }
+
+        return temp
+    }
 }
 
 /** SMT (define-fun [functionDef]) command. */
-data class DefineFun(val functionDef: FunctionDef<*>) : Command("define-fun $functionDef") {
+data class DefineFun<T : Sort>(val functionDef: FunctionDef<T>) : Command("define-fun $functionDef") {
   /**
    * SMT (define-fun [functionDef]) command.
    *
@@ -396,8 +413,8 @@ data class DefineFun(val functionDef: FunctionDef<*>) : Command("define-fun $fun
   constructor(
       name: Symbol,
       parameters: List<SortedVar<*>>,
-      sort: Sort,
-      term: Expression<Sort>,
+      sort: T,
+      term: Expression<T>,
   ) : this(FunctionDef(name, parameters, sort, term))
 
   override fun toString() = "(define-fun $functionDef)"

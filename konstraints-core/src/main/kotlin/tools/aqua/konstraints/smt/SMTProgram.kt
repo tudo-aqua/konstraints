@@ -71,6 +71,22 @@ abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
    */
   fun info(keyword: String) = infoOrNull(keyword) ?: throw NoSuchInfoException(keyword)
 
+  fun renameVariables(renamer : Map<Symbol, Symbol>) {
+    commands.filter { command -> (command is DeclareConst<*>) || (command is DeclareFun<*>) || (command is DefineConst<*>) || (command is DefineFun<*>) }.map { command ->
+      when(command) {
+        is DeclareConst<*> -> { if(renamer.contains(command.name)) command.rename(renamer.getValue(command.func.symbol)) else command }
+        is DeclareFun<*> -> { if(renamer.contains(command.name)) command.rename(renamer.getValue(command.func.symbol)) else command }
+        is DefineConst<*> -> { if(renamer.contains(command.name)) DeclareConst(renamer.getValue(command.name), command.sort, command.instance) else command }
+        is DefineFun<*> -> { if(renamer.contains(command.functionDef.name)) DefineFun(renamer.getValue(command.functionDef.name), command.functionDef.parameters, command.functionDef.sort, command.functionDef.term) else command }
+        else -> throw IllegalStateException("Can not rename $command!")
+      }
+    }
+  }
+
+  fun renameVariables(renamer: (Symbol) -> Symbol?) {
+
+  }
+
   /**
    * Get info value associated with [keyword] or `null` if no such info exists.
    * - [keyword] may or may not contain prefix ':' (e.g. `status` and `:status` both refer to the
