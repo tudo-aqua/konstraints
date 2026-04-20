@@ -311,7 +311,7 @@ class RealLiteral(val value: BigDecimal) :
  *             | A | B | C | D | E | F
  * ```
  */
-class Char(val value: String) : Literal<StringSort>(LiteralString("char"), SMTString) {
+class CharLiteral(val value: String) : Literal<StringSort>(LiteralString("char"), SMTString) {
   override val theories = STRINGS_MARKER_SET
 
   val character = Char(Integer.parseInt(value.substring(2)))
@@ -319,7 +319,8 @@ class Char(val value: String) : Literal<StringSort>(LiteralString("char"), SMTSt
   override fun copy(children: List<Expression<*>>): Expression<StringSort> = this
 
   override fun equals(other: Any?) =
-      if (this === other) true else if (other !is Char) false else character == other.character
+      if (this === other) true
+      else if (other !is CharLiteral) false else character == other.character
 }
 
 class StringLiteral(val value: String) :
