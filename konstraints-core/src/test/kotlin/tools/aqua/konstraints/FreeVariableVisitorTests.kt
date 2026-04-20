@@ -38,13 +38,14 @@ import tools.aqua.konstraints.smt.SMTBitVec
 import tools.aqua.konstraints.smt.Symbol
 import tools.aqua.konstraints.smt.toSymbol
 import tools.aqua.konstraints.visitors.FreeVariables
+import tools.aqua.konstraints.visitors.RecursionPolicy
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class FreeVariableVisitorTests {
   @ParameterizedTest
   @MethodSource("provideExpressionAndFreeVariables")
-  fun testVisitFreeVariables(expr: Expression<*>, expected: List<Symbol>) {
-    val freeVariables = FreeVariables.of(expr)
+  fun testVisitFreeVariables(expr: Expression<*>, expected: Set<Symbol>) {
+    val freeVariables = FreeVariables.of(expr, RecursionPolicy.RECURSIVE)
 
     assertEquals(expected.size, freeVariables.size)
     assert(
@@ -65,7 +66,7 @@ class FreeVariableVisitorTests {
                   .filterIsInstance<Assert>()
                   .single()
                   .expr,
-              listOf("s".toSymbol(), "s".toSymbol(), "s".toSymbol()),
+              setOf("s".toSymbol()),
           ),
           arguments(
               smt(QF_BV) {
@@ -77,13 +78,7 @@ class FreeVariableVisitorTests {
                   .filterIsInstance<Assert>()
                   .single()
                   .expr,
-              listOf(
-                  "s".toSymbol(),
-                  "t".toSymbol(),
-                  "t".toSymbol(),
-                  "s".toSymbol(),
-                  "t".toSymbol(),
-              ),
+              setOf("s".toSymbol(), "t".toSymbol()),
           ),
           arguments(
               smt(QF_BV) {
@@ -95,7 +90,7 @@ class FreeVariableVisitorTests {
                   .filterIsInstance<Assert>()
                   .single()
                   .expr,
-              listOf("s".toSymbol(), "s".toSymbol(), "t".toSymbol()),
+              setOf("s".toSymbol(), "t".toSymbol()),
           ),
       )
 }

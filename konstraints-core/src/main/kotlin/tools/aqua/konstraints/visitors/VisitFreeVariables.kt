@@ -22,7 +22,7 @@ import tools.aqua.konstraints.smt.AnnotatedExpression
 import tools.aqua.konstraints.smt.BinaryExpression
 import tools.aqua.konstraints.smt.BitVecLiteral
 import tools.aqua.konstraints.smt.BoundVariable
-import tools.aqua.konstraints.smt.Char
+import tools.aqua.konstraints.smt.CharLiteral
 import tools.aqua.konstraints.smt.ConstantExpression
 import tools.aqua.konstraints.smt.ConstructorExpression
 import tools.aqua.konstraints.smt.ExistsExpression
@@ -43,58 +43,58 @@ import tools.aqua.konstraints.smt.TernaryExpression
 import tools.aqua.konstraints.smt.TesterExpression
 import tools.aqua.konstraints.smt.UnaryExpression
 
-object FreeVariables : VisitByStructure<MutableList<FreeExpression<*>>> {
-  fun of(expr: Expression<*>): List<FreeExpression<*>> {
-    val list = mutableListOf<FreeExpression<*>>()
-    visit(expr, list)
-    return list
+object FreeVariables : VisitByStructure<MutableSet<FreeExpression<*>>> {
+  fun of(expr: Expression<*>, policy: RecursionPolicy): Set<FreeExpression<*>> {
+    val set = mutableSetOf<FreeExpression<*>>()
+    visit(expr, set, policy)
+    return set
   }
 
-  override fun visit(expr: ConstantExpression<*>, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(expr: ConstantExpression<*>, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(expr: UnaryExpression<*, *>, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(expr: UnaryExpression<*, *>, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(expr: BinaryExpression<*, *, *>, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(expr: BinaryExpression<*, *, *>, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(expr: TernaryExpression<*, *, *, *>, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(expr: TernaryExpression<*, *, *, *>, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(expr: HomogenousExpression<*, *>, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(expr: HomogenousExpression<*, *>, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(expr: NAryExpression<*>, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(expr: NAryExpression<*>, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(expr: FreeExpression<*>, ctx: MutableList<FreeExpression<*>>) {
+  override fun visit(expr: FreeExpression<*>, ctx: MutableSet<FreeExpression<*>>) {
     ctx.add(expr)
   }
 
-  override fun visit(expr: LetExpression<*>, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(expr: LetExpression<*>, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(expr: ExistsExpression, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(expr: ExistsExpression, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(expr: ForallExpression, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(expr: ForallExpression, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(expr: Ite<*>, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(expr: Ite<*>, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(expr: AnnotatedExpression<*>, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(expr: AnnotatedExpression<*>, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(expr: BoundVariable<*>, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(expr: BoundVariable<*>, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(expr: LocalExpression<*>, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(expr: LocalExpression<*>, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(expr: ConstructorExpression, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(expr: ConstructorExpression, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(expr: SelectorExpression<*>, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(expr: SelectorExpression<*>, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(expr: TesterExpression, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(expr: TesterExpression, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(literal: BitVecLiteral, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(literal: BitVecLiteral, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(literal: Char, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(literal: CharLiteral, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(literal: FloatingPointLiteral, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(literal: FloatingPointLiteral, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(literal: IntLiteral, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(literal: IntLiteral, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(literal: RealLiteral, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(literal: RealLiteral, ctx: MutableSet<FreeExpression<*>>) {}
 
-  override fun visit(literal: StringLiteral, ctx: MutableList<FreeExpression<*>>) {}
+  override fun visit(literal: StringLiteral, ctx: MutableSet<FreeExpression<*>>) {}
 }

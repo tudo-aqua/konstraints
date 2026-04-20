@@ -22,7 +22,7 @@ import tools.aqua.konstraints.smt.AnnotatedExpression
 import tools.aqua.konstraints.smt.BinaryExpression
 import tools.aqua.konstraints.smt.BitVecLiteral
 import tools.aqua.konstraints.smt.BoundVariable
-import tools.aqua.konstraints.smt.Char
+import tools.aqua.konstraints.smt.CharLiteral
 import tools.aqua.konstraints.smt.ConstantExpression
 import tools.aqua.konstraints.smt.ConstructorExpression
 import tools.aqua.konstraints.smt.ExistsExpression
@@ -44,26 +44,33 @@ import tools.aqua.konstraints.smt.TernaryExpression
 import tools.aqua.konstraints.smt.TesterExpression
 import tools.aqua.konstraints.smt.UnaryExpression
 
+enum class RecursionPolicy {
+  ITERATIVE,
+  RECURSIVE,
+}
+
 interface VisitByStructure<T> {
-  fun visit(expression: Expression<*>, ctx: T, useIterative: Boolean = true) =
-      if (useIterative) visitIterative(expression, ctx) else visitRecursive(expression, ctx)
+  fun visit(expression: Expression<*>, ctx: T, policy: RecursionPolicy) =
+      when (policy) {
+        RecursionPolicy.ITERATIVE -> visitIterative(expression, ctx)
+        RecursionPolicy.RECURSIVE -> visitRecursive(expression, ctx)
+      }
 
   fun visitIterative(expr: Expression<*>, ctx: T) {
     val stack = ArrayDeque(listOf(expr))
 
     while (stack.isNotEmpty()) {
-      val curr = stack.removeFirst()
+      val curr = stack.removeLast()
 
       visitInternal(curr, ctx)
 
-      // TODO check ordering
-      stack.addAll(curr.children)
+      stack.addAll(curr.children.reversed())
     }
   }
 
   fun visitRecursive(expr: Expression<*>, ctx: T) {
     visitInternal(expr, ctx)
-    expr.children.forEach { visitInternal(it, ctx) }
+    expr.children.forEach { visitRecursive(it, ctx) }
   }
 
   fun visitInternal(expr: Expression<*>, ctx: T) {
@@ -126,7 +133,7 @@ interface VisitByStructure<T> {
   fun visit(literal: Literal<*>, ctx: T) =
       when (literal) {
         is BitVecLiteral -> visit(literal, ctx)
-        is Char -> visit(literal, ctx)
+        is CharLiteral -> visit(literal, ctx)
         is FloatingPointLiteral -> visit(literal, ctx)
         is IntLiteral -> visit(literal, ctx)
         is RealLiteral -> visit(literal, ctx)
@@ -135,7 +142,7 @@ interface VisitByStructure<T> {
 
   fun visit(literal: BitVecLiteral, ctx: T)
 
-  fun visit(literal: Char, ctx: T)
+  fun visit(literal: CharLiteral, ctx: T)
 
   fun visit(literal: FloatingPointLiteral, ctx: T)
 
