@@ -144,6 +144,36 @@ private constructor(
       else sort.bits == other.sort.bits && value == other.value
 }
 
+/** Convert [this] to a bitvector, that represents the same number. */
+fun Byte.bitvec() = BitVecLiteral(this)
+
+/** Convert [this] to a bitvector with width [bits], that represents the same number. */
+fun Byte.bitvec(bits: Int) = BitVecLiteral(this, bits)
+
+/** Convert [this] to a bitvector, that represents the same number. */
+fun Short.bitvec() = BitVecLiteral(this)
+
+/** Convert [this] to a bitvector with width [bits], that represents the same number. */
+fun Short.bitvec(bits: Int) = BitVecLiteral(this, bits)
+
+/** Convert [this] to a bitvector, that represents the same number. */
+fun Int.bitvec() = BitVecLiteral(this)
+
+/** Convert [this] to a bitvector with width [bits], that represents the same number. */
+fun Int.bitvec(bits: Int) = BitVecLiteral(this, bits)
+
+/** Convert [this] to a bitvector, that represents the same number. */
+fun Long.bitvec() = BitVecLiteral(this)
+
+/** Convert [this] to a bitvector with width [bits], that represents the same number. */
+fun Long.bitvec(bits: Int) = BitVecLiteral(this, bits)
+
+/** Convert [this] to a bitvector, that represents the same number. */
+fun BigInteger.bitvec() = BitVecLiteral(this)
+
+/** Convert [this] to a bitvector with width [bits], that represents the same number. */
+fun BigInteger.bitvec(bits: Int) = BitVecLiteral(this, bits)
+
 /**
  * d Floating-point literal.
  *

@@ -664,6 +664,20 @@ fun extract(i: Int, j: Int, block: () -> Expression<BitVecSort>) = BVExtract(i, 
  */
 fun extract(i: Int, j: Int, expr: Expression<BitVecSort>) = BVExtract(i, j, expr)
 
+/**
+ * Extracts bits from [j] to [i] from the result of [this].
+ *
+ * This results in a bitvector of size [i] - [j] + 1. [i] and [j] are inclusive.
+ */
+fun Expression<BitVecSort>.extract(i: Int, j: Int) = BVExtract(i, j, this)
+
+/**
+ * Extracts bits from [j] to [i] from [this].
+ *
+ * This results in a bitvector of size [i] - [j] + 1. [i] and [j] are inclusive.
+ */
+fun (() -> Expression<BitVecSort>).extract(i: Int, j: Int) = BVExtract(i, j, this())
+
 /*
  * Unary bitvector operations
  */

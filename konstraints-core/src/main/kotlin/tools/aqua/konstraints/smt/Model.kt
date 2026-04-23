@@ -57,13 +57,12 @@ data class Model(val definitions: Map<Symbol, FunctionDef<*>>) {
       getDefinition(symbol.toSymbol(), sort)
 
   /**
-   * Get [FunctionDef] for [func], automatically casts to [UserDeclaredSMTFunction.sort].
+   * Get [FunctionDef] for [func], automatically casts to [SMTFunction.sort].
    *
    * @throws [IllegalArgumentException] if no function that matches [func] exists
-   * @throws [DefinitionCastException] if [FunctionDef] is not of sort
-   *   [UserDeclaredSMTFunction.sort]
+   * @throws [DefinitionCastException] if [FunctionDef] is not of sort [SMTFunction.sort]
    */
-  inline fun <reified T : Sort> getDefinition(func: UserDeclaredSMTFunction<T>) =
+  inline fun <reified T : Sort> getDefinition(func: SMTFunction<T>) =
       getDefinition(func.symbol, func.sort)
 
   /** Get [FunctionDef] by name [symbol] or null if no such function exists. */
@@ -92,12 +91,11 @@ data class Model(val definitions: Map<Symbol, FunctionDef<*>>) {
 
   /**
    * Get [FunctionDef] for [func] or null if no such function exists, automatically casts to
-   * [UserDeclaredSMTFunction.sort].
+   * [SMTFunction.sort].
    *
-   * @throws [DefinitionCastException] if [FunctionDef] is not of sort
-   *   [UserDeclaredSMTFunction.sort]
+   * @throws [DefinitionCastException] if [FunctionDef] is not of sort [SMTFunction.sort]
    */
-  inline fun <reified T : Sort> getDefinitionOrNull(func: UserDeclaredSMTFunction<T>) =
+  inline fun <reified T : Sort> getDefinitionOrNull(func: SMTFunction<T>) =
       getDefinitionOrNull(func.symbol, func.sort)
 
   /**
@@ -131,13 +129,12 @@ data class Model(val definitions: Map<Symbol, FunctionDef<*>>) {
   inline fun <reified T : Sort> getTerm(symbol: String, sort: T) = getTerm(symbol).cast<T>()
 
   /**
-   * Get [Expression] for [func], automatically casts to [UserDeclaredSMTFunction.sort].
+   * Get [Expression] for [func], automatically casts to [SMTFunction.sort].
    *
    * @throws [IllegalArgumentException] if no function that matches [func] exists
    * @throws [ExpressionCastException] if [FunctionDef] is not of sort [T]
    */
-  inline fun <reified T : Sort> getTerm(func: UserDeclaredSMTFunction<T>) =
-      getTerm(func.symbol, func.sort)
+  inline fun <reified T : Sort> getTerm(func: SMTFunction<T>) = getTerm(func.symbol, func.sort)
 
   /** Get [Expression] by name [symbol] or null if no such function exists. */
   fun getTermOrNull(symbol: Symbol) = getDefinitionOrNull(symbol)?.term
@@ -165,13 +162,62 @@ data class Model(val definitions: Map<Symbol, FunctionDef<*>>) {
 
   /**
    * Get [Expression] for [func] or null if no such function exists, automatically casts to
-   * [UserDeclaredSMTFunction.sort].
+   * [SMTFunction.sort].
    *
-   * @throws [ExpressionCastException] if [FunctionDef] is not of sort
-   *   [UserDeclaredSMTFunction.sort]
+   * @throws [ExpressionCastException] if [FunctionDef] is not of sort [SMTFunction.sort]
    */
-  inline fun <reified T : Sort> getTermOrNull(func: UserDeclaredSMTFunction<T>) =
+  inline fun <reified T : Sort> getTermOrNull(func: SMTFunction<T>) =
       getTermOrNull(func.symbol, func.sort)
+
+  fun getConstantValue(func: SMTFunction<BitVecSort>): BitVecLiteral {
+    return getConstantValue(getDefinition(func).term)
+  }
+
+  fun getConstantValue(term: Expression<BitVecSort>): BitVecLiteral {
+    require(term is BitVecLiteral)
+
+    return term
+  }
+
+  fun getConstantValue(func: SMTFunction<IntSort>): IntLiteral {
+    return getConstantValue(getDefinition(func).term)
+  }
+
+  fun getConstantValue(term: Expression<IntSort>): IntLiteral {
+    require(term is IntLiteral)
+
+    return term
+  }
+
+  fun getConstantValue(func: SMTFunction<RealSort>): RealLiteral {
+    return getConstantValue(getDefinition(func).term)
+  }
+
+  fun getConstantValue(term: Expression<RealSort>): RealLiteral {
+    require(term is RealLiteral)
+
+    return term
+  }
+
+  fun getConstantValue(func: SMTFunction<FPSort>): FloatingPointLiteral {
+    return getConstantValue(getDefinition(func).term)
+  }
+
+  fun getConstantValue(term: Expression<FPSort>): FloatingPointLiteral {
+    require(term is FloatingPointLiteral)
+
+    return term
+  }
+
+  fun getConstantValue(func: SMTFunction<StringSort>): StringLiteral {
+    return getConstantValue(getDefinition(func).term)
+  }
+
+  fun getConstantValue(term: Expression<StringSort>): StringLiteral {
+    require(term is StringLiteral)
+
+    return term
+  }
 
   /**
    * This will later hold the functions to convert from solver models to a generic konstraints
