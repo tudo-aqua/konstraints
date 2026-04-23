@@ -340,7 +340,7 @@ fun FPExpr.aquaify(): Expression<FPSort> {
         (this as FPNum).let { fpNum ->
           FloatingPointLiteral(
               fpNum.signBV.aquaify().cast(),
-              fpNum.getExponentBV(false).aquaify().cast(),
+              fpNum.getExponentBV(true).aquaify().cast(),
               fpNum.significandBV.aquaify().cast(),
           )
         }
