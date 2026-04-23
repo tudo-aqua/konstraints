@@ -55,7 +55,7 @@ class ModelTests {
     solver.use {
       solver.solve(prg)
       prg.getModel(solver)
-      assertEquals(term, prg.model!!.definitions.single().term)
+      assertEquals(term, prg.model!!.definitions.map { it.value }.single().term)
     }
   }
 

@@ -196,7 +196,7 @@ class BitvectorTests {
   @ParameterizedTest
   @MethodSource("getLiteralsAndLength")
   fun `test that BVLiterals have the right bit length`(literal: String, expected: Int) {
-    assertEquals(expected, BitVecLiteral(literal).bits)
+    assertEquals(expected, BitVecLiteral(literal).numBits)
   }
 
   private fun getLiteralsAndLength(): Stream<Arguments> {

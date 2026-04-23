@@ -570,6 +570,21 @@ class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: Lis
 
 class ExpressionCastException(msg: String) : ClassCastException(msg)
 
+class DefinitionCastException(msg: String) : ClassCastException(msg)
+
+/**
+ * Safely cast this definition to an Expression of Sort T.
+ *
+ * @throws [DefinitionCastException] if [sort] is not [T]
+ */
+inline fun <reified T : Sort> FunctionDef<*>.cast(): FunctionDef<T> {
+  if (sort !is T)
+      throw DefinitionCastException("Can not cast expression $name of sort $sort to ${T::class}")
+
+  @Suppress("UNCHECKED_CAST")
+  return this as FunctionDef<T>
+}
+
 /**
  * Safely cast this expression to an Expression of Sort T.
  *
