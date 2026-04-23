@@ -191,6 +191,15 @@ data class FloatingPointLiteral(
 
   init {
     require(sign.sort.bits == 1)
+    require(sign.children.isEmpty()) {
+      "Floating point literals may only contain constant bitvectors!"
+    }
+    require(exponent.children.isEmpty()) {
+      "Floating point literals may only contain constant bitvectors!"
+    }
+    require(significand.children.isEmpty()) {
+      "Floating point literals may only contain constant bitvectors!"
+    }
   }
 
   companion object {
