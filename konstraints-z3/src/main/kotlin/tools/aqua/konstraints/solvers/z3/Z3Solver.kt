@@ -40,9 +40,13 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     val declarationsByName = mutableMapOf<Symbol, DeclareFun<*>>()
     terms.forEach { base ->
       base.asSequence().filterIsInstance<UserDeclaredExpression<*>>().forEach { expr ->
-        declarationsByName.computeIfAbsentAndMerge(expr.name) { _ ->
+        declarationsByName.computeIfAbsentAndMerge(expr.symbol) { _ ->
           DeclareFun(
-              UserDeclaredSMTFunctionN(expr.name, expr.sort, expr.children.map(Expression<*>::sort))
+              UserDeclaredSMTFunctionN(
+                  expr.symbol,
+                  expr.sort,
+                  expr.children.map(Expression<*>::sort),
+              )
           )
         }
       }
@@ -204,7 +208,7 @@ operator fun Model.Companion.invoke(model: Z3Model, context: Z3Context) =
     Model(
         context.constants.map { (aqua, z3) ->
           FunctionDef(
-              aqua.name as Symbol,
+              aqua.symbol as Symbol,
               emptyList(),
               aqua.sort,
               model.getConstInterp(z3).aquaify(),

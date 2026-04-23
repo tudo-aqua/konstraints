@@ -50,7 +50,7 @@ class FreeVariableVisitorTests {
     assertEquals(expected.size, freeVariables.size)
     assert(
         expected.all { symbol ->
-          freeVariables.find { expression -> expression.name == symbol } != null
+          freeVariables.find { expression -> expression.symbol == symbol } != null
         }
     )
   }

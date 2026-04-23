@@ -20,7 +20,7 @@ package tools.aqua.konstraints.smt
 
 /** Interface for all sorted SMT terms. */
 sealed class Expression<out T : Sort> : SMTSerializable {
-  abstract val name: BaseSymbol
+  abstract val symbol: BaseSymbol
   abstract val sort: T
   abstract val theories: Set<Theories>
   abstract val func: SMTFunction<T>?
@@ -118,7 +118,7 @@ sealed class Expression<out T : Sort> : SMTSerializable {
     else if (other !is Expression<*>) false
     else
         sort == other.sort &&
-            name == other.name &&
+            symbol == other.symbol &&
             func == other.func &&
             (children zip other.children).all { (lhs, rhs) -> lhs == rhs }
   }
@@ -126,16 +126,16 @@ sealed class Expression<out T : Sort> : SMTSerializable {
   abstract fun copy(children: List<Expression<*>>): Expression<T>
 
   // use only name for hashcode as names are almost unique and thus mostly conflict free
-  override fun hashCode() = name.hashCode()
+  override fun hashCode() = symbol.hashCode()
 
   override fun toString() =
-      if (children.isEmpty()) name.toString() else "$($name ${children.joinToString(" ")})"
+      if (children.isEmpty()) symbol.toString() else "$($symbol ${children.joinToString(" ")})"
 
   fun nameStringWithIndices(quotingRule: QuotingRule, useIterative: Boolean) =
       if (indices.isEmpty()) {
-        name.toSMTString(quotingRule, useIterative)
+        symbol.toSMTString(quotingRule, useIterative)
       } else {
-        "(_ ${name.toSMTString(quotingRule, useIterative)} ${indices.joinToString(" ")})"
+        "(_ ${symbol.toSMTString(quotingRule, useIterative)} ${indices.joinToString(" ")})"
       }
 
   fun nameStringWithIndices(
@@ -144,10 +144,10 @@ sealed class Expression<out T : Sort> : SMTSerializable {
       useIterative: Boolean,
   ): Appendable =
       if (indices.isEmpty()) {
-        name.toSMTString(builder, quotingRule, useIterative)
+        symbol.toSMTString(builder, quotingRule, useIterative)
       } else {
         builder.append("(_ ")
-        name.toSMTString(builder, quotingRule, useIterative)
+        symbol.toSMTString(builder, quotingRule, useIterative)
 
         indices.forEach { builder.append(" $it") }
 
@@ -192,27 +192,27 @@ sealed class Expression<out T : Sort> : SMTSerializable {
 }
 
 /** SMT Literal */
-sealed class Literal<out T : Sort>(override val name: LiteralString, override val sort: T) :
+sealed class Literal<out T : Sort>(override val symbol: LiteralString, override val sort: T) :
     Expression<T>() {
   override val func = null
 
   override val children: List<Expression<*>> = emptyList()
 
-  override fun toString() = name.toString()
+  override fun toString() = symbol.toString()
 }
 
-abstract class ConstantExpression<out T : Sort>(override val name: Symbol, override val sort: T) :
+abstract class ConstantExpression<out T : Sort>(override val symbol: Symbol, override val sort: T) :
     Expression<T>() {
   override val func = null
 
   override val children: List<Expression<*>> = emptyList()
 
-  override fun toString() = name.toSMTString(QuotingRule.SAME_AS_INPUT, false)
+  override fun toString() = symbol.toSMTString(QuotingRule.SAME_AS_INPUT, false)
 }
 
 /** Base class of all expressions with exactly one child */
 abstract class UnaryExpression<out T : Sort, out S : Sort>(
-    override val name: Symbol,
+    override val symbol: Symbol,
     override val sort: T,
 ) : Expression<T>() {
   override val func: SMTFunction<T>? = null
@@ -222,12 +222,12 @@ abstract class UnaryExpression<out T : Sort, out S : Sort>(
   override val children: List<Expression<*>>
     get() = listOf(inner)
 
-  override fun toString() = "($name ${inner})"
+  override fun toString() = "($symbol ${inner})"
 }
 
 /** Base class of all expressions with exactly two children */
 abstract class BinaryExpression<out T : Sort, out S1 : Sort, out S2 : Sort>(
-    override val name: Symbol,
+    override val symbol: Symbol,
     override val sort: T,
 ) : Expression<T>() {
   override val func: SMTFunction<T>? = null
@@ -239,12 +239,12 @@ abstract class BinaryExpression<out T : Sort, out S1 : Sort, out S2 : Sort>(
   override val children: List<Expression<*>>
     get() = listOf(lhs, rhs)
 
-  override fun toString() = "($name $lhs $rhs)"
+  override fun toString() = "($symbol $lhs $rhs)"
 }
 
 /** Base class of all expressions with exactly three children */
 abstract class TernaryExpression<out T : Sort, out S1 : Sort, out S2 : Sort, out S3 : Sort>(
-    override val name: Symbol,
+    override val symbol: Symbol,
     override val sort: T,
 ) : Expression<T>() {
   override val func = null
@@ -258,7 +258,7 @@ abstract class TernaryExpression<out T : Sort, out S1 : Sort, out S2 : Sort, out
   override val children: List<Expression<*>>
     get() = listOf(lhs, mid, rhs)
 
-  override fun toString() = "($name $lhs $mid $rhs)"
+  override fun toString() = "($symbol $lhs $mid $rhs)"
 }
 
 /**
@@ -266,31 +266,31 @@ abstract class TernaryExpression<out T : Sort, out S1 : Sort, out S2 : Sort, out
  * sort
  */
 abstract class HomogenousExpression<out T : Sort, out S : Sort>(
-    override val name: Symbol,
+    override val symbol: Symbol,
     override val sort: T,
 ) : Expression<T>() {
   override val func = null
   abstract override val children: List<Expression<S>>
 
   override fun toString() =
-      if (children.isNotEmpty()) "($name ${children.joinToString(" ")})"
-      else name.toSMTString(QuotingRule.SAME_AS_INPUT, false)
+      if (children.isNotEmpty()) "($symbol ${children.joinToString(" ")})"
+      else symbol.toSMTString(QuotingRule.SAME_AS_INPUT, false)
 }
 
 /** Base class of all expressions with any number of children */
-abstract class NAryExpression<out T : Sort>(override val name: Symbol, override val sort: T) :
+abstract class NAryExpression<out T : Sort>(override val symbol: Symbol, override val sort: T) :
     Expression<T>() {
 
   override fun toString() =
-      if (children.isNotEmpty()) "($name ${children.joinToString(" ")})"
-      else name.toSMTString(QuotingRule.SAME_AS_INPUT, false)
+      if (children.isNotEmpty()) "($symbol ${children.joinToString(" ")})"
+      else symbol.toSMTString(QuotingRule.SAME_AS_INPUT, false)
 }
 
 /** Let expression */
 class LetExpression<out T : Sort>(val bindings: List<VarBinding<*>>, val inner: Expression<T>) :
     Expression<T>() {
   override val sort = inner.sort
-  override val name = Keyword("let")
+  override val symbol = Keyword("let")
   override val theories = emptySet<Theories>()
   override val func = null
 
@@ -355,7 +355,7 @@ class LetExpression<out T : Sort>(val bindings: List<VarBinding<*>>, val inner: 
 }
 
 sealed class FreeExpression<out T : Sort>(
-    override val name: Symbol,
+    override val symbol: Symbol,
     override val sort: T,
     override val children: List<Expression<*>>,
 ) : Expression<T>() {
@@ -372,7 +372,7 @@ class Variable<T : Sort>(name: Symbol, sort: T, args: List<Expression<*>>) :
 
   constructor(name: String, sort: T) : this(name.toSymbol(), sort, emptyList())
 
-  override fun copy(children: List<Expression<*>>): Expression<T> = Variable(name, sort, children)
+  override fun copy(children: List<Expression<*>>): Expression<T> = Variable(symbol, sort, children)
 }
 
 class UserDeclaredExpression<out T : Sort>(
@@ -386,7 +386,7 @@ class UserDeclaredExpression<out T : Sort>(
   override val children: List<Expression<*>> = args
 
   override fun copy(children: List<Expression<*>>): Expression<T> =
-      UserDeclaredExpression(name, sort, children, func)
+      UserDeclaredExpression(symbol, sort, children, func)
 }
 
 class UserDefinedExpression<T : Sort>(
@@ -404,14 +404,14 @@ class UserDefinedExpression<T : Sort>(
   override val children: List<Expression<*>> = args
 
   override fun copy(children: List<Expression<*>>): Expression<T> =
-      UserDefinedExpression(name, sort, children, definition, func)
+      UserDefinedExpression(symbol, sort, children, definition, func)
 
   fun expand(): Expression<*> = definition.expand(children)
 }
 
 /** Expression with a local variable */
 class LocalExpression<T : Sort>(
-    override val name: Symbol,
+    override val symbol: Symbol,
     override val sort: T,
     val term: Expression<T>,
     override val func: VarBinding<T>,
@@ -423,14 +423,14 @@ class LocalExpression<T : Sort>(
     require(children.single().sort == sort)
 
     @Suppress("UNCHECKED_CAST")
-    return LocalExpression(name, sort, children.single() as Expression<T>, func) as Expression<T>
+    return LocalExpression(symbol, sort, children.single() as Expression<T>, func) as Expression<T>
   }
 
   // children are empty here since a local expression is always of arity 0
   // and an alias for term
   override val children: List<Expression<*>> = emptyList()
 
-  override fun toString() = name.toString()
+  override fun toString() = symbol.toString()
 }
 
 class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSort>) :
@@ -441,7 +441,7 @@ class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
   constructor(vararg vars: SortedVar<*>, term: Expression<BoolSort>) : this(vars.toList(), term)
 
   override val sort = SMTBool
-  override val name = Keyword("exists")
+  override val symbol = Keyword("exists")
   override val children: List<Expression<*>> = listOf(term)
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> {
@@ -481,7 +481,7 @@ class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
   override val func = null
 
   override val sort = SMTBool
-  override val name = Keyword("forall")
+  override val symbol = Keyword("forall")
   override val children: List<Expression<*>> = listOf(term)
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> {
@@ -517,7 +517,7 @@ class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
 
 /** Instance of a sorted var */
 class BoundVariable<out T : Sort>(
-    override val name: Symbol,
+    override val symbol: Symbol,
     override val sort: T,
     override val func: SortedVar<T>,
 ) : Expression<T>() {
@@ -525,9 +525,10 @@ class BoundVariable<out T : Sort>(
 
   override val children: List<Expression<*>> = emptyList()
 
-  override fun copy(children: List<Expression<*>>): Expression<T> = BoundVariable(name, sort, func)
+  override fun copy(children: List<Expression<*>>): Expression<T> =
+      BoundVariable(symbol, sort, func)
 
-  override fun toString() = name.toString()
+  override fun toString() = symbol.toString()
 }
 
 class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: List<Attribute>) :
@@ -535,7 +536,7 @@ class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: Lis
   override val theories = emptySet<Theories>()
   override val func = null
 
-  override val name = Keyword("!")
+  override val symbol = Keyword("!")
   override val sort = term.sort
 
   override fun copy(children: List<Expression<*>>): Expression<T> {
@@ -592,7 +593,7 @@ inline fun <reified T : Sort> FunctionDef<*>.cast(): FunctionDef<T> {
  */
 inline fun <reified T : Sort> Expression<*>.cast(): Expression<T> {
   if (sort !is T)
-      throw ExpressionCastException("Can not cast expression $name of sort $sort to ${T::class}")
+      throw ExpressionCastException("Can not cast expression $symbol of sort $sort to ${T::class}")
 
   @Suppress("UNCHECKED_CAST")
   return this as Expression<T>

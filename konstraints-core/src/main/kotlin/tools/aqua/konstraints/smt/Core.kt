@@ -183,7 +183,7 @@ class Ite<out T : Sort>(
   override fun copy(children: List<Expression<*>>): Expression<T> =
       IteDecl.constructDynamic(children, emptyList()) as Expression<T>
 
-  override val name: Symbol = "ite".toSymbol()
+  override val symbol: Symbol = "ite".toSymbol()
 
   override val children: List<Expression<*>> = listOf(condition, then, otherwise)
 

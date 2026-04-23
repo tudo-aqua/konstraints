@@ -84,13 +84,13 @@ data class Assert(val expr: Expression<BoolSort>) : Command("assert") {
 data class DeclareConst<T : Sort>(val instance: UserDeclaredExpression<T>) :
     Command("declare-const") {
   val func = instance.func
-  val name = instance.name
+  val name = instance.symbol
   val sort = instance.sort
 
-  override fun toString() = "(declare-const ${instance.name} ${instance.sort})"
+  override fun toString() = "(declare-const ${instance.symbol} ${instance.sort})"
 
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      "(declare-const ${instance.name.toSMTString(quotingRule, useIterative)} ${instance.sort.toSMTString(quotingRule, useIterative)})"
+      "(declare-const ${instance.symbol.toSMTString(quotingRule, useIterative)} ${instance.sort.toSMTString(quotingRule, useIterative)})"
 
   override fun toSMTString(
       builder: Appendable,
@@ -453,7 +453,7 @@ data class FunctionDef<out S : Sort>(
       // its probably better to implement some form of Decl.isInstanceOf(Expression) or
       // Expression.isInstanceOf(Decl)
       if (expr.children.isEmpty()) {
-        bindings.find { (param, _) -> param.symbol == expr.name }?.second ?: expr
+        bindings.find { (param, _) -> param.symbol == expr.symbol }?.second ?: expr
       } else {
         expr
       }

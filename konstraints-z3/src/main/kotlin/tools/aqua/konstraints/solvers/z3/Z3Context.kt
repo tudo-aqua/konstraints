@@ -111,12 +111,12 @@ class Z3Context {
           functions[expr.func]?.apply()
         } else {
           constants[expr]
-        } ?: throw UnknownFunctionException(expr.name as Symbol)
+        } ?: throw UnknownFunctionException(expr.symbol as Symbol)
 
     // FIXME this sort here might be wrong
     if (constant.sort != sorts[expr.sort]) {
       throw UnexpectedSortException(
-          "Constant ${expr.name} had unexpected sort: expected ${expr.sort} but was ${constant.sort}"
+          "Constant ${expr.symbol} had unexpected sort: expected ${expr.sort} but was ${constant.sort}"
       )
     }
 

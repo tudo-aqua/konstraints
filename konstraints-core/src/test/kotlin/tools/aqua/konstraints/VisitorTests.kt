@@ -46,7 +46,7 @@ object OrderSensitiveVisitor : VisitByStructure<MutableList<Symbol>> {
   override fun visit(expr: NAryExpression<*>, ctx: MutableList<Symbol>) {}
 
   override fun visit(expr: FreeExpression<*>, ctx: MutableList<Symbol>) {
-    ctx.add(expr.name)
+    ctx.add(expr.symbol)
   }
 
   override fun visit(expr: LetExpression<*>, ctx: MutableList<Symbol>) {}

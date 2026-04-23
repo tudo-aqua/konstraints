@@ -134,7 +134,7 @@ private constructor(
 
   override val sort = BitVecSort(numBits)
 
-  override fun toString() = name.toString()
+  override fun toString() = symbol.toString()
 
   override fun copy(children: List<Expression<*>>): Expression<BitVecSort> = this
 

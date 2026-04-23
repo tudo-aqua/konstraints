@@ -38,7 +38,7 @@ class Selector<T : Sort>(override val symbol: Symbol, override val sort: T, data
 }
 
 class SelectorExpression<T : Sort>(
-    override val name: BaseSymbol,
+    override val symbol: BaseSymbol,
     override val sort: T,
     override val func: SMTFunction<T>?,
     override val children: List<Expression<*>>,
@@ -84,7 +84,7 @@ data class Constructor(
 }
 
 class ConstructorExpression(
-    override val name: BaseSymbol,
+    override val symbol: BaseSymbol,
     override val sort: Datatype,
     override val func: SMTFunction<Datatype>?,
     override val children: List<Expression<*>>,
@@ -223,7 +223,7 @@ object Testers : SMTFunction<BoolSort>() {
 }
 
 class TesterExpression(index: SymbolIndex) : Expression<BoolSort>() {
-  override val name = "is".toSymbol()
+  override val symbol = "is".toSymbol()
   override val sort = SMTBool
   override val theories = emptySet<Theories>()
   override val func = Testers

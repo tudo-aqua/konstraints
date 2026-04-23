@@ -2306,7 +2306,7 @@ internal object IntRealLessEqDecl :
         RealLessEqDecl.constructDynamic(args, indices)
     else
         throw IllegalArgumentException(
-            "Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")}), (<= ${args[0]} ${args[1].name})"
+            "Expected (Int Int) or (Real Real) for $symbol, but was (${args.map {expr -> expr.sort }.joinToString(" ")}), (<= ${args[0]} ${args[1].symbol})"
         )
   }
 }

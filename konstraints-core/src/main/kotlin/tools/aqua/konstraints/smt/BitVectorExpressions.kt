@@ -39,7 +39,7 @@ class BVConcat(override val lhs: Expression<BitVecSort>, override val rhs: Expre
     ) {
   override val theories = FIXED_SIZE_BIT_VECTORS_MARKER_SET
 
-  override val name: Symbol = "concat".toSymbol()
+  override val symbol: Symbol = "concat".toSymbol()
 
   init {
     require(!lhs.sort.isSymbolic())
