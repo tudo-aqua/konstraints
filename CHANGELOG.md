@@ -1,23 +1,42 @@
+<!--
+   SPDX-License-Identifier: CC-BY-4.0
+
+   Copyright 2023-2026 The Konstraints Authors
+
+   This work is licensed under the Creative Commons Attribution 4.0
+   International License.
+
+   You should have received a copy of the license along with this
+   work. If not, see <https://creativecommons.org/licenses/by/4.0/>.
+-->
+
 # Changelog
 
 ## 0.4.1 - 2026-04-24
 
-`0.4.1` is closer to a feature release than a pure patch release: it adds meaningful API surface and also contains a few source-breaking renames.
+`0.4.1` is closer to a feature release than a pure patch release: it adds meaningful API surface and
+also contains a few source-breaking renames.
 
 ### Breaking Changes
 
-- `Expression.name` was renamed to `Expression.symbol` across the expression hierarchy. Code that reads or overrides `name` must be updated.
+- `Expression.name` was renamed to `Expression.symbol` across the expression hierarchy. Code that
+  reads or overrides `name` must be updated.
 - `Char` was renamed to `CharLiteral`.
 - `BitVecLiteral.bits` was renamed to `BitVecLiteral.numBits`.
-- `Model.definitions` changed from `List<FunctionDef<*>>` to `Map<Symbol, FunctionDef<*>>`. A list-based constructor still exists, but code relying on list semantics must adapt.
+- `Model.definitions` changed from `List<FunctionDef<*>>` to `Map<Symbol, FunctionDef<*>>`. A
+  list-based constructor still exists, but code relying on list semantics must adapt.
 - `FloatingPointLiteral` now rejects non-constant bitvector components at construction time.
 
 ### Added
 
-- New visitor APIs: `VisitByType<T>`, `VisitByStructure<T>`, `RecursionPolicy`, and `FreeVariables` for traversal and free-variable collection.
-- Rich model accessors: lookup by `Symbol`, `String`, or `SMTFunction`, plus typed `getDefinition*`, `getTerm*`, and `getConstantValue(...)` helpers.
-- New bitvector DSL helpers: `expr.extract(i, j)`, `(() -> expr).extract(i, j)`, and `.bitvec()` extensions for `Byte`, `Short`, `Int`, `Long`, and `BigInteger`.
-- `FloatingPointLiteral` now supports conversion back to Kotlin values via `asBitString()`, `asFloat()`, and `asDouble()`.
+- New visitor APIs: `VisitByType<T>`, `VisitByStructure<T>`, `RecursionPolicy`, and `FreeVariables`
+  for traversal and free-variable collection.
+- Rich model accessors: lookup by `Symbol`, `String`, or `SMTFunction`, plus typed `getDefinition*`,
+  `getTerm*`, and `getConstantValue(...)` helpers.
+- New bitvector DSL helpers: `expr.extract(i, j)`, `(() -> expr).extract(i, j)`, and `.bitvec()`
+  extensions for `Byte`, `Short`, `Int`, `Long`, and `BigInteger`.
+- `FloatingPointLiteral` now supports conversion back to Kotlin values via `asBitString()`,
+  `asFloat()`, and `asDouble()`.
 
 ### Changed
 
@@ -27,8 +46,10 @@
 ### Fixed
 
 - Z3 model extraction now resolves constants consistently via `symbol`.
-- Floating-point conversion from Z3 was corrected, including exponent extraction and 64-bit double handling.
-- Model-related integration coverage now checks that solver models expose all free variables used in assertions.
+- Floating-point conversion from Z3 was corrected, including exponent extraction and 64-bit double
+  handling.
+- Model-related integration coverage now checks that solver models expose all free variables used in
+  assertions.
 
 ### Build And Tooling
 
