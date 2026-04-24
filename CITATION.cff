@@ -40,6 +40,10 @@ authors:
     family-names: "Spielmann"
     email: "laurenz-levi.spielmann@tu-dortmund.de"
     affiliation: "TU Dortmund University"
+  - given-names: "Richard"
+    family-names: "Stewing"
+    email: "richard.stewing@tu-dortmund.de"
+    affiliation: "TU Dortmund University"
 
 title: "Konstraints"
 type: "software"
