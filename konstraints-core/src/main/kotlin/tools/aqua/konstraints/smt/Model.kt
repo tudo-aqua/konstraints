@@ -22,6 +22,16 @@ package tools.aqua.konstraints.smt
 data class Model(val definitions: Map<Symbol, FunctionDef<*>>) {
   constructor(definitions: List<FunctionDef<*>>) : this(definitions.associateBy { def -> def.name })
 
+  /** All definitions that do not have any parameters. */
+  val constants: Map<Symbol, FunctionDef<*>> = definitions.filter {
+      (symbol, def) -> def.parameters.isEmpty()
+  }
+
+  /** All definitions that have at least one parameter. */
+  val functions: Map<Symbol, FunctionDef<*>> = definitions.filter {
+      (symbol, def) -> def.parameters.isNotEmpty()
+  }
+
   /**
    * Get [FunctionDef] by name [symbol].
    *

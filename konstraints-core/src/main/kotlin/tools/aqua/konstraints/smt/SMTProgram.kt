@@ -57,6 +57,8 @@ abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
   val context = Context()
 
   protected val _commands: MutableList<Command> = commands.toMutableList()
+
+  // TODO change to function that concatenates the commands in the correct order and inserts push/pop in the correct places when necessary
   val commands: List<Command>
     get() = _commands.toList()
 
@@ -118,6 +120,12 @@ abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
 
 /** SMT Program with a mutable command list. */
 class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
+  class AssertionLevel {
+    val definitions = mutableListOf<Declaration<*>>()
+    val assertions = mutableListOf<Assert>()
+  }
+
+  val assertionLevels = ArrayDeque<AssertionLevel>()
 
   constructor() : this(emptyList())
 
@@ -289,13 +297,25 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     return func
   }
 
-  fun push(n: Int) = context.push(n)
+  fun push(n: Int) {
+    context.push(n)
+    repeat(n) { assertionLevels.add(AssertionLevel()) }
+  }
 
-  fun push() = context.push()
+  fun push() = push(1)
 
-  fun push(block: (Context) -> Unit) = context.push(block)
+  fun<T> push(block: MutableSMTProgram.() -> T) {
+    push()
+    block()
+    pop()
+  }
 
-  fun pop(n: Int) = context.pop(n)
+  fun pop() = pop(1)
+
+  fun pop(n: Int) {
+    context.pop(n)
+    repeat(n) { assertionLevels.removeLast() }
+  }
 
   fun setOption(option: SetOption) {
     _options[option.name.removePrefix(":")] = option.value

@@ -110,12 +110,16 @@ open class InteractiveCLISolver(val name: String, vararg solverOptions: String) 
     }
   }
 
-  override fun solve(program: SMTProgram): SatStatus {
-    processCommand(SetOption(":print-success", BooleanOptionValue(true)), program, 1000L)
+  override fun solve(program: SMTProgram, produceModel: Boolean, timeout: Long): Pair<SatStatus, Model?> {
+    processCommand(SetOption(":print-success", BooleanOptionValue(true)), program, timeout)
+    processCommand(SetOption(":produce-models", BooleanOptionValue(produceModel)), program, timeout)
     program.commands.forEach {
-      val timeout = 5000L
       processCommand(it, program, timeout)
     }
+
+    // processCommand(CheckSat(), program, timeout)
+    // if(produceModel && pogram.status == SatStatus.SAT)
+    // processCommand(GetModel(), program, timeout)
 
     return program.status
   }

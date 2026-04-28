@@ -76,13 +76,15 @@ data class Assert(val expr: Expression<BoolSort>) : Command("assert") {
   }
 }
 
+abstract class Declaration<T : Sort>(command: String) : Command(command)
+
 /**
  * SMT (declare-const [name] [sort]) command.
  *
  * Declares a new a constant function of [sort] with the given [name]
  */
 data class DeclareConst<T : Sort>(val instance: UserDeclaredExpression<T>) :
-    Command("declare-const") {
+    Declaration<T>("declare-const") {
   val func = instance.func
   val name = instance.symbol
   val sort = instance.sort
@@ -110,7 +112,7 @@ data class DeclareConst<T : Sort>(val instance: UserDeclaredExpression<T>) :
  *
  * Declares a new a function of [sort] with the given [name] and [parameters]
  */
-data class DeclareFun<T : Sort>(val func: SMTFunction<T>) : Command("declare-fun") {
+data class DeclareFun<T : Sort>(val func: SMTFunction<T>) : Declaration<T>("declare-fun") {
   val name = func.symbol
   val parameters = func.parameters
   val sort = func.sort
@@ -142,6 +144,155 @@ data class DeclareFun<T : Sort>(val func: SMTFunction<T>) : Command("declare-fun
     sort.toSMTString(builder, quotingRule, useIterative)
     return builder.append(")")
   }
+}
+
+/** SMT (declare-sort [name] [arity]) command. */
+data class DeclareSort(val name: Symbol, val arity: Int) : Declaration<UserDeclaredSort>("declare-sort") {
+    override fun toString() = "declare-sort $name $arity"
+
+    override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+        "(declare-sort ${name.toSMTString(quotingRule, useIterative)} $arity)"
+
+    override fun toSMTString(
+        builder: Appendable,
+        quotingRule: QuotingRule,
+        useIterative: Boolean,
+    ): Appendable {
+        builder.append("(declare-sort ")
+        name.toSMTString(builder, quotingRule, useIterative)
+        return builder.append(" $arity)")
+    }
+}
+
+/** SMT (define-sort [name] ([sortParameters]) [sort]) command. */
+data class DefineSort(val name: Symbol, var sortParameters: List<Symbol>, val sort: Sort) :
+    Declaration<UserDefinedUserDeclaredSort>("define-sort") {
+    override fun toString() = "define-sort $name (${sortParameters.joinToString(" ")}) $sort"
+
+    override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+        "(define-sort ${name.toSMTString(quotingRule, useIterative)} (${sortParameters.joinToString(" "){ it.toSMTString(quotingRule, useIterative) }}) ${sort.toSMTString(
+            quotingRule, useIterative,
+        )})"
+
+    override fun toSMTString(
+        builder: Appendable,
+        quotingRule: QuotingRule,
+        useIterative: Boolean,
+    ): Appendable {
+        builder.append(" (define-sort ")
+        name.toSMTString(builder, quotingRule, useIterative)
+        builder.append(" (")
+
+        var counter = 0
+        sortParameters.forEach {
+            if (++counter > 1) builder.append(" ")
+            it.toSMTString(builder, quotingRule, useIterative)
+        }
+        builder.append(") ")
+
+        sort.toSMTString(builder, quotingRule, useIterative)
+        return builder.append(")")
+    }
+}
+
+/** SMT (define-const [name] [sort] [term]) command. */
+data class DefineConst<T : Sort>(val name: Symbol, val sort: T, val term: Expression<T>) :
+    Declaration<T>("define-const") {
+    override fun toString() = "(define-const $name $sort $term)"
+
+    override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+        "(define-const ${name.toSMTString(quotingRule, useIterative)} ${sort.toSMTString(quotingRule, useIterative)} ${term.toSMTString(quotingRule, useIterative)})"
+
+    override fun toSMTString(
+        builder: Appendable,
+        quotingRule: QuotingRule,
+        useIterative: Boolean,
+    ): Appendable {
+        builder.append("(define-const ")
+
+        name.toSMTString(builder, quotingRule, useIterative)
+        builder.append(" ")
+        sort.toSMTString(builder, quotingRule, useIterative)
+        builder.append(" ")
+        term.toSMTString(builder, quotingRule, useIterative)
+
+        return builder.append(")")
+    }
+}
+
+/** SMT (define-fun [functionDef]) command. */
+data class DefineFun<T: Sort>(val functionDef: FunctionDef<T>) : Declaration<T>("define-fun $functionDef") {
+    /**
+     * SMT (define-fun [functionDef]) command.
+     *
+     * Automatically construct [functionDef] from individual parameters
+     */
+    constructor(
+        name: Symbol,
+        parameters: List<SortedVar<*>>,
+        sort: T,
+        term: Expression<T>,
+    ) : this(FunctionDef(name, parameters, sort, term))
+
+    override fun toString() = "(define-fun $functionDef)"
+
+    override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+        "(define-fun ${functionDef.name.toSMTString(quotingRule, useIterative)} (${functionDef.parameters.joinToString(" "){it.toSMTString(
+            quotingRule, useIterative,
+        )}}) ${functionDef.sort.toSMTString(quotingRule, useIterative)} ${functionDef.term.toSMTString(quotingRule, useIterative)})"
+
+    override fun toSMTString(
+        builder: Appendable,
+        quotingRule: QuotingRule,
+        useIterative: Boolean,
+    ): Appendable {
+        builder.append("(define-fun ")
+        functionDef.name.toSMTString(builder, quotingRule, useIterative)
+        builder.append(" (")
+
+        var counter = 0
+        functionDef.parameters.forEach {
+            if (++counter > 1) builder.append(" ")
+            it.toSMTString(builder, quotingRule, useIterative)
+        }
+        builder.append(") ")
+
+        functionDef.sort.toSMTString(builder, quotingRule, useIterative)
+        builder.append(" ")
+        functionDef.term.toSMTString(builder, quotingRule, useIterative)
+        return builder.append(")")
+    }
+}
+
+/**
+ * Function definition object holding, [name], [parameters], [sort] and [term] of a function defined
+ * via [DefineFun].
+ */
+data class FunctionDef<out S : Sort>(
+    val name: Symbol,
+    val parameters: List<SortedVar<*>>,
+    val sort: S,
+    val term: Expression<S>,
+) {
+    override fun toString(): String = "$name (${parameters.joinToString(" ")}) $sort $term"
+
+    fun expand(args: List<Expression<*>>): Expression<*> {
+        // term is a placeholder expression using the parameters as expressions
+        // we need to build the same term but replace every occurrence of a parameter with
+        // the corresponding argument expression
+        val bindings = (parameters zip args)
+
+        return term.transform { expr: Expression<*> ->
+            // TODO do not check name equality here,
+            // its probably better to implement some form of Decl.isInstanceOf(Expression) or
+            // Expression.isInstanceOf(Decl)
+            if (expr.children.isEmpty()) {
+                bindings.find { (param, _) -> param.symbol == expr.symbol }?.second ?: expr
+            } else {
+                expr
+            }
+        }
+    }
 }
 
 /** SMT (set-info [Attribute.keyword] [Attribute.value]) command. */
@@ -227,55 +378,6 @@ data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : Attr
       sExpressions.joinTo(builder, separator = " ", prefix = "(", postfix = ")")
 }
 
-/** SMT (declare-sort [name] [arity]) command. */
-data class DeclareSort(val name: Symbol, val arity: Int) : Command("declare-sort") {
-  override fun toString() = "declare-sort $name $arity"
-
-  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      "(declare-sort ${name.toSMTString(quotingRule, useIterative)} $arity)"
-
-  override fun toSMTString(
-      builder: Appendable,
-      quotingRule: QuotingRule,
-      useIterative: Boolean,
-  ): Appendable {
-    builder.append("(declare-sort ")
-    name.toSMTString(builder, quotingRule, useIterative)
-    return builder.append(" $arity)")
-  }
-}
-
-/** SMT (define-sort [name] ([sortParameters]) [sort]) command. */
-data class DefineSort(val name: Symbol, var sortParameters: List<Symbol>, val sort: Sort) :
-    Command("define-sort") {
-  override fun toString() = "define-sort $name (${sortParameters.joinToString(" ")}) $sort"
-
-  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      "(define-sort ${name.toSMTString(quotingRule, useIterative)} (${sortParameters.joinToString(" "){ it.toSMTString(quotingRule, useIterative) }}) ${sort.toSMTString(
-        quotingRule, useIterative,
-      )})"
-
-  override fun toSMTString(
-      builder: Appendable,
-      quotingRule: QuotingRule,
-      useIterative: Boolean,
-  ): Appendable {
-    builder.append(" (define-sort ")
-    name.toSMTString(builder, quotingRule, useIterative)
-    builder.append(" (")
-
-    var counter = 0
-    sortParameters.forEach {
-      if (++counter > 1) builder.append(" ")
-      it.toSMTString(builder, quotingRule, useIterative)
-    }
-    builder.append(") ")
-
-    sort.toSMTString(builder, quotingRule, useIterative)
-    return builder.append(")")
-  }
-}
-
 // TODO string serialization of OptionValue
 /** SMT (set-option [name] [OptionValue]) command. */
 data class SetOption(val name: String, val value: OptionValue) : Command("set-option") {
@@ -359,106 +461,6 @@ data class SetLogic(val logic: Logic) : Command("set-logic") {
       quotingRule: QuotingRule,
       useIterative: Boolean,
   ): Appendable = builder.append(toString())
-}
-
-/** SMT (define-const [name] [sort] [term]) command. */
-data class DefineConst(val name: Symbol, val sort: Sort, val term: Expression<Sort>) :
-    Command("define-const") {
-  override fun toString() = "(define-const $name $sort $term)"
-
-  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      "(define-const ${name.toSMTString(quotingRule, useIterative)} ${sort.toSMTString(quotingRule, useIterative)} ${term.toSMTString(quotingRule, useIterative)})"
-
-  override fun toSMTString(
-      builder: Appendable,
-      quotingRule: QuotingRule,
-      useIterative: Boolean,
-  ): Appendable {
-    builder.append("(define-const ")
-
-    name.toSMTString(builder, quotingRule, useIterative)
-    builder.append(" ")
-    sort.toSMTString(builder, quotingRule, useIterative)
-    builder.append(" ")
-    term.toSMTString(builder, quotingRule, useIterative)
-
-    return builder.append(")")
-  }
-}
-
-/** SMT (define-fun [functionDef]) command. */
-data class DefineFun(val functionDef: FunctionDef<*>) : Command("define-fun $functionDef") {
-  /**
-   * SMT (define-fun [functionDef]) command.
-   *
-   * Automatically construct [functionDef] from individual parameters
-   */
-  constructor(
-      name: Symbol,
-      parameters: List<SortedVar<*>>,
-      sort: Sort,
-      term: Expression<Sort>,
-  ) : this(FunctionDef(name, parameters, sort, term))
-
-  override fun toString() = "(define-fun $functionDef)"
-
-  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      "(define-fun ${functionDef.name.toSMTString(quotingRule, useIterative)} (${functionDef.parameters.joinToString(" "){it.toSMTString(
-        quotingRule, useIterative,
-      )}}) ${functionDef.sort.toSMTString(quotingRule, useIterative)} ${functionDef.term.toSMTString(quotingRule, useIterative)})"
-
-  override fun toSMTString(
-      builder: Appendable,
-      quotingRule: QuotingRule,
-      useIterative: Boolean,
-  ): Appendable {
-    builder.append("(define-fun ")
-    functionDef.name.toSMTString(builder, quotingRule, useIterative)
-    builder.append(" (")
-
-    var counter = 0
-    functionDef.parameters.forEach {
-      if (++counter > 1) builder.append(" ")
-      it.toSMTString(builder, quotingRule, useIterative)
-    }
-    builder.append(") ")
-
-    functionDef.sort.toSMTString(builder, quotingRule, useIterative)
-    builder.append(" ")
-    functionDef.term.toSMTString(builder, quotingRule, useIterative)
-    return builder.append(")")
-  }
-}
-
-/**
- * Function definition object holding, [name], [parameters], [sort] and [term] of a function defined
- * via [DefineFun].
- */
-data class FunctionDef<out S : Sort>(
-    val name: Symbol,
-    val parameters: List<SortedVar<*>>,
-    val sort: S,
-    val term: Expression<S>,
-) {
-  override fun toString(): String = "$name (${parameters.joinToString(" ")}) $sort $term"
-
-  fun expand(args: List<Expression<*>>): Expression<*> {
-    // term is a placeholder expression using the parameters as expressions
-    // we need to build the same term but replace every occurrence of a parameter with
-    // the corresponding argument expression
-    val bindings = (parameters zip args)
-
-    return term.transform { expr: Expression<*> ->
-      // TODO do not check name equality here,
-      // its probably better to implement some form of Decl.isInstanceOf(Expression) or
-      // Expression.isInstanceOf(Decl)
-      if (expr.children.isEmpty()) {
-        bindings.find { (param, _) -> param.symbol == expr.symbol }?.second ?: expr
-      } else {
-        expr
-      }
-    }
-  }
 }
 
 /** SMT (push [n]) command. */

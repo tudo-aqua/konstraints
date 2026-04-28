@@ -23,8 +23,12 @@ import tools.aqua.konstraints.smt.SMTProgram
 import tools.aqua.konstraints.smt.SatStatus
 
 interface Solver : AutoCloseable {
-  /** Solves the provided program using this solver. */
-  fun solve(program: SMTProgram): SatStatus
-
-  fun getModel(): Model
+  /**
+   * Solves the provided program using [this] solver.
+   *
+   * If [produceModel] is true this will also return a model if [program] is SAT.
+   *
+   * @throws TimeoutException if timeout is reached.
+   */
+  fun solve(program: SMTProgram, produceModel: Boolean, timeout: Long): Pair<SatStatus, Model?>
 }
