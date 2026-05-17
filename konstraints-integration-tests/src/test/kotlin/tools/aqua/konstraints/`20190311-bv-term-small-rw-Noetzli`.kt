@@ -29,7 +29,6 @@ class `20190311-bv-term-small-rw-Noetzli` {
       val s by declaringConst(SMTBitVec(32))
 
       assert { not(s bvand s eq s) }
-      checkSat()
     }
   }
 
@@ -41,7 +40,6 @@ class `20190311-bv-term-small-rw-Noetzli` {
         not(s bvlshr s eq "#b0".bitvec(32))
         // not(s bvlshr s eq 0)
       }
-      checkSat()
     }
   }
 
@@ -51,7 +49,6 @@ class `20190311-bv-term-small-rw-Noetzli` {
       val t by declaringConst(SMTBitVec(32))
 
       assert { not((s bvor (t bvor t)) eq (s bvor t)) }
-      checkSat()
     }
   }
 
@@ -65,7 +62,6 @@ class `20190311-bv-term-small-rw-Noetzli` {
         val expr2 = s bvor t
         not(expr1 eq expr2)
       }
-      checkSat()
     }
   }
 }

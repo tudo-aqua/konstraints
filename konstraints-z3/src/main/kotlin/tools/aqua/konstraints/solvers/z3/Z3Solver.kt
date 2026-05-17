@@ -34,8 +34,6 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
 
   var status: SatStatus = SatStatus.PENDING
 
-  private var z3model: Z3Model? = null
-
   fun solve(terms: List<Expression<BoolSort>>): SatStatus {
     val declarationsByName = mutableMapOf<Symbol, DeclareFun<*>>()
     terms.forEach { base ->
@@ -54,28 +52,45 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
 
     declarationsByName.values.forEach { visit(it) }
     terms.forEach { visit(Assert(it)) }
-    visit(CheckSat)
 
     return status
   }
 
-  override fun solve(program: SMTProgram): SatStatus {
+  override fun solve(
+      program: SMTProgram,
+      produceModel: Boolean,
+      timeout: Long,
+  ): Pair<SatStatus, Model?> {
     program.commands.forEach { visit(it) }
+
+    when (solver.check()) {
+      Status.UNSATISFIABLE -> status = SatStatus.UNSAT
+      Status.UNKNOWN -> status = SatStatus.UNKNOWN
+      Status.SATISFIABLE -> status = SatStatus.SAT
+    }
+
     program.status = status
 
+    /*
     try {
       z3model = solver.model
     } catch (t: Throwable) {}
+      */
 
-    return status
+    return status to if (produceModel && isModelAvailable) Model(solver.model, context) else null
   }
 
-  /** Creates and returns the model if available else throws [IllegalStateException]. */
-  override fun getModel() =
-      if (isModelAvailable) Model(z3model!!, context) else throw IllegalStateException("")
-
+  // solver.model does not return null on failure, contrary to its documentation,
+  // but rather throws an exception we just catch this exception and return false,
+  // otherwise when the call does not fail we return true
   val isModelAvailable: Boolean
-    get() = z3model != null
+    get() =
+        try {
+          solver.model
+          true
+        } catch (e: Exception) {
+          false
+        }
 
   override fun visit(assert: Assert) {
     val assertion = assert.expr.z3ify(context)
@@ -143,15 +158,6 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
         }
       }
 
-  override fun visit(checkSat: CheckSat): Unit =
-      when (solver.check()) {
-        Status.UNSATISFIABLE -> status = SatStatus.UNSAT
-        Status.UNKNOWN -> status = SatStatus.UNKNOWN
-        Status.SATISFIABLE -> status = SatStatus.SAT
-      }
-
-  override fun visit(exit: Exit) {}
-
   override fun visit(setInfo: SetInfo) {}
 
   override fun visit(setOption: SetOption) {}
@@ -162,15 +168,11 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
     context.context.mkUninterpretedSort(declareSort.name.toString())
   }
 
-  override fun visit(getModel: GetModel) {
-    z3model = solver.model
-  }
-
-  override fun visit(defineConst: DefineConst) {
+  override fun visit(defineConst: DefineConst<*>) {
     TODO("Not yet implemented")
   }
 
-  override fun visit(defineFun: DefineFun) {
+  override fun visit(defineFun: DefineFun<*>) {
     // this is empty as we do not need to do any work when seeing a "defineFun"
     // Z3 has no concept of function definitions, we replace function created via define-fun
     // "on the fly" while converting the expression tree into z3 objects
@@ -187,6 +189,8 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
   override fun visit(defineSort: DefineSort) {
     // empty
   }
+
+  override fun visit(nullOp: NullOp) {}
 
   fun reset() {
     solver.reset()

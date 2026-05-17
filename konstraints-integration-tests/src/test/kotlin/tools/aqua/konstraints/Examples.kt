@@ -40,7 +40,7 @@ import tools.aqua.konstraints.smt.SMTRoundingMode
 import tools.aqua.konstraints.smt.SMTString
 import tools.aqua.konstraints.smt.SatStatus
 import tools.aqua.konstraints.smt.bitvec
-import tools.aqua.konstraints.solvers.z3.Z3Solver
+import tools.aqua.konstraints.solvers.InteractiveZ3Solver
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Examples {
@@ -105,21 +105,24 @@ class Examples {
 
           // when we added all assertions we can get the sat status as follows
 
-          val solver = Z3Solver()
+          val solver = InteractiveZ3Solver()
 
           // to automatically close solver resources once finished we solve inside this use block
-          solver.use { solver ->
-            // we may save the status here however it will also be stored at the program.status
-            // field for later use
-            val status = checkSat(solver)
+          // we capture the result of the solver and unpack the returned tuple
+          val (status, model) =
+              solver.use { solver ->
+                // we solve the program using our solver, the solve function returns a tuple of
+                // SatStatus and Model
+                // the model may be null if produceModel is set to false or if the program was not
+                // satisfiable
+                solve(solver, true, 5000)
+              }
 
-            // use the getModel variant that takes a solver to generate the model from the solver
-            // this needs to be done while the solver is still open
-            // later the model can be accessed again via program.model
-            getModel(solver) { model ->
-              // we can also inspect the model here
-              println(model)
-            }
+          // later we might inspect the model
+          if (model != null) {
+            // we still have the 'original' definition of 'u', we can use it to retrieve its value
+            // from the model
+            print(model.getConstant(u.func!!))
           }
         }
   }
@@ -170,15 +173,18 @@ class Examples {
           // we could also store the all quantified expression by writing val qExpr = forall(...)
           assert(forall(SMTBitVec(32), SMTBitVec(32)) { x, y -> f(x, y) bvult (x bvadd y) })
 
-          val solver = Z3Solver()
+          val solver = InteractiveZ3Solver()
 
           // to automatically close solver resources once finished we solve inside this use block
-          solver.use { solver ->
-            // we may save the status here however it will also be stored at the program.status
-            // field for later use
-            val status = checkSat(solver)
-            println(status)
-          }
+          // we capture the result of the solver and unpack the returned tuple
+          val (status, model) =
+              solver.use { solver ->
+                // we solve the program using our solver, the solve function returns a tuple of
+                // SatStatus and Model
+                // the model may be null if produceModel is set to false or if the program was not
+                // satisfiable
+                solve(solver, true, 5000)
+              }
         }
   }
 
@@ -245,19 +251,18 @@ class Examples {
 
           // when we added all assertions we can get the sat status as follows
 
-          val solver = Z3Solver()
+          val solver = InteractiveZ3Solver()
 
           // to automatically close solver resources once finished we solve inside this use block
-          solver.use { solver ->
-            // we may save the status here however it will also be stored at the program.status
-            // field for later use
-            val status = checkSat(solver)
-
-            getModel(solver) { model ->
-              // we can also inspect the model here
-              println(model)
-            }
-          }
+          // we capture the result of the solver and unpack the returned tuple
+          val (status, model) =
+              solver.use { solver ->
+                // we solve the program using our solver, the solve function returns a tuple of
+                // SatStatus and Model
+                // the model may be null if produceModel is set to false or if the program was not
+                // satisfiable
+                solve(solver, true, 5000)
+              }
         }
 
     println(program)
@@ -311,13 +316,18 @@ class Examples {
 
           assert(simpleIf eq nestedIf eq lambdaIf)
 
-          val solver = Z3Solver()
+          val solver = InteractiveZ3Solver()
 
-          solver.use { solver ->
-            checkSat(solver)
-
-            getModel(solver) { model -> println(model) }
-          }
+          // to automatically close solver resources once finished we solve inside this use block
+          // we capture the result of the solver and unpack the returned tuple
+          val (status, model) =
+              solver.use { solver ->
+                // we solve the program using our solver, the solve function returns a tuple of
+                // SatStatus and Model
+                // the model may be null if produceModel is set to false or if the program was not
+                // satisfiable
+                solve(solver, true, 5000)
+              }
         }
 
     println(program)
@@ -394,19 +404,18 @@ class Examples {
             forall(SMTBitVec(8), SMTBitVec(8)) { s, t -> (s bvsdiv t) eq bvsdiv8(s, t) }
           }
 
-          val solver = Z3Solver()
+          val solver = InteractiveZ3Solver()
 
           // to automatically close solver resources once finished we solve inside this use block
-          solver.use { solver ->
-            // we may save the status here however it will also be stored at the program.status
-            // field for later use
-            val status = checkSat(solver)
-
-            getModel(solver) { model ->
-              // we can also inspect the model here
-              println(model)
-            }
-          }
+          // we capture the result of the solver and unpack the returned tuple
+          val (status, model) =
+              solver.use { solver ->
+                // we solve the program using our solver, the solve function returns a tuple of
+                // SatStatus and Model
+                // the model may be null if produceModel is set to false or if the program was not
+                // satisfiable
+                solve(solver, true, 5000)
+              }
 
           // note that calling checkSat without a solver argument only
           // indicates that we want to get the sat status
@@ -508,11 +517,18 @@ class Examples {
             }
           }
 
-          val solver = Z3Solver()
+          val solver = InteractiveZ3Solver()
 
-          // we may save the status here however it will also be stored at the program.status
-          // field for later use
-          val status = solver.use { solver -> checkSat(solver) }
+          // to automatically close solver resources once finished we solve inside this use block
+          // we capture the result of the solver and unpack the returned tuple
+          val (status, model) =
+              solver.use { solver ->
+                // we solve the program using our solver, the solve function returns a tuple of
+                // SatStatus and Model
+                // the model may be null if produceModel is set to false or if the program was not
+                // satisfiable
+                solve(solver, true, 5000)
+              }
         }
 
     println(program)
@@ -568,12 +584,18 @@ class Examples {
           assert((filledIntArray select foo) eq 5)
           assert(javaClass.name eq (filledStringArray select 2))
 
-          val solver = Z3Solver()
+          val solver = InteractiveZ3Solver()
 
-          solver.use { solver ->
-            val status = checkSat(solver)
-            println(status)
-          }
+          // to automatically close solver resources once finished we solve inside this use block
+          // we capture the result of the solver and unpack the returned tuple
+          val (status, model) =
+              solver.use { solver ->
+                // we solve the program using our solver, the solve function returns a tuple of
+                // SatStatus and Model
+                // the model may be null if produceModel is set to false or if the program was not
+                // satisfiable
+                solve(solver, true, 5000)
+              }
         }
 
     println(program)
@@ -629,12 +651,18 @@ class Examples {
           assert(sum eq 3.14f)
           assert(diff eq 2.71f)
 
-          val solver = Z3Solver()
+          val solver = InteractiveZ3Solver()
 
-          solver.use { solver ->
-            val status = checkSat(solver)
-            println(status)
-          }
+          // to automatically close solver resources once finished we solve inside this use block
+          // we capture the result of the solver and unpack the returned tuple
+          val (status, model) =
+              solver.use { solver ->
+                // we solve the program using our solver, the solve function returns a tuple of
+                // SatStatus and Model
+                // the model may be null if produceModel is set to false or if the program was not
+                // satisfiable
+                solve(solver, false, 5000)
+              }
         }
   }
 }

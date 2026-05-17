@@ -19,9 +19,11 @@
 package tools.aqua.konstraints
 
 import java.util.stream.Stream
+import kotlin.use
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
@@ -58,8 +60,6 @@ class TestModel {
                       )
                   )
                 }
-                checkSat()
-                getModel()
               }
           ),
           /*
@@ -102,9 +102,6 @@ class TestModel {
                           (rd1 and prt)
                   )
                 }
-
-                checkSat()
-                getModel()
               }
           ),
       )
@@ -118,12 +115,9 @@ class TestModel {
             .map { assertion -> FreeVariables.of(assertion.expr, RecursionPolicy.RECURSIVE) }
             .reduce { a, b -> a + b }
 
-    val model =
-        Z3Solver().use { solver ->
-          solver.solve(program)
-          solver.getModel()
-        }
+    val (status, model) = Z3Solver().use { solver -> solver.solve(program, true, 5000) }
 
+    assertNotNull(model)
     assert(freeVariables.all { expression -> model.getDefinitionOrNull(expression.func!!) != null })
   }
 
@@ -133,21 +127,18 @@ class TestModel {
         smt(QF_BV) {
           val s by declaringConst(SMTBitVec(8))
           assert { s eq 16.bitvec(8) }
-          checkSat()
-          getModel()
         }
 
     val variable =
         program.commands.filterIsInstance<DeclareFun<*>>().single() as DeclareFun<BitVecSort>
 
-    val model =
-        Z3Solver().use { solver ->
-          solver.solve(program)
-          solver.getModel()
-        }
+    val (status, model) = Z3Solver().use { solver -> solver.solve(program, true, 5000) }
+
+    assertNotNull(model)
+
     val actual = model.getConstantValue(variable.func)
 
-    assertEquals(16, actual.value.toInt())
+    assertEquals(16, actual.toInt())
   }
 
   @Test
@@ -160,19 +151,15 @@ class TestModel {
     val s = program.declareConst("s".toSymbol(), SMTFP32)
 
     program.assert(Equals(s.instance, FloatingPointLiteral(4.25f)))
-    program.checkSat()
-    program.getModel()
 
-    val model =
-        Z3Solver().use { solver ->
-          solver.solve(program)
-          solver.getModel()
-        }
+    val (status, model) = Z3Solver().use { solver -> solver.solve(program, true, 5000) }
+
+    assertNotNull(model)
 
     // get constant value, this is automatically returned as a FloatingPointLiteral
-    val actual = model.getConstantValue(s)
+    val actual = model.getConstantFloatValue(s)
 
-    assertEquals(4.25f, actual.asFloat())
+    assertEquals(4.25f, actual)
   }
 
   @Test
@@ -185,19 +172,15 @@ class TestModel {
     val s = program.declareConst("s".toSymbol(), SMTInt)
 
     program.assert(Equals(s.instance, IntSub(IntLiteral(3), IntNeg(IntLiteral(5)))))
-    program.checkSat()
-    program.getModel()
 
-    val model =
-        Z3Solver().use { solver ->
-          solver.solve(program)
-          solver.getModel()
-        }
+    val (status, model) = Z3Solver().use { solver -> solver.solve(program, true, 5000) }
+
+    assertNotNull(model)
 
     // get constant value, this is automatically returned as a FloatingPointLiteral
     val actual = model.getConstantValue(s)
 
-    assertEquals(8, actual.value.toInt())
+    assertEquals(8, actual.toInt())
   }
 
   @Test
@@ -208,17 +191,13 @@ class TestModel {
     val s = program.declareConst("s".toSymbol(), SMTString)
 
     program.assert(Equals(s.instance, StrConcat(StringLiteral("foo"), StringLiteral("bar"))))
-    program.checkSat()
-    program.getModel()
 
-    val model =
-        Z3Solver().use { solver ->
-          solver.solve(program)
-          solver.getModel()
-        }
+    val (status, model) = Z3Solver().use { solver -> solver.solve(program, true, 5000) }
+
+    assertNotNull(model)
 
     val actual = model.getConstantValue(s)
 
-    assertEquals("foobar", actual.value)
+    assertEquals("foobar", actual)
   }
 }

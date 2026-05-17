@@ -21,11 +21,6 @@ package tools.aqua.konstraints.solvers
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
-import java.lang.Thread.sleep
-import kotlinx.coroutines.TimeoutCancellationException
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.runInterruptible
-import kotlinx.coroutines.withTimeout
 import tools.aqua.konstraints.parser.CheckSatResponse
 import tools.aqua.konstraints.parser.ErrorResponse
 import tools.aqua.konstraints.parser.GetModelResponse
@@ -37,6 +32,7 @@ import tools.aqua.konstraints.smt.BooleanOptionValue
 import tools.aqua.konstraints.smt.Command
 import tools.aqua.konstraints.smt.Model
 import tools.aqua.konstraints.smt.MutableSMTProgram
+import tools.aqua.konstraints.smt.NullOp
 import tools.aqua.konstraints.smt.QuotingRule
 import tools.aqua.konstraints.smt.SMTProgram
 import tools.aqua.konstraints.smt.SatStatus
@@ -60,37 +56,20 @@ open class InteractiveCLISolver(val name: String, vararg solverOptions: String) 
     writer.flush()
   }
 
-  /**
-   * Wait for a solver response, kill the solver after [timeout] milliseconds and throw a
-   * [SolverTimeoutException]
-   */
-  private fun waitResponse(timeout: Long) = runBlocking {
-    try {
-      withTimeout(timeout) {
-        runInterruptible {
-          // wait for reader to become available
-          // sleep in the body of the loop because sleep is an interruptible function
-          while (!reader.ready()) {
-            sleep(1)
-          }
-        }
-      }
-    } catch (e: TimeoutCancellationException) {
-      process.destroyForcibly()
-
-      throw SolverTimeoutException(timeout)
-    }
-
-    /*
-    var lines = ""
-    while(reader.ready()) {
-      lines += reader.readLine() + '\n'
-    }
-    lines
-    */
+  private fun writeCommand(cmd: String) {
+    writer.write(cmd)
+    writer.write("\n")
+    writer.flush()
   }
 
   private fun processCommand(cmd: Command, program: SMTProgram, timeout: Long) {
+    writeCommand(cmd)
+    val response = ResponseParser.parse(reader, program as MutableSMTProgram)
+
+    processResponse(response, program)
+  }
+
+  private fun processCommand(cmd: String, program: SMTProgram, timeout: Long) {
     writeCommand(cmd)
     val response = ResponseParser.parse(reader, program as MutableSMTProgram)
 
@@ -110,25 +89,25 @@ open class InteractiveCLISolver(val name: String, vararg solverOptions: String) 
     }
   }
 
-  override fun solve(program: SMTProgram, produceModel: Boolean, timeout: Long): Pair<SatStatus, Model?> {
+  override fun solve(
+      program: SMTProgram,
+      produceModel: Boolean,
+      timeout: Long,
+  ): Pair<SatStatus, Model?> {
     processCommand(SetOption(":print-success", BooleanOptionValue(true)), program, timeout)
     processCommand(SetOption(":produce-models", BooleanOptionValue(produceModel)), program, timeout)
-    program.commands.forEach {
-      processCommand(it, program, timeout)
+    program.commands.filter { it !is NullOp }.forEach { processCommand(it, program, timeout) }
+
+    processCommand("(check-sat)", program, timeout)
+    if (produceModel && program.status == SatStatus.SAT) {
+      processCommand("(get-model)", program, timeout)
     }
 
-    // processCommand(CheckSat(), program, timeout)
-    // if(produceModel && pogram.status == SatStatus.SAT)
-    // processCommand(GetModel(), program, timeout)
-
-    return program.status
-  }
-
-  override fun getModel(): Model {
-    return _model!!
+    return program.status to null
   }
 
   override fun close() {
+    writer.write("(exit)")
     writer.close()
     reader.close()
     process.destroy()

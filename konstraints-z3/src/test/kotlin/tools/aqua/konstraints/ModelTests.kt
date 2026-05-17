@@ -22,6 +22,7 @@ import java.util.stream.Stream
 import kotlin.use
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
@@ -39,6 +40,7 @@ import tools.aqua.konstraints.smt.RealDiv
 import tools.aqua.konstraints.smt.RealLiteral
 import tools.aqua.konstraints.smt.SMTBool
 import tools.aqua.konstraints.smt.SMTInt
+import tools.aqua.konstraints.smt.SatStatus
 import tools.aqua.konstraints.smt.SortedVar
 import tools.aqua.konstraints.smt.StringLiteral
 import tools.aqua.konstraints.smt.toSymbol
@@ -52,11 +54,11 @@ class ModelTests {
     val prg = SMTScriptParser(program)
     val solver = Z3Solver()
 
-    solver.use {
-      solver.solve(prg)
-      prg.getModel(solver)
-      assertEquals(term, prg.model!!.definitions.map { it.value }.single().term)
-    }
+    val (status, model) = solver.use { solver.solve(prg, true, 5000) }
+
+    assertNotNull(model)
+    assertEquals(status, SatStatus.SAT)
+    assertEquals(term, model.definitions.map { it.value }.single().term)
   }
 
   fun provideProgramAndModel(): Stream<Arguments> =

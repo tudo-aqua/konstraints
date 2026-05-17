@@ -25,7 +25,6 @@ import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.dsl.UserDeclaredSMTFunctionN
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunction0
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunctionN
-import tools.aqua.konstraints.solvers.Solver
 import tools.aqua.konstraints.util.StackOperation
 import tools.aqua.konstraints.util.StackOperationType
 
@@ -33,6 +32,7 @@ import tools.aqua.konstraints.util.StackOperationType
 enum class SatStatus {
   SAT, // program is satisfiable
   UNSAT, // program is unsatisfiable
+  ERROR, // there was an error during the solving process
   UNKNOWN, // solver timed out
   PENDING; // solve has not been called yet on program
 
@@ -40,9 +40,67 @@ enum class SatStatus {
       when (this) {
         SAT -> "sat"
         UNSAT -> "unsat"
+        ERROR -> "error"
         UNKNOWN -> "unknown"
         PENDING -> "pending"
       }
+}
+
+/**
+ * Provides access to all functions that modify the assertion stack inside a push block by
+ * forwarding the parameters to the underlying context. All functions that modify the assertion
+ * stack are: ``assert``, ``declare-sort``, ``declare-fun``, ``declare-const``, ``define-sort``,
+ * ``define-fun``, ``define-fun-rec``, ``define-funs-rec``, ``pop``, ``push``, ``reset`` and
+ * ``reset-assertions``
+ */
+interface PushContext {
+  fun assert(assertion: Assert)
+
+  fun assert(expr: Expression<BoolSort>)
+
+  fun <T : Sort> defineFun(
+      name: Symbol,
+      parameters: List<SortedVar<*>>,
+      sort: T,
+      term: Expression<T>,
+  ): DefinedSMTFunction<T>
+
+  fun <T : Sort> defineFun(def: FunctionDef<T>): DefinedSMTFunction<T>
+
+  fun <T : Sort> declareConst(name: Symbol, sort: T): UserDeclaredSMTFunction0<T>
+
+  fun <T : Sort> declareFun(func: UserDeclaredSMTFunction<T>): UserDeclaredSMTFunction<T>
+
+  // TODO add sort parameter here, this requires some more work on the sort factory in the parser
+  fun declareFun(name: Symbol, parameters: List<Sort>, sort: Sort): UserDeclaredSMTFunction<Sort>
+
+  fun <T : Sort> defineConst(
+      name: Symbol,
+      sort: T,
+      term: Expression<T>,
+  ): UserDefinedSMTFunction0<T>
+
+  fun <T : Sort> defineFun(func: DefinedSMTFunction<T>): DefinedSMTFunction<T>
+
+  fun push(n: Int)
+
+  fun push() = push(1)
+
+  fun <T> push(block: PushContext.() -> T) {
+    push()
+    this.block()
+    pop()
+  }
+
+  fun pop() = pop(1)
+
+  fun pop(n: Int)
+
+  fun declareSort(decl: DeclareSort)
+
+  fun declareSort(name: Symbol, arity: Int)
+
+  fun defineSort(name: Symbol, parameters: List<Symbol>, sort: Sort)
 }
 
 /** Base class for all types of smt program. */
@@ -58,7 +116,8 @@ abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
 
   protected val _commands: MutableList<Command> = commands.toMutableList()
 
-  // TODO change to function that concatenates the commands in the correct order and inserts push/pop in the correct places when necessary
+  // TODO change to function that concatenates the commands in the correct order and inserts
+  // push/pop in the correct places when necessary
   val commands: List<Command>
     get() = _commands.toList()
 
@@ -119,13 +178,19 @@ abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
 }
 
 /** SMT Program with a mutable command list. */
-class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
+class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands), PushContext {
+  // TODO implement assertion stack more explicitly in the future
+  // should also split commands into different lists to give the program more structure
+  // this will require changing the visitors and is planned for a future release
+  /*
   class AssertionLevel {
+    // TODO add sorts
     val definitions = mutableListOf<Declaration<*>>()
     val assertions = mutableListOf<Assert>()
   }
 
   val assertionLevels = ArrayDeque<AssertionLevel>()
+  */
 
   constructor() : this(emptyList())
 
@@ -134,11 +199,7 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
    *
    * Checks if [command] is legal w.r.t. the [context]
    */
-  @Deprecated(
-      "Prefer usage of specialized functions (e.g. assert)",
-      level = DeprecationLevel.WARNING,
-  )
-  fun add(command: Command) {
+  internal fun add(command: Command) {
     add(command, _commands.size)
   }
 
@@ -147,11 +208,7 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
    *
    * Checks if [command] is legal w.r.t. the [context]
    */
-  @Deprecated(
-      "Prefer usage of specialized functions (e.g. assert)",
-      level = DeprecationLevel.WARNING,
-  )
-  fun add(command: Command, index: Int) {
+  internal fun add(command: Command, index: Int) {
     if (command is Assert) {
       require(command.expr.all { context.contains(it) })
     }
@@ -159,7 +216,7 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     _commands.add(index, command)
   }
 
-  fun assert(assertion: Assert) {
+  override fun assert(assertion: Assert) {
     check(logic != null) { "Logic must be set before adding assertions!" }
 
     // check expr is in logic
@@ -261,7 +318,7 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     }
   }
 
-  fun <T : Sort> declareConst(name: Symbol, sort: T): UserDeclaredSMTFunction0<T> {
+  override fun <T : Sort> declareConst(name: Symbol, sort: T): UserDeclaredSMTFunction0<T> {
     val func = UserDeclaredSMTFunction0(name, sort)
 
     context.addFun(func)
@@ -270,14 +327,14 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     return func
   }
 
-  fun <T : Sort> declareFun(func: UserDeclaredSMTFunction<T>): UserDeclaredSMTFunction<T> {
+  override fun <T : Sort> declareFun(func: UserDeclaredSMTFunction<T>): UserDeclaredSMTFunction<T> {
     context.addFun(func)
     _commands.add(DeclareFun(func))
 
     return func
   }
 
-  fun <T : Sort> defineConst(
+  override fun <T : Sort> defineConst(
       name: Symbol,
       sort: T,
       term: Expression<T>,
@@ -290,31 +347,61 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     return func
   }
 
-  fun <T : Sort> defineFun(func: DefinedSMTFunction<T>): DefinedSMTFunction<T> {
+  override fun <T : Sort> defineFun(func: DefinedSMTFunction<T>): DefinedSMTFunction<T> {
     context.addFun(func)
     _commands.add(DefineFun(func.symbol, func.sortedVars, func.sort, func.term))
 
     return func
   }
 
-  fun push(n: Int) {
+  override fun assert(expr: Expression<BoolSort>) = assert(Assert(expr))
+
+  fun MutableSMTProgram.declareFun(name: Symbol, parameters: List<Sort>, sort: Sort) =
+      if (parameters.isEmpty()) {
+        declareFun(UserDeclaredSMTFunction0(name, sort))
+      } else {
+        declareFun(UserDeclaredSMTFunctionN(name, sort, parameters))
+      }
+
+  override fun <T : Sort> defineFun(
+      name: Symbol,
+      parameters: List<SortedVar<*>>,
+      sort: T,
+      term: Expression<T>,
+  ) = defineFun(UserDefinedSMTFunctionN(name, sort, parameters, term))
+
+  override fun <T : Sort> defineFun(def: FunctionDef<T>) =
+      defineFun(UserDefinedSMTFunctionN(def.name, def.sort, def.parameters, def.term))
+
+  override fun declareFun(name: Symbol, parameters: List<Sort>, sort: Sort) =
+      if (parameters.isEmpty()) {
+        declareFun(UserDeclaredSMTFunction0(name, sort))
+      } else {
+        declareFun(UserDeclaredSMTFunctionN(name, sort, parameters))
+      }
+
+  override fun push(n: Int) {
+    _commands.add(Push(n))
     context.push(n)
-    repeat(n) { assertionLevels.add(AssertionLevel()) }
+    // repeat(n) { assertionLevels.add(AssertionLevel()) }
   }
 
-  fun push() = push(1)
-
-  fun<T> push(block: MutableSMTProgram.() -> T) {
-    push()
-    block()
-    pop()
-  }
-
-  fun pop() = pop(1)
-
-  fun pop(n: Int) {
+  override fun pop(n: Int) {
     context.pop(n)
-    repeat(n) { assertionLevels.removeLast() }
+
+    // remove all commands since last push
+    // this is technically unsafe since this can remove commands that do not modify the assertion
+    // stack
+    // however this is only a temporary solution and inside a push block only functions that modify
+    // the assertion stack
+    // should be used
+    while (_commands.last() !is Push) {
+      _commands.removeLast()
+    }
+
+    _commands.removeLast()
+
+    // repeat(n) { assertionLevels.removeLast() }
   }
 
   fun setOption(option: SetOption) {
@@ -329,38 +416,19 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
     _commands.add(info)
   }
 
-  fun declareSort(decl: DeclareSort) {
+  override fun declareSort(decl: DeclareSort) {
     context.declareSort(decl)
     _commands.add(decl)
   }
 
-  fun declareSort(name: Symbol, arity: Int) {
+  override fun declareSort(name: Symbol, arity: Int) {
     context.declareSort(name, arity)
     _commands.add(DeclareSort(name, arity))
   }
 
-  fun defineSort(name: Symbol, parameters: List<Symbol>, sort: Sort) {
+  override fun defineSort(name: Symbol, parameters: List<Symbol>, sort: Sort) {
     context.defineSort(name, parameters, sort)
     _commands.add(DefineSort(name, parameters, sort))
-  }
-
-  fun checkSat() {
-    _commands.add(CheckSat)
-  }
-
-  fun checkSat(solver: Solver): SatStatus {
-    checkSat()
-
-    return solver.solve(this)
-  }
-
-  fun getModel() {
-    _commands.add(GetModel)
-  }
-
-  fun getModel(solver: Solver) {
-    getModel()
-    model = solver.getModel()
   }
 
   /**
@@ -429,25 +497,6 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands) {
 }
 
 class DefaultSMTProgram(commands: List<Command>) : SMTProgram(commands)
-
-fun MutableSMTProgram.assert(expr: Expression<BoolSort>) = assert(Assert(expr))
-
-fun MutableSMTProgram.declareFun(name: Symbol, parameters: List<Sort>, sort: Sort) =
-    if (parameters.isEmpty()) {
-      declareFun(UserDeclaredSMTFunction0(name, sort))
-    } else {
-      declareFun(UserDeclaredSMTFunctionN(name, sort, parameters))
-    }
-
-/*fun <T : Sort> MutableSMTProgram.defineFun(
-    name: Symbol,
-    parameters: List<Sort>,
-    sort: T,
-    term: Expression<T>
-) = defineFun(UserDefinedSMTFunctionN(name, sort, parameters, term))*/
-
-fun <T : Sort> MutableSMTProgram.defineFun(def: FunctionDef<T>) =
-    defineFun(UserDefinedSMTFunctionN(def.name, def.sort, def.parameters, def.term))
 
 fun MutableSMTProgram.setOption(name: String, value: Boolean) =
     setOption(SetOption(name, BooleanOptionValue(value)))

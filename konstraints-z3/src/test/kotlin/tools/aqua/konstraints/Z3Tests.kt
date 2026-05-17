@@ -50,20 +50,20 @@ class Z3Tests {
   private fun solve(file: File) {
     assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
 
-    val result =
+    val program =
         SMTScriptParser(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
 
     assumeTrue(
-        (result.info("status") as SymbolAttributeValue).symbol.toString() != "unknown",
+        (program.info("status") as SymbolAttributeValue).symbol.toString() != "unknown",
         "Skipped due to unknown sat status.",
     )
 
     Z3Solver().use { solver ->
-      solver.solve(result)
+      solver.solve(program, false, 5000)
 
       // verify we get the correct status for the test
       assertEquals(
-          (result.info("status") as SymbolAttributeValue).symbol.toString(),
+          (program.info("status") as SymbolAttributeValue).symbol.toString(),
           solver.status.toString(),
       )
     }
@@ -128,22 +128,20 @@ class Z3Tests {
     assumeTrue(file.length() < 5000000, "Skipped due to file size exceeding limit of 5000000")
 
     val solver = Z3Solver()
-    val result =
+    val program =
         SMTScriptParser(
             file.bufferedReader().use(BufferedReader::readLines).joinToString("\n") +
                 "\n(get-model)"
         )
 
     assumeTrue(
-        (result.info("status") as SymbolAttributeValue).symbol.toString() == "sat",
+        (program.info("status") as SymbolAttributeValue).symbol.toString() == "sat",
         "Skipped due to unknown or unsat status.",
     )
 
-    solver.use {
-      solver.solve(result)
-      result.getModel(solver)
-      print(result.model!!.definitions)
-    }
+    val (status, model) = solver.use { solver.solve(program, true, 5000) }
+
+    print(model!!.definitions)
   }
 
   fun getQFFPFile(): Stream<Arguments> = loadResource("/QF_FP/aqua/")
@@ -212,7 +210,7 @@ class Z3Tests {
     val smtProgram = SMTScriptParser(program)
 
     solver.use {
-      smtProgram.commands.map { solver.visit(it) }
+      solver.solve(smtProgram, false, 5000)
 
       // verify we get the correct status for the test
       assertEquals("sat", solver.status.toString())
@@ -242,9 +240,9 @@ class Z3Tests {
   fun testEquals(program: String) {
     val solver = Z3Solver()
 
-    val result = SMTScriptParser(program)
+    val program = SMTScriptParser(program)
     solver.use {
-      result.commands.map { solver.visit(it) }
+      solver.solve(program, false, 5000)
 
       // verify we get the correct status for the test
       assertEquals("sat", solver.status.toString())
@@ -261,9 +259,9 @@ class Z3Tests {
   fun testLet(program: String) {
     val solver = Z3Solver()
 
-    val result = SMTScriptParser(program)
+    val program = SMTScriptParser(program)
     solver.use {
-      result.commands.map { solver.visit(it) }
+      solver.solve(program, false, 5000)
 
       // verify we get the correct status for the test
       assertEquals("unsat", solver.status.toString())
@@ -280,9 +278,9 @@ class Z3Tests {
   fun testFreeFunctions(program: String) {
     val solver = Z3Solver()
 
-    val result = SMTScriptParser(program)
+    val program = SMTScriptParser(program)
     solver.use {
-      result.commands.map { solver.visit(it) }
+      solver.solve(program, false, 5000)
 
       // verify we get the correct status for the test
       assertEquals("sat", solver.status.toString())
@@ -301,14 +299,14 @@ class Z3Tests {
   fun testQuantifier(program: String) {
     val solver = Z3Solver()
 
-    val result = SMTScriptParser(program)
+    val program = SMTScriptParser(program)
 
     solver.use {
-      result.commands.map { solver.visit(it) }
+      solver.solve(program, false, 5000)
 
       // verify we get the correct status for the test
       assertEquals(
-          (result.info("status") as SymbolAttributeValue).symbol.toString(),
+          (program.info("status") as SymbolAttributeValue).symbol.toString(),
           solver.status.toString(),
       )
     }
@@ -324,14 +322,14 @@ class Z3Tests {
   fun testPushPop(program: String) {
     val solver = Z3Solver()
 
-    val result = SMTScriptParser(program)
+    val program = SMTScriptParser(program)
 
     solver.use {
-      result.commands.map { solver.visit(it) }
+      solver.solve(program, false, 5000)
 
       // verify we get the correct status for the test
       assertEquals(
-          (result.info("status") as SymbolAttributeValue).symbol.toString(),
+          (program.info("status") as SymbolAttributeValue).symbol.toString(),
           solver.status.toString(),
       )
     }
@@ -348,14 +346,14 @@ class Z3Tests {
   fun testDefineFun(program: String) {
     val solver = Z3Solver()
 
-    val result = SMTScriptParser(program)
+    val program = SMTScriptParser(program)
 
     solver.use {
-      result.commands.map { solver.visit(it) }
+      solver.solve(program, false, 5000)
 
       // verify we get the correct status for the test
       assertEquals(
-          (result.info("status") as SymbolAttributeValue).symbol.toString(),
+          (program.info("status") as SymbolAttributeValue).symbol.toString(),
           solver.status.toString(),
       )
     }
