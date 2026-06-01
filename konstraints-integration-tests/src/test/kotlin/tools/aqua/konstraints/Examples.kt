@@ -18,7 +18,9 @@
 
 package tools.aqua.konstraints
 
+import java.io.IOException
 import kotlin.use
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -45,6 +47,14 @@ import tools.aqua.konstraints.solvers.InteractiveZ3Solver
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Examples {
+  private fun getSolver() =
+      try {
+        InteractiveZ3Solver()
+      } catch (e: IOException) {
+        assumeTrue(false)
+      }
+          as InteractiveZ3Solver
+
   @Test
   fun simpleProgram() {
     // entry point for smt dsl
@@ -95,7 +105,7 @@ class Examples {
 
           // when we added all assertions we can get the sat status as follows
 
-          val solver = InteractiveZ3Solver()
+          val solver = getSolver()
 
           // to automatically close solver resources once finished we solve inside this use block
           // we capture the result of the solver and unpack the returned tuple
@@ -152,7 +162,7 @@ class Examples {
           // we could also store the all quantified expression by writing val qExpr = forall(...)
           assert(forall(SMTBitVec(32), SMTBitVec(32)) { x, y -> f(x, y) bvult (x bvadd y) })
 
-          val solver = InteractiveZ3Solver()
+          val solver = getSolver()
 
           // to automatically close solver resources once finished we solve inside this use block
           // we capture the result of the solver and unpack the returned tuple
@@ -219,7 +229,7 @@ class Examples {
 
           // when we added all assertions we can get the sat status as follows
 
-          val solver = InteractiveZ3Solver()
+          val solver = getSolver()
 
           // to automatically close solver resources once finished we solve inside this use block
           // we capture the result of the solver and unpack the returned tuple
@@ -284,7 +294,7 @@ class Examples {
 
           assert(simpleIf eq nestedIf eq lambdaIf)
 
-          val solver = InteractiveZ3Solver()
+          val solver = getSolver()
 
           // to automatically close solver resources once finished we solve inside this use block
           // we capture the result of the solver and unpack the returned tuple
@@ -372,7 +382,7 @@ class Examples {
             forall(SMTBitVec(8), SMTBitVec(8)) { s, t -> (s bvsdiv t) eq bvsdiv8(s, t) }
           }
 
-          val solver = InteractiveZ3Solver()
+          val solver = getSolver()
 
           // to automatically close solver resources once finished we solve inside this use block
           // we capture the result of the solver and unpack the returned tuple
@@ -485,7 +495,7 @@ class Examples {
             }
           }
 
-          val solver = InteractiveZ3Solver()
+          val solver = getSolver()
 
           // to automatically close solver resources once finished we solve inside this use block
           // we capture the result of the solver and unpack the returned tuple
@@ -553,7 +563,7 @@ class Examples {
           assert((filledIntArray select foo) eq 5)
           assert(javaClass.name eq (filledStringArray select 2))
 
-          val solver = InteractiveZ3Solver()
+          val solver = getSolver()
 
           // to automatically close solver resources once finished we solve inside this use block
           // we capture the result of the solver and unpack the returned tuple
@@ -619,7 +629,7 @@ class Examples {
           assert(sum eq 3.14f)
           assert(diff eq 2.71f)
 
-          val solver = InteractiveZ3Solver()
+          val solver = getSolver()
 
           // to automatically close solver resources once finished we solve inside this use block
           // we capture the result of the solver and unpack the returned tuple

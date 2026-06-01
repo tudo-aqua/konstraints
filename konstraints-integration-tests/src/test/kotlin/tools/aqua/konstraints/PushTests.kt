@@ -18,7 +18,9 @@
 
 package tools.aqua.konstraints
 
+import java.io.IOException
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.assertNull
@@ -36,6 +38,14 @@ import tools.aqua.konstraints.smt.toSymbol
 import tools.aqua.konstraints.solvers.InteractiveZ3Solver
 
 class PushTests {
+  private fun getSolver() =
+      try {
+        InteractiveZ3Solver()
+      } catch (e: IOException) {
+        assumeTrue(false)
+      }
+          as InteractiveZ3Solver
+
   @Test
   fun test() {
     val program = MutableSMTProgram()
@@ -44,7 +54,7 @@ class PushTests {
 
     program.assert(Equals(foo(), BitVecLiteral(8, 8)))
 
-    InteractiveZ3Solver().use { solver ->
+    getSolver().use { solver ->
       solver.solve(program, true, 5000).let { (status, model) ->
         assertEquals(SatStatus.SAT, status)
         assertNotNull(model)
@@ -64,7 +74,7 @@ class PushTests {
     assertEquals(8, (model.getConstant("bar") as BitVecLiteral).value.toInt())
 
     // solve program without the pushed assertions again and verify bar is no longer in the model
-    InteractiveZ3Solver().use { solver ->
+    getSolver().use { solver ->
       solver.solve(program, true, 5000).let { (status, model) ->
         assertEquals(SatStatus.SAT, status)
         assertNotNull(model)
@@ -85,7 +95,7 @@ class PushTests {
 
     // push and solve
     val (status, model) =
-        program.push(InteractiveZ3Solver(), true) {
+        program.push(getSolver(), true) {
           val bar = declareConst("bar".toSymbol(), SMTBitVec(8))
           val abc =
               defineFun("func", listOf(SMTBitVec(8), SMTBitVec(8)), SMTBitVec(8)) {
@@ -101,7 +111,7 @@ class PushTests {
     assertNull(model)
 
     // solve program without the pushed assertions again and verify bar is no longer in the model
-    InteractiveZ3Solver().use { solver ->
+    getSolver().use { solver ->
       solver.solve(program, true, 5000).let { (status, model) ->
         assertEquals(SatStatus.SAT, status)
         assertNotNull(model)
