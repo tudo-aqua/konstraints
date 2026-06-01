@@ -21,29 +21,20 @@ package tools.aqua.konstraints.smt
 import java.math.BigInteger
 
 /** Base class for each SMT command. */
-sealed class Command(val command: String) : SMTSerializable {
-  override fun toString(): String = "($command)"
+sealed interface Command : SMTSerializable {
+  val command: String
 }
 
 // implement NoOp
 
-class NullOp(command: String) : Command(command) {
-  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = "($command)"
+interface NullOp : Command
 
-  override fun toSMTString(
-      builder: Appendable,
-      quotingRule: QuotingRule,
-      useIterative: Boolean,
-  ): Appendable {
-    builder.append('(')
-    builder.append(command)
-    return builder.append(')')
-  }
-}
-
-/*
 /** SMT (check-sat) command. */
-internal object CheckSat : Command("check-sat") {
+object CheckSat : NullOp {
+  override val command = "check-sat"
+
+  override fun toString(): String = "($command)"
+
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = "($command)"
 
   override fun toSMTString(
@@ -54,7 +45,11 @@ internal object CheckSat : Command("check-sat") {
 }
 
 /** SMT (exit) command. */
-internal object Exit : Command("exit") {
+object Exit : NullOp {
+  override val command = "exit"
+
+  override fun toString(): String = "($command)"
+
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = "($command)"
 
   override fun toSMTString(
@@ -65,7 +60,11 @@ internal object Exit : Command("exit") {
 }
 
 /** SMT (get-model) command. */
-internal object GetModel : Command("get-model") {
+object GetModel : NullOp {
+  override val command = "get-model"
+
+  override fun toString(): String = "($command)"
+
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = "($command)"
 
   override fun toSMTString(
@@ -74,10 +73,11 @@ internal object GetModel : Command("get-model") {
       useIterative: Boolean,
   ): Appendable = builder.append("($command)")
 }
-*/
 
 /** SMT (assert) command. */
-data class Assert(val expr: Expression<BoolSort>) : Command("assert") {
+data class Assert(val expr: Expression<BoolSort>) : Command {
+  override val command = "assert"
+
   override fun toString() = "(assert $expr)"
 
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
@@ -94,18 +94,19 @@ data class Assert(val expr: Expression<BoolSort>) : Command("assert") {
   }
 }
 
-abstract class Declaration<T : Sort>(command: String) : Command(command)
+interface Declaration<T : Sort> : Command
 
 /**
  * SMT (declare-const [name] [sort]) command.
  *
  * Declares a new a constant function of [sort] with the given [name]
  */
-data class DeclareConst<T : Sort>(val instance: UserDeclaredExpression<T>) :
-    Declaration<T>("declare-const") {
+data class DeclareConst<T : Sort>(val instance: UserDeclaredExpression<T>) : Declaration<T> {
   val func = instance.func
   val name = instance.symbol
   val sort = instance.sort
+
+  override val command = "declare-const"
 
   override fun toString() = "(declare-const ${instance.symbol} ${instance.sort})"
 
@@ -130,10 +131,12 @@ data class DeclareConst<T : Sort>(val instance: UserDeclaredExpression<T>) :
  *
  * Declares a new a function of [sort] with the given [name] and [parameters]
  */
-data class DeclareFun<T : Sort>(val func: SMTFunction<T>) : Declaration<T>("declare-fun") {
+data class DeclareFun<T : Sort>(val func: SMTFunction<T>) : Declaration<T> {
   val name = func.symbol
   val parameters = func.parameters
   val sort = func.sort
+
+  override val command = "declare-fun"
 
   override fun toString() =
       "(declare-fun ${func.symbol} (${func.parameters.joinToString(" ")}) ${func.sort})"
@@ -165,8 +168,10 @@ data class DeclareFun<T : Sort>(val func: SMTFunction<T>) : Declaration<T>("decl
 }
 
 /** SMT (declare-sort [name] [arity]) command. */
-data class DeclareSort(val name: Symbol, val arity: Int) :
-    Declaration<UserDeclaredSort>("declare-sort") {
+data class DeclareSort(val name: Symbol, val arity: Int) : Declaration<UserDeclaredSort> {
+
+  override val command = "declare-sort"
+
   override fun toString() = "declare-sort $name $arity"
 
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
@@ -185,7 +190,10 @@ data class DeclareSort(val name: Symbol, val arity: Int) :
 
 /** SMT (define-sort [name] ([sortParameters]) [sort]) command. */
 data class DefineSort(val name: Symbol, var sortParameters: List<Symbol>, val sort: Sort) :
-    Declaration<UserDefinedUserDeclaredSort>("define-sort") {
+    Declaration<UserDefinedUserDeclaredSort> {
+
+  override val command = "define-sort"
+
   override fun toString() = "define-sort $name (${sortParameters.joinToString(" ")}) $sort"
 
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
@@ -216,7 +224,9 @@ data class DefineSort(val name: Symbol, var sortParameters: List<Symbol>, val so
 
 /** SMT (define-const [name] [sort] [term]) command. */
 data class DefineConst<T : Sort>(val name: Symbol, val sort: T, val term: Expression<T>) :
-    Declaration<T>("define-const") {
+    Declaration<T> {
+  override val command = "define-const"
+
   override fun toString() = "(define-const $name $sort $term)"
 
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
@@ -240,8 +250,10 @@ data class DefineConst<T : Sort>(val name: Symbol, val sort: T, val term: Expres
 }
 
 /** SMT (define-fun [functionDef]) command. */
-data class DefineFun<T : Sort>(val functionDef: FunctionDef<T>) :
-    Declaration<T>("define-fun $functionDef") {
+data class DefineFun<T : Sort>(val functionDef: FunctionDef<T>) : Declaration<T> {
+
+  override val command = "define-fun $functionDef"
+
   /**
    * SMT (define-fun [functionDef]) command.
    *
@@ -316,7 +328,10 @@ data class FunctionDef<out S : Sort>(
 }
 
 /** SMT (set-info [Attribute.keyword] [Attribute.value]) command. */
-data class SetInfo(val attribute: Attribute) : Command("set-info") {
+data class SetInfo(val attribute: Attribute) : Command {
+
+  override val command = "set-info"
+
   /** SMT (set-info [keyword] [value]) command */
   constructor(keyword: String, value: AttributeValue?) : this(Attribute(keyword, value))
 
@@ -400,18 +415,24 @@ data class SExpressionAttributeValue(val sExpressions: List<SExpression>) : Attr
 
 // TODO string serialization of OptionValue
 /** SMT (set-option [name] [OptionValue]) command. */
-data class SetOption(val name: String, val value: OptionValue) : Command("set-option") {
-  override fun toString() = "(set-option $name $value)"
+data class SetOption(val name: String, val value: OptionValue) : Command {
+
+  override val command = "set-option"
+
+  override fun toString() =
+      "(set-option ${if (!name.startsWith(':')) name.padStart(name.length + 1, ':') else name} $value)"
 
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      "(set-option $name ${value.toSMTString(quotingRule, useIterative)})"
+      "(set-option ${if (!name.startsWith(':')) name.padStart(name.length + 1, ':') else name} ${value.toSMTString(quotingRule, useIterative)})"
 
   override fun toSMTString(
       builder: Appendable,
       quotingRule: QuotingRule,
       useIterative: Boolean,
   ): Appendable {
-    builder.append("(set-option $name ")
+    builder.append(
+        "(set-option ${if (!name.startsWith(':')) name.padStart(name.length + 1, ':') else name} "
+    )
     value.toSMTString(builder, quotingRule, useIterative)
     return builder.append(")")
   }
@@ -471,7 +492,9 @@ data class AttributeOptionValue(val attribute: Attribute) : OptionValue {
 }
 
 /** SMT (set-logic [logic]) command. */
-data class SetLogic(val logic: Logic) : Command("set-logic") {
+data class SetLogic(val logic: Logic) : Command {
+  override val command = "set-logic"
+
   override fun toString() = "(set-logic $logic)"
 
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = toString()
@@ -484,7 +507,9 @@ data class SetLogic(val logic: Logic) : Command("set-logic") {
 }
 
 /** SMT (push [n]) command. */
-data class Push(val n: Int) : Command("push") {
+data class Push(val n: Int) : Command {
+  override val command = "push"
+
   override fun toString() = "(push $n)"
 
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = toString()
@@ -497,7 +522,9 @@ data class Push(val n: Int) : Command("push") {
 }
 
 /** SMT (pop [n]) command. */
-data class Pop(val n: Int) : Command("pop") {
+data class Pop(val n: Int) : Command {
+  override val command = "pop"
+
   override fun toString() = "(pop $n)"
 
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = toString()
@@ -509,7 +536,9 @@ data class Pop(val n: Int) : Command("pop") {
   ): Appendable = builder.append(toString())
 }
 
-class GetValue(val terms: List<Expression<*>>) : Command("get-value") {
+class GetValue(val terms: List<Expression<*>>) : Command {
+  override val command = "get-value"
+
   override fun toString() = "(get-value (${terms.joinToString(" ")}))"
 
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
@@ -528,7 +557,9 @@ class GetValue(val terms: List<Expression<*>>) : Command("get-value") {
   }
 }
 
-class DeclareDatatype(val datatype: Datatype) : Command("declare-datatype") {
+class DeclareDatatype(val datatype: Datatype) : Command {
+  override val command = "declare-datatype"
+
   override fun toString() = toSMTString(QuotingRule.SAME_AS_INPUT, false)
 
   override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =

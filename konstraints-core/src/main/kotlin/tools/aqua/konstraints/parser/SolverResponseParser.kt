@@ -21,20 +21,13 @@ package tools.aqua.konstraints.parser
 import java.io.Reader
 import kotlin.contracts.ExperimentalContracts
 import tools.aqua.konstraints.parser.lexer.ClosingBracket
-import tools.aqua.konstraints.parser.lexer.DefineFunRecWord
 import tools.aqua.konstraints.parser.lexer.DefineFunWord
-import tools.aqua.konstraints.parser.lexer.DefineFunsRecWord
-import tools.aqua.konstraints.parser.lexer.EOFToken
 import tools.aqua.konstraints.parser.lexer.ErrorToken
-import tools.aqua.konstraints.parser.lexer.KeywordToken
 import tools.aqua.konstraints.parser.lexer.OpeningBracket
-import tools.aqua.konstraints.parser.lexer.QuotedSymbolToken
 import tools.aqua.konstraints.parser.lexer.SMTStringToken
 import tools.aqua.konstraints.parser.lexer.SMTTokenizer
 import tools.aqua.konstraints.parser.lexer.SatToken
-import tools.aqua.konstraints.parser.lexer.SimpleSymbolToken
 import tools.aqua.konstraints.parser.lexer.SuccessToken
-import tools.aqua.konstraints.parser.lexer.SymbolToken
 import tools.aqua.konstraints.parser.lexer.Token
 import tools.aqua.konstraints.parser.lexer.UnknownToken
 import tools.aqua.konstraints.parser.lexer.UnsatToken
@@ -45,116 +38,110 @@ import tools.aqua.konstraints.smt.FunctionDef
 import tools.aqua.konstraints.smt.Model
 import tools.aqua.konstraints.smt.SMTProgram
 import tools.aqua.konstraints.smt.SatStatus
+import tools.aqua.konstraints.solvers.UnexpectedSolverResponseException
 
 object ResponseParser {
-  fun parse(response: String, program: SMTProgram): List<SolverResponse> {
-    val lexer = SMTTokenizer(response.reader()).peekable()
-    val result = mutableListOf<SolverResponse>()
-
-    while (lexer.peek() !is EOFToken) {
-      result.add(parseGeneralResponse(lexer, program))
-    }
-
-    return result.toList()
+  fun parseGeneralResponse(reader: Reader): SolverResponse {
+    val lexer = SMTTokenizer(reader, true).peekable()
+    return parseGeneralResponseOrNull(lexer) ?: throw UnexpectedSolverResponseException("")
   }
 
-  /** Parse a single response from [reader]. */
-  fun parse(reader: Reader, program: SMTProgram): SolverResponse {
-    val lexer = SMTTokenizer(reader).peekable()
-    return parseGeneralResponse(lexer, program)
-  }
-
+  /**
+   * Parse a general response (success, unsupported or (error <string>)) or return null if none of
+   * these match. If no match is found, no tokens will be consumed.
+   */
   @OptIn(ExperimentalContracts::class)
-  private fun parseGeneralResponse(
-      lexer: PeekableIterator<Token>,
-      program: SMTProgram,
-  ): SolverResponse {
-    val token = lexer.next()
-
-    if (token is SimpleSymbolToken && token.isPredefinedToken()) {
-      // cases check_sat_response, succes, unsupported, error
-      val predefinedToken = token.toPredefinedToken()
-
-      when (predefinedToken) {
-        is SuccessToken -> return SuccessResponse
-        is UnsupportedToken -> return UnsupportedResponse
-        is SatToken -> return CheckSatResponse(SatStatus.SAT)
-        is UnknownToken -> return CheckSatResponse(SatStatus.UNKNOWN)
-        is UnsatToken -> return CheckSatResponse(SatStatus.UNSAT)
-        else -> throw UnexpectedTokenException(token, "")
+  internal fun parseGeneralResponseOrNull(lexer: PeekableIterator<Token>): SolverResponse? {
+    when (val token = lexer.peek()) {
+      is SuccessToken -> {
+        lexer.consume()
+        return SuccessResponse
       }
-    } else if (token is OpeningBracket) {
-      val response =
-          when (lexer.peek()) {
-            is OpeningBracket -> {
-              // get_assertions_response, get_model_response, get_unsat_assump_response,
-              // get_value_response
-              val token = lexer.peek(1)
-              val response =
-                  when (token) {
-                    is DefineFunWord -> {
-                      val model =
-                          GetModelResponse(
-                              Model(
-                                  star<ClosingBracket, SMTProgram, FunctionDef<*>>(
-                                      lexer,
-                                      program,
-                                  ) { lexer, program ->
-                                    requireIsInstance<OpeningBracket>(lexer.next())
-                                    requireIsInstance<DefineFunWord>(lexer.next())
-                                    val def = SMTScriptParser.parseFuncDef(lexer, program)
-                                    requireIsInstance<ClosingBracket>(lexer.next())
+      is UnsupportedToken -> {
+        lexer.consume()
+        return UnsupportedResponse
+      }
+      is OpeningBracket -> {
+        // important to not consume the token before we are sure that we have an error response
+        if (lexer.peek(1) is ErrorToken) {
+          // consume both the opening bracket and the error token
+          lexer.consume(2)
 
-                                    def
-                                  }
-                              )
-                          ) // get_model_response
-                      requireIsInstance<ClosingBracket>(lexer.next())
-                      model
-                    }
-                    is DefineFunRecWord -> TODO() // get_model_response
-                    is DefineFunsRecWord -> TODO() // get_model_response
-                    else -> TODO()
-                  }
-              return response
-            }
-            is SymbolToken -> {
-              val token = lexer.next() as SymbolToken
+          val content = lexer.next()
+          requireIsInstance<SMTStringToken>(content)
+          requireIsInstance<ClosingBracket>(lexer.next())
 
-              when (token) {
-                is QuotedSymbolToken -> TODO()
-                is SimpleSymbolToken -> {
-                  if (token.isPredefinedToken()) {
-                    // must be error token here
-                    requireIsInstance<ErrorToken>(token.toPredefinedToken())
-                    parseErrorResponse(lexer)
-                  } else {
-                    TODO()
-                  }
-                }
-              }
-            } // get_unsat_core_response, error response
-            is KeywordToken -> TODO() // get_info_response
-            else ->
-                throw UnexpectedTokenException(
-                    lexer.peek(),
-                    "any of OpeningBracket, Symbol or Keyword",
-                )
-          }
-      requireIsInstance<ClosingBracket>(lexer.next())
-      return response
-    } else {
-      TODO()
+          return ErrorResponse(content.contents)
+        }
+
+        return null
+      }
+      else -> return null
+    }
+  }
+
+  fun parseCheckSatResponse(reader: Reader): SolverResponse {
+    val lexer = SMTTokenizer(reader, true).peekable()
+    parseGeneralResponseOrNull(lexer)?.let {
+      return it
     }
 
-    TODO()
+    return when (val token = lexer.next()) {
+      is SatToken -> CheckSatResponse(SatStatus.SAT)
+      is UnknownToken -> CheckSatResponse(SatStatus.UNKNOWN)
+      is UnsatToken -> CheckSatResponse(SatStatus.UNSAT)
+      else ->
+          throw UnexpectedTokenException(
+              token,
+              "Expected any of sat, unsat or unknown",
+          )
+    }
+  }
+
+  fun parseEchoResponse(reader: Reader): SolverResponse {
+    val lexer = SMTTokenizer(reader, true).peekable()
+    parseGeneralResponseOrNull(lexer)?.let {
+      return it
+    }
+
+    return when (val token = lexer.next()) {
+      is SMTStringToken -> EchoResponse(token.contents)
+      else ->
+          throw UnexpectedTokenException(
+              token,
+              "Expected SMTStringToken but got $token at ${token.source}",
+          )
+    }
   }
 
   @OptIn(ExperimentalContracts::class)
-  private fun parseErrorResponse(lexer: PeekableIterator<Token>): SolverResponse {
-    val token = lexer.next()
-    requireIsInstance<SMTStringToken>(token)
+  fun parseModelResponse(reader: Reader, program: SMTProgram): SolverResponse {
+    val lexer = SMTTokenizer(reader, true).peekable()
+    parseGeneralResponseOrNull(lexer)?.let {
+      return it
+    }
 
-    return ErrorResponse(token.contents)
+    requireIsInstance<OpeningBracket>(lexer.next())
+
+    val model =
+        GetModelResponse(
+            Model(
+                star<ClosingBracket, SMTProgram, FunctionDef<*>>(
+                    lexer,
+                    program,
+                ) { lexer, program ->
+                  requireIsInstance<OpeningBracket>(lexer.next())
+                  requireIsInstance<DefineFunWord>(lexer.next())
+                  val def = SMTScriptParser.parseFuncDef(lexer, program)
+                  requireIsInstance<ClosingBracket>(lexer.next())
+
+                  def
+                }
+            )
+        )
+
+    requireIsInstance<ClosingBracket>(lexer.next())
+
+    return model
   }
 }

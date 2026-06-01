@@ -62,12 +62,14 @@ import tools.aqua.konstraints.parser.lexer.SetOptionWord
 import tools.aqua.konstraints.parser.lexer.Token
 import tools.aqua.konstraints.parser.util.PeekableIterator
 import tools.aqua.konstraints.parser.util.peekable
+import tools.aqua.konstraints.smt.CheckSat
+import tools.aqua.konstraints.smt.Exit
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.FunctionDef
+import tools.aqua.konstraints.smt.GetModel
 import tools.aqua.konstraints.smt.GetValue
 import tools.aqua.konstraints.smt.Logic
 import tools.aqua.konstraints.smt.MutableSMTProgram
-import tools.aqua.konstraints.smt.NullOp
 import tools.aqua.konstraints.smt.SMTProgram
 import tools.aqua.konstraints.smt.Sort
 import tools.aqua.konstraints.smt.SortedVar
@@ -104,7 +106,7 @@ object SMTScriptParser {
     when (commandName) {
       is AssertWord -> parseAssert(lexer, program)
       is CheckSatAssumingWord -> TODO("CheckSatAssumingWord")
-      is CheckSatWord -> program.add(NullOp("check-sat"))
+      is CheckSatWord -> program.add(CheckSat)
       is DeclareConstWord -> parseDeclareConst(lexer, program)
       is DeclareDatatypeWord -> parseDatatype(lexer, program)
       is DeclareDatatypesWord -> TODO("DeclareDatatypesWord")
@@ -117,11 +119,11 @@ object SMTScriptParser {
       is DefineFunWord -> parseDefineFun(lexer, program)
       is DefineSortWord -> parseDefineSort(lexer, program)
       is EchoWord -> TODO("EchoWord")
-      is ExitWord -> program.add(NullOp("exit"))
+      is ExitWord -> program.add(Exit)
       is GetAssertionsWord -> TODO("GetAssertionsWord")
       is GetAssignmentWord -> TODO("GetAssignmentWord")
       is GetInfoWord -> TODO("GetInfoWord")
-      is GetModelWord -> program.add(NullOp("get-model"))
+      is GetModelWord -> program.add(GetModel)
       is GetOptionWord -> TODO("GetOptionWord")
       is GetProofWord -> TODO("GetProofWord")
       is GetUnsatAssumptionsWord -> TODO("GetUnsatAssumptionsWord")

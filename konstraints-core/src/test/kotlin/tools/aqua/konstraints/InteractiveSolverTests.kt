@@ -27,7 +27,7 @@ import tools.aqua.konstraints.dsl.eq
 import tools.aqua.konstraints.dsl.smt
 import tools.aqua.konstraints.smt.BitVecLiteral
 import tools.aqua.konstraints.smt.MutableSMTProgram
-import tools.aqua.konstraints.smt.QF_BV
+import tools.aqua.konstraints.smt.QF_UFBV
 import tools.aqua.konstraints.smt.SMTBitVec
 import tools.aqua.konstraints.smt.SatStatus
 import tools.aqua.konstraints.solvers.InteractiveZ3Solver
@@ -40,15 +40,15 @@ class InteractiveSolverTests {
     val solver = InteractiveZ3Solver()
 
     val program =
-        smt(QF_BV) {
+        smt(QF_UFBV) {
           val foo by declaringConst(SMTBitVec(8))
           assert(foo eq BitVecLiteral(8, 8))
         }
             as MutableSMTProgram
 
-    solver.use { solver -> solver.solve(program, true, 5000) }
+    val (status, model) = solver.use { solver -> solver.solve(program, true, 5000) }
 
-    assertEquals(SatStatus.SAT, program.status)
-    assertNotNull(program.model)
+    assertEquals(SatStatus.SAT, status)
+    assertNotNull(model)
   }
 }

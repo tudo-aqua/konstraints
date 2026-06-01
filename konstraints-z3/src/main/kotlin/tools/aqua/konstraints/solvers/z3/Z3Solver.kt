@@ -63,19 +63,12 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
   ): Pair<SatStatus, Model?> {
     program.commands.forEach { visit(it) }
 
-    when (solver.check()) {
-      Status.UNSATISFIABLE -> status = SatStatus.UNSAT
-      Status.UNKNOWN -> status = SatStatus.UNKNOWN
-      Status.SATISFIABLE -> status = SatStatus.SAT
-    }
-
-    program.status = status
-
-    /*
-    try {
-      z3model = solver.model
-    } catch (t: Throwable) {}
-      */
+    status =
+        when (solver.check()) {
+          Status.UNSATISFIABLE -> SatStatus.UNSAT
+          Status.UNKNOWN -> SatStatus.UNKNOWN
+          Status.SATISFIABLE -> SatStatus.SAT
+        }
 
     return status to if (produceModel && isModelAvailable) Model(solver.model, context) else null
   }

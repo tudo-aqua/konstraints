@@ -47,9 +47,9 @@ class SMTProgramTests {
 
     assumeTrue((program.info(":status") as SymbolAttributeValue).symbol.toString() == "sat")
 
-    program.solve()
+    val (status, model) = program.solve()
 
-    assertNotNull(program.model)
+    assertNotNull(model)
   }
 
   fun getQFBVModelFiles(): Stream<Arguments> {

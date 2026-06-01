@@ -28,7 +28,11 @@ import tools.aqua.konstraints.parser.util.peekable
 import tools.aqua.konstraints.parser.util.readWhile
 import tools.aqua.konstraints.util.lineColumnTracking
 
-class SMTTokenizer(sourceReader: Reader, private val source: String? = null) : Iterator<Token> {
+class SMTTokenizer(
+    sourceReader: Reader,
+    val producePredefinedTokens: Boolean = false,
+    private val source: String? = null,
+) : Iterator<Token> {
   private val reader = sourceReader.buffered().peekable().lineColumnTracking()
 
   private val readerLastLocation
@@ -40,6 +44,13 @@ class SMTTokenizer(sourceReader: Reader, private val source: String? = null) : I
   private var tokenStartLocation = readerNextLocation
 
   override fun hasNext(): Boolean = reader.peek() >= 0
+
+  fun joinToString(separator: String = "\n"): String {
+    var s = ""
+    forEachRemaining { r -> s += separator + r }
+
+    return s
+  }
 
   /**
    * Returns the next non [Whitespace] or [Comment] token or [EOFToken] if no more valid tokens are
@@ -176,7 +187,14 @@ class SMTTokenizer(sourceReader: Reader, private val source: String? = null) : I
   private fun readSimpleSymbolOrReservedWord(): Token {
     val symbol = requireReadWhile("a simple symbol", Char::isSimpleSymbolLetter)
     val source = tokenStartLocation..readerLastLocation
-    return reservedWords[symbol]?.let { it(source) } ?: SimpleSymbolToken(symbol, source)
+
+    return if (producePredefinedTokens) {
+      reservedWords[symbol]?.let { it(source) }
+          ?: predefinedTokens[symbol]?.let { it(source) }
+          ?: SimpleSymbolToken(symbol, source)
+    } else {
+      reservedWords[symbol]?.let { it(source) } ?: SimpleSymbolToken(symbol, source)
+    }
   }
 
   private fun readQuotedSymbol(): QuotedSymbolToken {
@@ -233,7 +251,7 @@ class SMTTokenizer(sourceReader: Reader, private val source: String? = null) : I
   private fun requireReadChar(expect: Char): Char = requireRead("a '$expect'") { it == expect }
 }
 
-fun Reader.tokenize(source: String? = null): SMTTokenizer = SMTTokenizer(this, source)
+fun Reader.tokenize(source: String? = null): SMTTokenizer = SMTTokenizer(this, false, source)
 
 fun Reader.tokenizeFully(source: String? = null): List<Token> =
     tokenize(source).asSequence().toList()

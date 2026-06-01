@@ -79,8 +79,6 @@ class SMTProgramBuilder(logic: Logic) {
     return solver.solve(program, produceModel, timeout)
   }
 
-  fun <T> getModelOrNull(block: (Model?) -> T) = block(program.model)
-
   /** Registers a new constant smt function with the given [sort] and auto generated name. */
   fun <T : Sort> const(sort: T) = const("|const!${UUID.randomUUID()}|", sort)
 

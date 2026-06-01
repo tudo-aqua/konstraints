@@ -20,7 +20,6 @@ package tools.aqua.konstraints
 
 import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -150,9 +149,4 @@ class ProgramDSLTests {
   }
 
   fun getFunNameAndSort(): Stream<Arguments> = Stream.of(arguments("x", SMTBool))
-
-  @Test
-  fun testSatStatusIsSet() {
-    assertEquals(SatStatus.SAT, program.status)
-  }
 }

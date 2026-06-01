@@ -26,10 +26,10 @@ import tools.aqua.konstraints.smt.BV
 import tools.aqua.konstraints.smt.BitVecSort
 import tools.aqua.konstraints.smt.FPMul
 import tools.aqua.konstraints.smt.QF_ASLIA
-import tools.aqua.konstraints.smt.QF_BV
 import tools.aqua.konstraints.smt.QF_FP
 import tools.aqua.konstraints.smt.QF_IDL
 import tools.aqua.konstraints.smt.QF_NIRA
+import tools.aqua.konstraints.smt.QF_UFBV
 import tools.aqua.konstraints.smt.SMTArray
 import tools.aqua.konstraints.smt.SMTBitVec
 import tools.aqua.konstraints.smt.SMTFP32
@@ -50,7 +50,7 @@ class Examples {
     // a logic needs to be specified when creating a program
     // we will be using QF_BV here
     val program =
-        smt(QF_BV) {
+        smt(QF_UFBV) {
           // all info flags can be set via the setInfo block
           setInfo {
             // for each standard flag described on p.74 of the smt-lib manual
@@ -59,14 +59,6 @@ class Examples {
             source("|An examples program to show the usage of the konstraints dsl.|")
             category(BenchmarkCategory.CRAFTED)
             status(SatStatus.SAT)
-
-            // custom flags can be set via <flag> set_to <value>
-            "CustomIntFlag" set_to 1
-
-            // for hexadecimal or binary values use set_to_hex and set_to_bin respectively
-            // note that hex and bin strings have to follow the smt-lib format of #x or #b
-            // respectively
-            "CustomHexFlag" set_to_hex "#xFF"
           }
 
           // solver options can similarly be set via a setOptions block
@@ -77,9 +69,6 @@ class Examples {
 
             // so we can later inspect the model returned by z3
             produceModels(true)
-
-            // none standard solver options may be set via the set_to infix function
-            "CustomIntOption" set_to 1
           }
 
           // there are several ways of introducing new function symbols
@@ -142,14 +131,6 @@ class Examples {
             source("|An examples program to show the usage of the konstraints dsl.|")
             category(BenchmarkCategory.CRAFTED)
             status(SatStatus.UNSAT)
-
-            // custom flags can be set via <flag> set_to <value>
-            "CustomIntFlag" set_to 1
-
-            // for hexadecimal or binary values use set_to_hex and set_to_bin respectively
-            // note that hex and bin strings have to follow the smt-lib format of #x or #b
-            // respectively
-            "CustomHexFlag" set_to_hex "#xFF"
           }
 
           // solver options can similarly be set via a setOptions block
@@ -160,9 +141,6 @@ class Examples {
 
             // so we can later inspect the model returned by z3
             produceModels(true)
-
-            // none standard solver options may be set via the set_to infix function
-            "CustomIntOption" set_to 1
           }
 
           val f by declaring(SMTBitVec(32), SMTBitVec(32), SMTBitVec(32))
@@ -203,14 +181,6 @@ class Examples {
             source("|An examples program to show the usage of the konstraints dsl.|")
             category(BenchmarkCategory.CRAFTED)
             status(SatStatus.SAT)
-
-            // custom flags can be set via <flag> set_to <value>
-            "CustomIntFlag" set_to 1
-
-            // for hexadecimal or binary values use set_to_hex and set_to_bin respectively
-            // note that hex and bin strings have to follow the smt-lib format of #x or #b
-            // respectively
-            "CustomHexFlag" set_to_hex "#xFF"
           }
 
           // solver options can similarly be set via a setOptions block
@@ -221,9 +191,6 @@ class Examples {
 
             // so we can later inspect the model returned by z3
             produceModels(true)
-
-            // none standard solver options may be set via the set_to infix function
-            "CustomIntOption" set_to 1
           }
 
           val u by declaringConst(SMTInt)
@@ -527,7 +494,7 @@ class Examples {
                 // SatStatus and Model
                 // the model may be null if produceModel is set to false or if the program was not
                 // satisfiable
-                solve(solver, true, 5000)
+                solve(solver, false, 5000)
               }
         }
 
@@ -591,9 +558,8 @@ class Examples {
           val (status, model) =
               solver.use { solver ->
                 // we solve the program using our solver, the solve function returns a tuple of
-                // SatStatus and Model
-                // the model may be null if produceModel is set to false or if the program was not
-                // satisfiable
+                // SatStatus and Model the model may be null if produceModel is set to false or
+                // if the program was not satisfiable
                 solve(solver, true, 5000)
               }
         }

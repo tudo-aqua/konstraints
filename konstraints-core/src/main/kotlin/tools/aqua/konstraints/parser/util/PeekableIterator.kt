@@ -47,6 +47,12 @@ open class PeekableIterator<T>(private val delegate: Iterator<T>) : Iterator<T> 
 
   override fun next(): T =
       if (peekBuffer.isNotEmpty()) peekBuffer.removeFirst() else delegate.next()
+
+  /** Consume the next [n] tokens without returning any of them. */
+  fun consume(n: Int = 1) {
+    require(n >= 0) { "n must be >= 0, was $n" }
+    repeat(n) { next() }
+  }
 }
 
 fun <T> Iterator<T>.peekable() = this as? PeekableIterator<T> ?: PeekableIterator(this)

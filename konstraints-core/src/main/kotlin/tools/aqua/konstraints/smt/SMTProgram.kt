@@ -25,6 +25,7 @@ import tools.aqua.konstraints.dsl.UserDeclaredSMTFunction0
 import tools.aqua.konstraints.dsl.UserDeclaredSMTFunctionN
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunction0
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunctionN
+import tools.aqua.konstraints.solvers.Solver
 import tools.aqua.konstraints.util.StackOperation
 import tools.aqua.konstraints.util.StackOperationType
 
@@ -65,6 +66,13 @@ interface PushContext {
       term: Expression<T>,
   ): DefinedSMTFunction<T>
 
+    fun <T : Sort> defineFun(
+        name: Symbol,
+        parameters: List<SortedVar<*>>,
+        sort: T,
+        term: (List<SortedVar<*>>) -> Expression<T>,
+    ): DefinedSMTFunction<T> = defineFun(name, parameters, sort, term(parameters))
+
   fun <T : Sort> defineFun(def: FunctionDef<T>): DefinedSMTFunction<T>
 
   fun <T : Sort> declareConst(name: Symbol, sort: T): UserDeclaredSMTFunction0<T>
@@ -86,12 +94,6 @@ interface PushContext {
 
   fun push() = push(1)
 
-  fun <T> push(block: PushContext.() -> T) {
-    push()
-    this.block()
-    pop()
-  }
-
   fun pop() = pop(1)
 
   fun pop(n: Int)
@@ -105,12 +107,8 @@ interface PushContext {
 
 /** Base class for all types of smt program. */
 abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
-  var model: Model? = null
-  var status = SatStatus.PENDING
   var logic: Logic? = null
     protected set
-
-  internal var produceModel = false
 
   val context = Context()
 
@@ -352,6 +350,21 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands), PushCon
     _commands.add(DefineFun(func.symbol, func.sortedVars, func.sort, func.term))
 
     return func
+  }
+
+  fun <T> push(
+      solver: Solver,
+      produceModel: Boolean,
+      timeout: Long = 5000,
+      block: PushContext.() -> T,
+  ): Pair<SatStatus, Model?> {
+    push()
+    this.block()
+
+    val result = solver.solve(this, produceModel, timeout)
+    pop()
+
+    return result
   }
 
   override fun assert(expr: Expression<BoolSort>) = assert(Assert(expr))

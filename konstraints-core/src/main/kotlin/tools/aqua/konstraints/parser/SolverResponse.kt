@@ -31,4 +31,6 @@ class ErrorResponse(val msg: String) : SolverResponse
 
 class CheckSatResponse(val status: SatStatus) : SolverResponse
 
+class EchoResponse(val msg: String) : SolverResponse
+
 class GetModelResponse(val model: Model) : SolverResponse
