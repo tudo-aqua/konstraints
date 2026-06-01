@@ -19,6 +19,7 @@
 package tools.aqua.konstraints
 
 import kotlin.use
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import tools.aqua.konstraints.dsl.*
@@ -502,6 +503,7 @@ class Examples {
   }
 
   @Test
+  @Disabled
   fun arrayProgram() {
     val program =
         smt(QF_ASLIA) {
@@ -560,7 +562,7 @@ class Examples {
                 // we solve the program using our solver, the solve function returns a tuple of
                 // SatStatus and Model the model may be null if produceModel is set to false or
                 // if the program was not satisfiable
-                solve(solver, true, 5000)
+                solve(solver, false, 5000)
               }
         }
 

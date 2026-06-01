@@ -27,6 +27,7 @@ import tools.aqua.konstraints.parser.lexer.OpeningBracket
 import tools.aqua.konstraints.parser.lexer.SMTStringToken
 import tools.aqua.konstraints.parser.lexer.SMTTokenizer
 import tools.aqua.konstraints.parser.lexer.SatToken
+import tools.aqua.konstraints.parser.lexer.SimpleSymbolToken
 import tools.aqua.konstraints.parser.lexer.SuccessToken
 import tools.aqua.konstraints.parser.lexer.Token
 import tools.aqua.konstraints.parser.lexer.UnknownToken
@@ -42,7 +43,7 @@ import tools.aqua.konstraints.solvers.UnexpectedSolverResponseException
 
 object ResponseParser {
   fun parseGeneralResponse(reader: Reader): SolverResponse {
-    val lexer = SMTTokenizer(reader, true).peekable()
+    val lexer = SMTTokenizer(reader).peekable()
     return parseGeneralResponseOrNull(lexer) ?: throw UnexpectedSolverResponseException("")
   }
 
@@ -51,42 +52,55 @@ object ResponseParser {
    * these match. If no match is found, no tokens will be consumed.
    */
   @OptIn(ExperimentalContracts::class)
-  internal fun parseGeneralResponseOrNull(lexer: PeekableIterator<Token>): SolverResponse? {
-    when (val token = lexer.peek()) {
-      is SuccessToken -> {
-        lexer.consume()
-        return SuccessResponse
-      }
-      is UnsupportedToken -> {
-        lexer.consume()
-        return UnsupportedResponse
-      }
-      is OpeningBracket -> {
-        // important to not consume the token before we are sure that we have an error response
-        if (lexer.peek(1) is ErrorToken) {
-          // consume both the opening bracket and the error token
-          lexer.consume(2)
-
-          val content = lexer.next()
-          requireIsInstance<SMTStringToken>(content)
-          requireIsInstance<ClosingBracket>(lexer.next())
-
-          return ErrorResponse(content.contents)
+  internal fun parseGeneralResponseOrNull(lexer: PeekableIterator<Token>): SolverResponse? =
+      when (val token = lexer.peek()) {
+        is SimpleSymbolToken -> {
+          token.toPredefinedTokenOrNull()?.let { predefinedToken ->
+            when (predefinedToken) {
+              is SuccessToken -> {
+                lexer.consume()
+                SuccessResponse
+              }
+              is UnsupportedToken -> {
+                lexer.consume()
+                UnsupportedResponse
+              }
+              else -> null
+            }
+          }
         }
+        is OpeningBracket -> {
+          val next = lexer.peek(1)
+          // important to not consume the token before we are sure that we have an error response
+          if (
+              next is SimpleSymbolToken &&
+                  next.toPredefinedTokenOrNull()?.let { it is ErrorToken } ?: false
+          ) {
+            // consume both the opening bracket and the error token
+            lexer.consume(2)
 
-        return null
+            val content = lexer.next()
+            requireIsInstance<SMTStringToken>(content)
+            requireIsInstance<ClosingBracket>(lexer.next())
+
+            return ErrorResponse(content.contents)
+          }
+
+          return null
+        }
+        else -> return null
       }
-      else -> return null
-    }
-  }
 
+  @OptIn(ExperimentalContracts::class)
   fun parseCheckSatResponse(reader: Reader): SolverResponse {
-    val lexer = SMTTokenizer(reader, true).peekable()
+    val lexer = SMTTokenizer(reader).peekable()
     parseGeneralResponseOrNull(lexer)?.let {
       return it
     }
 
-    return when (val token = lexer.next()) {
+    val token = lexer.next()
+    requireIsInstance<SimpleSymbolToken>(token)
+    return when (token.toPredefinedTokenOrNull()) {
       is SatToken -> CheckSatResponse(SatStatus.SAT)
       is UnknownToken -> CheckSatResponse(SatStatus.UNKNOWN)
       is UnsatToken -> CheckSatResponse(SatStatus.UNSAT)
@@ -99,7 +113,7 @@ object ResponseParser {
   }
 
   fun parseEchoResponse(reader: Reader): SolverResponse {
-    val lexer = SMTTokenizer(reader, true).peekable()
+    val lexer = SMTTokenizer(reader).peekable()
     parseGeneralResponseOrNull(lexer)?.let {
       return it
     }
@@ -116,7 +130,7 @@ object ResponseParser {
 
   @OptIn(ExperimentalContracts::class)
   fun parseModelResponse(reader: Reader, program: SMTProgram): SolverResponse {
-    val lexer = SMTTokenizer(reader, true).peekable()
+    val lexer = SMTTokenizer(reader).peekable()
     parseGeneralResponseOrNull(lexer)?.let {
       return it
     }

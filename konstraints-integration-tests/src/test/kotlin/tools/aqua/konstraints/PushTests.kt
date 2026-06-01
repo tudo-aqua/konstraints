@@ -25,7 +25,6 @@ import org.junit.jupiter.api.assertNull
 import tools.aqua.konstraints.dsl.toInt
 import tools.aqua.konstraints.smt.BVAdd
 import tools.aqua.konstraints.smt.BitVecLiteral
-import tools.aqua.konstraints.smt.BitVecSort
 import tools.aqua.konstraints.smt.Equals
 import tools.aqua.konstraints.smt.MutableSMTProgram
 import tools.aqua.konstraints.smt.QF_UFBV
@@ -86,21 +85,17 @@ class PushTests {
 
     // push and solve
     val (status, model) =
-      program.push(InteractiveZ3Solver(), true) {
-        val bar = declareConst("bar".toSymbol(), SMTBitVec(8))
-        val abc = defineFun(
-          "func".toSymbol(),
-          listOf(
-            SortedVar("x".toSymbol(), SMTBitVec(8)),
-            SortedVar("y".toSymbol(),SMTBitVec(8))
-          ),
-          SMTBitVec(8)) { params: List<SortedVar<*>> ->
-          BVAdd(params[0].instance.cast(), params[1].instance.cast())
-        }
+        program.push(InteractiveZ3Solver(), true) {
+          val bar = declareConst("bar".toSymbol(), SMTBitVec(8))
+          val abc =
+              defineFun("func", listOf(SMTBitVec(8), SMTBitVec(8)), SMTBitVec(8)) {
+                  params: List<SortedVar<*>> ->
+                BVAdd(params[0].instance.cast(), params[1].instance.cast())
+              }
 
-        assert(Equals(foo(), bar()))
-        assert(Equals(foo(), abc.constructDynamic(listOf(foo(), bar()), emptyList())))
-      }
+          assert(Equals(foo(), bar()))
+          assert(Equals(foo(), abc.constructDynamic(listOf(foo(), bar()), emptyList())))
+        }
 
     assertEquals(SatStatus.UNSAT, status)
     assertNull(model)

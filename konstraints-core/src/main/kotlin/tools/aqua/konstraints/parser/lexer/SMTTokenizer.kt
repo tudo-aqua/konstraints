@@ -30,7 +30,6 @@ import tools.aqua.konstraints.util.lineColumnTracking
 
 class SMTTokenizer(
     sourceReader: Reader,
-    val producePredefinedTokens: Boolean = false,
     private val source: String? = null,
 ) : Iterator<Token> {
   private val reader = sourceReader.buffered().peekable().lineColumnTracking()
@@ -188,13 +187,7 @@ class SMTTokenizer(
     val symbol = requireReadWhile("a simple symbol", Char::isSimpleSymbolLetter)
     val source = tokenStartLocation..readerLastLocation
 
-    return if (producePredefinedTokens) {
-      reservedWords[symbol]?.let { it(source) }
-          ?: predefinedTokens[symbol]?.let { it(source) }
-          ?: SimpleSymbolToken(symbol, source)
-    } else {
-      reservedWords[symbol]?.let { it(source) } ?: SimpleSymbolToken(symbol, source)
-    }
+    return reservedWords[symbol]?.let { it(source) } ?: SimpleSymbolToken(symbol, source)
   }
 
   private fun readQuotedSymbol(): QuotedSymbolToken {
@@ -251,7 +244,7 @@ class SMTTokenizer(
   private fun requireReadChar(expect: Char): Char = requireRead("a '$expect'") { it == expect }
 }
 
-fun Reader.tokenize(source: String? = null): SMTTokenizer = SMTTokenizer(this, false, source)
+fun Reader.tokenize(source: String? = null): SMTTokenizer = SMTTokenizer(this, source)
 
 fun Reader.tokenizeFully(source: String? = null): List<Token> =
     tokenize(source).asSequence().toList()

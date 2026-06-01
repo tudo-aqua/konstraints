@@ -55,10 +55,13 @@ enum class SatStatus {
  * ``reset-assertions``
  */
 interface PushContext {
+  /** Add [assertion] to the assertion stack. */
   fun assert(assertion: Assert)
 
+  /** Add (assert [expr]) to the assertion stack. */
   fun assert(expr: Expression<BoolSort>)
 
+  /** Defines a function (define-fun [name] ([parameters]) [sort] [term]). */
   fun <T : Sort> defineFun(
       name: Symbol,
       parameters: List<SortedVar<*>>,
@@ -66,42 +69,84 @@ interface PushContext {
       term: Expression<T>,
   ): DefinedSMTFunction<T>
 
-    fun <T : Sort> defineFun(
-        name: Symbol,
-        parameters: List<SortedVar<*>>,
-        sort: T,
-        term: (List<SortedVar<*>>) -> Expression<T>,
-    ): DefinedSMTFunction<T> = defineFun(name, parameters, sort, term(parameters))
+  /** Defines a function (define-fun [name] ([parameters]) [sort] [term]). */
+  fun <T : Sort> defineFun(
+      name: Symbol,
+      parameters: List<SortedVar<*>>,
+      sort: T,
+      term: (List<SortedVar<*>>) -> Expression<T>,
+  ): DefinedSMTFunction<T> = defineFun(name, parameters, sort, term(parameters))
 
+  /**
+   * Defines a function (define-fun [name] ([parameters]) [sort] [term]). [name] must contain a
+   * valid smt symbol. [parameters] are automatically converted to [SortedVar]'s and named by the
+   * following pattern: |x!i![sort]| where i is the position of the parameter in the list.
+   */
+  fun <T : Sort> defineFun(
+      name: String,
+      parameters: List<Sort>,
+      sort: T,
+      term: (List<SortedVar<*>>) -> Expression<T>,
+  ): DefinedSMTFunction<T> =
+      parameters
+          .mapIndexed { index, sort -> SortedVar("|x!$index!$sort|".toSymbol(), sort) }
+          .let { vars -> defineFun(name.toSymbol(), vars, sort, term(vars)) }
+
+  /** Add the function defined by [def] to the current context. */
   fun <T : Sort> defineFun(def: FunctionDef<T>): DefinedSMTFunction<T>
 
+  /** Declare constant (declare-const [name] [sort]). */
   fun <T : Sort> declareConst(name: Symbol, sort: T): UserDeclaredSMTFunction0<T>
 
+  /** Add the function declared by [func] to the current context. */
   fun <T : Sort> declareFun(func: UserDeclaredSMTFunction<T>): UserDeclaredSMTFunction<T>
 
   // TODO add sort parameter here, this requires some more work on the sort factory in the parser
+  /** Declare fun (declare-fun [name] ([parameters]) [sort]). */
   fun declareFun(name: Symbol, parameters: List<Sort>, sort: Sort): UserDeclaredSMTFunction<Sort>
 
+  /**
+   * Declare fun (declare-fun [name] ([parameters]) [sort]). [name] must contain a valid smt symbol.
+   */
+  fun declareFun(name: String, parameters: List<Sort>, sort: Sort) =
+      declareFun(name.toSymbol(), parameters, sort)
+
+  /** Define const (define-const [name] [sort] [term]). */
   fun <T : Sort> defineConst(
       name: Symbol,
       sort: T,
       term: Expression<T>,
   ): UserDefinedSMTFunction0<T>
 
+  /** Define const (define-const [name] [sort] [term]). [name] must contain a valid smt symbol. */
+  fun <T : Sort> defineConst(
+      name: String,
+      sort: T,
+      term: () -> Expression<T>,
+  ) = defineConst(name.toSymbol(), sort, term())
+
+  /** Add the function defined by [func] to the current context. */
   fun <T : Sort> defineFun(func: DefinedSMTFunction<T>): DefinedSMTFunction<T>
 
+  /** Push [n] empty levels to the assertion stack. */
   fun push(n: Int)
 
+  /** Push one empty level to the assertion stack. */
   fun push() = push(1)
 
+  /** Pop the top [n] levels of the assertion stack. */
   fun pop() = pop(1)
 
+  /** Pop the top level of the assertion stack. */
   fun pop(n: Int)
 
+  /** Add the sort declared by [decl] to the assertion stack. */
   fun declareSort(decl: DeclareSort)
 
+  /** Declare sort (declare-sort [name] [arity]) */
   fun declareSort(name: Symbol, arity: Int)
 
+  /** Define sort (declare-sort [name] ([parameters]) [sort]) */
   fun defineSort(name: Symbol, parameters: List<Symbol>, sort: Sort)
 }
 
