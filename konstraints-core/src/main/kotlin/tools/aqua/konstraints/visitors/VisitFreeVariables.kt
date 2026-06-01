@@ -35,13 +35,17 @@ import tools.aqua.konstraints.smt.IntLiteral
 import tools.aqua.konstraints.smt.Ite
 import tools.aqua.konstraints.smt.LetExpression
 import tools.aqua.konstraints.smt.LocalExpression
+import tools.aqua.konstraints.smt.Model
+import tools.aqua.konstraints.smt.MutableSMTProgram
 import tools.aqua.konstraints.smt.NAryExpression
 import tools.aqua.konstraints.smt.RealLiteral
+import tools.aqua.konstraints.smt.SMTInt
 import tools.aqua.konstraints.smt.SelectorExpression
 import tools.aqua.konstraints.smt.StringLiteral
 import tools.aqua.konstraints.smt.TernaryExpression
 import tools.aqua.konstraints.smt.TesterExpression
 import tools.aqua.konstraints.smt.UnaryExpression
+import tools.aqua.konstraints.smt.toSymbol
 
 object FreeVariables : VisitByStructure<MutableSet<FreeExpression<*>>> {
   fun of(expr: Expression<*>, policy: RecursionPolicy): Set<FreeExpression<*>> {
@@ -97,4 +101,31 @@ object FreeVariables : VisitByStructure<MutableSet<FreeExpression<*>>> {
   override fun visit(literal: RealLiteral, ctx: MutableSet<FreeExpression<*>>) {}
 
   override fun visit(literal: StringLiteral, ctx: MutableSet<FreeExpression<*>>) {}
+}
+
+fun test(model: Model) {
+  val literal = model.getConstant("x")
+
+  when (literal) {
+    is BitVecLiteral -> literal.value // BigInteger
+    is CharLiteral -> literal.value // String
+    is FloatingPointLiteral -> {
+      if (literal.sort.exponentBits == 8 && literal.sort.significantBits == 24) // double
+      {
+        literal.asFloat()
+      } else if (literal.sort.exponentBits == 11 && literal.sort.significantBits == 53) // double
+      {
+        literal.asDouble()
+      } else // custom floating point type needs custom conversion from raw bits
+      {}
+    }
+    is IntLiteral -> literal.value // BigInteger
+    is RealLiteral -> literal.value // BigDecimal
+    is StringLiteral -> literal.value // String
+  }
+
+  val program = MutableSMTProgram()
+  val def = program.declareConst("x".toSymbol(), SMTInt)
+
+  model.getConstantValue(def)
 }

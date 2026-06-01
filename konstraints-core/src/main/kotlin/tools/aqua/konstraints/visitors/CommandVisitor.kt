@@ -26,20 +26,19 @@ interface CommandVisitor<T> {
         is Assert -> visit(command)
         is DeclareConst<*> -> visit(command)
         is DeclareFun<*> -> visit(command)
-        is CheckSat -> visit(command)
-        is Exit -> visit(command)
         is SetInfo -> visit(command)
         is SetOption -> visit(command)
         is SetLogic -> visit(command)
         is DeclareSort -> visit(command)
-        is GetModel -> visit(command)
-        is DefineFun -> visit(command)
+        is DefineFun<*> -> visit(command)
         is Pop -> visit(command)
         is Push -> visit(command)
-        is DefineConst -> visit(command)
+        is DefineConst<*> -> visit(command)
         is DefineSort -> visit(command)
+        is NullOp -> visit(command)
         is GetValue -> TODO()
         is DeclareDatatype -> TODO()
+        is Declaration<*> -> TODO() // note that this is not reachable
       }
 
   fun visit(assert: Assert): T
@@ -47,10 +46,6 @@ interface CommandVisitor<T> {
   fun visit(declareConst: DeclareConst<*>): T
 
   fun visit(declareFun: DeclareFun<*>): T
-
-  fun visit(checkSat: CheckSat): T
-
-  fun visit(exit: Exit): T
 
   fun visit(setInfo: SetInfo): T
 
@@ -60,15 +55,15 @@ interface CommandVisitor<T> {
 
   fun visit(declareSort: DeclareSort): T
 
-  fun visit(getModel: GetModel): T
+  fun visit(defineConst: DefineConst<*>): T
 
-  fun visit(defineConst: DefineConst): T
-
-  fun visit(defineFun: DefineFun): T
+  fun visit(defineFun: DefineFun<*>): T
 
   fun visit(push: Push): T
 
   fun visit(pop: Pop): T
 
   fun visit(defineSort: DefineSort): T
+
+  fun visit(nullOp: NullOp): T
 }

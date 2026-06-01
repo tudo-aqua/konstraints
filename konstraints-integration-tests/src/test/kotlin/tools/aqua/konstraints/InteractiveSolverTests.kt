@@ -18,18 +18,24 @@
 
 package tools.aqua.konstraints
 
+import java.io.IOException
 import java.util.stream.Stream
 import kotlin.use
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
-import tools.aqua.konstraints.dsl.*
+import tools.aqua.konstraints.dsl.and
+import tools.aqua.konstraints.dsl.eq
+import tools.aqua.konstraints.dsl.ite
 import tools.aqua.konstraints.parser.SMTScriptParser
+import tools.aqua.konstraints.parser.SMTScriptParser.invoke
 import tools.aqua.konstraints.smt.BitVecLiteral
+import tools.aqua.konstraints.smt.BitVecLiteral.Companion.invoke
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.FPMinusZero
 import tools.aqua.konstraints.smt.FPNaN
@@ -44,15 +50,22 @@ import tools.aqua.konstraints.smt.SatStatus
 import tools.aqua.konstraints.smt.SortedVar
 import tools.aqua.konstraints.smt.StringLiteral
 import tools.aqua.konstraints.smt.toSymbol
-import tools.aqua.konstraints.solvers.z3.Z3Solver
+import tools.aqua.konstraints.solvers.InteractiveZ3Solver
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ModelTests {
+class InteractiveSolverTests {
   @ParameterizedTest
   @MethodSource("provideProgramAndModel")
   fun testModel(program: String, term: Expression<*>) {
     val prg = SMTScriptParser(program)
-    val solver = Z3Solver()
+    val solver =
+        try {
+          InteractiveZ3Solver()
+        } catch (e: IOException) {
+          // auto skip test when z3 is not installed
+          assumeTrue(false)
+        }
+            as InteractiveZ3Solver
 
     val (status, model) = solver.use { solver.solve(prg, true, 5000) }
 
@@ -70,7 +83,7 @@ class ModelTests {
               "(set-logic QF_LIA)(define-fun x1 ((a Int) (b Int)) Int (+ a b))(declare-fun y (Int Int) Int)(assert (forall ((a Int) (b Int))(=> (and (< a 40) (>= a 0)) (= (y a b) (x1 a b)))))(assert (forall ((a Int) (b Int))(=> (>= a 40) (= (y a b) 42))))(assert (forall ((a Int) (b Int))(=> (< a 0) (= (y a b) 23))))(check-sat)(get-model)",
               RealLiteral(1)),*/
           arguments(
-              "(set-logic QF_LIA)(declare-fun foo (Int Int) Int)(assert (and (= (foo 2 0) 2) (= (foo 1 0) 1) (= (foo 0 0) 0) (= (foo 2 1) 3) (= (foo 1 1) 2) (= (foo 0 1) 1)))(check-sat)(get-model)",
+              "(set-logic QF_UFLIA)(declare-fun foo (Int Int) Int)(assert (and (= (foo 2 0) 2) (= (foo 1 0) 1) (= (foo 0 0) 0) (= (foo 2 1) 3) (= (foo 1 1) 2) (= (foo 0 1) 1)))(check-sat)(get-model)",
               listOf(
                       SortedVar("x!0".toSymbol(), SMTInt),
                       SortedVar("x!1".toSymbol(), SMTInt),
@@ -90,7 +103,7 @@ class ModelTests {
                   },
           ),
           arguments(
-              "(set-logic QF_LIA)(declare-fun foo (Int) Int)(assert (and (= (foo 2) 2) (= (foo 1) 1) (= (foo 0) 0)))(check-sat)(get-model)",
+              "(set-logic QF_UFLIA)(declare-fun foo (Int) Int)(assert (and (= (foo 2) 2) (= (foo 1) 1) (= (foo 0) 0)))(check-sat)(get-model)",
               listOf(SortedVar("x!0".toSymbol(), SMTInt)).let {
                 val x0 = it[0].instance
                 ite(x0 eq 1) then
@@ -99,7 +112,7 @@ class ModelTests {
               },
           ),
           arguments(
-              "(set-logic QF_LIA)(declare-fun foo (Bool) Int)(assert (and (= (foo true) 1) (= (foo false) 0)))(check-sat)(get-model)",
+              "(set-logic QF_UFLIA)(declare-fun foo (Bool) Int)(assert (and (= (foo true) 1) (= (foo false) 0)))(check-sat)(get-model)",
               listOf(SortedVar("x!0".toSymbol(), SMTBool)).let {
                 val x0 = it[0].instance
                 ite(x0 eq False) then IntLiteral(0) otherwise IntLiteral(1)
@@ -137,11 +150,11 @@ class ModelTests {
           ),
           arguments(
               "(set-logic QF_LRA)(declare-fun foo () Real)(assert (= foo 0.0))(check-sat)(get-model)",
-              RealLiteral(0),
+              RealLiteral(0.0),
           ),
           arguments(
               "(set-logic QF_LIRA)(declare-fun foo () Real)(assert (= foo (/ 2.0 5.0)))(check-sat)(get-model)",
-              RealDiv(RealLiteral(2), RealLiteral(5)),
+              RealDiv(RealLiteral(2.0), RealLiteral(5.0)),
           ),
           /*arguments("(set-logic QF_LIRA)(declare-fun foo () Real)(assert (= foo 0.000000000000000000001))(check-sat)(get-model)",
           RealDiv(RealLiteral(1), RealLiteral(1000000000000000000000.0)))*/

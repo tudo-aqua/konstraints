@@ -90,10 +90,9 @@ class DSLTests {
           }
 
           assert { F fpleq F }
-          checkSat()
         }
 
-    val result = solver.solve(program)
+    val result = solver.solve(program, false, 5000)
 
     print(result)
   }
@@ -102,7 +101,7 @@ class DSLTests {
   @MethodSource("getProgramAndStatus")
   fun testProgram(program: SMTProgram, expected: SatStatus) {
     val solver = Z3Solver()
-    solver.solve(program)
+    solver.solve(program, false, 5000)
 
     assertEquals(expected, solver.status)
   }
@@ -122,7 +121,6 @@ class DSLTests {
                     }
                   }
                 }
-                checkSat()
               },
               SatStatus.UNSAT,
           ),
@@ -132,7 +130,6 @@ class DSLTests {
                 val t = const(BitVecSort(32))
 
                 assert { not { (s bvand s) eq s } }
-                checkSat()
               },
               SatStatus.UNSAT,
           ),
@@ -142,7 +139,6 @@ class DSLTests {
                 val t = const(BitVecSort(32))
 
                 assert { not { (s bvlshr s) eq "#b0".bitvec(32) } }
-                checkSat()
               },
               SatStatus.UNSAT,
           ),
@@ -152,7 +148,6 @@ class DSLTests {
                 val t = const(BitVecSort(32))
 
                 assert { not { s bvor s eq s } }
-                checkSat()
               },
               SatStatus.UNSAT,
           ),
@@ -162,7 +157,6 @@ class DSLTests {
                 val t = const(BitVecSort(32))
 
                 assert { not { s bvadd "#b0".bitvec(32) eq s } }
-                checkSat()
               },
               SatStatus.UNSAT,
           ),
@@ -172,7 +166,6 @@ class DSLTests {
                 val t = const(BitVecSort(32))
 
                 assert { not { s bvmul "#b0".bitvec(32) eq "#b0".bitvec(32) } }
-                checkSat()
               },
               SatStatus.UNSAT,
           ),
@@ -182,7 +175,6 @@ class DSLTests {
                 val B = const(FPSort(11, 53))
 
                 assert { (A fpadd B) eq (B fpadd A) }
-                checkSat()
               },
               SatStatus.SAT,
           ),
@@ -192,7 +184,6 @@ class DSLTests {
                 val nan = FPNaN(5, 11)
 
                 assert { (zero fpdiv zero) eq (nan) }
-                checkSat()
               },
               SatStatus.SAT,
           ),
@@ -203,7 +194,6 @@ class DSLTests {
                 val C = const(FPSort(11, 53))
 
                 assert { ((A fpmul B) fpadd C) fpeq (fpfma { A } mul { B } add { C }) }
-                checkSat()
               },
               SatStatus.SAT,
           ),
@@ -214,14 +204,12 @@ class DSLTests {
                 val C = const(FPSort(11, 53))
 
                 assert { ((A fpmul B) fpadd C) eq (fpfma { A } mul { B } add { C }) }
-                checkSat()
               },
               SatStatus.SAT,
           ),
           arguments(
               smt(QF_BV) {
                 assert { exists(BitVecSort(8), BitVecSort(8)) { x, y -> (x bvadd y) bvult x } }
-                checkSat()
               },
               SatStatus.SAT,
           ),
@@ -259,7 +247,6 @@ class DSLTests {
                         x9)
                   }
                 }
-                checkSat()
               },
               SatStatus.UNSAT,
           ),
@@ -289,7 +276,6 @@ class DSLTests {
                     (x1 eq { x2 } eq x3 eq x4 eq x5 eq x6 eq x7 eq x8 eq x9)
                   }
                 }
-                checkSat()
               },
               SatStatus.SAT,
           ),
@@ -299,7 +285,6 @@ class DSLTests {
                 val Y by declaringConst(BitVecSort(8))
 
                 assert { X bvult Y }
-                checkSat()
               },
               SatStatus.SAT,
           ),
@@ -335,7 +320,6 @@ class DSLTests {
                     (s bvsdiv t) eq expanded
                   }
                 }
-                checkSat()
               },
               SatStatus.SAT,
           ),
@@ -346,7 +330,6 @@ class DSLTests {
                       not { s eq t } and not { s bvult t }
                     }
                 assert { bvugt2("#b11111111".bitvec(), "#b01111111".bitvec()) }
-                checkSat()
               },
               SatStatus.SAT,
           ),
@@ -355,7 +338,6 @@ class DSLTests {
                 val A by declaringConst(SMTBool)
                 val B by declaringConst(SMTBool)
                 assert { A implies { B } implies A }
-                checkSat()
               },
               SatStatus.SAT,
           ),
@@ -364,7 +346,6 @@ class DSLTests {
                 val A = const(SMTBool)
                 val B = const(SMTBool)
                 assert { A implies { B } implies A }
-                checkSat()
               },
               SatStatus.SAT,
           ),
@@ -377,7 +358,6 @@ class DSLTests {
                 assert { A fpleq { B } fpleq C }
                 assert { { A } fpleq B fpleq C }
                 assert { { A } fpleq { B } fpleq { C } }
-                checkSat()
               },
               SatStatus.SAT,
           ),
@@ -393,7 +373,6 @@ class DSLTests {
                 assert {
                   not(not { extract(3, 3) { select(y, "#b0".bitvec(32)) } eq "#b0".bitvec(1) })
                 }
-                checkSat()
               },
               SatStatus.SAT,
           ),

@@ -18,15 +18,18 @@
 
 package tools.aqua.konstraints
 
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.assertNotNull
 import tools.aqua.konstraints.dsl.declaringConst
 import tools.aqua.konstraints.dsl.eq
 import tools.aqua.konstraints.dsl.smt
 import tools.aqua.konstraints.smt.BitVecLiteral
 import tools.aqua.konstraints.smt.MutableSMTProgram
-import tools.aqua.konstraints.smt.QF_BV
+import tools.aqua.konstraints.smt.QF_UFBV
 import tools.aqua.konstraints.smt.SMTBitVec
+import tools.aqua.konstraints.smt.SatStatus
 import tools.aqua.konstraints.solvers.InteractiveZ3Solver
 
 // these tests need a z3 version installed which is currently not present on the remote
@@ -37,17 +40,15 @@ class InteractiveSolverTests {
     val solver = InteractiveZ3Solver()
 
     val program =
-        smt(QF_BV) {
+        smt(QF_UFBV) {
           val foo by declaringConst(SMTBitVec(8))
           assert(foo eq BitVecLiteral(8, 8))
-          checkSat()
-          getModel()
         }
             as MutableSMTProgram
 
-    solver.use { solver -> solver.solve(program) }
+    val (status, model) = solver.use { solver -> solver.solve(program, true, 5000) }
 
-    println(program.status)
-    println(program.model)
+    assertEquals(SatStatus.SAT, status)
+    assertNotNull(model)
   }
 }

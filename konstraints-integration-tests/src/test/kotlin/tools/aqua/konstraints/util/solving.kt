@@ -18,14 +18,16 @@
 
 package tools.aqua.konstraints.util
 
+import tools.aqua.konstraints.smt.Model
 import tools.aqua.konstraints.smt.SMTProgram
+import tools.aqua.konstraints.smt.SatStatus
 import tools.aqua.konstraints.solvers.z3.Z3Solver
 
 /*
  * currently uses Z3 to solve eventually use an abstract Solver interface
  */
-fun SMTProgram.solve() {
+fun SMTProgram.solve(): Pair<SatStatus, Model?> {
   val solver = Z3Solver()
 
-  solver.use { status = solver.solve(this) }
+  return solver.use { solver.solve(this, false, 5000) }
 }

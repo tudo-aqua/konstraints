@@ -20,7 +20,6 @@ package tools.aqua.konstraints
 
 import java.util.stream.Stream
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.Arguments
@@ -29,7 +28,6 @@ import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.dsl.BenchmarkCategory
 import tools.aqua.konstraints.dsl.smt
 import tools.aqua.konstraints.smt.BooleanOptionValue
-import tools.aqua.konstraints.smt.CheckSat
 import tools.aqua.konstraints.smt.ConstantAttributeValue
 import tools.aqua.konstraints.smt.NumeralOptionValue
 import tools.aqua.konstraints.smt.QF_UF
@@ -83,7 +81,7 @@ class ProgramDSLTests {
         val x = const("x", SMTBool)
 
         assert { x }
-        checkSat(solver)
+        solve(solver, false, 5000)
         solver.close()
       }
 
@@ -151,14 +149,4 @@ class ProgramDSLTests {
   }
 
   fun getFunNameAndSort(): Stream<Arguments> = Stream.of(arguments("x", SMTBool))
-
-  @Test
-  fun testCheckSatExists() {
-    assert(program.commands.filterIsInstance<CheckSat>().isNotEmpty())
-  }
-
-  @Test
-  fun testSatStatusIsSet() {
-    assertEquals(program.status, SatStatus.SAT)
-  }
 }

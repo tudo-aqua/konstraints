@@ -74,10 +74,7 @@ import tools.aqua.konstraints.smt.SMTProgram
 import tools.aqua.konstraints.smt.Sort
 import tools.aqua.konstraints.smt.SortedVar
 import tools.aqua.konstraints.smt.Symbol
-import tools.aqua.konstraints.smt.assert
 import tools.aqua.konstraints.smt.cast
-import tools.aqua.konstraints.smt.declareFun
-import tools.aqua.konstraints.smt.defineFun
 import tools.aqua.konstraints.smt.setInfo
 
 object SMTScriptParser {
