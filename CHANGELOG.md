@@ -12,6 +12,72 @@
 
 # Changelog
 
+## 0.4.2 - 2026-06-02
+
+`0.4.2` focuses on solver and program integration improvements for GDart. It changes how solver
+results and models are requested, adds scoped push/pop solving support, and tightens interactive
+solver response parsing.
+
+### Breaking Changes
+
+- `Solver.solve(...)` now takes `produceModel` and `timeout` parameters and returns
+  `Pair<SatStatus, Model?>`. Code that previously called `solve(program): SatStatus` and then
+  `getModel()` must now request model production in the solve call and use the returned model.
+- `Solver.getModel()` was removed.
+- `SMTProgramBuilder.checkSat(...)`, `SMTProgramBuilder.getModel(...)`,
+  `MutableSMTProgram.checkSat(...)`, and `MutableSMTProgram.getModel(...)` were removed in favor of
+  solver-driven `solve(...)` calls.
+- `MutableSMTProgram.add(...)` is now internal. Use typed program APIs such as `assert`,
+  `declareConst`, `declareFun`, `defineConst`, `defineFun`, `push`, and `pop`.
+- `CommandVisitor` no longer exposes separate visits for `CheckSat`, `Exit`, and `GetModel`.
+  Visitors that care about these commands should handle them through `NullOp`.
+- `Model.getConstantValue(...)` now returns the underlying value instead of a literal wrapper. Use
+  `getConstant(...)` to retrieve a literal, or `getConstantFloatValue(...)` /
+  `getConstantDoubleValue(...)` for floating-point values.
+
+### Added
+
+- `PushContext` and scoped `MutableSMTProgram.push(solver, produceModel, timeout) { ... }` support
+  for temporary assertion-stack changes that are solved and then popped.
+- `Model.constants` and `Model.functions` views for separating constant and non-constant
+  definitions.
+- `Model.getConstant(...)` helpers for retrieving constant literals by symbol, string, function, or
+  term.
+- `SatStatus.ERROR` and `EchoResponse`.
+- Specialized solver response parser entry points for general responses, `check-sat`, `get-model`,
+  and `echo` responses.
+- `Declaration<T>` and `NullOp` command categories, plus generic `DefineConst<T>` and `DefineFun<T>`
+  command types.
+
+### Changed
+
+- `InteractiveCLISolver` now writes commands through `CommandVisitor`, enables `:produce-models`
+  based on the solve request, parses command responses according to command type, and returns a
+  model together with the satisfiability status when requested.
+- `Z3Solver.solve(program, produceModel, timeout)` now performs the satisfiability check as part of
+  `solve` and constructs a Konstraints model only when requested and available.
+- Program finalization no longer appends `Exit`; `CheckSat`, `GetModel`, and `Exit` are treated as
+  null operations by solver visitors.
+- `SetOption` now accepts option names with or without the leading `:`.
+- Function and constant definitions preserve their sort type more consistently through
+  `DefineFun<T>`, `DefineConst<T>`, and `FunctionDef<T>`.
+
+### Fixed
+
+- Interactive solver response parsing now handles `success`, `unsupported`, errors, check-sat
+  statuses, model responses, and echo responses through dedicated parser paths.
+- General response parsing no longer consumes tokens when a general response is not present,
+  improving follow-on parsing of `check-sat` and `get-model` responses.
+- Z3 model availability detection no longer relies on nullable behavior from the underlying Z3 API.
+
+### Build And Tooling
+
+- Updated `kotlinx-serialization-json` to `1.11.0`.
+- Updated Dokka Gradle plugin to `2.2.0`.
+- Updated Develocity to `4.4.1`.
+- Updated `commons-io` to `2.22.0`.
+- Added integration coverage for interactive solving and scoped push/pop solving.
+
 ## 0.4.1 - 2026-04-24
 
 `0.4.1` is closer to a feature release than a pure patch release: it adds meaningful API surface and
