@@ -600,6 +600,16 @@ fun MutableSMTProgram.setInfo(name: String, value: BigDecimal) =
 fun MutableSMTProgram.setInfo(name: String, value: Symbol) =
     setInfo(SetInfo(Attribute(name, SymbolAttributeValue(value))))
 
+/** Declare sort (declare-sort [name] [arity]) and return the resulting [UserDeclaredSort]. */
+fun PushContext.declareSort(name: String, arity: Int = 0): UserDeclaredSort {
+  declareSort(name.toSymbol(), arity)
+  return UserDeclaredSort(name.toSymbol(), emptyList())
+}
+
+/** Declare constant (declare-const [name] [sort]) and return its expression directly. */
+fun <T : Sort> PushContext.declareConst(name: String, sort: T): Expression<T> =
+    declareConst(name.toSymbol(), sort)()
+
 class AssertionOutOfLogicBounds(msg: String) : RuntimeException(msg)
 
 class NoSuchInfoException(keyword: String) : RuntimeException("Info $keyword not found!")
