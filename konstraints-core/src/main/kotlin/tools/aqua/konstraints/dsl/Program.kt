@@ -74,6 +74,29 @@ class SMTProgramBuilder(logic: Logic) {
     return func
   }
 
+  /** Declare sort (declare-sort [name] [arity]). */
+  fun declareSort(name: Symbol, arity: Int) = program.declareSort(name, arity)
+
+  /**
+   * Defines a function (define-fun [name] ([parameters]) [sort] [term]).
+   *
+   * Parameter names are auto-generated as `|x!i!sort|`.
+   */
+  fun <T : Sort> defineFun(
+      name: String,
+      parameters: List<Sort>,
+      sort: T,
+      term: (List<SortedVar<*>>) -> Expression<T>,
+  ): DefinedSMTFunction<T> = program.defineFun(name, parameters, sort, term)
+
+  /** Push a scope, solve with [solver], pop the scope, and return the result. */
+  fun push(
+      solver: Solver,
+      produceModel: Boolean,
+      timeout: Long = 5000,
+      block: PushContext.() -> Unit,
+  ): Pair<SatStatus, Model?> = program.push(solver, produceModel, timeout, block)
+
   /** Solve the program using [solver] and return its sat status */
   fun solve(solver: Solver, produceModel: Boolean, timeout: Long): Pair<SatStatus, Model?> {
     return solver.solve(program, produceModel, timeout)
