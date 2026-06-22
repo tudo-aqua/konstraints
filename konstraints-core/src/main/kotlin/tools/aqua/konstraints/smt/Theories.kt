@@ -42,6 +42,9 @@ val CORE_MARKER_SET = setOf(Theories.CORE)
 /** Marks all [SMTFunction]s that are part of FloatingPoint theory. */
 val FLOATING_POINT_MARKER_SET = setOf(Theories.FLOATING_POINT)
 
+/** Marks all [SMTFunction]s that are part of Ints theory. */
+val INTS_MARKER_SET = setOf(Theories.INTS, Theories.REALS_INTS)
+
 /** Marks all [SMTFunction]s that are part of IntsReals and Ints theory. */
 val INTS_REALS_INTS_MARKER_SET = setOf(Theories.INTS, Theories.REALS_INTS)
 
