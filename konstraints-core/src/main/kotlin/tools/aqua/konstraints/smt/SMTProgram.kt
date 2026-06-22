@@ -259,6 +259,65 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands), PushCon
     _commands.add(index, command)
   }
 
+    private fun validate(): Boolean {
+        // if a logic isnt set we are in auto logic mode
+        // this is not yet supported but will be in the future
+        logic?.let {logic ->
+            if(logic.quantifierFree && commands.filterIsInstance<Assert>().any { assert -> !isQuantifierFree(assert.expr) } ) {
+                return false
+            }
+        }
+
+        return true
+    }
+
+    private fun isQuantifierFree(expr: Expression<*>) = expr.any { it is ExistsExpression || it is ForallExpression }
+
+    private fun isLinear(expr: Expression<*>) = expr.all {
+        when (it.sort) {
+            is IntSort -> isLinear(it.cast<IntSort>())
+            is RealSort -> isLinear(it.cast<RealSort>())
+            else -> true
+        }
+    }
+
+    private fun isLinear(expr: Expression<IntSort>) = expr.all {
+        if (it is IntMul) {
+            // multiplications of the form (* c x) or (* x c) are allowed,
+            // where x is a free constant and c is a literal or negation of a numeral
+            // TODO might remove this as solvers do not seem to care about these logic fragment rules
+            if(it.children.size != 2) return@all false
+            if(it.children.all { child -> child is UserDeclaredExpression<*> || child is UserDefinedExpression<*> }) return@all false
+            true
+        }
+        else {
+            it !is IntDiv && it !is Mod && it !is Abs // TODO add exp when implemented
+        }
+    }
+
+    private fun isLinear(expr: Expression<RealSort>) = expr.all {
+        if (it is RealMul) {
+            // multiplications of the form (* c x) or (* x c) are allowed,
+            // where x is a free constant and c is a literal or negation of a numeral
+            if(it.children.size != 2) return@all false
+            if(it.children.all { child -> child is UserDeclaredExpression<*> || child is UserDefinedExpression<*> }) return@all false
+            true
+        }
+        else {
+            it !is RealDiv // TODO add exp for ints when implemented
+        }
+    }
+
+    private fun isNonLinear(expr: Expression<*>) = !isLinear(expr) && !isDifferential(expr)
+
+    // differential logic only allows subtraction, negation and comparison operators
+    private fun isDifferential(expr: Expression<*>) = expr.all {
+        if(it.sort !is NumeralSort) true
+        else {
+            it is IntLiteral || it is RealLiteral || it is IntSub || it is RealSub || it is IntNeg || it is RealNeg
+        }
+    }
+
   override fun assert(assertion: Assert) {
     check(logic != null) { "Logic must be set before adding assertions!" }
 
