@@ -151,7 +151,7 @@ interface PushContext {
 }
 
 /** Base class for all types of smt program. */
-abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
+abstract class SMTProgram(commands: List<Command>, val isDeep: Boolean = false) : SMTSerializable {
   var logic: Logic? = null
     protected set
 
@@ -221,7 +221,7 @@ abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
 }
 
 /** SMT Program with a mutable command list. */
-class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands), PushContext {
+class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) : SMTProgram(commands, isDeep), PushContext {
   // TODO implement assertion stack more explicitly in the future
   // should also split commands into different lists to give the program more structure
   // this will require changing the visitors and is planned for a future release
@@ -253,70 +253,99 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands), PushCon
    */
   internal fun add(command: Command, index: Int) {
     if (command is Assert) {
-      require(command.expr.all { context.contains(it) })
+      require(command.expr.all(isDeep) { context.contains(it) })
     }
 
     _commands.add(index, command)
   }
 
-    private fun validate(): Boolean {
-        // if a logic isnt set we are in auto logic mode
-        // this is not yet supported but will be in the future
-        logic?.let {logic ->
-            if(logic.quantifierFree && commands.filterIsInstance<Assert>().any { assert -> !isQuantifierFree(assert.expr) } ) {
-                return false
-            }
-        }
+  private fun validate(expr: Expression<*>) {
+    // validate expr in the current context, i.e. all symbols are known
+    checkContext(expr)
 
-        return true
+    // if a logic isnt set we are in auto logic mode
+    // this is not yet supported but will be in the future
+    logic?.let { logic ->
+      if (logic.quantifierFree && !isQuantifierFree(expr)) {
+        throw IllegalQuantifierUsageException("Quantifier used in quantifier free logic $logic")
+      }
+
+      // validate numerical fragment from most to least general
+      if (logic.nonlinearArithmetic) {
+        /* this empty block is needed as nonlinear logics also allow linear and differential fragments */
+      } else if (logic.linearArithmetic && !isLinear(expr)) {
+        throw IllegalNonLinearExpressionException("Illegal usage of non linear expression")
+      } else if (logic.differentialArithmetic && !isDifferential(expr)) {
+        throw IllegalNonDifferentialExpressionException("Illegal usage of non linear expression")
+      }
     }
+  }
 
-    private fun isQuantifierFree(expr: Expression<*>) = expr.any { it is ExistsExpression || it is ForallExpression }
+  private fun isQuantifierFree(expr: Expression<*>) =
+      !expr.any(isDeep) { it is ExistsExpression || it is ForallExpression }
 
-    private fun isLinear(expr: Expression<*>) = expr.all {
+  private fun isLinear(expr: Expression<*>) =
+      expr.all(isDeep) {
         when (it.sort) {
-            is IntSort -> isLinear(it.cast<IntSort>())
-            is RealSort -> isLinear(it.cast<RealSort>())
-            else -> true
+          is IntSort -> isLinear(it.cast<IntSort>())
+          is RealSort -> isLinear(it.cast<RealSort>())
+          else -> true
         }
-    }
+      }
 
-    private fun isLinear(expr: Expression<IntSort>) = expr.all {
+    @JvmName("isLinearInt")
+  private fun isLinear(expr: Expression<IntSort>) =
+      expr.all(isDeep) {
         if (it is IntMul) {
-            // multiplications of the form (* c x) or (* x c) are allowed,
-            // where x is a free constant and c is a literal or negation of a numeral
-            // TODO might remove this as solvers do not seem to care about these logic fragment rules
-            if(it.children.size != 2) return@all false
-            if(it.children.all { child -> child is UserDeclaredExpression<*> || child is UserDefinedExpression<*> }) return@all false
-            true
+          // multiplications of the form (* c x) or (* x c) are allowed,
+          // where x is a free constant and c is a literal or negation of a numeral
+          if (it.children.size != 2) false
+          else if (
+              it.children.all { child ->
+                child is UserDeclaredExpression<*> || child is UserDefinedExpression<*>
+              }
+          )
+              false
+          else true
+        } else {
+          it !is IntDiv && it !is Mod && it !is Abs // TODO add exp when implemented
         }
-        else {
-            it !is IntDiv && it !is Mod && it !is Abs // TODO add exp when implemented
-        }
-    }
+      }
 
-    private fun isLinear(expr: Expression<RealSort>) = expr.all {
+    @JvmName("isLinearReal")
+  private fun isLinear(expr: Expression<RealSort>) =
+      expr.all(isDeep) {
         if (it is RealMul) {
-            // multiplications of the form (* c x) or (* x c) are allowed,
-            // where x is a free constant and c is a literal or negation of a numeral
-            if(it.children.size != 2) return@all false
-            if(it.children.all { child -> child is UserDeclaredExpression<*> || child is UserDefinedExpression<*> }) return@all false
-            true
+          // multiplications of the form (* c x) or (* x c) are allowed,
+          // where x is a free constant and c is a literal or negation of a numeral
+          if (it.children.size != 2) false
+          else if (
+              it.children.all { child ->
+                child is UserDeclaredExpression<*> || child is UserDefinedExpression<*>
+              }
+          )
+              false
+          else true
+        } else {
+          it !is RealDiv // TODO add exp for ints when implemented
         }
-        else {
-            it !is RealDiv // TODO add exp for ints when implemented
-        }
-    }
+      }
 
-    private fun isNonLinear(expr: Expression<*>) = !isLinear(expr) && !isDifferential(expr)
+  private fun isNonLinear(expr: Expression<*>) = !isLinear(expr) && !isDifferential(expr)
 
-    // differential logic only allows subtraction, negation and comparison operators
-    private fun isDifferential(expr: Expression<*>) = expr.all {
-        if(it.sort !is NumeralSort) true
+  // differential logic only allows subtraction, negation and comparison operators
+  private fun isDifferential(expr: Expression<*>) =
+      expr.all(isDeep) {
+        if (it.sort !is NumeralSort) true
         else {
-            it is IntLiteral || it is RealLiteral || it is IntSub || it is RealSub || it is IntNeg || it is RealNeg
+          it is IntLiteral ||
+              it is RealLiteral ||
+              it is IntSub ||
+              it is RealSub ||
+              it is IntNeg ||
+              it is RealNeg
         }
-    }
+      }
 
   override fun assert(assertion: Assert) {
     check(logic != null) { "Logic must be set before adding assertions!" }
@@ -338,12 +367,13 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands), PushCon
     */
 
     // check all symbols are known
-    checkContext(assertion.expr)
+    validate(assertion.expr)
 
     _commands.add(assertion)
   }
 
   private fun checkContext(root: Expression<*>) {
+      // TODO implement recursive version
     val stack = ArrayDeque<StackOperation<Expression<*>>>()
 
     if (root is ExistsExpression || root is ForallExpression || root is LetExpression) {
@@ -659,7 +689,17 @@ fun MutableSMTProgram.setInfo(name: String, value: BigDecimal) =
 fun MutableSMTProgram.setInfo(name: String, value: Symbol) =
     setInfo(SetInfo(Attribute(name, SymbolAttributeValue(value))))
 
-class AssertionOutOfLogicBounds(msg: String) : RuntimeException(msg)
+abstract class InvalidSMTProgramException(msg: String) : IllegalStateException(msg)
+
+class OutOfLogicBoundsException(msg: String) : InvalidSMTProgramException(msg)
+
+class IllegalQuantifierUsageException(msg: String) : InvalidSMTProgramException(msg)
+
+class IllegalDatatypeUsageException(msg: String) : InvalidSMTProgramException(msg)
+
+class IllegalNonLinearExpressionException(msg: String) : InvalidSMTProgramException(msg)
+
+class IllegalNonDifferentialExpressionException(msg: String) : InvalidSMTProgramException(msg)
 
 class NoSuchInfoException(keyword: String) : RuntimeException("Info $keyword not found!")
 

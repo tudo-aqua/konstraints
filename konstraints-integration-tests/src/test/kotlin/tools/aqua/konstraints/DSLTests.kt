@@ -208,13 +208,13 @@ class DSLTests {
               SatStatus.SAT,
           ),
           arguments(
-              smt(QF_BV) {
+              smt(BV) {
                 assert { exists(BitVecSort(8), BitVecSort(8)) { x, y -> (x bvadd y) bvult x } }
               },
               SatStatus.SAT,
           ),
           arguments(
-              smt(QF_BV) {
+              smt(BV) {
                 assert {
                   exists(
                       BitVecSort(3),
@@ -251,7 +251,7 @@ class DSLTests {
               SatStatus.UNSAT,
           ),
           arguments(
-              smt(QF_BV) {
+              smt(BV) {
                 assert {
                   exists(
                       BitVecSort(3),

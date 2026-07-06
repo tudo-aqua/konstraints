@@ -140,7 +140,7 @@ class ModelTests {
               RealLiteral(0),
           ),
           arguments(
-              "(set-logic QF_LIRA)(declare-fun foo () Real)(assert (= foo (/ 2.0 5.0)))(check-sat)(get-model)",
+              "(set-logic QF_NIRA)(declare-fun foo () Real)(assert (= foo (/ 2.0 5.0)))(check-sat)(get-model)",
               RealDiv(RealLiteral(2), RealLiteral(5)),
           ),
           /*arguments("(set-logic QF_LIRA)(declare-fun foo () Real)(assert (= foo 0.000000000000000000001))(check-sat)(get-model)",

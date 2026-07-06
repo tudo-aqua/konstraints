@@ -78,13 +78,13 @@ import tools.aqua.konstraints.smt.cast
 import tools.aqua.konstraints.smt.setInfo
 
 object SMTScriptParser {
-  operator fun invoke(input: String) =
-      SMTScriptParser.parseScript(SMTTokenizer(input.reader()).peekable())
+  operator fun invoke(input: String, parseDeepProgram: Boolean = false) =
+      parseScript(SMTTokenizer(input.reader()).peekable(), parseDeepProgram)
 
-  operator fun invoke(input: Reader) = SMTScriptParser.parseScript(SMTTokenizer(input).peekable())
+  operator fun invoke(input: Reader, parseDeepProgram: Boolean = false) = parseScript(SMTTokenizer(input).peekable(), parseDeepProgram)
 
-  internal fun parseScript(lexer: PeekableIterator<Token>): MutableSMTProgram {
-    val program = MutableSMTProgram()
+  internal fun parseScript(lexer: PeekableIterator<Token>, parseDeepProgram: Boolean): MutableSMTProgram {
+    val program = MutableSMTProgram(emptyList(), parseDeepProgram)
 
     while (lexer.peek() !is EOFToken) {
       parseCommand(lexer, program)

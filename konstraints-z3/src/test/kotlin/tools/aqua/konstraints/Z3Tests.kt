@@ -291,9 +291,9 @@ class Z3Tests {
   @ValueSource(
       strings =
           [
-              "(set-logic QF_BV)(set-info :status sat)(assert (exists ((A (_ BitVec 8)) (B (_ BitVec 8))) (= (bvadd A B) (bvmul A B))))(check-sat)",
-              "(set-logic QF_IDL)(set-info :status unsat)(assert (forall ((A Int) (B Int)) (>= (* A B) (+ A B))))(check-sat)",
-              "(set-logic QF_BV)(set-info :status unsat)(assert (forall ((A (_ BitVec 8))) (exists ((B (_ BitVec 8))) (bvult A B))))(check-sat)",
+              "(set-logic BV)(set-info :status sat)(assert (exists ((A (_ BitVec 8)) (B (_ BitVec 8))) (= (bvadd A B) (bvmul A B))))(check-sat)",
+              "(set-logic LIA)(set-info :status unsat)(assert (forall ((A Int) (B Int)) (>= (* A B) (+ A B))))(check-sat)",
+              "(set-logic BV)(set-info :status unsat)(assert (forall ((A (_ BitVec 8))) (exists ((B (_ BitVec 8))) (bvult A B))))(check-sat)",
           ]
   )
   fun testQuantifier(program: String) {
