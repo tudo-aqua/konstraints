@@ -26,6 +26,7 @@ import tools.aqua.konstraints.dsl.UserDeclaredSMTFunctionN
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunction0
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunctionN
 import tools.aqua.konstraints.solvers.Solver
+import tools.aqua.konstraints.solvers.Solver.Companion.getDefaultSolver
 import tools.aqua.konstraints.util.StackOperation
 import tools.aqua.konstraints.util.StackOperationType
 
@@ -218,6 +219,11 @@ abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
 
     return builder
   }
+
+  fun solve(produceModel: Boolean, timeout: Long = 5000): Pair<SatStatus, Model?> {
+    val solver = getDefaultSolver()
+    return solver.solve(this, produceModel, timeout)
+  }
 }
 
 /** SMT Program with a mutable command list. */
@@ -396,6 +402,12 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands), PushCon
 
     return func
   }
+
+  fun <T> push(
+      produceModel: Boolean,
+      timeout: Long = 5000,
+      block: PushContext.() -> T,
+  ) = push(getDefaultSolver(), produceModel, timeout, block)
 
   fun <T> push(
       solver: Solver,
