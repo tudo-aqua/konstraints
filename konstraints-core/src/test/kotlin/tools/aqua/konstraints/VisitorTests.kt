@@ -85,7 +85,7 @@ object OrderSensitiveVisitor : VisitByStructure<MutableList<Symbol>> {
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class VisitorTests {
   val program =
-      smt(QF_BV) {
+      smt(QF_UFBV) {
         val func by declaring(SMTBitVec(8), SMTBitVec(8), SMTBitVec(8))
         val foo by declaring(SMTBitVec(8))
         val bar by declaring(SMTBitVec(8))

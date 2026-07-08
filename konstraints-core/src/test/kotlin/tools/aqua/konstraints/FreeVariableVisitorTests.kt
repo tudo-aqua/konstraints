@@ -32,6 +32,7 @@ import tools.aqua.konstraints.dsl.forall
 import tools.aqua.konstraints.dsl.not
 import tools.aqua.konstraints.dsl.smt
 import tools.aqua.konstraints.smt.Assert
+import tools.aqua.konstraints.smt.BV
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.QF_BV
 import tools.aqua.konstraints.smt.SMTBitVec
@@ -81,7 +82,7 @@ class FreeVariableVisitorTests {
               setOf("s".toSymbol(), "t".toSymbol()),
           ),
           arguments(
-              smt(QF_BV) {
+              smt(BV) {
                     val s by declaringConst(SMTBitVec(32))
                     val t by declaringConst(SMTBitVec(32))
                     assert { forall(SMTBitVec(32)) { x -> not((s bvor (x bvor x)) eq (s bvor t)) } }
