@@ -18,95 +18,123 @@
 
 package tools.aqua.konstraints
 
-/*
-@Disabled
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.assertDoesNotThrow
+import tools.aqua.konstraints.smt.And
+import tools.aqua.konstraints.smt.BoolSort
+import tools.aqua.konstraints.smt.Expression
+import tools.aqua.konstraints.smt.False
+import tools.aqua.konstraints.smt.Not
+import tools.aqua.konstraints.smt.Or
+import tools.aqua.konstraints.smt.Order
+import tools.aqua.konstraints.smt.QuotingRule
+import tools.aqua.konstraints.smt.True
+
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ExpressionTests {
-  private fun loadResource(path: String) =
-      File(javaClass.getResource(path)!!.file)
-          .walk()
-          .filter { file: File -> file.isFile }
-          .map { file: File -> Arguments.arguments(file) }
+  val expr = And(Not(True), Or(False, And(True, False)))
 
-  private fun loadResourceZipped(path: String) =
-      File(javaClass.getResource(path)!!.file)
-          .walk()
-          .filter { file: File -> file.isFile }
-          .zipWithNext()
-          .map { Arguments.of(it.first, it.second) }
+  @Test
+  fun testDeepRecursiveSequence() {
+    val deepExpr = (0..2048).fold(False) { acc: Expression<BoolSort>, _ -> Not(acc) }
 
-  /** Test that two expressions with same reference are considered equal */
-  @ParameterizedTest
-  @MethodSource("getFiles")
-  fun testExpressionIsEqualToItselfSameReference(file: File) {
-    val program =
-        Parser().parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
-
-    assertTrue(
-        program.commands.filterIsInstance<Assert>().first().expr ==
-            program.commands.filterIsInstance<Assert>().first().expr
-    )
+    assertDoesNotThrow {
+      deepExpr.asSequence().forEach { println(it.toSMTString(QuotingRule.SAME_AS_INPUT, true)) }
+    }
   }
 
-  /** Test that two identical expressions with different references are considered equal */
-  @ParameterizedTest
-  @MethodSource("getFiles")
-  fun testExpressionIsEqualToItselfDifferentReference(file: File) {
-    val expr1 =
-        Parser()
-            .parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
-            .commands
-            .filterIsInstance<Assert>()
-            .first()
-            .expr
-    val expr2 =
-        Parser()
-            .parse(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
-            .commands
-            .filterIsInstance<Assert>()
-            .first()
-            .expr
-
-    assertTrue(expr1 == expr2)
+  @Test
+  fun testRecursivePreorderSequence() {
+    val expected = mutableListOf("And", "Not", "True", "Or", "False", "And", "True", "False")
+    expr.asSequence(Order.PREORDER).forEach {
+      assertEquals(expected.first(), it.javaClass.name.removePrefix("tools.aqua.konstraints.smt."))
+      expected.removeFirst()
+    }
   }
 
-  fun getFiles(): Stream<Arguments> =
-      (loadResource("/QF_BV/20190311-bv-term-small-rw-Noetzli/") +
-              loadResource("/QF_IDL/Averest/binary_search/") +
-              loadResource("/QF_RDL/") +
-              loadResource("/QF_FP/wintersteiger/"))
-          .asStream()
-
-  @ParameterizedTest
-  @MethodSource("getFilesZipped")
-  fun testExpressionIsNotEqualToDifferentExpression(file1: File, file2: File) {
-    val expr1 =
-        Parser()
-            .parse(file1.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
-            .commands
-            .filterIsInstance<Assert>()
-            .first()
-            .expr
-    val expr2 =
-        Parser()
-            .parse(file2.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
-            .commands
-            .filterIsInstance<Assert>()
-            .first()
-            .expr
-
-    // it rarely happens that two benchmarks start with the same expression
-    // we try to skip these using this string comparison
-    assumeTrue(expr1.toString() != expr2.toString())
-
-    assertTrue(expr1 != expr2)
+  @Test
+  fun testIterativePreorderSequence() {
+    val expected = mutableListOf("And", "Not", "True", "Or", "False", "And", "True", "False")
+    expr.asSequence(Order.PREORDER, true).forEach {
+      assertEquals(expected.first(), it.javaClass.name.removePrefix("tools.aqua.konstraints.smt."))
+      expected.removeFirst()
+    }
   }
 
-  fun getFilesZipped(): Stream<Arguments> =
-      (loadResourceZipped("/QF_BV/20190311-bv-term-small-rw-Noetzli/") +
-              loadResourceZipped("/QF_IDL/Averest/binary_search/") +
-              loadResourceZipped("/QF_RDL/") +
-              loadResourceZipped("/QF_FP/wintersteiger/"))
-          .asStream()
+  @Test
+  fun testRecursivePostorderSequence() {
+    val expected = mutableListOf("True", "Not", "False", "True", "False", "And", "Or", "And")
+    expr.asSequence(Order.POSTORDER).forEach {
+      assertEquals(expected.first(), it.javaClass.name.removePrefix("tools.aqua.konstraints.smt."))
+      expected.removeFirst()
+    }
+  }
+
+  @Test
+  fun testIterativePostorderSequence() {
+    val expected = mutableListOf("True", "Not", "False", "True", "False", "And", "Or", "And")
+    expr.asSequence(Order.POSTORDER, true).forEach {
+      assertEquals(expected.first(), it.javaClass.name.removePrefix("tools.aqua.konstraints.smt."))
+      expected.removeFirst()
+    }
+  }
+
+  @Test
+  fun testRecursivePreorderForEach() {
+    val expected = mutableListOf("And", "Not", "True", "Or", "False", "And", "True", "False")
+    expr.forEach(Order.PREORDER) {
+      assertEquals(expected.first(), it.javaClass.name.removePrefix("tools.aqua.konstraints.smt."))
+      expected.removeFirst()
+    }
+  }
+
+  @Test
+  fun testIterativePreorderForEach() {
+    val expected = mutableListOf("And", "Not", "True", "Or", "False", "And", "True", "False")
+    expr.forEach(Order.PREORDER, true) {
+      assertEquals(expected.first(), it.javaClass.name.removePrefix("tools.aqua.konstraints.smt."))
+      expected.removeFirst()
+    }
+  }
+
+  @Test
+  fun testRecursivePostorderForEach() {
+    val expected = mutableListOf("True", "Not", "False", "True", "False", "And", "Or", "And")
+    expr.forEach(Order.POSTORDER) {
+      assertEquals(expected.first(), it.javaClass.name.removePrefix("tools.aqua.konstraints.smt."))
+      expected.removeFirst()
+    }
+  }
+
+  @Test
+  fun testIterativePostorderForEach() {
+    val expected = mutableListOf("True", "Not", "False", "True", "False", "And", "Or", "And")
+    expr.forEach(Order.POSTORDER, true) {
+      assertEquals(expected.first(), it.javaClass.name.removePrefix("tools.aqua.konstraints.smt."))
+      expected.removeFirst()
+    }
+  }
+
+  @Test
+  fun testRecursiveAny() {
+    assertTrue(expr.any { it is False })
+  }
+
+  @Test
+  fun testIterativeAny() {
+    assertTrue(expr.any(true) { it is False })
+  }
+
+  @Test
+  fun testRecursiveAll() {
+    assertTrue(expr.all { it.sort is BoolSort })
+  }
+
+  @Test
+  fun testIterativeAll() {
+    assertTrue(expr.all(true) { it.sort is BoolSort })
+  }
 }
-*/
