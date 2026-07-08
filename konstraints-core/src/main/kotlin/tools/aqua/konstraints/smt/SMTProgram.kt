@@ -227,7 +227,8 @@ abstract class SMTProgram(commands: List<Command>, val isDeep: Boolean = false) 
 }
 
 /** SMT Program with a mutable command list. */
-class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) : SMTProgram(commands, isDeep), PushContext {
+class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
+    SMTProgram(commands, isDeep), PushContext {
   // TODO implement assertion stack more explicitly in the future
   // should also split commands into different lists to give the program more structure
   // this will require changing the visitors and is planned for a future release
@@ -299,7 +300,7 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) : SMTP
         }
       }
 
-    @JvmName("isLinearInt")
+  @JvmName("isLinearInt")
   private fun isLinear(expr: Expression<IntSort>) =
       expr.all(isDeep) {
         if (it is IntMul) {
@@ -318,7 +319,7 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) : SMTP
         }
       }
 
-    @JvmName("isLinearReal")
+  @JvmName("isLinearReal")
   private fun isLinear(expr: Expression<RealSort>) =
       expr.all(isDeep) {
         if (it is RealMul) {
@@ -379,7 +380,7 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) : SMTP
   }
 
   private fun checkContext(root: Expression<*>) {
-      // TODO implement recursive version
+    // TODO implement recursive version
     val stack = ArrayDeque<StackOperation<Expression<*>>>()
 
     if (root is ExistsExpression || root is ForallExpression || root is LetExpression) {
@@ -466,6 +467,10 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) : SMTP
   }
 
   override fun <T : Sort> declareFun(func: UserDeclaredSMTFunction<T>): UserDeclaredSMTFunction<T> {
+    if (func.parameters.isNotEmpty() && !logic!!.freeSortFunctionSymbols) {
+      throw IllegalUsageOfFreeFunctionException("")
+    }
+
     context.addFun(func)
     _commands.add(DeclareFun(func))
 
@@ -486,6 +491,10 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) : SMTP
   }
 
   override fun <T : Sort> defineFun(func: DefinedSMTFunction<T>): DefinedSMTFunction<T> {
+    if (func.parameters.isNotEmpty() && !logic!!.freeSortFunctionSymbols) {
+      throw IllegalUsageOfFreeFunctionException("")
+    }
+
     context.addFun(func)
     _commands.add(DefineFun(func.symbol, func.sortedVars, func.sort, func.term))
 
@@ -706,6 +715,8 @@ abstract class InvalidSMTProgramException(msg: String) : IllegalStateException(m
 class OutOfLogicBoundsException(msg: String) : InvalidSMTProgramException(msg)
 
 class IllegalQuantifierUsageException(msg: String) : InvalidSMTProgramException(msg)
+
+class IllegalUsageOfFreeFunctionException(msg: String) : InvalidSMTProgramException(msg)
 
 class IllegalDatatypeUsageException(msg: String) : InvalidSMTProgramException(msg)
 

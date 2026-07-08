@@ -81,9 +81,13 @@ object SMTScriptParser {
   operator fun invoke(input: String, parseDeepProgram: Boolean = false) =
       parseScript(SMTTokenizer(input.reader()).peekable(), parseDeepProgram)
 
-  operator fun invoke(input: Reader, parseDeepProgram: Boolean = false) = parseScript(SMTTokenizer(input).peekable(), parseDeepProgram)
+  operator fun invoke(input: Reader, parseDeepProgram: Boolean = false) =
+      parseScript(SMTTokenizer(input).peekable(), parseDeepProgram)
 
-  internal fun parseScript(lexer: PeekableIterator<Token>, parseDeepProgram: Boolean): MutableSMTProgram {
+  internal fun parseScript(
+      lexer: PeekableIterator<Token>,
+      parseDeepProgram: Boolean,
+  ): MutableSMTProgram {
     val program = MutableSMTProgram(emptyList(), parseDeepProgram)
 
     while (lexer.peek() !is EOFToken) {
