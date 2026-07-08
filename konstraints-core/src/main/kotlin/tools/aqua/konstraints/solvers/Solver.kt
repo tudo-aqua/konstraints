@@ -22,7 +22,43 @@ import tools.aqua.konstraints.smt.Model
 import tools.aqua.konstraints.smt.SMTProgram
 import tools.aqua.konstraints.smt.SatStatus
 
+enum class Solvers {
+  Z3,
+  CVC5,
+}
+
 interface Solver : AutoCloseable {
+  companion object {
+    private val priorityList = listOf(Solvers.Z3, Solvers.CVC5)
+    private val defaultSolver: Solvers? =
+        priorityList.fold(null as Solvers?) { solver, priority ->
+          solver
+              ?: when (priority) {
+                Solvers.Z3 ->
+                    try {
+                      InteractiveZ3Solver()
+                      Solvers.Z3
+                    } catch (_: Exception) {
+                      null
+                    }
+                Solvers.CVC5 ->
+                    try {
+                      InteractiveCVC5Solver()
+                      Solvers.Z3
+                    } catch (_: Exception) {
+                      null
+                    }
+              }
+        }
+
+    fun getDefaultSolver(): Solver =
+        when (defaultSolver) {
+          Solvers.Z3 -> InteractiveZ3Solver()
+          Solvers.CVC5 -> InteractiveCVC5Solver()
+          null -> throw NoDefaultSolverAvailableException()
+        }
+  }
+
   /**
    * Solves the provided program using [this] solver.
    *
@@ -32,3 +68,6 @@ interface Solver : AutoCloseable {
    */
   fun solve(program: SMTProgram, produceModel: Boolean, timeout: Long): Pair<SatStatus, Model?>
 }
+
+class NoDefaultSolverAvailableException :
+    RuntimeException("No default solver was found on the system.")

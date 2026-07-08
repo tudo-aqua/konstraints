@@ -18,6 +18,11 @@
 
 package tools.aqua.konstraints.smt
 
+enum class Order {
+  PREORDER,
+  POSTORDER,
+}
+
 /** Interface for all sorted SMT terms. */
 sealed class Expression<out T : Sort> : SMTSerializable {
   abstract val symbol: BaseSymbol
@@ -39,64 +44,244 @@ sealed class Expression<out T : Sort> : SMTSerializable {
   // TODO implement more operations like filter, filterIsInstance, filterIsSort, forEach, onEach
   // etc.
 
-  fun all(predicate: (Expression<*>) -> Boolean): Boolean {
-    val deepAll =
-        DeepRecursiveFunction<Expression<*>, Boolean> { expr ->
-          // Apply predicate to current node
-          if (!predicate(expr)) return@DeepRecursiveFunction false
-
-          // Recursively check all children using the DeepRecursiveScope
-          for (child in expr.children) {
-            if (!this.callRecursive(child)) return@DeepRecursiveFunction false
-          }
-
-          true
-        }
-
-    return deepAll(this)
+  fun all(useIterative: Boolean = false, predicate: (Expression<*>) -> Boolean): Boolean {
+    return if (useIterative) {
+      iterativeAll(predicate)
+    } else {
+      recursiveAll(predicate)
+    }
   }
 
-  /*
-  fun all(predicate: (Expression<*>) -> Boolean): Boolean =
-      when (this) {
-        is ConstantExpression -> predicate(this)
-        is UnaryExpression<*, *> -> predicate(this) and inner.all(predicate)
-        is BinaryExpression<*, *, *> ->
-            predicate(this) and lhs.all(predicate) and rhs.all(predicate)
-        is HomogenousExpression<*, *> ->
-            predicate(this) and
-                children.map { it.all(predicate) }.reduceOrDefault(true) { t1, t2 -> t1 and t2 }
-        is Ite ->
-            predicate(this) and
-                predicate(condition) and
-                predicate(then) and
-                predicate(otherwise) and
-                condition.all(predicate) and
-                then.all(predicate) and
-                otherwise.all(predicate)
-        is Literal -> predicate(this)
-        is NAryExpression ->
-            predicate(this) and
-                children.map { it.all(predicate) }.reduceOrDefault(true) { t1, t2 -> t1 and t2 }
-        is TernaryExpression<*, *, *, *> ->
-            predicate(this) and lhs.all(predicate) and mid.all(predicate) and rhs.all(predicate)
-        is LetExpression -> predicate(this) and inner.all(predicate)
-        is LocalExpression -> predicate(this)
-        is BoundVariable -> predicate(this)
-        is ExistsExpression -> predicate(this) and term.all(predicate)
-        is ForallExpression -> predicate(this) and term.all(predicate)
-        is AnnotatedExpression -> predicate(this) and term.all(predicate)
+  fun iterativeAll(predicate: (Expression<*>) -> Boolean): Boolean {
+    val stack = ArrayDeque<Expression<*>>()
+    stack.add(this)
+
+    while (stack.isNotEmpty()) {
+      // depth first, children are visited in reverse order
+      val curr = stack.removeLast()
+
+      if (!predicate(curr)) return false
+      stack.addAll(curr.children)
+    }
+
+    return true
+  }
+
+  fun recursiveAll(predicate: (Expression<*>) -> Boolean): Boolean {
+    if (!predicate(this)) return false
+    return children.all { it.recursiveAll(predicate) }
+  }
+
+  fun any(useIterative: Boolean = false, predicate: (Expression<*>) -> Boolean): Boolean {
+    return if (useIterative) {
+      iterativeAny(predicate)
+    } else {
+      recursiveAny(predicate)
+    }
+  }
+
+  fun iterativeAny(predicate: (Expression<*>) -> Boolean): Boolean {
+    val stack = ArrayDeque<Expression<*>>()
+    stack.add(this)
+
+    while (stack.isNotEmpty()) {
+      // depth first, children are visited in reverse order
+      val curr = stack.removeLast()
+
+      if (predicate(curr)) return true
+      stack.addAll(curr.children)
+    }
+
+    return false
+  }
+
+  fun recursiveAny(predicate: (Expression<*>) -> Boolean): Boolean {
+    if (predicate(this)) return true
+    return children.any { it.recursiveAny(predicate) }
+  }
+
+  fun asSequence(
+      order: Order = Order.PREORDER,
+      useIterative: Boolean = false,
+  ): Sequence<Expression<*>> = sequence {
+    if (useIterative) {
+      asSequenceIterative(order)
+    } else {
+      asSequenceRecursive(order)
+    }
+  }
+
+  fun asSequenceRecursive(order: Order) = sequence {
+    when (order) {
+      Order.PREORDER -> {
+        yield(this@Expression)
+        yieldAll(this@Expression.children)
       }
-    */
-
-  fun asSequence(): Sequence<Expression<*>> = sequence {
-    yield(this@Expression)
-    children.forEach { yieldAll(it.asSequence()) }
+      Order.POSTORDER -> {
+        yieldAll(this@Expression.children)
+        yield(this@Expression)
+      }
+    }
   }
 
-  fun forEach(action: (Expression<*>) -> Unit) {
-    action(this)
-    children.forEach { it.forEach(action) }
+  fun asSequenceIterative(order: Order): Sequence<Expression<*>> = sequence {
+    yield(this@Expression)
+
+    val stack = ArrayDeque<Iterator<Expression<*>>>()
+    stack.addLast(children.iterator())
+
+    while (stack.isNotEmpty()) {
+      val iterator = stack.last()
+
+      if (iterator.hasNext()) {
+        val child = iterator.next()
+
+        yield(child)
+        stack.addLast(child.children.iterator())
+      } else {
+        stack.removeLast()
+      }
+    }
+  }
+
+  fun forEach(
+      order: Order = Order.PREORDER,
+      useIterative: Boolean = false,
+      action: (Expression<*>) -> Unit,
+  ) {
+    if (useIterative) {
+      forEachIterative(order, action)
+    } else {
+      forEachRecursive(order, action)
+    }
+  }
+
+  fun forEachRecursive(order: Order, action: (Expression<*>) -> Unit) {
+    when (order) {
+      Order.PREORDER -> {
+        action(this)
+        children.forEach { it.forEachRecursive(order, action) }
+      }
+      Order.POSTORDER -> {
+        children.forEach { it.forEachRecursive(order, action) }
+        action(this)
+      }
+    }
+  }
+
+  fun forEachIterative(order: Order, action: (Expression<*>) -> Unit) {
+    data class Node(val expr: Expression<*>, val expanded: Boolean)
+
+    when (order) {
+      Order.PREORDER -> {
+        action(this)
+
+        val stack = ArrayDeque<Iterator<Expression<*>>>()
+        stack.addLast(children.iterator())
+
+        while (stack.isNotEmpty()) {
+          val iterator = stack.last()
+
+          if (iterator.hasNext()) {
+            val child = iterator.next()
+
+            action(child)
+            stack.addLast(child.children.iterator())
+          } else {
+            stack.removeLast()
+          }
+        }
+      }
+      Order.POSTORDER -> {
+        val stack = ArrayDeque<Node>()
+        stack.addLast(Node(this, false))
+
+        while (stack.isNotEmpty()) {
+          val curr = stack.removeLast()
+
+          if (!curr.expanded) {
+            stack.add(Node(curr.expr, true))
+            // insert children in reverse order so they are visited in order of the list
+            // this makes order consistent with recursive version of foreach
+            stack.addAll(curr.expr.children.reversed().map { Node(it, false) })
+          } else {
+            action(curr.expr)
+          }
+        }
+      }
+    }
+  }
+
+  fun onEach(
+      order: Order = Order.PREORDER,
+      useIterative: Boolean = false,
+      action: (Expression<*>) -> Unit,
+  ): Expression<T> {
+    return if (useIterative) {
+      onEachIterative(order, action)
+    } else {
+      onEachRecursive(order, action)
+    }
+  }
+
+  fun onEachRecursive(order: Order, action: (Expression<*>) -> Unit): Expression<T> {
+    when (order) {
+      Order.PREORDER -> {
+        action(this)
+        children.forEach { it.forEachRecursive(order, action) }
+      }
+      Order.POSTORDER -> {
+        children.forEach { it.forEachRecursive(order, action) }
+        action(this)
+      }
+    }
+
+    return this
+  }
+
+  fun onEachIterative(order: Order, action: (Expression<*>) -> Unit): Expression<T> {
+    data class Node(val expr: Expression<*>, val expanded: Boolean)
+
+    when (order) {
+      Order.PREORDER -> {
+        action(this)
+
+        val stack = ArrayDeque<Iterator<Expression<*>>>()
+        stack.addLast(children.iterator())
+
+        while (stack.isNotEmpty()) {
+          val iterator = stack.last()
+
+          if (iterator.hasNext()) {
+            val child = iterator.next()
+
+            action(child)
+            stack.addLast(child.children.iterator())
+          } else {
+            stack.removeLast()
+          }
+        }
+      }
+      Order.POSTORDER -> {
+        val stack = ArrayDeque<Node>()
+        stack.addLast(Node(this, false))
+
+        while (stack.isNotEmpty()) {
+          val curr = stack.removeLast()
+
+          if (!curr.expanded) {
+            stack.add(Node(curr.expr, true))
+            // insert children in reverse order so they are visited in order of the list
+            // this makes order consistent with recursive version of foreach
+            stack.addAll(curr.expr.children.reversed().map { Node(it, false) })
+          } else {
+            action(curr.expr)
+          }
+        }
+      }
+    }
+
+    return this
   }
 
   fun transform(transformation: (Expression<*>) -> Expression<*>): Expression<T> {
