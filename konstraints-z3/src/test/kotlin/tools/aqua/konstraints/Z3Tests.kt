@@ -359,7 +359,7 @@ class Z3Tests {
     }
   }
 
-    @Disabled // direct solving mode is currently broken
+  @Disabled // direct solving mode is currently broken
   @ParameterizedTest
   @MethodSource("getTerms")
   fun testDirectSolvingMode(terms: List<Expression<BoolSort>>) {
