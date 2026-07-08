@@ -1898,6 +1898,32 @@ internal object DivisibleDecl :
   }
 }
 
+internal object IntExpDecl :
+    SMTTheoryFunction<IntSort>(
+        "**".toSymbol(),
+        listOf(SMTInt, SMTInt),
+        SMTInt,
+        Associativity.NONE,
+    ) {
+  override fun constructDynamic(
+      args: List<Expression<*>>,
+      indices: List<Index>,
+  ): Expression<IntSort> {
+    require(args.size == 2) {
+      "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+    require(args.first().sort is IntSort) {
+      "Expected arg of $symbol to be Int but was ${args.first().sort}"
+    }
+    require(args.last().sort is IntSort) {
+      "Expected arg of $symbol to be Int but was ${args.last().sort}"
+    }
+    require(indices.isEmpty())
+
+    return IntExp(args.first().cast(), args.last().cast())
+  }
+}
+
 /** Reals theory internal object */
 internal object RealsTheory : Theory {
   override val functions =

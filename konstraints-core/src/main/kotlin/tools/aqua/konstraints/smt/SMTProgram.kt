@@ -315,7 +315,7 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
               false
           else true
         } else {
-          it !is IntDiv && it !is Mod && it !is Abs // TODO add exp when implemented
+          it !is IntDiv && it !is Mod && it !is Abs && it !is IntExp
         }
       }
 
