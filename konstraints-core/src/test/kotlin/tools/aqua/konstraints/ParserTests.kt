@@ -38,7 +38,7 @@ class ParserTests {
 
     (0..level).forEach { program += ")" }
 
-    assertDoesNotThrow { SMTScriptParser(program) }
+    assertDoesNotThrow { SMTScriptParser(program, true) }
   }
 
   @Test

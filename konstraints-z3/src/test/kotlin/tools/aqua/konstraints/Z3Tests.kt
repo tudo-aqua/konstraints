@@ -291,9 +291,9 @@ class Z3Tests {
   @ValueSource(
       strings =
           [
-              "(set-logic QF_BV)(set-info :status sat)(assert (exists ((A (_ BitVec 8)) (B (_ BitVec 8))) (= (bvadd A B) (bvmul A B))))(check-sat)",
-              "(set-logic QF_IDL)(set-info :status unsat)(assert (forall ((A Int) (B Int)) (>= (* A B) (+ A B))))(check-sat)",
-              "(set-logic QF_BV)(set-info :status unsat)(assert (forall ((A (_ BitVec 8))) (exists ((B (_ BitVec 8))) (bvult A B))))(check-sat)",
+              "(set-logic BV)(set-info :status sat)(assert (exists ((A (_ BitVec 8)) (B (_ BitVec 8))) (= (bvadd A B) (bvmul A B))))(check-sat)",
+              "(set-logic LIA)(set-info :status unsat)(assert (forall ((A Int) (B Int)) (>= (* A B) (+ A B))))(check-sat)",
+              "(set-logic BV)(set-info :status unsat)(assert (forall ((A (_ BitVec 8))) (exists ((B (_ BitVec 8))) (bvult A B))))(check-sat)",
           ]
   )
   fun testQuantifier(program: String) {
@@ -339,8 +339,8 @@ class Z3Tests {
   @ValueSource(
       strings =
           [
-              "(set-logic QF_BV)(set-info :status sat)(declare-fun A () (_ BitVec 8))(define-fun B () (_ BitVec 8) (bvneg A))(assert (= A (bvneg B)))(check-sat)",
-              "(set-logic QF_BV)(set-info :status sat)(define-fun bvugt8 ((lhs (_ BitVec 8)) (rhs (_ BitVec 8))) Bool (and (not (= lhs rhs)) (not (bvult lhs rhs))))(declare-fun A () (_ BitVec 8))(declare-fun B () (_ BitVec 8))(assert (bvugt8 A B))(check-sat)",
+              "(set-logic QF_UFBV)(set-info :status sat)(declare-fun A () (_ BitVec 8))(define-fun B () (_ BitVec 8) (bvneg A))(assert (= A (bvneg B)))(check-sat)",
+              "(set-logic QF_UFBV)(set-info :status sat)(define-fun bvugt8 ((lhs (_ BitVec 8)) (rhs (_ BitVec 8))) Bool (and (not (= lhs rhs)) (not (bvult lhs rhs))))(declare-fun A () (_ BitVec 8))(declare-fun B () (_ BitVec 8))(assert (bvugt8 A B))(check-sat)",
           ]
   )
   fun testDefineFun(program: String) {

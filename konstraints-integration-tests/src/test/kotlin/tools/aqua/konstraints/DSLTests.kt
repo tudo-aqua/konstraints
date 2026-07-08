@@ -208,13 +208,13 @@ class DSLTests {
               SatStatus.SAT,
           ),
           arguments(
-              smt(QF_BV) {
+              smt(BV) {
                 assert { exists(BitVecSort(8), BitVecSort(8)) { x, y -> (x bvadd y) bvult x } }
               },
               SatStatus.SAT,
           ),
           arguments(
-              smt(QF_BV) {
+              smt(BV) {
                 assert {
                   exists(
                       BitVecSort(3),
@@ -251,7 +251,7 @@ class DSLTests {
               SatStatus.UNSAT,
           ),
           arguments(
-              smt(QF_BV) {
+              smt(BV) {
                 assert {
                   exists(
                       BitVecSort(3),
@@ -289,7 +289,7 @@ class DSLTests {
               SatStatus.SAT,
           ),
           arguments(
-              smt(QF_BV) {
+              smt(UFBV) {
                 assert {
                   forall(BitVecSort(8), BitVecSort(8)) { s, t ->
                     val msb_s = extract(s.sort.bits - 1, s.sort.bits - 1) { s }
@@ -324,7 +324,7 @@ class DSLTests {
               SatStatus.SAT,
           ),
           arguments(
-              smt(QF_BV) {
+              smt(QF_UFBV) {
                 val bvugt2 by
                     defining(SMTBool, BitVecSort(8), BitVecSort(8)) { s, t ->
                       not { s eq t } and not { s bvult t }
