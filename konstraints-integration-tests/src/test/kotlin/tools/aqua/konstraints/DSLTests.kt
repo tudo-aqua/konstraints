@@ -289,7 +289,7 @@ class DSLTests {
               SatStatus.SAT,
           ),
           arguments(
-              smt(QF_BV) {
+              smt(UFBV) {
                 assert {
                   forall(BitVecSort(8), BitVecSort(8)) { s, t ->
                     val msb_s = extract(s.sort.bits - 1, s.sort.bits - 1) { s }
@@ -324,7 +324,7 @@ class DSLTests {
               SatStatus.SAT,
           ),
           arguments(
-              smt(QF_BV) {
+              smt(QF_UFBV) {
                 val bvugt2 by
                     defining(SMTBool, BitVecSort(8), BitVecSort(8)) { s, t ->
                       not { s eq t } and not { s bvult t }

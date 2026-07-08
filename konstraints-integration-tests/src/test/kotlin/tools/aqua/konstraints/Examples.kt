@@ -25,7 +25,6 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import tools.aqua.konstraints.dsl.*
-import tools.aqua.konstraints.smt.BV
 import tools.aqua.konstraints.smt.BitVecSort
 import tools.aqua.konstraints.smt.FPMul
 import tools.aqua.konstraints.smt.QF_ASLIA
@@ -42,6 +41,7 @@ import tools.aqua.konstraints.smt.SMTReal
 import tools.aqua.konstraints.smt.SMTRoundingMode
 import tools.aqua.konstraints.smt.SMTString
 import tools.aqua.konstraints.smt.SatStatus
+import tools.aqua.konstraints.smt.UFBV
 import tools.aqua.konstraints.smt.bitvec
 import tools.aqua.konstraints.solvers.InteractiveZ3Solver
 
@@ -133,7 +133,7 @@ class Examples {
     // a logic needs to be specified when creating a program
     // we will be using QF_BV here
     val program =
-        smt(BV) {
+        smt(UFBV) {
           // all info flags can be set via the setInfo block
           setInfo {
             // for each standard flag described on p.74 of the smt-lib manual
@@ -316,7 +316,7 @@ class Examples {
     // this program showcases how a more complicated operation may be implemented in a read-able
     // manner using the dsl
     val program =
-        smt(BV) {
+        smt(UFBV) {
           // all info flags can be set via the setInfo block
           setInfo {
             smtLibVersion("2.6")
@@ -409,7 +409,7 @@ class Examples {
     // this program showcases how we can build a new smt operation on bitvectors of arbitrary but
     // fixed length
     val program =
-        smt(BV) {
+        smt(UFBV) {
           // all info flags can be set via the setInfo block
           setInfo {
             smtLibVersion("2.6")
