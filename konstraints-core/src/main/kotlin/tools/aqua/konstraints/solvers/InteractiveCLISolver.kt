@@ -52,6 +52,8 @@ import tools.aqua.konstraints.visitors.CommandVisitor
 
 class InteractiveZ3Solver : InteractiveCLISolver("z3", "-in")
 
+class InteractiveCVC5Solver : InteractiveCLISolver("cvc5", "--interactive")
+
 open class InteractiveCLISolver(val name: String, vararg solverOptions: String) :
     Solver, CommandVisitor<Unit> {
 
