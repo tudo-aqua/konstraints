@@ -280,10 +280,13 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
       // validate numerical fragment from most to least general
       if (logic.nonlinearArithmetic) {
         /* this empty block is needed as nonlinear logics also allow linear and differential fragments */
-      } else if (logic.linearArithmetic && !isLinear(expr)) {
-        throw IllegalNonLinearExpressionException("Illegal usage of non linear expression")
+      } else if (logic.linearArithmetic) {
+        if (!isLinear(expr))
+            throw IllegalNonLinearExpressionException("Illegal usage of non linear expression")
       } else if (logic.differentialArithmetic && !isDifferential(expr)) {
-        throw IllegalNonDifferentialExpressionException("Illegal usage of non linear expression")
+        throw IllegalNonDifferentialExpressionException(
+            "Illegal usage of non linear expression in $expr"
+        )
       }
     }
   }
@@ -341,16 +344,20 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
   private fun isNonLinear(expr: Expression<*>) = !isLinear(expr) && !isDifferential(expr)
 
   // differential logic only allows subtraction, negation and comparison operators
-  private fun isDifferential(expr: Expression<*>) =
+  private fun isDifferential(expr: Expression<*>): Boolean =
       expr.all(isDeep) {
-        if (it.sort !is NumeralSort) true
+        if (it.sort !is IntSort && it.sort !is RealSort) true
+        else if (it is IntNeg) it.inner is IntLiteral // negation is only allowed for literals
+        else if (it is RealNeg) it.inner is RealLiteral
+        else if (it is LocalExpression<*>) isDifferential(it.term)
         else {
           it is IntLiteral ||
               it is RealLiteral ||
               it is IntSub ||
               it is RealSub ||
-              it is IntNeg ||
-              it is RealNeg
+              it is UserDeclaredExpression<*> ||
+              it is UserDefinedExpression<*> ||
+              it is Ite<*>
         }
       }
 

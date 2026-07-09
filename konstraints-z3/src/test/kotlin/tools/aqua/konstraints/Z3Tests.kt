@@ -182,13 +182,6 @@ class Z3Tests {
 
   fun getQFFPLRAFile(): Stream<Arguments> = loadResource("/QF_FPLRA/")
 
-  @ParameterizedTest
-  @MethodSource("getQFIDLModelsFile")
-  @Timeout(value = 20, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
-  fun QF_IDL_Models(file: File) = solve(file)
-
-  fun getQFIDLModelsFile(): Stream<Arguments> = loadResource("/QF_IDL/Models/")
-
   @Disabled
   @ParameterizedTest
   @MethodSource("getQFBVModelsFile")

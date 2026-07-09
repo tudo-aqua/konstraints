@@ -58,11 +58,11 @@ class DSLTests {
 
           assert {
             or {
-              and {
+              +and {
                 +A
                 +Not(A)
               }
-              and {
+              +and {
                 +B
                 +Not(B)
               }
@@ -72,7 +72,7 @@ class DSLTests {
           assert {
             eq {
               +(A implies B)
-              or {
+              +or {
                 not { A }
                 +B
               }
@@ -81,7 +81,7 @@ class DSLTests {
 
           assert {
             eq {
-              realadd {
+              +realadd {
                 +D
                 +E
               }
