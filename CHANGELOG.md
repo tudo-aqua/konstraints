@@ -20,16 +20,16 @@ support, and extends the integer theory with exponentiation.
 ### Breaking Changes
 
 - `MutableSMTProgram` now validates assertions against the selected logic as they are added and
-  rejects quantifiers, arithmetic outside the selected numerical fragment, and free function
-  symbols where the logic does not permit them.
+  rejects quantifiers, arithmetic outside the selected numerical fragment, and free function symbols
+  where the logic does not permit them.
 - `Equals` now requires at least two operands.
 - `AssertionOutOfLogicBounds` was replaced by the `InvalidSMTProgramException` hierarchy, including
   dedicated exceptions for invalid quantifier, function, datatype, and arithmetic usage.
 
 ### Added
 
-- Default solver discovery through `Solver.getDefaultSolver()`, with interactive Z3 and CVC5
-  support and `NoDefaultSolverAvailableException` when neither solver is installed.
+- Default solver discovery through `Solver.getDefaultSolver()`, with interactive Z3 and CVC5 support
+  and `NoDefaultSolverAvailableException` when neither solver is installed.
 - `SMTProgram.solve(...)` and a default-solver overload of `MutableSMTProgram.push(...)` for solving
   without explicitly constructing a solver.
 - Expression-tree traversal APIs for preorder and postorder traversal: `any`, `all`, `asSequence`,
@@ -41,8 +41,8 @@ support, and extends the integer theory with exponentiation.
 
 ### Fixed
 
-- Linear and difference-logic validation now handles `let` expressions, `ite` expressions, and
-  free function symbols correctly.
+- Linear and difference-logic validation now handles `let` expressions, `ite` expressions, and free
+  function symbols correctly.
 - Difference-logic validation now restricts negation to numeric literals.
 - Equality expressions with fewer than two operands are rejected.
 
