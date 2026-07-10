@@ -12,6 +12,48 @@
 
 # Changelog
 
+## 0.4.3 - 2026-07-10
+
+This release expands expression traversal and program validation, adds convenient default-solver
+support, and extends the integer theory with exponentiation.
+
+### Breaking Changes
+
+- `MutableSMTProgram` now validates assertions against the selected logic as they are added and
+  rejects quantifiers, arithmetic outside the selected numerical fragment, and free function
+  symbols where the logic does not permit them.
+- `Equals` now requires at least two operands.
+- `AssertionOutOfLogicBounds` was replaced by the `InvalidSMTProgramException` hierarchy, including
+  dedicated exceptions for invalid quantifier, function, datatype, and arithmetic usage.
+
+### Added
+
+- Default solver discovery through `Solver.getDefaultSolver()`, with interactive Z3 and CVC5
+  support and `NoDefaultSolverAvailableException` when neither solver is installed.
+- `SMTProgram.solve(...)` and a default-solver overload of `MutableSMTProgram.push(...)` for solving
+  without explicitly constructing a solver.
+- Expression-tree traversal APIs for preorder and postorder traversal: `any`, `all`, `asSequence`,
+  `forEach`, and `onEach`, with recursive and iterative variants.
+- A deep-program mode through `SMTScriptParser(..., parseDeepProgram = true)` and the `isDeep`
+  program property, allowing iterative validation traversal for deeply nested expressions.
+- Integer exponentiation through `IntExp` and parser support for the SMT-LIB `**` operator.
+- Validation exceptions rooted at `InvalidSMTProgramException` for reporting logic violations.
+
+### Fixed
+
+- Linear and difference-logic validation now handles `let` expressions, `ite` expressions, and
+  free function symbols correctly.
+- Difference-logic validation now restricts negation to numeric literals.
+- Equality expressions with fewer than two operands are rejected.
+
+### Build And Tooling
+
+- Updated Kotlin to `2.4.0`.
+- Updated Gradle to `9.5.1`.
+- Updated Spotless to `8.6.0`.
+- Updated Develocity to `4.4.2`.
+- Updated GitHub Checkout Action to `v7`.
+
 ## 0.4.2 - 2026-06-02
 
 `0.4.2` focuses on solver and program integration improvements for GDart. It changes how solver
