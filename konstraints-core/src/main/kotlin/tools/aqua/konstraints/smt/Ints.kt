@@ -273,3 +273,14 @@ class Divisible(val n: Int, override val inner: Expression<IntSort>) :
 
   override fun toString() = "((_ divisible $n) $inner)"
 }
+
+class IntExp(val base: Expression<IntSort>, val exponent: Expression<IntSort>) :
+    BinaryExpression<IntSort, IntSort, IntSort>("**".toSymbol(), SMTInt) {
+  override val lhs: Expression<IntSort> = base
+  override val rhs: Expression<IntSort> = exponent
+  override val theories: Set<Theories> = INTS_MARKER_SET
+
+  override fun copy(children: List<Expression<*>>): Expression<IntSort> {
+    return IntExpDecl.constructDynamic(children, emptyList())
+  }
+}

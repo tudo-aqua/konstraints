@@ -26,6 +26,7 @@ import tools.aqua.konstraints.dsl.UserDeclaredSMTFunctionN
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunction0
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunctionN
 import tools.aqua.konstraints.solvers.Solver
+import tools.aqua.konstraints.solvers.Solver.Companion.getDefaultSolver
 import tools.aqua.konstraints.util.StackOperation
 import tools.aqua.konstraints.util.StackOperationType
 
@@ -151,7 +152,7 @@ interface PushContext {
 }
 
 /** Base class for all types of smt program. */
-abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
+abstract class SMTProgram(commands: List<Command>, val isDeep: Boolean = false) : SMTSerializable {
   var logic: Logic? = null
     protected set
 
@@ -218,10 +219,16 @@ abstract class SMTProgram(commands: List<Command>) : SMTSerializable {
 
     return builder
   }
+
+  fun solve(produceModel: Boolean, timeout: Long = 5000): Pair<SatStatus, Model?> {
+    val solver = getDefaultSolver()
+    return solver.solve(this, produceModel, timeout)
+  }
 }
 
 /** SMT Program with a mutable command list. */
-class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands), PushContext {
+class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
+    SMTProgram(commands, isDeep), PushContext {
   // TODO implement assertion stack more explicitly in the future
   // should also split commands into different lists to give the program more structure
   // this will require changing the visitors and is planned for a future release
@@ -253,11 +260,106 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands), PushCon
    */
   internal fun add(command: Command, index: Int) {
     if (command is Assert) {
-      require(command.expr.all { context.contains(it) })
+      require(command.expr.all(isDeep) { context.contains(it) })
     }
 
     _commands.add(index, command)
   }
+
+  private fun validate(expr: Expression<*>) {
+    // validate expr in the current context, i.e. all symbols are known
+    checkContext(expr)
+
+    // if a logic isnt set we are in auto logic mode
+    // this is not yet supported but will be in the future
+    logic?.let { logic ->
+      if (logic.quantifierFree && !isQuantifierFree(expr)) {
+        throw IllegalQuantifierUsageException("Quantifier used in quantifier free logic $logic")
+      }
+
+      // validate numerical fragment from most to least general
+      if (logic.nonlinearArithmetic) {
+        /* this empty block is needed as nonlinear logics also allow linear and differential fragments */
+      } else if (logic.linearArithmetic) {
+        if (!isLinear(expr))
+            throw IllegalNonLinearExpressionException("Illegal usage of non linear expression")
+      } else if (logic.differentialArithmetic && !isDifferential(expr)) {
+        throw IllegalNonDifferentialExpressionException(
+            "Illegal usage of non linear expression in $expr"
+        )
+      }
+    }
+  }
+
+  private fun isQuantifierFree(expr: Expression<*>) =
+      !expr.any(isDeep) { it is ExistsExpression || it is ForallExpression }
+
+  private fun isLinear(expr: Expression<*>) =
+      expr.all(isDeep) {
+        when (it.sort) {
+          is IntSort -> isLinear(it.cast<IntSort>())
+          is RealSort -> isLinear(it.cast<RealSort>())
+          else -> true
+        }
+      }
+
+  @JvmName("isLinearInt")
+  private fun isLinear(expr: Expression<IntSort>) =
+      expr.all(isDeep) {
+        if (it is IntMul) {
+          // multiplications of the form (* c x) or (* x c) are allowed,
+          // where x is a free constant and c is a literal or negation of a numeral
+          if (it.children.size != 2) false
+          else if (
+              it.children.all { child ->
+                child is UserDeclaredExpression<*> || child is UserDefinedExpression<*>
+              }
+          )
+              false
+          else true
+        } else {
+          it !is IntDiv && it !is Mod && it !is Abs && it !is IntExp
+        }
+      }
+
+  @JvmName("isLinearReal")
+  private fun isLinear(expr: Expression<RealSort>) =
+      expr.all(isDeep) {
+        if (it is RealMul) {
+          // multiplications of the form (* c x) or (* x c) are allowed,
+          // where x is a free constant and c is a literal or negation of a numeral
+          if (it.children.size != 2) false
+          else if (
+              it.children.all { child ->
+                child is UserDeclaredExpression<*> || child is UserDefinedExpression<*>
+              }
+          )
+              false
+          else true
+        } else {
+          it !is RealDiv // TODO add exp for ints when implemented
+        }
+      }
+
+  private fun isNonLinear(expr: Expression<*>) = !isLinear(expr) && !isDifferential(expr)
+
+  // differential logic only allows subtraction, negation and comparison operators
+  private fun isDifferential(expr: Expression<*>): Boolean =
+      expr.all(isDeep) {
+        if (it.sort !is IntSort && it.sort !is RealSort) true
+        else if (it is IntNeg) it.inner is IntLiteral // negation is only allowed for literals
+        else if (it is RealNeg) it.inner is RealLiteral
+        else if (it is LocalExpression<*>) isDifferential(it.term)
+        else {
+          it is IntLiteral ||
+              it is RealLiteral ||
+              it is IntSub ||
+              it is RealSub ||
+              it is UserDeclaredExpression<*> ||
+              it is UserDefinedExpression<*> ||
+              it is Ite<*>
+        }
+      }
 
   override fun assert(assertion: Assert) {
     check(logic != null) { "Logic must be set before adding assertions!" }
@@ -279,12 +381,13 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands), PushCon
     */
 
     // check all symbols are known
-    checkContext(assertion.expr)
+    validate(assertion.expr)
 
     _commands.add(assertion)
   }
 
   private fun checkContext(root: Expression<*>) {
+    // TODO implement recursive version
     val stack = ArrayDeque<StackOperation<Expression<*>>>()
 
     if (root is ExistsExpression || root is ForallExpression || root is LetExpression) {
@@ -371,6 +474,10 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands), PushCon
   }
 
   override fun <T : Sort> declareFun(func: UserDeclaredSMTFunction<T>): UserDeclaredSMTFunction<T> {
+    if (func.parameters.isNotEmpty() && !logic!!.freeSortFunctionSymbols) {
+      throw IllegalUsageOfFreeFunctionException("")
+    }
+
     context.addFun(func)
     _commands.add(DeclareFun(func))
 
@@ -391,11 +498,21 @@ class MutableSMTProgram(commands: List<Command>) : SMTProgram(commands), PushCon
   }
 
   override fun <T : Sort> defineFun(func: DefinedSMTFunction<T>): DefinedSMTFunction<T> {
+    if (func.parameters.isNotEmpty() && !logic!!.freeSortFunctionSymbols) {
+      throw IllegalUsageOfFreeFunctionException("")
+    }
+
     context.addFun(func)
     _commands.add(DefineFun(func.symbol, func.sortedVars, func.sort, func.term))
 
     return func
   }
+
+  fun <T> push(
+      produceModel: Boolean,
+      timeout: Long = 5000,
+      block: PushContext.() -> T,
+  ) = push(getDefaultSolver(), produceModel, timeout, block)
 
   fun <T> push(
       solver: Solver,
@@ -611,6 +728,19 @@ fun <T : Sort> PushContext.declareConst(name: String, sort: T): Expression<T> =
     declareConst(name.toSymbol(), sort)()
 
 class AssertionOutOfLogicBounds(msg: String) : RuntimeException(msg)
+abstract class InvalidSMTProgramException(msg: String) : IllegalStateException(msg)
+
+class OutOfLogicBoundsException(msg: String) : InvalidSMTProgramException(msg)
+
+class IllegalQuantifierUsageException(msg: String) : InvalidSMTProgramException(msg)
+
+class IllegalUsageOfFreeFunctionException(msg: String) : InvalidSMTProgramException(msg)
+
+class IllegalDatatypeUsageException(msg: String) : InvalidSMTProgramException(msg)
+
+class IllegalNonLinearExpressionException(msg: String) : InvalidSMTProgramException(msg)
+
+class IllegalNonDifferentialExpressionException(msg: String) : InvalidSMTProgramException(msg)
 
 class NoSuchInfoException(keyword: String) : RuntimeException("Info $keyword not found!")
 

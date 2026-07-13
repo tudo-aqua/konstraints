@@ -135,6 +135,10 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) :
  */
 class Equals<T : Sort>(val statements: List<Expression<T>>) :
     HomogenousExpression<BoolSort, T>("=".toSymbol(), SMTBool) {
+  init {
+    require(statements.size > 1) { "$symbol requires at least two arguments" }
+  }
+
   override val theories = CORE_MARKER_SET
 
   constructor(vararg statements: Expression<T>) : this(statements.toList())
