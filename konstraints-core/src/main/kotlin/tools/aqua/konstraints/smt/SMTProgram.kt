@@ -273,92 +273,154 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
     // if a logic isnt set we are in auto logic mode
     // this is not yet supported but will be in the future
     logic?.let { logic ->
-      if (logic.quantifierFree && !isQuantifierFree(expr)) {
-        throw IllegalQuantifierUsageException("Quantifier used in quantifier free logic $logic")
+      if (logic.quantifierFree) {
+        checkIsQuantifierFree(expr)
       }
 
       // validate numerical fragment from most to least general
       if (logic.nonlinearArithmetic) {
         /* this empty block is needed as nonlinear logics also allow linear and differential fragments */
       } else if (logic.linearArithmetic) {
-        if (!isLinear(expr))
-            throw IllegalNonLinearExpressionException("Illegal usage of non linear expression")
-      } else if (logic.differentialArithmetic && !isDifferential(expr)) {
-        throw IllegalNonDifferentialExpressionException(
-            "Illegal usage of non linear expression in $expr"
-        )
+        checkIsLinear(expr)
+      } else if (logic.differentialArithmetic) {
+        checkIsDifferential(expr)
       }
     }
   }
 
-  private fun isQuantifierFree(expr: Expression<*>) =
-      !expr.any(isDeep) { it is ExistsExpression || it is ForallExpression }
-
-  private fun isLinear(expr: Expression<*>) =
-      expr.all(isDeep) {
-        when (it.sort) {
-          is IntSort -> isLinear(it.cast<IntSort>())
-          is RealSort -> isLinear(it.cast<RealSort>())
-          else -> true
+  private fun checkIsQuantifierFree(expr: Expression<*>) =
+      expr.forEach(Order.PREORDER, isDeep) {
+        if (it is ExistsExpression || it is ForallExpression) {
+          throw IllegalQuantifierUsageException(it, expr, logic!!)
         }
       }
 
+  private fun checkIsLinear(expr: Expression<*>) =
+      expr.forEach(Order.PREORDER, isDeep) {
+        when (it.sort) {
+          is IntSort ->
+              if (!isLinear(it.cast<IntSort>())) {
+                throw IllegalNonLinearExpressionException(it, expr, logic!!)
+              }
+          is RealSort ->
+              if (!isLinear(it.cast<RealSort>())) {
+                throw IllegalNonLinearExpressionException(it, expr, logic!!)
+              }
+          else -> {}
+        }
+      }
+
+  /**
+   * Check a single expression for linearity, does not verify if any children of [expr] may be
+   * non-linear, this should only be used in combination with an `all`, `any` or similar
+   */
   @JvmName("isLinearInt")
   private fun isLinear(expr: Expression<IntSort>) =
-      expr.all(isDeep) {
-        if (it is IntMul) {
-          // multiplications of the form (* c x) or (* x c) are allowed,
-          // where x is a free constant and c is a literal or negation of a numeral
-          if (it.children.size != 2) false
-          else if (
-              it.children.all { child ->
-                child is UserDeclaredExpression<*> || child is UserDefinedExpression<*>
-              }
-          )
-              false
-          else true
-        } else {
-          it !is IntDiv && it !is Mod && it !is Abs && it !is IntExp
-        }
+      if (expr is IntMul) {
+        // multiplications of the form (* c x) or (* x c) are allowed,
+        // where x is a free constant and c is a literal or negation of a numeral
+        if (expr.children.size != 2) false
+        else if (
+            expr.children.all { child ->
+              child is UserDeclaredExpression<*> || child is UserDefinedExpression<*>
+            }
+        )
+            false
+        else true
+      } else {
+        expr !is IntDiv && expr !is Mod && expr !is Abs && expr !is IntExp
       }
 
+  /**
+   * Check a single expression for linearity, does not verify if any children of [expr] may be
+   * non-linear, this should only be used in combination with an `all`, `any` or similar
+   */
   @JvmName("isLinearReal")
   private fun isLinear(expr: Expression<RealSort>) =
-      expr.all(isDeep) {
-        if (it is RealMul) {
-          // multiplications of the form (* c x) or (* x c) are allowed,
-          // where x is a free constant and c is a literal or negation of a numeral
-          if (it.children.size != 2) false
-          else if (
-              it.children.all { child ->
-                child is UserDeclaredExpression<*> || child is UserDefinedExpression<*>
-              }
-          )
-              false
-          else true
-        } else {
-          it !is RealDiv // TODO add exp for ints when implemented
+      if (expr is RealMul) {
+        // multiplications of the form (* c x) or (* x c) are allowed,
+        // where x is a free constant and c is a literal or negation of a numeral
+        if (expr.children.size != 2) false
+        else {
+            (isFreeConstant(expr.children[0]) && isCoefficient(expr.children[1])) ||
+                    (isCoefficient(expr.children[0]) && isFreeConstant(expr.children[1]))
         }
+      } else if (expr is RealDiv) {
+          // division is only allowed in the form of a rational coefficient
+        isRationalCoefficient(expr)
+      } else {
+        true
       }
 
-  private fun isNonLinear(expr: Expression<*>) = !isLinear(expr) && !isDifferential(expr)
+    // TODO check if user defined functions also count as free constant
+    private fun isFreeConstant(expr: Expression<*>) =
+        expr is UserDeclaredExpression<*>
+
+    private fun isCoefficient(expr: Expression<*>) =
+        when(expr.sort) {
+            is IntSort -> isIntegerCoefficient(expr.cast())
+            is RealSort -> isRationalCoefficient(expr.cast())
+            else -> false
+        }
+
+  /**
+   * An integer coefficient is a term of the form m or (- m) for some numeral m.
+   * If [expr] contains an alias (i.e. a defined expression or a local expression bound by a let) the actual term of the alias will be checked.
+   **/
+  private fun isIntegerCoefficient(expr: Expression<RealSort>): Boolean =
+      when (expr) {
+          is UserDefinedExpression<*> -> {
+              isIntegerCoefficient(expr.expand().cast())
+          }
+
+          is LocalExpression<*> -> {
+              isIntegerCoefficient(expr.term.cast())
+          }
+
+          else -> {
+              isInteger(expr) || (expr is RealNeg && isInteger(expr.inner))
+          }
+      }
+
+  /**
+   * Check if an expression of sort [RealSort] contains a whole number. Note that a true result does
+   * not indicate that the number fits in an [Int] just that its a whole number.
+   */
+  private fun isInteger(expr: Expression<RealSort>) =
+      expr is RealLiteral && expr.value.stripTrailingZeros().scale() <= 0
+
+  /**
+   * A rational coefficient is a term of the form d, (- d) or (/ c n) for some decimal d, integer
+   * coefficient c and numeral n other than 0.
+   */
+  private fun isRationalCoefficient(expr: Expression<RealSort>) =
+      expr is RealLiteral ||
+          (expr is RealNeg && expr.inner is RealLiteral) ||
+          (expr is RealDiv &&
+              expr.children.size == 2 &&
+              isIntegerCoefficient(expr.children[0]) &&
+              isInteger(expr.children[1]))
 
   // differential logic only allows subtraction, negation and comparison operators
+  private fun checkIsDifferential(expr: Expression<*>) =
+      expr.forEach(Order.PREORDER, isDeep) {
+        if (!isDifferential(it)) throw IllegalNonDifferentialExpressionException(it, expr, logic!!)
+      }
+
   private fun isDifferential(expr: Expression<*>): Boolean =
-      expr.all(isDeep) {
-        if (it.sort !is IntSort && it.sort !is RealSort) true
-        else if (it is IntNeg) it.inner is IntLiteral // negation is only allowed for literals
-        else if (it is RealNeg) it.inner is RealLiteral
-        else if (it is LocalExpression<*>) isDifferential(it.term)
-        else {
-          it is IntLiteral ||
-              it is RealLiteral ||
-              it is IntSub ||
-              it is RealSub ||
-              it is UserDeclaredExpression<*> ||
-              it is UserDefinedExpression<*> ||
-              it is Ite<*>
-        }
+      if (expr.sort !is IntSort && expr.sort !is RealSort) true
+      else if (expr is IntNeg) expr.inner is IntLiteral // negation is only allowed for literals
+      else if (expr is RealNeg) expr.inner is RealLiteral
+      else if (expr is LocalExpression<*>) isDifferential(expr.term)
+      else if (expr is UserDefinedExpression<*>) isDifferential(expr.expand())
+      else {
+        expr is IntLiteral ||
+            expr is RealLiteral ||
+            expr is IntSub ||
+            expr is RealSub ||
+            expr is UserDeclaredExpression<*> ||
+            expr is Ite<*> ||
+            expr is BoundVariable<*>
       }
 
   override fun assert(assertion: Assert) {
@@ -453,7 +515,9 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
             if (
                 expr.theories.all { it !in logic!!.theories } &&
                     (expr !in context) &&
-                    expr !is AnnotatedExpression
+                    expr !is AnnotatedExpression &&
+                    expr !is LocalExpression<*> &&
+                    expr !is BoundVariable<*>
             ) {
               throw IllegalArgumentException("Illegal expression $expr!")
             }
@@ -475,7 +539,9 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
 
   override fun <T : Sort> declareFun(func: UserDeclaredSMTFunction<T>): UserDeclaredSMTFunction<T> {
     if (func.parameters.isNotEmpty() && !logic!!.freeSortFunctionSymbols) {
-      throw IllegalUsageOfFreeFunctionException("")
+      throw IllegalUsageOfFreeFunctionException(
+          "Illegal usage of free function $func in logic $logic"
+      )
     }
 
     context.addFun(func)
@@ -498,9 +564,9 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
   }
 
   override fun <T : Sort> defineFun(func: DefinedSMTFunction<T>): DefinedSMTFunction<T> {
-    if (func.parameters.isNotEmpty() && !logic!!.freeSortFunctionSymbols) {
-      throw IllegalUsageOfFreeFunctionException("")
-    }
+      // note that defined functions are allowed to have parameters even in a context where free functions
+      // are not allowed iff their term satisfies all restrictions of the logic
+      validate(func.term)
 
     context.addFun(func)
     _commands.add(DefineFun(func.symbol, func.sortedVars, func.sort, func.term))
@@ -721,15 +787,28 @@ abstract class InvalidSMTProgramException(msg: String) : IllegalStateException(m
 
 class OutOfLogicBoundsException(msg: String) : InvalidSMTProgramException(msg)
 
-class IllegalQuantifierUsageException(msg: String) : InvalidSMTProgramException(msg)
+class IllegalQuantifierUsageException(loc: Expression<*>, base: Expression<*>, logic: Logic) :
+    InvalidSMTProgramException(
+        "Illegal usage of quantifier $loc in expression $base when using logic $logic"
+    )
 
 class IllegalUsageOfFreeFunctionException(msg: String) : InvalidSMTProgramException(msg)
 
 class IllegalDatatypeUsageException(msg: String) : InvalidSMTProgramException(msg)
 
-class IllegalNonLinearExpressionException(msg: String) : InvalidSMTProgramException(msg)
+class IllegalNonLinearExpressionException(loc: Expression<*>, base: Expression<*>, logic: Logic) :
+    InvalidSMTProgramException(
+        "Illegal usage of non-differential ${if (loc is LocalExpression<*>) "local expression" else "expression"} ${if(loc is LocalExpression<*>) loc.func else loc} in expression $base when using logic $logic"
+    )
 
-class IllegalNonDifferentialExpressionException(msg: String) : InvalidSMTProgramException(msg)
+class IllegalNonDifferentialExpressionException(
+    loc: Expression<*>,
+    base: Expression<*>,
+    logic: Logic,
+) :
+    InvalidSMTProgramException(
+        "Illegal usage of non-differential ${if (loc is LocalExpression<*>) "local expression" else "expression"} ${if(loc is LocalExpression<*>) loc.func else loc} in expression $base when using logic $logic"
+    )
 
 class NoSuchInfoException(keyword: String) : RuntimeException("Info $keyword not found!")
 

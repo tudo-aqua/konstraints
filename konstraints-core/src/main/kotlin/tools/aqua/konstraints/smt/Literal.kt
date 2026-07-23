@@ -190,15 +190,19 @@ data class FloatingPointLiteral(
     ) {
 
   init {
+      // TODO floating point literals may containt
+      // 1. Bitvector literals
+      // 2. Free constants
+      // 3. Defined functions
     require(sign.sort.bits == 1)
     require(sign.children.isEmpty()) {
-      "Floating point literals may only contain constant bitvectors!"
+      "Expected bitvector constant but got $sign!"
     }
     require(exponent.children.isEmpty()) {
-      "Floating point literals may only contain constant bitvectors!"
+        "Expected bitvector constant but got $exponent!"
     }
     require(significand.children.isEmpty()) {
-      "Floating point literals may only contain constant bitvectors!"
+        "Expected bitvector constant but got $significand!"
     }
   }
 

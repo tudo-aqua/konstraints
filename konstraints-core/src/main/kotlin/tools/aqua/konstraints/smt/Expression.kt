@@ -591,7 +591,9 @@ class UserDefinedExpression<T : Sort>(
   override fun copy(children: List<Expression<*>>): Expression<T> =
       UserDefinedExpression(symbol, sort, children, definition, func)
 
-  fun expand(): Expression<*> = definition.expand(children)
+  // expanding may never change the sort of this expression so this cast is safe
+  @Suppress("UNCHECKED_CAST")
+  fun expand(): Expression<T> = definition.expand(children) as Expression<T>
 }
 
 /** Expression with a local variable */
