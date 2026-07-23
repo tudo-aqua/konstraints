@@ -190,18 +190,21 @@ data class FloatingPointLiteral(
     ) {
 
   init {
-      // TODO floating point literals may containt
+      // floating point literals may containt
       // 1. Bitvector literals
       // 2. Free constants
       // 3. Defined functions
+      // 4. terms that only contain the above mentioned sub-terms
+      // e.g. ((_ extract 1 1) foo) is allowed where foo is a user-declared constant
+      // ((_ extract 1 1) (foo true)) is not allowed where foo is a user-declared function of arity 1
     require(sign.sort.bits == 1)
-    require(sign.children.isEmpty()) {
+    require(sign.all { it !is UserDeclaredExpression || it.children.isEmpty() }) {
       "Expected bitvector constant but got $sign!"
     }
-    require(exponent.children.isEmpty()) {
+    require(sign.all { it !is UserDeclaredExpression || it.children.isEmpty() }) {
         "Expected bitvector constant but got $exponent!"
     }
-    require(significand.children.isEmpty()) {
+    require(sign.all { it !is UserDeclaredExpression || it.children.isEmpty() }) {
         "Expected bitvector constant but got $significand!"
     }
   }
