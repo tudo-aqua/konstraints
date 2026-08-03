@@ -30,9 +30,7 @@ val metadata = project.extensions.create<MetadataExtension>("metadata")
 
 mavenPublishing {
   publishToMavenCentral()
-  if (project.findProperty("mavenPublishing.signing.skip") != "true") {
-    signAllPublications()
-  }
+  signAllPublications()
 
   // unfortunately, we have to add an empty JAR in this step due to Gradle / Vanniktech limitations
   configure(JavaLibrary(JavadocJar.None(), SourcesJar.None()))

@@ -30,9 +30,7 @@ val metadata = project.extensions.create<MetadataExtension>("metadata")
 
 mavenPublishing {
   publishToMavenCentral()
-  if (project.findProperty("mavenPublishing.signing.skip") != "true") {
-    signAllPublications()
-  }
+  signAllPublications()
 
   configure(
       KotlinJvm(
