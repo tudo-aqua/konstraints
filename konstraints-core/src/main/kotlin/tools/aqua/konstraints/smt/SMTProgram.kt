@@ -135,7 +135,7 @@ interface PushContext {
   /** Push one empty level to the assertion stack. */
   fun push() = push(1)
 
-  /** Pop the top [n] levels of the assertion stack. */
+  /** Pop the top level of the assertion stack. */
   fun pop() = pop(1)
 
   /** Pop the top level of the assertion stack. */
@@ -343,7 +343,8 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
         if (expr.children.size != 2) false
         else {
             (isFreeConstant(expr.children[0]) && isCoefficient(expr.children[1])) ||
-                    (isCoefficient(expr.children[0]) && isFreeConstant(expr.children[1]))
+                    (isCoefficient(expr.children[0]) && isFreeConstant(expr.children[1])) ||
+                            (isFreeConstant(expr.children[0]) && isFreeConstant(expr.children[1]))
         }
       } else if (expr is RealDiv) {
           // division is only allowed in the form of a rational coefficient
