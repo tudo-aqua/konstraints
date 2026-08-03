@@ -728,6 +728,7 @@ fun <T : Sort> PushContext.declareConst(name: String, sort: T): Expression<T> =
     declareConst(name.toSymbol(), sort)()
 
 class AssertionOutOfLogicBounds(msg: String) : RuntimeException(msg)
+
 abstract class InvalidSMTProgramException(msg: String) : IllegalStateException(msg)
 
 class OutOfLogicBoundsException(msg: String) : InvalidSMTProgramException(msg)

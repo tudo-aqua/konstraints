@@ -60,7 +60,7 @@ class InteractiveSolverTests {
     val prg = SMTScriptParser(program)
     val solver =
         try {
-          InteractiveZ3Solver()
+          InteractiveZ3Solver(true)
         } catch (e: IOException) {
           // auto skip test when z3 is not installed
           assumeTrue(false)

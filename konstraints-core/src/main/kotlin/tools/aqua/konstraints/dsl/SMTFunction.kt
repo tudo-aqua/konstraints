@@ -26,12 +26,16 @@ import tools.aqua.konstraints.util.SimpleDelegate
 /**
  * Delegate provider for declaring an uninterpreted sort: (declare-sort [name] [arity]).
  *
- * The sort name is inferred from the Kotlin property name unless [name] is given explicitly.
- * Only arity 0 is supported (sorts with no type parameters).
+ * The sort name is inferred from the Kotlin property name unless [name] is given explicitly. Only
+ * arity 0 is supported (sorts with no type parameters).
  *
  * @return [UserDeclaredSort]
  */
-class DeclareSortDelegate(val arity: Int, val program: SMTProgramBuilder, val name: String? = null) {
+class DeclareSortDelegate(
+    val arity: Int,
+    val program: SMTProgramBuilder,
+    val name: String? = null,
+) {
   operator fun provideDelegate(
       thisRef: Any?,
       property: KProperty<*>,
@@ -54,7 +58,8 @@ fun SMTProgramBuilder.declaringSort(arity: Int = 0) = DeclareSortDelegate(arity,
  *
  * @return [DeclareSortDelegate]
  */
-fun SMTProgramBuilder.declaringSort(name: String, arity: Int = 0) = DeclareSortDelegate(arity, this, name)
+fun SMTProgramBuilder.declaringSort(name: String, arity: Int = 0) =
+    DeclareSortDelegate(arity, this, name)
 
 /**
  * Declares an SMT constant: (declare-const |const!sort!UUID| [sort]).

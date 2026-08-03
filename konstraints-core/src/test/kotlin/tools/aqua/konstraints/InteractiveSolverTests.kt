@@ -37,7 +37,7 @@ import tools.aqua.konstraints.solvers.InteractiveZ3Solver
 class InteractiveSolverTests {
   @Test
   fun testZ3InteractiveSolver() {
-    val solver = InteractiveZ3Solver()
+    val solver = InteractiveZ3Solver(true)
 
     val program =
         smt(QF_UFBV) {

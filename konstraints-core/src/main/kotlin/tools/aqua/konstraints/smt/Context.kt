@@ -34,7 +34,7 @@ class CurrentContext {
   val sorts = mutableMapOf<Symbol, SortFactory>()
 }
 
-/** Manages all legal smt function and sort symbols by modelling smts sort and function stack. */
+/** Manages all legal smt function and sort symbols by modeling smts sort and function stack. */
 class Context {
   private val forbiddenNames = mutableSetOf<Symbol>()
   val currentContext = CurrentContext()
