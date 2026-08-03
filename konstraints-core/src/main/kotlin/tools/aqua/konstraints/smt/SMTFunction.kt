@@ -85,6 +85,8 @@ abstract class SMTFunction<out T : Sort> {
 /** Base class for all functions declared by the user. */
 abstract class UserDeclaredSMTFunction<T : Sort> : SMTFunction<T>() {
 
+  final override fun toString() = "($symbol (${parameters.joinToString { it.name }}) $sort)"
+
   /**
    * Construct an expression from [args] and [indices].
    *
@@ -111,6 +113,8 @@ abstract class UserDeclaredSMTFunction<T : Sort> : SMTFunction<T>() {
 abstract class DefinedSMTFunction<T : Sort> : SMTFunction<T>() {
   abstract val term: Expression<T>
   abstract val sortedVars: List<SortedVar<*>>
+
+  final override fun toString() = "($symbol (${parameters.joinToString()}) $sort $term)"
 
   /**
    * Construct an expression from [args] and [indices].
