@@ -37,6 +37,7 @@ import tools.aqua.konstraints.parser.util.PeekableIterator
 import tools.aqua.konstraints.parser.util.peekable
 import tools.aqua.konstraints.smt.FunctionDef
 import tools.aqua.konstraints.smt.Model
+import tools.aqua.konstraints.smt.ModelContext
 import tools.aqua.konstraints.smt.SMTProgram
 import tools.aqua.konstraints.smt.SatStatus
 import tools.aqua.konstraints.solvers.UnexpectedSolverResponseException
@@ -140,6 +141,7 @@ object ResponseParser {
     val model =
         GetModelResponse(
             Model(
+                ModelContext(program.context),
                 star<ClosingBracket, SMTProgram, FunctionDef<*>>(
                     lexer,
                     program,
@@ -150,7 +152,7 @@ object ResponseParser {
                   requireIsInstance<ClosingBracket>(lexer.next())
 
                   def
-                }
+                },
             )
         )
 

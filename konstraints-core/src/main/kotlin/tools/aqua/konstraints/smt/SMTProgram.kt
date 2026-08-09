@@ -342,45 +342,45 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
         // where x is a free constant and c is a literal or negation of a numeral
         if (expr.children.size != 2) false
         else {
-            (isFreeConstant(expr.children[0]) && isCoefficient(expr.children[1])) ||
-                    (isCoefficient(expr.children[0]) && isFreeConstant(expr.children[1])) ||
-                            (isFreeConstant(expr.children[0]) && isFreeConstant(expr.children[1]))
+          (isFreeConstant(expr.children[0]) && isCoefficient(expr.children[1])) ||
+              (isCoefficient(expr.children[0]) && isFreeConstant(expr.children[1])) ||
+              (isFreeConstant(expr.children[0]) && isFreeConstant(expr.children[1]))
         }
       } else if (expr is RealDiv) {
-          // division is only allowed in the form of a rational coefficient
+        // division is only allowed in the form of a rational coefficient
         isRationalCoefficient(expr)
       } else {
         true
       }
 
-    // TODO check if user defined functions also count as free constant
-    private fun isFreeConstant(expr: Expression<*>) =
-        expr is UserDeclaredExpression<*>
+  // TODO check if user defined functions also count as free constant
+  private fun isFreeConstant(expr: Expression<*>) = expr is UserDeclaredExpression<*>
 
-    private fun isCoefficient(expr: Expression<*>) =
-        when(expr.sort) {
-            is IntSort -> isIntegerCoefficient(expr.cast())
-            is RealSort -> isRationalCoefficient(expr.cast())
-            else -> false
-        }
+  private fun isCoefficient(expr: Expression<*>) =
+      when (expr.sort) {
+        is IntSort -> isIntegerCoefficient(expr.cast())
+        is RealSort -> isRationalCoefficient(expr.cast())
+        else -> false
+      }
 
   /**
-   * An integer coefficient is a term of the form m or (- m) for some numeral m.
-   * If [expr] contains an alias (i.e. a defined expression or a local expression bound by a let) the actual term of the alias will be checked.
-   **/
+   * An integer coefficient is a term of the form m or (- m) for some numeral m. If [expr] contains
+   * an alias (i.e. a defined expression or a local expression bound by a let) the actual term of
+   * the alias will be checked.
+   */
   private fun isIntegerCoefficient(expr: Expression<RealSort>): Boolean =
       when (expr) {
-          is UserDefinedExpression<*> -> {
-              isIntegerCoefficient(expr.expand().cast())
-          }
+        is UserDefinedExpression<*> -> {
+          isIntegerCoefficient(expr.expand().cast())
+        }
 
-          is LocalExpression<*> -> {
-              isIntegerCoefficient(expr.term.cast())
-          }
+        is LocalExpression<*> -> {
+          isIntegerCoefficient(expr.term.cast())
+        }
 
-          else -> {
-              isInteger(expr) || (expr is RealNeg && isInteger(expr.inner))
-          }
+        else -> {
+          isInteger(expr) || (expr is RealNeg && isInteger(expr.inner))
+        }
       }
 
   /**
@@ -565,9 +565,10 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
   }
 
   override fun <T : Sort> defineFun(func: DefinedSMTFunction<T>): DefinedSMTFunction<T> {
-      // note that defined functions are allowed to have parameters even in a context where free functions
-      // are not allowed iff their term satisfies all restrictions of the logic
-      validate(func.term)
+    // note that defined functions are allowed to have parameters even in a context where free
+    // functions
+    // are not allowed iff their term satisfies all restrictions of the logic
+    validate(func.term)
 
     context.addFun(func)
     _commands.add(DefineFun(func.symbol, func.sortedVars, func.sort, func.term))

@@ -18,9 +18,50 @@
 
 package tools.aqua.konstraints.smt
 
+class ModelContext(
+    val userFunctions: Map<Symbol, SMTFunction<*>>,
+    val sorts: Map<Symbol, SortFactory>,
+) {
+  constructor(
+      context: Context
+  ) : this(context.currentContext.functions, context.currentContext.sorts)
+
+  val solverFunctions = mutableMapOf<Symbol, SMTFunction<*>>()
+  val functions
+    get() = userFunctions + solverFunctions
+}
+
 /** Model class holding the data of solver return get-model. */
-data class Model(val definitions: Map<Symbol, FunctionDef<*>>) {
-  constructor(definitions: List<FunctionDef<*>>) : this(definitions.associateBy { def -> def.name })
+data class Model(val context: ModelContext, val definitions: Map<Symbol, FunctionDef<*>>) {
+  constructor(
+      context: ModelContext,
+      definitions: List<FunctionDef<*>>,
+  ) : this(context, definitions.associateBy { def -> def.name })
+
+  constructor(
+      context: Context,
+      definitions: Map<Symbol, FunctionDef<*>>,
+  ) : this(ModelContext(context), definitions)
+
+  constructor(
+      context: Context,
+      definitions: List<FunctionDef<*>>,
+  ) : this(ModelContext(context), definitions.associateBy { def -> def.name })
+
+  init {
+    // find all as expressions, if they are newly introduced solver symbols add them to the solver
+    // definitions
+    definitions.forEach { (symbol, def) ->
+      def.term.forEach { expr ->
+        if (expr is AsExpression<*>) {
+          if (!context.functions.contains(expr.identifier.symbol)) {
+            context.solverFunctions[expr.identifier.symbol] =
+                SolverDeclaredSMTFunction(expr.identifier.symbol, expr.sort, expr)
+          }
+        }
+      }
+    }
+  }
 
   /** All definitions that do not have any parameters. */
   val constants: Map<Symbol, FunctionDef<*>> =

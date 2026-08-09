@@ -21,7 +21,6 @@ package tools.aqua.konstraints
 import java.io.IOException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions.assumeTrue
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.assertNull
@@ -51,16 +50,17 @@ import tools.aqua.konstraints.smt.cast
 import tools.aqua.konstraints.smt.declareConst
 import tools.aqua.konstraints.smt.declareSort
 import tools.aqua.konstraints.smt.toSymbol
+import tools.aqua.konstraints.solvers.InteractiveCVC5Solver
 import tools.aqua.konstraints.solvers.InteractiveZ3Solver
 
 class PushTests {
   private fun getSolver() =
       try {
-        InteractiveZ3Solver(true)
+        InteractiveCVC5Solver(true)
       } catch (e: IOException) {
         assumeTrue(false)
       }
-          as InteractiveZ3Solver
+          as InteractiveCVC5Solver
 
   @Test
   fun test() {
@@ -549,7 +549,7 @@ class PushTests {
     // push 1: negated — error must be non-empty (SAT: case AssertionError)
     program
         .push(getSolver(), true) { assert(not(obj0err eq "")) }
-        .let { (status, _) -> assertEquals(SatStatus.SAT, status) }
+        .let { (status, model) -> assertEquals(SatStatus.SAT, status) }
 
     // push 2: err="" AND obj not-null AND extends LB (SAT)
     program

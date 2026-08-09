@@ -30,7 +30,6 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.parser.SMTScriptParser
 import tools.aqua.konstraints.smt.Expression
-import tools.aqua.konstraints.smt.IllegalUsageOfFreeFunctionException
 import tools.aqua.konstraints.smt.QuotingRule
 import tools.aqua.konstraints.smt.SMTRegLan
 import tools.aqua.konstraints.smt.Theories

@@ -19,6 +19,7 @@
 package tools.aqua.konstraints.visitors
 
 import tools.aqua.konstraints.smt.AnnotatedExpression
+import tools.aqua.konstraints.smt.AsExpression
 import tools.aqua.konstraints.smt.BinaryExpression
 import tools.aqua.konstraints.smt.BitVecLiteral
 import tools.aqua.konstraints.smt.BoundVariable
@@ -89,6 +90,8 @@ object FreeVariables : VisitByStructure<MutableSet<FreeExpression<*>>> {
   override fun visit(expr: SelectorExpression<*>, ctx: MutableSet<FreeExpression<*>>) {}
 
   override fun visit(expr: TesterExpression, ctx: MutableSet<FreeExpression<*>>) {}
+
+  override fun visit(expr: AsExpression<*>, ctx: MutableSet<FreeExpression<*>>) {}
 
   override fun visit(literal: BitVecLiteral, ctx: MutableSet<FreeExpression<*>>) {}
 

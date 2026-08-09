@@ -18,8 +18,6 @@
 
 package tools.aqua.konstraints.smt
 
-import kotlin.math.exp
-
 enum class Order {
   PREORDER,
   POSTORDER,
@@ -62,9 +60,10 @@ sealed class Expression<out T : Sort> : SMTSerializable {
       // depth first, children are visited in reverse order
       val temp = stack.removeLast()
 
-      val curr = if(temp is UserDefinedExpression<*>) {
-        temp.expand()
-      } else temp
+      val curr =
+          if (temp is UserDefinedExpression<*>) {
+            temp.expand()
+          } else temp
       if (!predicate(curr)) return false
 
       stack.addAll(curr.children)
@@ -74,7 +73,7 @@ sealed class Expression<out T : Sort> : SMTSerializable {
   }
 
   fun recursiveAll(predicate: (Expression<*>) -> Boolean): Boolean {
-    if(this is UserDefinedExpression<*>) return expand().recursiveAll(predicate)
+    if (this is UserDefinedExpression<*>) return expand().recursiveAll(predicate)
     if (!predicate(this)) return false
     return children.all { it.recursiveAll(predicate) }
   }
@@ -95,9 +94,10 @@ sealed class Expression<out T : Sort> : SMTSerializable {
       // depth first, children are visited in reverse order
       val temp = stack.removeLast()
 
-      val curr = if(temp is UserDefinedExpression<*>) {
-        temp.expand()
-      } else temp
+      val curr =
+          if (temp is UserDefinedExpression<*>) {
+            temp.expand()
+          } else temp
 
       if (predicate(curr)) return true
       stack.addAll(curr.children)
@@ -107,7 +107,7 @@ sealed class Expression<out T : Sort> : SMTSerializable {
   }
 
   fun recursiveAny(predicate: (Expression<*>) -> Boolean): Boolean {
-    if(this is UserDefinedExpression<*>) return expand().recursiveAny(predicate)
+    if (this is UserDefinedExpression<*>) return expand().recursiveAny(predicate)
     if (predicate(this)) return true
     return children.any { it.recursiveAny(predicate) }
   }
@@ -765,6 +765,37 @@ class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: Lis
     }
 
     return builder.append(")")
+  }
+}
+
+class AsExpression<T : Sort>(val identifier: Identifier, override val sort: T) : Expression<T>() {
+  override val symbol = identifier.symbol
+
+  override fun toString() = "(as $identifier $sort)"
+
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
+    builder.append("(as ")
+    builder.append(identifier.toString())
+    builder.append(" ")
+    sort.toSMTString(builder, quotingRule, useIterative)
+    return builder.append(")")
+  }
+
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(as $identifier ${sort.toSMTString(quotingRule, useIterative)})"
+
+  override val theories: Set<Theories> = emptySet()
+  override val func: SMTFunction<T>? = null
+
+  // TODO might add actual term that symbol referees to here
+  override val children: List<Expression<*>> = emptyList()
+
+  override fun copy(children: List<Expression<*>>): Expression<T> {
+    TODO("Not yet implemented")
   }
 }
 
