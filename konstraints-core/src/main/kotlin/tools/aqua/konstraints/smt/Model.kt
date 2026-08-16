@@ -18,21 +18,49 @@
 
 package tools.aqua.konstraints.smt
 
+import tools.aqua.konstraints.smt.Symbol
+import kotlin.collections.Map
+import kotlin.collections.component1
+import kotlin.collections.component2
+
 class ModelContext(
     val userFunctions: Map<Symbol, SMTFunction<*>>,
-    val sorts: Map<Symbol, SortFactory>,
+    val solverFunctions: Map<Symbol, SMTFunction<*>>,
+    val sorts: Map<Symbol, SortFactory>
 ) {
   constructor(
-      context: Context
-  ) : this(context.currentContext.functions, context.currentContext.sorts)
+      context: Context,
+      solverFunctions: Map<Symbol, SMTFunction<*>>,
+  ) : this(context.currentContext.functions, solverFunctions, context.currentContext.sorts)
 
-  val solverFunctions = mutableMapOf<Symbol, SMTFunction<*>>()
   val functions
     get() = userFunctions + solverFunctions
 }
 
 /** Model class holding the data of solver return get-model. */
 data class Model(val context: ModelContext, val definitions: Map<Symbol, FunctionDef<*>>) {
+  /**
+   * This will later hold the functions to convert from solver models to a generic konstraints
+   * model.
+   */
+  companion object {
+    private fun findSolverSymbols(context: CurrentContext, definitions: Map<Symbol, FunctionDef<*>>): Map<Symbol, SolverDeclaredSMTFunction<*>> {
+      val temp = mutableMapOf<Symbol, SolverDeclaredSMTFunction<*>>()
+      definitions.forEach { (symbol, def) ->
+        def.term.forEach { expr ->
+          if (expr is AsExpression<*>) {
+            if (!context.functions.contains(expr.identifier.symbol)) {
+              temp[expr.identifier.symbol] =
+                SolverDeclaredSMTFunction(expr.identifier.symbol, expr.sort, expr)
+            }
+          }
+        }
+      }
+
+      return temp.toMap()
+    }
+  }
+
   constructor(
       context: ModelContext,
       definitions: List<FunctionDef<*>>,
@@ -41,27 +69,12 @@ data class Model(val context: ModelContext, val definitions: Map<Symbol, Functio
   constructor(
       context: Context,
       definitions: Map<Symbol, FunctionDef<*>>,
-  ) : this(ModelContext(context), definitions)
+  ) : this(ModelContext(context, findSolverSymbols(context.currentContext, definitions)), definitions)
 
   constructor(
       context: Context,
       definitions: List<FunctionDef<*>>,
-  ) : this(ModelContext(context), definitions.associateBy { def -> def.name })
-
-  init {
-    // find all as expressions, if they are newly introduced solver symbols add them to the solver
-    // definitions
-    definitions.forEach { (symbol, def) ->
-      def.term.forEach { expr ->
-        if (expr is AsExpression<*>) {
-          if (!context.functions.contains(expr.identifier.symbol)) {
-            context.solverFunctions[expr.identifier.symbol] =
-                SolverDeclaredSMTFunction(expr.identifier.symbol, expr.sort, expr)
-          }
-        }
-      }
-    }
-  }
+  ) : this(ModelContext(context, findSolverSymbols(context.currentContext, definitions.associateBy { it.name })), definitions.associateBy { def -> def.name })
 
   /** All definitions that do not have any parameters. */
   val constants: Map<Symbol, FunctionDef<*>> =
@@ -316,9 +329,5 @@ data class Model(val context: ModelContext, val definitions: Map<Symbol, Functio
   @JvmName("getConstantValueStringSort")
   fun getConstantValue(term: Expression<StringSort>) = getConstant(term).value
 
-  /**
-   * This will later hold the functions to convert from solver models to a generic konstraints
-   * model.
-   */
-  companion object
+
 }
