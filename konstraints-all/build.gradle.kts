@@ -30,5 +30,4 @@ metadata {
 
 dependencies {
   api(project(":konstraints-core"))
-  api(project(":konstraints-z3"))
 }
