@@ -69,6 +69,8 @@ object OrderSensitiveVisitor : VisitByStructure<MutableList<Symbol>> {
 
   override fun visit(expr: TesterExpression, ctx: MutableList<Symbol>) {}
 
+  override fun visit(expr: AsExpression<*>, ctx: MutableList<Symbol>) {}
+
   override fun visit(literal: BitVecLiteral, ctx: MutableList<Symbol>) {}
 
   override fun visit(literal: CharLiteral, ctx: MutableList<Symbol>) {}

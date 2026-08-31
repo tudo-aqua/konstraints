@@ -19,6 +19,7 @@
 package tools.aqua.konstraints.visitors
 
 import tools.aqua.konstraints.smt.AnnotatedExpression
+import tools.aqua.konstraints.smt.AsExpression
 import tools.aqua.konstraints.smt.BinaryExpression
 import tools.aqua.konstraints.smt.BitVecLiteral
 import tools.aqua.konstraints.smt.BoundVariable
@@ -93,6 +94,7 @@ interface VisitByStructure<T> {
       is ConstructorExpression -> visit(expr, ctx)
       is SelectorExpression<*> -> visit(expr, ctx)
       is TesterExpression -> visit(expr, ctx)
+      is AsExpression -> visit(expr, ctx)
     }
   }
 
@@ -129,6 +131,8 @@ interface VisitByStructure<T> {
   fun visit(expr: SelectorExpression<*>, ctx: T)
 
   fun visit(expr: TesterExpression, ctx: T)
+
+  fun visit(expr: AsExpression<*>, ctx: T)
 
   fun visit(literal: Literal<*>, ctx: T) =
       when (literal) {

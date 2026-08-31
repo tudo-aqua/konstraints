@@ -49,7 +49,7 @@ import tools.aqua.konstraints.solvers.InteractiveZ3Solver
 class Examples {
   private fun getSolver() =
       try {
-        InteractiveZ3Solver()
+        InteractiveZ3Solver(true)
       } catch (e: IOException) {
         assumeTrue(false)
       }

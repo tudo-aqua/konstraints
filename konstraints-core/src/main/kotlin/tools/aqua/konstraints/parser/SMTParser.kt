@@ -48,6 +48,7 @@ import tools.aqua.konstraints.parser.util.PeekableIterator
 import tools.aqua.konstraints.parser.util.peekIs
 import tools.aqua.konstraints.parser.util.peekIsNot
 import tools.aqua.konstraints.smt.AnnotatedExpression
+import tools.aqua.konstraints.smt.AsExpression
 import tools.aqua.konstraints.smt.Attribute
 import tools.aqua.konstraints.smt.AttributeValue
 import tools.aqua.konstraints.smt.BinaryConstant
@@ -378,7 +379,7 @@ internal object SMTParser {
                           .constructDynamic(emptyList(), identifier.indices)
                     }
                   }
-                  is AsWord -> TODO("As not implemented in konstraints yet")
+                  is AsWord -> parseAs(lexer, program)
                   is LetWord -> parseLet.callRecursive(lexer to program)
                   is LambdaWord -> TODO("Lambda not implemented in konstraints yet")
                   is ForallWord -> parseForall(lexer, program)
@@ -407,7 +408,7 @@ internal object SMTParser {
                     lexer.next()
 
                     when (lexer.peek(depth = 1)) {
-                      is AsWord -> TODO("As not implemented in konstraints yet")
+                      is AsWord -> parseAs(lexer, program)
                       is UnderscoreWord -> {
                         // indexed function with arity > 0
                         val identifier = parseIdentifier(lexer)
@@ -458,6 +459,16 @@ internal object SMTParser {
               )
         }
       }
+
+  fun parseAs(lexer: PeekableIterator<Token>, program: SMTProgram): AsExpression<Sort> {
+    // consume opening bracket and as word
+    lexer.consume(2)
+
+    val identifier = parseIdentifier(lexer)
+    val sort = parseSort(lexer, program)
+
+    return AsExpression(identifier, sort)
+  }
 
   /**
    * Parse a let including the opening and closing bracket (importantly the opening bracket must not

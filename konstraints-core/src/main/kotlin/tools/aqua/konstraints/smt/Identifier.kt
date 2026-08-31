@@ -24,7 +24,11 @@ sealed interface Identifier {
 }
 
 /** Symbolic identifier. */
-data class SymbolIdentifier(override val symbol: Symbol) : Identifier
+data class SymbolIdentifier(override val symbol: Symbol) : Identifier {
+  override fun toString(): String = "$symbol"
+}
 
 /** Numeral identifier. */
-data class IndexedIdentifier(override val symbol: Symbol, val indices: List<Index>) : Identifier
+data class IndexedIdentifier(override val symbol: Symbol, val indices: List<Index>) : Identifier {
+  override fun toString(): String = "(_ $symbol ${indices.joinToString(" ")})"
+}

@@ -70,7 +70,9 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
           Status.SATISFIABLE -> SatStatus.SAT
         }
 
-    return status to if (produceModel && isModelAvailable) Model(solver.model, context) else null
+    return status to
+        if (produceModel && isModelAvailable) Model(solver.model, context, program.context)
+        else null
   }
 
   // solver.model does not return null on failure, contrary to its documentation,
@@ -201,8 +203,9 @@ class Z3Solver : CommandVisitor<Unit>, Solver {
  * invoke function of the companion object to emulate constructor syntax
  */
 // TODO implement handling of uninterpreted sorts from model.sorts
-operator fun Model.Companion.invoke(model: Z3Model, context: Z3Context) =
+operator fun Model.Companion.invoke(model: Z3Model, context: Z3Context, prgContext: Context) =
     Model(
+        prgContext,
         context.constants.map { (aqua, z3) ->
           FunctionDef(
               aqua.symbol as Symbol,
@@ -225,7 +228,7 @@ operator fun Model.Companion.invoke(model: Z3Model, context: Z3Context) =
                   FunctionDef(aqua.symbol, arguments, aqua.sort, interp.aquaify(arguments))
                 }
               }
-            }
+            },
     )
 
 // build the chained ITE that z3 gives as interpretation for functions with arity

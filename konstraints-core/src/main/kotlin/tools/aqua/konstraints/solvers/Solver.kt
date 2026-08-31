@@ -36,14 +36,14 @@ interface Solver : AutoCloseable {
               ?: when (priority) {
                 Solvers.Z3 ->
                     try {
-                      InteractiveZ3Solver()
+                      InteractiveZ3Solver(true)
                       Solvers.Z3
                     } catch (_: Exception) {
                       null
                     }
                 Solvers.CVC5 ->
                     try {
-                      InteractiveCVC5Solver()
+                      InteractiveCVC5Solver(true)
                       Solvers.Z3
                     } catch (_: Exception) {
                       null
@@ -53,8 +53,8 @@ interface Solver : AutoCloseable {
 
     fun getDefaultSolver(): Solver =
         when (defaultSolver) {
-          Solvers.Z3 -> InteractiveZ3Solver()
-          Solvers.CVC5 -> InteractiveCVC5Solver()
+          Solvers.Z3 -> InteractiveZ3Solver(true)
+          Solvers.CVC5 -> InteractiveCVC5Solver(true)
           null -> throw NoDefaultSolverAvailableException()
         }
   }
