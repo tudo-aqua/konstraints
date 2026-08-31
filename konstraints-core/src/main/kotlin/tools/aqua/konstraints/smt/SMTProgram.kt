@@ -354,7 +354,8 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
       }
 
   // TODO check if user defined functions also count as free constant
-  private fun isFreeConstant(expr: Expression<*>) = expr is UserDeclaredExpression<*>
+  private fun isFreeConstant(expr: Expression<*>) =
+      expr is UserDeclaredExpression<*> || expr is LocalExpression<*> || expr is BoundVariable<*>
 
   private fun isCoefficient(expr: Expression<*>) =
       when (expr.sort) {
@@ -414,11 +415,11 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
       else if (expr is RealNeg) expr.inner is RealLiteral
       else if (expr is LocalExpression<*>) isDifferential(expr.term)
       else if (expr is UserDefinedExpression<*>) isDifferential(expr.expand())
+      else if (expr is IntSub || expr is IntAdd) expr.children.any { it is IntLiteral }
+      else if (expr is RealSub || expr is RealAdd) expr.children.any { it is IntLiteral }
       else {
         expr is IntLiteral ||
             expr is RealLiteral ||
-            expr is IntSub ||
-            expr is RealSub ||
             expr is UserDeclaredExpression<*> ||
             expr is Ite<*> ||
             expr is BoundVariable<*>
