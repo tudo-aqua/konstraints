@@ -65,7 +65,6 @@ class ProgramDSLTests {
         setOptions {
           diagnosticOutputChannel("stderr")
           globalDeclarations(false)
-          printSuccess(false)
           produceAssertions(false)
           produceAssignments(false)
           produceModels(false)
@@ -110,7 +109,6 @@ class ProgramDSLTests {
   fun getBooleanOptionsAndValue(): Stream<Arguments> =
       Stream.of(
           arguments("global-declarations", false),
-          arguments("print-success", false),
           arguments("produce-assertions", false),
           arguments("produce-assignments", false),
           arguments("produce-models", false),
@@ -129,7 +127,6 @@ class ProgramDSLTests {
       Stream.of(
           arguments("diagnostic-output-channel", "stderr"),
           arguments("regular-output-channel", "stdout"),
-          arguments("option", "value"),
       )
 
   @ParameterizedTest
