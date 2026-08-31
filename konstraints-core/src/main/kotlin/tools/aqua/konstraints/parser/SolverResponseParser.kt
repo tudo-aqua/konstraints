@@ -141,7 +141,7 @@ object ResponseParser {
     val model =
         GetModelResponse(
             Model(
-                ModelContext(program.context),
+                ModelContext(program.context, emptyMap()),
                 star<ClosingBracket, SMTProgram, FunctionDef<*>>(
                     lexer,
                     program,
