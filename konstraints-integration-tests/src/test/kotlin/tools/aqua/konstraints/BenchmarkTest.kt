@@ -31,7 +31,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.parser.SMTScriptParser
 import tools.aqua.konstraints.smt.SymbolAttributeValue
-import tools.aqua.konstraints.solvers.z3.Z3Solver
+import tools.aqua.konstraints.solvers.InteractiveZ3Solver
 import tools.aqua.konstraints.util.Benchmark
 import tools.aqua.konstraints.util.MiB
 import tools.aqua.konstraints.util.loadBenchmarkDatabase
@@ -75,22 +75,22 @@ class BenchmarkTest {
   @Timeout(value = 15, unit = TimeUnit.SECONDS, threadMode = Timeout.ThreadMode.SEPARATE_THREAD)
   fun solve(benchmark: Benchmark) {
 
-    val solver = Z3Solver()
+    val solver = InteractiveZ3Solver()
 
-    val result = SMTScriptParser(benchmark.program)
+    val prg = SMTScriptParser(benchmark.program)
 
     /* ignore the test if assumption fails, ignores all unknown tests */
     Assumptions.assumeTrue(
-        (result.info(":status") as SymbolAttributeValue).symbol.toString() != "unknown"
+        (prg.info(":status") as SymbolAttributeValue).symbol.toString() != "unknown"
     )
 
     solver.use {
-      result.commands.map { solver.visit(it) }
+      val result = solver.solve(prg, true, 5000L)
 
       // verify we get the correct status for the test
       Assertions.assertEquals(
-          (result.info(":status") as SymbolAttributeValue).symbol.toString(),
-          solver.status.toString(),
+          (prg.info(":status") as SymbolAttributeValue).symbol.toString(),
+          result.first.toString(),
       )
     }
   }

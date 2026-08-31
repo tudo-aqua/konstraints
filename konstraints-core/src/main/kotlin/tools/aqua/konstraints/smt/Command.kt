@@ -455,13 +455,13 @@ data class BooleanOptionValue(val bool: Boolean) : OptionValue {
 data class StringOptionValue(val string: String) : OptionValue {
   override fun toString(): String = toSMTString(QuotingRule.SAME_AS_INPUT, false)
 
-  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = string
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) = "\"$string\""
 
   override fun toSMTString(
       builder: Appendable,
       quotingRule: QuotingRule,
       useIterative: Boolean,
-  ): Appendable = builder.append(string)
+  ): Appendable = builder.append(toSMTString(quotingRule, useIterative))
 }
 
 /** Numeral option value. */
