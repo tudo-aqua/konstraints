@@ -18,7 +18,6 @@
 
 package tools.aqua.konstraints.smt
 
-import tools.aqua.konstraints.smt.Symbol
 import kotlin.collections.Map
 import kotlin.collections.component1
 import kotlin.collections.component2
@@ -26,7 +25,7 @@ import kotlin.collections.component2
 class ModelContext(
     val userFunctions: Map<Symbol, SMTFunction<*>>,
     val solverFunctions: Map<Symbol, SMTFunction<*>>,
-    val sorts: Map<Symbol, SortFactory>
+    val sorts: Map<Symbol, SortFactory>,
 ) {
   constructor(
       context: Context,
@@ -44,14 +43,17 @@ data class Model(val context: ModelContext, val definitions: Map<Symbol, Functio
    * model.
    */
   companion object {
-    private fun findSolverSymbols(context: CurrentContext, definitions: Map<Symbol, FunctionDef<*>>): Map<Symbol, SolverDeclaredSMTFunction<*>> {
+    private fun findSolverSymbols(
+        context: CurrentContext,
+        definitions: Map<Symbol, FunctionDef<*>>,
+    ): Map<Symbol, SolverDeclaredSMTFunction<*>> {
       val temp = mutableMapOf<Symbol, SolverDeclaredSMTFunction<*>>()
       definitions.forEach { (symbol, def) ->
         def.term.forEach { expr ->
           if (expr is AsExpression<*>) {
             if (!context.functions.contains(expr.identifier.symbol)) {
               temp[expr.identifier.symbol] =
-                SolverDeclaredSMTFunction(expr.identifier.symbol, expr.sort, expr)
+                  SolverDeclaredSMTFunction(expr.identifier.symbol, expr.sort, expr)
             }
           }
         }
@@ -69,12 +71,21 @@ data class Model(val context: ModelContext, val definitions: Map<Symbol, Functio
   constructor(
       context: Context,
       definitions: Map<Symbol, FunctionDef<*>>,
-  ) : this(ModelContext(context, findSolverSymbols(context.currentContext, definitions)), definitions)
+  ) : this(
+      ModelContext(context, findSolverSymbols(context.currentContext, definitions)),
+      definitions,
+  )
 
   constructor(
       context: Context,
       definitions: List<FunctionDef<*>>,
-  ) : this(ModelContext(context, findSolverSymbols(context.currentContext, definitions.associateBy { it.name })), definitions.associateBy { def -> def.name })
+  ) : this(
+      ModelContext(
+          context,
+          findSolverSymbols(context.currentContext, definitions.associateBy { it.name }),
+      ),
+      definitions.associateBy { def -> def.name },
+  )
 
   /** All definitions that do not have any parameters. */
   val constants: Map<Symbol, FunctionDef<*>> =
@@ -328,6 +339,4 @@ data class Model(val context: ModelContext, val definitions: Map<Symbol, Functio
 
   @JvmName("getConstantValueStringSort")
   fun getConstantValue(term: Expression<StringSort>) = getConstant(term).value
-
-
 }
