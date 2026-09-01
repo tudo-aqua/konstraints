@@ -21,6 +21,18 @@ introspection. It is designed to succeed JConstraints[^3] and build upon its con
 At the moment, Konstraints is pre-alpha software. While we are happy te receive feedback from early
 adopters, the library is still incomplete and APIs may change without warning.
 
+### Java Platform Module System
+
+Konstraints ships as a named JPMS module. To use it from a modular application, add
+
+```java
+requires tools.aqua.konstraints;
+```
+
+to your `module-info.java`. The module exports all of its packages and transitively requires
+`kotlin.stdlib`, so Kotlin types appearing in the API are readable without further directives. The
+Kotlin standard library therefore has to be on the module path as well.
+
 ### Development
 
 Building is completely done using Gradle. Most IDEs should be able to import the project without any

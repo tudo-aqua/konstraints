@@ -12,6 +12,25 @@
 
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Java Platform Module System support: `konstraints-core` now ships a `module-info.java` and is
+  published as the named module `tools.aqua.konstraints`, exporting all of its packages and
+  transitively requiring `kotlin.stdlib`.
+
+### Breaking Changes
+
+- Modular consumers that previously relied on `konstraints-core` being an automatic module have to
+  rename their `requires konstraints.core;` directive to `requires tools.aqua.konstraints;`.
+
+### Build And Tooling
+
+- Added the `konstraints.kotlin-jpms` convention plugin, which compiles the module declaration
+  against the Kotlin compiler output and adds a `checkModuleExports` verification task that fails
+  the build when a package is not exported and not declared internal.
+
 ## 0.4.3 - 2026-07-10
 
 This release expands expression traversal and program validation, adds convenient default-solver
