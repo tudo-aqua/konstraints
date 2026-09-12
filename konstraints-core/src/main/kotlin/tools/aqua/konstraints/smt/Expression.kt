@@ -618,34 +618,26 @@ class LocalExpression<T : Sort>(
   override fun toString() = symbol.toString()
 }
 
-class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSort>) :
-    Expression<BoolSort>() {
+abstract class QuantifiedExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSort>) : Expression<BoolSort>() {
   override val theories = emptySet<Theories>()
   override val func = null
 
   constructor(vararg vars: SortedVar<*>, term: Expression<BoolSort>) : this(vars.toList(), term)
 
   override val sort = SMTBool
-  override val symbol = Keyword("exists")
   override val children: List<Expression<*>> = listOf(term)
 
-  override fun copy(children: List<Expression<*>>): Expression<BoolSort> {
-    require(children.size == 1)
+  final override fun toString() = "($symbol (${vars.joinToString(" ")}) $term)"
 
-    return ExistsExpression(vars, children.single().cast<BoolSort>())
-  }
+  final override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+    "($symbol (${vars.joinToString(" "){it.toSMTString(quotingRule, useIterative)}}) ${term.toSMTString(quotingRule, useIterative)})"
 
-  override fun toString() = "(exists (${vars.joinToString(" ")}) $term)"
-
-  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      "(exists (${vars.joinToString(" "){it.toSMTString(quotingRule, useIterative)}}) ${term.toSMTString(quotingRule, useIterative)})"
-
-  override fun toSMTString(
-      builder: Appendable,
-      quotingRule: QuotingRule,
-      useIterative: Boolean,
+  final override fun toSMTString(
+    builder: Appendable,
+    quotingRule: QuotingRule,
+    useIterative: Boolean,
   ): Appendable {
-    builder.append("(exists (")
+    builder.append("($symbol (")
 
     var counter = 0
     vars.forEach {
@@ -660,43 +652,25 @@ class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
   }
 }
 
-class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSort>) :
-    Expression<BoolSort>() {
-  override val theories = emptySet<Theories>()
-  override val func = null
+class ExistsExpression(vars: List<SortedVar<*>>, term: Expression<BoolSort>) :
+    QuantifiedExpression(vars, term) {
+  override val symbol = Keyword("exists")
 
-  override val sort = SMTBool
+  override fun copy(children: List<Expression<*>>): Expression<BoolSort> {
+    require(children.size == 1)
+
+    return ExistsExpression(vars, children.single().cast<BoolSort>())
+  }
+}
+
+class ForallExpression(vars: List<SortedVar<*>>, term: Expression<BoolSort>) :
+    QuantifiedExpression(vars, term) {
   override val symbol = Keyword("forall")
-  override val children: List<Expression<*>> = listOf(term)
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> {
     require(children.size == 1)
 
     return ForallExpression(vars, children.single().cast<BoolSort>())
-  }
-
-  override fun toString() = "(forall (${vars.joinToString(" ")}) $term)"
-
-  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      "(forall (${vars.joinToString(" "){it.toSMTString(quotingRule, useIterative)}}) ${term.toSMTString(quotingRule, useIterative)})"
-
-  override fun toSMTString(
-      builder: Appendable,
-      quotingRule: QuotingRule,
-      useIterative: Boolean,
-  ): Appendable {
-    builder.append("(forall (")
-
-    var counter = 0
-    vars.forEach {
-      if (counter++ > 1) builder.append(" ")
-      it.toSMTString(builder, quotingRule, useIterative)
-    }
-
-    builder.append(") ")
-    term.toSMTString(builder, quotingRule, useIterative)
-
-    return builder.append(")")
   }
 }
 
