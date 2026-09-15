@@ -39,6 +39,9 @@ jobs:
         with:
           distribution: temurin
           java-version: 17
+      - run: |
+          sudo apt-get update
+          sudo apt-get install -y z3 cvc5
       - uses: gradle/actions/setup-gradle@v6
       - run: ./gradlew build
 

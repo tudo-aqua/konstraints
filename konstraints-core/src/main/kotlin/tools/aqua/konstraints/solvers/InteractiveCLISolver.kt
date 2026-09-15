@@ -184,6 +184,10 @@ open class InteractiveCLISolver(
   }
 
   override fun visit(setOption: SetOption) {
+    require(setOption.name != "print-success" || !(setOption.value as BooleanOptionValue).bool) {
+      "Option :print-success may not be turned off when using CLI solvers!"
+    }
+
     writeCommand(setOption)
     val response = ResponseParser.parseGeneralResponse(reader)
 
