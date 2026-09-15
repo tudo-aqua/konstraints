@@ -28,13 +28,13 @@ import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.dsl.*
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.solvers.z3.Z3Solver
+import tools.aqua.konstraints.solvers.InteractiveZ3Solver
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DSLTests {
   @Test
   fun testCoreDSL() {
-    val solver = Z3Solver()
+    val solver = InteractiveZ3Solver()
 
     val program =
         smt(QF_FPLRA) {
@@ -100,10 +100,10 @@ class DSLTests {
   @ParameterizedTest
   @MethodSource("getProgramAndStatus")
   fun testProgram(program: SMTProgram, expected: SatStatus) {
-    val solver = Z3Solver()
-    solver.solve(program, false, 5000)
+    val solver = InteractiveZ3Solver()
+    val result = solver.solve(program, false, 5000)
 
-    assertEquals(expected, solver.status)
+    assertEquals(expected, result.first)
   }
 
   private fun getProgramAndStatus(): Stream<Arguments> =
