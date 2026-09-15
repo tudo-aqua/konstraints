@@ -58,9 +58,14 @@ sealed class Expression<out T : Sort> : SMTSerializable {
 
     while (stack.isNotEmpty()) {
       // depth first, children are visited in reverse order
-      val curr = stack.removeLast()
+      val temp = stack.removeLast()
 
+      val curr =
+          if (temp is UserDefinedExpression<*>) {
+            temp.expand()
+          } else temp
       if (!predicate(curr)) return false
+
       stack.addAll(curr.children)
     }
 
@@ -68,6 +73,7 @@ sealed class Expression<out T : Sort> : SMTSerializable {
   }
 
   fun recursiveAll(predicate: (Expression<*>) -> Boolean): Boolean {
+    if (this is UserDefinedExpression<*>) return expand().recursiveAll(predicate)
     if (!predicate(this)) return false
     return children.all { it.recursiveAll(predicate) }
   }
@@ -86,7 +92,12 @@ sealed class Expression<out T : Sort> : SMTSerializable {
 
     while (stack.isNotEmpty()) {
       // depth first, children are visited in reverse order
-      val curr = stack.removeLast()
+      val temp = stack.removeLast()
+
+      val curr =
+          if (temp is UserDefinedExpression<*>) {
+            temp.expand()
+          } else temp
 
       if (predicate(curr)) return true
       stack.addAll(curr.children)
@@ -96,6 +107,7 @@ sealed class Expression<out T : Sort> : SMTSerializable {
   }
 
   fun recursiveAny(predicate: (Expression<*>) -> Boolean): Boolean {
+    if (this is UserDefinedExpression<*>) return expand().recursiveAny(predicate)
     if (predicate(this)) return true
     return children.any { it.recursiveAny(predicate) }
   }
@@ -591,7 +603,9 @@ class UserDefinedExpression<T : Sort>(
   override fun copy(children: List<Expression<*>>): Expression<T> =
       UserDefinedExpression(symbol, sort, children, definition, func)
 
-  fun expand(): Expression<*> = definition.expand(children)
+  // expanding may never change the sort of this expression so this cast is safe
+  @Suppress("UNCHECKED_CAST")
+  fun expand(): Expression<T> = definition.expand(children) as Expression<T>
 }
 
 /** Expression with a local variable */

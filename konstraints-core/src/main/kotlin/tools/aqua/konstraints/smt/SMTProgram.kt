@@ -135,7 +135,7 @@ interface PushContext {
   /** Push one empty level to the assertion stack. */
   fun push() = push(1)
 
-  /** Pop the top [n] levels of the assertion stack. */
+  /** Pop the top level of the assertion stack. */
   fun pop() = pop(1)
 
   /** Pop the top level of the assertion stack. */
@@ -273,91 +273,16 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
     // if a logic isnt set we are in auto logic mode
     // this is not yet supported but will be in the future
     logic?.let { logic ->
-      if (logic.quantifierFree && !isQuantifierFree(expr)) {
-        throw IllegalQuantifierUsageException("Quantifier used in quantifier free logic $logic")
-      }
-
-      // validate numerical fragment from most to least general
-      if (logic.nonlinearArithmetic) {
-        /* this empty block is needed as nonlinear logics also allow linear and differential fragments */
-      } else if (logic.linearArithmetic) {
-        if (!isLinear(expr))
-            throw IllegalNonLinearExpressionException("Illegal usage of non linear expression")
-      } else if (logic.differentialArithmetic && !isDifferential(expr)) {
-        throw IllegalNonDifferentialExpressionException(
-            "Illegal usage of non linear expression in $expr"
-        )
+      if (logic.quantifierFree) {
+        checkIsQuantifierFree(expr)
       }
     }
   }
 
-  private fun isQuantifierFree(expr: Expression<*>) =
-      !expr.any(isDeep) { it is ExistsExpression || it is ForallExpression }
-
-  private fun isLinear(expr: Expression<*>) =
-      expr.all(isDeep) {
-        when (it.sort) {
-          is IntSort -> isLinear(it.cast<IntSort>())
-          is RealSort -> isLinear(it.cast<RealSort>())
-          else -> true
-        }
-      }
-
-  @JvmName("isLinearInt")
-  private fun isLinear(expr: Expression<IntSort>) =
-      expr.all(isDeep) {
-        if (it is IntMul) {
-          // multiplications of the form (* c x) or (* x c) are allowed,
-          // where x is a free constant and c is a literal or negation of a numeral
-          if (it.children.size != 2) false
-          else if (
-              it.children.all { child ->
-                child is UserDeclaredExpression<*> || child is UserDefinedExpression<*>
-              }
-          )
-              false
-          else true
-        } else {
-          it !is IntDiv && it !is Mod && it !is Abs && it !is IntExp
-        }
-      }
-
-  @JvmName("isLinearReal")
-  private fun isLinear(expr: Expression<RealSort>) =
-      expr.all(isDeep) {
-        if (it is RealMul) {
-          // multiplications of the form (* c x) or (* x c) are allowed,
-          // where x is a free constant and c is a literal or negation of a numeral
-          if (it.children.size != 2) false
-          else if (
-              it.children.all { child ->
-                child is UserDeclaredExpression<*> || child is UserDefinedExpression<*>
-              }
-          )
-              false
-          else true
-        } else {
-          it !is RealDiv // TODO add exp for ints when implemented
-        }
-      }
-
-  private fun isNonLinear(expr: Expression<*>) = !isLinear(expr) && !isDifferential(expr)
-
-  // differential logic only allows subtraction, negation and comparison operators
-  private fun isDifferential(expr: Expression<*>): Boolean =
-      expr.all(isDeep) {
-        if (it.sort !is IntSort && it.sort !is RealSort) true
-        else if (it is IntNeg) it.inner is IntLiteral // negation is only allowed for literals
-        else if (it is RealNeg) it.inner is RealLiteral
-        else if (it is LocalExpression<*>) isDifferential(it.term)
-        else {
-          it is IntLiteral ||
-              it is RealLiteral ||
-              it is IntSub ||
-              it is RealSub ||
-              it is UserDeclaredExpression<*> ||
-              it is UserDefinedExpression<*> ||
-              it is Ite<*>
+  private fun checkIsQuantifierFree(expr: Expression<*>) =
+      expr.forEach(Order.PREORDER, isDeep) {
+        if (it is ExistsExpression || it is ForallExpression) {
+          throw IllegalQuantifierUsageException(it, expr, logic!!)
         }
       }
 
@@ -453,7 +378,9 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
             if (
                 expr.theories.all { it !in logic!!.theories } &&
                     (expr !in context) &&
-                    expr !is AnnotatedExpression
+                    expr !is AnnotatedExpression &&
+                    expr !is LocalExpression<*> &&
+                    expr !is BoundVariable<*>
             ) {
               throw IllegalArgumentException("Illegal expression $expr!")
             }
@@ -475,7 +402,9 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
 
   override fun <T : Sort> declareFun(func: UserDeclaredSMTFunction<T>): UserDeclaredSMTFunction<T> {
     if (func.parameters.isNotEmpty() && !logic!!.freeSortFunctionSymbols) {
-      throw IllegalUsageOfFreeFunctionException("")
+      throw IllegalUsageOfFreeFunctionException(
+          "Illegal usage of free function $func in logic $logic"
+      )
     }
 
     context.addFun(func)
@@ -498,9 +427,10 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
   }
 
   override fun <T : Sort> defineFun(func: DefinedSMTFunction<T>): DefinedSMTFunction<T> {
-    if (func.parameters.isNotEmpty() && !logic!!.freeSortFunctionSymbols) {
-      throw IllegalUsageOfFreeFunctionException("")
-    }
+    // note that defined functions are allowed to have parameters even in a context where free
+    // functions
+    // are not allowed iff their term satisfies all restrictions of the logic
+    validate(func.term)
 
     context.addFun(func)
     _commands.add(DefineFun(func.symbol, func.sortedVars, func.sort, func.term))
@@ -640,6 +570,7 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
    * this datatype exists, constructors still need to be added.
    */
   internal fun declareEmptyDatatype(arity: Int, symbol: Symbol): Datatype {
+
     val datatype = Datatype(arity, symbol)
 
     _commands.add(DeclareDatatype(datatype))
@@ -721,15 +652,28 @@ abstract class InvalidSMTProgramException(msg: String) : IllegalStateException(m
 
 class OutOfLogicBoundsException(msg: String) : InvalidSMTProgramException(msg)
 
-class IllegalQuantifierUsageException(msg: String) : InvalidSMTProgramException(msg)
+class IllegalQuantifierUsageException(loc: Expression<*>, base: Expression<*>, logic: Logic) :
+    InvalidSMTProgramException(
+        "Illegal usage of quantifier $loc in expression $base when using logic $logic"
+    )
 
 class IllegalUsageOfFreeFunctionException(msg: String) : InvalidSMTProgramException(msg)
 
 class IllegalDatatypeUsageException(msg: String) : InvalidSMTProgramException(msg)
 
-class IllegalNonLinearExpressionException(msg: String) : InvalidSMTProgramException(msg)
+class IllegalNonLinearExpressionException(loc: Expression<*>, base: Expression<*>, logic: Logic) :
+    InvalidSMTProgramException(
+        "Illegal usage of non-differential ${if (loc is LocalExpression<*>) "local expression" else "expression"} ${if(loc is LocalExpression<*>) loc.func else loc} in expression $base when using logic $logic"
+    )
 
-class IllegalNonDifferentialExpressionException(msg: String) : InvalidSMTProgramException(msg)
+class IllegalNonDifferentialExpressionException(
+    loc: Expression<*>,
+    base: Expression<*>,
+    logic: Logic,
+) :
+    InvalidSMTProgramException(
+        "Illegal usage of non-differential ${if (loc is LocalExpression<*>) "local expression" else "expression"} ${if(loc is LocalExpression<*>) loc.func else loc} in expression $base when using logic $logic"
+    )
 
 class NoSuchInfoException(keyword: String) : RuntimeException("Info $keyword not found!")
 
