@@ -18,8 +18,6 @@
 
 package tools.aqua.konstraints.smt
 
-import kotlin.math.exp
-
 enum class Order {
   PREORDER,
   POSTORDER,
@@ -62,9 +60,10 @@ sealed class Expression<out T : Sort> : SMTSerializable {
       // depth first, children are visited in reverse order
       val temp = stack.removeLast()
 
-      val curr = if(temp is UserDefinedExpression<*>) {
-        temp.expand()
-      } else temp
+      val curr =
+          if (temp is UserDefinedExpression<*>) {
+            temp.expand()
+          } else temp
       if (!predicate(curr)) return false
 
       stack.addAll(curr.children)
@@ -74,7 +73,7 @@ sealed class Expression<out T : Sort> : SMTSerializable {
   }
 
   fun recursiveAll(predicate: (Expression<*>) -> Boolean): Boolean {
-    if(this is UserDefinedExpression<*>) return expand().recursiveAll(predicate)
+    if (this is UserDefinedExpression<*>) return expand().recursiveAll(predicate)
     if (!predicate(this)) return false
     return children.all { it.recursiveAll(predicate) }
   }
@@ -95,9 +94,10 @@ sealed class Expression<out T : Sort> : SMTSerializable {
       // depth first, children are visited in reverse order
       val temp = stack.removeLast()
 
-      val curr = if(temp is UserDefinedExpression<*>) {
-        temp.expand()
-      } else temp
+      val curr =
+          if (temp is UserDefinedExpression<*>) {
+            temp.expand()
+          } else temp
 
       if (predicate(curr)) return true
       stack.addAll(curr.children)
@@ -107,7 +107,7 @@ sealed class Expression<out T : Sort> : SMTSerializable {
   }
 
   fun recursiveAny(predicate: (Expression<*>) -> Boolean): Boolean {
-    if(this is UserDefinedExpression<*>) return expand().recursiveAny(predicate)
+    if (this is UserDefinedExpression<*>) return expand().recursiveAny(predicate)
     if (predicate(this)) return true
     return children.any { it.recursiveAny(predicate) }
   }

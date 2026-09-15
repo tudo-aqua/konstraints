@@ -427,9 +427,10 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
   }
 
   override fun <T : Sort> defineFun(func: DefinedSMTFunction<T>): DefinedSMTFunction<T> {
-      // note that defined functions are allowed to have parameters even in a context where free functions
-      // are not allowed iff their term satisfies all restrictions of the logic
-      validate(func.term)
+    // note that defined functions are allowed to have parameters even in a context where free
+    // functions
+    // are not allowed iff their term satisfies all restrictions of the logic
+    validate(func.term)
 
     context.addFun(func)
     _commands.add(DefineFun(func.symbol, func.sortedVars, func.sort, func.term))
