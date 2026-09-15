@@ -18,10 +18,13 @@
 
 plugins {
   id("konstraints.developer-utilities")
+  id("konstraints.kotlin-jpms")
   id("konstraints.kotlin-library")
   id("konstraints.kotlin-static-analysis")
   id("konstraints.maven-library")
 }
+
+javaModule { name = "tools.aqua.konstraints" }
 
 metadata {
   name = "Konstraints Core"
