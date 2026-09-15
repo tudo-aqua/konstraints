@@ -37,7 +37,7 @@ import tools.aqua.konstraints.smt.Sort
 import tools.aqua.konstraints.smt.StringConstant
 import tools.aqua.konstraints.smt.StringOptionValue
 import tools.aqua.konstraints.smt.getFunc
-import tools.aqua.konstraints.solvers.z3.Z3Solver
+import tools.aqua.konstraints.solvers.InteractiveZ3Solver
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProgramDSLTests {
@@ -48,7 +48,7 @@ class ProgramDSLTests {
    * - test that assert has right expression
    * - test "in program" solving
    */
-  val solver = Z3Solver()
+  val solver = InteractiveZ3Solver()
 
   val program =
       smt(QF_UF) {
@@ -65,7 +65,6 @@ class ProgramDSLTests {
         setOptions {
           diagnosticOutputChannel("stderr")
           globalDeclarations(false)
-          printSuccess(false)
           produceAssertions(false)
           produceAssignments(false)
           produceModels(false)
@@ -75,7 +74,6 @@ class ProgramDSLTests {
           randomSeed(0)
           regularOutputChannel("stdout")
           reproducibleResourceLimit(0)
-          "option" set_to "value"
         }
 
         val x = const("x", SMTBool)
@@ -111,7 +109,6 @@ class ProgramDSLTests {
   fun getBooleanOptionsAndValue(): Stream<Arguments> =
       Stream.of(
           arguments("global-declarations", false),
-          arguments("print-success", false),
           arguments("produce-assertions", false),
           arguments("produce-assignments", false),
           arguments("produce-models", false),
@@ -130,7 +127,6 @@ class ProgramDSLTests {
       Stream.of(
           arguments("diagnostic-output-channel", "stderr"),
           arguments("regular-output-channel", "stdout"),
-          arguments("option", "value"),
       )
 
   @ParameterizedTest

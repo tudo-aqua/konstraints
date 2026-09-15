@@ -1128,7 +1128,8 @@ class BVSGe(override val lhs: Expression<BitVecSort>, override val rhs: Expressi
 fun String.bitvec() = BitVecLiteral(this)
 
 /** Convert [this] into SMT bitvector literal of sort (_ BitVec [bits]). */
-fun String.bitvec(bits: Int) = BitVecLiteral(this, bits)
+fun String.bitvec(bits: Int) =
+    BitVecLiteral("${this.substring(0, 2)}${this.substring(2).padStart(bits, '0')}", bits)
 
 /** Returns true iff [this] is of form #bX, where X is any valid binary number. */
 fun String.isSMTBinary() = this.startsWith("#b") && this.substring(2).all { ch -> ch in "01" }
