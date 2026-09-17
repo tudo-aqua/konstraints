@@ -273,91 +273,16 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
     // if a logic isnt set we are in auto logic mode
     // this is not yet supported but will be in the future
     logic?.let { logic ->
-      if (logic.quantifierFree && !isQuantifierFree(expr)) {
-        throw IllegalQuantifierUsageException("Quantifier used in quantifier free logic $logic")
-      }
-
-      // validate numerical fragment from most to least general
-      if (logic.nonlinearArithmetic) {
-        /* this empty block is needed as nonlinear logics also allow linear and differential fragments */
-      } else if (logic.linearArithmetic) {
-        if (!isLinear(expr))
-            throw IllegalNonLinearExpressionException("Illegal usage of non linear expression")
-      } else if (logic.differentialArithmetic && !isDifferential(expr)) {
-        throw IllegalNonDifferentialExpressionException(
-            "Illegal usage of non linear expression in $expr"
-        )
+      if (logic.quantifierFree) {
+        checkIsQuantifierFree(expr)
       }
     }
   }
 
-  private fun isQuantifierFree(expr: Expression<*>) =
-      !expr.any(isDeep) { it is ExistsExpression || it is ForallExpression }
-
-  private fun isLinear(expr: Expression<*>) =
-      expr.all(isDeep) {
-        when (it.sort) {
-          is IntSort -> isLinear(it.cast<IntSort>())
-          is RealSort -> isLinear(it.cast<RealSort>())
-          else -> true
-        }
-      }
-
-  @JvmName("isLinearInt")
-  private fun isLinear(expr: Expression<IntSort>) =
-      expr.all(isDeep) {
-        if (it is IntMul) {
-          // multiplications of the form (* c x) or (* x c) are allowed,
-          // where x is a free constant and c is a literal or negation of a numeral
-          if (it.children.size != 2) false
-          else if (
-              it.children.all { child ->
-                child is UserDeclaredExpression<*> || child is UserDefinedExpression<*>
-              }
-          )
-              false
-          else true
-        } else {
-          it !is IntDiv && it !is Mod && it !is Abs && it !is IntExp
-        }
-      }
-
-  @JvmName("isLinearReal")
-  private fun isLinear(expr: Expression<RealSort>) =
-      expr.all(isDeep) {
-        if (it is RealMul) {
-          // multiplications of the form (* c x) or (* x c) are allowed,
-          // where x is a free constant and c is a literal or negation of a numeral
-          if (it.children.size != 2) false
-          else if (
-              it.children.all { child ->
-                child is UserDeclaredExpression<*> || child is UserDefinedExpression<*>
-              }
-          )
-              false
-          else true
-        } else {
-          it !is RealDiv // TODO add exp for ints when implemented
-        }
-      }
-
-  private fun isNonLinear(expr: Expression<*>) = !isLinear(expr) && !isDifferential(expr)
-
-  // differential logic only allows subtraction, negation and comparison operators
-  private fun isDifferential(expr: Expression<*>): Boolean =
-      expr.all(isDeep) {
-        if (it.sort !is IntSort && it.sort !is RealSort) true
-        else if (it is IntNeg) it.inner is IntLiteral // negation is only allowed for literals
-        else if (it is RealNeg) it.inner is RealLiteral
-        else if (it is LocalExpression<*>) isDifferential(it.term)
-        else {
-          it is IntLiteral ||
-              it is RealLiteral ||
-              it is IntSub ||
-              it is RealSub ||
-              it is UserDeclaredExpression<*> ||
-              it is UserDefinedExpression<*> ||
-              it is Ite<*>
+  private fun checkIsQuantifierFree(expr: Expression<*>) =
+      expr.forEach(Order.PREORDER, isDeep) {
+        if (it is ExistsExpression || it is ForallExpression) {
+          throw IllegalQuantifierUsageException(it, expr, logic!!)
         }
       }
 
@@ -645,6 +570,7 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
    * this datatype exists, constructors still need to be added.
    */
   internal fun declareEmptyDatatype(arity: Int, symbol: Symbol): Datatype {
+
     val datatype = Datatype(arity, symbol)
 
     _commands.add(DeclareDatatype(datatype))
@@ -721,18 +647,6 @@ fun MutableSMTProgram.setInfo(name: String, value: BigDecimal) =
 
 fun MutableSMTProgram.setInfo(name: String, value: Symbol) =
     setInfo(SetInfo(Attribute(name, SymbolAttributeValue(value))))
-
-/** Declare sort (declare-sort [name] [arity]) and return the resulting [UserDeclaredSort]. */
-fun PushContext.declareSort(name: String, arity: Int = 0): UserDeclaredSort {
-  declareSort(name.toSymbol(), arity)
-  return UserDeclaredSort(name.toSymbol(), emptyList())
-}
-
-/** Declare constant (declare-const [name] [sort]) and return its expression directly. */
-fun <T : Sort> PushContext.declareConst(name: String, sort: T): Expression<T> =
-    declareConst(name.toSymbol(), sort)()
-
-class AssertionOutOfLogicBounds(msg: String) : RuntimeException(msg)
 
 abstract class InvalidSMTProgramException(msg: String) : IllegalStateException(msg)
 

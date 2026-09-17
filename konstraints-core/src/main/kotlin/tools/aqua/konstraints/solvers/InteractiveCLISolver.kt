@@ -51,14 +51,12 @@ import tools.aqua.konstraints.smt.SetLogic
 import tools.aqua.konstraints.smt.SetOption
 import tools.aqua.konstraints.visitors.CommandVisitor
 
-class InteractiveZ3Solver(verbose: Boolean) : InteractiveCLISolver("z3", verbose, "-in")
+class InteractiveZ3Solver : InteractiveCLISolver("z3", "-in")
 
-class InteractiveCVC5Solver(verbose: Boolean) :
-    InteractiveCLISolver("cvc5", verbose, "--interactive", "--incremental")
+class InteractiveCVC5Solver : InteractiveCLISolver("cvc5", "--interactive", "--incremental")
 
 open class InteractiveCLISolver(
     val name: String,
-    val verbose: Boolean,
     vararg solverOptions: String,
 ) : Solver, CommandVisitor<Unit> {
 
@@ -128,15 +126,7 @@ open class InteractiveCLISolver(
   private fun getModel() {
     writeCommand("(get-model)")
 
-    val response =
-        if (verbose) {
-          reader.mark(1_000_000)
-          println(reader.readParenthesizedMessage())
-          reader.reset()
-          ResponseParser.parseModelResponse(reader, program)
-        } else {
-          ResponseParser.parseModelResponse(reader, program)
-        }
+    val response = ResponseParser.parseModelResponse(reader, program)
 
     processResponse(response)
   }

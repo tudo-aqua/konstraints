@@ -21,14 +21,11 @@ package tools.aqua.konstraints
 import java.io.IOException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions.assumeTrue
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.assertNull
 import tools.aqua.konstraints.dsl.bvsle
 import tools.aqua.konstraints.dsl.eq
 import tools.aqua.konstraints.dsl.not
-import tools.aqua.konstraints.dsl.plus
-import tools.aqua.konstraints.dsl.toInt
 import tools.aqua.konstraints.smt.ALL
 import tools.aqua.konstraints.smt.And
 import tools.aqua.konstraints.smt.BVAdd
@@ -56,7 +53,7 @@ import tools.aqua.konstraints.solvers.InteractiveZ3Solver
 class PushTests {
   private fun getSolver() =
       try {
-        InteractiveCVC5Solver(true)
+        InteractiveCVC5Solver()
       } catch (e: IOException) {
         assumeTrue(false)
       }
@@ -79,7 +76,7 @@ class PushTests {
     }
 
     val (status, model) =
-        program.push(InteractiveZ3Solver(true), true) {
+        program.push(InteractiveZ3Solver(), true) {
           val bar = declareConst("bar".toSymbol(), SMTBitVec(8))
           assert(Equals(foo(), bar()))
         }
