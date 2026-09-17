@@ -30,6 +30,7 @@ import tools.aqua.konstraints.util.Stack
 
 /** Holds all [SMTFunction]s and [SortFactory]s of the current signature. */
 class CurrentContext {
+  // TODO might split this into theory and user functions/sorts
   val functions = mutableMapOf<Symbol, SMTFunction<*>>()
   val sorts = mutableMapOf<Symbol, SortFactory>()
 }

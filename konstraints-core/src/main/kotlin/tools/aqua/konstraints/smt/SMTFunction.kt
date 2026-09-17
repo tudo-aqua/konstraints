@@ -82,6 +82,18 @@ abstract class SMTFunction<out T : Sort> {
   }
 }
 
+class SolverDeclaredSMTFunction<T : Sort>(
+    override val symbol: Symbol,
+    override val sort: T,
+    val term: AsExpression<*>,
+) : SMTFunction<T>() {
+  override val parameters: List<Sort> = emptyList()
+
+  override fun constructDynamic(args: List<Expression<*>>, indices: List<Index>): Expression<T> {
+    return term as Expression<T>
+  }
+}
+
 /** Base class for all functions declared by the user. */
 abstract class UserDeclaredSMTFunction<T : Sort> : SMTFunction<T>() {
 

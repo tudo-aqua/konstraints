@@ -768,6 +768,37 @@ class AnnotatedExpression<T : Sort>(val term: Expression<T>, val annoations: Lis
   }
 }
 
+class AsExpression<T : Sort>(val identifier: Identifier, override val sort: T) : Expression<T>() {
+  override val symbol = identifier.symbol
+
+  override fun toString() = "(as $identifier $sort)"
+
+  override fun toSMTString(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
+    builder.append("(as ")
+    builder.append(identifier.toString())
+    builder.append(" ")
+    sort.toSMTString(builder, quotingRule, useIterative)
+    return builder.append(")")
+  }
+
+  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(as $identifier ${sort.toSMTString(quotingRule, useIterative)})"
+
+  override val theories: Set<Theories> = emptySet()
+  override val func: SMTFunction<T>? = null
+
+  // TODO might add actual term that symbol referees to here
+  override val children: List<Expression<*>> = emptyList()
+
+  override fun copy(children: List<Expression<*>>): Expression<T> {
+    TODO("Not yet implemented")
+  }
+}
+
 class ExpressionCastException(msg: String) : ClassCastException(msg)
 
 class DefinitionCastException(msg: String) : ClassCastException(msg)
