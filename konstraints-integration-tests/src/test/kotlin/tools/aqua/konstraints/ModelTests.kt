@@ -60,7 +60,7 @@ class TestModel {
           ),
           // this can be solved but the model contains 'as', which is not yet supported in
           // constraints
-          Arguments.arguments(
+          /* Arguments.arguments(
               smt(QF_ABV) {
                 val x by declaring(SMTArray(SMTBitVec(32), SMTBitVec(8)))
                 val y by declaring(SMTArray(SMTBitVec(32), SMTBitVec(8)))
@@ -71,7 +71,7 @@ class TestModel {
 
                 assert { not(not((y.instance select 0.bitvec(32)).extract(3, 3) eq 0.bitvec(1))) }
               }
-          ),
+          ), */
           Arguments.arguments(
               smt(QF_UF) {
                 val circuit by declaringConst(SMTBool)

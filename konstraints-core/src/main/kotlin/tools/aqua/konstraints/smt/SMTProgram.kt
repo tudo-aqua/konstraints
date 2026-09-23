@@ -675,6 +675,18 @@ class IllegalNonDifferentialExpressionException(
         "Illegal usage of non-differential ${if (loc is LocalExpression<*>) "local expression" else "expression"} ${if(loc is LocalExpression<*>) loc.func else loc} in expression $base when using logic $logic"
     )
 
+/** Declare sort (declare-sort [name] [arity]) and return the resulting [UserDeclaredSort]. */
+fun PushContext.declareSort(name: String, arity: Int = 0): UserDeclaredSort {
+  declareSort(name.toSymbol(), arity)
+  return UserDeclaredSort(name.toSymbol(), emptyList())
+}
+
+/** Declare constant (declare-const [name] [sort]) and return its expression directly. */
+fun <T : Sort> PushContext.declareConst(name: String, sort: T): Expression<T> =
+    declareConst(name.toSymbol(), sort)()
+
+class AssertionOutOfLogicBounds(msg: String) : RuntimeException(msg)
+
 class NoSuchInfoException(keyword: String) : RuntimeException("Info $keyword not found!")
 
 class NoSuchOptionException(keyword: String) : RuntimeException("Option $keyword not found!")
