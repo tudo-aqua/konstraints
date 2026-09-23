@@ -19,6 +19,7 @@
 package tools.aqua.konstraints.solvers
 
 import java.io.BufferedReader
+import java.io.EOFException
 import java.io.InputStreamReader
 import java.io.OutputStreamWriter
 import tools.aqua.konstraints.parser.CheckSatResponse
@@ -52,10 +53,12 @@ import tools.aqua.konstraints.visitors.CommandVisitor
 
 class InteractiveZ3Solver : InteractiveCLISolver("z3", "-in")
 
-class InteractiveCVC5Solver : InteractiveCLISolver("cvc5", "--interactive")
+class InteractiveCVC5Solver : InteractiveCLISolver("cvc5", "--interactive", "--incremental")
 
-open class InteractiveCLISolver(val name: String, vararg solverOptions: String) :
-    Solver, CommandVisitor<Unit> {
+open class InteractiveCLISolver(
+    val name: String,
+    vararg solverOptions: String,
+) : Solver, CommandVisitor<Unit> {
 
   // TODO this should have more exception handling
   val process: Process = ProcessBuilder(name, *solverOptions).redirectErrorStream(true).start()
@@ -122,6 +125,7 @@ open class InteractiveCLISolver(val name: String, vararg solverOptions: String) 
 
   private fun getModel() {
     writeCommand("(get-model)")
+
     val response = ResponseParser.parseModelResponse(reader, program)
 
     processResponse(response)
@@ -230,4 +234,46 @@ open class InteractiveCLISolver(val name: String, vararg solverOptions: String) 
   }
 
   override fun visit(nullOp: NullOp) {}
+}
+
+fun BufferedReader.readParenthesizedMessage(): String {
+  val result = StringBuilder()
+  var depth = 0
+  var started = false
+
+  while (true) {
+    val value = read()
+
+    if (value == -1) {
+      if (!started) {
+        throw EOFException("EOF before message started")
+      }
+      throw EOFException("EOF before closing parenthesis")
+    }
+
+    val char = value.toChar()
+
+    if (!started) {
+      if (char != '(') {
+        continue
+      }
+
+      started = true
+      depth = 1
+      result.append(char)
+      continue
+    }
+
+    result.append(char)
+
+    when (char) {
+      '(' -> depth++
+      ')' -> {
+        depth--
+        if (depth == 0) {
+          return result.toString()
+        }
+      }
+    }
+  }
 }

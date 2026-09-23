@@ -37,17 +37,13 @@ import tools.aqua.konstraints.visitors.RecursionPolicy
 class TestModel {
   private fun provideProgram() =
       Stream.of(
-          /* Z3s java api fails to generate a model for this
-           * CLI z3 works but can not be used on the remote
           Arguments.arguments(
               smt(QF_BV) {
                 val s by declaringConst(SMTBitVec(32))
                 val t by declaringConst(SMTBitVec(32))
                 assert { (s bvor (t bvor t)) eq (s bvor t) }
-                checkSat()
-                getModel()
               }
-          ),*/
+          ),
           Arguments.arguments(
               smt(QF_BVFP) {
                 val `d_ackerman!0` by declaring(SMTBitVec(64))
@@ -62,26 +58,20 @@ class TestModel {
                 }
               }
           ),
-          /*
-           * this can be solved but the model contains 'as', which is not yet supported in constraints
-          Arguments.arguments(
+          // this can be solved but the model contains 'as', which is not yet supported in
+          // constraints
+          /* Arguments.arguments(
               smt(QF_ABV) {
-                  val x by declaring(SMTArray(SMTBitVec(32), SMTBitVec(8)))
-                  val y by declaring(SMTArray(SMTBitVec(32), SMTBitVec(8)))
+                val x by declaring(SMTArray(SMTBitVec(32), SMTBitVec(8)))
+                val y by declaring(SMTArray(SMTBitVec(32), SMTBitVec(8)))
 
-                  assert {
-                      0.bitvec(30) concat (x.instance select 0.bitvec(32)).extract(2, 1) eq 2.bitvec(32)
-                  }
+                assert {
+                  0.bitvec(30) concat (x.instance select 0.bitvec(32)).extract(2, 1) eq 2.bitvec(32)
+                }
 
-                  assert {
-                      not(not((y.instance select 0.bitvec(32)).extract(3, 3) eq 0.bitvec(1)))
-                  }
-
-                  checkSat()
-                  getModel()
+                assert { not(not((y.instance select 0.bitvec(32)).extract(3, 3) eq 0.bitvec(1))) }
               }
-          )
-           */
+          ), */
           Arguments.arguments(
               smt(QF_UF) {
                 val circuit by declaringConst(SMTBool)

@@ -228,14 +228,14 @@ class DSLTests {
                       BitVecSort(3),
                   ) { exprs ->
                     val x1 = exprs[0] as Expression<BitVecSort>
-                    val x2 = exprs[0] as Expression<BitVecSort>
-                    val x3 = exprs[0] as Expression<BitVecSort>
-                    val x4 = exprs[0] as Expression<BitVecSort>
-                    val x5 = exprs[0] as Expression<BitVecSort>
-                    val x6 = exprs[0] as Expression<BitVecSort>
-                    val x7 = exprs[0] as Expression<BitVecSort>
-                    val x8 = exprs[0] as Expression<BitVecSort>
-                    val x9 = exprs[0] as Expression<BitVecSort>
+                    val x2 = exprs[1] as Expression<BitVecSort>
+                    val x3 = exprs[2] as Expression<BitVecSort>
+                    val x4 = exprs[3] as Expression<BitVecSort>
+                    val x5 = exprs[4] as Expression<BitVecSort>
+                    val x6 = exprs[5] as Expression<BitVecSort>
+                    val x7 = exprs[6] as Expression<BitVecSort>
+                    val x8 = exprs[7] as Expression<BitVecSort>
+                    val x9 = exprs[8] as Expression<BitVecSort>
                     (x1 distinct
                         x2 distinct
                         x3 distinct

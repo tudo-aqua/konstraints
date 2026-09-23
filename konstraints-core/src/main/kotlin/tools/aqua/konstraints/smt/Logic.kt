@@ -108,6 +108,7 @@ sealed interface Logic {
             "UFNIA" to UFNIA,
             "UFNIRA" to UFNIRA,
             "QF_ASLIA" to QF_ASLIA,
+            "ALL" to ALL,
         )
   }
 
@@ -1745,6 +1746,27 @@ data object QF_ASLIA : Logic {
   override val nonlinearArithmetic = false
   override val differentialArithmetic = true
   override val freeSortFunctionSymbols = false
+}
+
+/** Unrestricted logic combining all built-in theories with free sort and function symbols. */
+data object ALL : Logic {
+  override val theories =
+      setOf(
+          Theories.CORE,
+          Theories.STRINGS,
+          Theories.FIXED_SIZE_BIT_VECTORS,
+          Theories.INTS,
+          Theories.REALS,
+          Theories.REALS_INTS,
+          Theories.FLOATING_POINT,
+          Theories.ARRAYS_EX,
+      )
+  override val datatypes = true
+  override val quantifierFree = false
+  override val linearArithmetic = true
+  override val nonlinearArithmetic = true
+  override val differentialArithmetic = true
+  override val freeSortFunctionSymbols = true
 }
 
 /** interface to derive custom logics from. */
