@@ -36,7 +36,6 @@ import tools.aqua.konstraints.parser.SMTScriptParser
 import tools.aqua.konstraints.smt.BitVecLiteral
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.FPMinusZero
-import tools.aqua.konstraints.smt.FPNaN
 import tools.aqua.konstraints.smt.FPZero
 import tools.aqua.konstraints.smt.False
 import tools.aqua.konstraints.smt.IntLiteral
