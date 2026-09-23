@@ -21,6 +21,7 @@ package tools.aqua.konstraints
 import java.io.IOException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions.assumeTrue
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertNotNull
 import org.junit.jupiter.api.assertNull
 import tools.aqua.konstraints.dsl.bvsle
