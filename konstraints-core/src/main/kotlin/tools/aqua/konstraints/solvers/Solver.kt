@@ -44,7 +44,7 @@ interface Solver : AutoCloseable {
                 Solvers.CVC5 ->
                     try {
                       InteractiveCVC5Solver()
-                      Solvers.Z3
+                      Solvers.CVC5
                     } catch (_: Exception) {
                       null
                     }

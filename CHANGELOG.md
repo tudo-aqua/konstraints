@@ -19,6 +19,16 @@
 - Java Platform Module System support: `konstraints-core` now ships a `module-info.java` and is
   published as the named module `tools.aqua.konstraints`, exporting all of its packages and
   transitively requiring `kotlin.stdlib`.
+- `SolverSession`: a long-lived connection to a Z3 or cvc5 process that sends commands as they are
+  issued, so `push`/`pop` and repeated `check-sat` are truly incremental. Supports `get-value`,
+  `get-model`, `get-info` and per-query timeouts.
+- `SMTScriptParser.parseInto` appends a script to an existing program, and
+  `SMTScriptParser.parseTerm` parses a single term over a program's declarations.
+- `ResponseParser.parseGetValueResponse` and `GetValueResponse` for `get-value` responses.
+
+### Fixed
+
+- `Solver.getDefaultSolver()` now falls back to cvc5 when Z3 is not installed.
 
 ### Breaking Changes
 

@@ -26,6 +26,7 @@ import tools.aqua.konstraints.parser.CheckSatResponse
 import tools.aqua.konstraints.parser.EchoResponse
 import tools.aqua.konstraints.parser.ErrorResponse
 import tools.aqua.konstraints.parser.GetModelResponse
+import tools.aqua.konstraints.parser.GetValueResponse
 import tools.aqua.konstraints.parser.ResponseParser
 import tools.aqua.konstraints.parser.SolverResponse
 import tools.aqua.konstraints.parser.SuccessResponse
@@ -91,6 +92,7 @@ open class InteractiveCLISolver(
       is UnsupportedResponse -> throw SolverUnsupportedOperationException()
       is GetModelResponse -> model = response.model
       is EchoResponse -> Unit
+      is GetValueResponse -> Unit
     }
   }
 

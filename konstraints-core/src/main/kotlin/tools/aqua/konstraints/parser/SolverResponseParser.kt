@@ -35,6 +35,7 @@ import tools.aqua.konstraints.parser.lexer.UnsatToken
 import tools.aqua.konstraints.parser.lexer.UnsupportedToken
 import tools.aqua.konstraints.parser.util.PeekableIterator
 import tools.aqua.konstraints.parser.util.peekable
+import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.FunctionDef
 import tools.aqua.konstraints.smt.Model
 import tools.aqua.konstraints.smt.ModelContext
@@ -159,5 +160,29 @@ object ResponseParser {
     requireIsInstance<ClosingBracket>(lexer.next())
 
     return model
+  }
+
+  @OptIn(ExperimentalContracts::class)
+  fun parseGetValueResponse(reader: Reader, program: SMTProgram): SolverResponse {
+    val lexer = SMTTokenizer(reader).peekable()
+    parseGeneralResponseOrNull(lexer)?.let {
+      return it
+    }
+
+    requireIsInstance<OpeningBracket>(lexer.next())
+
+    val values = mutableListOf<Pair<Expression<*>, Expression<*>>>()
+    while (lexer.peek() !is ClosingBracket) {
+      requireIsInstance<OpeningBracket>(lexer.next())
+      val term = SMTParser.parseTerm(lexer to program)
+      val value = SMTParser.parseTerm(lexer to program)
+      requireIsInstance<ClosingBracket>(lexer.next())
+
+      values += term to value
+    }
+
+    requireIsInstance<ClosingBracket>(lexer.next())
+
+    return GetValueResponse(values)
   }
 }

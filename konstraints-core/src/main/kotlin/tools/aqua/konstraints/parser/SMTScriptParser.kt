@@ -84,6 +84,27 @@ object SMTScriptParser {
   operator fun invoke(input: Reader, parseDeepProgram: Boolean = false) =
       parseScript(SMTTokenizer(input).peekable(), parseDeepProgram)
 
+  /**
+   * Parses the commands in [input] and appends them to [program]. Declarations extend the context
+   * of [program], so later calls can refer to symbols declared by earlier ones.
+   */
+  fun parseInto(program: MutableSMTProgram, input: String) {
+    val lexer = SMTTokenizer(input.reader()).peekable()
+
+    while (lexer.peek() !is EOFToken) {
+      parseCommand(lexer, program)
+    }
+  }
+
+  /** Parses the single term in [input] over the declarations of [program] without modifying it. */
+  fun parseTerm(input: String, program: SMTProgram): Expression<*> {
+    val lexer = SMTTokenizer(input.reader()).peekable()
+    val term = SMTParser.parseTerm(lexer to program)
+    require(lexer.peek() is EOFToken) { "Unexpected input after term: $input" }
+
+    return term
+  }
+
   internal fun parseScript(
       lexer: PeekableIterator<Token>,
       parseDeepProgram: Boolean,

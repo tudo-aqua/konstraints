@@ -18,6 +18,7 @@
 
 package tools.aqua.konstraints.parser
 
+import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.Model
 import tools.aqua.konstraints.smt.SatStatus
 
@@ -34,3 +35,6 @@ class CheckSatResponse(val status: SatStatus) : SolverResponse
 class EchoResponse(val msg: String) : SolverResponse
 
 class GetModelResponse(val model: Model) : SolverResponse
+
+/** Response to get-value, pairing each requested term with its value in the current model. */
+class GetValueResponse(val values: List<Pair<Expression<*>, Expression<*>>>) : SolverResponse
