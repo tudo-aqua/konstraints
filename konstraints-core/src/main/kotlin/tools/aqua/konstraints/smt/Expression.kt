@@ -328,14 +328,14 @@ sealed class Expression<out T : Sort> : SMTSerializable {
   override fun toString() =
       if (children.isEmpty()) symbol.toString() else "$($symbol ${children.joinToString(" ")})"
 
-  fun nameStringWithIndices(quotingRule: QuotingRule, useIterative: Boolean) =
+  open fun nameStringWithIndices(quotingRule: QuotingRule, useIterative: Boolean) =
       if (indices.isEmpty()) {
         symbol.toSMTString(quotingRule, useIterative)
       } else {
         "(_ ${symbol.toSMTString(quotingRule, useIterative)} ${indices.joinToString(" ")})"
       }
 
-  fun nameStringWithIndices(
+  open fun nameStringWithIndices(
       builder: Appendable,
       quotingRule: QuotingRule,
       useIterative: Boolean,

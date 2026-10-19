@@ -88,11 +88,19 @@ object SMTScriptParser {
    * Parses the commands in [input] and appends them to [program]. Declarations extend the context
    * of [program], so later calls can refer to symbols declared by earlier ones.
    */
-  fun parseInto(program: MutableSMTProgram, input: String) {
+  fun parseInto(program: MutableSMTProgram, input: String) =
+      parseInto(program, input, ScriptHandler.AppendToProgram)
+
+  /**
+   * Parses the commands in [input] over the context of [program] and lets [handler] decide what
+   * happens with assertions, declarations of functions and constants, and push/pop. All other
+   * commands are appended to [program] as by [parseInto].
+   */
+  fun parseInto(program: MutableSMTProgram, input: String, handler: ScriptHandler) {
     val lexer = SMTTokenizer(input.reader()).peekable()
 
     while (lexer.peek() !is EOFToken) {
-      parseCommand(lexer, program)
+      parseCommand(lexer, program, handler)
     }
   }
 
@@ -119,7 +127,11 @@ object SMTScriptParser {
   }
 
   @OptIn(ExperimentalContracts::class)
-  internal fun parseCommand(lexer: PeekableIterator<Token>, program: MutableSMTProgram) {
+  internal fun parseCommand(
+      lexer: PeekableIterator<Token>,
+      program: MutableSMTProgram,
+      handler: ScriptHandler = ScriptHandler.AppendToProgram,
+  ) {
     // TODO EOF token would help here as EOF is valid at this point
     // when the input ends on a whitespace or comment we skip that token and get EOF here
     // we are finished parsing so this state is valid
@@ -129,13 +141,13 @@ object SMTScriptParser {
     requireIsInstance<CommandName>(commandName)
 
     when (commandName) {
-      is AssertWord -> parseAssert(lexer, program)
+      is AssertWord -> parseAssert(lexer, program, handler)
       is CheckSatAssumingWord -> TODO("CheckSatAssumingWord")
       is CheckSatWord -> program.add(CheckSat)
-      is DeclareConstWord -> parseDeclareConst(lexer, program)
+      is DeclareConstWord -> parseDeclareConst(lexer, program, handler)
       is DeclareDatatypeWord -> parseDatatype(lexer, program)
       is DeclareDatatypesWord -> TODO("DeclareDatatypesWord")
-      is DeclareFunWord -> parseDeclareFun(lexer, program)
+      is DeclareFunWord -> parseDeclareFun(lexer, program, handler)
       is DeclareSortParameterWord -> TODO("DeclareSortParameterWord")
       is DeclareSortWord -> parseDeclareSort(lexer, program)
       is DefineConstWord -> parseDefineConst(lexer, program)
@@ -154,8 +166,8 @@ object SMTScriptParser {
       is GetUnsatAssumptionsWord -> TODO("GetUnsatAssumptionsWord")
       is GetUnsatCoreWord -> TODO("GetUnsatCoreWord")
       is GetValueWord -> parseGetValue(lexer, program)
-      is PopWord -> parsePop(lexer, program)
-      is PushWord -> parsePush(lexer, program)
+      is PopWord -> parsePop(lexer, program, handler)
+      is PushWord -> parsePush(lexer, program, handler)
       is ResetAssertionsWord -> TODO("ResetAssertionsWord")
       is ResetWord -> TODO("ResetWord")
       is SetInfoWord -> parseSetInfo(lexer, program)
@@ -189,19 +201,31 @@ object SMTScriptParser {
     program.add(GetValue(terms))
   }
 
-  internal fun parseAssert(lexer: PeekableIterator<Token>, program: MutableSMTProgram) {
-    program.assert(SMTParser.parseTerm(lexer to program).cast())
+  internal fun parseAssert(
+      lexer: PeekableIterator<Token>,
+      program: MutableSMTProgram,
+      handler: ScriptHandler = ScriptHandler.AppendToProgram,
+  ) {
+    handler.assert(program, SMTParser.parseTerm(lexer to program).cast())
   }
 
-  internal fun parseDeclareConst(lexer: PeekableIterator<Token>, program: MutableSMTProgram) {
+  internal fun parseDeclareConst(
+      lexer: PeekableIterator<Token>,
+      program: MutableSMTProgram,
+      handler: ScriptHandler = ScriptHandler.AppendToProgram,
+  ) {
     val symbol = SMTParser.parseSymbol(lexer)
     val sort = SMTParser.parseSort(lexer, program)
 
-    program.declareConst(symbol, sort)
+    handler.declareConst(program, symbol, sort)
   }
 
   @OptIn(ExperimentalContracts::class)
-  internal fun parseDeclareFun(lexer: PeekableIterator<Token>, program: MutableSMTProgram) {
+  internal fun parseDeclareFun(
+      lexer: PeekableIterator<Token>,
+      program: MutableSMTProgram,
+      handler: ScriptHandler = ScriptHandler.AppendToProgram,
+  ) {
     val symbol = SMTParser.parseSymbol(lexer)
 
     requireIsInstance<OpeningBracket>(lexer.next())
@@ -210,7 +234,7 @@ object SMTScriptParser {
 
     val sort = SMTParser.parseSort(lexer, program)
 
-    program.declareFun(symbol, sorts, sort)
+    handler.declareFun(program, symbol, sorts, sort)
   }
 
   internal fun parseDefineConst(lexer: PeekableIterator<Token>, program: MutableSMTProgram) {
@@ -290,18 +314,26 @@ object SMTScriptParser {
   }
 
   @OptIn(ExperimentalContracts::class)
-  internal fun parsePush(lexer: PeekableIterator<Token>, program: MutableSMTProgram) {
+  internal fun parsePush(
+      lexer: PeekableIterator<Token>,
+      program: MutableSMTProgram,
+      handler: ScriptHandler = ScriptHandler.AppendToProgram,
+  ) {
     val numeral = lexer.next()
     requireIsInstance<Numeral>(numeral)
 
-    program.push(numeral.number.toInt())
+    handler.push(program, numeral.number.toInt())
   }
 
   @OptIn(ExperimentalContracts::class)
-  internal fun parsePop(lexer: PeekableIterator<Token>, program: MutableSMTProgram) {
+  internal fun parsePop(
+      lexer: PeekableIterator<Token>,
+      program: MutableSMTProgram,
+      handler: ScriptHandler = ScriptHandler.AppendToProgram,
+  ) {
     val numeral = lexer.next()
     requireIsInstance<Numeral>(numeral)
 
-    program.pop(numeral.number.toInt())
+    handler.pop(program, numeral.number.toInt())
   }
 }

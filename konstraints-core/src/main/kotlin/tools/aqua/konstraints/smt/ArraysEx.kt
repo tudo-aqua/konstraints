@@ -80,3 +80,48 @@ class ArrayStore<out X : Sort, out Y : Sort>(
   override fun copy(children: List<Expression<*>>): Expression<ArraySort<X, Y>> =
       ArrayStoreDecl.constructDynamic(children, emptyList()) as Expression<ArraySort<X, Y>>
 }
+
+/**
+ * Constant array, mapping every index to [value].
+ * - `((as const (Array X Y)) [value])`
+ *
+ * This is the qualified identifier `(as const (Array X Y))` applied to a single argument, as
+ * supported by most solvers (e.g. z3, cvc5, bitwuzla) although not part of the ArraysEx theory.
+ */
+class ArrayConst<out X : Sort, out Y : Sort>(
+    sort: ArraySort<X, Y>,
+    val value: Expression<Y>,
+) : UnaryExpression<ArraySort<X, Y>, Y>("const".toSymbol(), sort) {
+  override val theories = ARRAYS_EX_MARKER_SET
+
+  init {
+    require(sort.y == value.sort) {
+      "Value of sort ${value.sort} does not match element sort ${sort.y} of constant array!"
+    }
+  }
+
+  override val inner: Expression<Y> = value
+
+  override fun nameStringWithIndices(quotingRule: QuotingRule, useIterative: Boolean) =
+      "(as const ${sort.toSMTString(quotingRule, useIterative)})"
+
+  override fun nameStringWithIndices(
+      builder: Appendable,
+      quotingRule: QuotingRule,
+      useIterative: Boolean,
+  ): Appendable {
+    builder.append("(as const ")
+    sort.toSMTString(builder, quotingRule, useIterative)
+    return builder.append(")")
+  }
+
+  override fun toString() = "((as const $sort) $value)"
+
+  @Suppress("UNCHECKED_CAST")
+  override fun copy(children: List<Expression<*>>): Expression<ArraySort<X, Y>> {
+    require(children.size == 1) {
+      "One argument expected for constant array but ${children.size} were given"
+    }
+    return ArrayConst(sort, children.single() as Expression<Y>)
+  }
+}

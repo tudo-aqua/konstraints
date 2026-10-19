@@ -48,6 +48,8 @@ import tools.aqua.konstraints.parser.util.PeekableIterator
 import tools.aqua.konstraints.parser.util.peekIs
 import tools.aqua.konstraints.parser.util.peekIsNot
 import tools.aqua.konstraints.smt.AnnotatedExpression
+import tools.aqua.konstraints.smt.ArrayConst
+import tools.aqua.konstraints.smt.ArraySort
 import tools.aqua.konstraints.smt.AsExpression
 import tools.aqua.konstraints.smt.Attribute
 import tools.aqua.konstraints.smt.AttributeValue
@@ -408,7 +410,20 @@ internal object SMTParser {
                     lexer.next()
 
                     when (lexer.peek(depth = 1)) {
-                      is AsWord -> parseAs(lexer, program)
+                      is AsWord -> {
+                        // qualified function with arity > 0, e.g. ((as const (Array X Y)) term)
+                        val qualifier = parseAs(lexer, program)
+
+                        val terms = mutableListOf<Expression<*>>()
+                        do {
+                          terms.add(callRecursive(lexer to program))
+                        } while (lexer.peekIsNot { token -> token is ClosingBracket })
+
+                        // consume closing bracket of the whole term
+                        requireIsInstance<ClosingBracket>(lexer.next())
+
+                        constructQualifiedApplication(qualifier, terms)
+                      }
                       is UnderscoreWord -> {
                         // indexed function with arity > 0
                         val identifier = parseIdentifier(lexer)
@@ -460,6 +475,7 @@ internal object SMTParser {
         }
       }
 
+  @OptIn(ExperimentalContracts::class)
   fun parseAs(lexer: PeekableIterator<Token>, program: SMTProgram): AsExpression<Sort> {
     // consume opening bracket and as word
     lexer.consume(2)
@@ -467,7 +483,37 @@ internal object SMTParser {
     val identifier = parseIdentifier(lexer)
     val sort = parseSort(lexer, program)
 
+    // consume closing bracket of the qualified identifier
+    requireIsInstance<ClosingBracket>(lexer.next())
+
     return AsExpression(identifier, sort)
+  }
+
+  /**
+   * Build the application of the qualified identifier `(as <identifier> <sort>)` to [args].
+   * Currently only constant arrays `((as const (Array X Y)) <term>)` are supported.
+   */
+  internal fun constructQualifiedApplication(
+      qualifier: AsExpression<Sort>,
+      args: List<Expression<*>>,
+  ): Expression<*> {
+    val identifier = qualifier.identifier
+    val sort = qualifier.sort
+
+    require(
+        identifier is SymbolIdentifier &&
+            identifier.symbol.value == "const" &&
+            !identifier.symbol.isQuoted &&
+            sort is ArraySort<*, *>
+    ) {
+      "Unsupported qualified identifier application (as $identifier $sort)!"
+    }
+    require(args.size == 1) {
+      "One argument expected for constant array but ${args.size} were given:\n${args.joinToString(separator="\n")}"
+    }
+
+    @Suppress("UNCHECKED_CAST")
+    return ArrayConst(sort as ArraySort<Sort, Sort>, args.single() as Expression<Sort>)
   }
 
   /**
