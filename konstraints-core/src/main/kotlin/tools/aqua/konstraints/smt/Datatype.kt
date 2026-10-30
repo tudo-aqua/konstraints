@@ -201,7 +201,7 @@ open class Datatype(val arity: Int, symbol: Symbol) : Sort(symbol) {
 
 object Testers : SMTFunction<BoolSort>() {
   override val symbol = "is".toSymbol()
-  override val sort = SMTBool
+  override val sort = BoolSort
   override val parameters: List<Sort> = emptyList()
 
   val constructors = mutableSetOf<Symbol>()
@@ -224,7 +224,7 @@ object Testers : SMTFunction<BoolSort>() {
 
 class TesterExpression(index: SymbolIndex) : Expression<BoolSort>() {
   override val symbol = "is".toSymbol()
-  override val sort = SMTBool
+  override val sort = BoolSort
   override val theories = emptySet<Theories>()
   override val func = Testers
   override val children = emptyList<Expression<*>>()

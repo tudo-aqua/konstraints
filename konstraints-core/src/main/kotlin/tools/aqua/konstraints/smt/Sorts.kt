@@ -35,179 +35,12 @@ object BoolFactory : SortFactory {
     return build()
   }
 
-  fun build() = SMTBool
+  fun build() = BoolSort
 
   override fun isInstanceOf(sort: Sort) = (sort is BoolSort)
 
   override val isIndexed = false
   override val numIndicies = 0
-}
-
-class UserDefinedBoolFactory(symbol: Symbol, val parameters: List<Symbol>) :
-    UserDefinedSortFactory(symbol) {
-  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
-    require(this.parameters.size == parameters.size)
-    require(indices.isEmpty())
-
-    return UserDefinedBoolSort(symbol, parameters)
-  }
-
-  override fun isInstanceOf(sort: Sort) =
-      sort is UserDefinedBoolSort && sort.definedSymbol == symbol
-
-  override val isIndexed = false
-  override val numIndicies = 0
-}
-
-class UserDefinedBoolSort(override val definedSymbol: Symbol, override val parameters: List<Sort>) :
-    BoolSort() {
-  override fun toString() = definedSymbol.toString()
-
-  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(quotingRule, useIterative)
-
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(builder, quotingRule, useIterative)
-}
-
-class UserDefinedRealFactory(symbol: Symbol, val parameters: List<Symbol>) :
-    UserDefinedSortFactory(symbol) {
-  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
-    require(this.parameters.size == parameters.size)
-    require(indices.isEmpty())
-
-    return UserDefinedRealSort(symbol, parameters)
-  }
-
-  override fun isInstanceOf(sort: Sort) =
-      sort is UserDefinedRealSort && sort.definedSymbol == symbol
-
-  override val isIndexed = false
-  override val numIndicies = 0
-}
-
-class UserDefinedRealSort(override val definedSymbol: Symbol, override val parameters: List<Sort>) :
-    RealSort() {
-  override fun toString() = definedSymbol.toString()
-
-  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(quotingRule, useIterative)
-
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(builder, quotingRule, useIterative)
-}
-
-class UserDefinedIntFactory(symbol: Symbol, val parameters: List<Symbol>) :
-    UserDefinedSortFactory(symbol) {
-  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
-    require(this.parameters.size == parameters.size)
-    require(indices.isEmpty())
-
-    return UserDefinedIntSort(symbol, parameters)
-  }
-
-  override fun isInstanceOf(sort: Sort) = sort is UserDefinedIntSort && sort.definedSymbol == symbol
-
-  override val isIndexed = false
-  override val numIndicies = 0
-}
-
-class UserDefinedIntSort(override val definedSymbol: Symbol, override val parameters: List<Sort>) :
-    IntSort() {
-  override fun toString() = definedSymbol.toString()
-
-  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(quotingRule, useIterative)
-
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(builder, quotingRule, useIterative)
-}
-
-class UserDefinedStringFactory(symbol: Symbol, val parameters: List<Symbol>) :
-    UserDefinedSortFactory(symbol) {
-  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
-    require(this.parameters.size == parameters.size)
-    require(indices.isEmpty())
-
-    return UserDefinedStringSort(symbol, parameters)
-  }
-
-  override fun isInstanceOf(sort: Sort) =
-      sort is UserDefinedStringSort && sort.definedSymbol == symbol
-
-  override val isIndexed = false
-  override val numIndicies = 0
-}
-
-class UserDefinedStringSort(
-    override val definedSymbol: Symbol,
-    override val parameters: List<Sort>,
-) : StringSort() {
-  override fun toString() = definedSymbol.toString()
-
-  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(quotingRule, useIterative)
-
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(builder, quotingRule, useIterative)
-}
-
-class UserDefinedRegLanFactory(symbol: Symbol, val parameters: List<Symbol>) :
-    UserDefinedSortFactory(symbol) {
-  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
-    require(this.parameters.size == parameters.size)
-    require(indices.isEmpty())
-
-    return UserDefinedRegLanSort(symbol, parameters)
-  }
-
-  override fun isInstanceOf(sort: Sort) =
-      sort is UserDefinedRegLanSort && sort.definedSymbol == symbol
-
-  override val isIndexed = false
-  override val numIndicies = 0
-}
-
-class UserDefinedRegLanSort(
-    override val definedSymbol: Symbol,
-    override val parameters: List<Sort>,
-) : RegLanSort() {
-  override fun toString() = definedSymbol.toString()
-
-  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(quotingRule, useIterative)
-
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(builder, quotingRule, useIterative)
-}
-
-class UserDefinedRoundingModeFactory(symbol: Symbol, val parameters: List<Symbol>) :
-    UserDefinedSortFactory(symbol) {
-  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
-    require(this.parameters.size == parameters.size)
-    require(indices.isEmpty())
-
-    return UserDefinedRoundingModeSort(symbol, parameters)
-  }
-
-  override fun isInstanceOf(sort: Sort) =
-      sort is UserDefinedRoundingModeSort && sort.definedSymbol == symbol
-
-  override val isIndexed = false
-  override val numIndicies = 0
-}
-
-class UserDefinedRoundingModeSort(
-    override val definedSymbol: Symbol,
-    override val parameters: List<Sort>,
-) : RoundingModeSort() {
-  override fun toString() = definedSymbol.toString()
-
-  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(quotingRule, useIterative)
-
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(builder, quotingRule, useIterative)
 }
 
 object IntFactory : SortFactory {
@@ -218,7 +51,7 @@ object IntFactory : SortFactory {
     return build()
   }
 
-  fun build() = SMTInt
+  fun build() = IntSort
 
   override fun isInstanceOf(sort: Sort) = (sort is IntSort)
 
@@ -234,7 +67,7 @@ object RealFactory : SortFactory {
     return build()
   }
 
-  fun build() = SMTReal
+  fun build() = RealSort
 
   override fun isInstanceOf(sort: Sort) = (sort is RealSort)
 
@@ -250,7 +83,7 @@ object StringFactory : SortFactory {
     return build()
   }
 
-  fun build() = SMTString
+  fun build() = StringSort
 
   override fun isInstanceOf(sort: Sort) = (sort is StringSort)
 
@@ -266,7 +99,7 @@ object RegLanFactory : SortFactory {
     return build()
   }
 
-  fun build() = SMTRegLan
+  fun build() = RegLanSort
 
   override fun isInstanceOf(sort: Sort) = (sort is RegLanSort)
 
@@ -282,50 +115,54 @@ object RoundingModeFactory : SortFactory {
     return build()
   }
 
-  fun build() = SMTRoundingMode
+  fun build() = RoundingModeSort
 
-  override fun isInstanceOf(sort: Sort) = (sort is SMTRoundingMode)
+  override fun isInstanceOf(sort: Sort) = (sort is RoundingModeSort)
 
   override val isIndexed = false
   override val numIndicies = 0
 }
 
 object BitVecFactory : SortFactory {
+  /**
+   * Cache of common bitvector sorts containing Bitvectors sized 1-16, powers of two up to 2^16 and
+   * sizes needed for IEEE 754 floating points such as 19, 24, 53, 113, 237
+   */
   private val cache =
       arrayOf(
-          SMTBitVec(1),
-          SMTBitVec(2),
-          SMTBitVec(3),
-          SMTBitVec(4),
-          SMTBitVec(5),
-          SMTBitVec(6),
-          SMTBitVec(7),
-          SMTBitVec(8),
-          SMTBitVec(9),
-          SMTBitVec(10),
-          SMTBitVec(11),
-          SMTBitVec(12),
-          SMTBitVec(13),
-          SMTBitVec(14),
-          SMTBitVec(15),
-          SMTBitVec(16),
-          SMTBitVec(19),
-          SMTBitVec(24),
-          SMTBitVec(32),
-          SMTBitVec(53),
-          SMTBitVec(64),
-          SMTBitVec(113),
-          SMTBitVec(128),
-          SMTBitVec(237),
-          SMTBitVec(256),
-          SMTBitVec(512),
-          SMTBitVec(1024),
-          SMTBitVec(2048),
-          SMTBitVec(4096),
-          SMTBitVec(8192),
-          SMTBitVec(16384),
-          SMTBitVec(32786),
-          SMTBitVec(65536),
+          BitVecSort(1.idx()),
+          BitVecSort(2.idx()),
+          BitVecSort(3.idx()),
+          BitVecSort(4.idx()),
+          BitVecSort(5.idx()),
+          BitVecSort(6.idx()),
+          BitVecSort(7.idx()),
+          BitVecSort(8.idx()),
+          BitVecSort(9.idx()),
+          BitVecSort(10.idx()),
+          BitVecSort(11.idx()),
+          BitVecSort(12.idx()),
+          BitVecSort(13.idx()),
+          BitVecSort(14.idx()),
+          BitVecSort(15.idx()),
+          BitVecSort(16.idx()),
+          BitVecSort(19.idx()),
+          BitVecSort(24.idx()),
+          BitVecSort(32.idx()),
+          BitVecSort(53.idx()),
+          BitVecSort(64.idx()),
+          BitVecSort(113.idx()),
+          BitVecSort(128.idx()),
+          BitVecSort(237.idx()),
+          BitVecSort(256.idx()),
+          BitVecSort(512.idx()),
+          BitVecSort(1024.idx()),
+          BitVecSort(2048.idx()),
+          BitVecSort(4096.idx()),
+          BitVecSort(8192.idx()),
+          BitVecSort(16384.idx()),
+          BitVecSort(32786.idx()),
+          BitVecSort(65536.idx()),
       )
 
   override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): BitVecSort {
@@ -370,7 +207,7 @@ object BitVecFactory : SortFactory {
         16384 -> cache[30]
         32786 -> cache[31]
         65536 -> cache[32]
-        else -> SMTBitVec(n)
+        else -> BitVecSort(n.idx())
       }
 
   override fun isInstanceOf(sort: Sort) = (sort is BitVecSort)
@@ -379,26 +216,62 @@ object BitVecFactory : SortFactory {
   override val numIndicies = 1
 }
 
+class UserDefinedBitVectorFactory(symbol: Symbol, val bits: Int, val parameters: List<Symbol>) :
+    UserDefinedSortFactory(symbol) {
+  override fun build(
+      parameters: List<Sort>,
+      indices: List<NumeralIndex>,
+  ): BitVecSort {
+    require(parameters.size == this.parameters.size)
+    require(indices.isEmpty())
+
+    return bitvec
+  }
+
+  private val bitvec = BitVecFactory.build(bits)
+
+  override fun isInstanceOf(sort: Sort) = sort is BitVecSort && bits == sort.bits
+}
+
 object FloatingPointFactory : SortFactory {
 
-  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FPSort {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FloatingPointSort {
     require(parameters.isEmpty())
     require(indices.size == 2)
 
     return build(indices[0].numeral, indices[1].numeral)
   }
 
-  fun build(eb: Int, sb: Int) = FPSort(eb, sb)
+  fun build(eb: Int, sb: Int) = FloatingPointSort(eb, sb)
 
-  override fun isInstanceOf(sort: Sort) = (sort is FPSort)
+  override fun isInstanceOf(sort: Sort) = (sort is FloatingPointSort)
 
   override val isIndexed = true
   override val numIndicies = 2
 }
 
+class UserDefinedFloatingPointFactory(
+    symbol: Symbol,
+    val eb: Int,
+    val sb: Int,
+    val parameters: List<Symbol>,
+) : UserDefinedSortFactory(symbol) {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
+    require(parameters.size == this.parameters.size)
+    require(indices.isEmpty())
+
+    return sort
+  }
+
+  private val sort = FloatingPointSort(eb, sb)
+
+  override fun isInstanceOf(sort: Sort) =
+      sort is FloatingPointSort && sort.exponentBits == eb && sort.significantBits == sb
+}
+
 object Float16Factory : SortFactory {
 
-  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FPSort {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FloatingPointSort {
     require(parameters.isEmpty())
     require(indices.isEmpty())
 
@@ -408,7 +281,7 @@ object Float16Factory : SortFactory {
   fun build() = SMTFP16
 
   override fun isInstanceOf(sort: Sort) =
-      (sort is FPSort) && (sort.exponentBits == 5) && (sort.significantBits == 11)
+      (sort is FloatingPointSort) && (sort.exponentBits == 5) && (sort.significantBits == 11)
 
   override val isIndexed = false
   override val numIndicies = 0
@@ -416,7 +289,7 @@ object Float16Factory : SortFactory {
 
 object Float32Factory : SortFactory {
 
-  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FPSort {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FloatingPointSort {
     require(parameters.isEmpty())
     require(indices.isEmpty())
 
@@ -426,7 +299,7 @@ object Float32Factory : SortFactory {
   fun build() = SMTFP32
 
   override fun isInstanceOf(sort: Sort) =
-      (sort is FPSort) && (sort.exponentBits == 8) && (sort.significantBits == 24)
+      (sort is FloatingPointSort) && (sort.exponentBits == 8) && (sort.significantBits == 24)
 
   override val isIndexed = false
   override val numIndicies = 0
@@ -434,7 +307,7 @@ object Float32Factory : SortFactory {
 
 object Float64Factory : SortFactory {
 
-  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FPSort {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FloatingPointSort {
     require(parameters.isEmpty())
     require(indices.isEmpty())
 
@@ -444,7 +317,7 @@ object Float64Factory : SortFactory {
   fun build() = SMTFP64
 
   override fun isInstanceOf(sort: Sort) =
-      (sort is FPSort) && (sort.exponentBits == 11) && (sort.significantBits == 53)
+      (sort is FloatingPointSort) && (sort.exponentBits == 11) && (sort.significantBits == 53)
 
   override val isIndexed = false
   override val numIndicies = 0
@@ -452,7 +325,7 @@ object Float64Factory : SortFactory {
 
 object Float128Factory : SortFactory {
 
-  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FPSort {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): FloatingPointSort {
     require(parameters.isEmpty())
     require(indices.isEmpty())
 
@@ -462,7 +335,7 @@ object Float128Factory : SortFactory {
   fun build() = SMTFP128
 
   override fun isInstanceOf(sort: Sort) =
-      (sort is FPSort) && (sort.exponentBits == 15) && (sort.significantBits == 113)
+      (sort is FloatingPointSort) && (sort.exponentBits == 15) && (sort.significantBits == 113)
 
   override val isIndexed = false
   override val numIndicies = 0
@@ -476,12 +349,43 @@ object ArraySortFactory : SortFactory {
     return build(parameters[0], parameters[1])
   }
 
-  fun <A : Sort, B : Sort> build(X: A, Y: B) = SMTArray(X, Y)
+  fun <A : Sort, B : Sort> build(X: A, Y: B) = ArraySort(X, Y)
 
   override fun isInstanceOf(sort: Sort) = (sort is ArraySort<*, *>)
 
   override val isIndexed = false
   override val numIndicies = 0
+}
+
+class UserDefinedArrayFactory(
+    symbol: Symbol,
+    val parameters: List<Sort>,
+    val sortParameters: List<Symbol>,
+) : UserDefinedSortFactory(symbol) {
+  init {
+    require(parameters.size == 2)
+  }
+
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): ArraySort<*, *> {
+    require(parameters.size == sortParameters.size)
+    require(indices.isEmpty())
+
+    val mapping = (sortParameters zip parameters).toMap()
+
+    val actual =
+        this.parameters.map { sort ->
+          when (sort) {
+            is SortParameter -> mapping[sort.symbol]!!
+            else -> sort
+          }
+        }
+
+    return ArraySort(actual[0], actual[1])
+  }
+
+  override fun isInstanceOf(sort: Sort): Boolean {
+    TODO("Not yet implemented")
+  }
 }
 
 /**
@@ -569,6 +473,101 @@ class SortParameter(name: Symbol) : Sort(name) {
   override val theories = emptySet<Theories>()
 }
 
+abstract class UserDefinedSortFactory(val symbol: Symbol) : SortFactory {
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+class UserDefinedBoolFactory(symbol: Symbol, val parameters: List<Symbol>) :
+    UserDefinedSortFactory(symbol) {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
+    require(this.parameters.size == parameters.size)
+    require(indices.isEmpty())
+
+    return BoolSort
+  }
+
+  override fun isInstanceOf(sort: Sort) = sort is BoolSort && sort.definedSymbol == symbol
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+class UserDefinedRealFactory(symbol: Symbol, val parameters: List<Symbol>) :
+    UserDefinedSortFactory(symbol) {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
+    require(this.parameters.size == parameters.size)
+    require(indices.isEmpty())
+
+    return RealSort
+  }
+
+  override fun isInstanceOf(sort: Sort) = sort is RealSort && sort.definedSymbol == symbol
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+class UserDefinedIntFactory(symbol: Symbol, val parameters: List<Symbol>) :
+    UserDefinedSortFactory(symbol) {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
+    require(this.parameters.size == parameters.size)
+    require(indices.isEmpty())
+
+    return IntSort
+  }
+
+  override fun isInstanceOf(sort: Sort) = sort is IntSort && sort.definedSymbol == symbol
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+class UserDefinedStringFactory(symbol: Symbol, val parameters: List<Symbol>) :
+    UserDefinedSortFactory(symbol) {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
+    require(this.parameters.size == parameters.size)
+    require(indices.isEmpty())
+
+    return StringSort
+  }
+
+  override fun isInstanceOf(sort: Sort) = sort is StringSort && sort.definedSymbol == symbol
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+class UserDefinedRegLanFactory(symbol: Symbol, val parameters: List<Symbol>) :
+    UserDefinedSortFactory(symbol) {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
+    require(this.parameters.size == parameters.size)
+    require(indices.isEmpty())
+
+    return RegLanSort
+  }
+
+  override fun isInstanceOf(sort: Sort) = sort is RegLanSort && sort.definedSymbol == symbol
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
+class UserDefinedRoundingModeFactory(symbol: Symbol, val parameters: List<Symbol>) :
+    UserDefinedSortFactory(symbol) {
+  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
+    require(this.parameters.size == parameters.size)
+    require(indices.isEmpty())
+
+    return RoundingModeSort
+  }
+
+  override fun isInstanceOf(sort: Sort) = sort is RoundingModeSort && sort.definedSymbol == symbol
+
+  override val isIndexed = false
+  override val numIndicies = 0
+}
+
 class UserDeclaredSortFactory(val symbol: Symbol, val arity: Int) : SortFactory {
   override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
     require(parameters.size == arity)
@@ -587,46 +586,8 @@ class UserDeclaredSortFactory(val symbol: Symbol, val arity: Int) : SortFactory 
   override val numIndicies = 0
 }
 
-open class UserDeclaredSort(name: Symbol, override val parameters: List<Sort>) : Sort(name) {
+class UserDeclaredSort(name: Symbol, override val parameters: List<Sort>) : Sort(name) {
   override val theories = emptySet<Theories>()
-}
-
-class UserDefinedUserDeclaredFactory(
-    symbol: Symbol,
-    val parameters: List<Symbol>,
-    val sort: UserDeclaredSortFactory,
-) : UserDefinedSortFactory(symbol) {
-  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
-    require(this.parameters.size == parameters.size)
-    require(indices.isEmpty())
-
-    return UserDefinedUserDeclaredSort(symbol, sort.symbol, parameters)
-  }
-
-  override fun isInstanceOf(sort: Sort) =
-      sort is UserDefinedRegLanSort && sort.definedSymbol == symbol
-
-  override val isIndexed = false
-  override val numIndicies = 0
-}
-
-class UserDefinedUserDeclaredSort(
-    override val definedSymbol: Symbol,
-    name: Symbol,
-    parameters: List<Sort>,
-) : UserDeclaredSort(name, parameters) {
-  override fun toString() = definedSymbol.toString()
-
-  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(quotingRule, useIterative)
-
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(builder, quotingRule, useIterative)
-}
-
-abstract class UserDefinedSortFactory(val symbol: Symbol) : SortFactory {
-  override val isIndexed = false
-  override val numIndicies = 0
 }
 
 class SortParameterFactory(val symbol: Symbol) : SortFactory {
@@ -640,102 +601,8 @@ class SortParameterFactory(val symbol: Symbol) : SortFactory {
   override val numIndicies = 0
 }
 
-class UserDefinedBitVectorFactory(symbol: Symbol, val bits: Int, val parameters: List<Symbol>) :
-    UserDefinedSortFactory(symbol) {
-  override fun build(
-      parameters: List<Sort>,
-      indices: List<NumeralIndex>,
-  ): UserDefinedBitVectorSort {
-    require(parameters.size == this.parameters.size)
-    require(indices.isEmpty())
-
-    return bitvec
-  }
-
-  private val bitvec = UserDefinedBitVectorSort(symbol, bits)
-
-  override fun isInstanceOf(sort: Sort) = sort is BitVecSort && bits == sort.bits
-}
-
-class UserDefinedBitVectorSort(override val definedSymbol: Symbol, bits: Int) :
-    BitVecSort(bits.idx()) {
-  override fun toString() = definedSymbol.toString()
-
-  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(quotingRule, useIterative)
-
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(builder, quotingRule, useIterative)
-}
-
-class UserDefinedFloatingPointFactory(
-    symbol: Symbol,
-    val eb: Int,
-    val sb: Int,
-    val parameters: List<Symbol>,
-) : UserDefinedSortFactory(symbol) {
-  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): Sort {
-    require(parameters.size == this.parameters.size)
-    require(indices.isEmpty())
-
-    return sort
-  }
-
-  private val sort = UserDefinedFloatingPointSort(symbol, eb, sb)
-
-  override fun isInstanceOf(sort: Sort) =
-      sort is UserDefinedFloatingPointSort && sort.exponentBits == eb && sort.significantBits == sb
-}
-
-class UserDefinedFloatingPointSort(override val definedSymbol: Symbol, eb: Int, sb: Int) :
-    FPSort(eb.idx(), sb.idx()) {
-  override fun toString() = definedSymbol.toString()
-
-  override fun toSMTString(quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(quotingRule, useIterative)
-
-  override fun toSMTString(builder: Appendable, quotingRule: QuotingRule, useIterative: Boolean) =
-      definedSymbol.toSMTString(builder, quotingRule, useIterative)
-}
-
-class UserDefinedArrayFactory(
-    symbol: Symbol,
-    val parameters: List<Sort>,
-    val sortParameters: List<Symbol>,
-) : UserDefinedSortFactory(symbol) {
-  init {
-    require(parameters.size == 2)
-  }
-
-  override fun build(parameters: List<Sort>, indices: List<NumeralIndex>): ArraySort<*, *> {
-    require(parameters.size == sortParameters.size)
-    require(indices.isEmpty())
-
-    val mapping = (sortParameters zip parameters).toMap()
-
-    val actual =
-        this.parameters.map { sort ->
-          when (sort) {
-            is SortParameter -> mapping[sort.symbol]!!
-            else -> sort
-          }
-        }
-
-    return UserDefinedArraySort(symbol, actual[0], actual[1])
-  }
-
-  override fun isInstanceOf(sort: Sort): Boolean {
-    TODO("Not yet implemented")
-  }
-}
-
-class UserDefinedArraySort<X : Sort, Y : Sort>(override val definedSymbol: Symbol, x: X, y: Y) :
-    ArraySort<X, Y>(x, y) {
-  override fun toString() = definedSymbol.toString()
-}
-
 /** Default implementation of Array sort. */
-sealed class ArraySort<out X : Sort, out Y : Sort>(val x: X, val y: Y) : Sort("Array".toSymbol()) {
+class ArraySort<out X : Sort, out Y : Sort>(val x: X, val y: Y) : Sort("Array".toSymbol()) {
   override val parameters = listOf(x, y)
 
   override fun toString(): String = "(Array $x $y)"
@@ -743,11 +610,10 @@ sealed class ArraySort<out X : Sort, out Y : Sort>(val x: X, val y: Y) : Sort("A
   override val theories = ARRAYS_EX_MARKER_SET
 }
 
-/** Base class for all ArraySorts. */
-class SMTArray<out X : Sort, out Y : Sort>(x: X, y: Y) : ArraySort<X, Y>(x, y)
-
+// TODO the class is open for now to allow the SymbolicBitVec sub class might find a better solution
+// in the future
 /** Bitvector sort with [bits] length. */
-sealed class BitVecSort(index: Index) : Sort("BitVec") {
+open class BitVecSort(index: Index) : Sort("BitVec") {
   companion object {
     /**
      * Get BitVec sort with the given number of [bits].
@@ -785,53 +651,37 @@ sealed class BitVecSort(index: Index) : Sort("BitVec") {
   internal fun isSymbolic() = (indices.single() is SymbolIndex)
 }
 
-/** Default implementation of bitvectors in smt. */
-class SMTBitVec(bits: Int) : BitVecSort(bits.idx())
-
 internal class SymbolicBitVec(bits: String) : BitVecSort(bits.idx())
 
 /** Bool sort. */
-sealed class BoolSort : Sort("Bool") {
+object BoolSort : Sort("Bool") {
   override val theories = CORE_MARKER_SET
 }
 
-object SMTBool : BoolSort()
-
 /** Int sort. */
-sealed class IntSort : Sort("Int") {
+object IntSort : Sort("Int") {
   override val theories = setOf(Theories.INTS, Theories.REALS_INTS, Theories.STRINGS)
 }
 
-object SMTInt : IntSort()
-
 /** Real sort. */
-sealed class RealSort : Sort("Real") {
+object RealSort : Sort("Real") {
   override val theories = REALS_REALS_INTS_MARKER_SET.plus(FLOATING_POINT_MARKER_SET)
 }
 
-object SMTReal : RealSort()
-
 /** String sort. */
-sealed class StringSort : Sort("String") {
+object StringSort : Sort("String") {
   override val theories = STRINGS_MARKER_SET
 }
-
-object SMTString : StringSort()
 
 /** Regular expression sort. */
-sealed class RegLanSort : Sort("RegLan") {
+object RegLanSort : Sort("RegLan") {
   override val theories = STRINGS_MARKER_SET
 }
 
-object SMTRegLan : RegLanSort()
-
 /** RoundingMode sort object. */
-sealed class RoundingModeSort : Sort("RoundingMode") {
+object RoundingModeSort : Sort("RoundingMode") {
   override val theories = FLOATING_POINT_MARKER_SET
 }
-
-/** Default implementation of rounding mode sort. */
-object SMTRoundingMode : RoundingModeSort()
 
 /**
  * FloatingPoint sort with any positive number of bits.
@@ -841,11 +691,12 @@ object SMTRoundingMode : RoundingModeSort()
  * @param eb exponent bits
  * @param sb significant bits
  */
-sealed class FPSort(eb: Index, sb: Index) : Sort("FloatingPoint") {
+open class FloatingPointSort(eb: Index, sb: Index) : Sort("FloatingPoint") {
   companion object {
-    operator fun invoke(eb: Int, sb: Int): FPSort = SMTFloatingPoint(eb, sb)
+    operator fun invoke(eb: Int, sb: Int): FloatingPointSort = FloatingPointSort(eb.idx(), sb.idx())
 
-    operator fun invoke(eb: SymbolIndex, sb: SymbolIndex): FPSort = SymbolicFloatingPoint(eb, sb)
+    operator fun invoke(eb: SymbolIndex, sb: SymbolIndex): FloatingPointSort =
+        SymbolicFloatingPoint(eb, sb)
   }
 
   override val indices = listOf(eb, sb)
@@ -871,7 +722,7 @@ sealed class FPSort(eb: Index, sb: Index) : Sort("FloatingPoint") {
   override fun equals(other: Any?): Boolean =
       when {
         this === other -> true
-        other !is FPSort -> false
+        other !is FloatingPointSort -> false
         else ->
             this.exponentBits == other.exponentBits && this.significantBits == other.significantBits
       }
@@ -893,7 +744,7 @@ sealed class FPSort(eb: Index, sb: Index) : Sort("FloatingPoint") {
 }
 
 /** Standard 16-bit FloatingPoint sort. */
-object SMTFP16 : FPSort(5.idx(), 11.idx()) {
+object SMTFP16 : FloatingPointSort(5.idx(), 11.idx()) {
   override val definedSymbol: Symbol = "Float16".toSymbol()
 
   override fun toString() = definedSymbol.toString()
@@ -906,7 +757,7 @@ object SMTFP16 : FPSort(5.idx(), 11.idx()) {
 }
 
 /** Standard 32-bit FloatingPoint sort. */
-object SMTFP32 : FPSort(8.idx(), 24.idx()) {
+object SMTFP32 : FloatingPointSort(8.idx(), 24.idx()) {
   override val definedSymbol: Symbol = "Float32".toSymbol()
 
   override fun toString() = definedSymbol.toString()
@@ -919,7 +770,7 @@ object SMTFP32 : FPSort(8.idx(), 24.idx()) {
 }
 
 /** Standard 64-bit FloatingPoint sort. */
-object SMTFP64 : FPSort(11.idx(), 53.idx()) {
+object SMTFP64 : FloatingPointSort(11.idx(), 53.idx()) {
   override val definedSymbol: Symbol = "Float64".toSymbol()
 
   override fun toString() = definedSymbol.toString()
@@ -932,7 +783,7 @@ object SMTFP64 : FPSort(11.idx(), 53.idx()) {
 }
 
 /** Standard 128-bit FloatingPoint sort. */
-object SMTFP128 : FPSort(15.idx(), 113.idx()) {
+object SMTFP128 : FloatingPointSort(15.idx(), 113.idx()) {
   override val definedSymbol: Symbol = "Float128".toSymbol()
 
   override fun toString() = definedSymbol.toString()
@@ -944,10 +795,7 @@ object SMTFP128 : FPSort(15.idx(), 113.idx()) {
       definedSymbol.toSMTString(builder, quotingRule, useIterative)
 }
 
-/** Default floating point sort implementation. */
-class SMTFloatingPoint(eb: Int, sb: Int) : FPSort(eb.idx(), sb.idx())
-
-internal class SymbolicFloatingPoint(eb: SymbolIndex, sb: SymbolIndex) : FPSort(eb, sb)
+internal class SymbolicFloatingPoint(eb: SymbolIndex, sb: SymbolIndex) : FloatingPointSort(eb, sb)
 
 /** Common base class for IntSort and RealSort used by common operations in Ints_Reals theory. */
 sealed class NumeralSort(name: String) : Sort(name)

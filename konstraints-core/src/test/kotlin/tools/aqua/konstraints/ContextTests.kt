@@ -30,12 +30,12 @@ import tools.aqua.konstraints.smt.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ContextTests {
-  val boolFunc1 = UserDeclaredSMTFunction0("A".toSymbol(), SMTBool)
-  val boolFunc2 = UserDeclaredSMTFunction2("B".toSymbol(), SMTBool, BitVecSort(8), BitVecSort(8))
+  val boolFunc1 = UserDeclaredSMTFunction0("A".toSymbol(), BoolSort)
+  val boolFunc2 = UserDeclaredSMTFunction2("B".toSymbol(), BoolSort, BitVecSort(8), BitVecSort(8))
   val boolFunc2Copy =
-      UserDeclaredSMTFunction2("B".toSymbol(), SMTBool, BitVecSort(8), BitVecSort(8))
+      UserDeclaredSMTFunction2("B".toSymbol(), BoolSort, BitVecSort(8), BitVecSort(8))
   val boolFunc2Overloaded =
-      UserDeclaredSMTFunction2("B".toSymbol(), SMTBool, BitVecSort(16), BitVecSort(16))
+      UserDeclaredSMTFunction2("B".toSymbol(), BoolSort, BitVecSort(16), BitVecSort(16))
 
   @ParameterizedTest
   @MethodSource("getContextAndNames")
@@ -76,16 +76,16 @@ class ContextTests {
 
   private fun getContextAndIllegalNameFunctions(): Stream<Arguments> =
       Stream.of(
-          arguments(createContext(), UserDeclaredSMTFunction0("and".toSymbol(), SMTBool)),
-          arguments(createContext(), UserDeclaredSMTFunction0("true".toSymbol(), SMTBool)),
+          arguments(createContext(), UserDeclaredSMTFunction0("and".toSymbol(), BoolSort)),
+          arguments(createContext(), UserDeclaredSMTFunction0("true".toSymbol(), BoolSort)),
           arguments(
               createContext(),
-              UserDeclaredSMTFunction0("distinct".toSymbol(), SMTBool),
+              UserDeclaredSMTFunction0("distinct".toSymbol(), BoolSort),
           ),
-          arguments(createContext(), UserDeclaredSMTFunction0("bvadd".toSymbol(), SMTBool)),
+          arguments(createContext(), UserDeclaredSMTFunction0("bvadd".toSymbol(), BoolSort)),
           arguments(
               createContext(),
-              UserDeclaredSMTFunction0("extract".toSymbol(), SMTBool),
+              UserDeclaredSMTFunction0("extract".toSymbol(), BoolSort),
           ),
       )
 
@@ -110,7 +110,7 @@ class ContextTests {
 
   private fun getContextAndNewFunction() =
       Stream.of(
-          arguments(createContext(), UserDeclaredSMTFunction0("C".toSymbol(), SMTBool)),
+          arguments(createContext(), UserDeclaredSMTFunction0("C".toSymbol(), BoolSort)),
       )
 
   @ParameterizedTest
@@ -167,17 +167,17 @@ class ContextTests {
       Stream.of(
           arguments(
               createContext(),
-              UserDeclaredSMTFunction0("|Quoted|".toSymbol(), SMTBool),
+              UserDeclaredSMTFunction0("|Quoted|".toSymbol(), BoolSort),
               "Quoted",
           ),
           arguments(
               createContext(),
-              UserDeclaredSMTFunction0("|Quoted|".toSymbol(), SMTBool),
+              UserDeclaredSMTFunction0("|Quoted|".toSymbol(), BoolSort),
               "|Quoted|",
           ),
           arguments(
               createContext(),
-              UserDeclaredSMTFunction0("Unquoted".toSymbol(), SMTBool),
+              UserDeclaredSMTFunction0("Unquoted".toSymbol(), BoolSort),
               "|Unquoted|",
           ),
       )

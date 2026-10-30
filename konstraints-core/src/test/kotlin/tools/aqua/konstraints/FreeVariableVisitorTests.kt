@@ -33,9 +33,9 @@ import tools.aqua.konstraints.dsl.not
 import tools.aqua.konstraints.dsl.smt
 import tools.aqua.konstraints.smt.Assert
 import tools.aqua.konstraints.smt.BV
+import tools.aqua.konstraints.smt.BitVecSort
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.QF_BV
-import tools.aqua.konstraints.smt.SMTBitVec
 import tools.aqua.konstraints.smt.Symbol
 import tools.aqua.konstraints.smt.toSymbol
 import tools.aqua.konstraints.visitors.FreeVariables
@@ -60,7 +60,7 @@ class FreeVariableVisitorTests {
       Stream.of(
           arguments(
               smt(QF_BV) {
-                    val s by declaringConst(SMTBitVec(32))
+                    val s by declaringConst(BitVecSort(32))
                     assert { not(s bvand s eq s) }
                   }
                   .commands
@@ -71,8 +71,8 @@ class FreeVariableVisitorTests {
           ),
           arguments(
               smt(QF_BV) {
-                    val s by declaringConst(SMTBitVec(32))
-                    val t by declaringConst(SMTBitVec(32))
+                    val s by declaringConst(BitVecSort(32))
+                    val t by declaringConst(BitVecSort(32))
                     assert { not((s bvor (t bvor t)) eq (s bvor t)) }
                   }
                   .commands
@@ -83,9 +83,11 @@ class FreeVariableVisitorTests {
           ),
           arguments(
               smt(BV) {
-                    val s by declaringConst(SMTBitVec(32))
-                    val t by declaringConst(SMTBitVec(32))
-                    assert { forall(SMTBitVec(32)) { x -> not((s bvor (x bvor x)) eq (s bvor t)) } }
+                    val s by declaringConst(BitVecSort(32))
+                    val t by declaringConst(BitVecSort(32))
+                    assert {
+                      forall(BitVecSort(32)) { x -> not((s bvor (x bvor x)) eq (s bvor t)) }
+                    }
                   }
                   .commands
                   .filterIsInstance<Assert>()

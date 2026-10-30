@@ -26,7 +26,7 @@ interface VisitByType<T> {
       when (expr.sort) {
         is BoolSort -> visit(expr.cast<BoolSort>())
         is BitVecSort -> visit(expr.cast<BitVecSort>())
-        is FPSort -> visit(expr.cast<FPSort>())
+        is FloatingPointSort -> visit(expr.cast<FloatingPointSort>())
         is RoundingModeSort -> visit(expr.cast<RoundingModeSort>())
         is IntSort -> visit(expr.cast<IntSort>())
         is RealSort -> visit(expr.cast<RealSort>())
@@ -497,9 +497,9 @@ interface VisitByType<T> {
   @JvmName("visitUserDefinedExpressionRealSort") fun visit(expr: UserDefinedExpression<RealSort>): T
 
   @JvmName("visitExprFPSort")
-  fun visit(expr: Expression<FPSort>): T =
+  fun visit(expr: Expression<FloatingPointSort>): T =
       when (expr) {
-        is AnnotatedExpression<FPSort> -> visit(expr)
+        is AnnotatedExpression<FloatingPointSort> -> visit(expr)
         is LocalExpression -> visit(expr)
         is LetExpression -> visit(expr)
         is BoundVariable -> visit(expr)
@@ -527,7 +527,7 @@ interface VisitByType<T> {
         is RealToFP -> visit(expr)
         is SBitVecToFP -> visit(expr)
         is UBitVecToFP -> visit(expr)
-        is ArraySelect<*, FPSort> -> visit(expr)
+        is ArraySelect<*, FloatingPointSort> -> visit(expr)
         is UserDeclaredExpression -> visit(expr)
         is UserDefinedExpression -> visit(expr)
         else ->
@@ -536,15 +536,16 @@ interface VisitByType<T> {
             )
       }
 
-  @JvmName("visitAnnotatedExpressionFPSort") fun visit(expr: AnnotatedExpression<FPSort>): T
+  @JvmName("visitAnnotatedExpressionFPSort")
+  fun visit(expr: AnnotatedExpression<FloatingPointSort>): T
 
-  @JvmName("visitLocalExpressionFPSort") fun visit(expr: LocalExpression<FPSort>): T
+  @JvmName("visitLocalExpressionFPSort") fun visit(expr: LocalExpression<FloatingPointSort>): T
 
-  @JvmName("visitLetExpressionFPSort") fun visit(expr: LetExpression<FPSort>): T
+  @JvmName("visitLetExpressionFPSort") fun visit(expr: LetExpression<FloatingPointSort>): T
 
-  @JvmName("visitBoundVariableFPSort") fun visit(expr: BoundVariable<FPSort>): T
+  @JvmName("visitBoundVariableFPSort") fun visit(expr: BoundVariable<FloatingPointSort>): T
 
-  @JvmName("visitIteFPSort") fun visit(expr: Ite<FPSort>): T
+  @JvmName("visitIteFPSort") fun visit(expr: Ite<FloatingPointSort>): T
 
   fun visit(expr: FloatingPointLiteral): T
 
@@ -592,11 +593,13 @@ interface VisitByType<T> {
 
   fun visit(expr: UBitVecToFP): T
 
-  @JvmName("visitArraySelectFPSort") fun visit(expr: ArraySelect<*, FPSort>): T
+  @JvmName("visitArraySelectFPSort") fun visit(expr: ArraySelect<*, FloatingPointSort>): T
 
-  @JvmName("visitUserDeclaredExpressionFPSort") fun visit(expr: UserDeclaredExpression<FPSort>): T
+  @JvmName("visitUserDeclaredExpressionFPSort")
+  fun visit(expr: UserDeclaredExpression<FloatingPointSort>): T
 
-  @JvmName("visitUserDefinedExpressionFPSort") fun visit(expr: UserDefinedExpression<FPSort>): T
+  @JvmName("visitUserDefinedExpressionFPSort")
+  fun visit(expr: UserDefinedExpression<FloatingPointSort>): T
 
   @JvmName("visitExprRoundingModeSort")
   fun visit(expr: Expression<RoundingModeSort>): T =

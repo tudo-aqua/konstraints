@@ -32,7 +32,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.parser.SMTScriptParser
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.QuotingRule
-import tools.aqua.konstraints.smt.SMTRegLan
+import tools.aqua.konstraints.smt.RegLanSort
 import tools.aqua.konstraints.smt.Theories
 
 @Disabled
@@ -590,7 +590,7 @@ fun getKey(expr: Expression<*>): String {
     return "Core"
   } else if (expr.theories.contains(Theories.INTS)) {
     return "Int"
-  } else if (expr.sort is SMTRegLan) {
+  } else if (expr.sort is RegLanSort) {
     return "RegLan"
   } else {
     return "String"

@@ -33,6 +33,7 @@ import tools.aqua.konstraints.smt.ForallExpression
 import tools.aqua.konstraints.smt.FreeExpression
 import tools.aqua.konstraints.smt.HomogenousExpression
 import tools.aqua.konstraints.smt.IntLiteral
+import tools.aqua.konstraints.smt.IntSort
 import tools.aqua.konstraints.smt.Ite
 import tools.aqua.konstraints.smt.LetExpression
 import tools.aqua.konstraints.smt.LocalExpression
@@ -40,7 +41,6 @@ import tools.aqua.konstraints.smt.Model
 import tools.aqua.konstraints.smt.MutableSMTProgram
 import tools.aqua.konstraints.smt.NAryExpression
 import tools.aqua.konstraints.smt.RealLiteral
-import tools.aqua.konstraints.smt.SMTInt
 import tools.aqua.konstraints.smt.SelectorExpression
 import tools.aqua.konstraints.smt.StringLiteral
 import tools.aqua.konstraints.smt.TernaryExpression
@@ -128,7 +128,7 @@ fun test(model: Model) {
   }
 
   val program = MutableSMTProgram()
-  val def = program.declareConst("x".toSymbol(), SMTInt)
+  val def = program.declareConst("x".toSymbol(), IntSort)
 
   model.getConstantValue(def)
 }

@@ -30,7 +30,7 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.junit.jupiter.params.provider.ValueSource
 import tools.aqua.konstraints.smt.BitVecFactory
 import tools.aqua.konstraints.smt.BitVecSort
-import tools.aqua.konstraints.smt.SMTBool
+import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Sort
 
 /*
@@ -46,7 +46,7 @@ class SortTests {
   }
 
   private fun getSortsAndTheirSerialization(): Stream<Arguments> {
-    return Stream.of(arguments("Bool", SMTBool), arguments("(_ BitVec 32)", BitVecSort(32)))
+    return Stream.of(arguments("Bool", BoolSort), arguments("(_ BitVec 32)", BitVecSort(32)))
   }
 
   @ParameterizedTest

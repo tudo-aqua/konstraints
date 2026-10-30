@@ -184,9 +184,9 @@ data class FloatingPointLiteral(
     val exponent: Expression<BitVecSort>,
     val significand: Expression<BitVecSort>,
 ) :
-    Literal<FPSort>(
+    Literal<FloatingPointSort>(
         LiteralString("(fp $sign $exponent $significand)"),
-        FPSort(exponent.sort.bits, significand.sort.bits + 1),
+        FloatingPointSort(exponent.sort.bits, significand.sort.bits + 1),
     ) {
 
   init {
@@ -248,7 +248,7 @@ data class FloatingPointLiteral(
   override val theories: Set<Theories>
     get() = theoriesSet
 
-  override fun copy(children: List<Expression<*>>): Expression<FPSort> = this
+  override fun copy(children: List<Expression<*>>): Expression<FloatingPointSort> = this
 
   override fun equals(other: Any?) =
       if (this === other) true
@@ -290,7 +290,7 @@ data class FloatingPointLiteral(
  * (NUMERAL Int)
  */
 class IntLiteral(val value: BigInteger) :
-    Literal<IntSort>(LiteralString(value.toString()), SMTInt) {
+    Literal<IntSort>(LiteralString(value.toString()), IntSort) {
   override val theories = INTS_REALS_INTS_MARKER_SET + STRINGS_MARKER_SET
 
   constructor(value: Byte) : this(value.toInt().toBigInteger())
@@ -315,7 +315,7 @@ class IntLiteral(val value: BigInteger) :
  * (NUMERAL Real) (DECIMAL Real)
  */
 class RealLiteral(val value: BigDecimal) :
-    Literal<RealSort>(LiteralString(value.toPlainString()), SMTReal) {
+    Literal<RealSort>(LiteralString(value.toPlainString()), RealSort) {
   override val theories = REALS_REALS_INTS_MARKER_SET.plus(FLOATING_POINT_MARKER_SET)
 
   constructor(value: Byte) : this(value.toInt().toBigDecimal())
@@ -334,7 +334,7 @@ class RealLiteral(val value: BigDecimal) :
 
   constructor(value: String) : this(value.toBigDecimal())
 
-  override val sort: RealSort = SMTReal
+  override val sort: RealSort = RealSort
 
   override fun toString(): String = value.toPlainString()
 
@@ -357,7 +357,7 @@ class RealLiteral(val value: BigDecimal) :
  *             | A | B | C | D | E | F
  * ```
  */
-class CharLiteral(val value: String) : Literal<StringSort>(LiteralString("char"), SMTString) {
+class CharLiteral(val value: String) : Literal<StringSort>(LiteralString("char"), StringSort) {
   override val theories = STRINGS_MARKER_SET
 
   val character = Char(Integer.parseInt(value.substring(2)))
@@ -370,7 +370,7 @@ class CharLiteral(val value: String) : Literal<StringSort>(LiteralString("char")
 }
 
 class StringLiteral(val value: String) :
-    Literal<StringSort>(LiteralString("\"$value\""), SMTString) {
+    Literal<StringSort>(LiteralString("\"$value\""), StringSort) {
   override val theories = STRINGS_MARKER_SET
 
   // use symbol.toString here to get the unquoted string literal

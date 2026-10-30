@@ -187,7 +187,7 @@ class Context {
    * @throws [IllegalStateException] if the context is currently in any binder state (e.g. forall,
    *   exists etc.)
    */
-  fun defineSort(def: DefineSort) = defineSort(def.name, def.sortParameters, def.sort)
+  // fun defineSort(def: DefineSort) = defineSort(def.name, def.sortParameters, def.sort)
 
   /**
    * (define-sort [name] ([sortParameters]) [sort]).
@@ -199,14 +199,19 @@ class Context {
    */
   fun defineSort(name: Symbol, parameters: List<Symbol>, sort: Sort) =
       when (sort) {
-        is BoolSort -> defineSort(name, UserDefinedBoolFactory(name, parameters))
+        is BoolSort ->
+            defineSort(
+                name,
+                BoolFactory,
+            ) // TODO this might cause problems when defining a sort with parameters that are
+        // unused, either needs a wrapper or just declare this none sense illegal
         is IntSort -> defineSort(name, UserDefinedIntFactory(name, parameters))
         is RealSort -> defineSort(name, UserDefinedRealFactory(name, parameters))
         is StringSort -> defineSort(name, UserDefinedStringFactory(name, parameters))
         is RegLanSort -> defineSort(name, UserDefinedRegLanFactory(name, parameters))
         is RoundingModeSort -> defineSort(name, UserDefinedRoundingModeFactory(name, parameters))
         is BitVecSort -> defineSort(name, UserDefinedBitVectorFactory(name, sort.bits, parameters))
-        is FPSort ->
+        is FloatingPointSort ->
             defineSort(
                 name,
                 UserDefinedFloatingPointFactory(
@@ -221,11 +226,7 @@ class Context {
         else ->
             defineSort(
                 name,
-                UserDefinedUserDeclaredFactory(
-                    name,
-                    parameters,
-                    getSort(sort.symbol) as UserDeclaredSortFactory,
-                ),
+                UserDeclaredSortFactory(sort.symbol, parameters.size),
             )
       }
 

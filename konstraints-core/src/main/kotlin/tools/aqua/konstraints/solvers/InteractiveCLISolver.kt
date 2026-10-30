@@ -226,7 +226,7 @@ open class InteractiveCLISolver(
     processResponse(response)
   }
 
-  override fun visit(defineSort: DefineSort) {
+  override fun visit(defineSort: DefineSort<*>) {
     writeCommand(defineSort)
     val response = ResponseParser.parseGeneralResponse(reader)
 

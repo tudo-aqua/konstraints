@@ -88,9 +88,9 @@ object OrderSensitiveVisitor : VisitByStructure<MutableList<Symbol>> {
 class VisitorTests {
   val program =
       smt(QF_UFBV) {
-        val func by declaring(SMTBitVec(8), SMTBitVec(8), SMTBitVec(8))
-        val foo by declaring(SMTBitVec(8))
-        val bar by declaring(SMTBitVec(8))
+        val func by declaring(BitVecSort(8), BitVecSort(8), BitVecSort(8))
+        val foo by declaring(BitVecSort(8))
+        val bar by declaring(BitVecSort(8))
 
         assert { func(foo(), func(foo(), bar())) eq func(func(foo(), bar()), foo()) }
       }

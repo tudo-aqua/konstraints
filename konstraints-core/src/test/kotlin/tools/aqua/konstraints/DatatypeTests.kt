@@ -24,9 +24,9 @@ import org.junit.jupiter.api.assertDoesNotThrow
 import tools.aqua.konstraints.parser.SMTScriptParser
 import tools.aqua.konstraints.smt.ConstructorDecl
 import tools.aqua.konstraints.smt.Datatype
+import tools.aqua.konstraints.smt.IntSort
 import tools.aqua.konstraints.smt.MutableSMTProgram
 import tools.aqua.konstraints.smt.QuotingRule
-import tools.aqua.konstraints.smt.SMTInt
 import tools.aqua.konstraints.smt.SelectorDecl
 import tools.aqua.konstraints.smt.toSymbol
 
@@ -58,7 +58,7 @@ class DatatypeTests {
                 ConstructorDecl(
                     "insert".toSymbol(),
                     listOf(
-                        SelectorDecl("head".toSymbol(), SMTInt),
+                        SelectorDecl("head".toSymbol(), IntSort),
                         SelectorDecl("tail".toSymbol(), IntList),
                     ),
                 ),

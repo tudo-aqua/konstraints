@@ -284,11 +284,11 @@ data class Model(val context: ModelContext, val definitions: Map<Symbol, Functio
     return term
   }
 
-  fun getConstant(func: SMTFunction<FPSort>): FloatingPointLiteral {
+  fun getConstant(func: SMTFunction<FloatingPointSort>): FloatingPointLiteral {
     return getConstant(getDefinition(func).term)
   }
 
-  fun getConstant(term: Expression<FPSort>): FloatingPointLiteral {
+  fun getConstant(term: Expression<FloatingPointSort>): FloatingPointLiteral {
     require(term is FloatingPointLiteral)
 
     return term
@@ -323,16 +323,16 @@ data class Model(val context: ModelContext, val definitions: Map<Symbol, Functio
   fun getConstantValue(term: Expression<RealSort>) = getConstant(term).value
 
   @JvmName("getConstantValueFloat")
-  fun getConstantFloatValue(func: SMTFunction<FPSort>) = getConstant(func).asFloat()
+  fun getConstantFloatValue(func: SMTFunction<FloatingPointSort>) = getConstant(func).asFloat()
 
   @JvmName("getConstantValueFloat")
-  fun getConstantFloatValue(term: Expression<FPSort>) = getConstant(term).asFloat()
+  fun getConstantFloatValue(term: Expression<FloatingPointSort>) = getConstant(term).asFloat()
 
   @JvmName("getConstantValueDouble")
-  fun getConstantDoubleValue(func: SMTFunction<FPSort>) = getConstant(func).asDouble()
+  fun getConstantDoubleValue(func: SMTFunction<FloatingPointSort>) = getConstant(func).asDouble()
 
   @JvmName("getConstantValueDouble")
-  fun getConstantDoubleValue(term: Expression<FPSort>) = getConstant(term).asDouble()
+  fun getConstantDoubleValue(term: Expression<FloatingPointSort>) = getConstant(term).asDouble()
 
   @JvmName("getConstantValueStringSort")
   fun getConstantValue(func: SMTFunction<StringSort>) = getConstant(func).value
