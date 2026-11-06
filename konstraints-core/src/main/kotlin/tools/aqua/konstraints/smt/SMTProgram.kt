@@ -146,9 +146,6 @@ interface PushContext {
 
   /** Declare sort (declare-sort [name] [arity]) */
   fun declareSort(name: Symbol, arity: Int)
-
-  /** Define sort (declare-sort [name] ([parameters]) [sort]) */
-  fun defineSort(name: Symbol, parameters: List<Symbol>, sort: Sort)
 }
 
 /** Base class for all types of smt program. */
@@ -529,11 +526,6 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
   override fun declareSort(name: Symbol, arity: Int) {
     context.declareSort(name, arity)
     _commands.add(DeclareSort(name, arity))
-  }
-
-  override fun defineSort(name: Symbol, parameters: List<Symbol>, sort: Sort) {
-    context.defineSort(name, parameters, sort)
-    _commands.add(DefineSort(name, parameters, sort))
   }
 
   /**

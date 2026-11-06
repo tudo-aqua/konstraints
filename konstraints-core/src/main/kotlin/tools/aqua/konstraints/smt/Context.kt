@@ -33,6 +33,7 @@ class CurrentContext {
   // TODO might split this into theory and user functions/sorts
   val functions = mutableMapOf<Symbol, SMTFunction<*>>()
   val sorts = mutableMapOf<Symbol, SortFactory>()
+  internal val definedSorts = mutableMapOf<Symbol, UserDefinedSortFactory<*>>()
 }
 
 /** Manages all legal smt function and sort symbols by modeling smts sort and function stack. */
@@ -180,57 +181,6 @@ class Context {
   }
 
   /**
-   * (define-sort [def.name] ([def.sortParameters]) [def.sort]).
-   *
-   * @return newly constructed [SortFactory]
-   * @throws [IllegalArgumentException] if a sort with name [symbol] is already present
-   * @throws [IllegalStateException] if the context is currently in any binder state (e.g. forall,
-   *   exists etc.)
-   */
-  // fun defineSort(def: DefineSort) = defineSort(def.name, def.sortParameters, def.sort)
-
-  /**
-   * (define-sort [name] ([sortParameters]) [sort]).
-   *
-   * @return newly constructed [SortFactory]
-   * @throws [IllegalArgumentException] if a sort with name [symbol] is already present
-   * @throws [IllegalStateException] if the context is currently in any binder state (e.g. forall,
-   *   exists etc.)
-   */
-  fun defineSort(name: Symbol, parameters: List<Symbol>, sort: Sort) =
-      when (sort) {
-        is BoolSort ->
-            defineSort(
-                name,
-                BoolFactory,
-            ) // TODO this might cause problems when defining a sort with parameters that are
-        // unused, either needs a wrapper or just declare this none sense illegal
-        is IntSort -> defineSort(name, UserDefinedIntFactory(name, parameters))
-        is RealSort -> defineSort(name, UserDefinedRealFactory(name, parameters))
-        is StringSort -> defineSort(name, UserDefinedStringFactory(name, parameters))
-        is RegLanSort -> defineSort(name, UserDefinedRegLanFactory(name, parameters))
-        is RoundingModeSort -> defineSort(name, UserDefinedRoundingModeFactory(name, parameters))
-        is BitVecSort -> defineSort(name, UserDefinedBitVectorFactory(name, sort.bits, parameters))
-        is FloatingPointSort ->
-            defineSort(
-                name,
-                UserDefinedFloatingPointFactory(
-                    name,
-                    sort.exponentBits,
-                    sort.significantBits,
-                    parameters,
-                ),
-            )
-        is ArraySort<*, *> ->
-            defineSort(name, UserDefinedArrayFactory(name, sort.parameters, parameters))
-        else ->
-            defineSort(
-                name,
-                UserDeclaredSortFactory(sort.symbol, parameters.size),
-            )
-      }
-
-  /**
    * Define sort with name [symbol] and definition [factory].
    *
    * @return newly constructed [SortFactory]
@@ -251,17 +201,6 @@ class Context {
 
     return factory
   }
-
-  /**
-   * Add sort defined by [factory].
-   *
-   * @return [factory]
-   * @throws [IllegalArgumentException] if a sort with name [factory.symbol] is already present
-   * @throws [IllegalStateException] if the context is currently in any binder state (e.g. forall,
-   *   exists etc.)
-   */
-  fun defineSort(factory: UserDefinedSortFactory) =
-      defineSort(factory.symbol, factory) as UserDefinedSortFactory
 
   /** Returns true if a function with name [func] is present. */
   operator fun contains(func: Symbol) = currentContext.functions[func] != null
@@ -345,11 +284,14 @@ class Context {
    * @return [SortFactory]
    * @throws [SortNotFoundException] if no such sort exists
    */
-  fun getSort(name: Symbol): SortFactory =
-      currentContext.sorts[name] ?: throw SortNotFoundException(name)
+  fun getSort(name: Symbol): SortFactory {
+    return if (currentContext.sorts.contains(name)) currentContext.sorts[name]!!
+    else if (currentContext.definedSorts.contains(name)) currentContext.definedSorts[name]!!
+    else throw SortNotFoundException(name)
+  }
 
   // auto pops after block
-  /** Creates a new stack level and executes [block], afterwards pop the new stack level. */
+  /** Creates a new stack level and executes [block], afterward pop the new stack level. */
   fun push(block: Context.() -> Unit) {
     functionUndoStack.push(mutableSetOf<Symbol>())
     sortUndoStack.push(mutableSetOf<Symbol>())
