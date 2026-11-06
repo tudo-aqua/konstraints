@@ -100,16 +100,15 @@ class ParserBenchmark {
       val endOfHeader = augmented.indexOf("(define-sort")
 
       // remove all define-sort commands based on bracket matching
-      while(augmented.contains("(define-sort")) {
+      while (augmented.contains("(define-sort")) {
         val start = augmented.indexOf("(define-sort")
         var pos = start + 12
         var count = 1
 
-        while(count > 0) {
-          if(augmented.elementAt(pos) == '(') {
+        while (count > 0) {
+          if (augmented.elementAt(pos) == '(') {
             count += 1
-          }
-          else if(augmented.elementAt(pos) == ')') {
+          } else if (augmented.elementAt(pos) == ')') {
             count -= 1
           }
 
@@ -121,17 +120,27 @@ class ParserBenchmark {
 
       // replace all usages of defined sorts
       program.context.currentContext.definedSorts.forEach { (symbol, factory) ->
-        // only replace after the first occurrence of define-sort to prevent replacement in set-logic etc.
+        // only replace after the first occurrence of define-sort to prevent replacement in
+        // set-logic etc.
         var pos = augmented.indexOf(symbol.toString(), endOfHeader)
         val len = symbol.toString().length
 
         while (pos != -1) {
           // only replace full matching instances
-          // i.e. when a sort is defined as `(define-sort Int32 () (_ BitVec 32))` we do not want to replace `Int32` in `getInt32`
-          if ((augmented.elementAt(pos - 1).isWhitespace() || augmented.elementAt(pos - 1) == '(') &&
-            (augmented.elementAt(pos + len).isWhitespace() || augmented.elementAt(pos + len) == ')')
+          // i.e. when a sort is defined as `(define-sort Int32 () (_ BitVec 32))` we do not want to
+          // replace `Int32` in `getInt32`
+          if (
+              (augmented.elementAt(pos - 1).isWhitespace() ||
+                  augmented.elementAt(pos - 1) == '(') &&
+                  (augmented.elementAt(pos + len).isWhitespace() ||
+                      augmented.elementAt(pos + len) == ')')
           ) {
-            augmented = augmented.substring(0, pos) + " " + factory.sort.toString() + " " + augmented.substring(pos + len)
+            augmented =
+                augmented.substring(0, pos) +
+                    " " +
+                    factory.sort.toString() +
+                    " " +
+                    augmented.substring(pos + len)
           }
 
           // prevent infinite loop search next match after current
