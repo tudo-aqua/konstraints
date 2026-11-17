@@ -142,6 +142,16 @@ private constructor(
       if (this === other) true
       else if (other !is BitVecLiteral) false
       else sort.bits == other.sort.bits && value == other.value
+
+  override fun hashCode(): Int {
+    var result = super.hashCode()
+    result = 31 * result + numBits
+    result = 31 * result + isBinary.hashCode()
+    result = 31 * result + rawBits.hashCode()
+    result = 31 * result + sort.hashCode()
+    result = 31 * result + theories.hashCode()
+    return result
+  }
 }
 
 /** Convert [this] to a bitvector, that represents the same number. */
@@ -385,4 +395,70 @@ class StringLiteral(val value: String) :
 
   override fun equals(other: Any?) =
       if (this === other) true else if (other !is StringLiteral) false else value == other.value
+}
+
+sealed class Literal<out T : Sort>(override val symbol: LiteralString, override val sort: T) :
+    Expression<T>() {
+
+  companion object {
+    fun <S : Sort, T> of(mapping: SortMapping<S, T>, value: T) = mapping.create(value)
+  }
+
+  override val func = null
+
+  override val children: List<Expression<*>> = emptyList()
+
+  override fun toString() = symbol.toString()
+}
+
+sealed class BoolLiteral(val value: Boolean) :
+    Literal<BoolSort>(LiteralString(value.toString()), BoolSort) {
+  override val theories: Set<Theories>
+    get() = CORE_MARKER_SET
+
+  override fun copy(children: List<Expression<*>>) = this
+}
+
+sealed class SortMapping<S : Sort, T>(val sort: S) {
+  abstract fun create(value: T): Literal<S>
+
+  data object Boolean : SortMapping<BoolSort, kotlin.Boolean>(BoolSort) {
+    override fun create(value: kotlin.Boolean) = if (value) True else False
+  }
+
+  data object Int8 : SortMapping<BitVecSort, Byte>(BitVecSort(8)) {
+    override fun create(value: Byte) = BitVecLiteral(value, 8)
+  }
+
+  data object Int16 : SortMapping<BitVecSort, Short>(BitVecSort(16)) {
+    override fun create(value: Short) = BitVecLiteral(value, 16)
+  }
+
+  data object Int32 : SortMapping<BitVecSort, kotlin.Int>(BitVecSort(32)) {
+    override fun create(value: kotlin.Int) = BitVecLiteral(value, 32)
+  }
+
+  data object Int64 : SortMapping<BitVecSort, Long>(BitVecSort(64)) {
+    override fun create(value: Long) = BitVecLiteral(value, 64)
+  }
+
+  data object Int : SortMapping<IntSort, BigInteger>(IntSort) {
+    override fun create(value: BigInteger) = IntLiteral(value)
+  }
+
+  data object Float32 : SortMapping<FloatingPointSort, Float>(FloatingPointSort(8, 24)) {
+    override fun create(value: Float) = FloatingPointLiteral(value)
+  }
+
+  data object Float64 : SortMapping<FloatingPointSort, Double>(FloatingPointSort(11, 53)) {
+    override fun create(value: Double) = FloatingPointLiteral(value)
+  }
+
+  data object Real : SortMapping<RealSort, BigDecimal>(RealSort) {
+    override fun create(value: BigDecimal) = RealLiteral(value)
+  }
+
+  data object String : SortMapping<StringSort, kotlin.String>(StringSort) {
+    override fun create(value: kotlin.String) = StringLiteral(value)
+  }
 }

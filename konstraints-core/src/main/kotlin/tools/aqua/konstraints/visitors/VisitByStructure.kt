@@ -22,6 +22,7 @@ import tools.aqua.konstraints.smt.AnnotatedExpression
 import tools.aqua.konstraints.smt.AsExpression
 import tools.aqua.konstraints.smt.BinaryExpression
 import tools.aqua.konstraints.smt.BitVecLiteral
+import tools.aqua.konstraints.smt.BoolLiteral
 import tools.aqua.konstraints.smt.BoundVariable
 import tools.aqua.konstraints.smt.CharLiteral
 import tools.aqua.konstraints.smt.ConstantExpression
@@ -90,7 +91,7 @@ interface VisitByStructure<T> {
       is AnnotatedExpression<*> -> visit(expr, ctx)
       is BoundVariable<*> -> visit(expr, ctx)
       is LocalExpression<*> -> visit(expr, ctx)
-      is Literal -> visit(expr, ctx)
+      is Literal<*> -> visit(expr, ctx)
       is ConstructorExpression -> visit(expr, ctx)
       is SelectorExpression<*> -> visit(expr, ctx)
       is TesterExpression -> visit(expr, ctx)
@@ -142,6 +143,7 @@ interface VisitByStructure<T> {
         is IntLiteral -> visit(literal, ctx)
         is RealLiteral -> visit(literal, ctx)
         is StringLiteral -> visit(literal, ctx)
+        is BoolLiteral -> visit(literal, ctx)
       }
 
   fun visit(literal: BitVecLiteral, ctx: T)
@@ -155,4 +157,6 @@ interface VisitByStructure<T> {
   fun visit(literal: RealLiteral, ctx: T)
 
   fun visit(literal: StringLiteral, ctx: T)
+
+  fun visit(literal: BoolLiteral, ctx: T)
 }

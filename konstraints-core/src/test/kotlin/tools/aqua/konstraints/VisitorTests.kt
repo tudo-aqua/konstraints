@@ -82,6 +82,8 @@ object OrderSensitiveVisitor : VisitByStructure<MutableList<Symbol>> {
   override fun visit(literal: RealLiteral, ctx: MutableList<Symbol>) {}
 
   override fun visit(literal: StringLiteral, ctx: MutableList<Symbol>) {}
+
+  override fun visit(literal: BoolLiteral, ctx: MutableList<Symbol>) {}
 }
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

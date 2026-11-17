@@ -26,19 +26,19 @@ import tools.aqua.konstraints.parser.*
  */
 
 /** Object for SMT true. */
-object True : ConstantExpression<BoolSort>("true".toSymbol(), BoolSort) {
+object True : BoolLiteral(true) {
   override val theories = CORE_MARKER_SET
 
-  override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
+  override fun copy(children: List<Expression<*>>) = this
 
   fun toBoolean() = true
 }
 
 /** Object for SMT false. */
-object False : ConstantExpression<BoolSort>("false".toSymbol(), BoolSort) {
+object False : BoolLiteral(false) {
   override val theories = CORE_MARKER_SET
 
-  override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
+  override fun copy(children: List<Expression<*>>) = this
 
   fun toBoolean() = false
 }
