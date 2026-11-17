@@ -22,6 +22,7 @@ import tools.aqua.konstraints.smt.AnnotatedExpression
 import tools.aqua.konstraints.smt.AsExpression
 import tools.aqua.konstraints.smt.BinaryExpression
 import tools.aqua.konstraints.smt.BitVecLiteral
+import tools.aqua.konstraints.smt.BoolLiteral
 import tools.aqua.konstraints.smt.BoundVariable
 import tools.aqua.konstraints.smt.CharLiteral
 import tools.aqua.konstraints.smt.ConstantExpression
@@ -104,6 +105,8 @@ object FreeVariables : VisitByStructure<MutableSet<FreeExpression<*>>> {
   override fun visit(literal: RealLiteral, ctx: MutableSet<FreeExpression<*>>) {}
 
   override fun visit(literal: StringLiteral, ctx: MutableSet<FreeExpression<*>>) {}
+
+  override fun visit(literal: BoolLiteral, ctx: MutableSet<FreeExpression<*>>) {}
 }
 
 fun test(model: Model) {
@@ -125,6 +128,7 @@ fun test(model: Model) {
     is IntLiteral -> literal.value // BigInteger
     is RealLiteral -> literal.value // BigDecimal
     is StringLiteral -> literal.value // String
+    is BoolLiteral -> literal.value // Boolean
   }
 
   val program = MutableSMTProgram()

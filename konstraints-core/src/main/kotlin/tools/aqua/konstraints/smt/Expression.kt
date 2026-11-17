@@ -388,16 +388,6 @@ sealed class Expression<out T : Sort> : SMTSerializable {
       }
 }
 
-/** SMT Literal */
-sealed class Literal<out T : Sort>(override val symbol: LiteralString, override val sort: T) :
-    Expression<T>() {
-  override val func = null
-
-  override val children: List<Expression<*>> = emptyList()
-
-  override fun toString() = symbol.toString()
-}
-
 abstract class ConstantExpression<out T : Sort>(override val symbol: Symbol, override val sort: T) :
     Expression<T>() {
   override val func = null
