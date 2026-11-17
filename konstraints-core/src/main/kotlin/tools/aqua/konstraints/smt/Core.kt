@@ -26,7 +26,7 @@ import tools.aqua.konstraints.parser.*
  */
 
 /** Object for SMT true. */
-object True : ConstantExpression<BoolSort>("true".toSymbol(), SMTBool) {
+object True : ConstantExpression<BoolSort>("true".toSymbol(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
@@ -35,7 +35,7 @@ object True : ConstantExpression<BoolSort>("true".toSymbol(), SMTBool) {
 }
 
 /** Object for SMT false. */
-object False : ConstantExpression<BoolSort>("false".toSymbol(), SMTBool) {
+object False : ConstantExpression<BoolSort>("false".toSymbol(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
   override fun copy(children: List<Expression<*>>): Expression<BoolSort> = this
@@ -51,7 +51,7 @@ fun Boolean.toSMTBool() = if (this) True else False
  * - `(not [inner])`.
  */
 class Not(override val inner: Expression<BoolSort>) :
-    UnaryExpression<BoolSort, BoolSort>("not".toSymbol(), SMTBool) {
+    UnaryExpression<BoolSort, BoolSort>("not".toSymbol(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
   override fun toString(): String = "(not $inner)"
@@ -66,7 +66,7 @@ class Not(override val inner: Expression<BoolSort>) :
  * - `(=> [statements])`.
  */
 class Implies(val statements: List<Expression<BoolSort>>) :
-    HomogenousExpression<BoolSort, BoolSort>("=>".toSymbol(), SMTBool) {
+    HomogenousExpression<BoolSort, BoolSort>("=>".toSymbol(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg statements: Expression<BoolSort>) : this(statements.toList())
@@ -83,7 +83,7 @@ class Implies(val statements: List<Expression<BoolSort>>) :
  * - `(and [conjuncts])`.
  */
 class And(val conjuncts: List<Expression<BoolSort>>) :
-    HomogenousExpression<BoolSort, BoolSort>("and".toSymbol(), SMTBool) {
+    HomogenousExpression<BoolSort, BoolSort>("and".toSymbol(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg conjuncts: Expression<BoolSort>) : this(conjuncts.toList())
@@ -100,7 +100,7 @@ class And(val conjuncts: List<Expression<BoolSort>>) :
  * - `(or [disjuncts])`.
  */
 class Or(val disjuncts: List<Expression<BoolSort>>) :
-    HomogenousExpression<BoolSort, BoolSort>("or".toSymbol(), SMTBool) {
+    HomogenousExpression<BoolSort, BoolSort>("or".toSymbol(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
@@ -117,7 +117,7 @@ class Or(val disjuncts: List<Expression<BoolSort>>) :
  * - `(xor [disjuncts])`.
  */
 class XOr(val disjuncts: List<Expression<BoolSort>>) :
-    HomogenousExpression<BoolSort, BoolSort>("xor".toSymbol(), SMTBool) {
+    HomogenousExpression<BoolSort, BoolSort>("xor".toSymbol(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
@@ -134,7 +134,7 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) :
  * - `(= [statements])`
  */
 class Equals<T : Sort>(val statements: List<Expression<T>>) :
-    HomogenousExpression<BoolSort, T>("=".toSymbol(), SMTBool) {
+    HomogenousExpression<BoolSort, T>("=".toSymbol(), BoolSort) {
   init {
     require(statements.size > 1) { "$symbol requires at least two arguments" }
   }
@@ -155,7 +155,7 @@ class Equals<T : Sort>(val statements: List<Expression<T>>) :
  * - `(distinct [statements])`
  */
 class Distinct<T : Sort>(val statements: List<Expression<T>>) :
-    HomogenousExpression<BoolSort, T>("distinct".toSymbol(), SMTBool) {
+    HomogenousExpression<BoolSort, T>("distinct".toSymbol(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
   constructor(vararg statements: Expression<T>) : this(statements.toList())

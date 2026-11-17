@@ -59,14 +59,14 @@ internal object CoreTheory : Theory {
               ImpliesDecl,
           )
           .associateBy { it.symbol }
-  override val sorts = mapOf(SMTBool.symbol to BoolFactory)
+  override val sorts = mapOf(BoolSort.symbol to BoolFactory)
 }
 
 internal object TrueDecl :
     SMTTheoryFunction<BoolSort>(
         "true".toSymbol(),
         emptyList(),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
   override fun constructDynamic(
@@ -88,7 +88,7 @@ internal object FalseDecl :
     SMTTheoryFunction<BoolSort>(
         "false".toSymbol(),
         emptyList(),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
   override fun constructDynamic(
@@ -110,8 +110,8 @@ internal object FalseDecl :
 internal object NotDecl :
     SMTTheoryFunction<BoolSort>(
         "not".toSymbol(),
-        listOf(SMTBool),
-        SMTBool,
+        listOf(BoolSort),
+        BoolSort,
         Associativity.NONE,
     ) {
   override fun constructDynamic(
@@ -133,8 +133,8 @@ internal object NotDecl :
 internal object ImpliesDecl :
     SMTTheoryFunction<BoolSort>(
         "=>".toSymbol(),
-        listOf(SMTBool, SMTBool),
-        SMTBool,
+        listOf(BoolSort, BoolSort),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -163,8 +163,8 @@ internal object ImpliesDecl :
 internal object AndDecl :
     SMTTheoryFunction<BoolSort>(
         "and".toSymbol(),
-        listOf(SMTBool, SMTBool),
-        SMTBool,
+        listOf(BoolSort, BoolSort),
+        BoolSort,
         Associativity.LEFT_ASSOC,
     ) {
   override fun constructDynamic(
@@ -192,8 +192,8 @@ internal object AndDecl :
 internal object OrDecl :
     SMTTheoryFunction<BoolSort>(
         "or".toSymbol(),
-        listOf(SMTBool, SMTBool),
-        SMTBool,
+        listOf(BoolSort, BoolSort),
+        BoolSort,
         Associativity.LEFT_ASSOC,
     ) {
 
@@ -222,8 +222,8 @@ internal object OrDecl :
 internal object XOrDecl :
     SMTTheoryFunction<BoolSort>(
         "xor".toSymbol(),
-        listOf(SMTBool, SMTBool),
-        SMTBool,
+        listOf(BoolSort, BoolSort),
+        BoolSort,
         Associativity.LEFT_ASSOC,
     ) {
 
@@ -306,8 +306,8 @@ internal object DistinctDecl :
 internal object IteDecl :
     SMTTheoryFunction<Sort>(
         "ite".toSymbol(),
-        listOf(SMTBool, SortParameter("A"), SortParameter("A")),
-        SMTBool,
+        listOf(BoolSort, SortParameter("A"), SortParameter("A")),
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -709,7 +709,7 @@ internal object BVUltDecl :
     SMTTheoryFunction<BoolSort>(
         "bvult".toSymbol(),
         listOf(BitVecSort.fromSymbol("m"), BitVecSort.fromSymbol("m")),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -978,7 +978,7 @@ internal object BVULeDecl :
     SMTTheoryFunction<BoolSort>(
         "bvule".toSymbol(),
         listOf(BitVecSort.fromSymbol("m"), BitVecSort.fromSymbol("m")),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -1005,7 +1005,7 @@ internal object BVUGtDecl :
     SMTTheoryFunction<BoolSort>(
         "bvugt".toSymbol(),
         listOf(BitVecSort.fromSymbol("m"), BitVecSort.fromSymbol("m")),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -1032,7 +1032,7 @@ internal object BVUGeDecl :
     SMTTheoryFunction<BoolSort>(
         "bvuge".toSymbol(),
         listOf(BitVecSort.fromSymbol("m"), BitVecSort.fromSymbol("m")),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -1059,7 +1059,7 @@ internal object BVSLtDecl :
     SMTTheoryFunction<BoolSort>(
         "bvslt".toSymbol(),
         listOf(BitVecSort.fromSymbol("m"), BitVecSort.fromSymbol("m")),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -1086,7 +1086,7 @@ internal object BVSLeDecl :
     SMTTheoryFunction<BoolSort>(
         "bvsle".toSymbol(),
         listOf(BitVecSort.fromSymbol("m"), BitVecSort.fromSymbol("m")),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -1113,7 +1113,7 @@ internal object BVSGtDecl :
     SMTTheoryFunction<BoolSort>(
         "bvsgt".toSymbol(),
         listOf(BitVecSort.fromSymbol("m"), BitVecSort.fromSymbol("m")),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -1140,7 +1140,7 @@ internal object BVSGeDecl :
     SMTTheoryFunction<BoolSort>(
         "bvsge".toSymbol(),
         listOf(BitVecSort.fromSymbol("m"), BitVecSort.fromSymbol("m")),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -1358,7 +1358,7 @@ internal object BVNegODecl :
     SMTTheoryFunction<BoolSort>(
         "bvnego".toSymbol(),
         listOf(BitVecSort.fromSymbol("m")),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
   override fun constructDynamic(
@@ -1381,7 +1381,7 @@ internal object BVUAddODecl :
     SMTTheoryFunction<BoolSort>(
         "bvuaddo".toSymbol(),
         listOf(BitVecSort.fromSymbol("m"), BitVecSort.fromSymbol("m")),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
   override fun constructDynamic(
@@ -1404,7 +1404,7 @@ internal object BVSAddODecl :
     SMTTheoryFunction<BoolSort>(
         "bvsaddo".toSymbol(),
         listOf(BitVecSort.fromSymbol("m"), BitVecSort.fromSymbol("m")),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
   override fun constructDynamic(
@@ -1427,7 +1427,7 @@ internal object BVUSubODecl :
     SMTTheoryFunction<BoolSort>(
         "bvusubo".toSymbol(),
         listOf(BitVecSort.fromSymbol("m"), BitVecSort.fromSymbol("m")),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
   override fun constructDynamic(
@@ -1450,7 +1450,7 @@ internal object BVSSubODecl :
     SMTTheoryFunction<BoolSort>(
         "bvsaddo".toSymbol(),
         listOf(BitVecSort.fromSymbol("m"), BitVecSort.fromSymbol("m")),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
   override fun constructDynamic(
@@ -1473,7 +1473,7 @@ internal object BVUMulODecl :
     SMTTheoryFunction<BoolSort>(
         "bvumulo".toSymbol(),
         listOf(BitVecSort.fromSymbol("m"), BitVecSort.fromSymbol("m")),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
   override fun constructDynamic(
@@ -1496,7 +1496,7 @@ internal object BVSMulODecl :
     SMTTheoryFunction<BoolSort>(
         "bvsmulo".toSymbol(),
         listOf(BitVecSort.fromSymbol("m"), BitVecSort.fromSymbol("m")),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
   override fun constructDynamic(
@@ -1519,7 +1519,7 @@ internal object BVSDivODecl :
     SMTTheoryFunction<BoolSort>(
         "bvsdivo".toSymbol(),
         listOf(BitVecSort.fromSymbol("m"), BitVecSort.fromSymbol("m")),
-        SMTBool,
+        BoolSort,
         Associativity.NONE,
     ) {
   override fun constructDynamic(
@@ -1542,7 +1542,7 @@ internal object UBVToIntDecl :
     SMTTheoryFunction<IntSort>(
         "ubv_to_int".toSymbol(),
         listOf(BitVecSort.fromSymbol("m")),
-        SMTInt,
+        IntSort,
         Associativity.NONE,
     ) {
   override fun constructDynamic(
@@ -1565,7 +1565,7 @@ internal object SBVToIntDecl :
     SMTTheoryFunction<IntSort>(
         "sbv_to_int".toSymbol(),
         listOf(BitVecSort.fromSymbol("m")),
-        SMTInt,
+        IntSort,
         Associativity.NONE,
     ) {
   override fun constructDynamic(
@@ -1587,7 +1587,7 @@ internal object SBVToIntDecl :
 internal object IntToBVDecl :
     SMTTheoryFunction<BitVecSort>(
         "int_to_bv".toSymbol(),
-        listOf(SMTInt),
+        listOf(IntSort),
         BitVecSort.fromSymbol("m"),
         Associativity.NONE,
     ) {
@@ -1631,14 +1631,14 @@ internal object IntsTheory : Theory {
           )
           .associateBy { it.symbol }
 
-  override val sorts = mapOf(SMTInt.symbol to IntFactory)
+  override val sorts = mapOf(IntSort.symbol to IntFactory)
 }
 
 internal object IntNegDecl :
     SMTTheoryFunction<IntSort>(
         "-".toSymbol(),
-        listOf(SMTInt),
-        SMTInt,
+        listOf(IntSort),
+        IntSort,
         Associativity.NONE,
     ) {
 
@@ -1656,8 +1656,8 @@ internal object IntNegDecl :
 internal object IntSubDecl :
     SMTTheoryFunction<IntSort>(
         "-".toSymbol(),
-        listOf(SMTInt, SMTInt),
-        SMTInt,
+        listOf(IntSort, IntSort),
+        IntSort,
         Associativity.LEFT_ASSOC,
     ) {
 
@@ -1676,8 +1676,8 @@ internal object IntSubDecl :
 internal object IntNegSubDecl :
     SMTTheoryFunction<IntSort>(
         "-".toSymbol(),
-        listOf(SMTInt),
-        SMTInt,
+        listOf(IntSort),
+        IntSort,
         Associativity.NONE,
     ) {
 
@@ -1697,8 +1697,8 @@ internal object IntNegSubDecl :
 internal object IntAddDecl :
     SMTTheoryFunction<IntSort>(
         "+".toSymbol(),
-        listOf(SMTInt, SMTInt),
-        SMTInt,
+        listOf(IntSort, IntSort),
+        IntSort,
         Associativity.LEFT_ASSOC,
     ) {
 
@@ -1716,8 +1716,8 @@ internal object IntAddDecl :
 internal object IntMulDecl :
     SMTTheoryFunction<IntSort>(
         "*".toSymbol(),
-        listOf(SMTInt, SMTInt),
-        SMTInt,
+        listOf(IntSort, IntSort),
+        IntSort,
         Associativity.LEFT_ASSOC,
     ) {
 
@@ -1735,8 +1735,8 @@ internal object IntMulDecl :
 internal object IntDivDecl :
     SMTTheoryFunction<IntSort>(
         "div".toSymbol(),
-        listOf(SMTInt, SMTInt),
-        SMTInt,
+        listOf(IntSort, IntSort),
+        IntSort,
         Associativity.LEFT_ASSOC,
     ) {
 
@@ -1754,8 +1754,8 @@ internal object IntDivDecl :
 internal object ModDecl :
     SMTTheoryFunction<IntSort>(
         "mod".toSymbol(),
-        listOf(SMTInt, SMTInt),
-        SMTInt,
+        listOf(IntSort, IntSort),
+        IntSort,
         Associativity.NONE,
     ) {
 
@@ -1773,8 +1773,8 @@ internal object ModDecl :
 internal object AbsDecl :
     SMTTheoryFunction<IntSort>(
         "abs".toSymbol(),
-        listOf(SMTInt),
-        SMTInt,
+        listOf(IntSort),
+        IntSort,
         Associativity.NONE,
     ) {
 
@@ -1792,8 +1792,8 @@ internal object AbsDecl :
 internal object IntLessEqDecl :
     SMTTheoryFunction<BoolSort>(
         "<=".toSymbol(),
-        listOf(SMTInt, SMTInt),
-        SMTBool,
+        listOf(IntSort, IntSort),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -1811,8 +1811,8 @@ internal object IntLessEqDecl :
 internal object IntLessDecl :
     SMTTheoryFunction<BoolSort>(
         "<".toSymbol(),
-        listOf(SMTInt, SMTInt),
-        SMTBool,
+        listOf(IntSort, IntSort),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -1830,8 +1830,8 @@ internal object IntLessDecl :
 internal object IntGreaterEqDecl :
     SMTTheoryFunction<BoolSort>(
         ">=".toSymbol(),
-        listOf(SMTInt, SMTInt),
-        SMTBool,
+        listOf(IntSort, IntSort),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -1849,8 +1849,8 @@ internal object IntGreaterEqDecl :
 internal object IntGreaterDecl :
     SMTTheoryFunction<BoolSort>(
         ">".toSymbol(),
-        listOf(SMTInt, SMTInt),
-        SMTBool,
+        listOf(IntSort, IntSort),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -1868,8 +1868,8 @@ internal object IntGreaterDecl :
 internal object DivisibleDecl :
     SMTTheoryFunction<BoolSort>(
         "divisible".toSymbol(),
-        listOf(SMTInt),
-        SMTBool,
+        listOf(IntSort),
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -1901,8 +1901,8 @@ internal object DivisibleDecl :
 internal object IntExpDecl :
     SMTTheoryFunction<IntSort>(
         "**".toSymbol(),
-        listOf(SMTInt, SMTInt),
-        SMTInt,
+        listOf(IntSort, IntSort),
+        IntSort,
         Associativity.NONE,
     ) {
   override fun constructDynamic(
@@ -1939,11 +1939,11 @@ internal object RealsTheory : Theory {
           )
           .associateBy { it.symbol }
 
-  override val sorts = mapOf(SMTReal.symbol to RealFactory)
+  override val sorts = mapOf(RealSort.symbol to RealFactory)
 }
 
 internal object RealNegDecl :
-    SMTTheoryFunction<RealSort>("-".toSymbol(), listOf(SMTReal), SMTReal, Associativity.NONE) {
+    SMTTheoryFunction<RealSort>("-".toSymbol(), listOf(RealSort), RealSort, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -1959,8 +1959,8 @@ internal object RealNegDecl :
 internal object RealSubDecl :
     SMTTheoryFunction<RealSort>(
         "-".toSymbol(),
-        listOf(SMTReal),
-        SMTReal,
+        listOf(RealSort),
+        RealSort,
         Associativity.LEFT_ASSOC,
     ) {
 
@@ -1977,7 +1977,7 @@ internal object RealSubDecl :
 
 /** Combined function declaration for overloaded '-' operator */
 internal object RealNegSubDecl :
-    SMTTheoryFunction<RealSort>("-".toSymbol(), listOf(SMTReal), SMTReal, Associativity.NONE) {
+    SMTTheoryFunction<RealSort>("-".toSymbol(), listOf(RealSort), RealSort, Associativity.NONE) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
@@ -1995,8 +1995,8 @@ internal object RealNegSubDecl :
 internal object RealAddDecl :
     SMTTheoryFunction<RealSort>(
         "+".toSymbol(),
-        listOf(SMTReal, SMTReal),
-        SMTReal,
+        listOf(RealSort, RealSort),
+        RealSort,
         Associativity.LEFT_ASSOC,
     ) {
 
@@ -2014,8 +2014,8 @@ internal object RealAddDecl :
 internal object RealMulDecl :
     SMTTheoryFunction<RealSort>(
         "*".toSymbol(),
-        listOf(SMTReal, SMTReal),
-        SMTReal,
+        listOf(RealSort, RealSort),
+        RealSort,
         Associativity.LEFT_ASSOC,
     ) {
 
@@ -2033,8 +2033,8 @@ internal object RealMulDecl :
 internal object RealDivDecl :
     SMTTheoryFunction<RealSort>(
         "/".toSymbol(),
-        listOf(SMTReal, SMTReal),
-        SMTReal,
+        listOf(RealSort, RealSort),
+        RealSort,
         Associativity.LEFT_ASSOC,
     ) {
 
@@ -2052,8 +2052,8 @@ internal object RealDivDecl :
 internal object RealLessEqDecl :
     SMTTheoryFunction<BoolSort>(
         "<=".toSymbol(),
-        listOf(SMTReal, SMTReal),
-        SMTBool,
+        listOf(RealSort, RealSort),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -2071,8 +2071,8 @@ internal object RealLessEqDecl :
 internal object RealLessDecl :
     SMTTheoryFunction<BoolSort>(
         "<".toSymbol(),
-        listOf(SMTReal, SMTReal),
-        SMTBool,
+        listOf(RealSort, RealSort),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -2090,8 +2090,8 @@ internal object RealLessDecl :
 internal object RealGreaterEqDecl :
     SMTTheoryFunction<BoolSort>(
         ">=".toSymbol(),
-        listOf(SMTReal, SMTReal),
-        SMTBool,
+        listOf(RealSort, RealSort),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -2109,8 +2109,8 @@ internal object RealGreaterEqDecl :
 internal object RealGreaterDecl :
     SMTTheoryFunction<BoolSort>(
         ">".toSymbol(),
-        listOf(SMTReal, SMTReal),
-        SMTBool,
+        listOf(RealSort, RealSort),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -2147,7 +2147,7 @@ internal object RealsIntsTheory : Theory {
           )
           .associateBy { it.symbol }
 
-  override val sorts = mapOf(SMTInt.symbol to IntFactory, SMTReal.symbol to RealFactory)
+  override val sorts = mapOf(IntSort.symbol to IntFactory, RealSort.symbol to RealFactory)
 }
 
 internal object IntRealNegSubDecl :
@@ -2229,8 +2229,8 @@ internal object IntRealMulDecl :
 internal object ToRealDecl :
     SMTTheoryFunction<RealSort>(
         "to_real".toSymbol(),
-        listOf(SMTInt),
-        SMTReal,
+        listOf(IntSort),
+        RealSort,
         Associativity.NONE,
     ) {
 
@@ -2248,8 +2248,8 @@ internal object ToRealDecl :
 internal object ToIntDecl :
     SMTTheoryFunction<IntSort>(
         "to_int".toSymbol(),
-        listOf(SMTReal),
-        SMTInt,
+        listOf(RealSort),
+        IntSort,
         Associativity.NONE,
     ) {
 
@@ -2267,8 +2267,8 @@ internal object ToIntDecl :
 internal object IsIntDecl :
     SMTTheoryFunction<BoolSort>(
         "is_int".toSymbol(),
-        listOf(SMTReal),
-        SMTBool,
+        listOf(RealSort),
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -2286,8 +2286,8 @@ internal object IsIntDecl :
 internal object IntRealLessDecl :
     SMTTheoryFunction<BoolSort>(
         "<".toSymbol(),
-        listOf(SMTReal, SMTReal),
-        SMTBool,
+        listOf(RealSort, RealSort),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -2313,8 +2313,8 @@ internal object IntRealLessDecl :
 internal object IntRealLessEqDecl :
     SMTTheoryFunction<BoolSort>(
         "<=".toSymbol(),
-        listOf(SMTReal, SMTReal),
-        SMTBool,
+        listOf(RealSort, RealSort),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -2340,8 +2340,8 @@ internal object IntRealLessEqDecl :
 internal object IntRealGreaterEqDecl :
     SMTTheoryFunction<BoolSort>(
         ">=".toSymbol(),
-        listOf(SMTReal, SMTReal),
-        SMTBool,
+        listOf(RealSort, RealSort),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -2367,8 +2367,8 @@ internal object IntRealGreaterEqDecl :
 internal object IntRealGreaterDecl :
     SMTTheoryFunction<BoolSort>(
         ">".toSymbol(),
-        listOf(SMTReal, SMTReal),
-        SMTBool,
+        listOf(RealSort, RealSort),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -2445,8 +2445,8 @@ internal object FloatingPointTheory : Theory {
 
   override val sorts =
       mapOf(
-          SMTRoundingMode.symbol to RoundingModeFactory,
-          SMTReal.symbol to RealFactory,
+          RoundingModeSort.symbol to RoundingModeFactory,
+          RealSort.symbol to RealFactory,
           "BitVec".toSymbol() to BitVecFactory,
           "FloatingPoint".toSymbol() to FloatingPointFactory,
           "Float16".toSymbol() to Float16Factory,
@@ -2460,7 +2460,7 @@ internal object RoundNearestTiesToEvenDecl :
     SMTTheoryFunction<RoundingModeSort>(
         "roundNearestTiesToEven".toSymbol(),
         emptyList(),
-        SMTRoundingMode,
+        RoundingModeSort,
         Associativity.NONE,
     ) {
 
@@ -2479,7 +2479,7 @@ internal object RNEDecl :
     SMTTheoryFunction<RoundingModeSort>(
         "RNE".toSymbol(),
         emptyList(),
-        SMTRoundingMode,
+        RoundingModeSort,
         Associativity.NONE,
     ) {
 
@@ -2498,7 +2498,7 @@ internal object RoundNearestTiesToAwayDecl :
     SMTTheoryFunction<RoundingModeSort>(
         "roundNearestTiesToAway".toSymbol(),
         emptyList(),
-        SMTRoundingMode,
+        RoundingModeSort,
         Associativity.NONE,
     ) {
 
@@ -2517,7 +2517,7 @@ internal object RNADecl :
     SMTTheoryFunction<RoundingModeSort>(
         "RNA".toSymbol(),
         emptyList(),
-        SMTRoundingMode,
+        RoundingModeSort,
         Associativity.NONE,
     ) {
 
@@ -2536,7 +2536,7 @@ internal object RoundTowardPositiveDecl :
     SMTTheoryFunction<RoundingModeSort>(
         "roundTowardPositive".toSymbol(),
         emptyList(),
-        SMTRoundingMode,
+        RoundingModeSort,
         Associativity.NONE,
     ) {
 
@@ -2555,7 +2555,7 @@ internal object RTPDecl :
     SMTTheoryFunction<RoundingModeSort>(
         "RTP".toSymbol(),
         emptyList(),
-        SMTRoundingMode,
+        RoundingModeSort,
         Associativity.NONE,
     ) {
 
@@ -2574,7 +2574,7 @@ internal object RoundTowardNegativeDecl :
     SMTTheoryFunction<RoundingModeSort>(
         "roundTowardNegative".toSymbol(),
         emptyList(),
-        SMTRoundingMode,
+        RoundingModeSort,
         Associativity.NONE,
     ) {
 
@@ -2593,7 +2593,7 @@ internal object RTNDecl :
     SMTTheoryFunction<RoundingModeSort>(
         "RTN".toSymbol(),
         emptyList(),
-        SMTRoundingMode,
+        RoundingModeSort,
         Associativity.NONE,
     ) {
 
@@ -2612,7 +2612,7 @@ internal object RoundTowardZeroDecl :
     SMTTheoryFunction<RoundingModeSort>(
         "roundTowardZero".toSymbol(),
         emptyList(),
-        SMTRoundingMode,
+        RoundingModeSort,
         Associativity.NONE,
     ) {
 
@@ -2631,7 +2631,7 @@ internal object RTZDecl :
     SMTTheoryFunction<RoundingModeSort>(
         "RTZ".toSymbol(),
         emptyList(),
-        SMTRoundingMode,
+        RoundingModeSort,
         Associativity.NONE,
     ) {
 
@@ -2647,10 +2647,10 @@ internal object RTZDecl :
 }
 
 internal object FPLiteralDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "fp".toSymbol(),
         listOf(BitVecSort(1), BitVecSort.fromSymbol("eb"), BitVecSort.fromSymbol("i")),
-        FPSort("eb".idx(), "sb".idx()),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
@@ -2658,7 +2658,7 @@ internal object FPLiteralDecl :
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 3) {
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -2673,16 +2673,16 @@ internal object FPLiteralDecl :
 
 /** Plus infinity declaration internal object */
 internal object FPInfinityDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "+oo".toSymbol(),
         emptyList(),
-        FPSort("eb".idx(), "sb".idx()),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -2699,17 +2699,17 @@ internal object FPInfinityDecl :
 
 /** Minus infinity declaration internal object */
 internal object FPMinusInfinityDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "-oo".toSymbol(),
         emptyList(),
-        FPSort("eb".idx(), "sb".idx()),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -2729,17 +2729,17 @@ internal object FPMinusInfinityDecl :
 
 /** Plus zero declaration internal object */
 internal object FPZeroDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "+zero".toSymbol(),
         emptyList(),
-        FPSort("eb".idx(), "sb".idx()),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -2756,17 +2756,17 @@ internal object FPZeroDecl :
 
 /** Minus zero declaration internal object */
 internal object FPMinusZeroDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "-zero".toSymbol(),
         emptyList(),
-        FPSort("eb".idx(), "sb".idx()),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -2783,17 +2783,17 @@ internal object FPMinusZeroDecl :
 
 /** NaN declaration internal object */
 internal object FPNaNDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "NaN".toSymbol(),
         emptyList(),
-        FPSort("eb".idx(), "sb".idx()),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.isEmpty()) {
       "No arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -2810,24 +2810,24 @@ internal object FPNaNDecl :
 
 /** Absolute value declaration internal object */
 internal object FPAbsDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "fp.abs".toSymbol(),
-        listOf(FPSort("eb".idx(), "sb".idx())),
-        FPSort("eb".idx(), "sb".idx()),
+        listOf(FloatingPointSort("eb".idx(), "sb".idx())),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.single().sort is FPSort) {
+    require(args.single().sort is FloatingPointSort) {
       "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
     }
 
@@ -2838,24 +2838,24 @@ internal object FPAbsDecl :
 
 /** Negation declaration internal object */
 internal object FPNegDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "fp.neg".toSymbol(),
-        listOf(FPSort("eb".idx(), "sb".idx())),
-        FPSort("eb".idx(), "sb".idx()),
+        listOf(FloatingPointSort("eb".idx(), "sb".idx())),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.single().sort is FPSort) {
+    require(args.single().sort is FloatingPointSort) {
       "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
     }
 
@@ -2866,17 +2866,21 @@ internal object FPNegDecl :
 
 /** Addition declaration internal object */
 internal object FPAddDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "fp.add".toSymbol(),
-        listOf(SMTRoundingMode, FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
-        FPSort("eb".idx(), "sb".idx()),
+        listOf(
+            RoundingModeSort,
+            FloatingPointSort("eb".idx(), "sb".idx()),
+            FloatingPointSort("eb".idx(), "sb".idx()),
+        ),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 3) {
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -2884,8 +2888,8 @@ internal object FPAddDecl :
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
     require(args[0].sort is RoundingModeSort)
-    require(args[1].sort is FPSort)
-    require(args[2].sort is FPSort)
+    require(args[1].sort is FloatingPointSort)
+    require(args[2].sort is FloatingPointSort)
 
     @Suppress("UNCHECKED_CAST")
     return FPAdd(args[0].cast(), args[1].cast(), args[2].cast())
@@ -2894,17 +2898,21 @@ internal object FPAddDecl :
 
 /** Subtraction declaration internal object */
 internal object FPSubDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "fp.sub".toSymbol(),
-        listOf(SMTRoundingMode, FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
-        FPSort("eb".idx(), "sb".idx()),
+        listOf(
+            RoundingModeSort,
+            FloatingPointSort("eb".idx(), "sb".idx()),
+            FloatingPointSort("eb".idx(), "sb".idx()),
+        ),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 3) {
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -2912,8 +2920,8 @@ internal object FPSubDecl :
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
     require(args[0].sort is RoundingModeSort)
-    require(args[1].sort is FPSort)
-    require(args[2].sort is FPSort)
+    require(args[1].sort is FloatingPointSort)
+    require(args[2].sort is FloatingPointSort)
 
     @Suppress("UNCHECKED_CAST")
     return FPSub(args[0].cast(), args[1].cast(), args[2].cast())
@@ -2921,17 +2929,21 @@ internal object FPSubDecl :
 }
 
 internal object FPMulDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "fp.mul".toSymbol(),
-        listOf(SMTRoundingMode, FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
-        FPSort("eb".idx(), "sb".idx()),
+        listOf(
+            RoundingModeSort,
+            FloatingPointSort("eb".idx(), "sb".idx()),
+            FloatingPointSort("eb".idx(), "sb".idx()),
+        ),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 3) {
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -2939,8 +2951,8 @@ internal object FPMulDecl :
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
     require(args[0].sort is RoundingModeSort)
-    require(args[1].sort is FPSort)
-    require(args[2].sort is FPSort)
+    require(args[1].sort is FloatingPointSort)
+    require(args[2].sort is FloatingPointSort)
 
     @Suppress("UNCHECKED_CAST")
     return FPMul(args[0].cast(), args[1].cast(), args[2].cast())
@@ -2948,17 +2960,21 @@ internal object FPMulDecl :
 }
 
 internal object FPDivDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "fp.div".toSymbol(),
-        listOf(SMTRoundingMode, FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
-        FPSort("eb".idx(), "sb".idx()),
+        listOf(
+            RoundingModeSort,
+            FloatingPointSort("eb".idx(), "sb".idx()),
+            FloatingPointSort("eb".idx(), "sb".idx()),
+        ),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 3) {
       "Three arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -2966,8 +2982,8 @@ internal object FPDivDecl :
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
     require(args[0].sort is RoundingModeSort)
-    require(args[1].sort is FPSort)
-    require(args[2].sort is FPSort)
+    require(args[1].sort is FloatingPointSort)
+    require(args[2].sort is FloatingPointSort)
 
     @Suppress("UNCHECKED_CAST")
     return FPDiv(args[0].cast(), args[1].cast(), args[2].cast())
@@ -2975,22 +2991,22 @@ internal object FPDivDecl :
 }
 
 internal object FPFmaDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "fp.fma".toSymbol(),
         listOf(
-            SMTRoundingMode,
-            FPSort("eb".idx(), "sb".idx()),
-            FPSort("eb".idx(), "sb".idx()),
-            FPSort("eb".idx(), "sb".idx()),
+            RoundingModeSort,
+            FloatingPointSort("eb".idx(), "sb".idx()),
+            FloatingPointSort("eb".idx(), "sb".idx()),
+            FloatingPointSort("eb".idx(), "sb".idx()),
         ),
-        FPSort("eb".idx(), "sb".idx()),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 4) {
       "Four arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -2998,9 +3014,9 @@ internal object FPFmaDecl :
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
     require(args[0].sort is RoundingModeSort)
-    require(args[1].sort is FPSort)
-    require(args[2].sort is FPSort)
-    require(args[3].sort is FPSort)
+    require(args[1].sort is FloatingPointSort)
+    require(args[2].sort is FloatingPointSort)
+    require(args[3].sort is FloatingPointSort)
 
     @Suppress("UNCHECKED_CAST")
     return FPFma(args[0].cast(), args[1].cast(), args[2].cast(), args[3].cast())
@@ -3008,17 +3024,17 @@ internal object FPFmaDecl :
 }
 
 internal object FPSqrtDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "fp.sqrt".toSymbol(),
-        listOf(SMTRoundingMode, FPSort("eb".idx(), "sb".idx())),
-        FPSort("eb".idx(), "sb".idx()),
+        listOf(RoundingModeSort, FloatingPointSort("eb".idx(), "sb".idx())),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -3026,7 +3042,7 @@ internal object FPSqrtDecl :
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
     require(args[0].sort is RoundingModeSort)
-    require(args[1].sort is FPSort)
+    require(args[1].sort is FloatingPointSort)
 
     @Suppress("UNCHECKED_CAST")
     return FPSqrt(args[0].cast(), args[1].cast())
@@ -3034,24 +3050,27 @@ internal object FPSqrtDecl :
 }
 
 internal object FPRemDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "fp.rem".toSymbol(),
-        listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
-        FPSort("eb".idx(), "sb".idx()),
+        listOf(
+            FloatingPointSort("eb".idx(), "sb".idx()),
+            FloatingPointSort("eb".idx(), "sb".idx()),
+        ),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.all { expr -> expr.sort is FPSort })
+    require(args.all { expr -> expr.sort is FloatingPointSort })
 
     @Suppress("UNCHECKED_CAST")
     return FPRem(args[0].cast(), args[1].cast())
@@ -3059,17 +3078,17 @@ internal object FPRemDecl :
 }
 
 internal object FPRoundToIntegralDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "fp.roundToIntegral".toSymbol(),
-        listOf(SMTRoundingMode, FPSort("eb".idx(), "sb".idx())),
-        FPSort("eb".idx(), "sb".idx()),
+        listOf(RoundingModeSort, FloatingPointSort("eb".idx(), "sb".idx())),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -3077,7 +3096,7 @@ internal object FPRoundToIntegralDecl :
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
     require(args[0].sort is RoundingModeSort)
-    require(args[1].sort is FPSort)
+    require(args[1].sort is FloatingPointSort)
 
     @Suppress("UNCHECKED_CAST")
     return FPRoundToIntegral(args[0].cast(), args[1].cast())
@@ -3085,24 +3104,27 @@ internal object FPRoundToIntegralDecl :
 }
 
 internal object FPMinDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "fp.min".toSymbol(),
-        listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
-        FPSort("eb".idx(), "sb".idx()),
+        listOf(
+            FloatingPointSort("eb".idx(), "sb".idx()),
+            FloatingPointSort("eb".idx(), "sb".idx()),
+        ),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.all { expr -> expr.sort is FPSort })
+    require(args.all { expr -> expr.sort is FloatingPointSort })
 
     @Suppress("UNCHECKED_CAST")
     return FPMin(args[0].cast(), args[1].cast())
@@ -3110,24 +3132,27 @@ internal object FPMinDecl :
 }
 
 internal object FPMaxDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "fp.max".toSymbol(),
-        listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
-        FPSort("eb".idx(), "sb".idx()),
+        listOf(
+            FloatingPointSort("eb".idx(), "sb".idx()),
+            FloatingPointSort("eb".idx(), "sb".idx()),
+        ),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.all { expr -> expr.sort is FPSort })
+    require(args.all { expr -> expr.sort is FloatingPointSort })
 
     @Suppress("UNCHECKED_CAST")
     return FPMax(args[0].cast(), args[1].cast())
@@ -3137,8 +3162,11 @@ internal object FPMaxDecl :
 internal object FPLeqDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.leq".toSymbol(),
-        listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
-        SMTBool,
+        listOf(
+            FloatingPointSort("eb".idx(), "sb".idx()),
+            FloatingPointSort("eb".idx(), "sb".idx()),
+        ),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -3152,18 +3180,21 @@ internal object FPLeqDecl :
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.all { expr -> expr.sort is FPSort })
+    require(args.all { expr -> expr.sort is FloatingPointSort })
 
     @Suppress("UNCHECKED_CAST")
-    return FPLeq(args as List<Expression<FPSort>>)
+    return FPLeq(args as List<Expression<FloatingPointSort>>)
   }
 }
 
 internal object FPLtDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.lt".toSymbol(),
-        listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
-        SMTBool,
+        listOf(
+            FloatingPointSort("eb".idx(), "sb".idx()),
+            FloatingPointSort("eb".idx(), "sb".idx()),
+        ),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -3177,18 +3208,21 @@ internal object FPLtDecl :
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.all { expr -> expr.sort is FPSort })
+    require(args.all { expr -> expr.sort is FloatingPointSort })
 
     @Suppress("UNCHECKED_CAST")
-    return FPLt(args as List<Expression<FPSort>>)
+    return FPLt(args as List<Expression<FloatingPointSort>>)
   }
 }
 
 internal object FPGeqDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.geq".toSymbol(),
-        listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
-        SMTBool,
+        listOf(
+            FloatingPointSort("eb".idx(), "sb".idx()),
+            FloatingPointSort("eb".idx(), "sb".idx()),
+        ),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -3202,18 +3236,21 @@ internal object FPGeqDecl :
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.all { expr -> expr.sort is FPSort })
+    require(args.all { expr -> expr.sort is FloatingPointSort })
 
     @Suppress("UNCHECKED_CAST")
-    return FPGeq(args as List<Expression<FPSort>>)
+    return FPGeq(args as List<Expression<FloatingPointSort>>)
   }
 }
 
 internal object FPGtDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.gt".toSymbol(),
-        listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
-        SMTBool,
+        listOf(
+            FloatingPointSort("eb".idx(), "sb".idx()),
+            FloatingPointSort("eb".idx(), "sb".idx()),
+        ),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -3227,18 +3264,21 @@ internal object FPGtDecl :
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.all { expr -> expr.sort is FPSort })
+    require(args.all { expr -> expr.sort is FloatingPointSort })
 
     @Suppress("UNCHECKED_CAST")
-    return FPGt(args as List<Expression<FPSort>>)
+    return FPGt(args as List<Expression<FloatingPointSort>>)
   }
 }
 
 internal object FPEqDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.eq".toSymbol(),
-        listOf(FPSort("eb".idx(), "sb".idx()), FPSort("eb".idx(), "sb".idx())),
-        SMTBool,
+        listOf(
+            FloatingPointSort("eb".idx(), "sb".idx()),
+            FloatingPointSort("eb".idx(), "sb".idx()),
+        ),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -3252,18 +3292,18 @@ internal object FPEqDecl :
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.all { expr -> expr.sort is FPSort })
+    require(args.all { expr -> expr.sort is FloatingPointSort })
 
     @Suppress("UNCHECKED_CAST")
-    return FPEq(args as List<Expression<FPSort>>)
+    return FPEq(args as List<Expression<FloatingPointSort>>)
   }
 }
 
 internal object FPIsNormalDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.isNormal".toSymbol(),
-        listOf(FPSort("eb".idx(), "sb".idx())),
-        SMTBool,
+        listOf(FloatingPointSort("eb".idx(), "sb".idx())),
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -3277,7 +3317,7 @@ internal object FPIsNormalDecl :
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.single().sort is FPSort) {
+    require(args.single().sort is FloatingPointSort) {
       "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
     }
 
@@ -3289,8 +3329,8 @@ internal object FPIsNormalDecl :
 internal object FPIsSubormalDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.isSubnormal".toSymbol(),
-        listOf(FPSort("eb".idx(), "sb".idx())),
-        SMTBool,
+        listOf(FloatingPointSort("eb".idx(), "sb".idx())),
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -3304,7 +3344,7 @@ internal object FPIsSubormalDecl :
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.single().sort is FPSort) {
+    require(args.single().sort is FloatingPointSort) {
       "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
     }
 
@@ -3316,8 +3356,8 @@ internal object FPIsSubormalDecl :
 internal object FPIsZeroDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.isZero".toSymbol(),
-        listOf(FPSort("eb".idx(), "sb".idx())),
-        SMTBool,
+        listOf(FloatingPointSort("eb".idx(), "sb".idx())),
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -3331,7 +3371,7 @@ internal object FPIsZeroDecl :
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.single().sort is FPSort) {
+    require(args.single().sort is FloatingPointSort) {
       "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
     }
 
@@ -3343,8 +3383,8 @@ internal object FPIsZeroDecl :
 internal object FPIsInfiniteDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.isInfinite".toSymbol(),
-        listOf(FPSort("eb".idx(), "sb".idx())),
-        SMTBool,
+        listOf(FloatingPointSort("eb".idx(), "sb".idx())),
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -3358,7 +3398,7 @@ internal object FPIsInfiniteDecl :
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.single().sort is FPSort) {
+    require(args.single().sort is FloatingPointSort) {
       "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
     }
 
@@ -3370,8 +3410,8 @@ internal object FPIsInfiniteDecl :
 internal object FPIsNaNDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.isNaN".toSymbol(),
-        listOf(FPSort("eb".idx(), "sb".idx())),
-        SMTBool,
+        listOf(FloatingPointSort("eb".idx(), "sb".idx())),
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -3385,7 +3425,7 @@ internal object FPIsNaNDecl :
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.single().sort is FPSort) {
+    require(args.single().sort is FloatingPointSort) {
       "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
     }
 
@@ -3397,8 +3437,8 @@ internal object FPIsNaNDecl :
 internal object FPIsNegativeDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.isNegative".toSymbol(),
-        listOf(FPSort("eb".idx(), "sb".idx())),
-        SMTBool,
+        listOf(FloatingPointSort("eb".idx(), "sb".idx())),
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -3412,7 +3452,7 @@ internal object FPIsNegativeDecl :
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.single().sort is FPSort) {
+    require(args.single().sort is FloatingPointSort) {
       "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
     }
 
@@ -3424,8 +3464,8 @@ internal object FPIsNegativeDecl :
 internal object FPIsPositiveDecl :
     SMTTheoryFunction<BoolSort>(
         "fp.isPositive".toSymbol(),
-        listOf(FPSort("eb".idx(), "sb".idx())),
-        SMTBool,
+        listOf(FloatingPointSort("eb".idx(), "sb".idx())),
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -3439,7 +3479,7 @@ internal object FPIsPositiveDecl :
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.single().sort is FPSort) {
+    require(args.single().sort is FloatingPointSort) {
       "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
     }
 
@@ -3450,16 +3490,16 @@ internal object FPIsPositiveDecl :
 
 // "Super" SMT Function to emulate shadowing
 internal object ToFPDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "to_fp".toSymbol(),
         emptyList(),
-        FPSort("eb".idx(), "sb".idx()),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(indices.size == 2) {
       "Two indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
@@ -3471,7 +3511,7 @@ internal object ToFPDecl :
       require(args[0].sort is RoundingModeSort)
 
       when (args[1].sort) {
-        is FPSort -> FPToFPDecl.constructDynamic(args, indices)
+        is FloatingPointSort -> FPToFPDecl.constructDynamic(args, indices)
         is RealSort -> RealToFPDecl.constructDynamic(args, indices)
         is BitVecSort -> SBitVecToFPDecl.constructDynamic(args, indices)
         else -> throw IllegalArgumentException()
@@ -3483,17 +3523,17 @@ internal object ToFPDecl :
 }
 
 internal object BitVecToFPDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "to_fp".toSymbol(),
         listOf(BitVecSort.fromSymbol("m")),
-        FPSort("eb".idx(), "sb".idx()),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 1) {
       "One argument expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -3517,17 +3557,17 @@ internal object BitVecToFPDecl :
 }
 
 internal object FPToFPDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "to_fp".toSymbol(),
-        listOf(SMTRoundingMode, FPSort("mb".idx(), "nb".idx())),
-        FPSort("eb".idx(), "sb".idx()),
+        listOf(RoundingModeSort, FloatingPointSort("mb".idx(), "nb".idx())),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -3535,7 +3575,7 @@ internal object FPToFPDecl :
       "Two indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
     require(args[0].sort is RoundingModeSort)
-    require(args[1].sort is FPSort)
+    require(args[1].sort is FloatingPointSort)
     require(indices.all { index -> index is NumeralIndex }) {
       "Expected all indices of $symbol to be numeral"
     }
@@ -3551,17 +3591,17 @@ internal object FPToFPDecl :
 }
 
 internal object RealToFPDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "to_fp".toSymbol(),
-        listOf(SMTRoundingMode, SMTReal),
-        FPSort("eb".idx(), "sb".idx()),
+        listOf(RoundingModeSort, RealSort),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -3585,17 +3625,17 @@ internal object RealToFPDecl :
 }
 
 internal object SBitVecToFPDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "to_fp".toSymbol(),
-        listOf(SMTRoundingMode, BitVecSort.fromSymbol("m")),
-        FPSort("eb".idx(), "sb".idx()),
+        listOf(RoundingModeSort, BitVecSort.fromSymbol("m")),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -3619,20 +3659,20 @@ internal object SBitVecToFPDecl :
 }
 
 internal object UBitVecToFPDecl :
-    SMTTheoryFunction<FPSort>(
+    SMTTheoryFunction<FloatingPointSort>(
         "to_fp_unsigned".toSymbol(),
         listOf(
-            SMTRoundingMode,
+            RoundingModeSort,
             BitVecSort.fromSymbol("m"),
         ),
-        FPSort("eb".idx(), "sb".idx()),
+        FloatingPointSort("eb".idx(), "sb".idx()),
         Associativity.NONE,
     ) {
 
   override fun constructDynamic(
       args: List<Expression<*>>,
       indices: List<Index>,
-  ): Expression<FPSort> {
+  ): Expression<FloatingPointSort> {
     require(args.size == 2) {
       "Two arguments expected for ${this.symbol} but ${args.size} were given:\n${args.joinToString(separator="\n")}"
     }
@@ -3658,7 +3698,7 @@ internal object UBitVecToFPDecl :
 internal object FPToUBitVecDecl :
     SMTTheoryFunction<BitVecSort>(
         "fp.to_ubv".toSymbol(),
-        listOf(SMTRoundingMode, FPSort("eb".idx(), "sb".idx())),
+        listOf(RoundingModeSort, FloatingPointSort("eb".idx(), "sb".idx())),
         BitVecSort.fromSymbol("m"),
         Associativity.NONE,
     ) {
@@ -3674,7 +3714,7 @@ internal object FPToUBitVecDecl :
       "One index expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
     require(args[0].sort is RoundingModeSort)
-    require(args[1].sort is FPSort)
+    require(args[1].sort is FloatingPointSort)
     require(indices.single() is NumeralIndex) {
       "Expected index of $symbol to be numeral but was ${indices.single()}"
     }
@@ -3687,7 +3727,7 @@ internal object FPToUBitVecDecl :
 internal object FPToSBitVecDecl :
     SMTTheoryFunction<BitVecSort>(
         "fp.to_sbv".toSymbol(),
-        listOf(SMTRoundingMode, FPSort("eb".idx(), "sb".idx())),
+        listOf(RoundingModeSort, FloatingPointSort("eb".idx(), "sb".idx())),
         BitVecSort.fromSymbol("m"),
         Associativity.NONE,
     ) {
@@ -3703,7 +3743,7 @@ internal object FPToSBitVecDecl :
       "One index expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
     require(args[0].sort is RoundingModeSort)
-    require(args[1].sort is FPSort)
+    require(args[1].sort is FloatingPointSort)
     require(indices.single() is NumeralIndex) {
       "Expected index of $symbol to be numeral but was ${indices.single()}"
     }
@@ -3717,9 +3757,9 @@ internal object FPToRealDecl :
     SMTTheoryFunction<RealSort>(
         "fp.to_real".toSymbol(),
         listOf(
-            FPSort("eb".idx(), "sb".idx()),
+            FloatingPointSort("eb".idx(), "sb".idx()),
         ),
-        SMTReal,
+        RealSort,
         Associativity.NONE,
     ) {
 
@@ -3733,7 +3773,7 @@ internal object FPToRealDecl :
     require(indices.isEmpty()) {
       "No indices expected for ${this.symbol} but ${indices.size} were given:\n${indices.joinToString(separator="\n")}"
     }
-    require(args.single().sort is FPSort) {
+    require(args.single().sort is FloatingPointSort) {
       "Expected arg of $symbol to be FloatingPoint but was ${args.single().sort}"
     }
 
@@ -3753,7 +3793,7 @@ internal object ArrayExTheory : Theory {
 internal object ArraySelectDecl :
     SMTTheoryFunction<Sort>(
         "select".toSymbol(),
-        listOf(SMTArray(SortParameter("X"), SortParameter("Y"))),
+        listOf(ArraySort(SortParameter("X"), SortParameter("Y"))),
         SortParameter("Y"),
         Associativity.NONE,
     ) {
@@ -3778,8 +3818,8 @@ internal object ArraySelectDecl :
 internal object ArrayStoreDecl :
     SMTTheoryFunction<ArraySort<Sort, Sort>>(
         "store".toSymbol(),
-        listOf(SMTArray(SortParameter("X"), SortParameter("Y"))),
-        SMTArray(SortParameter("X"), SortParameter("Y")),
+        listOf(ArraySort(SortParameter("X"), SortParameter("Y"))),
+        ArraySort(SortParameter("X"), SortParameter("Y")),
         Associativity.NONE,
     ) {
 
@@ -3849,9 +3889,9 @@ internal object StringsTheory : Theory {
 
   override val sorts =
       mapOf(
-          SMTString.symbol to StringFactory,
-          SMTRegLan.symbol to RegLanFactory,
-          SMTInt.symbol to IntFactory,
+          StringSort.symbol to StringFactory,
+          RegLanSort.symbol to RegLanFactory,
+          IntSort.symbol to IntFactory,
       )
 }
 
@@ -3859,7 +3899,7 @@ internal object CharDecl :
     SMTTheoryFunction<StringSort>(
         "char".toSymbol(),
         emptyList(),
-        SMTString,
+        StringSort,
         Associativity.NONE,
     ) {
 
@@ -3884,8 +3924,8 @@ internal object CharDecl :
 internal object StrConcatDecl :
     SMTTheoryFunction<StringSort>(
         "str.++".toSymbol(),
-        listOf(SMTString, SMTString),
-        SMTString,
+        listOf(StringSort, StringSort),
+        StringSort,
         Associativity.LEFT_ASSOC,
     ) {
 
@@ -3909,8 +3949,8 @@ internal object StrConcatDecl :
 internal object StrLengthDecl :
     SMTTheoryFunction<IntSort>(
         "str.len".toSymbol(),
-        listOf(SMTString),
-        SMTInt,
+        listOf(StringSort),
+        IntSort,
         Associativity.NONE,
     ) {
 
@@ -3933,8 +3973,8 @@ internal object StrLengthDecl :
 internal object StrLexOrderDecl :
     SMTTheoryFunction<BoolSort>(
         "str.<".toSymbol(),
-        listOf(SMTString, SMTString),
-        SMTBool,
+        listOf(StringSort, StringSort),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -3958,8 +3998,8 @@ internal object StrLexOrderDecl :
 internal object ToRegexDecl :
     SMTTheoryFunction<RegLanSort>(
         "str.to_re".toSymbol(),
-        listOf(SMTString),
-        SMTRegLan,
+        listOf(StringSort),
+        RegLanSort,
         Associativity.NONE,
     ) {
 
@@ -3982,8 +4022,8 @@ internal object ToRegexDecl :
 internal object InRegexDecl :
     SMTTheoryFunction<BoolSort>(
         "str.in_re".toSymbol(),
-        listOf(SMTString, SMTRegLan),
-        SMTBool,
+        listOf(StringSort, RegLanSort),
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -4008,7 +4048,7 @@ internal object RegexNoneDecl :
     SMTTheoryFunction<RegLanSort>(
         "re.none".toSymbol(),
         emptyList(),
-        SMTRegLan,
+        RegLanSort,
         Associativity.NONE,
     ) {
 
@@ -4031,7 +4071,7 @@ internal object RegexAllDecl :
     SMTTheoryFunction<RegLanSort>(
         "re.all".toSymbol(),
         emptyList(),
-        SMTRegLan,
+        RegLanSort,
         Associativity.NONE,
     ) {
 
@@ -4054,7 +4094,7 @@ internal object RegexAllCharDecl :
     SMTTheoryFunction<RegLanSort>(
         "re.allchar".toSymbol(),
         emptyList(),
-        SMTRegLan,
+        RegLanSort,
         Associativity.NONE,
     ) {
 
@@ -4076,8 +4116,8 @@ internal object RegexAllCharDecl :
 internal object RegexConcatDecl :
     SMTTheoryFunction<RegLanSort>(
         "re.++".toSymbol(),
-        listOf(SMTRegLan, SMTRegLan),
-        SMTRegLan,
+        listOf(RegLanSort, RegLanSort),
+        RegLanSort,
         Associativity.LEFT_ASSOC,
     ) {
 
@@ -4101,8 +4141,8 @@ internal object RegexConcatDecl :
 internal object RegexUnionDecl :
     SMTTheoryFunction<RegLanSort>(
         "re.union".toSymbol(),
-        listOf(SMTRegLan, SMTRegLan),
-        SMTRegLan,
+        listOf(RegLanSort, RegLanSort),
+        RegLanSort,
         Associativity.LEFT_ASSOC,
     ) {
 
@@ -4126,8 +4166,8 @@ internal object RegexUnionDecl :
 internal object RegexIntersecDecl :
     SMTTheoryFunction<RegLanSort>(
         "re.inter".toSymbol(),
-        listOf(SMTRegLan, SMTRegLan),
-        SMTRegLan,
+        listOf(RegLanSort, RegLanSort),
+        RegLanSort,
         Associativity.LEFT_ASSOC,
     ) {
 
@@ -4151,8 +4191,8 @@ internal object RegexIntersecDecl :
 internal object RegexStarDecl :
     SMTTheoryFunction<RegLanSort>(
         "re.*".toSymbol(),
-        listOf(SMTRegLan),
-        SMTRegLan,
+        listOf(RegLanSort),
+        RegLanSort,
         Associativity.NONE,
     ) {
 
@@ -4176,8 +4216,8 @@ internal object RegexStarDecl :
 internal object StrRefLexOrderDecl :
     SMTTheoryFunction<BoolSort>(
         "str.<=".toSymbol(),
-        listOf(SMTString, SMTString),
-        SMTBool,
+        listOf(StringSort, StringSort),
+        BoolSort,
         Associativity.CHAINABLE,
     ) {
 
@@ -4201,8 +4241,8 @@ internal object StrRefLexOrderDecl :
 internal object StrAtDecl :
     SMTTheoryFunction<StringSort>(
         "str.at".toSymbol(),
-        listOf(SMTString, SMTInt),
-        SMTString,
+        listOf(StringSort, IntSort),
+        StringSort,
         Associativity.NONE,
     ) {
 
@@ -4226,8 +4266,8 @@ internal object StrAtDecl :
 internal object StrSubstringDecl :
     SMTTheoryFunction<StringSort>(
         "str.substr".toSymbol(),
-        listOf(SMTString, SMTInt, SMTInt),
-        SMTString,
+        listOf(StringSort, IntSort, IntSort),
+        StringSort,
         Associativity.NONE,
     ) {
 
@@ -4252,8 +4292,8 @@ internal object StrSubstringDecl :
 internal object StrPrefixOfDecl :
     SMTTheoryFunction<BoolSort>(
         "str.prefixof".toSymbol(),
-        listOf(SMTString, SMTString),
-        SMTBool,
+        listOf(StringSort, StringSort),
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -4276,8 +4316,8 @@ internal object StrPrefixOfDecl :
 internal object StrSuffixOfDecl :
     SMTTheoryFunction<BoolSort>(
         "str.suffixof".toSymbol(),
-        listOf(SMTString, SMTString),
-        SMTBool,
+        listOf(StringSort, StringSort),
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -4300,8 +4340,8 @@ internal object StrSuffixOfDecl :
 internal object StrContainsDecl :
     SMTTheoryFunction<BoolSort>(
         "str.contains".toSymbol(),
-        listOf(SMTString, SMTString),
-        SMTBool,
+        listOf(StringSort, StringSort),
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -4324,8 +4364,8 @@ internal object StrContainsDecl :
 internal object StrIndexOfDecl :
     SMTTheoryFunction<IntSort>(
         "str.indexof".toSymbol(),
-        listOf(SMTString, SMTString, SMTInt),
-        SMTInt,
+        listOf(StringSort, StringSort, IntSort),
+        IntSort,
         Associativity.NONE,
     ) {
 
@@ -4350,8 +4390,8 @@ internal object StrIndexOfDecl :
 internal object StrReplaceDecl :
     SMTTheoryFunction<StringSort>(
         "str.replace".toSymbol(),
-        listOf(SMTString, SMTString, SMTString),
-        SMTString,
+        listOf(StringSort, StringSort, StringSort),
+        StringSort,
         Associativity.NONE,
     ) {
 
@@ -4374,8 +4414,8 @@ internal object StrReplaceDecl :
 internal object StrReplaceAllDecl :
     SMTTheoryFunction<StringSort>(
         "str.replace_all".toSymbol(),
-        listOf(SMTString, SMTString, SMTString),
-        SMTString,
+        listOf(StringSort, StringSort, StringSort),
+        StringSort,
         Associativity.NONE,
     ) {
 
@@ -4398,8 +4438,8 @@ internal object StrReplaceAllDecl :
 internal object StrReplaceRegexDecl :
     SMTTheoryFunction<StringSort>(
         "str.replace_re".toSymbol(),
-        listOf(SMTString, SMTRegLan, SMTString),
-        SMTString,
+        listOf(StringSort, RegLanSort, StringSort),
+        StringSort,
         Associativity.NONE,
     ) {
 
@@ -4424,8 +4464,8 @@ internal object StrReplaceRegexDecl :
 internal object StrReplaceAllRegexDecl :
     SMTTheoryFunction<StringSort>(
         "str.replace_re_all".toSymbol(),
-        listOf(SMTString, SMTRegLan, SMTString),
-        SMTString,
+        listOf(StringSort, RegLanSort, StringSort),
+        StringSort,
         Associativity.NONE,
     ) {
 
@@ -4450,8 +4490,8 @@ internal object StrReplaceAllRegexDecl :
 internal object RegexCompDecl :
     SMTTheoryFunction<RegLanSort>(
         "re.comp".toSymbol(),
-        listOf(SMTRegLan),
-        SMTRegLan,
+        listOf(RegLanSort),
+        RegLanSort,
         Associativity.NONE,
     ) {
 
@@ -4474,8 +4514,8 @@ internal object RegexCompDecl :
 internal object RegexDiffDecl :
     SMTTheoryFunction<RegLanSort>(
         "re.diff".toSymbol(),
-        listOf(SMTRegLan, SMTRegLan),
-        SMTRegLan,
+        listOf(RegLanSort, RegLanSort),
+        RegLanSort,
         Associativity.LEFT_ASSOC,
     ) {
 
@@ -4499,8 +4539,8 @@ internal object RegexDiffDecl :
 internal object RegexPlusDecl :
     SMTTheoryFunction<RegLanSort>(
         "re.+".toSymbol(),
-        listOf(SMTRegLan),
-        SMTRegLan,
+        listOf(RegLanSort),
+        RegLanSort,
         Associativity.NONE,
     ) {
 
@@ -4523,8 +4563,8 @@ internal object RegexPlusDecl :
 internal object RegexOptionDecl :
     SMTTheoryFunction<RegLanSort>(
         "re.opt".toSymbol(),
-        listOf(SMTRegLan),
-        SMTRegLan,
+        listOf(RegLanSort),
+        RegLanSort,
         Associativity.NONE,
     ) {
 
@@ -4547,8 +4587,8 @@ internal object RegexOptionDecl :
 internal object RegexRangeDecl :
     SMTTheoryFunction<RegLanSort>(
         "re.range".toSymbol(),
-        listOf(SMTString, SMTString),
-        SMTRegLan,
+        listOf(StringSort, StringSort),
+        RegLanSort,
         Associativity.NONE,
     ) {
 
@@ -4571,8 +4611,8 @@ internal object RegexRangeDecl :
 internal object RegexPowerDecl :
     SMTTheoryFunction<RegLanSort>(
         "re.^".toSymbol(),
-        listOf(SMTRegLan),
-        SMTRegLan,
+        listOf(RegLanSort),
+        RegLanSort,
         Associativity.NONE,
     ) {
 
@@ -4598,8 +4638,8 @@ internal object RegexPowerDecl :
 internal object RegexLoopDecl :
     SMTTheoryFunction<RegLanSort>(
         "re.loop".toSymbol(),
-        listOf(SMTRegLan),
-        SMTRegLan,
+        listOf(RegLanSort),
+        RegLanSort,
         Associativity.NONE,
     ) {
 
@@ -4629,8 +4669,8 @@ internal object RegexLoopDecl :
 internal object StrIsDigitDecl :
     SMTTheoryFunction<BoolSort>(
         "str.is_digit".toSymbol(),
-        listOf(SMTString),
-        SMTBool,
+        listOf(StringSort),
+        BoolSort,
         Associativity.NONE,
     ) {
 
@@ -4653,8 +4693,8 @@ internal object StrIsDigitDecl :
 internal object StrToCodeDecl :
     SMTTheoryFunction<IntSort>(
         "str.to_code".toSymbol(),
-        listOf(SMTString),
-        SMTInt,
+        listOf(StringSort),
+        IntSort,
         Associativity.NONE,
     ) {
 
@@ -4677,8 +4717,8 @@ internal object StrToCodeDecl :
 internal object StrFromCodeDecl :
     SMTTheoryFunction<StringSort>(
         "str.from_code".toSymbol(),
-        listOf(SMTInt),
-        SMTString,
+        listOf(IntSort),
+        StringSort,
         Associativity.NONE,
     ) {
 
@@ -4703,8 +4743,8 @@ internal object StrFromCodeDecl :
 internal object StrToIntDecl :
     SMTTheoryFunction<IntSort>(
         "str.to_int".toSymbol(),
-        listOf(SMTString),
-        SMTInt,
+        listOf(StringSort),
+        IntSort,
         Associativity.NONE,
     ) {
 
@@ -4727,8 +4767,8 @@ internal object StrToIntDecl :
 internal object StrFromIntDecl :
     SMTTheoryFunction<StringSort>(
         "str.from_int".toSymbol(),
-        listOf(SMTInt),
-        SMTString,
+        listOf(IntSort),
+        StringSort,
         Associativity.NONE,
     ) {
 

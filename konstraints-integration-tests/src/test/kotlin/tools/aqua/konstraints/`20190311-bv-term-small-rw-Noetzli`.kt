@@ -19,14 +19,14 @@
 package tools.aqua.konstraints
 
 import tools.aqua.konstraints.dsl.*
+import tools.aqua.konstraints.smt.BitVecSort
 import tools.aqua.konstraints.smt.QF_BV
-import tools.aqua.konstraints.smt.SMTBitVec
 import tools.aqua.konstraints.smt.bitvec
 
 class `20190311-bv-term-small-rw-Noetzli` {
   fun `bv-term-small-rw_1`() {
     smt(QF_BV) {
-      val s by declaringConst(SMTBitVec(32))
+      val s by declaringConst(BitVecSort(32))
 
       assert { not(s bvand s eq s) }
     }
@@ -34,7 +34,7 @@ class `20190311-bv-term-small-rw-Noetzli` {
 
   fun `bv-term-small-rw_2`() {
     smt(QF_BV) {
-      val s by declaringConst(SMTBitVec(32))
+      val s by declaringConst(BitVecSort(32))
 
       assert {
         not(s bvlshr s eq "#b0".bitvec(32))
@@ -45,8 +45,8 @@ class `20190311-bv-term-small-rw-Noetzli` {
 
   fun `bv-term-small-rw_64`() {
     smt(QF_BV) {
-      val s by declaringConst(SMTBitVec(32))
-      val t by declaringConst(SMTBitVec(32))
+      val s by declaringConst(BitVecSort(32))
+      val t by declaringConst(BitVecSort(32))
 
       assert { not((s bvor (t bvor t)) eq (s bvor t)) }
     }
@@ -54,8 +54,8 @@ class `20190311-bv-term-small-rw-Noetzli` {
 
   fun `bv-term-small-rw_64-named-expressions`() {
     smt(QF_BV) {
-      val s by declaringConst(SMTBitVec(32))
-      val t by declaringConst(SMTBitVec(32))
+      val s by declaringConst(BitVecSort(32))
+      val t by declaringConst(BitVecSort(32))
 
       assert {
         val expr1 = s bvor (t bvor t)

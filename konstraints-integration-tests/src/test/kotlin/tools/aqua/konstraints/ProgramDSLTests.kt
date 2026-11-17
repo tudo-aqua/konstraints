@@ -27,11 +27,11 @@ import org.junit.jupiter.params.provider.Arguments.arguments
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.dsl.BenchmarkCategory
 import tools.aqua.konstraints.dsl.smt
+import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.BooleanOptionValue
 import tools.aqua.konstraints.smt.ConstantAttributeValue
 import tools.aqua.konstraints.smt.NumeralOptionValue
 import tools.aqua.konstraints.smt.QF_UF
-import tools.aqua.konstraints.smt.SMTBool
 import tools.aqua.konstraints.smt.SatStatus
 import tools.aqua.konstraints.smt.Sort
 import tools.aqua.konstraints.smt.StringConstant
@@ -76,7 +76,7 @@ class ProgramDSLTests {
           reproducibleResourceLimit(0)
         }
 
-        val x = const("x", SMTBool)
+        val x = const("x", BoolSort)
 
         assert { x }
         solve(solver, false, 5000)
@@ -144,5 +144,5 @@ class ProgramDSLTests {
     assertEquals(program.context.getFunc(name).sort, sort)
   }
 
-  fun getFunNameAndSort(): Stream<Arguments> = Stream.of(arguments("x", SMTBool))
+  fun getFunNameAndSort(): Stream<Arguments> = Stream.of(arguments("x", BoolSort))
 }

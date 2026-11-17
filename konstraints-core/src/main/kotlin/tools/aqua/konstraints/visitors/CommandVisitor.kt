@@ -34,7 +34,7 @@ interface CommandVisitor<T> {
         is Pop -> visit(command)
         is Push -> visit(command)
         is DefineConst<*> -> visit(command)
-        is DefineSort -> visit(command)
+        is DefineSort<*> -> visit(command)
         is NullOp -> visit(command)
         is GetValue -> TODO()
         is DeclareDatatype -> TODO()
@@ -63,7 +63,7 @@ interface CommandVisitor<T> {
 
   fun visit(pop: Pop): T
 
-  fun visit(defineSort: DefineSort): T
+  fun visit(defineSort: DefineSort<*>): T
 
   fun visit(nullOp: NullOp): T
 }

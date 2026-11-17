@@ -38,14 +38,14 @@ class DSLTests {
 
     val program =
         smt(QF_FPLRA) {
-          val A = const("A", SMTBool)
-          val B = const("B", SMTBool)
-          val C = const("C", SMTBool)
+          val A = const("A", BoolSort)
+          val B = const("B", BoolSort)
+          val C = const("C", BoolSort)
 
-          val D = const("D", SMTReal)
-          val E = const("E", SMTReal)
+          val D = const("D", RealSort)
+          val E = const("E", RealSort)
 
-          val F = const("F", FPSort(5, 11))
+          val F = const("F", FloatingPointSort(5, 11))
 
           assert { ite { A } then { B } otherwise { C } }
 
@@ -171,8 +171,8 @@ class DSLTests {
           ),
           arguments(
               smt(QF_FP) {
-                val A = const(FPSort(11, 53))
-                val B = const(FPSort(11, 53))
+                val A = const(FloatingPointSort(11, 53))
+                val B = const(FloatingPointSort(11, 53))
 
                 assert { (A fpadd B) eq (B fpadd A) }
               },
@@ -189,9 +189,9 @@ class DSLTests {
           ),
           arguments(
               smt(QF_FP) {
-                val A = const(FPSort(11, 53))
-                val B = const(FPSort(11, 53))
-                val C = const(FPSort(11, 53))
+                val A = const(FloatingPointSort(11, 53))
+                val B = const(FloatingPointSort(11, 53))
+                val C = const(FloatingPointSort(11, 53))
 
                 assert { ((A fpmul B) fpadd C) fpeq (fpfma { A } mul { B } add { C }) }
               },
@@ -199,9 +199,9 @@ class DSLTests {
           ),
           arguments(
               smt(QF_FP) {
-                val A = const(FPSort(11, 53))
-                val B = const(FPSort(11, 53))
-                val C = const(FPSort(11, 53))
+                val A = const(FloatingPointSort(11, 53))
+                val B = const(FloatingPointSort(11, 53))
+                val C = const(FloatingPointSort(11, 53))
 
                 assert { ((A fpmul B) fpadd C) eq (fpfma { A } mul { B } add { C }) }
               },
@@ -326,7 +326,7 @@ class DSLTests {
           arguments(
               smt(QF_UFBV) {
                 val bvugt2 by
-                    defining(SMTBool, BitVecSort(8), BitVecSort(8)) { s, t ->
+                    defining(BoolSort, BitVecSort(8), BitVecSort(8)) { s, t ->
                       not { s eq t } and not { s bvult t }
                     }
                 assert { bvugt2("#b11111111".bitvec(), "#b01111111".bitvec()) }
@@ -335,25 +335,25 @@ class DSLTests {
           ),
           arguments(
               smt(QF_UF) {
-                val A by declaringConst(SMTBool)
-                val B by declaringConst(SMTBool)
+                val A by declaringConst(BoolSort)
+                val B by declaringConst(BoolSort)
                 assert { A implies { B } implies A }
               },
               SatStatus.SAT,
           ),
           arguments(
               smt(QF_UF) {
-                val A = const(SMTBool)
-                val B = const(SMTBool)
+                val A = const(BoolSort)
+                val B = const(BoolSort)
                 assert { A implies { B } implies A }
               },
               SatStatus.SAT,
           ),
           arguments(
               smt(QF_FP) {
-                val A = const(FPSort(5, 11))
-                val B = const(FPSort(5, 11))
-                val C = const(FPSort(5, 11))
+                val A = const(FloatingPointSort(5, 11))
+                val B = const(FloatingPointSort(5, 11))
+                val C = const(FloatingPointSort(5, 11))
                 assert { A fpleq B fpleq C }
                 assert { A fpleq { B } fpleq C }
                 assert { { A } fpleq B fpleq C }
@@ -363,8 +363,8 @@ class DSLTests {
           ),
           arguments(
               smt(QF_ABV) {
-                val x by declaringConst(SMTArray(BitVecSort(32), BitVecSort(8)))
-                val y by declaringConst(SMTArray(BitVecSort(32), BitVecSort(8)))
+                val x by declaringConst(ArraySort(BitVecSort(32), BitVecSort(8)))
+                val y by declaringConst(ArraySort(BitVecSort(32), BitVecSort(8)))
 
                 assert {
                   ("#b0".bitvec(30) concat extract(2, 1) { select(x, "#b0".bitvec(32)) }) eq

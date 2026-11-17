@@ -25,22 +25,21 @@ import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import tools.aqua.konstraints.dsl.*
+import tools.aqua.konstraints.smt.ArraySort
 import tools.aqua.konstraints.smt.BitVecSort
 import tools.aqua.konstraints.smt.FPMul
+import tools.aqua.konstraints.smt.FloatingPointSort
+import tools.aqua.konstraints.smt.IntSort
 import tools.aqua.konstraints.smt.QF_ASLIA
 import tools.aqua.konstraints.smt.QF_FP
 import tools.aqua.konstraints.smt.QF_IDL
 import tools.aqua.konstraints.smt.QF_NIRA
 import tools.aqua.konstraints.smt.QF_UFBV
-import tools.aqua.konstraints.smt.SMTArray
-import tools.aqua.konstraints.smt.SMTBitVec
+import tools.aqua.konstraints.smt.RealSort
+import tools.aqua.konstraints.smt.RoundingModeSort
 import tools.aqua.konstraints.smt.SMTFP32
-import tools.aqua.konstraints.smt.SMTFloatingPoint
-import tools.aqua.konstraints.smt.SMTInt
-import tools.aqua.konstraints.smt.SMTReal
-import tools.aqua.konstraints.smt.SMTRoundingMode
-import tools.aqua.konstraints.smt.SMTString
 import tools.aqua.konstraints.smt.SatStatus
+import tools.aqua.konstraints.smt.StringSort
 import tools.aqua.konstraints.smt.UFBV
 import tools.aqua.konstraints.smt.bitvec
 import tools.aqua.konstraints.solvers.InteractiveZ3Solver
@@ -86,13 +85,13 @@ class Examples {
           // note that these will be named like the kotlin field on the smt side
           // directly creating a constant will return the created expression that can directly be
           // used
-          val u by declaringConst(SMTBitVec(32))
+          val u by declaringConst(BitVecSort(32))
 
           // creating a function requires instantiating the function to retrieve the expression
-          val v by declaring(SMTBitVec(32))
+          val v by declaring(BitVecSort(32))
 
           // we can declare a function that takes two bitvectors and returns a bitvector as follows
-          val f by declaring(SMTBitVec(32), SMTBitVec(32), SMTBitVec(32))
+          val f by declaring(BitVecSort(32), BitVecSort(32), BitVecSort(32))
 
           // to build constraints over the terms we created the infix operators can be used
           // note that we need to either use invoke or .instance to retrieve the expression from v
@@ -154,13 +153,13 @@ class Examples {
             produceModels(true)
           }
 
-          val f by declaring(SMTBitVec(32), SMTBitVec(32), SMTBitVec(32))
+          val f by declaring(BitVecSort(32), BitVecSort(32), BitVecSort(32))
 
           // we use the forall function to generate an all quantified expression over two bitvectors
           // x and y
           // x and y are only valid within the scope of the lambda
           // we could also store the all quantified expression by writing val qExpr = forall(...)
-          assert(forall(SMTBitVec(32), SMTBitVec(32)) { x, y -> f(x, y) bvult (x bvadd y) })
+          assert(forall(BitVecSort(32), BitVecSort(32)) { x, y -> f(x, y) bvult (x bvadd y) })
 
           val solver = getSolver()
 
@@ -204,8 +203,8 @@ class Examples {
             produceModels(true)
           }
 
-          val u by declaringConst(SMTInt)
-          val v by declaringConst(SMTReal)
+          val u by declaringConst(IntSort)
+          val v by declaringConst(RealSort)
 
           // the dsl also allows for easy use of kotlin primitives in smt programs
           // for IntSort terms any of the following may be used as its automatically converted to an
@@ -262,8 +261,8 @@ class Examples {
             produceModels(true)
           }
 
-          val u by declaringConst(SMTInt)
-          val v by declaringConst(SMTInt)
+          val u by declaringConst(IntSort)
+          val v by declaringConst(IntSort)
 
           // if-then-else conditions can be formulated in a kotlin-like syntax
           val simpleIf = ite(u gt v) then u otherwise v
@@ -350,7 +349,7 @@ class Examples {
           // also note that we can not name the kotlin val bvsdiv as this would lead to an illegal
           // shadowing of a theory symbol
           val bvsdiv8 by
-              defining(SMTBitVec(8), SMTBitVec(8), SMTBitVec(8)) { s, t ->
+              defining(BitVecSort(8), BitVecSort(8), BitVecSort(8)) { s, t ->
                 // we emulate let by storing the extract operation in a local variable
                 val msb_s = extract(s.sort.bits - 1, s.sort.bits - 1) { s }
                 val msb_t = extract(t.sort.bits - 1, t.sort.bits - 1) { t }
@@ -379,7 +378,7 @@ class Examples {
 
           assert {
             // we use an all-quantified expression to verify that our bvsdiv behaves as expected
-            forall(SMTBitVec(8), SMTBitVec(8)) { s, t -> (s bvsdiv t) eq bvsdiv8(s, t) }
+            forall(BitVecSort(8), BitVecSort(8)) { s, t -> (s bvsdiv t) eq bvsdiv8(s, t) }
           }
 
           val solver = getSolver()
@@ -445,12 +444,12 @@ class Examples {
 
           // its important that this is a local function so we have access to the SMTProgramBuilder
           // functions
-          fun bvsdivn(n: Int): UserDefinedSMTFunction2<BitVecSort, SMTBitVec, SMTBitVec> {
+          fun bvsdivn(n: Int): UserDefinedSMTFunction2<BitVecSort, BitVecSort, BitVecSort> {
             require(n > 0)
 
             // note that we need to manually give a name here to avoid illegal shadowing
             val bvsdiv by
-                defining("bvsdiv$n", SMTBitVec(n), SMTBitVec(n), SMTBitVec(n)) { s, t ->
+                defining("bvsdiv$n", BitVecSort(n), BitVecSort(n), BitVecSort(n)) { s, t ->
                   // we emulate let by storing the extract operation in a local variable
                   val msb_s = extract(s.sort.bits - 1, s.sort.bits - 1) { s }
                   val msb_t = extract(t.sort.bits - 1, t.sort.bits - 1) { t }
@@ -491,7 +490,7 @@ class Examples {
             val bvsdiv = bvsdivn(i)
             assert {
               // we use an all-quantified expression to verify that our bvsdiv behaves as expected
-              forall(SMTBitVec(i), SMTBitVec(i)) { s, t -> (s bvsdiv t) eq bvsdiv(s, t) }
+              forall(BitVecSort(i), BitVecSort(i)) { s, t -> (s bvsdiv t) eq bvsdiv(s, t) }
             }
           }
 
@@ -529,8 +528,8 @@ class Examples {
             produceModels(true)
           }
 
-          val intArray by declaringConst(SMTArray(SMTInt, SMTInt))
-          val foo by declaringConst(SMTInt)
+          val intArray by declaringConst(ArraySort(IntSort, IntSort))
+          val foo by declaringConst(IntSort)
 
           // we can now store values in the array using any combination of integer primitives and
           // IntSort terms
@@ -553,7 +552,7 @@ class Examples {
                   } at { 5 })
 
           // arrays can also use other kotlin primitives like strings
-          val stringArray by declaringConst(SMTArray(SMTInt, SMTString))
+          val stringArray by declaringConst(ArraySort(IntSort, StringSort))
           val filledStringArray =
               stringArray store ("foo" at 0) then ("bar" at 1) then ({ javaClass.name } at 2)
 
@@ -601,13 +600,13 @@ class Examples {
           // there are no compile-time checks so its completely legal to mix
           // floating point types with different sizes however this will lead to runtime errors
 
-          val foo by declaringConst(SMTFloatingPoint(8, 24))
+          val foo by declaringConst(FloatingPointSort(8, 24))
 
           // the smt shorthand for Float32 can be used
           val bar by declaringConst(SMTFP32)
 
           // we can also declare a free function of rounding mode sort
-          val rm by declaring(SMTRoundingMode)
+          val rm by declaring(RoundingModeSort)
 
           // infix operator exist in 2 variants the 'default' version without a name postfix
           // they use the default rounding mode rne (round nearest ties to even)

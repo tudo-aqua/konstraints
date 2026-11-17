@@ -74,6 +74,7 @@ import tools.aqua.konstraints.smt.SMTProgram
 import tools.aqua.konstraints.smt.Sort
 import tools.aqua.konstraints.smt.SortedVar
 import tools.aqua.konstraints.smt.Symbol
+import tools.aqua.konstraints.smt.UserDefinedSortFactory
 import tools.aqua.konstraints.smt.cast
 import tools.aqua.konstraints.smt.setInfo
 
@@ -265,7 +266,7 @@ object SMTScriptParser {
 
     val sort = SMTParser.parseSort(lexer, program)
 
-    program.defineSort(symbol, typeParameter, sort)
+    program.context.currentContext.definedSorts[symbol] = UserDefinedSortFactory(symbol, sort)
   }
 
   @OptIn(ExperimentalContracts::class)

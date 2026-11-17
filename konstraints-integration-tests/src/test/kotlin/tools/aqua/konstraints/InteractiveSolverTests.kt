@@ -34,15 +34,15 @@ import tools.aqua.konstraints.dsl.eq
 import tools.aqua.konstraints.dsl.ite
 import tools.aqua.konstraints.parser.SMTScriptParser
 import tools.aqua.konstraints.smt.BitVecLiteral
+import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Expression
 import tools.aqua.konstraints.smt.FPMinusZero
 import tools.aqua.konstraints.smt.FPZero
 import tools.aqua.konstraints.smt.False
 import tools.aqua.konstraints.smt.IntLiteral
+import tools.aqua.konstraints.smt.IntSort
 import tools.aqua.konstraints.smt.RealDiv
 import tools.aqua.konstraints.smt.RealLiteral
-import tools.aqua.konstraints.smt.SMTBool
-import tools.aqua.konstraints.smt.SMTInt
 import tools.aqua.konstraints.smt.SatStatus
 import tools.aqua.konstraints.smt.SortedVar
 import tools.aqua.konstraints.smt.StringLiteral
@@ -84,8 +84,8 @@ class InteractiveSolverTests {
           arguments(
               "(set-logic QF_UFLIA)(declare-fun foo (Int Int) Int)(assert (and (= (foo 2 0) 2) (= (foo 1 0) 1) (= (foo 0 0) 0) (= (foo 2 1) 3) (= (foo 1 1) 2) (= (foo 0 1) 1)))(check-sat)(get-model)",
               listOf(
-                      SortedVar("x!0".toSymbol(), SMTInt),
-                      SortedVar("x!1".toSymbol(), SMTInt),
+                      SortedVar("x!0".toSymbol(), IntSort),
+                      SortedVar("x!1".toSymbol(), IntSort),
                   )
                   .let {
                     val x0 = it[0].instance
@@ -103,7 +103,7 @@ class InteractiveSolverTests {
           ),
           arguments(
               "(set-logic QF_UFLIA)(declare-fun foo (Int) Int)(assert (and (= (foo 2) 2) (= (foo 1) 1) (= (foo 0) 0)))(check-sat)(get-model)",
-              listOf(SortedVar("x!0".toSymbol(), SMTInt)).let {
+              listOf(SortedVar("x!0".toSymbol(), IntSort)).let {
                 val x0 = it[0].instance
                 ite(x0 eq 1) then
                     IntLiteral(1) otherwise
@@ -112,7 +112,7 @@ class InteractiveSolverTests {
           ),
           arguments(
               "(set-logic QF_UFLIA)(declare-fun foo (Bool) Int)(assert (and (= (foo true) 1) (= (foo false) 0)))(check-sat)(get-model)",
-              listOf(SortedVar("x!0".toSymbol(), SMTBool)).let {
+              listOf(SortedVar("x!0".toSymbol(), BoolSort)).let {
                 val x0 = it[0].instance
                 ite(x0 eq False) then IntLiteral(0) otherwise IntLiteral(1)
               },

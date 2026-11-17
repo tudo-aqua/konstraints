@@ -639,7 +639,7 @@ class ExistsExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
 
   constructor(vararg vars: SortedVar<*>, term: Expression<BoolSort>) : this(vars.toList(), term)
 
-  override val sort = SMTBool
+  override val sort = BoolSort
   override val symbol = Keyword("exists")
   override val children: List<Expression<*>> = listOf(term)
 
@@ -679,7 +679,7 @@ class ForallExpression(val vars: List<SortedVar<*>>, val term: Expression<BoolSo
   override val theories = emptySet<Theories>()
   override val func = null
 
-  override val sort = SMTBool
+  override val sort = BoolSort
   override val symbol = Keyword("forall")
   override val children: List<Expression<*>> = listOf(term)
 

@@ -31,14 +31,13 @@ import tools.aqua.konstraints.smt.ALL
 import tools.aqua.konstraints.smt.And
 import tools.aqua.konstraints.smt.BVAdd
 import tools.aqua.konstraints.smt.BitVecLiteral
+import tools.aqua.konstraints.smt.BitVecSort
+import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Equals
+import tools.aqua.konstraints.smt.IntSort
 import tools.aqua.konstraints.smt.MutableSMTProgram
 import tools.aqua.konstraints.smt.Or
 import tools.aqua.konstraints.smt.QF_UFBV
-import tools.aqua.konstraints.smt.SMTBitVec
-import tools.aqua.konstraints.smt.SMTBool
-import tools.aqua.konstraints.smt.SMTInt
-import tools.aqua.konstraints.smt.SMTString
 import tools.aqua.konstraints.smt.SatStatus
 import tools.aqua.konstraints.smt.SortedVar
 import tools.aqua.konstraints.smt.StringLiteral
@@ -64,7 +63,7 @@ class PushTests {
   fun test() {
     val program = MutableSMTProgram()
     program.setLogic(QF_UFBV)
-    val foo = program.declareConst("foo".toSymbol(), SMTBitVec(8))
+    val foo = program.declareConst("foo".toSymbol(), BitVecSort(8))
 
     program.assert(Equals(foo(), BitVecLiteral(8, 8)))
 
@@ -78,7 +77,7 @@ class PushTests {
 
     val (status, model) =
         program.push(InteractiveZ3Solver(), true) {
-          val bar = declareConst("bar".toSymbol(), SMTBitVec(8))
+          val bar = declareConst("bar".toSymbol(), BitVecSort(8))
           assert(Equals(foo(), bar()))
         }
 
@@ -102,7 +101,7 @@ class PushTests {
   fun pushWithDefineFun() {
     val program = MutableSMTProgram()
     program.setLogic(QF_UFBV)
-    val foo = program.declareConst("foo".toSymbol(), SMTBitVec(8))
+    val foo = program.declareConst("foo".toSymbol(), BitVecSort(8))
 
     // add base assertions
     program.assert(Equals(foo(), BitVecLiteral(8, 8)))
@@ -110,9 +109,9 @@ class PushTests {
     // push and solve
     val (status, model) =
         program.push(getSolver(), true) {
-          val bar = declareConst("bar".toSymbol(), SMTBitVec(8))
+          val bar = declareConst("bar".toSymbol(), BitVecSort(8))
           val abc =
-              defineFun("func", listOf(SMTBitVec(8), SMTBitVec(8)), SMTBitVec(8)) {
+              defineFun("func", listOf(BitVecSort(8), BitVecSort(8)), BitVecSort(8)) {
                   params: List<SortedVar<*>> ->
                 BVAdd(params[0].instance.cast(), params[1].instance.cast())
               }
@@ -141,10 +140,10 @@ class PushTests {
     val program = MutableSMTProgram()
     program.setLogic(ALL)
 
-    val nullConst = program.declareConst("null", SMTInt)
+    val nullConst = program.declareConst("null", IntSort)
 
     val objExtends =
-        program.defineFun("obj.extends", listOf(SMTString, SMTString), SMTBool) { params ->
+        program.defineFun("obj.extends", listOf(StringSort, StringSort), BoolSort) { params ->
           val sub = params[0].instance.cast<StringSort>()
           val sup = params[1].instance.cast<StringSort>()
           Or(
@@ -165,8 +164,8 @@ class PushTests {
     val objMethodOf =
         program.defineFun(
             "obj.method.of",
-            listOf(SMTString, SMTString, SMTString, SMTString),
-            SMTBool,
+            listOf(StringSort, StringSort, StringSort, StringSort),
+            BoolSort,
         ) { params ->
           val cls = params[0].instance.cast<StringSort>()
           val method = params[1].instance.cast<StringSort>()
@@ -179,14 +178,14 @@ class PushTests {
           )
         }
 
-    val obj0 = program.declareConst("__object_0", SMTInt)
-    val obj0cls = program.declareConst("__object_0.cls", SMTString)
-    val obj0x = program.declareConst("__object_0.x", SMTBitVec(32))
-    val obj0a = program.declareConst("__object_0.a", SMTInt)
-    val obj0aCls = program.declareConst("__object_0.a.cls", SMTString)
-    val int0 = program.declareConst("__int_0", SMTBitVec(32))
-    val obj0init = program.declareConst("__object_0.init", SMTString)
-    val obj0err = program.declareConst("__object_0.err", SMTString)
+    val obj0 = program.declareConst("__object_0", IntSort)
+    val obj0cls = program.declareConst("__object_0.cls", StringSort)
+    val obj0x = program.declareConst("__object_0.x", BitVecSort(32))
+    val obj0a = program.declareConst("__object_0.a", IntSort)
+    val obj0aCls = program.declareConst("__object_0.a.cls", StringSort)
+    val int0 = program.declareConst("__int_0", BitVecSort(32))
+    val obj0init = program.declareConst("__object_0.init", StringSort)
+    val obj0err = program.declareConst("__object_0.err", StringSort)
 
     program.assert(
         Or(
@@ -442,7 +441,7 @@ class PushTests {
     val nullConst = program.declareConst("null", objectSort)
 
     val objExtends =
-        program.defineFun("obj.extends", listOf(SMTString, SMTString), SMTBool) { params ->
+        program.defineFun("obj.extends", listOf(StringSort, StringSort), BoolSort) { params ->
           val sub = params[0].instance.cast<StringSort>()
           val sup = params[1].instance.cast<StringSort>()
           Or(
@@ -463,8 +462,8 @@ class PushTests {
     val objMethodOf =
         program.defineFun(
             "obj.method.of",
-            listOf(SMTString, SMTString, SMTString, SMTString),
-            SMTBool,
+            listOf(StringSort, StringSort, StringSort, StringSort),
+            BoolSort,
         ) { params ->
           val cls = params[0].instance.cast<StringSort>()
           val method = params[1].instance.cast<StringSort>()
@@ -478,13 +477,13 @@ class PushTests {
         }
 
     val obj0 = program.declareConst("__object_0", objectSort)
-    val obj0cls = program.declareConst("__object_0.cls", SMTString)
-    val obj0x = program.declareConst("__object_0.x", SMTBitVec(32))
+    val obj0cls = program.declareConst("__object_0.cls", StringSort)
+    val obj0x = program.declareConst("__object_0.x", BitVecSort(32))
     val obj0a = program.declareConst("__object_0.a", objectSort)
-    val obj0aCls = program.declareConst("__object_0.a.cls", SMTString)
-    val int0 = program.declareConst("__int_0", SMTBitVec(32))
-    val obj0init = program.declareConst("__object_0.init", SMTString)
-    val obj0err = program.declareConst("__object_0.err", SMTString)
+    val obj0aCls = program.declareConst("__object_0.a.cls", StringSort)
+    val int0 = program.declareConst("__int_0", BitVecSort(32))
+    val obj0init = program.declareConst("__object_0.init", StringSort)
+    val obj0err = program.declareConst("__object_0.err", StringSort)
 
     program.assert(
         Or(

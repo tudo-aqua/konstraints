@@ -429,43 +429,49 @@ infix fun <X : RealSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(
 
 @JvmName("selectFPSortFloat")
 /** Select value stored at [index] in [this]. */
-infix fun <X : FPSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: Float) =
+infix fun <X : FloatingPointSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: Float) =
     ArraySelect(this, FloatingPointLiteral(index))
 
 @JvmName("selectFPSortFloatLambdaIndex")
 /** Select value stored at [index] in [this]. */
-infix fun <X : FPSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: (() -> Float)) =
-    ArraySelect(this, FloatingPointLiteral(index()))
+infix fun <X : FloatingPointSort, Y : Sort> Expression<ArraySort<X, Y>>.select(
+    index: (() -> Float)
+) = ArraySelect(this, FloatingPointLiteral(index()))
 
 @JvmName("selectFPSortFloatLambdaArray")
 /** Select value stored at [index] in [this]. */
-infix fun <X : FPSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(index: Float) =
-    ArraySelect(this(), FloatingPointLiteral(index))
+infix fun <X : FloatingPointSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(
+    index: Float
+) = ArraySelect(this(), FloatingPointLiteral(index))
 
 @JvmName("selectFPSortFloatLambda")
 /** Select value stored at [index] in [this]. */
-infix fun <X : FPSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(index: (() -> Float)) =
-    ArraySelect(this(), FloatingPointLiteral(index()))
+infix fun <X : FloatingPointSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(
+    index: (() -> Float)
+) = ArraySelect(this(), FloatingPointLiteral(index()))
 
 @JvmName("selectFPSortDouble")
 /** Select value stored at [index] in [this]. */
-infix fun <X : FPSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: Double) =
+infix fun <X : FloatingPointSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: Double) =
     ArraySelect(this, FloatingPointLiteral(index))
 
 @JvmName("selectFPSortDoubleLambdaIndex")
 /** Select value stored at [index] in [this]. */
-infix fun <X : FPSort, Y : Sort> Expression<ArraySort<X, Y>>.select(index: (() -> Double)) =
-    ArraySelect(this, FloatingPointLiteral(index()))
+infix fun <X : FloatingPointSort, Y : Sort> Expression<ArraySort<X, Y>>.select(
+    index: (() -> Double)
+) = ArraySelect(this, FloatingPointLiteral(index()))
 
 @JvmName("selectFPSortDoubleLambdaArray")
 /** Select value stored at [index] in [this]. */
-infix fun <X : FPSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(index: Double) =
-    ArraySelect(this(), FloatingPointLiteral(index))
+infix fun <X : FloatingPointSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(
+    index: Double
+) = ArraySelect(this(), FloatingPointLiteral(index))
 
 @JvmName("selectFPSortDoubleLambda")
 /** Select value stored at [index] in [this]. */
-infix fun <X : FPSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(index: (() -> Double)) =
-    ArraySelect(this(), FloatingPointLiteral(index()))
+infix fun <X : FloatingPointSort, Y : Sort> (() -> Expression<ArraySort<X, Y>>).select(
+    index: (() -> Double)
+) = ArraySelect(this(), FloatingPointLiteral(index()))
 
 @JvmName("selectBitVecSortByte")
 /** Select value stored at [index] in [this]. */
@@ -1675,139 +1681,147 @@ infix fun (() -> ArrayStore<IntSort, RegLanSort>).then(
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<FPSort>.at(index: Expression<IntSort>) = this to index
+infix fun Expression<FloatingPointSort>.at(index: Expression<IntSort>) = this to index
 
 @JvmName("storeFPSortIntSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<IntSort, FPSort>>.store(
-    entry: Pair<Expression<FPSort>, Expression<IntSort>>
+infix fun Expression<ArraySort<IntSort, FloatingPointSort>>.store(
+    entry: Pair<Expression<FloatingPointSort>, Expression<IntSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("thenFPSortIntSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<IntSort, FPSort>.then(entry: Pair<Expression<FPSort>, Expression<IntSort>>) =
-    ArrayStore(this, entry.second, entry.first)
+infix fun ArrayStore<IntSort, FloatingPointSort>.then(
+    entry: Pair<Expression<FloatingPointSort>, Expression<IntSort>>
+) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("atFPSortIntSortLambdaValue")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: Expression<IntSort>) = this() to index
+infix fun (() -> Expression<FloatingPointSort>).at(index: Expression<IntSort>) = this() to index
 
 @JvmName("storeFPSortIntSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<IntSort, FPSort>>).store(
-    entry: Pair<Expression<FPSort>, Expression<IntSort>>
+infix fun (() -> Expression<ArraySort<IntSort, FloatingPointSort>>).store(
+    entry: Pair<Expression<FloatingPointSort>, Expression<IntSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("thenFPSortIntSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<IntSort, FPSort>).then(
-    entry: Pair<Expression<FPSort>, Expression<IntSort>>
+infix fun (() -> ArrayStore<IntSort, FloatingPointSort>).then(
+    entry: Pair<Expression<FloatingPointSort>, Expression<IntSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("atFPSortIntSortLambdaIndex")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<FPSort>.at(index: (() -> Expression<IntSort>)) = this to index()
+infix fun Expression<FloatingPointSort>.at(index: (() -> Expression<IntSort>)) = this to index()
 
 @JvmName("storeFPSortIntSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<IntSort, FPSort>>.store(
-    entry: (() -> Pair<Expression<FPSort>, Expression<IntSort>>)
+infix fun Expression<ArraySort<IntSort, FloatingPointSort>>.store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<IntSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("thenFPSortIntSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<IntSort, FPSort>.then(
-    entry: (() -> Pair<Expression<FPSort>, Expression<IntSort>>)
+infix fun ArrayStore<IntSort, FloatingPointSort>.then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<IntSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("atFPSortIntSortLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: (() -> Expression<IntSort>)) = this() to index()
+infix fun (() -> Expression<FloatingPointSort>).at(index: (() -> Expression<IntSort>)) =
+    this() to index()
 
 @JvmName("storeFPSortIntSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<IntSort, FPSort>>).store(
-    entry: (() -> Pair<Expression<FPSort>, Expression<IntSort>>)
+infix fun (() -> Expression<ArraySort<IntSort, FloatingPointSort>>).store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<IntSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("thenFPSortIntSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<IntSort, FPSort>).then(
-    entry: (() -> Pair<Expression<FPSort>, Expression<IntSort>>)
+infix fun (() -> ArrayStore<IntSort, FloatingPointSort>).then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<IntSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("atFPSortInt")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun Expression<FPSort>.at(index: Int) = this to IntLiteral(index)
+infix fun Expression<FloatingPointSort>.at(index: Int) = this to IntLiteral(index)
 
 @JvmName("storeFPSortInt")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<IntSort, FPSort>>.store(entry: Pair<Expression<FPSort>, Int>) =
-    ArrayStore(this, IntLiteral(entry.second), entry.first)
+infix fun Expression<ArraySort<IntSort, FloatingPointSort>>.store(
+    entry: Pair<Expression<FloatingPointSort>, Int>
+) = ArrayStore(this, IntLiteral(entry.second), entry.first)
 
 @JvmName("thenFPSortInt")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<IntSort, FPSort>.then(entry: Pair<Expression<FPSort>, Int>) =
-    ArrayStore(this, IntLiteral(entry.second), entry.first)
+infix fun ArrayStore<IntSort, FloatingPointSort>.then(
+    entry: Pair<Expression<FloatingPointSort>, Int>
+) = ArrayStore(this, IntLiteral(entry.second), entry.first)
 
 @JvmName("atFPSortIntLambdaArray")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun (() -> Expression<FPSort>).at(index: Int) = this() to IntLiteral(index)
+infix fun (() -> Expression<FloatingPointSort>).at(index: Int) = this() to IntLiteral(index)
 
 @JvmName("storeFPSortIntLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<IntSort, FPSort>>).store(
-    entry: Pair<Expression<FPSort>, Int>
+infix fun (() -> Expression<ArraySort<IntSort, FloatingPointSort>>).store(
+    entry: Pair<Expression<FloatingPointSort>, Int>
 ) = ArrayStore(this(), IntLiteral(entry.second), entry.first)
 
 @JvmName("thenFPSortIntLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<IntSort, FPSort>).then(entry: Pair<Expression<FPSort>, Int>) =
-    ArrayStore(this(), IntLiteral(entry.second), entry.first)
+infix fun (() -> ArrayStore<IntSort, FloatingPointSort>).then(
+    entry: Pair<Expression<FloatingPointSort>, Int>
+) = ArrayStore(this(), IntLiteral(entry.second), entry.first)
 
 @JvmName("atFPSortIntLambdaIndex")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun Expression<FPSort>.at(index: (() -> Int)) = this to IntLiteral(index())
+infix fun Expression<FloatingPointSort>.at(index: (() -> Int)) = this to IntLiteral(index())
 
 @JvmName("storeFPSortIntLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<IntSort, FPSort>>.store(
-    entry: (() -> Pair<Expression<FPSort>, Int>)
+infix fun Expression<ArraySort<IntSort, FloatingPointSort>>.store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Int>)
 ) = entry().let { (first, second) -> ArrayStore(this, IntLiteral(second), first) }
 
 @JvmName("thenFPSortIntLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<IntSort, FPSort>.then(entry: (() -> Pair<Expression<FPSort>, Int>)) =
-    entry().let { (first, second) -> ArrayStore(this, IntLiteral(second), first) }
+infix fun ArrayStore<IntSort, FloatingPointSort>.then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Int>)
+) = entry().let { (first, second) -> ArrayStore(this, IntLiteral(second), first) }
 
 @JvmName("atFPSortIntLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: (() -> Int)) = this() to IntLiteral(index())
+infix fun (() -> Expression<FloatingPointSort>).at(index: (() -> Int)) =
+    this() to IntLiteral(index())
 
 @JvmName("storeFPSortIntLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<IntSort, FPSort>>).store(
-    entry: (() -> Pair<Expression<FPSort>, Int>)
+infix fun (() -> Expression<ArraySort<IntSort, FloatingPointSort>>).store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Int>)
 ) = entry().let { (first, second) -> ArrayStore(this(), IntLiteral(second), first) }
 
 @JvmName("thenFPSortIntLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<IntSort, FPSort>).then(entry: (() -> Pair<Expression<FPSort>, Int>)) =
-    entry().let { (first, second) -> ArrayStore(this(), IntLiteral(second), first) }
+infix fun (() -> ArrayStore<IntSort, FloatingPointSort>).then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Int>)
+) = entry().let { (first, second) -> ArrayStore(this(), IntLiteral(second), first) }
 
 @JvmName("atRoundingModeSortIntSort")
 /** Create a pair to store [this] at [index] in a smt array. */
@@ -3210,139 +3224,146 @@ infix fun (() -> ArrayStore<BoolSort, RegLanSort>).then(
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<FPSort>.at(index: Expression<BoolSort>) = this to index
+infix fun Expression<FloatingPointSort>.at(index: Expression<BoolSort>) = this to index
 
 @JvmName("storeFPSortBoolSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<BoolSort, FPSort>>.store(
-    entry: Pair<Expression<FPSort>, Expression<BoolSort>>
+infix fun Expression<ArraySort<BoolSort, FloatingPointSort>>.store(
+    entry: Pair<Expression<FloatingPointSort>, Expression<BoolSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("thenFPSortBoolSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<BoolSort, FPSort>.then(entry: Pair<Expression<FPSort>, Expression<BoolSort>>) =
-    ArrayStore(this, entry.second, entry.first)
+infix fun ArrayStore<BoolSort, FloatingPointSort>.then(
+    entry: Pair<Expression<FloatingPointSort>, Expression<BoolSort>>
+) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("atFPSortBoolSortLambdaValue")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: Expression<BoolSort>) = this() to index
+infix fun (() -> Expression<FloatingPointSort>).at(index: Expression<BoolSort>) = this() to index
 
 @JvmName("storeFPSortBoolSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<BoolSort, FPSort>>).store(
-    entry: Pair<Expression<FPSort>, Expression<BoolSort>>
+infix fun (() -> Expression<ArraySort<BoolSort, FloatingPointSort>>).store(
+    entry: Pair<Expression<FloatingPointSort>, Expression<BoolSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("thenFPSortBoolSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<BoolSort, FPSort>).then(
-    entry: Pair<Expression<FPSort>, Expression<BoolSort>>
+infix fun (() -> ArrayStore<BoolSort, FloatingPointSort>).then(
+    entry: Pair<Expression<FloatingPointSort>, Expression<BoolSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("atFPSortBoolSortLambdaIndex")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<FPSort>.at(index: (() -> Expression<BoolSort>)) = this to index()
+infix fun Expression<FloatingPointSort>.at(index: (() -> Expression<BoolSort>)) = this to index()
 
 @JvmName("storeFPSortBoolSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<BoolSort, FPSort>>.store(
-    entry: (() -> Pair<Expression<FPSort>, Expression<BoolSort>>)
+infix fun Expression<ArraySort<BoolSort, FloatingPointSort>>.store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<BoolSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("thenFPSortBoolSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<BoolSort, FPSort>.then(
-    entry: (() -> Pair<Expression<FPSort>, Expression<BoolSort>>)
+infix fun ArrayStore<BoolSort, FloatingPointSort>.then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<BoolSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("atFPSortBoolSortLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: (() -> Expression<BoolSort>)) = this() to index()
+infix fun (() -> Expression<FloatingPointSort>).at(index: (() -> Expression<BoolSort>)) =
+    this() to index()
 
 @JvmName("storeFPSortBoolSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<BoolSort, FPSort>>).store(
-    entry: (() -> Pair<Expression<FPSort>, Expression<BoolSort>>)
+infix fun (() -> Expression<ArraySort<BoolSort, FloatingPointSort>>).store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<BoolSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("thenFPSortBoolSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<BoolSort, FPSort>).then(
-    entry: (() -> Pair<Expression<FPSort>, Expression<BoolSort>>)
+infix fun (() -> ArrayStore<BoolSort, FloatingPointSort>).then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<BoolSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("atFPSortBoolean")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun Expression<FPSort>.at(index: Boolean) = this to index.toSMTBool()
+infix fun Expression<FloatingPointSort>.at(index: Boolean) = this to index.toSMTBool()
 
 @JvmName("storeFPSortBoolean")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<BoolSort, FPSort>>.store(entry: Pair<Expression<FPSort>, Boolean>) =
-    ArrayStore(this, entry.second.toSMTBool(), entry.first)
+infix fun Expression<ArraySort<BoolSort, FloatingPointSort>>.store(
+    entry: Pair<Expression<FloatingPointSort>, Boolean>
+) = ArrayStore(this, entry.second.toSMTBool(), entry.first)
 
 @JvmName("thenFPSortBoolean")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<BoolSort, FPSort>.then(entry: Pair<Expression<FPSort>, Boolean>) =
-    ArrayStore(this, entry.second.toSMTBool(), entry.first)
+infix fun ArrayStore<BoolSort, FloatingPointSort>.then(
+    entry: Pair<Expression<FloatingPointSort>, Boolean>
+) = ArrayStore(this, entry.second.toSMTBool(), entry.first)
 
 @JvmName("atFPSortBooleanLambdaArray")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun (() -> Expression<FPSort>).at(index: Boolean) = this() to index.toSMTBool()
+infix fun (() -> Expression<FloatingPointSort>).at(index: Boolean) = this() to index.toSMTBool()
 
 @JvmName("storeFPSortBooleanLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<BoolSort, FPSort>>).store(
-    entry: Pair<Expression<FPSort>, Boolean>
+infix fun (() -> Expression<ArraySort<BoolSort, FloatingPointSort>>).store(
+    entry: Pair<Expression<FloatingPointSort>, Boolean>
 ) = ArrayStore(this(), entry.second.toSMTBool(), entry.first)
 
 @JvmName("thenFPSortBooleanLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<BoolSort, FPSort>).then(entry: Pair<Expression<FPSort>, Boolean>) =
-    ArrayStore(this(), entry.second.toSMTBool(), entry.first)
+infix fun (() -> ArrayStore<BoolSort, FloatingPointSort>).then(
+    entry: Pair<Expression<FloatingPointSort>, Boolean>
+) = ArrayStore(this(), entry.second.toSMTBool(), entry.first)
 
 @JvmName("atFPSortBooleanLambdaIndex")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun Expression<FPSort>.at(index: (() -> Boolean)) = this to index().toSMTBool()
+infix fun Expression<FloatingPointSort>.at(index: (() -> Boolean)) = this to index().toSMTBool()
 
 @JvmName("storeFPSortBooleanLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<BoolSort, FPSort>>.store(
-    entry: (() -> Pair<Expression<FPSort>, Boolean>)
+infix fun Expression<ArraySort<BoolSort, FloatingPointSort>>.store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Boolean>)
 ) = entry().let { (first, second) -> ArrayStore(this, second.toSMTBool(), first) }
 
 @JvmName("thenFPSortBooleanLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<BoolSort, FPSort>.then(entry: (() -> Pair<Expression<FPSort>, Boolean>)) =
-    entry().let { (first, second) -> ArrayStore(this, second.toSMTBool(), first) }
+infix fun ArrayStore<BoolSort, FloatingPointSort>.then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Boolean>)
+) = entry().let { (first, second) -> ArrayStore(this, second.toSMTBool(), first) }
 
 @JvmName("atFPSortBooleanLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: (() -> Boolean)) = this() to index().toSMTBool()
+infix fun (() -> Expression<FloatingPointSort>).at(index: (() -> Boolean)) =
+    this() to index().toSMTBool()
 
 @JvmName("storeFPSortBooleanLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<BoolSort, FPSort>>).store(
-    entry: (() -> Pair<Expression<FPSort>, Boolean>)
+infix fun (() -> Expression<ArraySort<BoolSort, FloatingPointSort>>).store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Boolean>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second.toSMTBool(), first) }
 
 @JvmName("thenFPSortBooleanLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<BoolSort, FPSort>).then(
-    entry: (() -> Pair<Expression<FPSort>, Boolean>)
+infix fun (() -> ArrayStore<BoolSort, FloatingPointSort>).then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Boolean>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second.toSMTBool(), first) }
 
 @JvmName("atRoundingModeSortBoolSort")
@@ -4763,140 +4784,146 @@ infix fun (() -> ArrayStore<StringSort, RegLanSort>).then(
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<FPSort>.at(index: Expression<StringSort>) = this to index
+infix fun Expression<FloatingPointSort>.at(index: Expression<StringSort>) = this to index
 
 @JvmName("storeFPSortStringSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<StringSort, FPSort>>.store(
-    entry: Pair<Expression<FPSort>, Expression<StringSort>>
+infix fun Expression<ArraySort<StringSort, FloatingPointSort>>.store(
+    entry: Pair<Expression<FloatingPointSort>, Expression<StringSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("thenFPSortStringSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<StringSort, FPSort>.then(
-    entry: Pair<Expression<FPSort>, Expression<StringSort>>
+infix fun ArrayStore<StringSort, FloatingPointSort>.then(
+    entry: Pair<Expression<FloatingPointSort>, Expression<StringSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("atFPSortStringSortLambdaValue")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: Expression<StringSort>) = this() to index
+infix fun (() -> Expression<FloatingPointSort>).at(index: Expression<StringSort>) = this() to index
 
 @JvmName("storeFPSortStringSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<StringSort, FPSort>>).store(
-    entry: Pair<Expression<FPSort>, Expression<StringSort>>
+infix fun (() -> Expression<ArraySort<StringSort, FloatingPointSort>>).store(
+    entry: Pair<Expression<FloatingPointSort>, Expression<StringSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("thenFPSortStringSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<StringSort, FPSort>).then(
-    entry: Pair<Expression<FPSort>, Expression<StringSort>>
+infix fun (() -> ArrayStore<StringSort, FloatingPointSort>).then(
+    entry: Pair<Expression<FloatingPointSort>, Expression<StringSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("atFPSortStringSortLambdaIndex")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<FPSort>.at(index: (() -> Expression<StringSort>)) = this to index()
+infix fun Expression<FloatingPointSort>.at(index: (() -> Expression<StringSort>)) = this to index()
 
 @JvmName("storeFPSortStringSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<StringSort, FPSort>>.store(
-    entry: (() -> Pair<Expression<FPSort>, Expression<StringSort>>)
+infix fun Expression<ArraySort<StringSort, FloatingPointSort>>.store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<StringSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("thenFPSortStringSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<StringSort, FPSort>.then(
-    entry: (() -> Pair<Expression<FPSort>, Expression<StringSort>>)
+infix fun ArrayStore<StringSort, FloatingPointSort>.then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<StringSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("atFPSortStringSortLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: (() -> Expression<StringSort>)) = this() to index()
+infix fun (() -> Expression<FloatingPointSort>).at(index: (() -> Expression<StringSort>)) =
+    this() to index()
 
 @JvmName("storeFPSortStringSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<StringSort, FPSort>>).store(
-    entry: (() -> Pair<Expression<FPSort>, Expression<StringSort>>)
+infix fun (() -> Expression<ArraySort<StringSort, FloatingPointSort>>).store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<StringSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("thenFPSortStringSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<StringSort, FPSort>).then(
-    entry: (() -> Pair<Expression<FPSort>, Expression<StringSort>>)
+infix fun (() -> ArrayStore<StringSort, FloatingPointSort>).then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<StringSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("atFPSortString")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun Expression<FPSort>.at(index: String) = this to StringLiteral(index)
+infix fun Expression<FloatingPointSort>.at(index: String) = this to StringLiteral(index)
 
 @JvmName("storeFPSortString")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<StringSort, FPSort>>.store(entry: Pair<Expression<FPSort>, String>) =
-    ArrayStore(this, StringLiteral(entry.second), entry.first)
+infix fun Expression<ArraySort<StringSort, FloatingPointSort>>.store(
+    entry: Pair<Expression<FloatingPointSort>, String>
+) = ArrayStore(this, StringLiteral(entry.second), entry.first)
 
 @JvmName("thenFPSortString")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<StringSort, FPSort>.then(entry: Pair<Expression<FPSort>, String>) =
-    ArrayStore(this, StringLiteral(entry.second), entry.first)
+infix fun ArrayStore<StringSort, FloatingPointSort>.then(
+    entry: Pair<Expression<FloatingPointSort>, String>
+) = ArrayStore(this, StringLiteral(entry.second), entry.first)
 
 @JvmName("atFPSortStringLambdaArray")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun (() -> Expression<FPSort>).at(index: String) = this() to StringLiteral(index)
+infix fun (() -> Expression<FloatingPointSort>).at(index: String) = this() to StringLiteral(index)
 
 @JvmName("storeFPSortStringLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<StringSort, FPSort>>).store(
-    entry: Pair<Expression<FPSort>, String>
+infix fun (() -> Expression<ArraySort<StringSort, FloatingPointSort>>).store(
+    entry: Pair<Expression<FloatingPointSort>, String>
 ) = ArrayStore(this(), StringLiteral(entry.second), entry.first)
 
 @JvmName("thenFPSortStringLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<StringSort, FPSort>).then(entry: Pair<Expression<FPSort>, String>) =
-    ArrayStore(this(), StringLiteral(entry.second), entry.first)
+infix fun (() -> ArrayStore<StringSort, FloatingPointSort>).then(
+    entry: Pair<Expression<FloatingPointSort>, String>
+) = ArrayStore(this(), StringLiteral(entry.second), entry.first)
 
 @JvmName("atFPSortStringLambdaIndex")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun Expression<FPSort>.at(index: (() -> String)) = this to StringLiteral(index())
+infix fun Expression<FloatingPointSort>.at(index: (() -> String)) = this to StringLiteral(index())
 
 @JvmName("storeFPSortStringLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<StringSort, FPSort>>.store(
-    entry: (() -> Pair<Expression<FPSort>, String>)
+infix fun Expression<ArraySort<StringSort, FloatingPointSort>>.store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, String>)
 ) = entry().let { (first, second) -> ArrayStore(this, StringLiteral(second), first) }
 
 @JvmName("thenFPSortStringLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<StringSort, FPSort>.then(entry: (() -> Pair<Expression<FPSort>, String>)) =
-    entry().let { (first, second) -> ArrayStore(this, StringLiteral(second), first) }
+infix fun ArrayStore<StringSort, FloatingPointSort>.then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, String>)
+) = entry().let { (first, second) -> ArrayStore(this, StringLiteral(second), first) }
 
 @JvmName("atFPSortStringLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: (() -> String)) = this() to StringLiteral(index())
+infix fun (() -> Expression<FloatingPointSort>).at(index: (() -> String)) =
+    this() to StringLiteral(index())
 
 @JvmName("storeFPSortStringLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<StringSort, FPSort>>).store(
-    entry: (() -> Pair<Expression<FPSort>, String>)
+infix fun (() -> Expression<ArraySort<StringSort, FloatingPointSort>>).store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, String>)
 ) = entry().let { (first, second) -> ArrayStore(this(), StringLiteral(second), first) }
 
 @JvmName("thenFPSortStringLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<StringSort, FPSort>).then(
-    entry: (() -> Pair<Expression<FPSort>, String>)
+infix fun (() -> ArrayStore<StringSort, FloatingPointSort>).then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, String>)
 ) = entry().let { (first, second) -> ArrayStore(this(), StringLiteral(second), first) }
 
 @JvmName("atRoundingModeSortStringSort")
@@ -5760,71 +5787,73 @@ infix fun (() -> ArrayStore<RealSort, RegLanSort>).then(
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<FPSort>.at(index: Expression<RealSort>) = this to index
+infix fun Expression<FloatingPointSort>.at(index: Expression<RealSort>) = this to index
 
 @JvmName("storeFPSortRealSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<RealSort, FPSort>>.store(
-    entry: Pair<Expression<FPSort>, Expression<RealSort>>
+infix fun Expression<ArraySort<RealSort, FloatingPointSort>>.store(
+    entry: Pair<Expression<FloatingPointSort>, Expression<RealSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("thenFPSortRealSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<RealSort, FPSort>.then(entry: Pair<Expression<FPSort>, Expression<RealSort>>) =
-    ArrayStore(this, entry.second, entry.first)
+infix fun ArrayStore<RealSort, FloatingPointSort>.then(
+    entry: Pair<Expression<FloatingPointSort>, Expression<RealSort>>
+) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("atFPSortRealSortLambdaValue")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: Expression<RealSort>) = this() to index
+infix fun (() -> Expression<FloatingPointSort>).at(index: Expression<RealSort>) = this() to index
 
 @JvmName("storeFPSortRealSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<RealSort, FPSort>>).store(
-    entry: Pair<Expression<FPSort>, Expression<RealSort>>
+infix fun (() -> Expression<ArraySort<RealSort, FloatingPointSort>>).store(
+    entry: Pair<Expression<FloatingPointSort>, Expression<RealSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("thenFPSortRealSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<RealSort, FPSort>).then(
-    entry: Pair<Expression<FPSort>, Expression<RealSort>>
+infix fun (() -> ArrayStore<RealSort, FloatingPointSort>).then(
+    entry: Pair<Expression<FloatingPointSort>, Expression<RealSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("atFPSortRealSortLambdaIndex")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<FPSort>.at(index: (() -> Expression<RealSort>)) = this to index()
+infix fun Expression<FloatingPointSort>.at(index: (() -> Expression<RealSort>)) = this to index()
 
 @JvmName("storeFPSortRealSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<RealSort, FPSort>>.store(
-    entry: (() -> Pair<Expression<FPSort>, Expression<RealSort>>)
+infix fun Expression<ArraySort<RealSort, FloatingPointSort>>.store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<RealSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("thenFPSortRealSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<RealSort, FPSort>.then(
-    entry: (() -> Pair<Expression<FPSort>, Expression<RealSort>>)
+infix fun ArrayStore<RealSort, FloatingPointSort>.then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<RealSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("atFPSortRealSortLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: (() -> Expression<RealSort>)) = this() to index()
+infix fun (() -> Expression<FloatingPointSort>).at(index: (() -> Expression<RealSort>)) =
+    this() to index()
 
 @JvmName("storeFPSortRealSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<RealSort, FPSort>>).store(
-    entry: (() -> Pair<Expression<FPSort>, Expression<RealSort>>)
+infix fun (() -> Expression<ArraySort<RealSort, FloatingPointSort>>).store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<RealSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("thenFPSortRealSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<RealSort, FPSort>).then(
-    entry: (() -> Pair<Expression<FPSort>, Expression<RealSort>>)
+infix fun (() -> ArrayStore<RealSort, FloatingPointSort>).then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<RealSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("atRoundingModeSortRealSort")
@@ -6550,72 +6579,73 @@ infix fun (() -> ArrayStore<RegLanSort, RegLanSort>).then(
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<FPSort>.at(index: Expression<RegLanSort>) = this to index
+infix fun Expression<FloatingPointSort>.at(index: Expression<RegLanSort>) = this to index
 
 @JvmName("storeFPSortRegLanSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<RegLanSort, FPSort>>.store(
-    entry: Pair<Expression<FPSort>, Expression<RegLanSort>>
+infix fun Expression<ArraySort<RegLanSort, FloatingPointSort>>.store(
+    entry: Pair<Expression<FloatingPointSort>, Expression<RegLanSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("thenFPSortRegLanSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<RegLanSort, FPSort>.then(
-    entry: Pair<Expression<FPSort>, Expression<RegLanSort>>
+infix fun ArrayStore<RegLanSort, FloatingPointSort>.then(
+    entry: Pair<Expression<FloatingPointSort>, Expression<RegLanSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("atFPSortRegLanSortLambdaValue")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: Expression<RegLanSort>) = this() to index
+infix fun (() -> Expression<FloatingPointSort>).at(index: Expression<RegLanSort>) = this() to index
 
 @JvmName("storeFPSortRegLanSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<RegLanSort, FPSort>>).store(
-    entry: Pair<Expression<FPSort>, Expression<RegLanSort>>
+infix fun (() -> Expression<ArraySort<RegLanSort, FloatingPointSort>>).store(
+    entry: Pair<Expression<FloatingPointSort>, Expression<RegLanSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("thenFPSortRegLanSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<RegLanSort, FPSort>).then(
-    entry: Pair<Expression<FPSort>, Expression<RegLanSort>>
+infix fun (() -> ArrayStore<RegLanSort, FloatingPointSort>).then(
+    entry: Pair<Expression<FloatingPointSort>, Expression<RegLanSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("atFPSortRegLanSortLambdaIndex")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<FPSort>.at(index: (() -> Expression<RegLanSort>)) = this to index()
+infix fun Expression<FloatingPointSort>.at(index: (() -> Expression<RegLanSort>)) = this to index()
 
 @JvmName("storeFPSortRegLanSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<RegLanSort, FPSort>>.store(
-    entry: (() -> Pair<Expression<FPSort>, Expression<RegLanSort>>)
+infix fun Expression<ArraySort<RegLanSort, FloatingPointSort>>.store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<RegLanSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("thenFPSortRegLanSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<RegLanSort, FPSort>.then(
-    entry: (() -> Pair<Expression<FPSort>, Expression<RegLanSort>>)
+infix fun ArrayStore<RegLanSort, FloatingPointSort>.then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<RegLanSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("atFPSortRegLanSortLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: (() -> Expression<RegLanSort>)) = this() to index()
+infix fun (() -> Expression<FloatingPointSort>).at(index: (() -> Expression<RegLanSort>)) =
+    this() to index()
 
 @JvmName("storeFPSortRegLanSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<RegLanSort, FPSort>>).store(
-    entry: (() -> Pair<Expression<FPSort>, Expression<RegLanSort>>)
+infix fun (() -> Expression<ArraySort<RegLanSort, FloatingPointSort>>).store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<RegLanSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("thenFPSortRegLanSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<RegLanSort, FPSort>).then(
-    entry: (() -> Pair<Expression<FPSort>, Expression<RegLanSort>>)
+infix fun (() -> ArrayStore<RegLanSort, FloatingPointSort>).then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<RegLanSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("atRoundingModeSortRegLanSort")
@@ -6768,776 +6798,807 @@ infix fun (() -> ArrayStore<RegLanSort, BitVecSort>).then(
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<IntSort>.at(index: Expression<FPSort>) = this to index
+infix fun Expression<IntSort>.at(index: Expression<FloatingPointSort>) = this to index
 
 @JvmName("storeIntSortFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, IntSort>>.store(
-    entry: Pair<Expression<IntSort>, Expression<FPSort>>
+infix fun Expression<ArraySort<FloatingPointSort, IntSort>>.store(
+    entry: Pair<Expression<IntSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("thenIntSortFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, IntSort>.then(entry: Pair<Expression<IntSort>, Expression<FPSort>>) =
-    ArrayStore(this, entry.second, entry.first)
+infix fun ArrayStore<FloatingPointSort, IntSort>.then(
+    entry: Pair<Expression<IntSort>, Expression<FloatingPointSort>>
+) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("atIntSortFPSortLambdaValue")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<IntSort>).at(index: Expression<FPSort>) = this() to index
+infix fun (() -> Expression<IntSort>).at(index: Expression<FloatingPointSort>) = this() to index
 
 @JvmName("storeIntSortFPSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, IntSort>>).store(
-    entry: Pair<Expression<IntSort>, Expression<FPSort>>
+infix fun (() -> Expression<ArraySort<FloatingPointSort, IntSort>>).store(
+    entry: Pair<Expression<IntSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("thenIntSortFPSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, IntSort>).then(
-    entry: Pair<Expression<IntSort>, Expression<FPSort>>
+infix fun (() -> ArrayStore<FloatingPointSort, IntSort>).then(
+    entry: Pair<Expression<IntSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("atIntSortFPSortLambdaIndex")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<IntSort>.at(index: (() -> Expression<FPSort>)) = this to index()
+infix fun Expression<IntSort>.at(index: (() -> Expression<FloatingPointSort>)) = this to index()
 
 @JvmName("storeIntSortFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, IntSort>>.store(
-    entry: (() -> Pair<Expression<IntSort>, Expression<FPSort>>)
+infix fun Expression<ArraySort<FloatingPointSort, IntSort>>.store(
+    entry: (() -> Pair<Expression<IntSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("thenIntSortFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, IntSort>.then(
-    entry: (() -> Pair<Expression<IntSort>, Expression<FPSort>>)
+infix fun ArrayStore<FloatingPointSort, IntSort>.then(
+    entry: (() -> Pair<Expression<IntSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("atIntSortFPSortLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<IntSort>).at(index: (() -> Expression<FPSort>)) = this() to index()
+infix fun (() -> Expression<IntSort>).at(index: (() -> Expression<FloatingPointSort>)) =
+    this() to index()
 
 @JvmName("storeIntSortFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, IntSort>>).store(
-    entry: (() -> Pair<Expression<IntSort>, Expression<FPSort>>)
+infix fun (() -> Expression<ArraySort<FloatingPointSort, IntSort>>).store(
+    entry: (() -> Pair<Expression<IntSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("thenIntSortFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, IntSort>).then(
-    entry: (() -> Pair<Expression<IntSort>, Expression<FPSort>>)
+infix fun (() -> ArrayStore<FloatingPointSort, IntSort>).then(
+    entry: (() -> Pair<Expression<IntSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("atIntFPSort")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun Int.at(index: Expression<FPSort>) = IntLiteral(this) to index
+infix fun Int.at(index: Expression<FloatingPointSort>) = IntLiteral(this) to index
 
 @JvmName("storeIntFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, IntSort>>.store(entry: Pair<Int, Expression<FPSort>>) =
-    ArrayStore(this, entry.second, IntLiteral(entry.first))
+infix fun Expression<ArraySort<FloatingPointSort, IntSort>>.store(
+    entry: Pair<Int, Expression<FloatingPointSort>>
+) = ArrayStore(this, entry.second, IntLiteral(entry.first))
 
 @JvmName("thenIntFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, IntSort>.then(entry: Pair<Int, Expression<FPSort>>) =
-    ArrayStore(this, entry.second, IntLiteral(entry.first))
+infix fun ArrayStore<FloatingPointSort, IntSort>.then(
+    entry: Pair<Int, Expression<FloatingPointSort>>
+) = ArrayStore(this, entry.second, IntLiteral(entry.first))
 
 @JvmName("atIntFPSortLambdaValue")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun (() -> Int).at(index: Expression<FPSort>) = IntLiteral(this()) to index
+infix fun (() -> Int).at(index: Expression<FloatingPointSort>) = IntLiteral(this()) to index
 
 @JvmName("storeIntFPSortLambdaValue")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, IntSort>>).store(
-    entry: Pair<Int, Expression<FPSort>>
+infix fun (() -> Expression<ArraySort<FloatingPointSort, IntSort>>).store(
+    entry: Pair<Int, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, IntLiteral(entry.first))
 
 @JvmName("thenIntFPSortLambdaValue")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, IntSort>).then(entry: Pair<Int, Expression<FPSort>>) =
-    ArrayStore(this(), entry.second, IntLiteral(entry.first))
+infix fun (() -> ArrayStore<FloatingPointSort, IntSort>).then(
+    entry: Pair<Int, Expression<FloatingPointSort>>
+) = ArrayStore(this(), entry.second, IntLiteral(entry.first))
 
 @JvmName("atIntFPSortLambdaIndex")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun Int.at(index: (() -> Expression<FPSort>)) = IntLiteral(this) to index()
+infix fun Int.at(index: (() -> Expression<FloatingPointSort>)) = IntLiteral(this) to index()
 
 @JvmName("storeIntFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, IntSort>>.store(
-    entry: (() -> Pair<Int, Expression<FPSort>>)
+infix fun Expression<ArraySort<FloatingPointSort, IntSort>>.store(
+    entry: (() -> Pair<Int, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, IntLiteral(first)) }
 
 @JvmName("thenIntFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, IntSort>.then(entry: (() -> Pair<Int, Expression<FPSort>>)) =
-    entry().let { (first, second) -> ArrayStore(this, second, IntLiteral(first)) }
+infix fun ArrayStore<FloatingPointSort, IntSort>.then(
+    entry: (() -> Pair<Int, Expression<FloatingPointSort>>)
+) = entry().let { (first, second) -> ArrayStore(this, second, IntLiteral(first)) }
 
 @JvmName("atIntFPSortLambda")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun (() -> Int).at(index: (() -> Expression<FPSort>)) = IntLiteral(this()) to index()
+infix fun (() -> Int).at(index: (() -> Expression<FloatingPointSort>)) =
+    IntLiteral(this()) to index()
 
 @JvmName("storeIntFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, IntSort>>).store(
-    entry: (() -> Pair<Int, Expression<FPSort>>)
+infix fun (() -> Expression<ArraySort<FloatingPointSort, IntSort>>).store(
+    entry: (() -> Pair<Int, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, IntLiteral(first)) }
 
 @JvmName("thenIntFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, IntSort>).then(entry: (() -> Pair<Int, Expression<FPSort>>)) =
-    entry().let { (first, second) -> ArrayStore(this(), second, IntLiteral(first)) }
+infix fun (() -> ArrayStore<FloatingPointSort, IntSort>).then(
+    entry: (() -> Pair<Int, Expression<FloatingPointSort>>)
+) = entry().let { (first, second) -> ArrayStore(this(), second, IntLiteral(first)) }
 
 @JvmName("atBoolSortFPSort")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<BoolSort>.at(index: Expression<FPSort>) = this to index
+infix fun Expression<BoolSort>.at(index: Expression<FloatingPointSort>) = this to index
 
 @JvmName("storeBoolSortFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, BoolSort>>.store(
-    entry: Pair<Expression<BoolSort>, Expression<FPSort>>
+infix fun Expression<ArraySort<FloatingPointSort, BoolSort>>.store(
+    entry: Pair<Expression<BoolSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("thenBoolSortFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, BoolSort>.then(entry: Pair<Expression<BoolSort>, Expression<FPSort>>) =
-    ArrayStore(this, entry.second, entry.first)
+infix fun ArrayStore<FloatingPointSort, BoolSort>.then(
+    entry: Pair<Expression<BoolSort>, Expression<FloatingPointSort>>
+) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("atBoolSortFPSortLambdaValue")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<BoolSort>).at(index: Expression<FPSort>) = this() to index
+infix fun (() -> Expression<BoolSort>).at(index: Expression<FloatingPointSort>) = this() to index
 
 @JvmName("storeBoolSortFPSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, BoolSort>>).store(
-    entry: Pair<Expression<BoolSort>, Expression<FPSort>>
+infix fun (() -> Expression<ArraySort<FloatingPointSort, BoolSort>>).store(
+    entry: Pair<Expression<BoolSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("thenBoolSortFPSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, BoolSort>).then(
-    entry: Pair<Expression<BoolSort>, Expression<FPSort>>
+infix fun (() -> ArrayStore<FloatingPointSort, BoolSort>).then(
+    entry: Pair<Expression<BoolSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("atBoolSortFPSortLambdaIndex")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<BoolSort>.at(index: (() -> Expression<FPSort>)) = this to index()
+infix fun Expression<BoolSort>.at(index: (() -> Expression<FloatingPointSort>)) = this to index()
 
 @JvmName("storeBoolSortFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, BoolSort>>.store(
-    entry: (() -> Pair<Expression<BoolSort>, Expression<FPSort>>)
+infix fun Expression<ArraySort<FloatingPointSort, BoolSort>>.store(
+    entry: (() -> Pair<Expression<BoolSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("thenBoolSortFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, BoolSort>.then(
-    entry: (() -> Pair<Expression<BoolSort>, Expression<FPSort>>)
+infix fun ArrayStore<FloatingPointSort, BoolSort>.then(
+    entry: (() -> Pair<Expression<BoolSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("atBoolSortFPSortLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<BoolSort>).at(index: (() -> Expression<FPSort>)) = this() to index()
+infix fun (() -> Expression<BoolSort>).at(index: (() -> Expression<FloatingPointSort>)) =
+    this() to index()
 
 @JvmName("storeBoolSortFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, BoolSort>>).store(
-    entry: (() -> Pair<Expression<BoolSort>, Expression<FPSort>>)
+infix fun (() -> Expression<ArraySort<FloatingPointSort, BoolSort>>).store(
+    entry: (() -> Pair<Expression<BoolSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("thenBoolSortFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, BoolSort>).then(
-    entry: (() -> Pair<Expression<BoolSort>, Expression<FPSort>>)
+infix fun (() -> ArrayStore<FloatingPointSort, BoolSort>).then(
+    entry: (() -> Pair<Expression<BoolSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("atBooleanFPSort")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun Boolean.at(index: Expression<FPSort>) = this.toSMTBool() to index
+infix fun Boolean.at(index: Expression<FloatingPointSort>) = this.toSMTBool() to index
 
 @JvmName("storeBooleanFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, BoolSort>>.store(entry: Pair<Boolean, Expression<FPSort>>) =
-    ArrayStore(this, entry.second, entry.first.toSMTBool())
+infix fun Expression<ArraySort<FloatingPointSort, BoolSort>>.store(
+    entry: Pair<Boolean, Expression<FloatingPointSort>>
+) = ArrayStore(this, entry.second, entry.first.toSMTBool())
 
 @JvmName("thenBooleanFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, BoolSort>.then(entry: Pair<Boolean, Expression<FPSort>>) =
-    ArrayStore(this, entry.second, entry.first.toSMTBool())
+infix fun ArrayStore<FloatingPointSort, BoolSort>.then(
+    entry: Pair<Boolean, Expression<FloatingPointSort>>
+) = ArrayStore(this, entry.second, entry.first.toSMTBool())
 
 @JvmName("atBooleanFPSortLambdaValue")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun (() -> Boolean).at(index: Expression<FPSort>) = this().toSMTBool() to index
+infix fun (() -> Boolean).at(index: Expression<FloatingPointSort>) = this().toSMTBool() to index
 
 @JvmName("storeBooleanFPSortLambdaValue")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, BoolSort>>).store(
-    entry: Pair<Boolean, Expression<FPSort>>
+infix fun (() -> Expression<ArraySort<FloatingPointSort, BoolSort>>).store(
+    entry: Pair<Boolean, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, entry.first.toSMTBool())
 
 @JvmName("thenBooleanFPSortLambdaValue")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, BoolSort>).then(entry: Pair<Boolean, Expression<FPSort>>) =
-    ArrayStore(this(), entry.second, entry.first.toSMTBool())
+infix fun (() -> ArrayStore<FloatingPointSort, BoolSort>).then(
+    entry: Pair<Boolean, Expression<FloatingPointSort>>
+) = ArrayStore(this(), entry.second, entry.first.toSMTBool())
 
 @JvmName("atBooleanFPSortLambdaIndex")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun Boolean.at(index: (() -> Expression<FPSort>)) = this.toSMTBool() to index()
+infix fun Boolean.at(index: (() -> Expression<FloatingPointSort>)) = this.toSMTBool() to index()
 
 @JvmName("storeBooleanFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, BoolSort>>.store(
-    entry: (() -> Pair<Boolean, Expression<FPSort>>)
+infix fun Expression<ArraySort<FloatingPointSort, BoolSort>>.store(
+    entry: (() -> Pair<Boolean, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first.toSMTBool()) }
 
 @JvmName("thenBooleanFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, BoolSort>.then(entry: (() -> Pair<Boolean, Expression<FPSort>>)) =
-    entry().let { (first, second) -> ArrayStore(this, second, first.toSMTBool()) }
+infix fun ArrayStore<FloatingPointSort, BoolSort>.then(
+    entry: (() -> Pair<Boolean, Expression<FloatingPointSort>>)
+) = entry().let { (first, second) -> ArrayStore(this, second, first.toSMTBool()) }
 
 @JvmName("atBooleanFPSortLambda")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun (() -> Boolean).at(index: (() -> Expression<FPSort>)) = this().toSMTBool() to index()
+infix fun (() -> Boolean).at(index: (() -> Expression<FloatingPointSort>)) =
+    this().toSMTBool() to index()
 
 @JvmName("storeBooleanFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, BoolSort>>).store(
-    entry: (() -> Pair<Boolean, Expression<FPSort>>)
+infix fun (() -> Expression<ArraySort<FloatingPointSort, BoolSort>>).store(
+    entry: (() -> Pair<Boolean, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first.toSMTBool()) }
 
 @JvmName("thenBooleanFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, BoolSort>).then(
-    entry: (() -> Pair<Boolean, Expression<FPSort>>)
+infix fun (() -> ArrayStore<FloatingPointSort, BoolSort>).then(
+    entry: (() -> Pair<Boolean, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first.toSMTBool()) }
 
 @JvmName("atStringSortFPSort")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<StringSort>.at(index: Expression<FPSort>) = this to index
+infix fun Expression<StringSort>.at(index: Expression<FloatingPointSort>) = this to index
 
 @JvmName("storeStringSortFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, StringSort>>.store(
-    entry: Pair<Expression<StringSort>, Expression<FPSort>>
+infix fun Expression<ArraySort<FloatingPointSort, StringSort>>.store(
+    entry: Pair<Expression<StringSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("thenStringSortFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, StringSort>.then(
-    entry: Pair<Expression<StringSort>, Expression<FPSort>>
+infix fun ArrayStore<FloatingPointSort, StringSort>.then(
+    entry: Pair<Expression<StringSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("atStringSortFPSortLambdaValue")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<StringSort>).at(index: Expression<FPSort>) = this() to index
+infix fun (() -> Expression<StringSort>).at(index: Expression<FloatingPointSort>) = this() to index
 
 @JvmName("storeStringSortFPSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, StringSort>>).store(
-    entry: Pair<Expression<StringSort>, Expression<FPSort>>
+infix fun (() -> Expression<ArraySort<FloatingPointSort, StringSort>>).store(
+    entry: Pair<Expression<StringSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("thenStringSortFPSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, StringSort>).then(
-    entry: Pair<Expression<StringSort>, Expression<FPSort>>
+infix fun (() -> ArrayStore<FloatingPointSort, StringSort>).then(
+    entry: Pair<Expression<StringSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("atStringSortFPSortLambdaIndex")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<StringSort>.at(index: (() -> Expression<FPSort>)) = this to index()
+infix fun Expression<StringSort>.at(index: (() -> Expression<FloatingPointSort>)) = this to index()
 
 @JvmName("storeStringSortFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, StringSort>>.store(
-    entry: (() -> Pair<Expression<StringSort>, Expression<FPSort>>)
+infix fun Expression<ArraySort<FloatingPointSort, StringSort>>.store(
+    entry: (() -> Pair<Expression<StringSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("thenStringSortFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, StringSort>.then(
-    entry: (() -> Pair<Expression<StringSort>, Expression<FPSort>>)
+infix fun ArrayStore<FloatingPointSort, StringSort>.then(
+    entry: (() -> Pair<Expression<StringSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("atStringSortFPSortLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<StringSort>).at(index: (() -> Expression<FPSort>)) = this() to index()
+infix fun (() -> Expression<StringSort>).at(index: (() -> Expression<FloatingPointSort>)) =
+    this() to index()
 
 @JvmName("storeStringSortFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, StringSort>>).store(
-    entry: (() -> Pair<Expression<StringSort>, Expression<FPSort>>)
+infix fun (() -> Expression<ArraySort<FloatingPointSort, StringSort>>).store(
+    entry: (() -> Pair<Expression<StringSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("thenStringSortFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, StringSort>).then(
-    entry: (() -> Pair<Expression<StringSort>, Expression<FPSort>>)
+infix fun (() -> ArrayStore<FloatingPointSort, StringSort>).then(
+    entry: (() -> Pair<Expression<StringSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("atStringFPSort")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun String.at(index: Expression<FPSort>) = StringLiteral(this) to index
+infix fun String.at(index: Expression<FloatingPointSort>) = StringLiteral(this) to index
 
 @JvmName("storeStringFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, StringSort>>.store(entry: Pair<String, Expression<FPSort>>) =
-    ArrayStore(this, entry.second, StringLiteral(entry.first))
+infix fun Expression<ArraySort<FloatingPointSort, StringSort>>.store(
+    entry: Pair<String, Expression<FloatingPointSort>>
+) = ArrayStore(this, entry.second, StringLiteral(entry.first))
 
 @JvmName("thenStringFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, StringSort>.then(entry: Pair<String, Expression<FPSort>>) =
-    ArrayStore(this, entry.second, StringLiteral(entry.first))
+infix fun ArrayStore<FloatingPointSort, StringSort>.then(
+    entry: Pair<String, Expression<FloatingPointSort>>
+) = ArrayStore(this, entry.second, StringLiteral(entry.first))
 
 @JvmName("atStringFPSortLambdaValue")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun (() -> String).at(index: Expression<FPSort>) = StringLiteral(this()) to index
+infix fun (() -> String).at(index: Expression<FloatingPointSort>) = StringLiteral(this()) to index
 
 @JvmName("storeStringFPSortLambdaValue")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, StringSort>>).store(
-    entry: Pair<String, Expression<FPSort>>
+infix fun (() -> Expression<ArraySort<FloatingPointSort, StringSort>>).store(
+    entry: Pair<String, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, StringLiteral(entry.first))
 
 @JvmName("thenStringFPSortLambdaValue")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, StringSort>).then(entry: Pair<String, Expression<FPSort>>) =
-    ArrayStore(this(), entry.second, StringLiteral(entry.first))
+infix fun (() -> ArrayStore<FloatingPointSort, StringSort>).then(
+    entry: Pair<String, Expression<FloatingPointSort>>
+) = ArrayStore(this(), entry.second, StringLiteral(entry.first))
 
 @JvmName("atStringFPSortLambdaIndex")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun String.at(index: (() -> Expression<FPSort>)) = StringLiteral(this) to index()
+infix fun String.at(index: (() -> Expression<FloatingPointSort>)) = StringLiteral(this) to index()
 
 @JvmName("storeStringFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, StringSort>>.store(
-    entry: (() -> Pair<String, Expression<FPSort>>)
+infix fun Expression<ArraySort<FloatingPointSort, StringSort>>.store(
+    entry: (() -> Pair<String, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, StringLiteral(first)) }
 
 @JvmName("thenStringFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, StringSort>.then(entry: (() -> Pair<String, Expression<FPSort>>)) =
-    entry().let { (first, second) -> ArrayStore(this, second, StringLiteral(first)) }
+infix fun ArrayStore<FloatingPointSort, StringSort>.then(
+    entry: (() -> Pair<String, Expression<FloatingPointSort>>)
+) = entry().let { (first, second) -> ArrayStore(this, second, StringLiteral(first)) }
 
 @JvmName("atStringFPSortLambda")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
 /** Create a pair to store [this] at [index] in a smt array. */
-infix fun (() -> String).at(index: (() -> Expression<FPSort>)) = StringLiteral(this()) to index()
+infix fun (() -> String).at(index: (() -> Expression<FloatingPointSort>)) =
+    StringLiteral(this()) to index()
 
 @JvmName("storeStringFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, StringSort>>).store(
-    entry: (() -> Pair<String, Expression<FPSort>>)
+infix fun (() -> Expression<ArraySort<FloatingPointSort, StringSort>>).store(
+    entry: (() -> Pair<String, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, StringLiteral(first)) }
 
 @JvmName("thenStringFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, StringSort>).then(
-    entry: (() -> Pair<String, Expression<FPSort>>)
+infix fun (() -> ArrayStore<FloatingPointSort, StringSort>).then(
+    entry: (() -> Pair<String, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, StringLiteral(first)) }
 
 @JvmName("atRealSortFPSort")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<RealSort>.at(index: Expression<FPSort>) = this to index
+infix fun Expression<RealSort>.at(index: Expression<FloatingPointSort>) = this to index
 
 @JvmName("storeRealSortFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, RealSort>>.store(
-    entry: Pair<Expression<RealSort>, Expression<FPSort>>
+infix fun Expression<ArraySort<FloatingPointSort, RealSort>>.store(
+    entry: Pair<Expression<RealSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("thenRealSortFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, RealSort>.then(entry: Pair<Expression<RealSort>, Expression<FPSort>>) =
-    ArrayStore(this, entry.second, entry.first)
+infix fun ArrayStore<FloatingPointSort, RealSort>.then(
+    entry: Pair<Expression<RealSort>, Expression<FloatingPointSort>>
+) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("atRealSortFPSortLambdaValue")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<RealSort>).at(index: Expression<FPSort>) = this() to index
+infix fun (() -> Expression<RealSort>).at(index: Expression<FloatingPointSort>) = this() to index
 
 @JvmName("storeRealSortFPSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, RealSort>>).store(
-    entry: Pair<Expression<RealSort>, Expression<FPSort>>
+infix fun (() -> Expression<ArraySort<FloatingPointSort, RealSort>>).store(
+    entry: Pair<Expression<RealSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("thenRealSortFPSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, RealSort>).then(
-    entry: Pair<Expression<RealSort>, Expression<FPSort>>
+infix fun (() -> ArrayStore<FloatingPointSort, RealSort>).then(
+    entry: Pair<Expression<RealSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("atRealSortFPSortLambdaIndex")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<RealSort>.at(index: (() -> Expression<FPSort>)) = this to index()
+infix fun Expression<RealSort>.at(index: (() -> Expression<FloatingPointSort>)) = this to index()
 
 @JvmName("storeRealSortFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, RealSort>>.store(
-    entry: (() -> Pair<Expression<RealSort>, Expression<FPSort>>)
+infix fun Expression<ArraySort<FloatingPointSort, RealSort>>.store(
+    entry: (() -> Pair<Expression<RealSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("thenRealSortFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, RealSort>.then(
-    entry: (() -> Pair<Expression<RealSort>, Expression<FPSort>>)
+infix fun ArrayStore<FloatingPointSort, RealSort>.then(
+    entry: (() -> Pair<Expression<RealSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("atRealSortFPSortLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<RealSort>).at(index: (() -> Expression<FPSort>)) = this() to index()
+infix fun (() -> Expression<RealSort>).at(index: (() -> Expression<FloatingPointSort>)) =
+    this() to index()
 
 @JvmName("storeRealSortFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, RealSort>>).store(
-    entry: (() -> Pair<Expression<RealSort>, Expression<FPSort>>)
+infix fun (() -> Expression<ArraySort<FloatingPointSort, RealSort>>).store(
+    entry: (() -> Pair<Expression<RealSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("thenRealSortFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, RealSort>).then(
-    entry: (() -> Pair<Expression<RealSort>, Expression<FPSort>>)
+infix fun (() -> ArrayStore<FloatingPointSort, RealSort>).then(
+    entry: (() -> Pair<Expression<RealSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("atRegLanSortFPSort")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<RegLanSort>.at(index: Expression<FPSort>) = this to index
+infix fun Expression<RegLanSort>.at(index: Expression<FloatingPointSort>) = this to index
 
 @JvmName("storeRegLanSortFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, RegLanSort>>.store(
-    entry: Pair<Expression<RegLanSort>, Expression<FPSort>>
+infix fun Expression<ArraySort<FloatingPointSort, RegLanSort>>.store(
+    entry: Pair<Expression<RegLanSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("thenRegLanSortFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, RegLanSort>.then(
-    entry: Pair<Expression<RegLanSort>, Expression<FPSort>>
+infix fun ArrayStore<FloatingPointSort, RegLanSort>.then(
+    entry: Pair<Expression<RegLanSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("atRegLanSortFPSortLambdaValue")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<RegLanSort>).at(index: Expression<FPSort>) = this() to index
+infix fun (() -> Expression<RegLanSort>).at(index: Expression<FloatingPointSort>) = this() to index
 
 @JvmName("storeRegLanSortFPSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, RegLanSort>>).store(
-    entry: Pair<Expression<RegLanSort>, Expression<FPSort>>
+infix fun (() -> Expression<ArraySort<FloatingPointSort, RegLanSort>>).store(
+    entry: Pair<Expression<RegLanSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("thenRegLanSortFPSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, RegLanSort>).then(
-    entry: Pair<Expression<RegLanSort>, Expression<FPSort>>
+infix fun (() -> ArrayStore<FloatingPointSort, RegLanSort>).then(
+    entry: Pair<Expression<RegLanSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("atRegLanSortFPSortLambdaIndex")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<RegLanSort>.at(index: (() -> Expression<FPSort>)) = this to index()
+infix fun Expression<RegLanSort>.at(index: (() -> Expression<FloatingPointSort>)) = this to index()
 
 @JvmName("storeRegLanSortFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, RegLanSort>>.store(
-    entry: (() -> Pair<Expression<RegLanSort>, Expression<FPSort>>)
+infix fun Expression<ArraySort<FloatingPointSort, RegLanSort>>.store(
+    entry: (() -> Pair<Expression<RegLanSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("thenRegLanSortFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, RegLanSort>.then(
-    entry: (() -> Pair<Expression<RegLanSort>, Expression<FPSort>>)
+infix fun ArrayStore<FloatingPointSort, RegLanSort>.then(
+    entry: (() -> Pair<Expression<RegLanSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("atRegLanSortFPSortLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<RegLanSort>).at(index: (() -> Expression<FPSort>)) = this() to index()
+infix fun (() -> Expression<RegLanSort>).at(index: (() -> Expression<FloatingPointSort>)) =
+    this() to index()
 
 @JvmName("storeRegLanSortFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, RegLanSort>>).store(
-    entry: (() -> Pair<Expression<RegLanSort>, Expression<FPSort>>)
+infix fun (() -> Expression<ArraySort<FloatingPointSort, RegLanSort>>).store(
+    entry: (() -> Pair<Expression<RegLanSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("thenRegLanSortFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, RegLanSort>).then(
-    entry: (() -> Pair<Expression<RegLanSort>, Expression<FPSort>>)
+infix fun (() -> ArrayStore<FloatingPointSort, RegLanSort>).then(
+    entry: (() -> Pair<Expression<RegLanSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("atFPSortFPSort")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<FPSort>.at(index: Expression<FPSort>) = this to index
+infix fun Expression<FloatingPointSort>.at(index: Expression<FloatingPointSort>) = this to index
 
 @JvmName("storeFPSortFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, FPSort>>.store(
-    entry: Pair<Expression<FPSort>, Expression<FPSort>>
+infix fun Expression<ArraySort<FloatingPointSort, FloatingPointSort>>.store(
+    entry: Pair<Expression<FloatingPointSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("thenFPSortFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, FPSort>.then(entry: Pair<Expression<FPSort>, Expression<FPSort>>) =
-    ArrayStore(this, entry.second, entry.first)
+infix fun ArrayStore<FloatingPointSort, FloatingPointSort>.then(
+    entry: Pair<Expression<FloatingPointSort>, Expression<FloatingPointSort>>
+) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("atFPSortFPSortLambdaValue")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: Expression<FPSort>) = this() to index
+infix fun (() -> Expression<FloatingPointSort>).at(index: Expression<FloatingPointSort>) =
+    this() to index
 
 @JvmName("storeFPSortFPSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, FPSort>>).store(
-    entry: Pair<Expression<FPSort>, Expression<FPSort>>
+infix fun (() -> Expression<ArraySort<FloatingPointSort, FloatingPointSort>>).store(
+    entry: Pair<Expression<FloatingPointSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("thenFPSortFPSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, FPSort>).then(
-    entry: Pair<Expression<FPSort>, Expression<FPSort>>
+infix fun (() -> ArrayStore<FloatingPointSort, FloatingPointSort>).then(
+    entry: Pair<Expression<FloatingPointSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("atFPSortFPSortLambdaIndex")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<FPSort>.at(index: (() -> Expression<FPSort>)) = this to index()
+infix fun Expression<FloatingPointSort>.at(index: (() -> Expression<FloatingPointSort>)) =
+    this to index()
 
 @JvmName("storeFPSortFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, FPSort>>.store(
-    entry: (() -> Pair<Expression<FPSort>, Expression<FPSort>>)
+infix fun Expression<ArraySort<FloatingPointSort, FloatingPointSort>>.store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("thenFPSortFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, FPSort>.then(
-    entry: (() -> Pair<Expression<FPSort>, Expression<FPSort>>)
+infix fun ArrayStore<FloatingPointSort, FloatingPointSort>.then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("atFPSortFPSortLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: (() -> Expression<FPSort>)) = this() to index()
+infix fun (() -> Expression<FloatingPointSort>).at(index: (() -> Expression<FloatingPointSort>)) =
+    this() to index()
 
 @JvmName("storeFPSortFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, FPSort>>).store(
-    entry: (() -> Pair<Expression<FPSort>, Expression<FPSort>>)
+infix fun (() -> Expression<ArraySort<FloatingPointSort, FloatingPointSort>>).store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("thenFPSortFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, FPSort>).then(
-    entry: (() -> Pair<Expression<FPSort>, Expression<FPSort>>)
+infix fun (() -> ArrayStore<FloatingPointSort, FloatingPointSort>).then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("atRoundingModeSortFPSort")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<RoundingModeSort>.at(index: Expression<FPSort>) = this to index
+infix fun Expression<RoundingModeSort>.at(index: Expression<FloatingPointSort>) = this to index
 
 @JvmName("storeRoundingModeSortFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, RoundingModeSort>>.store(
-    entry: Pair<Expression<RoundingModeSort>, Expression<FPSort>>
+infix fun Expression<ArraySort<FloatingPointSort, RoundingModeSort>>.store(
+    entry: Pair<Expression<RoundingModeSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("thenRoundingModeSortFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, RoundingModeSort>.then(
-    entry: Pair<Expression<RoundingModeSort>, Expression<FPSort>>
+infix fun ArrayStore<FloatingPointSort, RoundingModeSort>.then(
+    entry: Pair<Expression<RoundingModeSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("atRoundingModeSortFPSortLambdaValue")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<RoundingModeSort>).at(index: Expression<FPSort>) = this() to index
+infix fun (() -> Expression<RoundingModeSort>).at(index: Expression<FloatingPointSort>) =
+    this() to index
 
 @JvmName("storeRoundingModeSortFPSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, RoundingModeSort>>).store(
-    entry: Pair<Expression<RoundingModeSort>, Expression<FPSort>>
+infix fun (() -> Expression<ArraySort<FloatingPointSort, RoundingModeSort>>).store(
+    entry: Pair<Expression<RoundingModeSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("thenRoundingModeSortFPSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, RoundingModeSort>).then(
-    entry: Pair<Expression<RoundingModeSort>, Expression<FPSort>>
+infix fun (() -> ArrayStore<FloatingPointSort, RoundingModeSort>).then(
+    entry: Pair<Expression<RoundingModeSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("atRoundingModeSortFPSortLambdaIndex")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<RoundingModeSort>.at(index: (() -> Expression<FPSort>)) = this to index()
+infix fun Expression<RoundingModeSort>.at(index: (() -> Expression<FloatingPointSort>)) =
+    this to index()
 
 @JvmName("storeRoundingModeSortFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, RoundingModeSort>>.store(
-    entry: (() -> Pair<Expression<RoundingModeSort>, Expression<FPSort>>)
+infix fun Expression<ArraySort<FloatingPointSort, RoundingModeSort>>.store(
+    entry: (() -> Pair<Expression<RoundingModeSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("thenRoundingModeSortFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, RoundingModeSort>.then(
-    entry: (() -> Pair<Expression<RoundingModeSort>, Expression<FPSort>>)
+infix fun ArrayStore<FloatingPointSort, RoundingModeSort>.then(
+    entry: (() -> Pair<Expression<RoundingModeSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("atRoundingModeSortFPSortLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<RoundingModeSort>).at(index: (() -> Expression<FPSort>)) =
+infix fun (() -> Expression<RoundingModeSort>).at(index: (() -> Expression<FloatingPointSort>)) =
     this() to index()
 
 @JvmName("storeRoundingModeSortFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, RoundingModeSort>>).store(
-    entry: (() -> Pair<Expression<RoundingModeSort>, Expression<FPSort>>)
+infix fun (() -> Expression<ArraySort<FloatingPointSort, RoundingModeSort>>).store(
+    entry: (() -> Pair<Expression<RoundingModeSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("thenRoundingModeSortFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, RoundingModeSort>).then(
-    entry: (() -> Pair<Expression<RoundingModeSort>, Expression<FPSort>>)
+infix fun (() -> ArrayStore<FloatingPointSort, RoundingModeSort>).then(
+    entry: (() -> Pair<Expression<RoundingModeSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("atBitVecSortFPSort")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<BitVecSort>.at(index: Expression<FPSort>) = this to index
+infix fun Expression<BitVecSort>.at(index: Expression<FloatingPointSort>) = this to index
 
 @JvmName("storeBitVecSortFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, BitVecSort>>.store(
-    entry: Pair<Expression<BitVecSort>, Expression<FPSort>>
+infix fun Expression<ArraySort<FloatingPointSort, BitVecSort>>.store(
+    entry: Pair<Expression<BitVecSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("thenBitVecSortFPSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, BitVecSort>.then(
-    entry: Pair<Expression<BitVecSort>, Expression<FPSort>>
+infix fun ArrayStore<FloatingPointSort, BitVecSort>.then(
+    entry: Pair<Expression<BitVecSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("atBitVecSortFPSortLambdaValue")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<BitVecSort>).at(index: Expression<FPSort>) = this() to index
+infix fun (() -> Expression<BitVecSort>).at(index: Expression<FloatingPointSort>) = this() to index
 
 @JvmName("storeBitVecSortFPSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, BitVecSort>>).store(
-    entry: Pair<Expression<BitVecSort>, Expression<FPSort>>
+infix fun (() -> Expression<ArraySort<FloatingPointSort, BitVecSort>>).store(
+    entry: Pair<Expression<BitVecSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("thenBitVecSortFPSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, BitVecSort>).then(
-    entry: Pair<Expression<BitVecSort>, Expression<FPSort>>
+infix fun (() -> ArrayStore<FloatingPointSort, BitVecSort>).then(
+    entry: Pair<Expression<BitVecSort>, Expression<FloatingPointSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("atBitVecSortFPSortLambdaIndex")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<BitVecSort>.at(index: (() -> Expression<FPSort>)) = this to index()
+infix fun Expression<BitVecSort>.at(index: (() -> Expression<FloatingPointSort>)) = this to index()
 
 @JvmName("storeBitVecSortFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<FPSort, BitVecSort>>.store(
-    entry: (() -> Pair<Expression<BitVecSort>, Expression<FPSort>>)
+infix fun Expression<ArraySort<FloatingPointSort, BitVecSort>>.store(
+    entry: (() -> Pair<Expression<BitVecSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("thenBitVecSortFPSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<FPSort, BitVecSort>.then(
-    entry: (() -> Pair<Expression<BitVecSort>, Expression<FPSort>>)
+infix fun ArrayStore<FloatingPointSort, BitVecSort>.then(
+    entry: (() -> Pair<Expression<BitVecSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("atBitVecSortFPSortLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<BitVecSort>).at(index: (() -> Expression<FPSort>)) = this() to index()
+infix fun (() -> Expression<BitVecSort>).at(index: (() -> Expression<FloatingPointSort>)) =
+    this() to index()
 
 @JvmName("storeBitVecSortFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<FPSort, BitVecSort>>).store(
-    entry: (() -> Pair<Expression<BitVecSort>, Expression<FPSort>>)
+infix fun (() -> Expression<ArraySort<FloatingPointSort, BitVecSort>>).store(
+    entry: (() -> Pair<Expression<BitVecSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("thenBitVecSortFPSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<FPSort, BitVecSort>).then(
-    entry: (() -> Pair<Expression<BitVecSort>, Expression<FPSort>>)
+infix fun (() -> ArrayStore<FloatingPointSort, BitVecSort>).then(
+    entry: (() -> Pair<Expression<BitVecSort>, Expression<FloatingPointSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("atIntSortRoundingModeSort")
@@ -8128,73 +8189,75 @@ infix fun (() -> ArrayStore<RoundingModeSort, RegLanSort>).then(
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<FPSort>.at(index: Expression<RoundingModeSort>) = this to index
+infix fun Expression<FloatingPointSort>.at(index: Expression<RoundingModeSort>) = this to index
 
 @JvmName("storeFPSortRoundingModeSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<RoundingModeSort, FPSort>>.store(
-    entry: Pair<Expression<FPSort>, Expression<RoundingModeSort>>
+infix fun Expression<ArraySort<RoundingModeSort, FloatingPointSort>>.store(
+    entry: Pair<Expression<FloatingPointSort>, Expression<RoundingModeSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("thenFPSortRoundingModeSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<RoundingModeSort, FPSort>.then(
-    entry: Pair<Expression<FPSort>, Expression<RoundingModeSort>>
+infix fun ArrayStore<RoundingModeSort, FloatingPointSort>.then(
+    entry: Pair<Expression<FloatingPointSort>, Expression<RoundingModeSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("atFPSortRoundingModeSortLambdaValue")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: Expression<RoundingModeSort>) = this() to index
+infix fun (() -> Expression<FloatingPointSort>).at(index: Expression<RoundingModeSort>) =
+    this() to index
 
 @JvmName("storeFPSortRoundingModeSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<RoundingModeSort, FPSort>>).store(
-    entry: Pair<Expression<FPSort>, Expression<RoundingModeSort>>
+infix fun (() -> Expression<ArraySort<RoundingModeSort, FloatingPointSort>>).store(
+    entry: Pair<Expression<FloatingPointSort>, Expression<RoundingModeSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("thenFPSortRoundingModeSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<RoundingModeSort, FPSort>).then(
-    entry: Pair<Expression<FPSort>, Expression<RoundingModeSort>>
+infix fun (() -> ArrayStore<RoundingModeSort, FloatingPointSort>).then(
+    entry: Pair<Expression<FloatingPointSort>, Expression<RoundingModeSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("atFPSortRoundingModeSortLambdaIndex")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<FPSort>.at(index: (() -> Expression<RoundingModeSort>)) = this to index()
+infix fun Expression<FloatingPointSort>.at(index: (() -> Expression<RoundingModeSort>)) =
+    this to index()
 
 @JvmName("storeFPSortRoundingModeSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<RoundingModeSort, FPSort>>.store(
-    entry: (() -> Pair<Expression<FPSort>, Expression<RoundingModeSort>>)
+infix fun Expression<ArraySort<RoundingModeSort, FloatingPointSort>>.store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<RoundingModeSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("thenFPSortRoundingModeSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<RoundingModeSort, FPSort>.then(
-    entry: (() -> Pair<Expression<FPSort>, Expression<RoundingModeSort>>)
+infix fun ArrayStore<RoundingModeSort, FloatingPointSort>.then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<RoundingModeSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("atFPSortRoundingModeSortLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: (() -> Expression<RoundingModeSort>)) =
+infix fun (() -> Expression<FloatingPointSort>).at(index: (() -> Expression<RoundingModeSort>)) =
     this() to index()
 
 @JvmName("storeFPSortRoundingModeSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<RoundingModeSort, FPSort>>).store(
-    entry: (() -> Pair<Expression<FPSort>, Expression<RoundingModeSort>>)
+infix fun (() -> Expression<ArraySort<RoundingModeSort, FloatingPointSort>>).store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<RoundingModeSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("thenFPSortRoundingModeSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<RoundingModeSort, FPSort>).then(
-    entry: (() -> Pair<Expression<FPSort>, Expression<RoundingModeSort>>)
+infix fun (() -> ArrayStore<RoundingModeSort, FloatingPointSort>).then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<RoundingModeSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("atRoundingModeSortRoundingModeSort")
@@ -8923,72 +8986,73 @@ infix fun (() -> ArrayStore<BitVecSort, RegLanSort>).then(
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<FPSort>.at(index: Expression<BitVecSort>) = this to index
+infix fun Expression<FloatingPointSort>.at(index: Expression<BitVecSort>) = this to index
 
 @JvmName("storeFPSortBitVecSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<BitVecSort, FPSort>>.store(
-    entry: Pair<Expression<FPSort>, Expression<BitVecSort>>
+infix fun Expression<ArraySort<BitVecSort, FloatingPointSort>>.store(
+    entry: Pair<Expression<FloatingPointSort>, Expression<BitVecSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("thenFPSortBitVecSort")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<BitVecSort, FPSort>.then(
-    entry: Pair<Expression<FPSort>, Expression<BitVecSort>>
+infix fun ArrayStore<BitVecSort, FloatingPointSort>.then(
+    entry: Pair<Expression<FloatingPointSort>, Expression<BitVecSort>>
 ) = ArrayStore(this, entry.second, entry.first)
 
 @JvmName("atFPSortBitVecSortLambdaValue")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: Expression<BitVecSort>) = this() to index
+infix fun (() -> Expression<FloatingPointSort>).at(index: Expression<BitVecSort>) = this() to index
 
 @JvmName("storeFPSortBitVecSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<BitVecSort, FPSort>>).store(
-    entry: Pair<Expression<FPSort>, Expression<BitVecSort>>
+infix fun (() -> Expression<ArraySort<BitVecSort, FloatingPointSort>>).store(
+    entry: Pair<Expression<FloatingPointSort>, Expression<BitVecSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("thenFPSortBitVecSortLambdaArray")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<BitVecSort, FPSort>).then(
-    entry: Pair<Expression<FPSort>, Expression<BitVecSort>>
+infix fun (() -> ArrayStore<BitVecSort, FloatingPointSort>).then(
+    entry: Pair<Expression<FloatingPointSort>, Expression<BitVecSort>>
 ) = ArrayStore(this(), entry.second, entry.first)
 
 @JvmName("atFPSortBitVecSortLambdaIndex")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun Expression<FPSort>.at(index: (() -> Expression<BitVecSort>)) = this to index()
+infix fun Expression<FloatingPointSort>.at(index: (() -> Expression<BitVecSort>)) = this to index()
 
 @JvmName("storeFPSortBitVecSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun Expression<ArraySort<BitVecSort, FPSort>>.store(
-    entry: (() -> Pair<Expression<FPSort>, Expression<BitVecSort>>)
+infix fun Expression<ArraySort<BitVecSort, FloatingPointSort>>.store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<BitVecSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("thenFPSortBitVecSortLambdaEntry")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun ArrayStore<BitVecSort, FPSort>.then(
-    entry: (() -> Pair<Expression<FPSort>, Expression<BitVecSort>>)
+infix fun ArrayStore<BitVecSort, FloatingPointSort>.then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<BitVecSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this, second, first) }
 
 @JvmName("atFPSortBitVecSortLambda")
 /** Create a pair to store [this] at [index] in a smt array. */
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun (() -> Expression<FPSort>).at(index: (() -> Expression<BitVecSort>)) = this() to index()
+infix fun (() -> Expression<FloatingPointSort>).at(index: (() -> Expression<BitVecSort>)) =
+    this() to index()
 
 @JvmName("storeFPSortBitVecSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> Expression<ArraySort<BitVecSort, FPSort>>).store(
-    entry: (() -> Pair<Expression<FPSort>, Expression<BitVecSort>>)
+infix fun (() -> Expression<ArraySort<BitVecSort, FloatingPointSort>>).store(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<BitVecSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("thenFPSortBitVecSortLambda")
 /** Store [entry.first][Pair.first] at [entry.second][Pair.second] in [this]. */
-infix fun (() -> ArrayStore<BitVecSort, FPSort>).then(
-    entry: (() -> Pair<Expression<FPSort>, Expression<BitVecSort>>)
+infix fun (() -> ArrayStore<BitVecSort, FloatingPointSort>).then(
+    entry: (() -> Pair<Expression<FloatingPointSort>, Expression<BitVecSort>>)
 ) = entry().let { (first, second) -> ArrayStore(this(), second, first) }
 
 @JvmName("atRoundingModeSortBitVecSort")

@@ -189,8 +189,8 @@ data class DeclareSort(val name: Symbol, val arity: Int) : Declaration<UserDecla
 }
 
 /** SMT (define-sort [name] ([sortParameters]) [sort]) command. */
-data class DefineSort(val name: Symbol, var sortParameters: List<Symbol>, val sort: Sort) :
-    Declaration<UserDefinedUserDeclaredSort> {
+data class DefineSort<T : Sort>(val name: Symbol, var sortParameters: List<Symbol>, val sort: T) :
+    Declaration<T> {
 
   override val command = "define-sort"
 

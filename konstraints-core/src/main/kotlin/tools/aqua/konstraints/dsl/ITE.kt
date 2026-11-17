@@ -23,8 +23,8 @@ import java.math.BigInteger
 import kotlin.experimental.ExperimentalTypeInference
 import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.smt.Expression
-import tools.aqua.konstraints.smt.FPSort
 import tools.aqua.konstraints.smt.FloatingPointLiteral
+import tools.aqua.konstraints.smt.FloatingPointSort
 import tools.aqua.konstraints.smt.IntLiteral
 import tools.aqua.konstraints.smt.IntSort
 import tools.aqua.konstraints.smt.Ite
@@ -344,7 +344,7 @@ class FloatITE2(val condition: Expression<BoolSort>, val numeral: Float) {
    * - [numeral] is converted to [RealLiteral]
    */
   @JvmName("FloatOtherwiseFPSort")
-  infix fun otherwise(expr: Expression<FPSort>) =
+  infix fun otherwise(expr: Expression<FloatingPointSort>) =
       Ite(condition, FloatingPointLiteral(numeral), expr)
 
   /**
@@ -354,7 +354,7 @@ class FloatITE2(val condition: Expression<BoolSort>, val numeral: Float) {
   @JvmName("FloatOtherwiseFPSortLambda")
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
-  infix fun otherwise(expr: (() -> Expression<FPSort>)) =
+  infix fun otherwise(expr: (() -> Expression<FloatingPointSort>)) =
       Ite(condition, FloatingPointLiteral(numeral), expr())
 }
 
@@ -385,7 +385,7 @@ class DoubleITE2(val condition: Expression<BoolSort>, val numeral: Double) {
    * - [numeral] is converted to [RealLiteral]
    */
   @JvmName("FloatOtherwiseFPSort")
-  infix fun otherwise(expr: Expression<FPSort>) =
+  infix fun otherwise(expr: Expression<FloatingPointSort>) =
       Ite(condition, FloatingPointLiteral(numeral), expr)
 
   /**
@@ -395,7 +395,7 @@ class DoubleITE2(val condition: Expression<BoolSort>, val numeral: Double) {
   @JvmName("FloatOtherwiseFPSortLambda")
   @OptIn(ExperimentalTypeInference::class)
   @OverloadResolutionByLambdaReturnType
-  infix fun otherwise(expr: (() -> Expression<FPSort>)) =
+  infix fun otherwise(expr: (() -> Expression<FloatingPointSort>)) =
       Ite(condition, FloatingPointLiteral(numeral), expr())
 }
 
@@ -602,21 +602,23 @@ infix fun ITE2<RealSort>.otherwise(numeral: (() -> BigDecimal)) = otherwise(Real
 
 // Float extensions
 @JvmName("FloatingPointSortOtherwiseFloat")
-infix fun ITE2<FPSort>.otherwise(numeral: Float) = otherwise(FloatingPointLiteral(numeral))
+infix fun ITE2<FloatingPointSort>.otherwise(numeral: Float) =
+    otherwise(FloatingPointLiteral(numeral))
 
 @JvmName("FloatingPointSortOtherwiseDouble")
-infix fun ITE2<FPSort>.otherwise(numeral: Double) = otherwise(FloatingPointLiteral(numeral))
+infix fun ITE2<FloatingPointSort>.otherwise(numeral: Double) =
+    otherwise(FloatingPointLiteral(numeral))
 
 @JvmName("FloatingPointSortOtherwiseFloatLambda")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun ITE2<FPSort>.otherwise(numeral: (() -> Float)) =
+infix fun ITE2<FloatingPointSort>.otherwise(numeral: (() -> Float)) =
     otherwise(FloatingPointLiteral(numeral()))
 
 @JvmName("FloatingPointSortOtherwiseDoubleLambda")
 @OptIn(ExperimentalTypeInference::class)
 @OverloadResolutionByLambdaReturnType
-infix fun ITE2<FPSort>.otherwise(numeral: (() -> Double)) =
+infix fun ITE2<FloatingPointSort>.otherwise(numeral: (() -> Double)) =
     otherwise(FloatingPointLiteral(numeral()))
 
 // String extensions
