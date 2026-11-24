@@ -22,6 +22,7 @@ import java.util.UUID
 import tools.aqua.konstraints.smt.*
 import tools.aqua.konstraints.smt.BoolSort
 import tools.aqua.konstraints.solvers.Solver
+import tools.aqua.konstraints.solvers.SolverResult
 
 @DslMarker annotation class SMTDSL
 
@@ -35,7 +36,7 @@ class SMTProgramBuilder(logic: Logic) {
 
   /** Adds a new assertion: (assert [expr]). */
   fun assert(expr: Expression<BoolSort>) {
-    program.assert(expr)
+    program.addAssertion(expr)
   }
 
   /**
@@ -95,10 +96,10 @@ class SMTProgramBuilder(logic: Logic) {
       produceModel: Boolean,
       timeout: Long = 5000,
       block: PushContext.() -> Unit,
-  ): Pair<SatStatus, Model?> = program.push(solver, produceModel, timeout, block)
+  ): SolverResult = program.push(solver, produceModel, timeout, block)
 
   /** Solve the program using [solver] and return its sat status */
-  fun solve(solver: Solver, produceModel: Boolean, timeout: Long): Pair<SatStatus, Model?> {
+  fun solve(solver: Solver, produceModel: Boolean, timeout: Long): SolverResult {
     return solver.solve(program, produceModel, timeout)
   }
 

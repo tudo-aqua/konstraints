@@ -29,7 +29,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.dsl.*
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.solvers.InteractiveZ3Solver
+import tools.aqua.konstraints.solvers.Z3Solver
 import tools.aqua.konstraints.visitors.FreeVariables
 import tools.aqua.konstraints.visitors.RecursionPolicy
 
@@ -105,7 +105,7 @@ class TestModel {
             .map { assertion -> FreeVariables.of(assertion.expr, RecursionPolicy.RECURSIVE) }
             .reduce { a, b -> a + b }
 
-    val (status, model) = InteractiveZ3Solver().use { solver -> solver.solve(program, true, 5000) }
+    val (status, model) = Z3Solver().use { solver -> solver.solve(program, true, 5000) }
 
     assertNotNull(model)
     assert(freeVariables.all { expression -> model.getDefinitionOrNull(expression.func!!) != null })
@@ -122,7 +122,7 @@ class TestModel {
     val variable =
         program.commands.filterIsInstance<DeclareFun<*>>().single() as DeclareFun<BitVecSort>
 
-    val (status, model) = InteractiveZ3Solver().use { solver -> solver.solve(program, true, 5000) }
+    val (status, model) = Z3Solver().use { solver -> solver.solve(program, true, 5000) }
 
     assertNotNull(model)
 
@@ -140,9 +140,9 @@ class TestModel {
     // correct type automatically deduced
     val s = program.declareConst("s".toSymbol(), SMTFP32)
 
-    program.assert(Equals(s.instance, FloatingPointLiteral(4.25f)))
+    program.addAssertion(Equals(s.instance, FloatingPointLiteral(4.25f)))
 
-    val (status, model) = InteractiveZ3Solver().use { solver -> solver.solve(program, true, 5000) }
+    val (status, model) = Z3Solver().use { solver -> solver.solve(program, true, 5000) }
 
     assertNotNull(model)
 
@@ -161,9 +161,9 @@ class TestModel {
     // correct type automatically deduced
     val s = program.declareConst("s".toSymbol(), IntSort)
 
-    program.assert(Equals(s.instance, IntSub(IntLiteral(3), IntNeg(IntLiteral(5)))))
+    program.addAssertion(Equals(s.instance, IntSub(IntLiteral(3), IntNeg(IntLiteral(5)))))
 
-    val (status, model) = InteractiveZ3Solver().use { solver -> solver.solve(program, true, 5000) }
+    val (status, model) = Z3Solver().use { solver -> solver.solve(program, true, 5000) }
 
     assertNotNull(model)
 
@@ -180,9 +180,9 @@ class TestModel {
 
     val s = program.declareConst("s".toSymbol(), StringSort)
 
-    program.assert(Equals(s.instance, StrConcat(StringLiteral("foo"), StringLiteral("bar"))))
+    program.addAssertion(Equals(s.instance, StrConcat(StringLiteral("foo"), StringLiteral("bar"))))
 
-    val (status, model) = InteractiveZ3Solver().use { solver -> solver.solve(program, true, 5000) }
+    val (status, model) = Z3Solver().use { solver -> solver.solve(program, true, 5000) }
 
     assertNotNull(model)
 

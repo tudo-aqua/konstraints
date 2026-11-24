@@ -33,7 +33,7 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import tools.aqua.konstraints.parser.SMTScriptParser
 import tools.aqua.konstraints.smt.*
-import tools.aqua.konstraints.solvers.InteractiveZ3Solver
+import tools.aqua.konstraints.solvers.Z3Solver
 
 @Disabled
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
@@ -44,7 +44,7 @@ class SMTProgramTests {
   fun testModelGeneration(file: File) {
     val program =
         SMTScriptParser(file.bufferedReader().use(BufferedReader::readLines).joinToString("\n"))
-    val solver = InteractiveZ3Solver()
+    val solver = Z3Solver()
 
     assumeTrue((program.info(":status") as SymbolAttributeValue).symbol.toString() == "sat")
 

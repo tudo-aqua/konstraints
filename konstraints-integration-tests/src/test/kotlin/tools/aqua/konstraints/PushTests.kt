@@ -47,17 +47,17 @@ import tools.aqua.konstraints.smt.cast
 import tools.aqua.konstraints.smt.declareConst
 import tools.aqua.konstraints.smt.declareSort
 import tools.aqua.konstraints.smt.toSymbol
-import tools.aqua.konstraints.solvers.InteractiveCVC5Solver
-import tools.aqua.konstraints.solvers.InteractiveZ3Solver
+import tools.aqua.konstraints.solvers.CVC5Solver
+import tools.aqua.konstraints.solvers.Z3Solver
 
 class PushTests {
   private fun getSolver() =
       try {
-        InteractiveCVC5Solver()
+        CVC5Solver()
       } catch (e: IOException) {
         assumeTrue(false)
       }
-          as InteractiveCVC5Solver
+          as CVC5Solver
 
   @Test
   fun test() {
@@ -65,7 +65,7 @@ class PushTests {
     program.setLogic(QF_UFBV)
     val foo = program.declareConst("foo".toSymbol(), BitVecSort(8))
 
-    program.assert(Equals(foo(), BitVecLiteral(8, 8)))
+    program.addAssertion(Equals(foo(), BitVecLiteral(8, 8)))
 
     getSolver().use { solver ->
       solver.solve(program, true, 5000).let { (status, model) ->
@@ -76,9 +76,9 @@ class PushTests {
     }
 
     val (status, model) =
-        program.push(InteractiveZ3Solver(), true) {
+        program.push(Z3Solver(), true) {
           val bar = declareConst("bar".toSymbol(), BitVecSort(8))
-          assert(Equals(foo(), bar()))
+          addAssertion(Equals(foo(), bar()))
         }
 
     assertEquals(SatStatus.SAT, status)
@@ -104,7 +104,7 @@ class PushTests {
     val foo = program.declareConst("foo".toSymbol(), BitVecSort(8))
 
     // add base assertions
-    program.assert(Equals(foo(), BitVecLiteral(8, 8)))
+    program.addAssertion(Equals(foo(), BitVecLiteral(8, 8)))
 
     // push and solve
     val (status, model) =
@@ -116,8 +116,8 @@ class PushTests {
                 BVAdd(params[0].instance.cast(), params[1].instance.cast())
               }
 
-          assert(Equals(foo(), bar()))
-          assert(Equals(foo(), abc.constructDynamic(listOf(foo(), bar()), emptyList())))
+          addAssertion(Equals(foo(), bar()))
+          addAssertion(Equals(foo(), abc.constructDynamic(listOf(foo(), bar()), emptyList())))
         }
 
     assertEquals(SatStatus.UNSAT, status)
@@ -187,7 +187,7 @@ class PushTests {
     val obj0init = program.declareConst("__object_0.init", StringSort)
     val obj0err = program.declareConst("__object_0.err", StringSort)
 
-    program.assert(
+    program.addAssertion(
         Or(
             And(
                 obj0init eq "<>null|NULL",
@@ -247,14 +247,14 @@ class PushTests {
 
     // push 1: negated — error must be non-empty (SAT: case AssertionError)
     program
-        .push(getSolver(), true) { assert(not(obj0err eq "")) }
+        .push(getSolver(), true) { addAssertion(not(obj0err eq "")) }
         .let { (status, _) -> assertEquals(SatStatus.SAT, status) }
 
     // push 2: err="" AND obj not-null AND extends LB (SAT)
     program
         .push(getSolver(), true) {
-          assert(obj0err eq "")
-          assert(
+          addAssertion(obj0err eq "")
+          addAssertion(
               not(
                   not(
                       And(
@@ -274,14 +274,14 @@ class PushTests {
     // UNSAT: every class extending LB also extends LA in this hierarchy
     program
         .push(getSolver(), true) {
-          assert(obj0err eq "")
-          assert(
+          addAssertion(obj0err eq "")
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LB;")), emptyList()),
               )
           )
-          assert(
+          addAssertion(
               not(
                   And(
                       not(obj0 eq nullConst),
@@ -298,20 +298,20 @@ class PushTests {
     // push 4: err="" AND extends LB AND extends LA AND NOT extends LC (SAT: LB)
     program
         .push(getSolver(), true) {
-          assert(obj0err eq "")
-          assert(
+          addAssertion(obj0err eq "")
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LB;")), emptyList()),
               )
           )
-          assert(
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LA;")), emptyList()),
               )
           )
-          assert(
+          addAssertion(
               not(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
           )
         }
@@ -320,43 +320,43 @@ class PushTests {
     // push 5: same + assert obj=null (contradicts not-null) (UNSAT)
     program
         .push(getSolver(), true) {
-          assert(obj0err eq "")
-          assert(
+          addAssertion(obj0err eq "")
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LB;")), emptyList()),
               )
           )
-          assert(
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LA;")), emptyList()),
               )
           )
-          assert(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
-          assert(not(not(obj0 eq nullConst)))
+          addAssertion(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
+          addAssertion(not(not(obj0 eq nullConst)))
         }
         .let { (status, _) -> assertEquals(SatStatus.UNSAT, status) }
 
     // push 6: same + not-null + assert obj=null (UNSAT)
     program
         .push(getSolver(), true) {
-          assert(obj0err eq "")
-          assert(
+          addAssertion(obj0err eq "")
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LB;")), emptyList()),
               )
           )
-          assert(
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LA;")), emptyList()),
               )
           )
-          assert(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
-          assert(not(obj0 eq nullConst))
-          assert(not(not(obj0 eq nullConst)))
+          addAssertion(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
+          addAssertion(not(obj0 eq nullConst))
+          addAssertion(not(not(obj0 eq nullConst)))
         }
         .let { (status, _) -> assertEquals(SatStatus.UNSAT, status) }
 
@@ -364,23 +364,23 @@ class PushTests {
     // true)
     program
         .push(getSolver(), true) {
-          assert(obj0err eq "")
-          assert(
+          addAssertion(obj0err eq "")
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LB;")), emptyList()),
               )
           )
-          assert(
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LA;")), emptyList()),
               )
           )
-          assert(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
-          assert(not(obj0 eq nullConst))
-          assert(not(obj0 eq nullConst))
-          assert(
+          addAssertion(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
+          addAssertion(not(obj0 eq nullConst))
+          addAssertion(not(obj0 eq nullConst))
+          addAssertion(
               not(
                   objMethodOf.constructDynamic(
                       listOf(
@@ -399,23 +399,23 @@ class PushTests {
     // push 8: extends LC, not-null, method.of, x > 0 (SAT)
     program
         .push(getSolver(), true) {
-          assert(obj0err eq "")
-          assert(
+          addAssertion(obj0err eq "")
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LB;")), emptyList()),
               )
           )
-          assert(
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LA;")), emptyList()),
               )
           )
-          assert(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
-          assert(not(obj0 eq nullConst))
-          assert(not(obj0 eq nullConst))
-          assert(
+          addAssertion(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
+          addAssertion(not(obj0 eq nullConst))
+          addAssertion(not(obj0 eq nullConst))
+          addAssertion(
               objMethodOf.constructDynamic(
                   listOf(
                       obj0cls,
@@ -426,7 +426,7 @@ class PushTests {
                   emptyList(),
               )
           )
-          assert(not(obj0x bvsle 0.bitvec(32)))
+          addAssertion(not(obj0x bvsle 0.bitvec(32)))
         }
         .let { (status, _) -> assertEquals(SatStatus.SAT, status) }
   }
@@ -485,7 +485,7 @@ class PushTests {
     val obj0init = program.declareConst("__object_0.init", StringSort)
     val obj0err = program.declareConst("__object_0.err", StringSort)
 
-    program.assert(
+    program.addAssertion(
         Or(
             And(
                 obj0init eq "<>null|NULL",
@@ -545,14 +545,14 @@ class PushTests {
 
     // push 1: negated — error must be non-empty (SAT: case AssertionError)
     program
-        .push(getSolver(), true) { assert(not(obj0err eq "")) }
+        .push(getSolver(), true) { addAssertion(not(obj0err eq "")) }
         .let { (status, model) -> assertEquals(SatStatus.SAT, status) }
 
     // push 2: err="" AND obj not-null AND extends LB (SAT)
     program
         .push(getSolver(), false) {
-          assert(obj0err eq "")
-          assert(
+          addAssertion(obj0err eq "")
+          addAssertion(
               not(
                   not(
                       And(
@@ -572,14 +572,14 @@ class PushTests {
     // UNSAT: every class extending LB also extends LA in this hierarchy
     program
         .push(getSolver(), false) {
-          assert(obj0err eq "")
-          assert(
+          addAssertion(obj0err eq "")
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LB;")), emptyList()),
               )
           )
-          assert(
+          addAssertion(
               not(
                   And(
                       not(obj0 eq nullConst),
@@ -596,20 +596,20 @@ class PushTests {
     // push 4: err="" AND extends LB AND extends LA AND NOT extends LC (SAT: LB)
     program
         .push(getSolver(), false) {
-          assert(obj0err eq "")
-          assert(
+          addAssertion(obj0err eq "")
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LB;")), emptyList()),
               )
           )
-          assert(
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LA;")), emptyList()),
               )
           )
-          assert(
+          addAssertion(
               not(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
           )
         }
@@ -618,43 +618,43 @@ class PushTests {
     // push 5: same + assert obj=null (contradicts not-null) (UNSAT)
     program
         .push(getSolver(), false) {
-          assert(obj0err eq "")
-          assert(
+          addAssertion(obj0err eq "")
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LB;")), emptyList()),
               )
           )
-          assert(
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LA;")), emptyList()),
               )
           )
-          assert(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
-          assert(not(not(obj0 eq nullConst)))
+          addAssertion(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
+          addAssertion(not(not(obj0 eq nullConst)))
         }
         .let { (status, _) -> assertEquals(SatStatus.UNSAT, status) }
 
     // push 6: same + not-null + assert obj=null (UNSAT)
     program
         .push(getSolver(), false) {
-          assert(obj0err eq "")
-          assert(
+          addAssertion(obj0err eq "")
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LB;")), emptyList()),
               )
           )
-          assert(
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LA;")), emptyList()),
               )
           )
-          assert(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
-          assert(not(obj0 eq nullConst))
-          assert(not(not(obj0 eq nullConst)))
+          addAssertion(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
+          addAssertion(not(obj0 eq nullConst))
+          addAssertion(not(not(obj0 eq nullConst)))
         }
         .let { (status, _) -> assertEquals(SatStatus.UNSAT, status) }
 
@@ -662,23 +662,23 @@ class PushTests {
     // true)
     program
         .push(getSolver(), false) {
-          assert(obj0err eq "")
-          assert(
+          addAssertion(obj0err eq "")
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LB;")), emptyList()),
               )
           )
-          assert(
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LA;")), emptyList()),
               )
           )
-          assert(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
-          assert(not(obj0 eq nullConst))
-          assert(not(obj0 eq nullConst))
-          assert(
+          addAssertion(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
+          addAssertion(not(obj0 eq nullConst))
+          addAssertion(not(obj0 eq nullConst))
+          addAssertion(
               not(
                   objMethodOf.constructDynamic(
                       listOf(
@@ -697,23 +697,23 @@ class PushTests {
     // push 8: extends LC, not-null, method.of, x > 0 (SAT)
     program
         .push(getSolver(), false) {
-          assert(obj0err eq "")
-          assert(
+          addAssertion(obj0err eq "")
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LB;")), emptyList()),
               )
           )
-          assert(
+          addAssertion(
               And(
                   not(obj0 eq nullConst),
                   objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LA;")), emptyList()),
               )
           )
-          assert(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
-          assert(not(obj0 eq nullConst))
-          assert(not(obj0 eq nullConst))
-          assert(
+          addAssertion(objExtends.constructDynamic(listOf(obj0cls, StringLiteral("LC;")), emptyList()))
+          addAssertion(not(obj0 eq nullConst))
+          addAssertion(not(obj0 eq nullConst))
+          addAssertion(
               objMethodOf.constructDynamic(
                   listOf(
                       obj0cls,
@@ -724,7 +724,7 @@ class PushTests {
                   emptyList(),
               )
           )
-          assert(not(obj0x bvsle 0.bitvec(32)))
+          addAssertion(not(obj0x bvsle 0.bitvec(32)))
         }
         .let { (status, _) -> assertEquals(SatStatus.SAT, status) }
   }

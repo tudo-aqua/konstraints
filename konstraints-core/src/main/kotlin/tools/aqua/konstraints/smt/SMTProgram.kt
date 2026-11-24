@@ -27,6 +27,7 @@ import tools.aqua.konstraints.dsl.UserDefinedSMTFunction0
 import tools.aqua.konstraints.dsl.UserDefinedSMTFunctionN
 import tools.aqua.konstraints.solvers.Solver
 import tools.aqua.konstraints.solvers.Solver.Companion.getDefaultSolver
+import tools.aqua.konstraints.solvers.SolverResult
 import tools.aqua.konstraints.util.StackOperation
 import tools.aqua.konstraints.util.StackOperationType
 
@@ -57,10 +58,10 @@ enum class SatStatus {
  */
 interface PushContext {
   /** Add [assertion] to the assertion stack. */
-  fun assert(assertion: Assert)
+  fun addAssertion(assertion: Assert)
 
   /** Add (assert [expr]) to the assertion stack. */
-  fun assert(expr: Expression<BoolSort>)
+  fun addAssertion(expr: Expression<BoolSort>)
 
   /** Defines a function (define-fun [name] ([parameters]) [sort] [term]). */
   fun <T : Sort> defineFun(
@@ -217,7 +218,7 @@ abstract class SMTProgram(commands: List<Command>, val isDeep: Boolean = false) 
     return builder
   }
 
-  fun solve(produceModel: Boolean, timeout: Long = 5000): Pair<SatStatus, Model?> {
+  fun solve(produceModel: Boolean, timeout: Long = 5000): SolverResult {
     val solver = getDefaultSolver()
     return solver.solve(this, produceModel, timeout)
   }
@@ -283,7 +284,7 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
         }
       }
 
-  override fun assert(assertion: Assert) {
+  override fun addAssertion(assertion: Assert) {
     check(logic != null) { "Logic must be set before adding assertions!" }
 
     // check expr is in logic
@@ -446,7 +447,7 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
       produceModel: Boolean,
       timeout: Long = 5000,
       block: PushContext.() -> T,
-  ): Pair<SatStatus, Model?> {
+  ): SolverResult {
     push()
     this.block()
 
@@ -456,7 +457,7 @@ class MutableSMTProgram(commands: List<Command>, isDeep: Boolean = false) :
     return result
   }
 
-  override fun assert(expr: Expression<BoolSort>) = assert(Assert(expr))
+  override fun addAssertion(expr: Expression<BoolSort>) = addAssertion(Assert(expr))
 
   fun MutableSMTProgram.declareFun(name: Symbol, parameters: List<Sort>, sort: Sort) =
       if (parameters.isEmpty()) {

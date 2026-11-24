@@ -36,14 +36,14 @@ interface Solver : AutoCloseable {
               ?: when (priority) {
                 Solvers.Z3 ->
                     try {
-                      InteractiveZ3Solver()
+                      Z3Solver()
                       Solvers.Z3
                     } catch (_: Exception) {
                       null
                     }
                 Solvers.CVC5 ->
                     try {
-                      InteractiveCVC5Solver()
+                      CVC5Solver()
                       Solvers.Z3
                     } catch (_: Exception) {
                       null
@@ -53,8 +53,8 @@ interface Solver : AutoCloseable {
 
     fun getDefaultSolver(): Solver =
         when (defaultSolver) {
-          Solvers.Z3 -> InteractiveZ3Solver()
-          Solvers.CVC5 -> InteractiveCVC5Solver()
+          Solvers.Z3 -> Z3Solver()
+          Solvers.CVC5 -> CVC5Solver()
           null -> throw NoDefaultSolverAvailableException()
         }
   }
@@ -66,7 +66,7 @@ interface Solver : AutoCloseable {
    *
    * @throws TimeoutException if timeout is reached.
    */
-  fun solve(program: SMTProgram, produceModel: Boolean, timeout: Long): Pair<SatStatus, Model?>
+  fun solve(program: SMTProgram, produceModel: Boolean, timeout: Long): SolverResult
 }
 
 class NoDefaultSolverAvailableException :

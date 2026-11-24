@@ -51,9 +51,9 @@ import tools.aqua.konstraints.smt.SetLogic
 import tools.aqua.konstraints.smt.SetOption
 import tools.aqua.konstraints.visitors.CommandVisitor
 
-class InteractiveZ3Solver : InteractiveCLISolver("z3", "-in")
+class Z3Solver : InteractiveCLISolver("z3", "-in")
 
-class InteractiveCVC5Solver : InteractiveCLISolver("cvc5", "--interactive", "--incremental")
+class CVC5Solver : InteractiveCLISolver("cvc5", "--interactive", "--incremental")
 
 open class InteractiveCLISolver(
     val name: String,
@@ -98,7 +98,7 @@ open class InteractiveCLISolver(
       program: SMTProgram,
       produceModel: Boolean,
       timeout: Long,
-  ): Pair<SatStatus, Model?> {
+  ): SolverResult {
     // TODO if this solver was used before/is still open from a previous solve,
     // the old program is still in the solver and we need to call reset
 
@@ -113,7 +113,7 @@ open class InteractiveCLISolver(
       getModel()
     }
 
-    return status to model
+    return SolverResult(status, model)
   }
 
   private fun checkSat() {

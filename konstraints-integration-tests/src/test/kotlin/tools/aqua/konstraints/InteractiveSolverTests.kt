@@ -47,7 +47,7 @@ import tools.aqua.konstraints.smt.SatStatus
 import tools.aqua.konstraints.smt.SortedVar
 import tools.aqua.konstraints.smt.StringLiteral
 import tools.aqua.konstraints.smt.toSymbol
-import tools.aqua.konstraints.solvers.InteractiveZ3Solver
+import tools.aqua.konstraints.solvers.Z3Solver
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class InteractiveSolverTests {
@@ -57,12 +57,12 @@ class InteractiveSolverTests {
     val prg = SMTScriptParser(program)
     val solver =
         try {
-          InteractiveZ3Solver()
+          Z3Solver()
         } catch (e: IOException) {
           // auto skip test when z3 is not installed
           assumeTrue(false)
         }
-            as InteractiveZ3Solver
+            as Z3Solver
 
     val (status, model) = solver.use { solver.solve(prg, true, 5000) }
 

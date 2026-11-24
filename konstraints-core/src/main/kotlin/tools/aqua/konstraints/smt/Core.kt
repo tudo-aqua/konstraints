@@ -69,6 +69,7 @@ class Implies(val statements: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("=>".toSymbol(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
+    @SafeVarargs
   constructor(vararg statements: Expression<BoolSort>) : this(statements.toList())
 
   override val children: List<Expression<BoolSort>> = statements
@@ -86,6 +87,7 @@ class And(val conjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("and".toSymbol(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
+    @SafeVarargs
   constructor(vararg conjuncts: Expression<BoolSort>) : this(conjuncts.toList())
 
   override val children: List<Expression<BoolSort>> = conjuncts
@@ -103,6 +105,7 @@ class Or(val disjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("or".toSymbol(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
+    @SafeVarargs
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
 
   override val children: List<Expression<BoolSort>> = disjuncts
@@ -120,6 +123,7 @@ class XOr(val disjuncts: List<Expression<BoolSort>>) :
     HomogenousExpression<BoolSort, BoolSort>("xor".toSymbol(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
+    @SafeVarargs
   constructor(vararg disjuncts: Expression<BoolSort>) : this(disjuncts.toList())
 
   override val children: List<Expression<BoolSort>> = disjuncts
@@ -141,6 +145,7 @@ class Equals<T : Sort>(val statements: List<Expression<T>>) :
 
   override val theories = CORE_MARKER_SET
 
+    @SafeVarargs
   constructor(vararg statements: Expression<T>) : this(statements.toList())
 
   override val children: List<Expression<T>> = statements
@@ -158,6 +163,7 @@ class Distinct<T : Sort>(val statements: List<Expression<T>>) :
     HomogenousExpression<BoolSort, T>("distinct".toSymbol(), BoolSort) {
   override val theories = CORE_MARKER_SET
 
+    @SafeVarargs
   constructor(vararg statements: Expression<T>) : this(statements.toList())
 
   override val children: List<Expression<T>> = statements

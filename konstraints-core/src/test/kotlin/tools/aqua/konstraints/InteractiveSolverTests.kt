@@ -30,14 +30,14 @@ import tools.aqua.konstraints.smt.BitVecSort
 import tools.aqua.konstraints.smt.MutableSMTProgram
 import tools.aqua.konstraints.smt.QF_UFBV
 import tools.aqua.konstraints.smt.SatStatus
-import tools.aqua.konstraints.solvers.InteractiveZ3Solver
+import tools.aqua.konstraints.solvers.Z3Solver
 
 // these tests need a z3 version installed which is currently not present on the remote
 @Disabled
 class InteractiveSolverTests {
   @Test
   fun testZ3InteractiveSolver() {
-    val solver = InteractiveZ3Solver()
+    val solver = Z3Solver()
 
     val program =
         smt(QF_UFBV) {

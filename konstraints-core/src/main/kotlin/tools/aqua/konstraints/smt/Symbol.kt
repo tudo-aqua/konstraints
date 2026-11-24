@@ -34,6 +34,8 @@ internal constructor(
     val isQuoted: Boolean,
     val isSimple: Boolean = checkIsSimple(raw),
 ) : BaseSymbol {
+   constructor(raw: String) : this(raw, raw.startsWith('|') && raw.endsWith('|'))
+
   /**
    * Internal representation of the symbol without quotes, quoting will be reconstructed by
    * [toSMTString] before giving the symbol to a solver.
@@ -41,8 +43,6 @@ internal constructor(
   val value: String = raw.trim('|')
 
   companion object {
-    operator fun invoke(raw: String) = Symbol(raw, raw.startsWith('|') && raw.endsWith('|'))
-
     /**
      * @return true if [raw] is a simple symbol, false if [raw] is only valid as quoted symbol
      * @throws [IllegalSymbolException] if [raw] is not a legal symbol

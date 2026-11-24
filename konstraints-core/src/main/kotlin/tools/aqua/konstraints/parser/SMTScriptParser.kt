@@ -170,7 +170,7 @@ object SMTScriptParser {
   }
 
   internal fun parseAssert(lexer: PeekableIterator<Token>, program: MutableSMTProgram) {
-    program.assert(SMTParser.parseTerm(lexer to program).cast())
+    program.addAssertion(SMTParser.parseTerm(lexer to program).cast())
   }
 
   internal fun parseDeclareConst(lexer: PeekableIterator<Token>, program: MutableSMTProgram) {

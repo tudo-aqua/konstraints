@@ -37,7 +37,7 @@ import tools.aqua.konstraints.smt.Sort
 import tools.aqua.konstraints.smt.StringConstant
 import tools.aqua.konstraints.smt.StringOptionValue
 import tools.aqua.konstraints.smt.getFunc
-import tools.aqua.konstraints.solvers.InteractiveZ3Solver
+import tools.aqua.konstraints.solvers.Z3Solver
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ProgramDSLTests {
@@ -48,7 +48,7 @@ class ProgramDSLTests {
    * - test that assert has right expression
    * - test "in program" solving
    */
-  val solver = InteractiveZ3Solver()
+  val solver = Z3Solver()
 
   val program =
       smt(QF_UF) {

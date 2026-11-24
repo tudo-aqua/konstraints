@@ -42,17 +42,17 @@ import tools.aqua.konstraints.smt.SatStatus
 import tools.aqua.konstraints.smt.StringSort
 import tools.aqua.konstraints.smt.UFBV
 import tools.aqua.konstraints.smt.bitvec
-import tools.aqua.konstraints.solvers.InteractiveZ3Solver
+import tools.aqua.konstraints.solvers.Z3Solver
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class Examples {
   private fun getSolver() =
       try {
-        InteractiveZ3Solver()
+        Z3Solver()
       } catch (e: IOException) {
         assumeTrue(false)
       }
-          as InteractiveZ3Solver
+          as Z3Solver
 
   @Test
   fun simpleProgram() {
