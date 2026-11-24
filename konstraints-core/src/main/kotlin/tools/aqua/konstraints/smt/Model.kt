@@ -304,6 +304,16 @@ data class Model(val context: ModelContext, val definitions: Map<Symbol, Functio
     return term
   }
 
+  fun getConstant(func: SMTFunction<BoolSort>): BoolLiteral {
+    return getConstant(getDefinition(func).term)
+  }
+
+  fun getConstant(term: Expression<BoolSort>): BoolLiteral {
+    require(term is BoolLiteral)
+
+    return term
+  }
+
   @JvmName("getConstantValueBitVecSort")
   fun getConstantValue(func: SMTFunction<BitVecSort>) = getConstant(func).value
 
